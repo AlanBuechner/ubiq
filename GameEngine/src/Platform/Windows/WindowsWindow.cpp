@@ -180,4 +180,8 @@ namespace Engine {
 	{
 		return m_Data.VSync; // returns the v-sync state
 	}
+	inline void* WindowsWindow::GetNativeWindow() const
+	{
+		return m_Window;
+	}
 }

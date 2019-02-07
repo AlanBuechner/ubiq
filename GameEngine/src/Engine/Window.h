@@ -2,7 +2,7 @@
 
 #include "pch.h"
 
-#include "Engine/Core.h"
+#include "Engine/core.h"
 #include "Engine/Events/Event.h"
 
 namespace Engine {
