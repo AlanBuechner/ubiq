@@ -5,16 +5,22 @@ class ExampleLayer : public Engine::Layer
 public:
 	ExampleLayer()
 		: Layer("Example")
-	{}
+	{
+		
+	}
 
 	void OnUpdate() override
 	{
-		DEBUG_INFO("ExampleLayer::Update");
+		
 	}
 
 	void OnEvent(Engine::Event& event) override
 	{
-		DEBUG_TRACE("{0}", event);
+		if (event.GetEventType() == Engine::EventType::KeyPressed)
+		{
+			Engine::KeyPressedEvent& e = (Engine::KeyPressedEvent&)event;
+			DEBUG_TRACE("{0}", (char)e.GetKeyCode());
+		}
 	}
 };
 

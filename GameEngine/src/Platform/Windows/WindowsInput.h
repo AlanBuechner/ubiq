@@ -5,6 +5,12 @@
 
 namespace Engine
 {
+	class WindowsKeyCode : public KeyCode
+	{
+	protected:
+		virtual int GetKeyCodeImpl(char key) override;
+	};
+
 	class WindowsInput : public Input
 	{
 	protected:

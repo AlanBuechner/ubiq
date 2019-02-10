@@ -1,5 +1,6 @@
-workspace "GameEngine"
+workspace "KarmaEngine"
 	architecture "x64"
+	startproject "Sandbox"
 
 	configurations
 	{
@@ -8,14 +9,12 @@ workspace "GameEngine"
 		"Dist"
 	}
 
-startproject "Sandbox"
-
 outputdir = "%{cfg.buldcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
-IncludeDir["GLFW"] = "Engine/vendor/GLFW/include"
-IncludeDir["GLAD"] = "Engine/vendor/GLAD/include"
-IncludeDir["ImGui"] = "Engine/vendor/imgui"
+IncludeDir["GLFW"] = "GameEngine/vendor/GLFW/include"
+IncludeDir["GLAD"] = "GameEngine/vendor/GLAD/include"
+IncludeDir["ImGui"] = "GameEngine/vendor/imgui"
 
 include "GameEngine/vendor/GLFW"
 include "GameEngine/vendor/GLAD"
@@ -43,9 +42,9 @@ project "GameEngine"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{prj.name}/vendor/GLFW/include",
-		"%{prj.name}/vendor/GLAD/include",
-		"%{prj.name}/vendor/imgui",
+		--"%{prj.name}/vendor/GLFW/include",
+		--"%{prj.name}/vendor/GLAD/include",
+		--"%{prj.name}/vendor/imgui",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLAD}",
 		"%{IncludeDir.ImGui}"
@@ -72,7 +71,7 @@ project "GameEngine"
 
 		postbuildcommands
 		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+			("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
 		}
 
 	filter "configurations:Debug"

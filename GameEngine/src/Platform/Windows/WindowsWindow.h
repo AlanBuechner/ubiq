@@ -14,13 +14,13 @@ namespace Engine {
 
 		void OnUpdate() override; // updates the window
 
-		inline unsigned int GetWidth() const override { return m_Data.Width; } // get the width of the window
-		inline unsigned int GetHeight() const override { return m_Data.Height; } // get the hight of the window
+		inline virtual unsigned int GetWidth() const override { return m_Data.Width; } // get the width of the window
+		inline virtual unsigned int GetHeight() const override { return m_Data.Height; } // get the hight of the window
 
 		// Window attributes
-		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
-		void SetVSync(bool enabled) override; // enables v-sync
-		bool IsVSync() const override; // returns wither or not v-sync is enabled
+		inline virtual void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+		virtual void SetVSync(bool enabled) override; // enables v-sync
+		virtual bool IsVSync() const override; // returns wither or not v-sync is enabled
 
 		inline virtual void* GetNativeWindow() const;
 	private:

@@ -6,6 +6,16 @@
 
 namespace Engine
 {
+	KeyCode* KeyCode::s_Instance = new WindowsKeyCode();
+
+	int WindowsKeyCode::GetKeyCodeImpl(char Key)
+	{
+		return 0;
+	}
+}
+
+namespace Engine
+{
 
 	Input* Input::s_Instance = new WindowsInput();
 
