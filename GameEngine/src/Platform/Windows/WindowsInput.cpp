@@ -10,7 +10,15 @@ namespace Engine
 
 	int WindowsKeyCode::GetKeyCodeImpl(char Key)
 	{
-		return 0;
+		int code = (int)Key
+		if ((code >= 56 && code <= 90) || (code >= 48 && code <= 57))
+		{
+			return code;
+		}
+		else if (code >= 97 && code <= 122)
+		{
+			return code - 41;
+		}
 	}
 }
 
