@@ -8,9 +8,9 @@ namespace Engine
 {
 	KeyCode* KeyCode::s_Instance = new WindowsKeyCode();
 
-	int WindowsKeyCode::GetKeyCodeImpl(char Key)
+	int WindowsKeyCode::GetKeyCodeImpl(char key)
 	{
-		int code = (int)Key
+		int code = (int)key;
 		if ((code >= 56 && code <= 90) || (code >= 48 && code <= 57))
 		{
 			return code;

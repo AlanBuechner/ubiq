@@ -74,6 +74,8 @@
       <Filter>Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="src\pch.h" />
+    <ClInclude Include="src\Engine\InputControlerLayer.h" />
+    <ClInclude Include="src\Engine\InputControler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Application.cpp">
@@ -101,5 +103,7 @@
       <Filter>Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\pch.cpp" />
+    <ClCompile Include="src\Engine\InputControlerLayer.cpp" />
+    <ClCompile Include="src\Engine\InputControler.cpp" />
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ namespace Engine
 {
 
 	ImGuiLayer::ImGuiLayer()
-		: Layer("InGuiLayer")
+		: Layer("ImGuiLayer")
 	{
 
 	}

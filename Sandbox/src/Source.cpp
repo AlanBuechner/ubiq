@@ -31,11 +31,21 @@ public:
 	{
 		PushLayer(new ExampleLayer());
 		PushLayer(new Engine::ImGuiLayer());
+		PushLayer(new Engine::InputControlerLayer());
+
+		Engine::InputControler* input = new Engine::InputControler();
+
+		input->BindActionEvent(KEYCODE_A, Engine::EventType::KeyPressed, BIND(&Sandbox::thing));
 	}
 
 	~Sandbox()
 	{
 
+	}
+
+	void thing()
+	{
+		DEBUG_INFO("the A key was pressed");
 	}
 
 };
