@@ -41,7 +41,7 @@ namespace Engine
 		return &action->Key;
 	}
 
-	int * InputControler::BindAxisEvent(int key, EventType state, std::function<void(float)> func, float param)
+	int* InputControler::BindAxisEvent(int key, EventType state, std::function<void(float)> func, float param)
 	{
 		AxisEventData* action = new AxisEventData;
 		action->type = state;

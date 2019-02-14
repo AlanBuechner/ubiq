@@ -27,6 +27,7 @@ public:
 class Sandbox : public Engine::Application
 {
 public:
+
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
@@ -35,7 +36,8 @@ public:
 
 		Engine::InputControler* input = new Engine::InputControler();
 
-		input->BindActionEvent(KEYCODE_A, Engine::EventType::KeyPressed, BIND(&Sandbox::thing));
+		input->BindActionEvent(KEYCODE_A, Engine::EventType::KeyPressed, BIND_ACTION(&Sandbox::thing));
+		input->BindAxisEvent(KEYCODE_W, Engine::EventType::KeyPressed, BIND_AXIS(&Sandbox::thing2), 1.0f);
 	}
 
 	~Sandbox()
@@ -46,6 +48,11 @@ public:
 	void thing()
 	{
 		DEBUG_INFO("the A key was pressed");
+	}
+
+	void thing2(float i)
+	{
+		DEBUG_INFO("{0}", i);
 	}
 
 };

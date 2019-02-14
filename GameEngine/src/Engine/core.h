@@ -22,4 +22,5 @@
 #define BIT(x) (1 << x)
 
 #define BIND_EVENT_FN(x) std::bind(x, this, std::placeholders::_1)
-#define BIND(x) std::bind(x, this)
+#define BIND_ACTION(x) std::bind(x, this)
+#define BIND_AXIS(x, p) std::bind(x, this, std::placeholders::_1)

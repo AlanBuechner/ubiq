@@ -50,18 +50,20 @@ namespace Engine
 	bool InputControlerLayer::OnKeyPressedEvent(KeyPressedEvent & e)
 	{
 		EventType type = e.GetEventType();
-		for (auto i = begin(); i != end(); )
+		for (auto i = begin(); i != end(); i++)
 		{
-			(*(i++))->ActionEvent(e.GetKeyCode(), type);
+			(*i)->ActionEvent(e.GetKeyCode(), type);
+			(*i)->AxisEvent(e.GetKeyCode(), type);
 		}
 		return false;
 	}
 	bool InputControlerLayer::OnKeyRelesedEvent(KeyReleasedEvent & e)
 	{
 		EventType type = e.GetEventType();
-		for (auto i = begin(); i != end(); )
+		for (auto i = begin(); i != end(); i++)
 		{
-			(*(i++))->ActionEvent(e.GetKeyCode(), type);
+			(*i)->ActionEvent(e.GetKeyCode(), type);
+			(*i)->AxisEvent(e.GetKeyCode(), type);
 		}
 		return false;
 	}
@@ -71,6 +73,7 @@ namespace Engine
 		for (auto i = begin(); i != end(); i++)
 		{
 			(*i)->ActionEvent(e.GetKeyCode(), type);
+			(*i)->AxisEvent(e.GetKeyCode(), type);
 		}
 		return false;
 	}
