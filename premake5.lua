@@ -9,16 +9,17 @@ workspace "KarmaEngine"
 		"Dist"
 	}
 
-outputdir = "%{cfg.buldcfg}-%{cfg.system}-%{cfg.architecture}"
+outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to root folder (solution directory)
 IncludeDir = {}
 IncludeDir["GLFW"] = "GameEngine/vendor/GLFW/include"
-IncludeDir["GLAD"] = "GameEngine/vendor/GLAD/include"
+IncludeDir["Glad"] = "GameEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "GameEngine/vendor/imgui"
 IncludeDir["glm"] = "GameEngine/vendor/glm"
 
 include "GameEngine/vendor/GLFW"
-include "GameEngine/vendor/GLAD"
+include "GameEngine/vendor/Glad"
 include "GameEngine/vendor/imgui"
 
 project "GameEngine"
@@ -29,39 +30,38 @@ project "GameEngine"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-	
+
 	pchheader "pch.h"
 	pchsource "GameEngine/src/pch.cpp"
 
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl",
 	}
 
 	includedirs
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		--"%{prj.name}/vendor/GLFW/include",
-		--"%{prj.name}/vendor/GLAD/include",
-		--"%{prj.name}/vendor/imgui",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.GLAD}",
+		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}"
 	}
 
-	links
-	{
+	links 
+	{ 
 		"GLFW",
-		"GLAD",
+		"Glad",
+		"ImGui",
 		"opengl32.lib"
 	}
 
-	filter "system:windwos"
+	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -118,9 +118,8 @@ project "Sandbox"
 		"GameEngine"
 	}
 
-	filter "system:windwos"
+	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
