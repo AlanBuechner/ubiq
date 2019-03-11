@@ -45,7 +45,6 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		PushLayer(new Engine::InputControlerLayer());
 
 		Engine::InputControler* input = new Engine::InputControler();
 

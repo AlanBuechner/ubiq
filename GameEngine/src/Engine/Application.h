@@ -27,6 +27,8 @@ namespace Engine
 		inline Window& GetWindow() { return *m_Window;  }
 
 	private:
+		void GenLayerStack();
+
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> m_Window;

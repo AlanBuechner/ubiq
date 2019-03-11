@@ -3,6 +3,8 @@
 
 #include "Engine/Log.h"
 
+#include "InputControlerLayer.h"
+
 #include <glad/glad.h>
 
 namespace Engine {
@@ -18,9 +20,8 @@ namespace Engine {
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
-
-		m_ImGuiLayer = new ImGuiLayer();
-		PushOverlay(m_ImGuiLayer);
+		
+		GenLayerStack();
 	}
 
 	Application::~Application()
@@ -67,6 +68,13 @@ namespace Engine {
 
 			m_Window->OnUpdate();
 		}
+	}
+
+	void Application::GenLayerStack()
+	{
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer);
+		PushLayer(new InputControlerLayer());
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
