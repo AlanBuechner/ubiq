@@ -8,9 +8,9 @@ namespace Engine
 		InputControlerLayer::AddControler(this);
 	}
 
-	void InputControler::ActionEvent(int key, EventType state)
+	void InputControler::RaiseEvent(int key, EventType state)
 	{
-		for (auto i = actionEvents.begin(); i != actionEvents.end(); i++)
+		for (auto i = events.begin(); i != events.end(); i++)
 		{
 			if ((*i)->Key == key && (*i)->type == state)
 			{
@@ -19,38 +19,14 @@ namespace Engine
 		}
 	}
 
-	void InputControler::AxisEvent(int key, EventType state)
+	int* InputControler::BindEvent(int key, EventType state, std::function<void()> func)
 	{
-		for (auto i = axisEvents.begin(); i != axisEvents.end(); i++)
-		{
-			if ((*i)->Key == key && (*i)->type == state)
-			{
-				(*i)->function((*i)->param);
-			}
-		}
-	}
-
-	int* InputControler::BindActionEvent(int key, EventType state, std::function<void()> func)
-	{
-		ActionEventData* action = new ActionEventData;
+		EventData* action = new EventData;
 		action->type = state;
 		action->function = func;
 		action->Key = key;
 
-		actionEvents.push_back(action);
+		events.push_back(action);
 		return &action->Key;
 	}
-
-	int* InputControler::BindAxisEvent(int key, EventType state, std::function<void(float)> func, float param)
-	{
-		AxisEventData* action = new AxisEventData;
-		action->type = state;
-		action->function = func;
-		action->Key = key;
-		action->param = param;
-
-		axisEvents.push_back(action);
-		return &action->Key;
-	}
-
 }

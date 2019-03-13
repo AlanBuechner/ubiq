@@ -48,8 +48,8 @@ public:
 
 		Engine::InputControler* input = new Engine::InputControler();
 
-		input->BindActionEvent(KEYCODE_A, Engine::EventType::KeyPressed, BIND_ACTION(&Sandbox::thing));
-		input->BindAxisEvent(KEYCODE_W, Engine::EventType::KeyPressed, BIND_AXIS(&Sandbox::thing2), 1.0f);
+		input->BindEvent(KEYCODE_A, Engine::EventType::KeyPressed, BIND_ACTION(&Sandbox::thing));
+		input->BindEvent(KEYCODE_W, Engine::EventType::KeyPressed, BIND_AXIS(&Sandbox::thing2, 1.0f));
 	}
 
 	~Sandbox()

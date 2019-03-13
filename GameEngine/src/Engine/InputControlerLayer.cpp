@@ -52,8 +52,7 @@ namespace Engine
 		EventType type = e.GetEventType();
 		for (auto i = begin(); i != end(); i++)
 		{
-			(*i)->ActionEvent(e.GetKeyCode(), type);
-			(*i)->AxisEvent(e.GetKeyCode(), type);
+			(*i)->RaiseEvent(e.GetKeyCode(), type);
 		}
 		return false;
 	}
@@ -62,8 +61,7 @@ namespace Engine
 		EventType type = e.GetEventType();
 		for (auto i = begin(); i != end(); i++)
 		{
-			(*i)->ActionEvent(e.GetKeyCode(), type);
-			(*i)->AxisEvent(e.GetKeyCode(), type);
+			(*i)->RaiseEvent(e.GetKeyCode(), type);
 		}
 		return false;
 	}
@@ -72,8 +70,7 @@ namespace Engine
 		EventType type = e.GetEventType();
 		for (auto i = begin(); i != end(); i++)
 		{
-			(*i)->ActionEvent(e.GetKeyCode(), type);
-			(*i)->AxisEvent(e.GetKeyCode(), type);
+			(*i)->RaiseEvent(e.GetKeyCode(), type);
 		}
 		return false;
 	}
