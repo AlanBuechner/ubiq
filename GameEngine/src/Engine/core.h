@@ -1,5 +1,7 @@
 #pragma once
 
+#define ENABLE_ASSERTS
+
 #ifdef PLATFORM_WINDOWS
 	#ifdef BUILD_DLL
 		#define ENGINE_API __declspec(dllexport)
