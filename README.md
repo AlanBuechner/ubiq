@@ -1,2 +1,2 @@
-# Karma
-Karma Engine
+# UBIQ
+ubiq Engine

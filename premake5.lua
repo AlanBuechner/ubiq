@@ -1,4 +1,4 @@
-workspace "KarmaEngine"
+workspace "UbiqEngine"
 	architecture "x64"
 	startproject "Sandbox"
 
