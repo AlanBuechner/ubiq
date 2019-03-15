@@ -17,10 +17,14 @@ glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 class ExampleLayer : public Engine::Layer
 {
 public:
+
 	ExampleLayer()
 		: Layer("Example")
 	{
-		
+		Engine::InputControler* input = new Engine::InputControler(InputManeger);
+
+		input->BindEvent(KEYCODE_A, Engine::EventType::KeyPressed, BIND_ACTION(&ExampleLayer::thing));
+		input->BindEvent(KEYCODE_W, Engine::EventType::KeyPressed, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
 	}
 
 	void OnUpdate() override
@@ -30,11 +34,22 @@ public:
 
 	void OnEvent(Engine::Event& event) override
 	{
+		Engine::Layer::OnEvent(event);
 		if (event.GetEventType() == Engine::EventType::KeyPressed)
 		{
 			Engine::KeyPressedEvent& e = (Engine::KeyPressedEvent&)event;
 			DEBUG_TRACE("{0}", (char)e.GetKeyCode());
 		}
+	}
+
+	void thing()
+	{
+		DEBUG_INFO("the A key was pressed");
+	}
+
+	void thing2(float i)
+	{
+		DEBUG_INFO("{0}", i);
 	}
 };
 
@@ -46,25 +61,12 @@ public:
 	{
 		PushLayer(new ExampleLayer());
 
-		Engine::InputControler* input = new Engine::InputControler();
-
-		input->BindEvent(KEYCODE_A, Engine::EventType::KeyPressed, BIND_ACTION(&Sandbox::thing));
-		input->BindEvent(KEYCODE_W, Engine::EventType::KeyPressed, BIND_AXIS(&Sandbox::thing2, 1.0f));
+		
 	}
 
 	~Sandbox()
 	{
 
-	}
-
-	void thing()
-	{
-		DEBUG_INFO("the A key was pressed");
-	}
-
-	void thing2(float i)
-	{
-		DEBUG_INFO("{0}", i);
 	}
 
 };

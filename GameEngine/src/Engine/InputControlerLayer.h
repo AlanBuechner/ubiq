@@ -25,19 +25,7 @@ namespace Engine
 		void OnUpdate();
 		void OnEvent(Event& event);
 
-		static void AddControler(InputControler* controler);
-
 	private:
-
-		bool OnKeyPressedEvent(KeyPressedEvent& e);
-		bool OnKeyRelesedEvent(KeyReleasedEvent& e);
-		bool OnKeyTypedEvent(KeyTypedEvent& e);
-
-		std::vector<InputControler*> controlers;
-
-		std::vector<InputControler*>::iterator begin() { return controlers.begin(); }
-		std::vector<InputControler*>::iterator end() { return controlers.end(); }
-
 		static InputControlerLayer* s_Instance;
 	};
 }

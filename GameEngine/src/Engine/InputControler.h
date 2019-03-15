@@ -7,6 +7,8 @@
 #include "Events/KeyEvent.h"
 #include "Events/MouseEvent.h"
 
+#include "InputControlerManeger.h"
+
 namespace Engine
 {
 
@@ -21,7 +23,7 @@ namespace Engine
 	{
 	public:
 
-		InputControler();
+		InputControler(InputControlerManeger* maneger);
 
 		void RaiseEvent(int key, EventType state);
 

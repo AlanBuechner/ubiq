@@ -159,6 +159,8 @@
     <ClInclude Include="src\Engine\Input.h" />
     <ClInclude Include="src\Engine\InputControler.h" />
     <ClInclude Include="src\Engine\InputControlerLayer.h" />
+    <ClInclude Include="src\Engine\InputControlerManeger.h" />
+    <ClInclude Include="src\Engine\KeyCodes.h" />
     <ClInclude Include="src\Engine\Layer.h" />
     <ClInclude Include="src\Engine\LayerStack.h" />
     <ClInclude Include="src\Engine\Log.h" />
@@ -166,7 +168,6 @@
     <ClInclude Include="src\Engine\core.h" />
     <ClInclude Include="src\Engine\imGui\ImGuiLayer.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
-    <ClInclude Include="src\Platform\Windows\WindowsKeyCodes.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
@@ -534,8 +535,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Application.cpp" />
+    <ClCompile Include="src\Engine\Input.cpp" />
     <ClCompile Include="src\Engine\InputControler.cpp" />
     <ClCompile Include="src\Engine\InputControlerLayer.cpp" />
+    <ClCompile Include="src\Engine\InputControlerManeger.cpp" />
     <ClCompile Include="src\Engine\Layer.cpp" />
     <ClCompile Include="src\Engine\LayerStack.cpp" />
     <ClCompile Include="src\Engine\Log.cpp" />

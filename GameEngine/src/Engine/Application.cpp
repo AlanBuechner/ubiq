@@ -72,9 +72,9 @@ namespace Engine {
 
 	void Application::GenLayerStack()
 	{
+		PushLayer(new InputControlerLayer());
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
-		PushLayer(new InputControlerLayer());
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)

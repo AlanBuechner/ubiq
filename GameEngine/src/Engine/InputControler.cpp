@@ -3,9 +3,9 @@
 
 namespace Engine
 {
-	InputControler::InputControler()
+	InputControler::InputControler(InputControlerManeger* maneger)
 	{
-		InputControlerLayer::AddControler(this);
+		maneger->AddControler(this);
 	}
 
 	void InputControler::RaiseEvent(int key, EventType state)
