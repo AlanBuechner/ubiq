@@ -29,7 +29,8 @@ public:
 
 	void OnUpdate() override
 	{
-		
+
+		DEBUG_INFO("{0}", Engine::Input::GetKeyState(KEYCODE_F));
 	}
 
 	void OnEvent(Engine::Event& event) override

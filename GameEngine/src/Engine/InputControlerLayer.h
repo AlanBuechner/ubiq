@@ -25,7 +25,13 @@ namespace Engine
 		void OnUpdate();
 		void OnEvent(Event& event);
 
+		static void UpdateKeyState() { s_Instance->UpdateKeyStateImpl(); }
+
 	private:
+
+		void UpdateKeyStateImpl();
+
+		std::vector<int> ToUpdate;
 		static InputControlerLayer* s_Instance;
 	};
 }

@@ -67,6 +67,8 @@ namespace Engine {
 			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
+
+			InputControlerLayer::UpdateKeyState();
 		}
 	}
 

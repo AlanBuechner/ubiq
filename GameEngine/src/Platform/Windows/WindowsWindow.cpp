@@ -5,6 +5,7 @@
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/MouseEvent.h"
 #include "Engine/Events/KeyEvent.h"
+#include "Engine/Input.h"
 
 #include <glad/glad.h>
 
@@ -81,6 +82,8 @@ namespace Engine {
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
+
+			key = KeyCode::OglToUbiq(key);
 
 			switch (action) // determens the type of key event
 			{

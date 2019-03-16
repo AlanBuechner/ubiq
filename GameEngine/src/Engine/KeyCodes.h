@@ -1,5 +1,4 @@
 #pragma once
-#include <Windows.h>
 
 // mouse
 #define MOUSE_LBUTTON 0x01
@@ -107,31 +106,31 @@
 #define KEYCODE_PRINT_SCREEN 0x2C
 #define KEYCODE_PAUSE 0x13
 
-#define KEYCODE_F1 290
-#define KEYCODE_F2 291
-#define KEYCODE_F3 292
-#define KEYCODE_F4 293
-#define KEYCODE_F5 294
-#define KEYCODE_F6 295
-#define KEYCODE_F7 296
-#define KEYCODE_F8 297
-#define KEYCODE_F9 298
-#define KEYCODE_F10 299
-#define KEYCODE_F11 300
-#define KEYCODE_F12 301
-#define KEYCODE_F13 302
-#define KEYCODE_F14 303
-#define KEYCODE_F15 304
-#define KEYCODE_F16 305
-#define KEYCODE_F17 306
-#define KEYCODE_F18 307
-#define KEYCODE_F19 308
-#define KEYCODE_F20 309
-#define KEYCODE_F21 310
-#define KEYCODE_F22 311
-#define KEYCODE_F23 312
-#define KEYCODE_F24 313
-#define KEYCODE_F25 314
+#define KEYCODE_F1 0x70
+#define KEYCODE_F2 0x71
+#define KEYCODE_F3 0x72
+#define KEYCODE_F4 0x73
+#define KEYCODE_F5 0x74
+#define KEYCODE_F6 0x75
+#define KEYCODE_F7 0x76
+#define KEYCODE_F8 0x77
+#define KEYCODE_F9 0x78
+#define KEYCODE_F10 0x79
+#define KEYCODE_F11 0x7A
+#define KEYCODE_F12 0x7B
+#define KEYCODE_F13 0x7C
+#define KEYCODE_F14 0x7D
+#define KEYCODE_F15 0x7E
+#define KEYCODE_F16 0x7F
+#define KEYCODE_F17 0x80
+#define KEYCODE_F18 0x81
+#define KEYCODE_F19 0x82
+#define KEYCODE_F20 0x83
+#define KEYCODE_F21 0x84
+#define KEYCODE_F22 0x85
+#define KEYCODE_F23 0x86
+#define KEYCODE_F24 0x87
+#define KEYCODE_F25 0x88
 
 
 #define KEYCODE_SHIFT 0x10
