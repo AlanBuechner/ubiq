@@ -23,8 +23,8 @@ public:
 	{
 		Engine::InputControler* input = new Engine::InputControler(InputManeger);
 
-		input->BindEvent(KEYCODE_A, Engine::EventType::KeyPressed, BIND_ACTION(&ExampleLayer::thing));
-		input->BindEvent(KEYCODE_W, Engine::EventType::KeyPressed, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
+		input->BindEvent(KEYCODE_A, IE_PRESSED, BIND_ACTION(&ExampleLayer::thing));
+		input->BindEvent(KEYCODE_W, IE_RELEASED, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
 	}
 
 	void OnUpdate() override

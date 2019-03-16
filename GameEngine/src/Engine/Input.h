@@ -5,6 +5,10 @@
 #include <map>
 #include <string>
 
+#define IE_PRESSED Engine::EventType::KeyPressed
+#define IE_RELEASED Engine::EventType::KeyReleased
+#define IE_REPEAT  Engine::EventType::KeyTyped
+
 namespace Engine
 {
 	class ENGINE_API KeyCode
@@ -13,8 +17,8 @@ namespace Engine
 		KeyCode();
 
 		static int GetKeyCode(std::string key) { return s_Instance->GetKeyCodeImpl(key); }
-		static int OglToUbiq(int key) { return s_Instance->OglToUbiqImpl(key);; }
-		static int UbiqToOgl(int key) { return s_Instance->UbiqToOglImpl(key);; }
+		static int OglToUbiq(int key) { return s_Instance->OglToUbiqImpl(key); }
+		static int UbiqToOgl(int key) { return s_Instance->UbiqToOglImpl(key); }
 
 		enum
 		{
