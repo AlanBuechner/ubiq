@@ -14,7 +14,7 @@ namespace Engine
 
 namespace Engine
 {
-	class ENGINE_API InputControlerLayer : public Layer
+	class InputControlerLayer : public Layer
 	{
 	public:
 		InputControlerLayer();

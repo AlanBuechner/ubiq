@@ -21,16 +21,17 @@ public:
 	ExampleLayer()
 		: Layer("Example")
 	{
-		Engine::InputControler* input = new Engine::InputControler(InputManeger);
+		InputControler* input = new InputControler(InputManeger);
 
 		input->BindEvent(KEYCODE_A, IE_PRESSED, BIND_ACTION(&ExampleLayer::thing));
 		input->BindEvent(KEYCODE_W, IE_RELEASED, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
+
 	}
 
 	void OnUpdate() override
 	{
 
-		DEBUG_INFO("{0}", Engine::Input::GetKeyState(KEYCODE_F));
+		DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
 	}
 
 	void OnEvent(Engine::Event& event) override

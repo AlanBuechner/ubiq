@@ -1,8 +1,6 @@
 #pragma once
 
 #include "core.h"
-
-#include "InputControlerLayer.h"
 #include "Events/Event.h"
 #include "Events/KeyEvent.h"
 #include "Events/MouseEvent.h"
@@ -37,3 +35,5 @@ namespace Engine
 
 	};
 }
+
+typedef Engine::InputControler InputControler
