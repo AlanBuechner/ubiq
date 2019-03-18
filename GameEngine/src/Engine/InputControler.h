@@ -36,4 +36,4 @@ namespace Engine
 	};
 }
 
-typedef Engine::InputControler InputControler
+typedef Engine::InputControler InputControler;

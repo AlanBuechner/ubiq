@@ -28,10 +28,12 @@ namespace Engine
 
 	private:
 		void GenLayerStack();
+		void SendInputBuffer();
 
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> m_Window;
+		std::vector<Event*> inputBuffer;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;

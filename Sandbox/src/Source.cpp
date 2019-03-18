@@ -17,7 +17,7 @@ glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 class ExampleLayer : public Engine::Layer
 {
 public:
-
+	bool set = false;
 	ExampleLayer()
 		: Layer("Example")
 	{
@@ -30,8 +30,7 @@ public:
 
 	void OnUpdate() override
 	{
-
-		DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
+		//DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
 	}
 
 	void OnEvent(Engine::Event& event) override

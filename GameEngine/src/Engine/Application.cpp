@@ -4,6 +4,7 @@
 #include "Engine/Log.h"
 
 #include "InputControlerLayer.h"
+#include "Input.h"
 
 namespace Engine {
 
@@ -38,21 +39,16 @@ namespace Engine {
 
 	void Application::OnEvent(Event& e)
 	{
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
-
-		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
-		{
-			(*--it)->OnEvent(e);
-			if (e.Handled)
-				break;
-		}
+		inputBuffer.insert(inputBuffer.begin(), &e);
 	}
 
 	void Application::Run()
 	{
 		while (m_Running)
 		{
+			InputControlerLayer::UpdateKeyState();
+
+			SendInputBuffer();
 
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
@@ -63,8 +59,6 @@ namespace Engine {
 			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
-
-			InputControlerLayer::UpdateKeyState();
 		}
 	}
 
@@ -73,6 +67,27 @@ namespace Engine {
 		PushLayer(new InputControlerLayer());
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
+	}
+
+	void Application::SendInputBuffer()
+	{
+		if (inputBuffer.empty()) return;
+
+		for (auto i = inputBuffer.end(); i != inputBuffer.begin();)
+		{
+			Event& e = *(*--i);
+			EventDispatcher dispatcher(e);
+			dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+
+			for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+			{
+				(*--it)->OnEvent(e);
+				if (e.Handled)
+					break;
+			}
+			delete *i;
+		}
+		inputBuffer.clear();
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)

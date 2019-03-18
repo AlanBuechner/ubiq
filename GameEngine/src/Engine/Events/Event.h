@@ -35,6 +35,7 @@ namespace Engine {
 	class ENGINE_API Event
 	{
 	public:
+		Event() {}
 		bool Handled = false; // if the event has been handeld
 
 		virtual EventType GetEventType() const = 0;

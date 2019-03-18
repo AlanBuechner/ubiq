@@ -66,16 +66,16 @@ namespace Engine {
 			data.Width = width; // sets new width
 			data.Height = height; // sets new hight
 
-			WindowResizeEvent event(width, height); // creates new resize event
-			data.EventCallback(event); //
+			WindowResizeEvent* event = new WindowResizeEvent(width, height); // creates new resize event
+			data.EventCallback(*event); //
 		});
 
 		// set close event
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
-			WindowCloseEvent event; // creats new close event
-			data.EventCallback(event);
+			WindowCloseEvent* event = new WindowCloseEvent(); // creats new close event
+			data.EventCallback(*event);
 		});
 
 		// set key events
@@ -89,20 +89,20 @@ namespace Engine {
 			{
 			case GLFW_PRESS: // press event
 			{
-				KeyPressedEvent event(key, 0); // creats new key pressed event
-				data.EventCallback(event);
+				KeyPressedEvent* event = new KeyPressedEvent(key, 0); // creats new key pressed event
+				data.EventCallback(*event);
 				break;
 			}
 			case GLFW_RELEASE: // release event
 			{
-				KeyReleasedEvent event(key); // creates new key release event
-				data.EventCallback(event);
+				KeyReleasedEvent* event = new KeyReleasedEvent(key); // creates new key release event
+				data.EventCallback(*event);
 				break;
 			}
 			case GLFW_REPEAT: // repeat event
 			{
-				KeyPressedEvent event(key, 1); // creates new key repeat event
-				data.EventCallback(event);
+				KeyPressedEvent* event = new KeyPressedEvent(key, 1); // creates new key repeat event
+				data.EventCallback(*event);
 				break;
 			}
 			}
@@ -113,8 +113,8 @@ namespace Engine {
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
 
-			KeyTypedEvent event(keycode); // creates new key typed event
-			data.EventCallback(event);
+			KeyTypedEvent* event = new KeyTypedEvent(keycode); // creates new key typed event
+			data.EventCallback(*event);
 		});
 
 		// set mouse button event
@@ -126,14 +126,14 @@ namespace Engine {
 			{
 			case GLFW_PRESS: // press event
 			{
-				MouseButtonPressedEvent event(button); // creates new mouse button pressed event
-				data.EventCallback(event);
+				MouseButtonPressedEvent* event = new MouseButtonPressedEvent(button); // creates new mouse button pressed event
+				data.EventCallback(*event);
 				break;
 			}
 			case GLFW_RELEASE: // release event
 			{
-				MouseButtonReleasedEvent event(button); // creates new mouse button release event
-				data.EventCallback(event);
+				MouseButtonReleasedEvent* event = new MouseButtonReleasedEvent(button); // creates new mouse button release event
+				data.EventCallback(*event);
 				break;
 			}
 			}
@@ -144,8 +144,8 @@ namespace Engine {
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
 
-			MouseScrolledEvent event((float)xOffset, (float)yOffset); // creates new mouse scrolled event
-			data.EventCallback(event);
+			MouseScrolledEvent* event = new MouseScrolledEvent((float)xOffset, (float)yOffset); // creates new mouse scrolled event
+			data.EventCallback(*event);
 		});
 
 		// set mouse moved event
@@ -153,8 +153,8 @@ namespace Engine {
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
 
-			MouseMovedEvent event((float)xPos, (float)yPos); // creates new mouse moved event
-			data.EventCallback(event);
+			MouseMovedEvent* event = new MouseMovedEvent((float)xPos, (float)yPos); // creates new mouse moved event
+			data.EventCallback(*event);
 		});
 	}
 

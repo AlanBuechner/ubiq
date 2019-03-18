@@ -3,6 +3,7 @@
 #include "InputControlerLayer.h"
 #include "InputControler.h"
 #include "Input.h"
+#include "Log.h"
 
 namespace Engine
 {
@@ -41,22 +42,24 @@ namespace Engine
 		if (type == EventType::KeyPressed || type == EventType::KeyReleased)
 		{
 			auto event = (KeyPressedEvent&)e;
-			Input::SetKeyState(event.GetKeyCode(), (Input::KeyState)type);
-			ToUpdate.push_back(event.GetKeyCode());
+			int key = event.GetKeyCode();
+			Input::SetKeyState(key, (Input::KeyState)type);
+			ToUpdate.push_back(key);
 		}
 	}
+
 	void InputControlerLayer::UpdateKeyStateImpl()
 	{
-		for (auto i = ToUpdate.begin(); i != ToUpdate.end(); i++)
+		for (int i : ToUpdate)
 		{
-			int state = Input::GetKeyState(*i);
+			int state = Input::GetKeyState(i);
 			if (state == Input::KeyPressed)
 			{
-				Input::SetKeyState(*i, Input::KeyDown);
+				Input::SetKeyState(i, Input::KeyDown);
 			}
 			else if (state == Input::KeyReleased)
 			{
-				Input::SetKeyState(*i, Input::KeyUp);
+				Input::SetKeyState(i, Input::KeyUp);
 			}
 		}
 		ToUpdate.clear();
