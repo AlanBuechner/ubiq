@@ -30,7 +30,7 @@ public:
 
 	void OnUpdate() override
 	{
-		//DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
+		DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
 	}
 
 	void OnEvent(Engine::Event& event) override

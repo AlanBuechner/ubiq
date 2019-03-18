@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Input.h"
+#include "InputControlerLayer.h"
 #include <GLFW/glfw3.h>
 
 namespace Engine
@@ -70,4 +71,9 @@ namespace Engine
 			oglToUbiq[i] = i-178;
 		}
 	}
+	inline Input::KeyState Input::GetKeyState(int keycode) { return InputControlerLayer::GetKeyState(keycode); }
+	inline bool Input::GetKeyDown(int keycode) { return InputControlerLayer::GetKeyDown(keycode); }
+	inline bool Input::GetKeyUp(int keycode) { return InputControlerLayer::GetKeyUp(keycode); }
+	inline bool Input::GetKeyPressed(int keycode) { return InputControlerLayer::GetKeyPressed(keycode); }
+	inline bool Input::GetKeyReleased(int keycode) { return InputControlerLayer::GetKeyReleased(keycode); }
 }

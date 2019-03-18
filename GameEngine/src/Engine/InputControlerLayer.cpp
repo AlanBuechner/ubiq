@@ -2,7 +2,6 @@
 
 #include "InputControlerLayer.h"
 #include "InputControler.h"
-#include "Input.h"
 #include "Log.h"
 
 namespace Engine
@@ -43,7 +42,7 @@ namespace Engine
 		{
 			auto event = (KeyPressedEvent&)e;
 			int key = event.GetKeyCode();
-			Input::SetKeyState(key, (Input::KeyState)type);
+			SetKeyState(key, (Input::KeyState)type);
 			ToUpdate.push_back(key);
 		}
 	}
@@ -52,14 +51,14 @@ namespace Engine
 	{
 		for (int i : ToUpdate)
 		{
-			int state = Input::GetKeyState(i);
+			int state = GetKeyState(i);
 			if (state == Input::KeyPressed)
 			{
-				Input::SetKeyState(i, Input::KeyDown);
+				SetKeyState(i, Input::KeyDown);
 			}
 			else if (state == Input::KeyReleased)
 			{
-				Input::SetKeyState(i, Input::KeyUp);
+				SetKeyState(i, Input::KeyUp);
 			}
 		}
 		ToUpdate.clear();

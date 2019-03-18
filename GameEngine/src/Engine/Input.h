@@ -191,13 +191,11 @@ namespace Engine
 			KeyReleased = EventType::KeyReleased
 		};
 
-		static void SetKeyState(int keycode, KeyState state) { s_Instance->KeyStates[keycode] = state; }
-
-		inline static KeyState GetKeyState(int keycode) { return s_Instance->GetKeyStateImpl(keycode); }
-		inline static bool GetKeyDown(int keycode) { return s_Instance->GetKeyDownImpl(keycode); }
-		inline static bool GetKeyUp(int keycode) { return s_Instance->GetKeyUpImpl(keycode); }
-		inline static bool GetKeyPressed(int keycode) { return s_Instance->GetKeyPressedImpl(keycode); }
-		inline static bool GetKeyReleased(int keycode) { return s_Instance->GetKeyReleasedImpl(keycode); }
+		inline static KeyState GetKeyState(int keycode);
+		inline static bool GetKeyDown(int keycode);
+		inline static bool GetKeyUp(int keycode);
+		inline static bool GetKeyPressed(int keycode);
+		inline static bool GetKeyReleased(int keycode);
 
 		inline static bool IsMouseButtonPressed(int button) { return s_Instance->IsMouseButtonPressedImpl(button); }
 		inline static std::pair<float, float> GetMousePosition() { return s_Instance->GetMousePositionImpl(); }
@@ -205,17 +203,10 @@ namespace Engine
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
 	protected:
-		virtual KeyState GetKeyStateImpl(int keycode) { return KeyStates[keycode]; };
-		virtual bool GetKeyDownImpl(int keycode) { return (GetKeyStateImpl(keycode) == KeyState::KeyDown); }
-		virtual bool GetKeyUpImpl(int keycode) { return (GetKeyStateImpl(keycode) == KeyState::KeyUp); }
-		virtual bool GetKeyPressedImpl(int keycode) { return (GetKeyStateImpl(keycode) == KeyState::KeyPressed); }
-		virtual bool GetKeyReleasedImpl(int keycode) { return (GetKeyStateImpl(keycode) == KeyState::KeyReleased); }
 		virtual bool IsMouseButtonPressedImpl(int button) = 0;
 		virtual std::pair<float, float> GetMousePositionImpl() = 0;
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
-
-		std::map<int, KeyState> KeyStates;
 
 	private:
 		static Input* s_Instance;
