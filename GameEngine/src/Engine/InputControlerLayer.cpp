@@ -41,6 +41,7 @@ namespace Engine
 		if (type == EventType::KeyPressed || type == EventType::KeyReleased)
 		{
 			auto event = (KeyPressedEvent&)e;
+			if (event.GetRepeatCount() == 1) return;
 			int key = event.GetKeyCode();
 			SetKeyState(key, (Input::KeyState)type);
 			ToUpdate.push_back(key);
