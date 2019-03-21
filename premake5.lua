@@ -16,7 +16,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "GameEngine/vendor/GLFW/include"
 IncludeDir["Glad"] = "GameEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "GameEngine/vendor/imgui"
-IncludeDir["glm"] = "GameEngine/vendor/glm"
+IncludeDir["glm"] = "GameEngine/vendor/Glm"
 
 include "GameEngine/vendor/GLFW"
 include "GameEngine/vendor/Glad"
@@ -38,8 +38,8 @@ project "GameEngine"
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
-		"%{prj.name}/vendor/glm/glm/**.hpp",
-		"%{prj.name}/vendor/glm/glm/**.inl",
+		"%{prj.name}/vendor/Glm/glm/**.hpp",
+		"%{prj.name}/vendor/Glm/glm/**.inl",
 	}
 
 	includedirs

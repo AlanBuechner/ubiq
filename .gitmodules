@@ -1,0 +1,3 @@
+[submodule "GameEngine/vendor/Glm"]
+	path = GameEngine/vendor/Glm
+	url = https://github.com/AlanBuechner/glm

@@ -300,6 +300,12 @@
     <ClInclude Include="vendor\glm\glm\ext\matrix_clip_space.inl">
       <Filter>vendor\glm\glm\ext</Filter>
     </ClInclude>
+    <ClInclude Include="vendor\glm\glm\ext\matrix_common.hpp">
+      <Filter>vendor\glm\glm\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\glm\glm\ext\matrix_common.inl">
+      <Filter>vendor\glm\glm\ext</Filter>
+    </ClInclude>
     <ClInclude Include="vendor\glm\glm\ext\matrix_double2x2.hpp">
       <Filter>vendor\glm\glm\ext</Filter>
     </ClInclude>

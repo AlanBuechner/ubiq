@@ -235,6 +235,8 @@
     <ClInclude Include="vendor\glm\glm\ext.hpp" />
     <ClInclude Include="vendor\glm\glm\ext\matrix_clip_space.hpp" />
     <ClInclude Include="vendor\glm\glm\ext\matrix_clip_space.inl" />
+    <ClInclude Include="vendor\glm\glm\ext\matrix_common.hpp" />
+    <ClInclude Include="vendor\glm\glm\ext\matrix_common.inl" />
     <ClInclude Include="vendor\glm\glm\ext\matrix_double2x2.hpp" />
     <ClInclude Include="vendor\glm\glm\ext\matrix_double2x2_precision.hpp" />
     <ClInclude Include="vendor\glm\glm\ext\matrix_double2x3.hpp" />
