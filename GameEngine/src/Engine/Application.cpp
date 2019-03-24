@@ -3,12 +3,12 @@
 
 #include "Engine/Log.h"
 
-#include "InputControlerLayer.h"
 #include "Input.h"
 
 namespace Engine {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+#define BIND_EVENT_FN_EXTERN(x, p) std::bind(x, p, std::placeholders::_1)
 
 	Application* Application::s_Instance = nullptr;
 
@@ -46,7 +46,7 @@ namespace Engine {
 	{
 		while (m_Running)
 		{
-			InputControlerLayer::UpdateKeyState();
+			Input::UpdateKeyState();
 
 			SendInputBuffer();
 
@@ -64,7 +64,6 @@ namespace Engine {
 
 	void Application::GenLayerStack()
 	{
-		PushLayer(new InputControlerLayer());
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 	}
@@ -78,6 +77,8 @@ namespace Engine {
 			Event& e = *(*--i);
 			EventDispatcher dispatcher(e);
 			dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+			dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnKeyPressed, Input::s_Instance));
+			dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnKeyReleased, Input::s_Instance));
 
 			for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 			{

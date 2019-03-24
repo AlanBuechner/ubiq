@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Input.h"
-#include "InputControlerLayer.h"
 #include <GLFW/glfw3.h>
 
 namespace Engine
@@ -71,9 +70,44 @@ namespace Engine
 			oglToUbiq[i] = i-178;
 		}
 	}
-	inline Input::KeyState Input::GetKeyState(int keycode) { return InputControlerLayer::GetKeyState(keycode); }
-	inline bool Input::GetKeyDown(int keycode) { return InputControlerLayer::GetKeyDown(keycode); }
-	inline bool Input::GetKeyUp(int keycode) { return InputControlerLayer::GetKeyUp(keycode); }
-	inline bool Input::GetKeyPressed(int keycode) { return InputControlerLayer::GetKeyPressed(keycode); }
-	inline bool Input::GetKeyReleased(int keycode) { return InputControlerLayer::GetKeyReleased(keycode); }
+
+	inline Input::KeyState Input::GetKeyStateImpl(int keycode) { return KeyStates[keycode]; }
+	inline bool Input::GetKeyDown(int keycode) { return (GetKeyState(keycode) == Input::KeyDown); }
+	inline bool Input::GetKeyUp(int keycode) { return (GetKeyState(keycode) == Input::KeyUp); }
+	inline bool Input::GetKeyPressed(int keycode) { return (GetKeyState(keycode) == Input::KeyPressed); }
+	inline bool Input::GetKeyReleased(int keycode) { return (GetKeyState(keycode) == Input::KeyReleased); }
+
+	inline bool Input::OnKeyPressed(KeyPressedEvent& e) 
+	{ 
+		if (e.GetRepeatCount() == 1) return false;
+		int keycode = e.GetKeyCode();
+		SetKeyState(keycode, KeyPressed); 
+		ToUpdate.push_back(keycode);
+		return false; 
+	}
+
+	inline bool Input::OnKeyReleased(KeyReleasedEvent& e) 
+	{ 
+		int keycode = e.GetKeyCode();
+		SetKeyState(keycode, KeyReleased); 
+		ToUpdate.push_back(keycode);
+		return false; 
+	}
+
+	void Input::UpdateKeyStateImpl()
+	{
+		for (int i : ToUpdate)
+		{
+			int state = GetKeyState(i);
+			if (state == Input::KeyPressed)
+			{
+				SetKeyState(i, Input::KeyDown);
+			}
+			else if (state == Input::KeyReleased)
+			{
+				SetKeyState(i, Input::KeyUp);
+			}
+		}
+		ToUpdate.clear();
+	}
 }

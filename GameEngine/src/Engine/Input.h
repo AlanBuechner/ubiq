@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include "Events/Event.h"
+#include "Application.h"
 
 #define IE_PRESSED (Engine::EventType)Engine::Input::KeyPressed
 #define IE_RELEASED (Engine::EventType)Engine::Input::KeyReleased
@@ -182,6 +183,7 @@ namespace Engine
 
 	class ENGINE_API Input
 	{
+		friend Application;
 	public:
 		enum KeyState
 		{
@@ -191,7 +193,7 @@ namespace Engine
 			KeyReleased = EventType::KeyReleased
 		};
 
-		inline static KeyState GetKeyState(int keycode);
+		inline static KeyState GetKeyState(int keycode) { return s_Instance->GetKeyStateImpl(keycode); }
 		inline static bool GetKeyDown(int keycode);
 		inline static bool GetKeyUp(int keycode);
 		inline static bool GetKeyPressed(int keycode);
@@ -203,13 +205,24 @@ namespace Engine
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
 	protected:
+		inline KeyState GetKeyStateImpl(int keycode);
 		virtual bool IsMouseButtonPressedImpl(int button) = 0;
 		virtual std::pair<float, float> GetMousePositionImpl() = 0;
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
 
+		void SetKeyState(int key, KeyState state) { KeyStates[key] = state; }
+		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnKeyReleased(KeyReleasedEvent& e);
+		static void UpdateKeyState() { s_Instance->UpdateKeyStateImpl(); }
+		void UpdateKeyStateImpl();
+
 	private:
 		static Input* s_Instance;
+
+		std::map<int, KeyState> KeyStates;
+
+		std::vector<int> ToUpdate;
 
 	};
 }

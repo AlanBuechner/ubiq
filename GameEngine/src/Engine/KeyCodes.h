@@ -5,7 +5,7 @@
 #define MOUSE_RBUTTON 0x02
 #define MOUSE_MBUTTON 0x04
 #define MOUSE_XBUTTON1 0x05
-#define MOUSE_XBUTTON1 0x06
+#define MOUSE_XBUTTON2 0x06
 
 // keyboard 
 #define KEYCODE_UNKNOWN -1

@@ -69,9 +69,6 @@
     <ClInclude Include="src\Engine\InputControler.h">
       <Filter>src\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\InputControlerLayer.h">
-      <Filter>src\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\InputControlerManeger.h">
       <Filter>src\Engine</Filter>
     </ClInclude>
@@ -1206,9 +1203,6 @@
       <Filter>src\Engine</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\InputControler.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\InputControlerLayer.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\InputControlerManeger.cpp">

@@ -158,7 +158,6 @@
     <ClInclude Include="src\Engine\Events\MouseEvent.h" />
     <ClInclude Include="src\Engine\Input.h" />
     <ClInclude Include="src\Engine\InputControler.h" />
-    <ClInclude Include="src\Engine\InputControlerLayer.h" />
     <ClInclude Include="src\Engine\InputControlerManeger.h" />
     <ClInclude Include="src\Engine\KeyCodes.h" />
     <ClInclude Include="src\Engine\Layer.h" />
@@ -539,7 +538,6 @@
     <ClCompile Include="src\Engine\Application.cpp" />
     <ClCompile Include="src\Engine\Input.cpp" />
     <ClCompile Include="src\Engine\InputControler.cpp" />
-    <ClCompile Include="src\Engine\InputControlerLayer.cpp" />
     <ClCompile Include="src\Engine\InputControlerManeger.cpp" />
     <ClCompile Include="src\Engine\Layer.cpp" />
     <ClCompile Include="src\Engine\LayerStack.cpp" />
