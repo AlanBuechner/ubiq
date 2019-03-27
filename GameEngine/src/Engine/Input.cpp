@@ -76,10 +76,16 @@ namespace Engine
 	}
 
 	inline Input::KeyState Input::GetKeyStateImpl(int keycode) { return KeyStates[keycode]; }
-	inline bool Input::GetKeyDown(int keycode) { return (GetKeyState(keycode) == Input::KeyDown); }
-	inline bool Input::GetKeyUp(int keycode) { return (GetKeyState(keycode) == Input::KeyUp); }
+	inline bool Input::GetKeyDown(int keycode) { return (GetKeyState(keycode) == Input::Down); }
+	inline bool Input::GetKeyUp(int keycode) { return (GetKeyState(keycode) == Input::Up); }
 	inline bool Input::GetKeyPressed(int keycode) { return (GetKeyState(keycode) == Input::KeyPressed); }
 	inline bool Input::GetKeyReleased(int keycode) { return (GetKeyState(keycode) == Input::KeyReleased); }
+
+	inline Input::KeyState Input::GetMouseButtonStateImpl(int button) { return MouseStates[button]; }
+	inline bool Input::GetMouseButtonDown(int button) { return (GetMouseButtonState(button) == Input::Down); }
+	inline bool Input::GetMouseButtonUp(int button) { return (GetMouseButtonState(button) == Input::Up); }
+	inline bool Input::GetMouseButtonPressed(int button) { return (GetMouseButtonState(button) == Input::MousePressed); }
+	inline bool Input::GetMouseButtonReleased(int button) { return (GetMouseButtonState(button) == Input::MouseReleased); }
 
 	inline bool Input::OnKeyPressed(KeyPressedEvent& e) 
 	{ 
@@ -98,20 +104,52 @@ namespace Engine
 		return false; 
 	}
 
+	bool Input::OnMousePressed(MouseButtonPressedEvent& e)
+	{
+		int button = e.GetMouseButton();
+		SetMouseButtonState(button, MousePressed);
+		ToUpdateMouse.push_back(button);
+		return false;
+	}
+
+	bool Input::OnMouseReleased(MouseButtonReleasedEvent& e)
+	{
+		int button = e.GetMouseButton();
+		SetMouseButtonState(button, MouseReleased);
+		ToUpdateMouse.push_back(button);
+		return false;
+	}
+
 	void Input::UpdateKeyStateImpl()
 	{
+		// keyboard
 		for (int i : ToUpdate)
 		{
 			int state = GetKeyState(i);
 			if (state == Input::KeyPressed)
 			{
-				SetKeyState(i, Input::KeyDown);
+				SetKeyState(i, Input::Down);
 			}
 			else if (state == Input::KeyReleased)
 			{
-				SetKeyState(i, Input::KeyUp);
+				SetKeyState(i, Input::Up);
 			}
 		}
 		ToUpdate.clear();
+
+		// mouse
+		for (int i : ToUpdateMouse)
+		{
+			int state = GetMouseButtonState(i);
+			if (state == Input::MousePressed)
+			{
+				SetMouseButtonState(i, Input::Down);
+			}
+			else if (state == Input::MouseReleased)
+			{
+				SetMouseButtonState(i, Input::Up);
+			}
+		}
+		ToUpdateMouse.clear();
 	}
 }

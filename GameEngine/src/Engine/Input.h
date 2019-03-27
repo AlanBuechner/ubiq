@@ -9,11 +9,13 @@
 
 #define KEY_PRESSED		(int)Engine::Input::KeyPressed
 #define KEY_RELEASED	(int)Engine::Input::KeyReleased
-#define KEY_DOWN		(int)Engine::Input::KeyDown
-#define KEY_UP			(int)Engine::Input::KeyUp
+#define KEY_DOWN		(int)Engine::Input::Down
+#define KEY_UP			(int)Engine::Input::Up
 
 #define MOUSE_PRESSED	(int)Engine::Input::MousePressed
 #define MOUSE_RELEASED	(int)Engine::Input::MouseReleased
+#define MOUSE_DOWN		(int)Engine::Input::Down
+#define MOUSE_UP		(int)Engine::Input::Up
 
 //#define IE_PRESSED		(int)Engine::Input::KeyPressed | (int)Engine::Input::MousePressed
 //#define IE_RELEASED		(int)Engine::Input::KeyReleased | (int)Engine::Input::MouseReleased
@@ -196,35 +198,49 @@ namespace Engine
 	public:
 		enum KeyState
 		{
-			KeyUp,
-			KeyDown,
+			Up = 0,
+			Down = 1,
 			KeyPressed = EventType::KeyPressed,
 			KeyReleased = EventType::KeyReleased,
 			MousePressed = EventType::MouseButtonPressed,
 			MouseReleased = EventType::MouseButtonReleased
 		};
 
+		// keybord
 		inline static KeyState GetKeyState(int keycode) { return s_Instance->GetKeyStateImpl(keycode); }
 		inline static bool GetKeyDown(int keycode);
 		inline static bool GetKeyUp(int keycode);
 		inline static bool GetKeyPressed(int keycode);
 		inline static bool GetKeyReleased(int keycode);
 
-		inline static bool IsMouseButtonPressed(int button) { return s_Instance->IsMouseButtonPressedImpl(button); }
+		// mouse
+		inline static KeyState GetMouseButtonState(int button) { return s_Instance->GetMouseButtonStateImpl(button); }
+		inline static bool GetMouseButtonDown(int button);
+		inline static bool GetMouseButtonUp(int button);
+		inline static bool GetMouseButtonPressed(int button);
+		inline static bool GetMouseButtonReleased(int button);
+
 		inline static std::pair<float, float> GetMousePosition() { return s_Instance->GetMousePositionImpl(); }
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
 	protected:
+		// keybord
 		inline KeyState GetKeyStateImpl(int keycode);
-		virtual bool IsMouseButtonPressedImpl(int button) = 0;
+
+		// mouse
+		inline KeyState GetMouseButtonStateImpl(int keycode);
+
 		virtual std::pair<float, float> GetMousePositionImpl() = 0;
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
 
 		void SetKeyState(int key, KeyState state) { KeyStates[key] = state; }
+		void SetMouseButtonState(int button, KeyState state) { MouseStates[button] = state; }
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnKeyReleased(KeyReleasedEvent& e);
+		bool OnMousePressed(MouseButtonPressedEvent& e);
+		bool OnMouseReleased(MouseButtonReleasedEvent& e);
 		static void UpdateKeyState() { s_Instance->UpdateKeyStateImpl(); }
 		void UpdateKeyStateImpl();
 
@@ -232,8 +248,10 @@ namespace Engine
 		static Input* s_Instance;
 
 		std::map<int, KeyState> KeyStates;
+		std::map<int, KeyState> MouseStates;
 
 		std::vector<int> ToUpdate;
+		std::vector<int> ToUpdateMouse;
 
 	};
 }

@@ -30,8 +30,8 @@ public:
 
 	void OnUpdate() override
 	{
-		DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
-		//DEBUG_INFO("{0}", Input::IsMouseButtonPressed(MOUSE_LBUTTON));
+		//DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
+		DEBUG_INFO("{0}", Input::GetMouseButtonState(MOUSE_LBUTTON));
 	}
 
 	void OnEvent(Engine::Event& event) override
