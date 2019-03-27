@@ -1,14 +1,14 @@
 #pragma once
 
 #include "core.h"
-#include "Events/Event.h"
-#include "Events/KeyEvent.h"
-#include "Events/MouseEvent.h"
-
-#include "InputControlerManeger.h"
 
 #define BIND_ACTION(x) std::bind(x, this)
 #define BIND_AXIS(x, p) std::bind(x, this, p)
+
+namespace Engine
+{
+	class InputControlerManeger;
+}
 
 namespace Engine
 {

@@ -2,13 +2,15 @@
 #include "core.h"
 #include <vector>
 
-#include "Events/Event.h"
-#include "Events/KeyEvent.h"
-#include "Events/MouseEvent.h"
-
 namespace Engine
 {
 	class InputControler;
+	class Event;
+	class KeyPressedEvent;
+	class KeyReleasedEvent;
+	class KeyTypedEvent;
+	class MouseButtonPressedEvent;
+	class MouseButtonReleasedEvent;
 }
 
 namespace Engine

@@ -1,9 +1,13 @@
 #pragma once
 
 #include "Engine/Core.h"
-#include "Layer.h"
 
 #include <vector>
+
+namespace Engine
+{
+	class Layer;
+}
 
 namespace Engine {
 

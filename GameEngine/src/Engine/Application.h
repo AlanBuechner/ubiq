@@ -3,10 +3,16 @@
 #include "core.h"
 
 #include "Window.h"
-#include "Engine/LayerStack.h"
-#include "Engine/Events/Event.h"
-#include "Engine/Events/ApplicationEvent.h"
-#include "Engine/imGui/ImGuiLayer.h"
+#include "LayerStack.h"
+
+namespace Engine
+{
+	class Layer;
+	class ImGuiLayer;
+	class Event;
+	class WindowCloseEvent;
+
+}
 
 namespace Engine
 {

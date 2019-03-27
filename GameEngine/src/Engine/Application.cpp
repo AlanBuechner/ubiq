@@ -5,6 +5,10 @@
 
 #include "Input.h"
 
+#include "Engine/Events/Event.h"
+#include "Engine/Events/ApplicationEvent.h"
+#include "Engine/imGui/ImGuiLayer.h"
+
 namespace Engine {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)

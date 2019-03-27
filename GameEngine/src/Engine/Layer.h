@@ -1,8 +1,12 @@
 #pragma once
 
 #include "core.h"
-#include "Events/Event.h"
-#include "InputControlerManeger.h"
+
+namespace Engine
+{
+	class Event;
+	class InputControlerManeger;
+}
 
 namespace Engine {
 
@@ -16,13 +20,13 @@ namespace Engine {
 		virtual void OnDetach() {}
 		virtual void OnUpdate() {}
 		virtual void OnImGuiRender() {}
-		virtual void OnEvent(Event& event) { InputManeger->Update(event); }
+		virtual void OnEvent(Event& event);
 
 		inline const std::string& GetName() const { return m_DebugName; }
 
 	protected:
 
-		InputControlerManeger* InputManeger = new InputControlerManeger();
+		InputControlerManeger* InputManeger;
 
 		std::string m_DebugName;
 	};

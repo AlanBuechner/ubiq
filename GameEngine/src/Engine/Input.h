@@ -4,7 +4,6 @@
 #include "KeyCodes.h"
 #include <map>
 #include <string>
-#include "Events/Event.h"
 #include "Application.h"
 
 #define KEY_PRESSED		(int)Engine::Input::KeyPressed
@@ -19,6 +18,14 @@
 
 //#define IE_PRESSED		(int)Engine::Input::KeyPressed | (int)Engine::Input::MousePressed
 //#define IE_RELEASED		(int)Engine::Input::KeyReleased | (int)Engine::Input::MouseReleased
+
+namespace Engine
+{
+	class KeyPressedEvent;
+	class KeyReleasedEvent;
+	class MouseButtonPressedEvent;
+	class MouseButtonReleasedEvent;
+}
 
 namespace Engine
 {

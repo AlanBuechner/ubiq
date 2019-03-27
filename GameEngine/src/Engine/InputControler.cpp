@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "InputControler.h"
+#include "InputControlerManeger.h"
 
 namespace Engine
 {
