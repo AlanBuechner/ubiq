@@ -112,7 +112,7 @@ namespace Engine {
 		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
-
+			keycode = KeyCode::OglToUbiq(keycode);
 			KeyTypedEvent* event = new KeyTypedEvent(keycode); // creates new key typed event
 			data.EventCallback(*event);
 		});
@@ -121,6 +121,8 @@ namespace Engine {
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
+
+			button = KeyCode::OglToUbiqMouse(button);
 
 			switch (action) // determens the type of mouse button event
 			{

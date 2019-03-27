@@ -23,14 +23,15 @@ public:
 	{
 		InputControler* input = new InputControler(InputManeger);
 
-		input->BindEvent(KEYCODE_A, IE_PRESSED, BIND_ACTION(&ExampleLayer::thing));
-		input->BindEvent(KEYCODE_W, IE_RELEASED, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
+		input->BindEvent(MOUSE_LBUTTON, MOUSE_RELEASED, BIND_ACTION(&ExampleLayer::thing));
+		input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
 
 	}
 
 	void OnUpdate() override
 	{
 		DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
+		//DEBUG_INFO("{0}", Input::IsMouseButtonPressed(MOUSE_LBUTTON));
 	}
 
 	void OnEvent(Engine::Event& event) override
@@ -39,13 +40,12 @@ public:
 		if (event.GetEventType() == Engine::EventType::KeyPressed)
 		{
 			Engine::KeyPressedEvent& e = (Engine::KeyPressedEvent&)event;
-			DEBUG_TRACE("{0}", (char)e.GetKeyCode());
 		}
 	}
 
 	void thing()
 	{
-		DEBUG_INFO("the A key was pressed");
+		DEBUG_INFO("the mouse button was pressed");
 	}
 
 	void thing2(float i)

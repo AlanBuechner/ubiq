@@ -25,6 +25,8 @@ namespace Engine
 		bool OnKeyPressedEvent(KeyPressedEvent& e);
 		bool OnKeyRelesedEvent(KeyReleasedEvent& e);
 		bool OnKeyTypedEvent(KeyTypedEvent& e);
+		bool OnMousePressedEvent(MouseButtonPressedEvent& e);
+		bool OnMouseReleasedEvent(MouseButtonReleasedEvent& e);
 
 		std::vector<InputControler*> controlers;
 

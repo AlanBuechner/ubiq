@@ -69,6 +69,10 @@ namespace Engine
 		{
 			oglToUbiq[i] = i-178;
 		}
+		// mouse
+		oglToUbiqMouse[GLFW_MOUSE_BUTTON_LEFT] = MOUSE_LBUTTON;
+		oglToUbiqMouse[GLFW_MOUSE_BUTTON_RIGHT] = MOUSE_RBUTTON;
+		oglToUbiqMouse[GLFW_MOUSE_BUTTON_MIDDLE] = MOUSE_MBUTTON;
 	}
 
 	inline Input::KeyState Input::GetKeyStateImpl(int keycode) { return KeyStates[keycode]; }

@@ -15,7 +15,7 @@ namespace Engine
 
 	struct ENGINE_API EventData
 	{
-		EventType type;
+		int type;
 		std::function<void()> function;
 		int Key;
 	};
@@ -26,9 +26,9 @@ namespace Engine
 
 		InputControler(InputControlerManeger* maneger);
 
-		void RaiseEvent(int key, EventType state);
+		void RaiseEvent(int key, int state);
 
-		int* BindEvent(int key, EventType state, std::function<void()> func);
+		int* BindEvent(int key, int state, std::function<void()> func);
 
 	private:
 		std::vector<EventData*> events;

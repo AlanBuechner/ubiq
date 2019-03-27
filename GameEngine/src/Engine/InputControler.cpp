@@ -8,7 +8,7 @@ namespace Engine
 		maneger->AddControler(this);
 	}
 
-	void InputControler::RaiseEvent(int key, EventType state)
+	void InputControler::RaiseEvent(int key, int state)
 	{
 		for (auto i = events.begin(); i != events.end(); i++)
 		{
@@ -19,7 +19,7 @@ namespace Engine
 		}
 	}
 
-	int* InputControler::BindEvent(int key, EventType state, std::function<void()> func)
+	int* InputControler::BindEvent(int key, int state, std::function<void()> func)
 	{
 		EventData* action = new EventData;
 		action->type = state;

@@ -7,10 +7,16 @@
 #include "Events/Event.h"
 #include "Application.h"
 
-#define IE_PRESSED (Engine::EventType)Engine::Input::KeyPressed
-#define IE_RELEASED (Engine::EventType)Engine::Input::KeyReleased
-#define IE_DOWN  Engine::Input::KeyDown
-#define IE_UP  Engine::Input::KeyUp
+#define KEY_PRESSED		(int)Engine::Input::KeyPressed
+#define KEY_RELEASED	(int)Engine::Input::KeyReleased
+#define KEY_DOWN		(int)Engine::Input::KeyDown
+#define KEY_UP			(int)Engine::Input::KeyUp
+
+#define MOUSE_PRESSED	(int)Engine::Input::MousePressed
+#define MOUSE_RELEASED	(int)Engine::Input::MouseReleased
+
+//#define IE_PRESSED		(int)Engine::Input::KeyPressed | (int)Engine::Input::MousePressed
+//#define IE_RELEASED		(int)Engine::Input::KeyReleased | (int)Engine::Input::MouseReleased
 
 namespace Engine
 {
@@ -19,9 +25,10 @@ namespace Engine
 	public:
 		KeyCode();
 
-		static int GetKeyCode(std::string key) { return s_Instance->GetKeyCodeImpl(key); }
-		static int OglToUbiq(int key) { return s_Instance->OglToUbiqImpl(key); }
-		static int UbiqToOgl(int key) { return s_Instance->UbiqToOglImpl(key); }
+		static inline int GetKeyCode(std::string key) { return s_Instance->GetKeyCodeImpl(key); }
+		static inline int OglToUbiq(int key) { return s_Instance->OglToUbiqImpl(key); }
+		static inline int UbiqToOgl(int key) { return s_Instance->UbiqToOglImpl(key); }
+		static inline int OglToUbiqMouse(int key) { return s_Instance->OglToUbiqMouseImpl(key); }
 
 		enum
 		{
@@ -169,13 +176,15 @@ namespace Engine
 		};
 
 	protected:
-		int GetKeyCodeImpl(std::string key) { return asciiToUbiq[key]; }
-		int OglToUbiqImpl(int key) { return oglToUbiq[key]; }
-		int UbiqToOglImpl(int key) { return ubiqToOgl[key]; }
+		inline int GetKeyCodeImpl(std::string key) { return asciiToUbiq[key]; }
+		inline int OglToUbiqImpl(int key) { return oglToUbiq[key]; }
+		inline int UbiqToOglImpl(int key) { return ubiqToOgl[key]; }
+		inline int OglToUbiqMouseImpl(int key) { return oglToUbiqMouse[key]; }
 
 		std::map<std::string, int> asciiToUbiq;
 		std::map<int, int> oglToUbiq;
 		std::map<int, int> ubiqToOgl;
+		std::map<int, int> oglToUbiqMouse;
 
 	private:
 		static KeyCode* s_Instance;
@@ -190,7 +199,9 @@ namespace Engine
 			KeyUp,
 			KeyDown,
 			KeyPressed = EventType::KeyPressed,
-			KeyReleased = EventType::KeyReleased
+			KeyReleased = EventType::KeyReleased,
+			MousePressed = EventType::MouseButtonPressed,
+			MouseReleased = EventType::MouseButtonReleased
 		};
 
 		inline static KeyState GetKeyState(int keycode) { return s_Instance->GetKeyStateImpl(keycode); }
