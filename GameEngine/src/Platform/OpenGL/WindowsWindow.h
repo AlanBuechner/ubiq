@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
+#ifdef PLATFORM_WINDOWS
+
 namespace Engine {
 
 	class WindowsWindow : public Window
@@ -42,3 +44,5 @@ namespace Engine {
 	};
 
 }
+
+#endif

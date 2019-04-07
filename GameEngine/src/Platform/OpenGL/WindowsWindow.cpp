@@ -89,7 +89,7 @@ namespace Engine {
 			{
 			case GLFW_PRESS: // press event
 			{
-				KeyPressedEvent* event = new KeyPressedEvent(key, 0); // creats new key pressed event
+				KeyPressedEvent* event = new KeyPressedEvent(key); // creats new key pressed event
 				data.EventCallback(*event);
 				break;
 			}
@@ -101,7 +101,7 @@ namespace Engine {
 			}
 			case GLFW_REPEAT: // repeat event
 			{
-				KeyPressedEvent* event = new KeyPressedEvent(key, 1); // creates new key repeat event
+				KeyRepeatEvent* event = new KeyRepeatEvent(key, 1); // creates new key repeat event
 				data.EventCallback(*event);
 				break;
 			}

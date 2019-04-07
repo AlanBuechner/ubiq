@@ -89,16 +89,15 @@ namespace Engine
 	inline bool Input::GetMouseButtonPressed(int button) { return (GetMouseButtonState(button) == Input::MousePressed); }
 	inline bool Input::GetMouseButtonReleased(int button) { return (GetMouseButtonState(button) == Input::MouseReleased); }
 
-	inline bool Input::OnKeyPressed(KeyPressedEvent& e) 
+	bool Input::OnKeyPressed(KeyPressedEvent& e)
 	{ 
-		if (e.GetRepeatCount() == 1) return false;
 		int keycode = e.GetKeyCode();
 		SetKeyState(keycode, KeyPressed); 
 		ToUpdate.push_back(keycode);
 		return false; 
 	}
 
-	inline bool Input::OnKeyReleased(KeyReleasedEvent& e) 
+	bool Input::OnKeyReleased(KeyReleasedEvent& e) 
 	{ 
 		int keycode = e.GetKeyCode();
 		SetKeyState(keycode, KeyReleased); 

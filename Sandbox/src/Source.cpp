@@ -23,15 +23,16 @@ public:
 	{
 		InputControler* input = new InputControler(InputManeger);
 
-		input->BindEvent(MOUSE_LBUTTON, MOUSE_RELEASED, BIND_ACTION(&ExampleLayer::thing));
+		input->BindEvent(MOUSE_LBUTTON, MOUSE_PRESSED, BIND_ACTION(&ExampleLayer::thing));
 		input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
+		input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&ExampleLayer::thing2, -1.0f));
 
 	}
 
 	void OnUpdate() override
 	{
 		//DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
-		DEBUG_INFO("{0}", Input::GetMouseButtonState(MOUSE_LBUTTON));
+		//DEBUG_INFO("{0}", Input::GetMouseButtonState(MOUSE_LBUTTON));
 	}
 
 	void OnEvent(Engine::Event& event) override

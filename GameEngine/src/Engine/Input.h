@@ -16,8 +16,8 @@
 #define MOUSE_DOWN		(int)Engine::Input::Down
 #define MOUSE_UP		(int)Engine::Input::Up
 
-//#define IE_PRESSED		(int)Engine::Input::KeyPressed | (int)Engine::Input::MousePressed
-//#define IE_RELEASED		(int)Engine::Input::KeyReleased | (int)Engine::Input::MouseReleased
+#define IE_DOWN			(int)Engine::Input::Down
+#define IE_UP			(int)Engine::Input::Up
 
 namespace Engine
 {
@@ -202,6 +202,7 @@ namespace Engine
 	class ENGINE_API Input
 	{
 		friend Application;
+
 	public:
 		enum KeyState
 		{

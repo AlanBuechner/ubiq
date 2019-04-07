@@ -3,11 +3,15 @@
 #define ENABLE_ASSERTS
 
 #ifdef PLATFORM_WINDOWS
-	#ifdef BUILD_DLL
-		#define ENGINE_API __declspec(dllexport)
+	#ifdef DYNAMIC_LINK
+		#ifdef BUILD_DLL
+			#define ENGINE_API __declspec(dllexport)
+		#else
+			#define ENGINE_API __declspec(dllimport)
+		#endif // BUILD_DLL
 	#else
-		#define ENGINE_API __declspec(dllimport)
-	#endif // BUILD_DLL
+		#define ENGINE_API
+	#endif
 #else
 	#error Platform not saported
 #endif
