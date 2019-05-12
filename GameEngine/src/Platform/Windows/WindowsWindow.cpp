@@ -7,9 +7,8 @@
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Input.h"
 
-#include <glad/glad.h>
-
-namespace Engine {
+namespace Engine 
+{
 
 	static bool s_GLFWInitialized = false;
 
@@ -52,9 +51,10 @@ namespace Engine {
 		}
 
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr); // creates the window
-		glfwMakeContextCurrent(m_Window); // makes the new window the current context
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); // loads glad
-		CORE_ASSERT(status, "Failed to initialize Glad!"); // checks if glad was seccessfuly loaded
+
+		m_Context = new OpenGLContext(m_Window);
+		m_Context->Init();
+
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true); // sets v-sync to true
 
@@ -167,8 +167,7 @@ namespace Engine {
 
 	void WindowsWindow::OnUpdate()
 	{
-		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)

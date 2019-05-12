@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Engine/Window.h"
+#include "Engine/Renderer/GraphicsContext.h"
+#include "Platform/OpenGL/OpenGLContext.h"
 
 #include <GLFW/glfw3.h>
 
-#ifdef PLATFORM_WINDOWS
-
-namespace Engine {
+namespace Engine 
+{
 
 	class WindowsWindow : public Window
 	{
@@ -30,6 +31,7 @@ namespace Engine {
 		virtual void Shutdown(); // closes the window
 	private:
 		GLFWwindow* m_Window;
+		GraphicsContext* m_Context;
 
 		struct WindowData
 		{
@@ -44,5 +46,3 @@ namespace Engine {
 	};
 
 }
-
-#endif
