@@ -21,6 +21,7 @@ namespace Engine
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnKeyPressedEvent));
 		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnKeyRelesedEvent));
+		dispatcher.Dispatch<KeyDownEvent>(BIND_EVENT_FN(&InputControlerManeger::OnKeyDownEvent));
 		dispatcher.Dispatch<KeyTypedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnKeyTypedEvent));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnMousePressedEvent));
 		dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnMouseReleasedEvent));
@@ -42,6 +43,16 @@ namespace Engine
 	}
 
 	bool InputControlerManeger::OnKeyRelesedEvent(KeyReleasedEvent& e)
+	{
+		EventType type = e.GetEventType();
+		for (auto i = begin(); i != end(); i++)
+		{
+			(*i)->RaiseEvent(e.GetKeyCode(), (int)type);
+		}
+		return false;
+	}
+
+	bool InputControlerManeger::OnKeyDownEvent(KeyDownEvent& e)
 	{
 		EventType type = e.GetEventType();
 		for (auto i = begin(); i != end(); i++)

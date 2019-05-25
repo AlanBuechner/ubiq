@@ -24,8 +24,8 @@ public:
 		InputControler* input = new InputControler(InputManeger);
 
 		input->BindEvent(MOUSE_LBUTTON, MOUSE_PRESSED, BIND_ACTION(&ExampleLayer::thing));
-		input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
-		input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&ExampleLayer::thing2, -1.0f));
+		input->BindEvent(KEYCODE_W, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
+		input->BindEvent(KEYCODE_S, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, -1.0f));
 
 	}
 
@@ -37,7 +37,7 @@ public:
 
 	void OnEvent(Engine::Event& event) override
 	{
-		Engine::Layer::OnEvent(event);
+		SUPER::OnEvent(event);
 		if (event.GetEventType() == Engine::EventType::KeyPressed)
 		{
 			Engine::KeyPressedEvent& e = (Engine::KeyPressedEvent&)event;

@@ -11,8 +11,8 @@ namespace Engine {
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
-		KeyPressed, KeyReleased, KeyTyped, KeyRepeat,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+		KeyPressed, KeyReleased, KeyTyped, KeyRepeat, KeyDown,
+		MouseButtonPressed, MouseButtonReleased, MouseButtonDown, MouseMoved, MouseScrolled
 	};
 
 	// event categorys

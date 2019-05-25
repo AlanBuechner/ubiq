@@ -8,13 +8,11 @@
 
 #define KEY_PRESSED		(int)Engine::Input::KeyPressed
 #define KEY_RELEASED	(int)Engine::Input::KeyReleased
-#define KEY_DOWN		(int)Engine::Input::Down
-#define KEY_UP			(int)Engine::Input::Up
+#define KEY_DOWN		(int)Engine::Input::KeyDown
 
 #define MOUSE_PRESSED	(int)Engine::Input::MousePressed
 #define MOUSE_RELEASED	(int)Engine::Input::MouseReleased
-#define MOUSE_DOWN		(int)Engine::Input::Down
-#define MOUSE_UP		(int)Engine::Input::Up
+#define MOUSE_DOWN		(int)Engine::Input::MouseDown
 
 #define IE_DOWN			(int)Engine::Input::Down
 #define IE_UP			(int)Engine::Input::Up
@@ -209,9 +207,11 @@ namespace Engine
 			Up = 0,
 			Down = 1,
 			KeyPressed = EventType::KeyPressed,
+			KeyDown = EventType::KeyDown,
 			KeyReleased = EventType::KeyReleased,
 			MousePressed = EventType::MouseButtonPressed,
-			MouseReleased = EventType::MouseButtonReleased
+			MouseReleased = EventType::MouseButtonReleased,
+			MouseDown = EventType::MouseButtonDown
 		};
 
 		// keybord
@@ -252,6 +252,8 @@ namespace Engine
 		static void UpdateKeyState() { s_Instance->UpdateKeyStateImpl(); }
 		void UpdateKeyStateImpl();
 
+		static void GetUpdatedEventList(std::vector<Event*>& events);
+
 	private:
 		static Input* s_Instance;
 
@@ -260,6 +262,8 @@ namespace Engine
 
 		std::vector<int> ToUpdate;
 		std::vector<int> ToUpdateMouse;
+
+		std::vector<int> KeysDown;
 
 	};
 }

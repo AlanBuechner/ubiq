@@ -9,6 +9,9 @@
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/imGui/ImGuiLayer.h"
 
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+
 namespace Engine {
 
 #define BIND_EVENT_FN_EXTERN(x, p) std::bind(x, p, std::placeholders::_1)
@@ -24,6 +27,30 @@ namespace Engine {
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent));
 		
 		GenLayerStack();
+
+		glGenVertexArrays(1, &m_VertexArray);
+		glBindVertexArray(m_VertexArray);
+
+		glGenBuffers(1, &m_VertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
+
+		float vertices[3*3] = 
+		{
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.0f,  0.5f, 0.0f
+		};
+
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+
+		glGenBuffers(1, &m_IndexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+
+		unsigned int indeces[3] = { 0, 1, 2};
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indeces), indeces, GL_STATIC_DRAW);
 	}
 
 	Application::~Application()
@@ -47,8 +74,15 @@ namespace Engine {
 
 	void Application::Run()
 	{
+		CORE_INFO("Runing Application");
 		while (m_Running)
 		{
+			glClearColor(0.1f, 0.1f, 0.1f, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			glBindVertexArray(m_VertexArray);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+
 			Input::UpdateKeyState();
 
 			SendInputBuffer();
@@ -74,6 +108,8 @@ namespace Engine {
 	void Application::SendInputBuffer()
 	{
 		if (inputBuffer.empty()) return;
+
+		Input::GetUpdatedEventList(inputBuffer);
 
 		for (auto i = inputBuffer.end(); i != inputBuffer.begin();)
 		{

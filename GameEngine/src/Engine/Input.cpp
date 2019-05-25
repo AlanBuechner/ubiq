@@ -94,6 +94,7 @@ namespace Engine
 		int keycode = e.GetKeyCode();
 		SetKeyState(keycode, KeyPressed); 
 		ToUpdate.push_back(keycode);
+		KeysDown.push_back(keycode);
 		return false; 
 	}
 
@@ -102,6 +103,16 @@ namespace Engine
 		int keycode = e.GetKeyCode();
 		SetKeyState(keycode, KeyReleased); 
 		ToUpdate.push_back(keycode);
+		std::vector<int>::const_iterator toRemove;
+		for (std::vector<int>::const_iterator it = KeysDown.begin(); it < KeysDown.end(); it++)
+		{
+			if (*it == keycode)
+			{
+				toRemove = it;
+				break;
+			}
+		}
+		KeysDown.erase(toRemove);
 		return false; 
 	}
 
@@ -152,5 +163,13 @@ namespace Engine
 			}
 		}
 		ToUpdateMouse.clear();
+	}
+
+	void Input::GetUpdatedEventList(std::vector<Event*>& events)
+	{
+		for (auto i : s_Instance->KeysDown)
+		{
+			events.push_back(new KeyDownEvent(i));
+		}
 	}
 }

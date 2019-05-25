@@ -8,6 +8,7 @@ namespace Engine
 	class Event;
 	class KeyPressedEvent;
 	class KeyReleasedEvent;
+	class KeyDownEvent;
 	class KeyTypedEvent;
 	class MouseButtonPressedEvent;
 	class MouseButtonReleasedEvent;
@@ -26,6 +27,7 @@ namespace Engine
 	private:
 		bool OnKeyPressedEvent(KeyPressedEvent& e);
 		bool OnKeyRelesedEvent(KeyReleasedEvent& e);
+		bool OnKeyDownEvent(KeyDownEvent& e);
 		bool OnKeyTypedEvent(KeyTypedEvent& e);
 		bool OnMousePressedEvent(MouseButtonPressedEvent& e);
 		bool OnMouseReleasedEvent(MouseButtonReleasedEvent& e);

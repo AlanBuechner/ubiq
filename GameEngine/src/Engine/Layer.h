@@ -8,10 +8,13 @@ namespace Engine
 	class InputControlerManeger;
 }
 
-namespace Engine {
+namespace Engine 
+{
 
 	class ENGINE_API Layer
 	{
+#define SUPER Engine::Layer
+
 	public:
 		Layer(const std::string& name = "Layer");
 		virtual ~Layer();

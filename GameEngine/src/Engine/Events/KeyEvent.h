@@ -84,4 +84,20 @@ namespace Engine {
 	private:
 		int m_RepeatCount;
 	};
+
+	class ENGINE_API KeyDownEvent : public KeyEvent
+	{
+	public:
+		KeyDownEvent(int keycode)
+			: KeyEvent(keycode) {}
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyDownEvent: " << m_KeyCode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyDown)
+	};
 }
