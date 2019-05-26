@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Shader.h"
 #include "Engine/Log.h"
+#include <fstream>
 #include <glad/glad.h>
 
 namespace Engine
@@ -130,5 +131,21 @@ namespace Engine
 	void Shader::UnBind()
 	{
 		glUseProgram(0);
+	}
+
+	bool Shader::LoadShader(std::string file, std::string& src)
+	{
+		std::ifstream shaderFile;
+		shaderFile.open(file);
+		if (shaderFile.fail())
+		{
+			CORE_ERROR("Cant open file {0}", file);
+			return false;
+		}
+
+		std::getline(shaderFile, src, (char)shaderFile.eof());
+
+		shaderFile.close();
+		return true;
 	}
 }

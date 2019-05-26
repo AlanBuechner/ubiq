@@ -12,6 +12,8 @@ namespace Engine
 		void Bind();
 		void UnBind();
 
+		static bool LoadShader(std::string file, std::string& src);
+
 	private:
 		uint32_t m_RendererID;
 	};

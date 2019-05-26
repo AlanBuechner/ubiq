@@ -52,7 +52,7 @@ namespace Engine {
 		unsigned int indeces[3] = { 0, 1, 2};
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indeces), indeces, GL_STATIC_DRAW);
 
-		std::string vertexSrc = R"(
+		/*std::string vertexSrc = R"(
 			#version 330 core
 			layout(location = 0) in vec3 a_Position;
 
@@ -68,7 +68,12 @@ namespace Engine {
 			void main(){
 				color = vec4(0.8, 0.2, 0.3, 1.0);
 			}
-		)";
+		)";*/
+
+		std::string vertexSrc;
+		std::string fragSrc;
+		Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\vertexShader.hlsl", vertexSrc);
+		Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\fragShader.hlsl", fragSrc);
 
 		m_Shader.reset(new Shader(vertexSrc, fragSrc));
 	}
