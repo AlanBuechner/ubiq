@@ -1200,6 +1200,7 @@
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Engine\Renderer\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Application.cpp">
@@ -1240,5 +1241,6 @@
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGlContext.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Engine\Renderer\Shader.cpp" />
   </ItemGroup>
 </Project>

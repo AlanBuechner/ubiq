@@ -5,6 +5,9 @@
 #include "Window.h"
 #include "LayerStack.h"
 
+// temp
+#include "Engine/Renderer/Shader.h"
+
 namespace Engine
 {
 	class Layer;
@@ -45,6 +48,8 @@ namespace Engine
 		LayerStack m_LayerStack;
 
 		unsigned int m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+
+		std::unique_ptr<Shader> m_Shader;
 
 	private:
 		static Application* s_Instance;
