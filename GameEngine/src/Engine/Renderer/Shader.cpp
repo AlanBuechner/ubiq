@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	Shader::Shader(const std::string & vertexSrc, const std::string & fragmentSrc)
+	Shader::Shader(const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 
 		// Create an empty vertex shader handle
@@ -133,19 +133,48 @@ namespace Engine
 		glUseProgram(0);
 	}
 
-	bool Shader::LoadShader(std::string file, std::string& src)
+	Shader::ShaderSorce Shader::LoadShader(std::string file)
 	{
 		std::ifstream shaderFile;
 		shaderFile.open(file);
 		if (shaderFile.fail())
 		{
 			CORE_ERROR("Cant open file {0}", file);
-			return false;
+			return ShaderSorce();
 		}
 
-		std::getline(shaderFile, src, (char)shaderFile.eof());
+		enum class ShaderType
+		{
+			NONE = -1, VERTEX = 0, PIXLE = 1
+		};
+
+		ShaderType mode = ShaderType::NONE;
+
+		ShaderSorce sorce;
+
+		std::stringstream ss[2];
+
+		std::string line;
+		while (getline(shaderFile, line))
+		{
+			if (line.find("#shader") != std::string::npos)
+			{
+				if (line.find("vertex") != std::string::npos) 
+					mode = ShaderType::VERTEX;
+				else if (line.find("pixle") != std::string::npos || line.find("fragment") != std::string::npos)
+					mode = ShaderType::PIXLE;
+			}
+			else
+			{
+				ss[(int)mode] << line << '\n';
+			}
+		}
 
 		shaderFile.close();
-		return true;
+
+		sorce.vertexShader = ss[(int)ShaderType::VERTEX].str();
+		sorce.pixleShader = ss[(int)ShaderType::PIXLE].str();
+
+		return sorce;
 	}
 }

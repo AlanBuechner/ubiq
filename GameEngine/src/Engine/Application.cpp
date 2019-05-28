@@ -70,12 +70,10 @@ namespace Engine {
 			}
 		)";*/
 
-		std::string vertexSrc;
-		std::string fragSrc;
-		Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\vertexShader.hlsl", vertexSrc);
-		Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\fragShader.hlsl", fragSrc);
+		Shader::ShaderSorce src;
+		src << Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\shader.hlsl");
 
-		m_Shader.reset(new Shader(vertexSrc, fragSrc));
+		m_Shader.reset(new Shader(src.vertexShader, src.pixleShader));
 	}
 
 	Application::~Application()
