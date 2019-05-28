@@ -143,12 +143,12 @@ namespace Engine
 			return ShaderSorce();
 		}
 
-		enum class ShaderType
+		enum class Type
 		{
 			NONE = -1, VERTEX = 0, PIXLE = 1
 		};
 
-		ShaderType mode = ShaderType::NONE;
+		Type mode = Type::NONE;
 
 		ShaderSorce sorce;
 
@@ -160,9 +160,9 @@ namespace Engine
 			if (line.find("#shader") != std::string::npos)
 			{
 				if (line.find("vertex") != std::string::npos) 
-					mode = ShaderType::VERTEX;
+					mode = Type::VERTEX;
 				else if (line.find("pixle") != std::string::npos || line.find("fragment") != std::string::npos)
-					mode = ShaderType::PIXLE;
+					mode = Type::PIXLE;
 			}
 			else
 			{
@@ -172,9 +172,20 @@ namespace Engine
 
 		shaderFile.close();
 
-		sorce.vertexShader = ss[(int)ShaderType::VERTEX].str();
-		sorce.pixleShader = ss[(int)ShaderType::PIXLE].str();
+		sorce.vertexShader = ss[(int)Type::VERTEX].str();
+		sorce.pixleShader = ss[(int)Type::PIXLE].str();
 
 		return sorce;
+	}
+	Shader::ShaderSorce Shader::LoadShader(std::string file, ShaderType type)
+	{
+		ShaderSorce src = LoadShader(file);
+		ShaderSorce srcToReturn;
+		if (type == ShaderType::VERTEX)
+			srcToReturn.vertexShader = src.vertexShader;
+		if (type == ShaderType::PIXLE)
+			srcToReturn.pixleShader = src.pixleShader;
+
+		return srcToReturn;
 	}
 }

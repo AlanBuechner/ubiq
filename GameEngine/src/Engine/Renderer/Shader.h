@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "Engine/core.h"
 
 namespace Engine
 {
@@ -17,6 +18,11 @@ namespace Engine
 				if (this->pixleShader.empty()) this->pixleShader = other.pixleShader;
 			}
 		};
+
+		enum class ShaderType
+		{
+			NONE = -1, VERTEX = BIT(0), PIXLE = BIT(1)
+		};
 	public:
 		Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
 		~Shader();
@@ -25,6 +31,7 @@ namespace Engine
 		void UnBind();
 
 		static ShaderSorce LoadShader(std::string file);
+		static ShaderSorce LoadShader(std::string file, ShaderType type);
 
 	protected:
 
