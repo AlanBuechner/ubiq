@@ -7,6 +7,8 @@
 // latency.cpp : spdlog latency benchmarks
 //
 
+#include "pch.h"
+
 #include "benchmark/benchmark.h"
 
 #include "spdlog/spdlog.h"

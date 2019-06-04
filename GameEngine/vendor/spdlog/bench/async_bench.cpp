@@ -6,6 +6,8 @@
 //
 // bench.cpp : spdlog benchmarks
 //
+#include "pch.h"
+
 #include "spdlog/spdlog.h"
 #include "spdlog/async.h"
 #include "spdlog/sinks/basic_file_sink.h"

@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include "Application.h"
+#include "InputControler.h"
 
 #define KEY_PRESSED		(int)Engine::Input::KeyPressed
 #define KEY_RELEASED	(int)Engine::Input::KeyReleased
@@ -232,7 +233,9 @@ namespace Engine
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
-	protected:
+		static void BindKey(int* key);
+
+	private:
 		// keybord
 		inline KeyState GetKeyStateImpl(int keycode);
 
@@ -254,6 +257,8 @@ namespace Engine
 
 		static void GetUpdatedEventList(std::vector<Event*>& events);
 
+		inline bool isKeyBinded(int key);
+
 	private:
 		static Input* s_Instance;
 
@@ -264,6 +269,7 @@ namespace Engine
 		std::vector<int> ToUpdateMouse;
 
 		std::vector<int> KeysDown;
+		std::vector<int*> bindedKeys;
 
 	};
 }

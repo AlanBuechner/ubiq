@@ -24,7 +24,6 @@ namespace Engine
 
 		void Update(Event& event);
 		void AddControler(InputControler* controler);
-		void BindKey(int key);
 
 	private:
 		bool OnKeyPressedEvent(KeyPressedEvent& e);
@@ -38,7 +37,5 @@ namespace Engine
 
 		std::vector<InputControler*>::iterator begin() { return controlers.begin(); }
 		std::vector<InputControler*>::iterator end() { return controlers.end(); }
-
-		std::vector<int> bindedKeys;
 	};
 }

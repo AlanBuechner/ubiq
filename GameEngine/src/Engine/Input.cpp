@@ -3,6 +3,8 @@
 #include "Events/KeyEvent.h"
 #include "Events/MouseEvent.h"
 #include "Log.h"
+#include "InputControlerManeger.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Engine
@@ -170,8 +172,27 @@ namespace Engine
 	{
 		for (auto i : s_Instance->KeysDown)
 		{
-			events.push_back(new KeyDownEvent(i));
-			CORE_INFO("{0}", i);
+			if (s_Instance->isKeyBinded(i))
+			{
+				events.push_back(new KeyDownEvent(i));
+			}
 		}
+	}
+
+	void Input::BindKey(int * key)
+	{
+		s_Instance->bindedKeys.push_back(key);
+	}
+	
+	inline bool Input::isKeyBinded(int key)
+	{
+		for (int* i : bindedKeys)
+		{
+			if (*i == key)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

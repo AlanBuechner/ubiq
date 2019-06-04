@@ -28,6 +28,7 @@ namespace Engine
 		action->Key = key;
 
 		events.push_back(action);
+		Input::BindKey(&action->Key);
 		return &action->Key;
 	}
 }

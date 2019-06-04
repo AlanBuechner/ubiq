@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core.h"
+#include "Input.h"
 
 #define BIND_ACTION(x) std::bind(x, this)
 #define BIND_AXIS(x, p) std::bind(x, this, p)

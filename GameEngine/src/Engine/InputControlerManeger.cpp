@@ -32,11 +32,6 @@ namespace Engine
 		controlers.push_back(controler);
 	}
 
-	void InputControlerManeger::BindKey(int key)
-	{
-		bindedKeys.push_back(key);
-	}
-
 	bool InputControlerManeger::OnKeyPressedEvent(KeyPressedEvent& e)
 	{
 		EventType type = e.GetEventType();
