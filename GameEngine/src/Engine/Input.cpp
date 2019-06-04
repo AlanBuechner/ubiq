@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Events/KeyEvent.h"
 #include "Events/MouseEvent.h"
+#include "Log.h"
 #include <GLFW/glfw3.h>
 
 namespace Engine
@@ -170,6 +171,7 @@ namespace Engine
 		for (auto i : s_Instance->KeysDown)
 		{
 			events.push_back(new KeyDownEvent(i));
+			CORE_INFO("{0}", i);
 		}
 	}
 }

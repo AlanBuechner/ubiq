@@ -140,6 +140,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Engine\Renderer\Buffer.h" />
+    <ClInclude Include="src\Engine\Renderer\Renderer.h" />
     <ClInclude Include="src\Engine\Renderer\Shader.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Engine.h" />
@@ -160,7 +162,9 @@
     <ClInclude Include="src\Engine\Window.h" />
     <ClInclude Include="src\Engine\core.h" />
     <ClInclude Include="src\Engine\imGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGlBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\pch.h" />
@@ -530,6 +534,8 @@
     <ClInclude Include="vendor\Glm\glm\vector_relational.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Engine\Renderer\Shader.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Engine\Application.cpp" />
@@ -541,7 +547,9 @@
     <ClCompile Include="src\Engine\Log.cpp" />
     <ClCompile Include="src\Engine\imGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\imGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGlContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\pch.cpp">

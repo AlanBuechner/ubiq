@@ -21,21 +21,18 @@ namespace Engine
 
 		enum class ShaderType
 		{
-			NONE = -1, VERTEX = BIT(0), PIXLE = BIT(1)
+			None = -1, Vertex = BIT(0), Pixle = BIT(1)
 		};
-	public:
-		Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
-		~Shader();
 
-		void Bind();
-		void UnBind();
+	public:
+		virtual ~Shader() {};
+
+		virtual void Bind() = 0;
+		virtual void Unbind() = 0;
 
 		static ShaderSorce LoadShader(std::string file);
 		static ShaderSorce LoadShader(std::string file, ShaderType type);
 
-	protected:
-
-	private:
-		uint32_t m_RendererID;
+		static Shader* Create(const std::string& vertexSrc, const std::string& pixleSrc);
 	};
 }

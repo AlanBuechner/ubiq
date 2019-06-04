@@ -31,9 +31,6 @@ namespace Engine {
 		glGenVertexArrays(1, &m_VertexArray);
 		glBindVertexArray(m_VertexArray);
 
-		glGenBuffers(1, &m_VertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-
 		float vertices[4*3] = 
 		{
 			-0.5f, -0.5f, 0.0f,
@@ -42,22 +39,19 @@ namespace Engine {
 			-0.5f,  0.5f, 0.0f
 		};
 
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
 
-		glGenBuffers(1, &m_IndexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+		uint32_t indeces[] = { 0, 1, 2,  1, 3, 2};
 
-		unsigned int indeces[] = { 0, 1, 2, 2, 0, 3};
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indeces), indeces, GL_STATIC_DRAW);
+		m_IndexBuffer.reset(IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t)));
 
 		Shader::ShaderSorce src;
-		src << Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\shader.hlsl", Shader::ShaderType::VERTEX);
-		src << Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\shader.hlsl", Shader::ShaderType::PIXLE);
+		src << Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\shader.hlsl");
 
-		m_Shader.reset(new Shader(src.vertexShader, src.pixleShader));
+		m_Shader.reset(Shader::Create(src.vertexShader, src.pixleShader));
 	}
 
 	Application::~Application()
@@ -89,7 +83,7 @@ namespace Engine {
 
 			m_Shader->Bind();
 			glBindVertexArray(m_VertexArray);
-			glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 
 			Input::UpdateKeyState();
 
@@ -117,8 +111,6 @@ namespace Engine {
 	{
 		if (inputBuffer.empty()) return;
 
-		Input::GetUpdatedEventList(inputBuffer);
-
 		for (auto i = inputBuffer.end(); i != inputBuffer.begin();)
 		{
 			Event& e = *(*--i);
@@ -128,7 +120,13 @@ namespace Engine {
 			dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnKeyReleased, Input::s_Instance));
 			dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMousePressed, Input::s_Instance));
 			dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMouseReleased, Input::s_Instance));
+		}
 
+		Input::GetUpdatedEventList(inputBuffer);
+
+		for (auto i = inputBuffer.end(); i != inputBuffer.begin();)
+		{
+			Event& e = *(*--i);
 			for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 			{
 				(*--it)->OnEvent(e);
