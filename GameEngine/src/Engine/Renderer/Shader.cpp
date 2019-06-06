@@ -54,13 +54,13 @@ namespace Engine
 		return sorce;
 	}
 
-	Shader::ShaderSorce Shader::LoadShader(std::string file, ShaderType type)
+	Shader::ShaderSorce Shader::LoadShader(std::string file, int type)
 	{
 		ShaderSorce src = LoadShader(file);
 		ShaderSorce srcToReturn;
-		if (type == ShaderType::Vertex)
+		if ((type & (int)ShaderType::Vertex) != 0)
 			srcToReturn.vertexShader = src.vertexShader;
-		if (type == ShaderType::Pixle)
+		if ((type & (int)ShaderType::Pixle) != 0)
 			srcToReturn.pixleShader = src.pixleShader;
 
 		return srcToReturn;

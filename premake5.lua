@@ -24,7 +24,6 @@ include "GameEngine/vendor/imgui"
 
 project "GameEngine"
 	location "GameEngine"
-	icon "logo/UBIQ.ico"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"

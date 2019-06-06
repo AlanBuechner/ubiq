@@ -19,7 +19,7 @@ namespace Engine
 			}
 		};
 
-		enum class ShaderType
+		enum ShaderType
 		{
 			None = -1, Vertex = BIT(0), Pixle = BIT(1)
 		};
@@ -31,7 +31,7 @@ namespace Engine
 		virtual void Unbind() = 0;
 
 		static ShaderSorce LoadShader(std::string file);
-		static ShaderSorce LoadShader(std::string file, ShaderType type);
+		static ShaderSorce LoadShader(std::string file, int type);
 
 		static Shader* Create(const std::string& vertexSrc, const std::string& pixleSrc);
 	};
