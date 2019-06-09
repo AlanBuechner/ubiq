@@ -18,6 +18,26 @@ namespace Engine {
 
 	Application* Application::s_Instance = nullptr;
 
+	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
+	{
+		switch (type)
+		{
+		case Engine::ShaderDataType::Float:
+		case Engine::ShaderDataType::Float2:
+		case Engine::ShaderDataType::Float3:
+		case Engine::ShaderDataType::Float4:
+		case Engine::ShaderDataType::Mat3:		
+		case Engine::ShaderDataType::Mat4:		return GL_FLOAT;
+		case Engine::ShaderDataType::Int:		
+		case Engine::ShaderDataType::Int2:		
+		case Engine::ShaderDataType::Int3:		
+		case Engine::ShaderDataType::Int4:		return GL_INT;
+		case Engine::ShaderDataType::Bool:		return GL_BOOL;
+		}
+		CORE_ASSERT(false, "Unknown ShaderDataType!");
+		return 0;
+	}
+
 	Application::Application()
 	{
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!")
@@ -31,20 +51,40 @@ namespace Engine {
 		glGenVertexArrays(1, &m_VertexArray);
 		glBindVertexArray(m_VertexArray);
 
-		float vertices[4*3] = 
+		float vertices[4*7] = 
 		{
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.5f,  0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f
+			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f
 		};
 
 		m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+		{
+			BufferLayout layout = {
+				{ShaderDataType::Float3, "a_Position"},
+				{ShaderDataType::Float4, "a_Color"}
+			};
 
-		uint32_t indeces[] = { 0, 1, 2,  1, 3, 2};
+			m_VertexBuffer->SetLayout(layout);
+		}
+
+		uint32_t index = 0;
+		auto& layout = m_VertexBuffer->GetLayout();
+		for (auto& element : layout)
+		{
+			glEnableVertexAttribArray(index);
+			glVertexAttribPointer(index, 
+				element.GetComponentCount(), 
+				ShaderDataTypeToOpenGLBaseType(element.Type), 
+				element.Normalized ? GL_TRUE : GL_FALSE, 
+				layout.GetStride(), 
+				(const void*)element.Offset);
+			index++;
+		}
+
+		uint32_t indeces[] = { 0, 1, 2,  0, 3, 2};
 
 		m_IndexBuffer.reset(IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t)));
 

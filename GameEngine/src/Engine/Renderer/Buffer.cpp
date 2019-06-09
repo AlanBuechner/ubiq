@@ -17,7 +17,7 @@ namespace Engine
 		case RendererAPI::OpenGl:
 			return new OpenGLVertexBuffer(vertices, size);
 		}
-		CORE_ASSERT(false, "Unknown RendererAPI!")
+		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
 
@@ -31,7 +31,7 @@ namespace Engine
 		case RendererAPI::OpenGl:
 			return new OpenGLIndexBuffer(indices, size);
 		}
-		CORE_ASSERT(false, "Unknown RendererAPI!")
-			return nullptr;
+		CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
 	}
 }
