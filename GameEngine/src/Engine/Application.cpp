@@ -18,40 +18,19 @@ namespace Engine {
 
 	Application* Application::s_Instance = nullptr;
 
-	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
-	{
-		switch (type)
-		{
-		case Engine::ShaderDataType::Float:
-		case Engine::ShaderDataType::Float2:
-		case Engine::ShaderDataType::Float3:
-		case Engine::ShaderDataType::Float4:
-		case Engine::ShaderDataType::Mat3:		
-		case Engine::ShaderDataType::Mat4:		return GL_FLOAT;
-		case Engine::ShaderDataType::Int:		
-		case Engine::ShaderDataType::Int2:		
-		case Engine::ShaderDataType::Int3:		
-		case Engine::ShaderDataType::Int4:		return GL_INT;
-		case Engine::ShaderDataType::Bool:		return GL_BOOL;
-		}
-		CORE_ASSERT(false, "Unknown ShaderDataType!");
-		return 0;
-	}
-
 	Application::Application()
 	{
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!")
-		s_Instance = this;
+			s_Instance = this;
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent));
-		
+
 		GenLayerStack();
 
-		glGenVertexArrays(1, &m_VertexArray);
-		glBindVertexArray(m_VertexArray);
+		m_VertexArray.reset(VertexArray::Create());
 
-		float vertices[4*7] = 
+		float vertices[4 * 7] =
 		{
 			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 			 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
@@ -61,32 +40,19 @@ namespace Engine {
 
 		m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
-		{
-			BufferLayout layout = {
-				{ShaderDataType::Float3, "a_Position"},
-				{ShaderDataType::Float4, "a_Color"}
-			};
+		BufferLayout layout = {
+			{ShaderDataType::Float3, "a_Position"},
+			{ShaderDataType::Float4, "a_Color"}
+		};
 
-			m_VertexBuffer->SetLayout(layout);
-		}
+		m_VertexBuffer->SetLayout(layout);
 
-		uint32_t index = 0;
-		auto& layout = m_VertexBuffer->GetLayout();
-		for (auto& element : layout)
-		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index, 
-				element.GetComponentCount(), 
-				ShaderDataTypeToOpenGLBaseType(element.Type), 
-				element.Normalized ? GL_TRUE : GL_FALSE, 
-				layout.GetStride(), 
-				(const void*)element.Offset);
-			index++;
-		}
+		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 
-		uint32_t indeces[] = { 0, 1, 2,  0, 3, 2};
+		uint32_t indeces[] = { 0, 1, 2,  0, 3, 2 };
 
 		m_IndexBuffer.reset(IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t)));
+		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
 		Shader::ShaderSorce src;
 		src << Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\shader.hlsl");
@@ -122,7 +88,7 @@ namespace Engine {
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			m_Shader->Bind();
-			glBindVertexArray(m_VertexArray);
+			m_VertexArray->Bind();
 			glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 
 			Input::UpdateKeyState();
