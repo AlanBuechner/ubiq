@@ -183,6 +183,20 @@ namespace Engine
 	{
 		s_Instance->bindedKeys.push_back(key);
 	}
+
+	void Input::UbindKey(int key)
+	{
+		int index = 0;
+		for (int* i : s_Instance->bindedKeys)
+		{
+			if (*i == key)
+			{
+				s_Instance->bindedKeys.erase(s_Instance->bindedKeys.begin() + index);
+				return;
+			}
+			index++;
+		}
+	}
 	
 	inline bool Input::isKeyBinded(int key)
 	{

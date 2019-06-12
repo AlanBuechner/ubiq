@@ -17,15 +17,18 @@ glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 class ExampleLayer : public Engine::Layer
 {
 public:
+	Engine::EventData* boundedKey;
+	InputControler* input;
+
 	bool set = false;
 	ExampleLayer()
 		: Layer("Example")
 	{
-		InputControler* input = new InputControler(InputManeger);
+		input = new InputControler(InputManeger);
 
 		input->BindEvent(MOUSE_LBUTTON, MOUSE_PRESSED, BIND_ACTION(&ExampleLayer::thing));
-		input->BindEvent(KEYCODE_W, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, 1.0f));
-		input->BindEvent(KEYCODE_S, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, -1.0f));
+		boundedKey = input->BindEvent(KEYCODE_W, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, true));
+		input->BindEvent(KEYCODE_S, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, false));
 
 	}
 
@@ -49,9 +52,14 @@ public:
 		DEBUG_INFO("the mouse button was pressed");
 	}
 
-	void thing2(float i)
+	void thing2(bool i)
 	{
+
 		DEBUG_INFO("{0}", i);
+		if (i == false)
+		{
+			input->UnbindKey(boundedKey);
+		}
 	}
 };
 

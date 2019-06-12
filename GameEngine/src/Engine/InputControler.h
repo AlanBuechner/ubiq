@@ -16,8 +16,8 @@ namespace Engine
 
 	struct ENGINE_API EventData
 	{
-		int type;
-		std::function<void()> function;
+		int Type;
+		std::function<void()> Function;
 		int Key;
 	};
 
@@ -29,7 +29,8 @@ namespace Engine
 
 		void RaiseEvent(int key, int state);
 
-		int* BindEvent(int key, int state, std::function<void()> func);
+		EventData* BindEvent(int key, int state, std::function<void()> func);
+		void UnbindKey(EventData* event);
 
 	private:
 		std::vector<EventData*> events;

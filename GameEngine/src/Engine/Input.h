@@ -234,6 +234,7 @@ namespace Engine
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
 		static void BindKey(int* key);
+		static void UbindKey(int key);
 
 	private:
 		// keybord
