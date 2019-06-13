@@ -26,12 +26,11 @@ namespace Engine
 		void AddControler(InputControler* controler);
 
 	private:
-		bool OnKeyPressedEvent(KeyPressedEvent& e);
-		bool OnKeyRelesedEvent(KeyReleasedEvent& e);
-		bool OnKeyDownEvent(KeyDownEvent& e);
-		bool OnKeyTypedEvent(KeyTypedEvent& e);
-		bool OnMousePressedEvent(MouseButtonPressedEvent& e);
-		bool OnMouseReleasedEvent(MouseButtonReleasedEvent& e);
+		template<class T>
+		bool OnKeyEvent(T& e);
+
+		template<class T>
+		bool OnMouseEvent(T& e);
 
 		std::vector<InputControler*> controlers;
 
