@@ -24,6 +24,7 @@ namespace Engine
 
 		void Update(Event& event);
 		void AddControler(InputControler* controler);
+		void RemoveControler(InputControler* controler);
 
 	private:
 		template<class T>
@@ -33,8 +34,5 @@ namespace Engine
 		bool OnMouseEvent(T& e);
 
 		std::vector<InputControler*> controlers;
-
-		std::vector<InputControler*>::iterator begin() { return controlers.begin(); }
-		std::vector<InputControler*>::iterator end() { return controlers.end(); }
 	};
 }

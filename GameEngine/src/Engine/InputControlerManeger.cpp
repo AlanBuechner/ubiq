@@ -32,13 +32,25 @@ namespace Engine
 		controlers.push_back(controler);
 	}
 
+	void InputControlerManeger::RemoveControler(InputControler * controler)
+	{
+		int index = 0;
+		for (auto i : controlers)
+		{
+			if (i == controler)
+			{
+				controlers.erase(controlers.begin() + index);
+			}
+		}
+	}
+
 	template<class T>
 	bool InputControlerManeger::OnKeyEvent(T& e) 
 	{
 		EventType type = e.GetEventType();
-		for (auto i = begin(); i != end(); i++)
+		for (auto i : controlers)
 		{
-			(*i)->RaiseEvent(e.GetKeyCode(), (int)type);
+			i->RaiseEvent(e.GetKeyCode(), (int)type);
 		}
 		return false;
 	}
@@ -47,9 +59,9 @@ namespace Engine
 	bool InputControlerManeger::OnMouseEvent(T & e)
 	{
 		EventType type = e.GetEventType();
-		for (auto i = begin(); i != end(); i++)
+		for (auto i : controlers)
 		{
-			(*i)->RaiseEvent(e.GetMouseButton(), (int)type);
+			i->RaiseEvent(e.GetMouseButton(), (int)type);
 		}
 		return false;
 	}

@@ -6,7 +6,20 @@ namespace Engine
 {
 	InputControler::InputControler(InputControlerManeger* maneger)
 	{
-		maneger->AddControler(this);
+		m_Maneger = maneger;
+		m_Maneger->AddControler(this);
+	}
+
+	InputControler::~InputControler()
+	{
+		// remove controler from maneger
+		
+		// unbind events
+		for (auto i : events)
+		{
+			Input::UnbindKey(i->Key);
+			delete i;
+		}
 	}
 
 	void InputControler::RaiseEvent(int key, int state)
@@ -39,7 +52,7 @@ namespace Engine
 		{
 			if (e == event)
 			{
-				Input::UbindKey(e->Key);
+				Input::UnbindKey(e->Key);
 				events.erase(events.begin() + index);
 				return;
 			}

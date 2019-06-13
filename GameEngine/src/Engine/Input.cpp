@@ -184,7 +184,7 @@ namespace Engine
 		s_Instance->bindedKeys.push_back(key);
 	}
 
-	void Input::UbindKey(int key)
+	void Input::UnbindKey(int key)
 	{
 		int index = 0;
 		for (int* i : s_Instance->bindedKeys)

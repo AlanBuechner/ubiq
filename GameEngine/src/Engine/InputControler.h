@@ -26,6 +26,7 @@ namespace Engine
 	public:
 
 		InputControler(InputControlerManeger* maneger);
+		~InputControler();
 
 		void RaiseEvent(int key, int state);
 
@@ -34,6 +35,8 @@ namespace Engine
 
 	private:
 		std::vector<EventData*> events;
+
+		InputControlerManeger* m_Maneger;
 
 	};
 }
