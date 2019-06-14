@@ -8,12 +8,12 @@ namespace Engine {
 	Layer::Layer(const std::string& debugName)
 		: m_DebugName(debugName)
 	{
-		InputManeger = new InputControlerManeger();
+		m_InputManeger = new InputControlerManeger();
 	}
 
 	Layer::~Layer()
 	{
-		delete InputManeger;
+		delete m_InputManeger;
 	}
-	inline void Layer::OnEvent(Event & event) { InputManeger->Update(event); }
+	inline void Layer::OnEvent(Event & event) { m_InputManeger->Update(event); }
 }

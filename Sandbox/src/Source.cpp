@@ -24,7 +24,7 @@ public:
 	ExampleLayer()
 		: Layer("Example")
 	{
-		input = new InputControler(InputManeger);
+		input = new InputControler(m_InputManeger);
 
 		input->BindEvent(MOUSE_LBUTTON, MOUSE_PRESSED, BIND_ACTION(&ExampleLayer::thing));
 		boundedKey = input->BindEvent(KEYCODE_W, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, true));

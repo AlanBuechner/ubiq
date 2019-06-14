@@ -29,7 +29,7 @@ namespace Engine
 
 	protected:
 
-		InputControlerManeger* InputManeger;
+		InputControlerManeger* m_InputManeger;
 
 		std::string m_DebugName;
 	};

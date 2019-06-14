@@ -184,15 +184,15 @@ namespace Engine
 		};
 
 	protected:
-		inline int GetKeyCodeImpl(std::string key) { return asciiToUbiq[key]; }
-		inline int OglToUbiqImpl(int key) { return oglToUbiq[key]; }
-		inline int UbiqToOglImpl(int key) { return ubiqToOgl[key]; }
-		inline int OglToUbiqMouseImpl(int key) { return oglToUbiqMouse[key]; }
+		inline int GetKeyCodeImpl(std::string key) { return m_AsciiToUbiq[key]; }
+		inline int OglToUbiqImpl(int key) { return m_OglToUbiq[key]; }
+		inline int UbiqToOglImpl(int key) { return m_UbiqToOgl[key]; }
+		inline int OglToUbiqMouseImpl(int key) { return m_OglToUbiqMouse[key]; }
 
-		std::map<std::string, int> asciiToUbiq;
-		std::map<int, int> oglToUbiq;
-		std::map<int, int> ubiqToOgl;
-		std::map<int, int> oglToUbiqMouse;
+		std::map<std::string, int> m_AsciiToUbiq;
+		std::map<int, int> m_OglToUbiq;
+		std::map<int, int> m_UbiqToOgl;
+		std::map<int, int> m_OglToUbiqMouse;
 
 	private:
 		static KeyCode* s_Instance;
@@ -247,8 +247,8 @@ namespace Engine
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
 
-		void SetKeyState(int key, KeyState state) { KeyStates[key] = state; }
-		void SetMouseButtonState(int button, KeyState state) { MouseStates[button] = state; }
+		void SetKeyState(int key, KeyState state) { m_KeyStates[key] = state; }
+		void SetMouseButtonState(int button, KeyState state) { m_MouseStates[button] = state; }
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnKeyReleased(KeyReleasedEvent& e);
 		bool OnMousePressed(MouseButtonPressedEvent& e);
@@ -263,14 +263,14 @@ namespace Engine
 	private:
 		static Input* s_Instance;
 
-		std::map<int, KeyState> KeyStates;
-		std::map<int, KeyState> MouseStates;
+		std::map<int, KeyState> m_KeyStates;
+		std::map<int, KeyState> m_MouseStates;
 
-		std::vector<int> ToUpdate;
-		std::vector<int> ToUpdateMouse;
+		std::vector<int> m_ToUpdate;
+		std::vector<int> m_ToUpdateMouse;
 
-		std::vector<int> KeysDown;
-		std::vector<int*> bindedKeys;
+		std::vector<int> m_KeysDown;
+		std::vector<int*> m_bindedKeys;
 
 	};
 }

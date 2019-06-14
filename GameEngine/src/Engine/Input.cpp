@@ -21,72 +21,72 @@ namespace Engine
 		// init ogltoubiq keycodes
 		for (int i = (int)'A'; i <= (int)'Z'; i++)
 		{
-			oglToUbiq[i] = i;
+			m_OglToUbiq[i] = i;
 		}
 		for (int i = (int)'0'; i <= (int)'9'; i++)
 		{
-			oglToUbiq[i] = i;
+			m_OglToUbiq[i] = i;
 		}
-		oglToUbiq[GLFW_KEY_SPACE] = KEYCODE_SPACE;
-		oglToUbiq[GLFW_KEY_ENTER] = KEYCODE_ENTER;
-		oglToUbiq[GLFW_KEY_LEFT_ALT] = KEYCODE_LEFT_ALT;
-		oglToUbiq[GLFW_KEY_RIGHT_ALT] = KEYCODE_RIGHT_ALT;
-		oglToUbiq[GLFW_KEY_LEFT_SHIFT] = KEYCODE_LEFT_SHIFT;
-		oglToUbiq[GLFW_KEY_RIGHT_SHIFT] = KEYCODE_RIGHT_SHIFT;
-		oglToUbiq[GLFW_KEY_LEFT_CONTROL] = KEYCODE_LEFT_CONTROL;
-		oglToUbiq[GLFW_KEY_RIGHT_CONTROL] = KEYCODE_RIGHT_CONTROL;
-		oglToUbiq[GLFW_KEY_LEFT_SUPER] = KEYCODE_LEFT_SUPER;
-		oglToUbiq[GLFW_KEY_RIGHT_SUPER] = KEYCODE_RIGHT_SUPER;
-		oglToUbiq[GLFW_KEY_RIGHT_SUPER] = KEYCODE_RIGHT_SUPER;
-		oglToUbiq[GLFW_KEY_BACKSPACE] = KEYCODE_BACKSPACE;
-		oglToUbiq[GLFW_KEY_TAB] = KEYCODE_TAB;
-		oglToUbiq[GLFW_KEY_CAPS_LOCK] = KEYCODE_CAPS_LOCK;
-		oglToUbiq[GLFW_KEY_APOSTROPHE] = KEYCODE_APOSTROPHE;
-		oglToUbiq[GLFW_KEY_SEMICOLON] = KEYCODE_SEMICOLON;
-		oglToUbiq[GLFW_KEY_LEFT_BRACKET] = KEYCODE_LEFT_BRACKET;
-		oglToUbiq[GLFW_KEY_RIGHT_BRACKET] = KEYCODE_RIGHT_BRACKET;
-		oglToUbiq[GLFW_KEY_BACKSLASH] = KEYCODE_BACKSLASH;
-		oglToUbiq[GLFW_KEY_COMMA] = KEYCODE_COMMA;
-		oglToUbiq[GLFW_KEY_PERIOD] = KEYCODE_PERIOD;
-		oglToUbiq[GLFW_KEY_SLASH] = KEYCODE_SLASH;
-		oglToUbiq[GLFW_KEY_MINUS] = KEYCODE_MINUS;
-		oglToUbiq[GLFW_KEY_EQUAL] = KEYCODE_EQUAL;
-		oglToUbiq[GLFW_KEY_GRAVE_ACCENT] = KEYCODE_TILDE;
-		oglToUbiq[GLFW_KEY_PAGE_UP] = KEYCODE_PAGE_UP;
-		oglToUbiq[GLFW_KEY_PAGE_DOWN] = KEYCODE_PAGE_DOWN;
-		oglToUbiq[GLFW_KEY_HOME] = KEYCODE_HOME;
-		oglToUbiq[GLFW_KEY_END] = KEYCODE_END;
-		oglToUbiq[GLFW_KEY_INSERT] = KEYCODE_INSERT;
-		oglToUbiq[GLFW_KEY_DELETE] = KEYCODE_DELETE;
+		m_OglToUbiq[GLFW_KEY_SPACE] = KEYCODE_SPACE;
+		m_OglToUbiq[GLFW_KEY_ENTER] = KEYCODE_ENTER;
+		m_OglToUbiq[GLFW_KEY_LEFT_ALT] = KEYCODE_LEFT_ALT;
+		m_OglToUbiq[GLFW_KEY_RIGHT_ALT] = KEYCODE_RIGHT_ALT;
+		m_OglToUbiq[GLFW_KEY_LEFT_SHIFT] = KEYCODE_LEFT_SHIFT;
+		m_OglToUbiq[GLFW_KEY_RIGHT_SHIFT] = KEYCODE_RIGHT_SHIFT;
+		m_OglToUbiq[GLFW_KEY_LEFT_CONTROL] = KEYCODE_LEFT_CONTROL;
+		m_OglToUbiq[GLFW_KEY_RIGHT_CONTROL] = KEYCODE_RIGHT_CONTROL;
+		m_OglToUbiq[GLFW_KEY_LEFT_SUPER] = KEYCODE_LEFT_SUPER;
+		m_OglToUbiq[GLFW_KEY_RIGHT_SUPER] = KEYCODE_RIGHT_SUPER;
+		m_OglToUbiq[GLFW_KEY_RIGHT_SUPER] = KEYCODE_RIGHT_SUPER;
+		m_OglToUbiq[GLFW_KEY_BACKSPACE] = KEYCODE_BACKSPACE;
+		m_OglToUbiq[GLFW_KEY_TAB] = KEYCODE_TAB;
+		m_OglToUbiq[GLFW_KEY_CAPS_LOCK] = KEYCODE_CAPS_LOCK;
+		m_OglToUbiq[GLFW_KEY_APOSTROPHE] = KEYCODE_APOSTROPHE;
+		m_OglToUbiq[GLFW_KEY_SEMICOLON] = KEYCODE_SEMICOLON;
+		m_OglToUbiq[GLFW_KEY_LEFT_BRACKET] = KEYCODE_LEFT_BRACKET;
+		m_OglToUbiq[GLFW_KEY_RIGHT_BRACKET] = KEYCODE_RIGHT_BRACKET;
+		m_OglToUbiq[GLFW_KEY_BACKSLASH] = KEYCODE_BACKSLASH;
+		m_OglToUbiq[GLFW_KEY_COMMA] = KEYCODE_COMMA;
+		m_OglToUbiq[GLFW_KEY_PERIOD] = KEYCODE_PERIOD;
+		m_OglToUbiq[GLFW_KEY_SLASH] = KEYCODE_SLASH;
+		m_OglToUbiq[GLFW_KEY_MINUS] = KEYCODE_MINUS;
+		m_OglToUbiq[GLFW_KEY_EQUAL] = KEYCODE_EQUAL;
+		m_OglToUbiq[GLFW_KEY_GRAVE_ACCENT] = KEYCODE_TILDE;
+		m_OglToUbiq[GLFW_KEY_PAGE_UP] = KEYCODE_PAGE_UP;
+		m_OglToUbiq[GLFW_KEY_PAGE_DOWN] = KEYCODE_PAGE_DOWN;
+		m_OglToUbiq[GLFW_KEY_HOME] = KEYCODE_HOME;
+		m_OglToUbiq[GLFW_KEY_END] = KEYCODE_END;
+		m_OglToUbiq[GLFW_KEY_INSERT] = KEYCODE_INSERT;
+		m_OglToUbiq[GLFW_KEY_DELETE] = KEYCODE_DELETE;
 		// numpad
 		for (int i = GLFW_KEY_KP_0; i <= GLFW_KEY_KP_9; i++)
 		{
-			oglToUbiq[i] = i-224;
+			m_OglToUbiq[i] = i-224;
 		}
-		oglToUbiq[GLFW_KEY_NUM_LOCK] = KEYCODE_NUM_LOCK;
-		oglToUbiq[GLFW_KEY_KP_DECIMAL] = KEYCODE_NUM_DECIMAL;
-		oglToUbiq[GLFW_KEY_KP_DIVIDE] = KEYCODE_NUM_DIVIDE;
-		oglToUbiq[GLFW_KEY_KP_MULTIPLY] = KEYCODE_NUM_MULTIPLY;
-		oglToUbiq[GLFW_KEY_KP_SUBTRACT] = KEYCODE_NUM_SUBTRACT;
-		oglToUbiq[GLFW_KEY_KP_ADD] = KEYCODE_NUM_ADD;
-		oglToUbiq[GLFW_KEY_KP_ENTER] = KEYCODE_NUM_ENTER;
+		m_OglToUbiq[GLFW_KEY_NUM_LOCK] = KEYCODE_NUM_LOCK;
+		m_OglToUbiq[GLFW_KEY_KP_DECIMAL] = KEYCODE_NUM_DECIMAL;
+		m_OglToUbiq[GLFW_KEY_KP_DIVIDE] = KEYCODE_NUM_DIVIDE;
+		m_OglToUbiq[GLFW_KEY_KP_MULTIPLY] = KEYCODE_NUM_MULTIPLY;
+		m_OglToUbiq[GLFW_KEY_KP_SUBTRACT] = KEYCODE_NUM_SUBTRACT;
+		m_OglToUbiq[GLFW_KEY_KP_ADD] = KEYCODE_NUM_ADD;
+		m_OglToUbiq[GLFW_KEY_KP_ENTER] = KEYCODE_NUM_ENTER;
 		for (int i = GLFW_KEY_F1; i <= GLFW_KEY_F25; i++)
 		{
-			oglToUbiq[i] = i-178;
+			m_OglToUbiq[i] = i-178;
 		}
 		// mouse
-		oglToUbiqMouse[GLFW_MOUSE_BUTTON_LEFT] = MOUSE_LBUTTON;
-		oglToUbiqMouse[GLFW_MOUSE_BUTTON_RIGHT] = MOUSE_RBUTTON;
-		oglToUbiqMouse[GLFW_MOUSE_BUTTON_MIDDLE] = MOUSE_MBUTTON;
+		m_OglToUbiqMouse[GLFW_MOUSE_BUTTON_LEFT] = MOUSE_LBUTTON;
+		m_OglToUbiqMouse[GLFW_MOUSE_BUTTON_RIGHT] = MOUSE_RBUTTON;
+		m_OglToUbiqMouse[GLFW_MOUSE_BUTTON_MIDDLE] = MOUSE_MBUTTON;
 	}
 
-	inline Input::KeyState Input::GetKeyStateImpl(int keycode) { return KeyStates[keycode]; }
+	inline Input::KeyState Input::GetKeyStateImpl(int keycode) { return m_KeyStates[keycode]; }
 	inline bool Input::GetKeyDown(int keycode) { return (GetKeyState(keycode) == Input::Down); }
 	inline bool Input::GetKeyUp(int keycode) { return (GetKeyState(keycode) == Input::Up); }
 	inline bool Input::GetKeyPressed(int keycode) { return (GetKeyState(keycode) == Input::KeyPressed); }
 	inline bool Input::GetKeyReleased(int keycode) { return (GetKeyState(keycode) == Input::KeyReleased); }
 
-	inline Input::KeyState Input::GetMouseButtonStateImpl(int button) { return MouseStates[button]; }
+	inline Input::KeyState Input::GetMouseButtonStateImpl(int button) { return m_MouseStates[button]; }
 	inline bool Input::GetMouseButtonDown(int button) { return (GetMouseButtonState(button) == Input::Down); }
 	inline bool Input::GetMouseButtonUp(int button) { return (GetMouseButtonState(button) == Input::Up); }
 	inline bool Input::GetMouseButtonPressed(int button) { return (GetMouseButtonState(button) == Input::MousePressed); }
@@ -96,8 +96,8 @@ namespace Engine
 	{ 
 		int keycode = e.GetKeyCode();
 		SetKeyState(keycode, KeyPressed); 
-		ToUpdate.push_back(keycode);
-		KeysDown.push_back(keycode);
+		m_ToUpdate.push_back(keycode);
+		m_KeysDown.push_back(keycode);
 		return false; 
 	}
 
@@ -105,9 +105,9 @@ namespace Engine
 	{ 
 		int keycode = e.GetKeyCode();
 		SetKeyState(keycode, KeyReleased); 
-		ToUpdate.push_back(keycode);
+		m_ToUpdate.push_back(keycode);
 		std::vector<int>::const_iterator toRemove;
-		for (std::vector<int>::const_iterator it = KeysDown.begin(); it < KeysDown.end(); it++)
+		for (std::vector<int>::const_iterator it = m_KeysDown.begin(); it < m_KeysDown.end(); it++)
 		{
 			if (*it == keycode)
 			{
@@ -115,7 +115,7 @@ namespace Engine
 				break;
 			}
 		}
-		KeysDown.erase(toRemove);
+		m_KeysDown.erase(toRemove);
 		return false; 
 	}
 
@@ -123,7 +123,7 @@ namespace Engine
 	{
 		int button = e.GetMouseButton();
 		SetMouseButtonState(button, MousePressed);
-		ToUpdateMouse.push_back(button);
+		m_ToUpdateMouse.push_back(button);
 		return false;
 	}
 
@@ -131,14 +131,14 @@ namespace Engine
 	{
 		int button = e.GetMouseButton();
 		SetMouseButtonState(button, MouseReleased);
-		ToUpdateMouse.push_back(button);
+		m_ToUpdateMouse.push_back(button);
 		return false;
 	}
 
 	void Input::UpdateKeyStateImpl()
 	{
 		// keyboard
-		for (int i : ToUpdate)
+		for (int i : m_ToUpdate)
 		{
 			int state = GetKeyState(i);
 			if (state == Input::KeyPressed)
@@ -150,10 +150,10 @@ namespace Engine
 				SetKeyState(i, Input::Up);
 			}
 		}
-		ToUpdate.clear();
+		m_ToUpdate.clear();
 
 		// mouse
-		for (int i : ToUpdateMouse)
+		for (int i : m_ToUpdateMouse)
 		{
 			int state = GetMouseButtonState(i);
 			if (state == Input::MousePressed)
@@ -165,12 +165,12 @@ namespace Engine
 				SetMouseButtonState(i, Input::Up);
 			}
 		}
-		ToUpdateMouse.clear();
+		m_ToUpdateMouse.clear();
 	}
 
 	void Input::GetUpdatedEventList(std::vector<Event*>& events)
 	{
-		for (auto i : s_Instance->KeysDown)
+		for (auto i : s_Instance->m_KeysDown)
 		{
 			if (s_Instance->isKeyBinded(i))
 			{
@@ -181,17 +181,17 @@ namespace Engine
 
 	void Input::BindKey(int * key)
 	{
-		s_Instance->bindedKeys.push_back(key);
+		s_Instance->m_bindedKeys.push_back(key);
 	}
 
 	void Input::UnbindKey(int key)
 	{
 		int index = 0;
-		for (int* i : s_Instance->bindedKeys)
+		for (int* i : s_Instance->m_bindedKeys)
 		{
 			if (*i == key)
 			{
-				s_Instance->bindedKeys.erase(s_Instance->bindedKeys.begin() + index);
+				s_Instance->m_bindedKeys.erase(s_Instance->m_bindedKeys.begin() + index);
 				return;
 			}
 			index++;
@@ -200,7 +200,7 @@ namespace Engine
 	
 	inline bool Input::isKeyBinded(int key)
 	{
-		for (int* i : bindedKeys)
+		for (int* i : m_bindedKeys)
 		{
 			if (*i == key)
 			{
