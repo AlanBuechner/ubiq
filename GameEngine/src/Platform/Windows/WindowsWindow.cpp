@@ -167,7 +167,7 @@ namespace Engine
 
 	void WindowsWindow::OnUpdate()
 	{
-		m_Context->SwapBuffers();
+		m_Context->SwapBuffers(); // swap frame buffers
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)

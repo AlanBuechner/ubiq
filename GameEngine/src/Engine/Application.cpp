@@ -21,10 +21,10 @@ namespace Engine {
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!")
 			s_Instance = this;
 
-		m_Window = std::unique_ptr<Window>(Window::Create());
-		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent));
+		m_Window = std::unique_ptr<Window>(Window::Create()); // create a window
+		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
 
-		GenLayerStack();
+		GenLayerStack(); // generate the starting layer stack
 
 		m_VertexArray.reset(VertexArray::Create());
 
@@ -89,31 +89,35 @@ namespace Engine {
 			m_VertexArray->Bind();
 			glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 
-			Input::UpdateKeyState();
+			Input::UpdateKeyState(); // update the key stats
 
-			SendInputBuffer();
+			SendInputBuffer(); // sent the input buffer through the layer stack
 
+			// update the layer stack
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
 
+			// render im gui layer
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
 			m_ImGuiLayer->End();
 
+			// update the window
 			m_Window->OnUpdate();
 		}
 	}
 
 	void Application::GenLayerStack()
 	{
+		// create im gui layer
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 	}
 
 	void Application::SendInputBuffer()
 	{
-		if (inputBuffer.empty()) return;
+		if (inputBuffer.empty()) return; // 
 
 		for (auto i = inputBuffer.end(); i != inputBuffer.begin();)
 		{
