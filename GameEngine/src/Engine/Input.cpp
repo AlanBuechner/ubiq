@@ -2,7 +2,6 @@
 #include "Input.h"
 #include "Events/KeyEvent.h"
 #include "Events/MouseEvent.h"
-#include "Log.h"
 #include "InputControlerManeger.h"
 
 #include <GLFW/glfw3.h>

@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "Application.h"
 
-#include "Engine/Log.h"
-
 #include "Input.h"
 
 #include "Engine/Events/Event.h"

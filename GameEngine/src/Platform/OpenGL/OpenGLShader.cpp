@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "OpenGLShader.h"
-#include "Engine/Log.h"
 #include <glad/glad.h>
 
 namespace Engine

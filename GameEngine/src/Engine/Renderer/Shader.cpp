@@ -2,7 +2,6 @@
 #include "Shader.h"
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
-#include "Engine/Log.h"
 
 #include <fstream>
 

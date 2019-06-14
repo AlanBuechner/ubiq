@@ -5,7 +5,6 @@
 #include <map>
 #include <string>
 #include "Application.h"
-#include "InputControler.h"
 
 #define KEY_PRESSED		(int)Engine::Input::KeyPressed
 #define KEY_RELEASED	(int)Engine::Input::KeyReleased

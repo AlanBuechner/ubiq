@@ -8,8 +8,11 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 #include <unordered_map>
 #include <unordered_set>
+
+#include "Engine/Log.h"
 
 #ifdef PLATFORM_WINDOWS
 	#include <Windows.h>

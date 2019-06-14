@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "Engine/Log.h"
 #include "OpenGLVertexArray.h"
 #include <glad/glad.h>
 
