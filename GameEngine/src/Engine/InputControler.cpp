@@ -13,6 +13,7 @@ namespace Engine
 	InputControler::~InputControler()
 	{
 		// remove controler from maneger
+		m_Maneger->RemoveControler(this);
 		
 		// unbind events
 		for (auto i : events)
