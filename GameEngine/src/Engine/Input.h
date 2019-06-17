@@ -269,7 +269,7 @@ namespace Engine
 		std::vector<int> m_ToUpdateMouse;
 
 		std::vector<int> m_KeysDown;
-		std::vector<int*> m_bindedKeys;
+		std::vector<int*> m_BindedKeys;
 
 	};
 }

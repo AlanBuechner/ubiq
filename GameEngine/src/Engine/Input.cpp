@@ -180,17 +180,17 @@ namespace Engine
 
 	void Input::BindKey(int * key)
 	{
-		s_Instance->m_bindedKeys.push_back(key);
+		s_Instance->m_BindedKeys.push_back(key);
 	}
 
 	void Input::UnbindKey(int key)
 	{
 		int index = 0;
-		for (int* i : s_Instance->m_bindedKeys)
+		for (int* i : s_Instance->m_BindedKeys)
 		{
 			if (*i == key)
 			{
-				s_Instance->m_bindedKeys.erase(s_Instance->m_bindedKeys.begin() + index);
+				s_Instance->m_BindedKeys.erase(s_Instance->m_BindedKeys.begin() + index);
 				return;
 			}
 			index++;
@@ -199,7 +199,7 @@ namespace Engine
 	
 	inline bool Input::isKeyBinded(int key)
 	{
-		for (int* i : m_bindedKeys)
+		for (int* i : m_BindedKeys)
 		{
 			if (*i == key)
 			{

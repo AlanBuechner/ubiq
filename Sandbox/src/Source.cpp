@@ -58,7 +58,7 @@ public:
 		DEBUG_INFO("{0}", i);
 		if (i == false)
 		{
-			input->UnbindKey(boundedKey);
+			delete input;
 		}
 	}
 };

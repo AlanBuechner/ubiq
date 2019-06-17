@@ -44,7 +44,7 @@ namespace Engine
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> m_Window;
-		std::vector<Event*> inputBuffer;
+		std::vector<Event*> m_InputBuffer;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
