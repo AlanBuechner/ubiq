@@ -170,35 +170,45 @@ namespace Engine
 	void Input::GetUpdatedEventList(std::vector<Event*>& events)
 	{
 		std::vector<Event*> newEventList;
-
-		for (auto e : events)
+		if (!s_Instance->m_SendAllEventData)
 		{
-			if((e->GetCategoryFlags() & (EventCategoryInput | EventCategoryKeyboard | EventCategoryMouse | EventCategoryMouseButton)) != 0 )
+			for (auto e : events)
 			{
-				for (auto i : s_Instance->m_BindedKeys)
+				if ((e->GetCategoryFlags() & (EventCategoryInput | EventCategoryKeyboard | EventCategoryMouse | EventCategoryMouseButton)) != 0)
 				{
-					EventType eventType = e->GetEventType();
-					if ((int)eventType == *(i.Type))
+					for (auto i : s_Instance->m_BindedKeys)
 					{
-						int key = 0;
-						switch (eventType)
+						EventType eventType = e->GetEventType();
+						if ((int)eventType == *(i.Type))
 						{
-						case EventType::KeyPressed:
-							key = ((KeyPressedEvent*)e)->GetKeyCode();
+							bool send = false;
+
+							int key = 0;
+							switch (eventType)
+							{
+							case EventType::KeyPressed:
+								if (s_Instance->m_SystemsNeedingAllPressedEvents > 0) { send = true; break; }
+								key = ((KeyPressedEvent*)e)->GetKeyCode();
+								break;
+							case EventType::KeyReleased:
+								if (s_Instance->m_SystemsNeedingAllRelesedEvents > 0) { send = true; break; }
+								key = ((KeyReleasedEvent*)e)->GetKeyCode();
+								break;
+							case EventType::KeyTyped:
+								if (s_Instance->m_SystemsNeedingAllTypedEvents > 0) { send = true; break; }
+								key = ((KeyTypedEvent*)e)->GetKeyCode();
+								break;
+							case EventType::KeyRepeat:
+								if (s_Instance->m_SystemsNeedingAllRepeatEvents > 0) { send = true; break; }
+								key = ((KeyRepeatEvent*)e)->GetKeyCode();
+								break;
+							}
+
+							if (send || key == *(i.Key))
+							{
+								newEventList.push_back(e);
+							}
 							break;
-						case EventType::KeyReleased:
-							key = ((KeyReleasedEvent*)e)->GetKeyCode();
-							break;
-						case EventType::KeyTyped:
-							key = ((KeyTypedEvent*)e)->GetKeyCode();
-							break;
-						case EventType::KeyRepeat:
-							key = ((KeyRepeatEvent*)e)->GetKeyCode();
-							break;
-						}
-						if (key == *(i.Key))
-						{
-							newEventList.push_back(e);
 						}
 					}
 				}

@@ -232,6 +232,12 @@ namespace Engine
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
+		static void SendAllEventData(bool sendAll) { s_Instance->m_SendAllEventData = sendAll; }
+		static void SendAddTypedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllTypedEvents++ : s_Instance->m_SystemsNeedingAllTypedEvents--; }
+		static void SendAddPressedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllPressedEvents++ : s_Instance->m_SystemsNeedingAllPressedEvents--; }
+		static void SendAddRelesedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllRelesedEvents++ : s_Instance->m_SystemsNeedingAllRelesedEvents--; }
+		static void SendAddRepeatEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllRepeatEvents++ : s_Instance->m_SystemsNeedingAllRepeatEvents--; }
+
 		static void BindKey(int* key, int* type);
 		static void UnbindKey(int key, int type);
 
@@ -275,6 +281,11 @@ namespace Engine
 		std::vector<int> m_ToUpdateMouse;
 
 		std::vector<int> m_KeysDown;
+		bool m_SendAllEventData = false;
+		unsigned int m_SystemsNeedingAllTypedEvents = 0;
+		unsigned int m_SystemsNeedingAllPressedEvents = 0;
+		unsigned int m_SystemsNeedingAllRelesedEvents = 0;
+		unsigned int m_SystemsNeedingAllRepeatEvents = 0;
 		std::vector<BindedKeyData> m_BindedKeys;
 
 	};
