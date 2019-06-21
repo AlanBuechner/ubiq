@@ -19,7 +19,7 @@ namespace Engine
 		// unbind events
 		for (auto i : events)
 		{
-			Input::UnbindKey(i->Key);
+			Input::UnbindKey(i->Key, i->Type);
 			delete i;
 		}
 	}
@@ -43,7 +43,7 @@ namespace Engine
 		action->Key = key;
 
 		events.push_back(action);
-		Input::BindKey(&action->Key);
+		Input::BindKey(&action->Key, &action->Type);
 		return action;
 	}
 
@@ -54,7 +54,7 @@ namespace Engine
 		{
 			if (e == event)
 			{
-				Input::UnbindKey(e->Key);
+				Input::UnbindKey(e->Key, e->Type);
 				events.erase(events.begin() + index);
 				return;
 			}

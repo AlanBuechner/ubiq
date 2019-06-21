@@ -232,8 +232,8 @@ namespace Engine
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
-		static void BindKey(int* key);
-		static void UnbindKey(int key);
+		static void BindKey(int* key, int* type);
+		static void UnbindKey(int key, int type);
 
 	private:
 		// keybord
@@ -259,6 +259,12 @@ namespace Engine
 
 		inline bool isKeyBinded(int key);
 
+		struct BindedKeyData
+		{
+			int* Key;
+			int* Type;
+		};
+
 	private:
 		static Input* s_Instance;
 
@@ -269,7 +275,7 @@ namespace Engine
 		std::vector<int> m_ToUpdateMouse;
 
 		std::vector<int> m_KeysDown;
-		std::vector<int*> m_BindedKeys;
+		std::vector<BindedKeyData> m_BindedKeys;
 
 	};
 }

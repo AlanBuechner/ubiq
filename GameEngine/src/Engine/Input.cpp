@@ -169,26 +169,63 @@ namespace Engine
 
 	void Input::GetUpdatedEventList(std::vector<Event*>& events)
 	{
+		std::vector<Event*> newEventList;
+
+		for (auto e : events)
+		{
+			if((e->GetCategoryFlags() & (EventCategoryInput | EventCategoryKeyboard | EventCategoryMouse | EventCategoryMouseButton)) != 0 )
+			{
+				for (auto i : s_Instance->m_BindedKeys)
+				{
+					EventType eventType = e->GetEventType();
+					if ((int)eventType == *(i.Type))
+					{
+						int key = 0;
+						switch (eventType)
+						{
+						case EventType::KeyPressed:
+							key = ((KeyPressedEvent*)e)->GetKeyCode();
+							break;
+						case EventType::KeyReleased:
+							key = ((KeyReleasedEvent*)e)->GetKeyCode();
+							break;
+						case EventType::KeyTyped:
+							key = ((KeyTypedEvent*)e)->GetKeyCode();
+							break;
+						case EventType::KeyRepeat:
+							key = ((KeyRepeatEvent*)e)->GetKeyCode();
+							break;
+						}
+						if (key == *(i.Key))
+						{
+							newEventList.push_back(e);
+						}
+					}
+				}
+			}
+		}
+
 		for (auto i : s_Instance->m_KeysDown)
 		{
 			if (s_Instance->isKeyBinded(i))
 			{
-				events.push_back(new KeyDownEvent(i));
+				newEventList.push_back(new KeyDownEvent(i));
 			}
 		}
+		events = newEventList;
 	}
 
-	void Input::BindKey(int * key)
+	void Input::BindKey(int* key, int* type)
 	{
-		s_Instance->m_BindedKeys.push_back(key);
+		s_Instance->m_BindedKeys.push_back({ key, type });
 	}
 
-	void Input::UnbindKey(int key)
+	void Input::UnbindKey(int key, int type)
 	{
 		int index = 0;
-		for (int* i : s_Instance->m_BindedKeys)
+		for (BindedKeyData i : s_Instance->m_BindedKeys)
 		{
-			if (*i == key)
+			if (*(i.Key) == key && *(i.Type) == type)
 			{
 				s_Instance->m_BindedKeys.erase(s_Instance->m_BindedKeys.begin() + index);
 				return;
@@ -199,9 +236,9 @@ namespace Engine
 	
 	inline bool Input::isKeyBinded(int key)
 	{
-		for (int* i : m_BindedKeys)
+		for (BindedKeyData i : m_BindedKeys)
 		{
-			if (*i == key)
+			if (*(i.Key) == key)
 			{
 				return true;
 			}
