@@ -10,6 +10,8 @@
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/VertexArray.h"
 
+#include "Renderer/OrthographicCamera.h"
+
 namespace Engine
 {
 	class Layer;
@@ -49,10 +51,12 @@ namespace Engine
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 
-		std::unique_ptr<Shader> m_Shader;
+		std::shared_ptr<Shader> m_Shader;
 		std::shared_ptr<VertexArray> m_VertexArray;
 		std::shared_ptr<VertexBuffer> m_VertexBuffer;
 		std::shared_ptr<IndexBuffer> m_IndexBuffer;
+
+		OrthographicCamera m_Camera;
 
 	private:
 		static Application* s_Instance;

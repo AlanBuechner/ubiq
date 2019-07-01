@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include "Engine/core.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Engine
 {
@@ -29,6 +31,8 @@ namespace Engine
 
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
+
+		virtual void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) = 0;
 
 		static ShaderSorce LoadShader(std::string file);
 		static ShaderSorce LoadShader(std::string file, int type);
