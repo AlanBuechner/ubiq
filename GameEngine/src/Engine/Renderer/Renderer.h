@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-	class OrthographicCamera;
+	class Camera;
 	class Shader;
 }
 
@@ -13,7 +13,7 @@ namespace Engine
 	class Renderer
 	{
 	public:
-		static void BeginScene(OrthographicCamera& camera);
+		static void BeginScene(Camera& camera);
 		static void EndScene();
 
 		static void Submit(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<Shader>& shader);

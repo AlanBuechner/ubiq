@@ -79,18 +79,6 @@ namespace Engine
 		m_OglToUbiqMouse[GLFW_MOUSE_BUTTON_MIDDLE] = MOUSE_MBUTTON;
 	}
 
-	inline Input::KeyState Input::GetKeyStateImpl(int keycode) { return m_KeyStates[keycode]; }
-	inline bool Input::GetKeyDown(int keycode) { return (GetKeyState(keycode) == Input::Down); }
-	inline bool Input::GetKeyUp(int keycode) { return (GetKeyState(keycode) == Input::Up); }
-	inline bool Input::GetKeyPressed(int keycode) { return (GetKeyState(keycode) == Input::KeyPressed); }
-	inline bool Input::GetKeyReleased(int keycode) { return (GetKeyState(keycode) == Input::KeyReleased); }
-
-	inline Input::KeyState Input::GetMouseButtonStateImpl(int button) { return m_MouseStates[button]; }
-	inline bool Input::GetMouseButtonDown(int button) { return (GetMouseButtonState(button) == Input::Down); }
-	inline bool Input::GetMouseButtonUp(int button) { return (GetMouseButtonState(button) == Input::Up); }
-	inline bool Input::GetMouseButtonPressed(int button) { return (GetMouseButtonState(button) == Input::MousePressed); }
-	inline bool Input::GetMouseButtonReleased(int button) { return (GetMouseButtonState(button) == Input::MouseReleased); }
-
 	bool Input::OnKeyPressed(KeyPressedEvent& e)
 	{ 
 		int keycode = e.GetKeyCode();

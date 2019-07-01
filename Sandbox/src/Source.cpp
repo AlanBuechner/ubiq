@@ -36,11 +36,12 @@ public:
 	{
 		//DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
 		//DEBUG_INFO("{0}", Input::GetMouseButtonState(MOUSE_LBUTTON));
+		Input::GetKeyDown(KEYCODE_W);
 	}
 
 	void OnEvent(Engine::Event& event) override
 	{
-		SUPER::OnEvent(event);
+		Engine::Layer::OnEvent(event);
 		if (event.GetEventType() == Engine::EventType::KeyPressed)
 		{
 			Engine::KeyPressedEvent& e = (Engine::KeyPressedEvent&)event;

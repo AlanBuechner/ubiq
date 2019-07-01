@@ -216,17 +216,17 @@ namespace Engine
 
 		// keybord
 		inline static KeyState GetKeyState(int keycode) { return s_Instance->GetKeyStateImpl(keycode); }
-		inline static bool GetKeyDown(int keycode);
-		inline static bool GetKeyUp(int keycode);
-		inline static bool GetKeyPressed(int keycode);
-		inline static bool GetKeyReleased(int keycode);
+		inline static bool GetKeyDown(int keycode) { return (GetKeyState(keycode) == Input::Down); }
+		inline static bool GetKeyUp(int keycode) { return (GetKeyState(keycode) == Input::Up); }
+		inline static bool GetKeyPressed(int keycode) { return (GetKeyState(keycode) == Input::KeyPressed); }
+		inline static bool GetKeyReleased(int keycode) { return (GetKeyState(keycode) == Input::KeyReleased); }
 
 		// mouse
 		inline static KeyState GetMouseButtonState(int button) { return s_Instance->GetMouseButtonStateImpl(button); }
-		inline static bool GetMouseButtonDown(int button);
-		inline static bool GetMouseButtonUp(int button);
-		inline static bool GetMouseButtonPressed(int button);
-		inline static bool GetMouseButtonReleased(int button);
+		inline static bool GetMouseButtonDown(int button) { return (GetMouseButtonState(button) == Input::Down); }
+		inline static bool GetMouseButtonUp(int button) { return (GetMouseButtonState(button) == Input::Up); }
+		inline static bool GetMouseButtonPressed(int button) { return (GetMouseButtonState(button) == Input::MousePressed); }
+		inline static bool GetMouseButtonReleased(int button) { return (GetMouseButtonState(button) == Input::MouseReleased); }
 
 		inline static std::pair<float, float> GetMousePosition() { return s_Instance->GetMousePositionImpl(); }
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
@@ -243,10 +243,10 @@ namespace Engine
 
 	private:
 		// keybord
-		inline KeyState GetKeyStateImpl(int keycode);
+		inline KeyState GetKeyStateImpl(int keycode) { return m_KeyStates[keycode]; }
 
 		// mouse
-		inline KeyState GetMouseButtonStateImpl(int keycode);
+		inline KeyState GetMouseButtonStateImpl(int button) { return m_MouseStates[button]; }
 
 		virtual std::pair<float, float> GetMousePositionImpl() = 0;
 		virtual float GetMouseXImpl() = 0;

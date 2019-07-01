@@ -11,6 +11,7 @@
 #include "Engine/Renderer/VertexArray.h"
 
 #include "Renderer/OrthographicCamera.h"
+#include "Renderer/PerspectiveCamera.h"
 
 namespace Engine
 {
@@ -56,7 +57,7 @@ namespace Engine
 		std::shared_ptr<VertexBuffer> m_VertexBuffer;
 		std::shared_ptr<IndexBuffer> m_IndexBuffer;
 
-		OrthographicCamera m_Camera;
+		PerspectiveCamera m_Camera;
 
 	private:
 		static Application* s_Instance;
