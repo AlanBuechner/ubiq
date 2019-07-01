@@ -13,6 +13,9 @@ namespace Engine
 
 	class ENGINE_API Layer
 	{
+	protected:
+		typedef Engine::Layer Super;
+
 	public:
 		Layer(const std::string& name = "Layer");
 		virtual ~Layer();

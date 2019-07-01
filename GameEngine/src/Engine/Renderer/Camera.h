@@ -6,6 +6,9 @@ namespace Engine
 {
 	class Camera
 	{
+	protected:
+		typedef Engine::Camera Super;
+
 	public:
 		Camera(glm::mat4& projectionMatrix);
 
