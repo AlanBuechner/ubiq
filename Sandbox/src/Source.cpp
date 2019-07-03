@@ -1,4 +1,5 @@
 #include <Engine.h>
+#include <Engine/Renderer/PerspectiveCamera.h>
 
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/vec4.hpp> // glm::vec4
@@ -13,6 +14,14 @@ glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
 	return Projection * View * Model;
 }
+
+class EditerCamera : public Engine::PerspectiveCamera
+{
+public:
+	EditerCamera()
+		: Super(60.0f, 16.0f/9.0f)
+	{}
+};
 
 class ExampleLayer : public Engine::Layer
 {
@@ -72,7 +81,7 @@ public:
 	{
 		PushLayer(new ExampleLayer());
 
-		
+		Application::SetMainCamera(new EditerCamera());
 	}
 
 	~Sandbox()

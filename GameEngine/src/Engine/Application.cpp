@@ -8,6 +8,7 @@
 #include "Engine/imGui/ImGuiLayer.h"
 
 #include "Renderer/Renderer.h"
+#include "Renderer/Camera.h"
 
 namespace Engine {
 
@@ -16,7 +17,6 @@ namespace Engine {
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application()
-		: m_Camera(60.0f, 16.0f/9.0f)
 	{
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!")
 			s_Instance = this;
@@ -79,34 +79,12 @@ namespace Engine {
 
 	void Application::Run()
 	{
-		m_Camera.SetPosition({ 0.0f, 0.0f, 2.0f });
+		m_Camera->SetPosition({ 0.0f, 0.0f, 2.0f });
 
 		CORE_INFO("Runing Application");
 		while (m_Running)
 		{
-			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-			RenderCommand::Clear();
-
-			if (Input::GetKeyPressed(KEYCODE_W))
-				m_Camera.Translate({ 0.0f, 0.5f, 0.0f });
-			if (Input::GetKeyPressed(KEYCODE_S))
-				m_Camera.Translate({ 0.0f, -0.5f, 0.0f });
-			if (Input::GetKeyPressed(KEYCODE_A))
-				m_Camera.Translate({ -0.5f, 0.0f, 0.0f });
-			if (Input::GetKeyPressed(KEYCODE_D))
-				m_Camera.Translate({ 0.5f, 0.0f, 0.0f });
-
-			Renderer::BeginScene(m_Camera);
-
-			Renderer::Submit(m_VertexArray, m_Shader);
-
-			Renderer::EndScene();
-
-			//Renderer::Flush();
-
-
 			Input::UpdateKeyState(); // update the key stats
-
 			SendInputBuffer(); // sent the input buffer through the layer stack
 
 			// update the layer stack
@@ -118,6 +96,17 @@ namespace Engine {
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
 			m_ImGuiLayer->End();
+
+			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+			RenderCommand::Clear();
+
+			Renderer::BeginScene(*m_Camera);
+
+			Renderer::Submit(m_VertexArray, m_Shader);
+
+			Renderer::EndScene();
+
+			//Renderer::Flush();
 
 			// update the window
 			m_Window->OnUpdate();

@@ -10,15 +10,13 @@
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/VertexArray.h"
 
-#include "Renderer/OrthographicCamera.h"
-#include "Renderer/PerspectiveCamera.h"
-
 namespace Engine
 {
 	class Layer;
 	class ImGuiLayer;
 	class Event;
 	class WindowCloseEvent;
+	class Camera;
 
 }
 
@@ -40,6 +38,9 @@ namespace Engine
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window;  }
 
+		inline static Camera* GetMainCamera() { return s_Instance->m_Camera; }
+		static void SetMainCamera(Camera* camera) { s_Instance->m_Camera = camera; }
+
 	private:
 		void GenLayerStack();
 		void SendInputBuffer();
@@ -57,7 +58,7 @@ namespace Engine
 		std::shared_ptr<VertexBuffer> m_VertexBuffer;
 		std::shared_ptr<IndexBuffer> m_IndexBuffer;
 
-		PerspectiveCamera m_Camera;
+		Camera* m_Camera;
 
 	private:
 		static Application* s_Instance;
