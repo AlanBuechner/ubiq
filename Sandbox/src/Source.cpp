@@ -1,6 +1,8 @@
 #include <Engine.h>
 #include <Engine/Renderer/PerspectiveCamera.h>
 
+#include <glm/gtx/quaternion.hpp>
+
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/vec4.hpp> // glm::vec4
 #include <glm/mat4x4.hpp> // glm::mat4
@@ -21,6 +23,42 @@ public:
 	EditerCamera()
 		: Super(60.0f, 16.0f/9.0f)
 	{}
+
+	InputControler* Input;
+	float Speed = 0.15f;
+	glm::vec2 prevMousePos;
+	glm::vec3 MoveDir = { 0.0f, 0.0f, 0.0f };
+
+	void SetPlayerInput(Engine::InputControlerManeger* maneger)
+	{
+		Input = new InputControler(maneger);
+
+		Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&EditerCamera::StartMove, glm::vec3({  0.0f, 0.0f, -1.0f })));
+		Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&EditerCamera::StartMove, glm::vec3({  0.0f, 0.0f,  1.0f })));
+		Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&EditerCamera::StartMove, glm::vec3({ -1.0f, 0.0f,  0.0f })));
+		Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&EditerCamera::StartMove, glm::vec3({  1.0f, 0.0f,  0.0f })));
+
+		Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&EditerCamera::EndMove, glm::vec3({  0.0f, 0.0f, -1.0f })));
+		Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&EditerCamera::EndMove, glm::vec3({  0.0f, 0.0f,  1.0f })));
+		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&EditerCamera::EndMove, glm::vec3({ -1.0f, 0.0f,  0.0f })));
+		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&EditerCamera::EndMove, glm::vec3({  1.0f, 0.0f,  0.0f })));
+	}
+
+	void Update()
+	{
+		Translate(MoveDir * Speed);
+	}
+
+private:
+	void StartMove(const glm::vec3& movedir)
+	{
+		MoveDir += movedir;
+	}
+
+	void EndMove(const glm::vec3& movedir)
+	{
+		MoveDir -= movedir;
+	}
 };
 
 class ExampleLayer : public Engine::Layer
@@ -39,13 +77,13 @@ public:
 		boundedKey = input->BindEvent(KEYCODE_W, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, true));
 		input->BindEvent(KEYCODE_S, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, false));
 
+		((EditerCamera*)Engine::Application::GetMainCamera())->SetPlayerInput(m_InputManeger);
+
 	}
 
 	void OnUpdate() override
 	{
-		//DEBUG_INFO("{0}", Input::GetKeyState(KEYCODE_F));
-		//DEBUG_INFO("{0}", Input::GetMouseButtonState(MOUSE_LBUTTON));
-		Input::GetKeyDown(KEYCODE_W);
+		((EditerCamera*)Engine::Application::GetMainCamera())->Update();
 	}
 
 	void OnEvent(Engine::Event& event) override
@@ -79,9 +117,8 @@ public:
 
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
-
 		Application::SetMainCamera(new EditerCamera());
+		PushLayer(new ExampleLayer());
 	}
 
 	~Sandbox()
