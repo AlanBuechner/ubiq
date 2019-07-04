@@ -196,11 +196,14 @@ namespace Engine
 							{
 								newEventList.push_back(e);
 							}
-							break;
 						}
 					}
 				}
 			}
+		}
+		else
+		{
+			newEventList = events;
 		}
 
 		for (auto i : s_Instance->m_KeysDown)
