@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/core.h"
+#include "Engine/Log.h"
 
 namespace Engine
 {

@@ -26,36 +26,7 @@ namespace Engine {
 
 		GenLayerStack(); // generate the starting layer stack
 
-		m_VertexArray.reset(VertexArray::Create());
-
-		float vertices[4 * 7] =
-		{
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f
-		};
-
-		m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-
-		BufferLayout layout = {
-			{ShaderDataType::Float3, "a_Position"},
-			{ShaderDataType::Float4, "a_Color"}
-		};
-
-		m_VertexBuffer->SetLayout(layout);
-
-		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
-
-		uint32_t indeces[] = { 0, 1, 2,  0, 3, 2 };
-
-		m_IndexBuffer.reset(IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t)));
-		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
-
-		Shader::ShaderSorce src;
-		src << Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\shader.hlsl");
-
-		m_Shader.reset(Shader::Create(src.vertexShader, src.pixleShader));
+		
 	}
 
 	Application::~Application()
@@ -79,8 +50,6 @@ namespace Engine {
 
 	void Application::Run()
 	{
-		m_Camera->SetPosition({ 0.0f, 0.0f, 2.0f });
-
 		CORE_INFO("Runing Application");
 		while (m_Running)
 		{
@@ -96,17 +65,6 @@ namespace Engine {
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
 			m_ImGuiLayer->End();
-
-			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-			RenderCommand::Clear();
-
-			Renderer::BeginScene(*m_Camera);
-
-			Renderer::Submit(m_VertexArray, m_Shader);
-
-			Renderer::EndScene();
-
-			//Renderer::Flush();
 
 			// update the window
 			m_Window->OnUpdate();

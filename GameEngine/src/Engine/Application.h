@@ -38,9 +38,6 @@ namespace Engine
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window;  }
 
-		inline static Camera* GetMainCamera() { return s_Instance->m_Camera; }
-		static void SetMainCamera(Camera* camera) { s_Instance->m_Camera = camera; }
-
 	private:
 		void GenLayerStack();
 		void SendInputBuffer();
@@ -52,13 +49,6 @@ namespace Engine
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
-
-		std::shared_ptr<Shader> m_Shader;
-		std::shared_ptr<VertexArray> m_VertexArray;
-		std::shared_ptr<VertexBuffer> m_VertexBuffer;
-		std::shared_ptr<IndexBuffer> m_IndexBuffer;
-
-		Camera* m_Camera;
 
 	private:
 		static Application* s_Instance;

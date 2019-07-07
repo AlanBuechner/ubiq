@@ -1,21 +1,4 @@
 #include <Engine.h>
-#include <Engine/Renderer/PerspectiveCamera.h>
-
-#include <glm/gtx/quaternion.hpp>
-
-#include <glm/vec3.hpp> // glm::vec3
-#include <glm/vec4.hpp> // glm::vec4
-#include <glm/mat4x4.hpp> // glm::mat4
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
-{
-	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.f);
-	glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
-	View = glm::rotate(View, Rotate.y, glm::vec3(-1.0f, 0.0f, 0.0f));
-	View = glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
-	return Projection * View * Model;
-}
 
 class EditerCamera : public Engine::PerspectiveCamera
 {
@@ -64,8 +47,14 @@ private:
 class ExampleLayer : public Engine::Layer
 {
 public:
-	Engine::EventData* boundedKey;
 	InputControler* input;
+
+	std::shared_ptr<Engine::Shader> m_Shader;
+	std::shared_ptr<Engine::VertexArray> m_VertexArray;
+	std::shared_ptr<Engine::VertexBuffer> m_VertexBuffer;
+	std::shared_ptr<Engine::IndexBuffer> m_IndexBuffer;
+
+	EditerCamera m_Camera;
 
 	bool set = false;
 	ExampleLayer()
@@ -73,17 +62,56 @@ public:
 	{
 		input = new InputControler(m_InputManeger);
 
-		input->BindEvent(MOUSE_LBUTTON, MOUSE_PRESSED, BIND_ACTION(&ExampleLayer::thing));
-		boundedKey = input->BindEvent(KEYCODE_W, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, true));
-		input->BindEvent(KEYCODE_S, KEY_DOWN, BIND_AXIS(&ExampleLayer::thing2, false));
+		m_Camera.SetPlayerInput(m_InputManeger);
 
-		((EditerCamera*)Engine::Application::GetMainCamera())->SetPlayerInput(m_InputManeger);
+
+		m_VertexArray.reset(Engine::VertexArray::Create());
+
+		float vertices[4 * 7] =
+		{
+			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f
+		};
+
+		m_VertexBuffer.reset(Engine::VertexBuffer::Create(vertices, sizeof(vertices)));
+
+		Engine::BufferLayout layout = {
+			{Engine::ShaderDataType::Float3, "a_Position"},
+			{Engine::ShaderDataType::Float4, "a_Color"}
+		};
+
+		m_VertexBuffer->SetLayout(layout);
+
+		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+
+		uint32_t indeces[] = { 0, 1, 2,  0, 3, 2 };
+
+		m_IndexBuffer.reset(Engine::IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t)));
+		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
+
+		Engine::Shader::ShaderSorce src;
+		src << Engine::Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\shader.hlsl");
+
+		m_Shader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));
 
 	}
 
 	void OnUpdate() override
 	{
-		((EditerCamera*)Engine::Application::GetMainCamera())->Update();
+		m_Camera.Update();
+
+		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		Engine::RenderCommand::Clear();
+
+		Engine::Renderer::BeginScene(m_Camera);
+
+		Engine::Renderer::Submit(m_VertexArray, m_Shader);
+
+		Engine::Renderer::EndScene();
+
+		//Engine::Renderer::Flush();
 	}
 
 	void OnEvent(Engine::Event& event) override
@@ -94,21 +122,6 @@ public:
 			Engine::KeyPressedEvent& e = (Engine::KeyPressedEvent&)event;
 		}
 	}
-
-	void thing()
-	{
-		DEBUG_INFO("the mouse button was pressed");
-	}
-
-	void thing2(bool i)
-	{
-
-		DEBUG_INFO("{0}", i);
-		if (i == false)
-		{
-			delete input;
-		}
-	}
 };
 
 class Sandbox : public Engine::Application
@@ -117,7 +130,6 @@ public:
 
 	Sandbox()
 	{
-		Application::SetMainCamera(new EditerCamera());
 		PushLayer(new ExampleLayer());
 	}
 
