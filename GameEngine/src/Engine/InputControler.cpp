@@ -17,7 +17,7 @@ namespace Engine
 		m_Maneger->RemoveControler(this);
 		
 		// unbind events
-		for (auto i : events)
+		for (auto i : m_Events)
 		{
 			Input::UnbindKey(i->Key, i->Type);
 			delete i;
@@ -26,12 +26,20 @@ namespace Engine
 
 	void InputControler::RaiseEvent(int key, int state)
 	{
-		for (auto i : events)
+		for (auto i : m_Events)
 		{
 			if (i->Key == key && i->Type == state)
 			{
 				i->Function();
 			}
+		}
+	}
+
+	void InputControler::RaiseMouseMoveEvent(glm::vec2& pos)
+	{
+		for (auto i : m_MouseMoveEvents)
+		{
+			i->Function(pos);
 		}
 	}
 
@@ -42,23 +50,47 @@ namespace Engine
 		action->Function = func;
 		action->Key = key;
 
-		events.push_back(action);
+		m_Events.push_back(action);
 		Input::BindKey(&action->Key, &action->Type);
 		return action;
 	}
 
-	void InputControler::UnbindKey(EventData * event)
+	void InputControler::UnbindKey(EventData* event)
 	{
 		int index = 0;
-		for (EventData* e : events)
+		for (EventData* e : m_Events)
 		{
 			if (e == event)
 			{
 				Input::UnbindKey(e->Key, e->Type);
-				events.erase(events.begin() + index);
+				m_Events.erase(m_Events.begin() + index);
 				return;
 			}
 			index++;
 		}
 	}
+
+	MouseMoveEventData* InputControler::BindMouseMoveEnvent(std::function<void(glm::vec2&)> func)
+	{
+		MouseMoveEventData* action = new MouseMoveEventData;
+		action->Function = func;
+		m_MouseMoveEvents.push_back(action);
+		Input::SendMouseMovedEvents(true);
+		return action;
+	}
+
+	void InputControler::UnbindMouseEvent(MouseMoveEventData* event)
+	{
+		int index = 0;
+		for (auto i : m_MouseMoveEvents)
+		{
+			if (i == event)
+			{
+				m_MouseMoveEvents.erase(m_MouseMoveEvents.begin() + index);
+				Input::SendMouseMovedEvents(false);
+			}
+			index++;
+		}
+	}
+
 }

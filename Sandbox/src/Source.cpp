@@ -9,22 +9,23 @@ public:
 
 	InputControler* Input;
 	float Speed = 0.15f;
-	glm::vec2 prevMousePos;
 	glm::vec3 MoveDir = { 0.0f, 0.0f, 0.0f };
 
 	void SetPlayerInput(Engine::InputControlerManeger* maneger)
 	{
 		Input = new InputControler(maneger);
 
-		Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&EditerCamera::StartMove, glm::vec3({  0.0f, 0.0f, -1.0f })));
-		Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&EditerCamera::StartMove, glm::vec3({  0.0f, 0.0f,  1.0f })));
-		Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&EditerCamera::StartMove, glm::vec3({ -1.0f, 0.0f,  0.0f })));
-		Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&EditerCamera::StartMove, glm::vec3({  1.0f, 0.0f,  0.0f })));
+		Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f, 0.0f, -1.0f })));
+		Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f, 0.0f,  1.0f })));
+		Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({ -1.0f, 0.0f,  0.0f })));
+		Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  1.0f, 0.0f,  0.0f })));
 
-		Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&EditerCamera::EndMove, glm::vec3({  0.0f, 0.0f, -1.0f })));
-		Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&EditerCamera::EndMove, glm::vec3({  0.0f, 0.0f,  1.0f })));
-		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&EditerCamera::EndMove, glm::vec3({ -1.0f, 0.0f,  0.0f })));
-		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&EditerCamera::EndMove, glm::vec3({  1.0f, 0.0f,  0.0f })));
+		Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  0.0f, 0.0f, -1.0f })));
+		Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  0.0f, 0.0f,  1.0f })));
+		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({ -1.0f, 0.0f,  0.0f })));
+		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  1.0f, 0.0f,  0.0f })));
+
+		Input->BindMouseMoveEnvent(BIND_MOUSEMOVE(&EditerCamera::MouseMoved));
 	}
 
 	void Update()
@@ -33,14 +34,16 @@ public:
 	}
 
 private:
-	void StartMove(const glm::vec3& movedir)
+	void Move(const glm::vec3& movedir)
 	{
-		MoveDir += movedir;
+		glm::vec3 xMove = movedir.x * RightVector();
+		glm::vec3 zMove = movedir.z * ForwordVector();
+		MoveDir += xMove + zMove;
 	}
 
-	void EndMove(const glm::vec3& movedir)
+	void MouseMoved(glm::vec2& pos)
 	{
-		MoveDir -= movedir;
+		
 	}
 };
 
@@ -86,7 +89,7 @@ public:
 
 		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 
-		uint32_t indeces[] = { 0, 1, 2,  0, 3, 2 };
+		uint32_t indeces[] = { 2, 1, 0,  0, 3, 2 };
 
 		m_IndexBuffer.reset(Engine::IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t)));
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);

@@ -5,19 +5,12 @@
 #include "Window.h"
 #include "LayerStack.h"
 
-// temp
-#include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/Buffer.h"
-#include "Engine/Renderer/VertexArray.h"
-
 namespace Engine
 {
 	class Layer;
 	class ImGuiLayer;
 	class Event;
 	class WindowCloseEvent;
-	class Camera;
-
 }
 
 namespace Engine

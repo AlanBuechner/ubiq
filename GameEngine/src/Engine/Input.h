@@ -233,10 +233,11 @@ namespace Engine
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
 		static void SendAllEventData(bool sendAll) { s_Instance->m_SendAllEventData = sendAll; }
-		static void SendAddTypedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllTypedEvents++ : s_Instance->m_SystemsNeedingAllTypedEvents--; }
-		static void SendAddPressedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllPressedEvents++ : s_Instance->m_SystemsNeedingAllPressedEvents--; }
-		static void SendAddRelesedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllRelesedEvents++ : s_Instance->m_SystemsNeedingAllRelesedEvents--; }
-		static void SendAddRepeatEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllRepeatEvents++ : s_Instance->m_SystemsNeedingAllRepeatEvents--; }
+		static void SendAllTypedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllTypedEvents++ : s_Instance->m_SystemsNeedingAllTypedEvents--; }
+		static void SendAllPressedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllPressedEvents++ : s_Instance->m_SystemsNeedingAllPressedEvents--; }
+		static void SendAllRelesedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllRelesedEvents++ : s_Instance->m_SystemsNeedingAllRelesedEvents--; }
+		static void SendAllRepeatEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllRepeatEvents++ : s_Instance->m_SystemsNeedingAllRepeatEvents--; }
+		static void SendMouseMovedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllMouseMoveEvents++ : s_Instance->m_SystemsNeedingAllMouseMoveEvents--; }
 
 		static void BindKey(int* key, int* type);
 		static void UnbindKey(int key, int type);
@@ -263,7 +264,7 @@ namespace Engine
 
 		static void GetUpdatedEventList(std::vector<Event*>& events);
 
-		inline bool isKeyBinded(int key);
+		inline bool isKeyBinded(int key, int type);
 
 		struct BindedKeyData
 		{
@@ -286,6 +287,7 @@ namespace Engine
 		unsigned int m_SystemsNeedingAllPressedEvents = 0;
 		unsigned int m_SystemsNeedingAllRelesedEvents = 0;
 		unsigned int m_SystemsNeedingAllRepeatEvents = 0;
+		unsigned int m_SystemsNeedingAllMouseMoveEvents = 0;
 		std::vector<BindedKeyData> m_BindedKeys;
 
 	};

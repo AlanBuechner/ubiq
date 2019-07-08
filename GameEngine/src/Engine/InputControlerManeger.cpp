@@ -25,6 +25,7 @@ namespace Engine
 		dispatcher.Dispatch<KeyTypedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnKeyEvent<KeyTypedEvent>));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnMouseEvent<MouseButtonPressedEvent>));
 		dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnMouseEvent<MouseButtonReleasedEvent>));
+		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnMouseMoveEvent));
 	}
 
 	void InputControlerManeger::AddControler(InputControler* controler)
@@ -42,6 +43,17 @@ namespace Engine
 				m_Controlers.erase(m_Controlers.begin() + index);
 			}
 		}
+	}
+
+	bool InputControlerManeger::OnMouseMoveEvent(MouseMovedEvent& e)
+	{
+		if (m_Controlers.empty())
+			return false;
+		for (auto i : m_Controlers)
+		{
+			i->RaiseMouseMoveEvent(glm::vec2({e.GetX(), e.GetY()}));
+		}
+		return false;
 	}
 
 	template<class T>

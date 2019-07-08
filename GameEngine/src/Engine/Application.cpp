@@ -7,9 +7,6 @@
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/imGui/ImGuiLayer.h"
 
-#include "Renderer/Renderer.h"
-#include "Renderer/Camera.h"
-
 namespace Engine {
 
 #define BIND_EVENT_FN_EXTERN(x, p) std::bind(x, p, std::placeholders::_1)
@@ -25,8 +22,6 @@ namespace Engine {
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
 
 		GenLayerStack(); // generate the starting layer stack
-
-		
 	}
 
 	Application::~Application()
@@ -80,7 +75,7 @@ namespace Engine {
 
 	void Application::SendInputBuffer()
 	{
-		if (m_InputBuffer.empty()) return; // 
+		if (m_InputBuffer.empty()) return;
 
 		for (auto i = m_InputBuffer.end(); i != m_InputBuffer.begin();)
 		{

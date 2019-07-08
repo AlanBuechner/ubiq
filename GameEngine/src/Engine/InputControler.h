@@ -1,9 +1,11 @@
 #pragma once
 
 #include "core.h"
+#include "glm/vec2.hpp"
 
 #define BIND_ACTION(x) std::bind(x, this)
 #define BIND_AXIS(x, p) std::bind(x, this, p)
+#define BIND_MOUSEMOVE(x) std::bind(x, this, std::placeholders::_1)
 
 namespace Engine
 {
@@ -20,6 +22,11 @@ namespace Engine
 		int Key;
 	};
 
+	struct ENGINE_API MouseMoveEventData
+	{
+		std::function<void(glm::vec2& pos)> Function;
+	};
+
 	class ENGINE_API InputControler
 	{
 	public:
@@ -28,12 +35,17 @@ namespace Engine
 		~InputControler();
 
 		void RaiseEvent(int key, int state);
+		void RaiseMouseMoveEvent(glm::vec2& pos);
 
 		EventData* BindEvent(int key, int state, std::function<void()> func);
 		void UnbindKey(EventData* event);
 
+		MouseMoveEventData* BindMouseMoveEnvent(std::function<void(glm::vec2&)> func);
+		void UnbindMouseEvent(MouseMoveEventData* event);
+
 	private:
-		std::vector<EventData*> events;
+		std::vector<EventData*> m_Events;
+		std::vector<MouseMoveEventData*> m_MouseMoveEvents;
 
 		InputControlerManeger* m_Maneger;
 

@@ -164,9 +164,9 @@ namespace Engine
 			{
 				if ((e->GetCategoryFlags() & (EventCategoryInput | EventCategoryKeyboard | EventCategoryMouse | EventCategoryMouseButton)) != 0)
 				{
+					EventType eventType = e->GetEventType();
 					for (auto i : s_Instance->m_BindedKeys)
 					{
-						EventType eventType = e->GetEventType();
 						if ((int)eventType == *(i.Type))
 						{
 							bool send = false;
@@ -190,6 +190,14 @@ namespace Engine
 								if (s_Instance->m_SystemsNeedingAllRepeatEvents > 0) { send = true; break; }
 								key = ((KeyRepeatEvent*)e)->GetKeyCode();
 								break;
+							case EventType::MouseButtonPressed:
+								if (s_Instance->m_SystemsNeedingAllPressedEvents > 0) { send = true; break; }
+								key = ((MouseButtonPressedEvent*)e)->GetMouseButton();
+								break;
+							case EventType::MouseButtonReleased:
+								if (s_Instance->m_SystemsNeedingAllRelesedEvents > 0) { send = true; break; }
+								key = ((MouseButtonReleasedEvent*)e)->GetMouseButton();
+								break;
 							}
 
 							if (send || key == *(i.Key))
@@ -197,6 +205,10 @@ namespace Engine
 								newEventList.push_back(e);
 							}
 						}
+					}
+					if (eventType == EventType::MouseMoved && s_Instance->m_SystemsNeedingAllMouseMoveEvents > 0)
+					{
+						newEventList.push_back(e);
 					}
 				}
 			}
@@ -208,7 +220,7 @@ namespace Engine
 
 		for (auto i : s_Instance->m_KeysDown)
 		{
-			if (s_Instance->isKeyBinded(i))
+			if (s_Instance->isKeyBinded(i, KeyDown))
 			{
 				newEventList.push_back(new KeyDownEvent(i));
 			}
@@ -235,11 +247,11 @@ namespace Engine
 		}
 	}
 	
-	inline bool Input::isKeyBinded(int key)
+	inline bool Input::isKeyBinded(int key, int type)
 	{
 		for (BindedKeyData i : m_BindedKeys)
 		{
-			if (*(i.Key) == key)
+			if (*(i.Key) == key && *(i.Type) == type)
 			{
 				return true;
 			}

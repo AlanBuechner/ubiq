@@ -93,4 +93,20 @@ namespace Engine {
 		EVENT_CLASS_TYPE(MouseButtonReleased)
 	};
 
+	class ENGINE_API MouseButtonDownEvent : public MouseButtonEvent
+	{
+	public:
+		MouseButtonDownEvent(int button)
+			: MouseButtonEvent(button) {}
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "MouseButtonDownEvent: " << m_Button;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(MouseButtonReleased)
+	};
+
 }
