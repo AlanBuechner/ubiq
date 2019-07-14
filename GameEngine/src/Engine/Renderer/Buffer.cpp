@@ -9,7 +9,7 @@ namespace Engine
 {
 	VertexBuffer* VertexBuffer::Create(float* vertices, uint32_t size)
 	{
-		switch (Renderer::GetrAPI())
+		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
@@ -23,7 +23,7 @@ namespace Engine
 
 	IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t size)
 	{
-		switch (Renderer::GetrAPI())
+		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");

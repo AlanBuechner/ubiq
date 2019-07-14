@@ -57,11 +57,13 @@ public:
 	std::shared_ptr<Engine::VertexBuffer> m_VertexBuffer;
 	std::shared_ptr<Engine::IndexBuffer> m_IndexBuffer;
 
+	glm::vec3 m_Position;
+
 	EditerCamera m_Camera;
 
 	bool set = false;
 	ExampleLayer()
-		: Layer("Example")
+		: Layer("Example"), m_Position(0.0f)
 	{
 		input = new InputControler(m_InputManeger);
 
@@ -110,7 +112,7 @@ public:
 
 		Engine::Renderer::BeginScene(m_Camera);
 
-		Engine::Renderer::Submit(m_VertexArray, m_Shader);
+		Engine::Renderer::Submit(m_VertexArray, m_Shader, glm::translate(glm::mat4(1.0f), m_Position));
 
 		Engine::Renderer::EndScene();
 

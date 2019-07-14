@@ -7,7 +7,7 @@ namespace Engine
 {
 	VertexArray * VertexArray::Create()
 	{
-		switch (Renderer::GetrAPI())
+		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
