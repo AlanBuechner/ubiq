@@ -1229,6 +1229,8 @@
     <ClInclude Include="src\Engine\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\Engine\Renderer\Camera.h" />
     <ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h" />
+    <ClInclude Include="src\Engine\Core\Time.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLTime.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Application.cpp">
@@ -1293,5 +1295,7 @@
     <ClCompile Include="src\Engine\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Engine\Renderer\Camera.cpp" />
     <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp" />
+    <ClCompile Include="src\Engine\Core\Time.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLTime.cpp" />
   </ItemGroup>
 </Project>

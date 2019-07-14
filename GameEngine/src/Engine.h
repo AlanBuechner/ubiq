@@ -3,6 +3,7 @@
 #include "Engine/Application.h"
 #include "Engine/Layer.h"
 #include "Engine/Log.h"
+#include "Engine/Core/Time.h"
 
 // Input
 #include "Engine/Input.h"

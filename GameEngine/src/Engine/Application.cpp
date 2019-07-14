@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Application.h"
-
+#include "Core/Time.h"
 #include "Input.h"
 
 #include "Engine/Events/Event.h"
@@ -48,6 +48,8 @@ namespace Engine {
 		CORE_INFO("Runing Application");
 		while (m_Running)
 		{
+			Time::UpdateDeltaTime();
+
 			Input::UpdateKeyState(); // update the key stats
 			SendInputBuffer(); // sent the input buffer through the layer stack
 

@@ -8,7 +8,7 @@ public:
 	{}
 
 	InputControler* Input;
-	float Speed = 0.15f;
+	float Speed = 1.0f;
 	glm::vec3 MoveDir = { 0.0f, 0.0f, 0.0f };
 
 	void SetPlayerInput(Engine::InputControlerManeger* maneger)
@@ -30,7 +30,7 @@ public:
 
 	void Update()
 	{
-		Translate(MoveDir * Speed);
+		Translate(MoveDir * Speed * Time::GetDeltaTime());
 	}
 
 private:
