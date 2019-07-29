@@ -129,9 +129,31 @@ namespace Engine
 	{
 		glUseProgram(0);
 	}
+
+	uint32_t OpenGLShader::GetUniformLocation(const std::string & name) const
+	{
+		if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+			return m_UniformLocationCache[name];
+		uint32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (location == -1)
+		{
+			CORE_ERROR("Uniform {0} was not found!", name);
+			return location;
+		}
+		m_UniformLocationCache[name] = location;
+		return location;
+	}
+
+	void OpenGLShader::UploadUniformFloat4(const std::string & name, const glm::vec4 & values)
+	{
+		uint32_t location = GetUniformLocation(name);
+		glUniform4f(location, values.x, values.y, values.z, values.w);
+	}
+
 	void OpenGLShader::UploadUniformMat4(const std::string & name, const glm::mat4 & matrix)
 	{
-		uint16_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		uint32_t location = GetUniformLocation(name);
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
+
 }

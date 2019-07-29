@@ -32,11 +32,15 @@ namespace Engine
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
+		virtual void UploadUniformFloat4(const std::string& name, const glm::vec4& values) = 0;
 		virtual void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) = 0;
 
 		static ShaderSorce LoadShader(std::string file);
 		static ShaderSorce LoadShader(std::string file, int type);
 
 		static Shader* Create(const std::string& vertexSrc, const std::string& pixleSrc);
+
+	private:
+		virtual uint32_t GetUniformLocation(const std::string& name) const = 0;
 	};
 }

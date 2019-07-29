@@ -74,17 +74,16 @@ public:
 
 		float vertices[4 * 7] =
 		{
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f
 		};
 
 		m_VertexBuffer.reset(Engine::VertexBuffer::Create(vertices, sizeof(vertices)));
 
 		Engine::BufferLayout layout = {
-			{Engine::ShaderDataType::Float3, "a_Position"},
-			{Engine::ShaderDataType::Float4, "a_Color"}
+			{Engine::ShaderDataType::Float3, "a_Position"}
 		};
 
 		m_VertexBuffer->SetLayout(layout);
@@ -97,7 +96,7 @@ public:
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
 		Engine::Shader::ShaderSorce src;
-		src << Engine::Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\shader.hlsl");
+		src << Engine::Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\FlatColorShader.glsl");
 
 		m_Shader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));
 
@@ -112,7 +111,25 @@ public:
 
 		Engine::Renderer::BeginScene(m_Camera);
 
-		Engine::Renderer::Submit(m_VertexArray, m_Shader, glm::translate(glm::mat4(1.0f), m_Position));
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
+
+		glm::vec4 redColor(0.8f, 0.2f, 0.3f, 1.0f);
+		glm::vec4 blueColor(0.2f, 0.3f, 0.8f, 1.0f);
+		for (int y = 0; y < 20; y++)
+		{
+			for (int x = 0; x < 20; x++)
+			{
+				glm::vec3 pos(x * 1.1f, y * 1.1f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos);
+				if (x % 2 == 0)
+					m_Shader->UploadUniformFloat4("u_Color", redColor);
+				else
+					m_Shader->UploadUniformFloat4("u_Color", blueColor);
+				Engine::Renderer::Submit(m_VertexArray, m_Shader, transform);
+			}
+		}
+		/*m_Shader->UploadUniformFloat4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		Engine::Renderer::Submit(m_VertexArray, m_Shader, glm::translate(glm::mat4(1.0f), m_Position));*/
 
 		Engine::Renderer::EndScene();
 
