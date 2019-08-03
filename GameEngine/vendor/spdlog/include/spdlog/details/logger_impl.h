@@ -64,7 +64,7 @@ inline void spdlog::logger::log(level::level_enum lvl, const char *fmt, const Ar
     try
     {
         using details::fmt_helper::to_string_view;
-        fmt::memory_buffer buf;
+        typename fmt::memory_buffer buf;
         fmt::format_to(buf, fmt, args...);
         details::log_msg log_msg(&name_, lvl, to_string_view(buf));
         sink_it_(log_msg);
