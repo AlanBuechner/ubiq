@@ -96,7 +96,7 @@ public:
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
 		Engine::Shader::ShaderSorce src;
-		src << Engine::Shader::LoadShader("C:\\Users\\Alan\\source\\repos\\GameEngine\\FlatColorShader.glsl");
+		src << Engine::Shader::LoadShader("C:\\Users\\alanj\\source\\repos\\GameEngine\\FlatColorShader.glsl");
 
 		m_Shader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));
 
