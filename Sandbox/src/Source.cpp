@@ -7,13 +7,13 @@ public:
 		: Super(60.0f, 16.0f/9.0f)
 	{}
 
-	InputControler* Input;
+	Engine::Scope<InputControler> Input;
 	float Speed = 1.0f;
 	glm::vec3 MoveDir = { 0.0f, 0.0f, 0.0f };
 
 	void SetPlayerInput(Engine::InputControlerManeger* maneger)
 	{
-		Input = new InputControler(maneger);
+		Input.reset(new InputControler(maneger));
 
 		Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f, 0.0f, -1.0f })));
 		Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f, 0.0f,  1.0f })));
@@ -52,10 +52,10 @@ class ExampleLayer : public Engine::Layer
 public:
 	InputControler* input;
 
-	std::shared_ptr<Engine::Shader> m_Shader;
-	std::shared_ptr<Engine::VertexArray> m_VertexArray;
-	std::shared_ptr<Engine::VertexBuffer> m_VertexBuffer;
-	std::shared_ptr<Engine::IndexBuffer> m_IndexBuffer;
+	Engine::Ref<Engine::Shader> m_Shader;
+	Engine::Ref<Engine::VertexArray> m_VertexArray;
+	Engine::Ref<Engine::VertexBuffer> m_VertexBuffer;
+	Engine::Ref<Engine::IndexBuffer> m_IndexBuffer;
 
 	glm::vec3 m_Position;
 
