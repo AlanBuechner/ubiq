@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include "Application.h"
+#include <glm/glm.hpp>
 
 #define KEY_PRESSED		(int)Engine::Input::KeyPressed
 #define KEY_RELEASED	(int)Engine::Input::KeyReleased
@@ -228,9 +229,10 @@ namespace Engine
 		inline static bool GetMouseButtonPressed(int button) { return (GetMouseButtonState(button) == Input::MousePressed); }
 		inline static bool GetMouseButtonReleased(int button) { return (GetMouseButtonState(button) == Input::MouseReleased); }
 
-		inline static std::pair<float, float> GetMousePosition() { return s_Instance->GetMousePositionImpl(); }
+		inline static glm::vec2 GetMousePosition() { return s_Instance->GetMousePositionImpl(); }
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
+		inline static glm::vec2 GetPreviousMousePosition() { return s_Instance->m_PreviousMousePosition; }
 
 		static void SendAllEventData(bool sendAll) { s_Instance->m_SendAllEventData = sendAll; }
 		static void SendAllTypedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllTypedEvents++ : s_Instance->m_SystemsNeedingAllTypedEvents--; }
@@ -249,7 +251,7 @@ namespace Engine
 		// mouse
 		inline KeyState GetMouseButtonStateImpl(int button) { return m_MouseStates[button]; }
 
-		virtual std::pair<float, float> GetMousePositionImpl() = 0;
+		virtual glm::vec2 GetMousePositionImpl() = 0;
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
 
@@ -290,6 +292,7 @@ namespace Engine
 		unsigned int m_SystemsNeedingAllMouseMoveEvents = 0;
 		std::vector<BindedKeyData> m_BindedKeys;
 
+		glm::vec2 m_PreviousMousePosition;
 	};
 }
 

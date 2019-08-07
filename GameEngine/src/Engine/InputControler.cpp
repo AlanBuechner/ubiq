@@ -35,11 +35,14 @@ namespace Engine
 		}
 	}
 
-	void InputControler::RaiseMouseMoveEvent(glm::vec2& pos)
+	void InputControler::RaiseMouseMoveEvent(MouseMoveBindMode bindMode, glm::vec2& pos)
 	{
 		for (auto i : m_MouseMoveEvents)
 		{
-			i->Function(pos);
+			if (i->BindMode == (int)bindMode)
+			{
+				i->Function(pos);
+			}
 		}
 	}
 
@@ -70,10 +73,11 @@ namespace Engine
 		}
 	}
 
-	MouseMoveEventData* InputControler::BindMouseMoveEnvent(std::function<void(glm::vec2&)> func)
+	MouseMoveEventData* InputControler::BindMouseMoveEvent(MouseMoveBindMode bindMode, std::function<void(glm::vec2&)> func)
 	{
 		MouseMoveEventData* action = new MouseMoveEventData;
 		action->Function = func;
+		action->BindMode = (int)bindMode;
 		m_MouseMoveEvents.push_back(action);
 		Input::SendMouseMovedEvents(true);
 		return action;

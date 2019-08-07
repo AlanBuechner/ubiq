@@ -25,7 +25,7 @@ public:
 		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({ -1.0f, 0.0f,  0.0f })));
 		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  1.0f, 0.0f,  0.0f })));
 
-		Input->BindMouseMoveEnvent(BIND_MOUSEMOVE(&EditerCamera::MouseMoved));
+		Input->BindMouseMoveEvent(MOUSE_DELTA_POSITON, BIND_MOUSEMOVE(&EditerCamera::MouseMoved));
 	}
 
 	void Update()
@@ -43,7 +43,7 @@ private:
 
 	void MouseMoved(glm::vec2& pos)
 	{
-		
+		DEBUG_INFO("{0}, {1}", pos.x, pos.y);
 	}
 };
 

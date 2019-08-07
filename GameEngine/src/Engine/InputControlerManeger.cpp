@@ -51,7 +51,7 @@ namespace Engine
 			return false;
 		for (auto i : m_Controlers)
 		{
-			i->RaiseMouseMoveEvent(glm::vec2({e.GetX(), e.GetY()}));
+			i->RaiseMouseMoveEvent(e.GetMouseBindMode(), glm::vec2({e.GetX(), e.GetY()}));
 		}
 		return false;
 	}

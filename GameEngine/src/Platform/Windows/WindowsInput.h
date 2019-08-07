@@ -10,7 +10,7 @@ namespace Engine
 	class WindowsInput : public Input
 	{
 	protected:
-		virtual std::pair<float, float> GetMousePositionImpl() override;
+		virtual glm::vec2 GetMousePositionImpl() override;
 		virtual float GetMouseXImpl() override;
 		virtual float GetMouseYImpl() override;
 	};

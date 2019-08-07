@@ -9,7 +9,7 @@ namespace Engine
 
 	Input* Input::s_Instance = new WindowsInput();
 
-	std::pair<float, float> WindowsInput::GetMousePositionImpl()
+	glm::vec2 WindowsInput::GetMousePositionImpl()
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double xpos, ypos;
@@ -20,15 +20,15 @@ namespace Engine
 
 	float WindowsInput::GetMouseXImpl()
 	{
-		auto[x, y] = GetMousePositionImpl();
+		auto pos = GetMousePositionImpl();
 
-		return x;
+		return pos.x;
 	}
 
 	float WindowsInput::GetMouseYImpl()
 	{
-		auto[x, y] = GetMousePositionImpl();
+		auto pos = GetMousePositionImpl();
 
-		return y;
+		return pos.y;
 	}
 }

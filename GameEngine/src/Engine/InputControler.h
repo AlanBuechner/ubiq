@@ -7,6 +7,9 @@
 #define BIND_AXIS(x, p) std::bind(x, this, p)
 #define BIND_MOUSEMOVE(x) std::bind(x, this, std::placeholders::_1)
 
+#define MOUSE_CURSER_POSITON Engine::MouseMoveBindMode::CurserPosition
+#define MOUSE_DELTA_POSITON Engine::MouseMoveBindMode::DeltaPosition
+
 namespace Engine
 {
 	class InputControlerManeger;
@@ -25,6 +28,13 @@ namespace Engine
 	struct ENGINE_API MouseMoveEventData
 	{
 		std::function<void(glm::vec2& pos)> Function;
+		int BindMode;
+	};
+
+	enum class MouseMoveBindMode
+	{
+		CurserPosition,
+		DeltaPosition
 	};
 
 	class ENGINE_API InputControler
@@ -35,12 +45,12 @@ namespace Engine
 		~InputControler();
 
 		void RaiseEvent(int key, int state);
-		void RaiseMouseMoveEvent(glm::vec2& pos);
+		void RaiseMouseMoveEvent(MouseMoveBindMode bindMode, glm::vec2& pos);
 
 		EventData* BindEvent(int key, int state, std::function<void()> func);
 		void UnbindKey(EventData* event);
 
-		MouseMoveEventData* BindMouseMoveEnvent(std::function<void(glm::vec2&)> func);
+		MouseMoveEventData* BindMouseMoveEvent(MouseMoveBindMode bindMode, std::function<void(glm::vec2&)> func);
 		void UnbindMouseEvent(MouseMoveEventData* event);
 
 	private:

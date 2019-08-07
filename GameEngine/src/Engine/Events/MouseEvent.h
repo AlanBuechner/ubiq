@@ -1,14 +1,15 @@
 #pragma once
 
 #include "Event.h"
+#include "Engine/InputControler.h"
 
 namespace Engine {
 
 	class ENGINE_API MouseMovedEvent : public Event
 	{
 	public:
-		MouseMovedEvent(float x, float y)
-			: m_MouseX(x), m_MouseY(y) {}
+		MouseMovedEvent(MouseMoveBindMode bindMode, float x, float y)
+			: m_MouseBindMode(bindMode), m_MouseX(x), m_MouseY(y) {}
 
 		inline float GetX() const { return m_MouseX; }
 		inline float GetY() const { return m_MouseY; }
@@ -22,7 +23,13 @@ namespace Engine {
 
 		EVENT_CLASS_TYPE(MouseMoved)
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+
+		inline MouseMoveBindMode GetMouseBindMode()
+		{
+			return m_MouseBindMode;
+		}
 	private:
+		MouseMoveBindMode m_MouseBindMode;
 		float m_MouseX, m_MouseY;
 	};
 

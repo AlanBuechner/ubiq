@@ -2,6 +2,7 @@
 #include "WindowsWindow.h"
 #include "Engine/Log.h"
 
+#include "Engine/InputControler.h"
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/MouseEvent.h"
 #include "Engine/Events/KeyEvent.h"
@@ -155,8 +156,12 @@ namespace Engine
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
 
-			MouseMovedEvent* event = new MouseMovedEvent((float)xPos, (float)yPos); // creates new mouse moved event
-			data.EventCallback(*event);
+			MouseMovedEvent* cursorPositionEvent = new MouseMovedEvent(MOUSE_CURSER_POSITON, (float)xPos, (float)yPos); // creates new mouse moved event
+			data.EventCallback(*cursorPositionEvent);
+
+			glm::vec2 previousMousePosition = Input::GetPreviousMousePosition();
+			MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA_POSITON, (float)xPos - previousMousePosition.x , (float)yPos - previousMousePosition.y); // creates new mouse moved event
+			data.EventCallback(*deltaMousePostionEvent);
 		});
 	}
 
