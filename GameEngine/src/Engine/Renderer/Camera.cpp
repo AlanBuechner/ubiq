@@ -13,8 +13,8 @@ namespace Engine
 
 	void Camera::RecalculateViewMatrix()
 	{
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position) *
-			glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation.w), glm::vec3(m_Rotation.x, m_Rotation.y, m_Rotation.z));
+		m_RotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation.w), glm::vec3(m_Rotation.x, m_Rotation.y, m_Rotation.z));
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position) * m_RotationMatrix;
 
 		m_ViewMatrix = glm::inverse(transform);
 		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
@@ -22,7 +22,7 @@ namespace Engine
 
 	void Camera::RecalculateDirectionVectors()
 	{
-		glm::mat3 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation.w), glm::vec3(m_Rotation.x, m_Rotation.y, m_Rotation.z));
+		glm::mat3 rotation = m_RotationMatrix;
 
 		m_ForwordVector =	glm::vec3({ 0.0f, 0.0f, 1.0f }) * rotation;
 		m_UpVector =		glm::vec3({ 0.0f, 1.0f, 0.0f }) * rotation;

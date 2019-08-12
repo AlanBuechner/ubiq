@@ -19,6 +19,7 @@ namespace Engine
 		void SetRotation(const glm::quat& rotation) { m_Rotation = rotation;  RecalculateViewMatrix();  RecalculateDirectionVectors(); }
 
 		void Translate(const glm::vec3& translation) { m_Position += translation; RecalculateViewMatrix(); }
+		void Rotate(const glm::quat& rotation) { m_Rotation += rotation; RecalculateViewMatrix();  RecalculateDirectionVectors(); }
 
 		const glm::mat4 GetProjectionMatrix() const { return m_ProjectionMatrix; }
 		const glm::mat4 GetViewMatrix() const { return m_ViewMatrix; }
@@ -36,6 +37,7 @@ namespace Engine
 		glm::mat4 m_ProjectionMatrix;
 		glm::mat4 m_ViewMatrix;
 		glm::mat4 m_ViewProjectionMatrix;
+		glm::mat4 m_RotationMatrix;
 
 		glm::vec3 m_ForwordVector	= { 0.0f, 0.0f, 1.0f };
 		glm::vec3 m_UpVector		= { 0.0f, 1.0f, 0.0f };
