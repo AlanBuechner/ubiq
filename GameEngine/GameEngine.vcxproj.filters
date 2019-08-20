@@ -49,6 +49,9 @@
     <Filter Include="vendor\Glm\glm\gtx">
       <UniqueIdentifier>{93FE10C0-7FE2-D115-E842-CC68D445BC97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vendor\stb_image">
+      <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
@@ -123,6 +126,9 @@
     <ClInclude Include="src\Engine\Renderer\Shader.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Texture.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
@@ -145,6 +151,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLTime.h">
@@ -1254,6 +1263,9 @@
     <ClInclude Include="vendor\Glm\glm\vector_relational.hpp">
       <Filter>vendor\Glm\glm</Filter>
     </ClInclude>
+    <ClInclude Include="vendor\stb_image\stb_image.h">
+      <Filter>vendor\stb_image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Application.cpp">
@@ -1304,6 +1316,9 @@
     <ClCompile Include="src\Engine\Renderer\Shader.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\Texture.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
@@ -1320,6 +1335,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLTime.cpp">
@@ -1339,6 +1357,9 @@
     </ClCompile>
     <ClCompile Include="src\pch.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\stb_image\stb_image.cpp">
+      <Filter>vendor\stb_image</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

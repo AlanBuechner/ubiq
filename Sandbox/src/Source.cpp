@@ -31,19 +31,21 @@ public:
 	void Update()
 	{
 		Translate(MoveDir * Speed * Time::GetDeltaTime());
+		glm::vec3 pos = GetPosition();
+		//DEBUG_INFO("{0}, {1}, {2}", pos.x, pos.y, pos.z);
 	}
 
 private:
 	void Move(const glm::vec3& movedir)
 	{
-		glm::vec3 xMove = movedir.x * RightVector();
-		glm::vec3 zMove = movedir.z * ForwordVector();
+		glm::vec3 xMove = movedir.x * glm::vec3(1.0f, 0.0f, 0.0f);
+		glm::vec3 zMove = movedir.z * glm::vec3(0.0f, 0.0f, 1.0f);
 		MoveDir += xMove + zMove;
 	}
 
 	void MouseMoved(glm::vec2& pos)
 	{
-		DEBUG_INFO("{0}, {1}", pos.x, pos.y);
+		//DEBUG_INFO("{0}, {1}", pos.x, pos.y);
 	}
 };
 
@@ -52,10 +54,11 @@ class ExampleLayer : public Engine::Layer
 public:
 	InputControler* input;
 
-	Engine::Ref<Engine::Shader> m_Shader;
+	Engine::Ref<Engine::Shader> m_Shader, m_TextureShader;
 	Engine::Ref<Engine::VertexArray> m_VertexArray;
 	Engine::Ref<Engine::VertexBuffer> m_VertexBuffer;
 	Engine::Ref<Engine::IndexBuffer> m_IndexBuffer;
+	Engine::Ref<Engine::Texture2D> m_Texture;
 
 	glm::vec3 m_Position;
 
@@ -70,20 +73,21 @@ public:
 		m_Camera.SetPlayerInput(m_InputManeger);
 
 
-		m_VertexArray.reset(Engine::VertexArray::Create());
+		m_VertexArray = Engine::VertexArray::Create();
 
-		float vertices[4 * 7] =
+		float vertices[4 * 5] =
 		{
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.5f,  0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		};
 
 		m_VertexBuffer.reset(Engine::VertexBuffer::Create(vertices, sizeof(vertices)));
 
 		Engine::BufferLayout layout = {
-			{Engine::ShaderDataType::Float3, "a_Position"}
+			{Engine::ShaderDataType::Float3, "a_Position"},
+			{Engine::ShaderDataType::Float2, "a_TexCoord"}
 		};
 
 		m_VertexBuffer->SetLayout(layout);
@@ -96,9 +100,18 @@ public:
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
 		Engine::Shader::ShaderSorce src;
-		src << Engine::Shader::LoadShader("C:\\Users\\alanj\\source\\repos\\GameEngine\\FlatColorShader.glsl");
 
-		m_Shader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));
+		/*src << Engine::Shader::LoadShader("C:\\Users\\alanj\\source\\repos\\GameEngine\\FlatColorShader.glsl");
+		m_Shader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));*/
+
+		src << Engine::Shader::LoadShader("C:\\Users\\alanj\\source\\repos\\GameEngine\\TextureShader.glsl");
+		m_TextureShader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));
+
+		m_Texture = Engine::Texture2D::Create("C:\\Users\\alanj\\source\\repos\\GameEngine\\logo\\UBIQ.png");
+		m_Texture->Bind(0);
+
+		m_TextureShader->Bind();
+		m_TextureShader->UploadUniformInt("u_Texture", 0);
 
 	}
 
@@ -111,7 +124,7 @@ public:
 
 		Engine::Renderer::BeginScene(m_Camera);
 
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
+		/*glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
 
 		glm::vec4 redColor(0.8f, 0.2f, 0.3f, 1.0f);
 		glm::vec4 blueColor(0.2f, 0.3f, 0.8f, 1.0f);
@@ -127,11 +140,9 @@ public:
 					m_Shader->UploadUniformFloat4("u_Color", blueColor);
 				Engine::Renderer::Submit(m_VertexArray, m_Shader, transform);
 			}
-		}
-		/*m_Shader->UploadUniformFloat4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		Engine::Renderer::Submit(m_VertexArray, m_Shader, glm::translate(glm::mat4(1.0f), m_Position));*/
+		}*/
 
-		Engine::Renderer::EndScene();
+		Engine::Renderer::Submit(m_VertexArray, m_TextureShader, glm::translate(glm::mat4(1.0f), m_Position));
 
 		//Engine::Renderer::Flush();
 	}

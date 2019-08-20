@@ -32,8 +32,14 @@ namespace Engine
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
+		virtual void UploadUniformInt(const std::string& name, const int value) = 0;
 		virtual void UploadUniformFloat4(const std::string& name, const glm::vec4& values) = 0;
+		virtual void UploadUniformFloat3(const std::string& name, const glm::vec3& values) = 0;
+		virtual void UploadUniformFloat2(const std::string& name, const glm::vec2& values) = 0;
+		virtual void UploadUniformFloat(const std::string& name, const float value) = 0;
 		virtual void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) = 0;
+		virtual void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) = 0;
+		virtual void UploadUniformMat2(const std::string& name, const glm::mat2& matrix) = 0;
 
 		static ShaderSorce LoadShader(std::string file);
 		static ShaderSorce LoadShader(std::string file, int type);
