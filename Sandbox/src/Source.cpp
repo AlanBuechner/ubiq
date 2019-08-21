@@ -108,7 +108,6 @@ public:
 		m_TextureShader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));
 
 		m_Texture = Engine::Texture2D::Create("C:\\Users\\alanj\\source\\repos\\GameEngine\\logo\\UBIQ.png");
-		m_Texture->Bind(0);
 
 		m_TextureShader->Bind();
 		m_TextureShader->UploadUniformInt("u_Texture", 0);
@@ -142,6 +141,7 @@ public:
 			}
 		}*/
 
+		m_Texture->Bind(0);
 		Engine::Renderer::Submit(m_VertexArray, m_TextureShader, glm::translate(glm::mat4(1.0f), m_Position));
 
 		//Engine::Renderer::Flush();
