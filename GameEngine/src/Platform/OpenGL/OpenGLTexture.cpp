@@ -34,6 +34,8 @@ namespace Engine
 			OpenGLChannels = GL_RGB;
 		case 4:
 			OpenGLChannels = GL_RGBA;
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		default:
 			break;
 		}
