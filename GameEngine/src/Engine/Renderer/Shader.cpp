@@ -65,7 +65,7 @@ namespace Engine
 		return srcToReturn;
 	}
 
-	Shader* Shader::Create(const std::string& vertexSrc, const std::string& pixleSrc)
+	Ref<Shader> Shader::Create(const std::string& vertexSrc, const std::string& pixleSrc)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -73,7 +73,7 @@ namespace Engine
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return new OpenGLShader(vertexSrc, pixleSrc);
+			return std::make_shared<OpenGLShader>(vertexSrc, pixleSrc);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!")
 			return nullptr;

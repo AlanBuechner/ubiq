@@ -83,7 +83,7 @@ public:
 			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		};
 
-		m_VertexBuffer.reset(Engine::VertexBuffer::Create(vertices, sizeof(vertices)));
+		m_VertexBuffer = Engine::VertexBuffer::Create(vertices, sizeof(vertices));
 
 		Engine::BufferLayout layout = {
 			{Engine::ShaderDataType::Float3, "a_Position"},
@@ -96,7 +96,7 @@ public:
 
 		uint32_t indeces[] = { 2, 1, 0,  0, 3, 2 };
 
-		m_IndexBuffer.reset(Engine::IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t)));
+		m_IndexBuffer = Engine::IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t));
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
 		Engine::Shader::ShaderSorce src;
@@ -105,7 +105,7 @@ public:
 		m_Shader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));*/
 
 		src << Engine::Shader::LoadShader("C:\\Users\\alanj\\source\\repos\\GameEngine\\TextureShader.glsl");
-		m_TextureShader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));
+		m_TextureShader = Engine::Shader::Create(src.vertexShader, src.pixleShader);
 
 		m_Texture = Engine::Texture2D::Create("C:\\Users\\alanj\\source\\repos\\GameEngine\\logo\\UBIQ.png");
 

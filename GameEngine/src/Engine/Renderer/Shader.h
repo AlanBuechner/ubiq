@@ -44,7 +44,7 @@ namespace Engine
 		static ShaderSorce LoadShader(std::string file);
 		static ShaderSorce LoadShader(std::string file, int type);
 
-		static Shader* Create(const std::string& vertexSrc, const std::string& pixleSrc);
+		static Ref<Shader> Create(const std::string& vertexSrc, const std::string& pixleSrc);
 
 	private:
 		virtual uint32_t GetUniformLocation(const std::string& name) const = 0;
