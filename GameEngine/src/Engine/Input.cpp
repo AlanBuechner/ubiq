@@ -153,7 +153,8 @@ namespace Engine
 			}
 		}
 		m_ToUpdateMouse.clear();
-		m_PreviousMousePosition = GetMousePositionImpl();
+		m_PreviousMousePosition = m_MousePosition;
+		m_MousePosition = QueryMousePosition();
 	}
 
 	void Input::GetUpdatedEventList(std::vector<Event*>& events)

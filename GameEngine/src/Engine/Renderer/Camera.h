@@ -21,13 +21,14 @@ namespace Engine
 		void Translate(const glm::vec3& translation) { m_Position += translation; RecalculateViewMatrix(); }
 		void Rotate(const glm::quat& rotation) { m_Rotation += rotation; RecalculateViewMatrix();  RecalculateDirectionVectors(); }
 
-		const glm::mat4 GetProjectionMatrix() const { return m_ProjectionMatrix; }
-		const glm::mat4 GetViewMatrix() const { return m_ViewMatrix; }
-		const glm::mat4 GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
+		const glm::mat3& GetRotationMatrix() const { return m_RotationMatrix; }
+		const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
+		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
+		const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
 
-		inline const glm::vec3 ForwordVector() const { return m_ForwordVector; }
-		inline const glm::vec3 UpVector() const { return m_UpVector; }
-		inline const glm::vec3 RightVector() const { return m_RightVector; }
+		inline const glm::vec3& ForwordVector() const { return m_ForwordVector; }
+		inline const glm::vec3& UpVector() const { return m_UpVector; }
+		inline const glm::vec3& RightVector() const { return m_RightVector; }
 
 	private:
 		void RecalculateViewMatrix();

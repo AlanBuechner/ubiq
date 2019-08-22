@@ -9,26 +9,12 @@ namespace Engine
 
 	Input* Input::s_Instance = new WindowsInput();
 
-	glm::vec2 WindowsInput::GetMousePositionImpl()
+	glm::vec2 WindowsInput::QueryMousePosition()
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 
 		return { (float)xpos, (float)ypos };
-	}
-
-	float WindowsInput::GetMouseXImpl()
-	{
-		auto pos = GetMousePositionImpl();
-
-		return pos.x;
-	}
-
-	float WindowsInput::GetMouseYImpl()
-	{
-		auto pos = GetMousePositionImpl();
-
-		return pos.y;
 	}
 }

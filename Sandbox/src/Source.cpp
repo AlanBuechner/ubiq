@@ -31,20 +31,17 @@ public:
 	void Update()
 	{
 		Translate(MoveDir * Speed * Time::GetDeltaTime());
-		glm::vec3 pos = GetPosition();
-		//DEBUG_INFO("{0}, {1}, {2}", pos.x, pos.y, pos.z);
 	}
 
 private:
 	void Move(const glm::vec3& movedir)
 	{
-		glm::vec3 xMove = movedir.x * glm::vec3(1.0f, 0.0f, 0.0f);
-		glm::vec3 zMove = movedir.z * glm::vec3(0.0f, 0.0f, 1.0f);
-		MoveDir += xMove + zMove;
+		MoveDir += movedir;
 	}
 
 	void MouseMoved(glm::vec2& pos)
 	{
+		//Rotate({ -pos.x * 0.1f, 0.0f, 1.0f, 0.0f});
 		//DEBUG_INFO("{0}, {1}", pos.x, pos.y);
 	}
 };

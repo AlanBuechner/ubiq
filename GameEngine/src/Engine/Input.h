@@ -229,9 +229,7 @@ namespace Engine
 		inline static bool GetMouseButtonPressed(int button) { return (GetMouseButtonState(button) == Input::MousePressed); }
 		inline static bool GetMouseButtonReleased(int button) { return (GetMouseButtonState(button) == Input::MouseReleased); }
 
-		inline static glm::vec2 GetMousePosition() { return s_Instance->GetMousePositionImpl(); }
-		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
-		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
+		inline static glm::vec2 GetMousePosition() { return s_Instance->m_MousePosition; }
 		inline static glm::vec2 GetPreviousMousePosition() { return s_Instance->m_PreviousMousePosition; }
 
 		static void SendAllEventData(bool sendAll) { s_Instance->m_SendAllEventData = sendAll; }
@@ -251,9 +249,7 @@ namespace Engine
 		// mouse
 		inline KeyState GetMouseButtonStateImpl(int button) { return m_MouseStates[button]; }
 
-		virtual glm::vec2 GetMousePositionImpl() = 0;
-		virtual float GetMouseXImpl() = 0;
-		virtual float GetMouseYImpl() = 0;
+		virtual glm::vec2 QueryMousePosition() = 0;
 
 		void SetKeyState(int key, KeyState state) { m_KeyStates[key] = state; }
 		void SetMouseButtonState(int button, KeyState state) { m_MouseStates[button] = state; }
@@ -292,6 +288,7 @@ namespace Engine
 		unsigned int m_SystemsNeedingAllMouseMoveEvents = 0;
 		std::vector<BindedKeyData> m_BindedKeys;
 
+		glm::vec2 m_MousePosition;
 		glm::vec2 m_PreviousMousePosition;
 	};
 }
