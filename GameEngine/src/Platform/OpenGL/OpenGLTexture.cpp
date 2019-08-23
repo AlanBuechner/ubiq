@@ -28,6 +28,12 @@ namespace Engine
 		m_WrapV = V;
 	}
 
+	void OpenGLTexture2D::SetMinMagFilter(MinMagFilter min, MinMagFilter mag)
+	{
+		m_MinFilter = min;
+		m_MagFilter = mag;
+	}
+
 	void OpenGLTexture2D::LoadFromFile(const std::string& path)
 	{
 		m_Path = path;
@@ -42,9 +48,31 @@ namespace Engine
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, GL_RGBA8, m_Width, m_Width);
 
+		int minFilter = 0, magFilter = 0;
+		switch (m_MinFilter)
+		{
+		case MinMagFilter::Linear:
+			minFilter = GL_LINEAR;
+			break;
+		case MinMagFilter::Nearest:
+			minFilter = GL_NEAREST;
+		default:
+			break;
+		}
+		
+		switch (m_MagFilter)
+		{
+		case MinMagFilter::Linear:
+			magFilter = GL_LINEAR;
+			break;
+		case MinMagFilter::Nearest:
+			magFilter = GL_NEAREST;
+		default:
+			break;
+		}
 
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, minFilter);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, magFilter);
 
 		int u_Wrap = 0, v_Wrap = 0;
 		switch (m_WrapU)

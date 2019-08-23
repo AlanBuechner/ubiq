@@ -14,6 +14,7 @@ namespace Engine
 		virtual uint32_t GetHeight() const override { return m_Height; }
 		virtual void Bind(uint32_t slot) const override;
 		virtual void SetWrapMode(WrapMode U, WrapMode V) override;
+		virtual void SetMinMagFilter(MinMagFilter min, MinMagFilter mag) override;
 		virtual void LoadFromFile(const std::string& path);
 
 	private:
@@ -21,6 +22,7 @@ namespace Engine
 
 		uint32_t m_Width, m_Height;
 		WrapMode m_WrapU, m_WrapV;
+		MinMagFilter m_MinFilter, m_MagFilter;
 		uint32_t m_RendererID;
 	};
 }

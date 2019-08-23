@@ -74,10 +74,10 @@ public:
 
 		float vertices[4 * 5] =
 		{
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f, 2.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f, 2.0f, 2.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 2.0f
+			-2.0f, -2.0f, 0.0f, 0.0f, 0.0f,
+			 2.0f, -2.0f, 0.0f, 2.0f, 0.0f,
+			 2.0f,  2.0f, 0.0f, 2.0f, 2.0f,
+			-2.0f,  2.0f, 0.0f, 0.0f, 2.0f
 		};
 
 		m_VertexBuffer = Engine::VertexBuffer::Create(vertices, sizeof(vertices));
@@ -106,6 +106,7 @@ public:
 
 		m_Texture = Engine::Texture2D::Create();
 		m_Texture->SetWrapMode(Engine::Texture::WrapMode::MirroredRepeat, Engine::Texture::WrapMode::MirroredRepeat);
+		m_Texture->SetMinMagFilter(Engine::Texture::MinMagFilter::Linear, Engine::Texture::MinMagFilter::Linear);
 		m_Texture->LoadFromFile("C:\\Users\\alanj\\source\\repos\\GameEngine\\logo\\UBIQ.png");
 		
 		m_TextureShader->Bind();
