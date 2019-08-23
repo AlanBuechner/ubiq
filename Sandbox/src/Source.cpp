@@ -75,9 +75,9 @@ public:
 		float vertices[4 * 5] =
 		{
 			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+			 0.5f, -0.5f, 0.0f, 2.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 2.0f, 2.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 2.0f
 		};
 
 		m_VertexBuffer = Engine::VertexBuffer::Create(vertices, sizeof(vertices));
@@ -104,8 +104,10 @@ public:
 		src << Engine::Shader::LoadShader("C:\\Users\\alanj\\source\\repos\\GameEngine\\TextureShader.glsl");
 		m_TextureShader = Engine::Shader::Create(src.vertexShader, src.pixleShader);
 
-		m_Texture = Engine::Texture2D::Create("C:\\Users\\alanj\\source\\repos\\GameEngine\\logo\\UBIQ.png");
-
+		m_Texture = Engine::Texture2D::Create();
+		m_Texture->SetWrapMode(Engine::Texture::WrapMode::MirroredRepeat, Engine::Texture::WrapMode::MirroredRepeat);
+		m_Texture->LoadFromFile("C:\\Users\\alanj\\source\\repos\\GameEngine\\logo\\UBIQ.png");
+		
 		m_TextureShader->Bind();
 		m_TextureShader->UploadUniformInt("u_Texture", 0);
 
