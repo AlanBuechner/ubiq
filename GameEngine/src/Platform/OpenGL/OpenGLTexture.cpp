@@ -45,8 +45,31 @@ namespace Engine
 		m_Width = width;
 		m_Height = height;
 
+		int InternalFormat = 0, DataFormat = 0;
+		switch (channels)
+		{
+		case 1:
+			InternalFormat = GL_R8;
+			DataFormat = GL_R;
+			break;
+		case 2:
+			InternalFormat = GL_RG8;
+			DataFormat = GL_RG;
+			break;
+		case 3:
+			InternalFormat = GL_RGB8;
+			DataFormat = GL_RGB;
+			break;
+		case 4:
+			InternalFormat = GL_RGBA8;
+			DataFormat = GL_RGBA;
+			break;
+		default:
+			break;
+		}
+
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-		glTextureStorage2D(m_RendererID, 1, GL_RGBA8, m_Width, m_Width);
+		glTextureStorage2D(m_RendererID, 1, InternalFormat, m_Width, m_Width);
 
 		int minFilter = 0, magFilter = 0;
 		switch (m_MinFilter)
@@ -108,28 +131,7 @@ namespace Engine
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, u_Wrap);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, v_Wrap);
 
-		int OpenGLChannels = 0;
-		switch (channels)
-		{
-		case 1:
-			OpenGLChannels = GL_R;
-			break;
-		case 2:
-			OpenGLChannels = GL_RG;
-			break;
-		case 3:
-			OpenGLChannels = GL_RGB;
-			break;
-		case 4:
-			OpenGLChannels = GL_RGBA;
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			break;
-		default:
-			break;
-		}
-
-		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, OpenGLChannels, GL_UNSIGNED_BYTE, data);
+		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, DataFormat, GL_UNSIGNED_BYTE, data);
 
 		stbi_image_free(data);
 	}

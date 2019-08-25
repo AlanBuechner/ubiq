@@ -7,6 +7,8 @@
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/imGui/ImGuiLayer.h"
 
+#include "Renderer/Renderer.h"
+
 namespace Engine {
 
 #define BIND_EVENT_FN_EXTERN(x, p) std::bind(x, p, std::placeholders::_1)
@@ -20,6 +22,8 @@ namespace Engine {
 
 		m_Window = std::unique_ptr<Window>(Window::Create()); // create a window
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
+
+		Renderer::Init();
 
 		GenLayerStack(); // generate the starting layer stack
 	}
