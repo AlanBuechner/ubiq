@@ -6,7 +6,7 @@ namespace Engine
 	class ENGINE_API OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const std::string& vertexSrc, const std::string pixleSrc);
+		OpenGLShader(Ref<ShaderSorce> src);
 		virtual ~OpenGLShader();
 
 		virtual void Bind();
@@ -24,8 +24,12 @@ namespace Engine
 	private:
 		virtual uint32_t GetUniformLocation(const std::string& name) const;
 
+		void Compile();
+
 	private:
 		uint32_t m_RendererID;
 		mutable std::unordered_map<std::string, uint32_t> m_UniformLocationCache;
+
+		Ref<ShaderSorce> m_Src;
 	};
 }

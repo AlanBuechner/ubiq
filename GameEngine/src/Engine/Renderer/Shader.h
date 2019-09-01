@@ -11,13 +11,18 @@ namespace Engine
 	public:
 		struct ShaderSorce
 		{
+		public:
 			std::string vertexShader;
 			std::string pixleShader;
+
+			std::vector<std::pair<std::string, int>> path;
 
 			void operator<<(const ShaderSorce& other)
 			{
 				if (this->vertexShader.empty()) this->vertexShader = other.vertexShader;
 				if (this->pixleShader.empty()) this->pixleShader = other.pixleShader;
+
+				path.push_back(other.path[0]);
 			}
 		};
 
@@ -43,8 +48,9 @@ namespace Engine
 
 		static ShaderSorce LoadShader(std::string file);
 		static ShaderSorce LoadShader(std::string file, int type);
+		static void ReloadShader(ShaderSorce& shaders);
 
-		static Ref<Shader> Create(const std::string& vertexSrc, const std::string& pixleSrc);
+		static Ref<Shader> Create(Ref<Shader::ShaderSorce> src);
 
 	private:
 		virtual uint32_t GetUniformLocation(const std::string& name) const = 0;

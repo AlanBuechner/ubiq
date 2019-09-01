@@ -1,4 +1,5 @@
 #include <Engine.h>
+#include <direct.h>
 
 class EditerCamera : public Engine::PerspectiveCamera
 {
@@ -96,18 +97,18 @@ public:
 		m_IndexBuffer = Engine::IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t));
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
-		Engine::Shader::ShaderSorce src;
+		Engine::Ref<Engine::Shader::ShaderSorce> src = std::make_shared<Engine::Shader::ShaderSorce>();
 
 		/*src << Engine::Shader::LoadShader("C:\\Users\\alanj\\source\\repos\\GameEngine\\FlatColorShader.glsl");
 		m_Shader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));*/
 
-		src << Engine::Shader::LoadShader("C:\\Users\\alanj\\source\\repos\\GameEngine\\TextureShader.glsl");
-		m_TextureShader = Engine::Shader::Create(src.vertexShader, src.pixleShader);
+		*src << Engine::Shader::LoadShader("Assets/Shaders/TextureShader.glsl");
+		m_TextureShader = Engine::Shader::Create(src);
 
 		m_Texture = Engine::Texture2D::Create();
 		m_Texture->SetWrapMode(Engine::Texture::WrapMode::MirroredRepeat, Engine::Texture::WrapMode::MirroredRepeat);
 		m_Texture->SetMinMagFilter(Engine::Texture::MinMagFilter::Linear, Engine::Texture::MinMagFilter::Linear);
-		m_Texture->LoadFromFile("C:\\Users\\alanj\\source\\repos\\GameEngine\\logo\\UBIQ.png");
+		m_Texture->LoadFromFile("Assets/Images/UBIQ.png");
 		
 		m_TextureShader->Bind();
 		m_TextureShader->UploadUniformInt("u_Texture", 0);

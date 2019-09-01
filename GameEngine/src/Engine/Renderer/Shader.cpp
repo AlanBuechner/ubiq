@@ -50,6 +50,8 @@ namespace Engine
 		sorce.vertexShader = ss[(int)Type::VERTEX].str();
 		sorce.pixleShader = ss[(int)Type::PIXLE].str();
 
+		sorce.path.push_back(std::pair(file, ShaderType::None));
+
 		return sorce;
 	}
 
@@ -62,10 +64,28 @@ namespace Engine
 		if ((type & (int)ShaderType::Pixle) != 0)
 			srcToReturn.pixleShader = src.pixleShader;
 
+		srcToReturn.path.push_back(std::pair(file, type));
+
 		return srcToReturn;
 	}
 
-	Ref<Shader> Shader::Create(const std::string& vertexSrc, const std::string& pixleSrc)
+	void Shader::ReloadShader(ShaderSorce& shaders)
+	{
+		for (int i = 0; i < shaders.path.size(); i++)
+		{
+			auto [path, type] = shaders.path[i];
+			if (type == ShaderType::None)
+			{
+				shaders << LoadShader(path);
+			}
+			else
+			{
+				shaders << LoadShader(path, type);
+			}
+		}
+	}
+
+	Ref<Shader> Shader::Create(Ref<Shader::ShaderSorce> src)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -73,7 +93,7 @@ namespace Engine
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return std::make_shared<OpenGLShader>(vertexSrc, pixleSrc);
+			return std::make_shared<OpenGLShader>(src);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!")
 			return nullptr;

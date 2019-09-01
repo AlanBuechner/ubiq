@@ -4,14 +4,49 @@
 
 namespace Engine
 {
-	OpenGLShader::OpenGLShader(const std::string & vertexSrc, const std::string pixleSrc)
+	OpenGLShader::OpenGLShader(Ref<Shader::ShaderSorce> src)
+		: m_Src(src)
+	{
+		Compile();
+	}
+
+	OpenGLShader::~OpenGLShader()
+	{
+		glDeleteProgram(m_RendererID);
+	}
+
+	void OpenGLShader::Bind()
+	{
+		glUseProgram(m_RendererID);
+	}
+
+	void OpenGLShader::Unbind()
+	{
+		glUseProgram(0);
+	}
+
+	uint32_t OpenGLShader::GetUniformLocation(const std::string & name) const
+	{
+		if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+			return m_UniformLocationCache[name];
+		uint32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (location == -1)
+		{
+			CORE_ERROR("Uniform {0} was not found!", name);
+			return location;
+		}
+		m_UniformLocationCache[name] = location;
+		return location;
+	}
+
+	void OpenGLShader::Compile()
 	{
 		// Create an empty vertex shader handle
 		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
 		// Send the vertex shader source code to GL
 		// Note that std::string's .c_str is NULL character terminated.
-		const GLchar *source = (const GLchar *)vertexSrc.c_str();
+		const GLchar* source = (const GLchar*)m_Src->vertexShader.c_str();
 		glShaderSource(vertexShader, 1, &source, 0);
 
 		// Compile the vertex shader
@@ -44,7 +79,7 @@ namespace Engine
 
 		// Send the fragment shader source code to GL
 		// Note that std::string's .c_str is NULL character terminated.
-		source = pixleSrc.c_str();
+		source = m_Src->pixleShader.c_str();
 		glShaderSource(fragmentShader, 1, &source, 0);
 
 		// Compile the fragment shader
@@ -86,7 +121,7 @@ namespace Engine
 
 		// Note the different functions here: glGetProgram* instead of glGetShader*.
 		GLint isLinked = 0;
-		glGetProgramiv(m_RendererID, GL_LINK_STATUS, (int *)&isLinked);
+		glGetProgramiv(m_RendererID, GL_LINK_STATUS, (int*)&isLinked);
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxLength = 0;
@@ -113,35 +148,6 @@ namespace Engine
 		// Always detach shaders after a successful link.
 		glDetachShader(m_RendererID, vertexShader);
 		glDetachShader(m_RendererID, fragmentShader);
-	}
-
-	OpenGLShader::~OpenGLShader()
-	{
-		glDeleteProgram(m_RendererID);
-	}
-
-	void OpenGLShader::Bind()
-	{
-		glUseProgram(m_RendererID);
-	}
-
-	void OpenGLShader::Unbind()
-	{
-		glUseProgram(0);
-	}
-
-	uint32_t OpenGLShader::GetUniformLocation(const std::string & name) const
-	{
-		if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
-			return m_UniformLocationCache[name];
-		uint32_t location = glGetUniformLocation(m_RendererID, name.c_str());
-		if (location == -1)
-		{
-			CORE_ERROR("Uniform {0} was not found!", name);
-			return location;
-		}
-		m_UniformLocationCache[name] = location;
-		return location;
 	}
 
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int value)
