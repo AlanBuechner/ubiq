@@ -1,5 +1,4 @@
 #include <Engine.h>
-#include <direct.h>
 
 class EditerCamera : public Engine::PerspectiveCamera
 {
@@ -26,7 +25,7 @@ public:
 		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({ -1.0f, 0.0f,  0.0f })));
 		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  1.0f, 0.0f,  0.0f })));
 
-		Input->BindMouseMoveEvent(MOUSE_DELTA_POSITON, BIND_MOUSEMOVE(&EditerCamera::MouseMoved));
+		Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&EditerCamera::MouseMoved));
 	}
 
 	void Update()
@@ -105,10 +104,7 @@ public:
 		*src << Engine::Shader::LoadShader("Assets/Shaders/TextureShader.glsl");
 		m_TextureShader = Engine::Shader::Create(src);
 
-		m_Texture = Engine::Texture2D::Create();
-		m_Texture->SetWrapMode(Engine::Texture::WrapMode::MirroredRepeat, Engine::Texture::WrapMode::MirroredRepeat);
-		m_Texture->SetMinMagFilter(Engine::Texture::MinMagFilter::Linear, Engine::Texture::MinMagFilter::Linear);
-		m_Texture->LoadFromFile("Assets/Images/UBIQ.png");
+		m_Texture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
 		
 		m_TextureShader->Bind();
 		m_TextureShader->UploadUniformInt("u_Texture", 0);

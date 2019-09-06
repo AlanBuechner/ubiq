@@ -156,11 +156,11 @@ namespace Engine
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
 
-			MouseMovedEvent* cursorPositionEvent = new MouseMovedEvent(MOUSE_CURSER_POSITON, (float)xPos, (float)yPos); // creates new mouse moved event
+			MouseMovedEvent* cursorPositionEvent = new MouseMovedEvent(MOUSE_POSITON, (float)xPos, (float)yPos); // creates new mouse moved event
 			data.EventCallback(*cursorPositionEvent);
 
 			glm::vec2 PrevMousePos = Input::GetPreviousMousePosition();
-			MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA_POSITON, (float)xPos - PrevMousePos.x , (float)yPos - PrevMousePos.y); // creates new mouse moved event
+			MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)xPos - PrevMousePos.x , (float)yPos - PrevMousePos.y); // creates new mouse moved event
 			data.EventCallback(*deltaMousePostionEvent);
 		});
 	}

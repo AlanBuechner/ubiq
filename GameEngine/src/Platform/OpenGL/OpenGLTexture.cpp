@@ -7,7 +7,8 @@
 
 namespace Engine
 {
-	OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
+	OpenGLTexture2D::OpenGLTexture2D(const std::string& path, Ref<TextureAttribute> attrib)
+		: m_Attribute(attrib)
 	{
 		LoadFromFile(path);
 	}
@@ -20,18 +21,6 @@ namespace Engine
 	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
 		glBindTextureUnit(slot, m_RendererID);
-	}
-
-	void OpenGLTexture2D::SetWrapMode(WrapMode U, WrapMode V)
-	{
-		m_WrapU = U;
-		m_WrapV = V;
-	}
-
-	void OpenGLTexture2D::SetMinMagFilter(MinMagFilter min, MinMagFilter mag)
-	{
-		m_MinFilter = min;
-		m_MagFilter = mag;
 	}
 
 	void OpenGLTexture2D::LoadFromFile(const std::string& path)
@@ -72,23 +61,23 @@ namespace Engine
 		glTextureStorage2D(m_RendererID, 1, InternalFormat, m_Width, m_Width);
 
 		int minFilter = 0, magFilter = 0;
-		switch (m_MinFilter)
+		switch (m_Attribute->Min)
 		{
-		case MinMagFilter::Linear:
+		case TextureAttribute::MinMagFilter::Linear:
 			minFilter = GL_LINEAR;
 			break;
-		case MinMagFilter::Nearest:
+		case TextureAttribute::MinMagFilter::Nearest:
 			minFilter = GL_NEAREST;
 		default:
 			break;
 		}
 		
-		switch (m_MagFilter)
+		switch (m_Attribute->Mag)
 		{
-		case MinMagFilter::Linear:
+		case TextureAttribute::MinMagFilter::Linear:
 			magFilter = GL_LINEAR;
 			break;
-		case MinMagFilter::Nearest:
+		case TextureAttribute::MinMagFilter::Nearest:
 			magFilter = GL_NEAREST;
 		default:
 			break;
@@ -98,30 +87,30 @@ namespace Engine
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, magFilter);
 
 		int u_Wrap = 0, v_Wrap = 0;
-		switch (m_WrapU)
+		switch (m_Attribute->U)
 		{
-		case WrapMode::Repeat:
+		case TextureAttribute::WrapMode::Repeat:
 			u_Wrap = GL_REPEAT;
 			break;
-		case WrapMode::MirroredRepeat:
+		case TextureAttribute::WrapMode::MirroredRepeat:
 			u_Wrap = GL_MIRRORED_REPEAT;
 			break;
-		case WrapMode::ClampToEdge:
+		case TextureAttribute::WrapMode::ClampToEdge:
 			u_Wrap = GL_CLAMP_TO_EDGE;
 			break;
 		default:
 			break;
 		}
 
-		switch (m_WrapV)
+		switch (m_Attribute->V)
 		{
-		case WrapMode::Repeat:
+		case TextureAttribute::WrapMode::Repeat:
 			v_Wrap = GL_REPEAT;
 			break;
-		case WrapMode::MirroredRepeat:
+		case TextureAttribute::WrapMode::MirroredRepeat:
 			v_Wrap = GL_MIRRORED_REPEAT;
 			break;
-		case WrapMode::ClampToEdge:
+		case TextureAttribute::WrapMode::ClampToEdge:
 			v_Wrap = GL_CLAMP_TO_EDGE;
 			break;
 		default:

@@ -7,8 +7,8 @@
 #define BIND_AXIS(x, p) std::bind(x, this, p)
 #define BIND_MOUSEMOVE(x) std::bind(x, this, std::placeholders::_1)
 
-#define MOUSE_CURSER_POSITON Engine::MouseMoveBindMode::CurserPosition
-#define MOUSE_DELTA_POSITON Engine::MouseMoveBindMode::DeltaPosition
+#define MOUSE_POSITON Engine::MouseMoveBindMode::CurserPosition
+#define MOUSE_DELTA Engine::MouseMoveBindMode::DeltaPosition
 
 namespace Engine
 {

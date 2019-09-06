@@ -6,30 +6,21 @@
 
 namespace Engine
 {
-	Ref<Texture2D> Texture2D::Create(const std::string& path)
+	Ref<Texture2D> Texture2D::Create(const std::string& path, TextureAttribute& attribute)
 	{
-		if (path == "")
+		ASSERT(path == "" ,"Path must be given");
+		
+		Ref<TextureAttribute> attrib = std::make_shared<TextureAttribute>(attribute);
+
+		switch (Renderer::GetAPI())
 		{
-			switch (Renderer::GetAPI())
-			{
-			case RendererAPI::API::None:
-				CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-				return nullptr;
-			case RendererAPI::API::OpenGl:
-				return std::make_shared<OpenGLTexture2D>();
-			}
+		case RendererAPI::API::None:
+			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGl:
+			return std::make_shared<OpenGLTexture2D>(path, attrib);
 		}
-		else
-		{
-			switch (Renderer::GetAPI())
-			{
-			case RendererAPI::API::None:
-				CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-				return nullptr;
-			case RendererAPI::API::OpenGl:
-				return std::make_shared<OpenGLTexture2D>(path);
-			}
-		}
+		
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
