@@ -1,12 +1,11 @@
 #include <Engine.h>
 
-class EditerCamera : public Engine::PerspectiveCamera
+class EditerCamera : public Engine::OrthographicCamera
 {
 public:
 	EditerCamera()
-		: Super(60.0f, 16.0f/9.0f)
+		: Super(-1.6f, 1.6f, -0.9f, 0.9f)
 	{}
-
 	Engine::Scope<InputControler> Input;
 	float Speed = 1.0f;
 	glm::vec3 MoveDir = { 0.0f, 0.0f, 0.0f };
@@ -15,15 +14,15 @@ public:
 	{
 		Input.reset(new InputControler(maneger));
 
-		Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f, 0.0f, -1.0f })));
-		Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f, 0.0f,  1.0f })));
-		Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({ -1.0f, 0.0f,  0.0f })));
-		Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  1.0f, 0.0f,  0.0f })));
+		Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f,  1.0f, 0.0f })));
+		Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f, -1.0f, 0.0f })));
+		Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({ -1.0f,  0.0f, 0.0f })));
+		Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  1.0f,  0.0f, 0.0f })));
 
-		Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  0.0f, 0.0f, -1.0f })));
-		Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  0.0f, 0.0f,  1.0f })));
-		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({ -1.0f, 0.0f,  0.0f })));
-		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  1.0f, 0.0f,  0.0f })));
+		Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  0.0f,  1.0f, 0.0f })));
+		Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  0.0f, -1.0f, 0.0f })));
+		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({ -1.0f,  0.0f, 0.0f })));
+		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  1.0f,  0.0f, 0.0f })));
 
 		Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&EditerCamera::MouseMoved));
 	}
