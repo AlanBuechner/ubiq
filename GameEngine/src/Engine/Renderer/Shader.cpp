@@ -50,7 +50,8 @@ namespace Engine
 		sorce.vertexShader = ss[(int)Type::VERTEX].str();
 		sorce.pixleShader = ss[(int)Type::PIXLE].str();
 
-		sorce.path.push_back(std::pair(file, ShaderType::None));
+		sorce.vertexPath = file;
+		sorce.pixlePath = file;
 
 		return sorce;
 	}
@@ -64,38 +65,55 @@ namespace Engine
 		if ((type & (int)ShaderType::Pixle) != 0)
 			srcToReturn.pixleShader = src.pixleShader;
 
-		srcToReturn.path.push_back(std::pair(file, type));
-
 		return srcToReturn;
 	}
 
 	void Shader::ReloadShader(ShaderSorce& shaders)
 	{
-		for (int i = 0; i < shaders.path.size(); i++)
-		{
-			auto [path, type] = shaders.path[i];
-			if (type == ShaderType::None)
-			{
-				shaders << LoadShader(path);
-			}
-			else
-			{
-				shaders << LoadShader(path, type);
-			}
-		}
+		// TODO : add new Reload Shader Function
 	}
 
-	Ref<Shader> Shader::Create(Ref<Shader::ShaderSorce> src)
+	Ref<Shader> Shader::Create(const std::string& name, Ref<Shader::ShaderSorce> src)
 	{
+		CORE_ASSERT(name != "", "Shader must have a name");
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return std::make_shared<OpenGLShader>(src);
+			return std::make_shared<OpenGLShader>(name, src);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!")
 			return nullptr;
+	}
+
+	void ShaderLibrary::Add(const Ref<Shader>& shader)
+	{
+		auto& name = shader->GetName();
+		CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end(), "Shader name allredy taken");
+		m_Shaders[name] = shader;
+	}
+
+	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& path)
+	{
+		Ref<Shader::ShaderSorce> src = std::make_shared<Shader::ShaderSorce>();
+		*src << Shader::LoadShader(path);
+		auto shader = Shader::Create(name, src);
+		Add(shader);
+		return shader;
+	}
+
+	Ref<Shader> ShaderLibrary::Load(const std::string& name, Ref<Shader::ShaderSorce> src)
+	{
+		auto shader = Shader::Create(name, src);
+		Add(shader);
+		return shader;
+	}
+
+	Ref<Shader> ShaderLibrary::Get(const std::string& name)
+	{
+		CORE_ASSERT(m_Shaders.find(name) != m_Shaders.end(), "Shader not found");
+		return m_Shaders[name];
 	}
 }

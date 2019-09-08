@@ -6,11 +6,13 @@ namespace Engine
 	class ENGINE_API OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(Ref<ShaderSorce> src);
+		OpenGLShader(const std::string& name, Ref<ShaderSorce> src);
 		virtual ~OpenGLShader();
 
-		virtual void Bind();
-		virtual void Unbind();
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
+
+		virtual const std::string& GetName() const override;
 
 		virtual void UploadUniformInt(const std::string& name, const int value) override;
 		virtual void UploadUniformFloat4(const std::string& name, const glm::vec4& values)override;
@@ -28,6 +30,7 @@ namespace Engine
 
 	private:
 		uint32_t m_RendererID;
+		std::string m_Name;
 		mutable std::unordered_map<std::string, uint32_t> m_UniformLocationCache;
 
 		Ref<ShaderSorce> m_Src;

@@ -1,8 +1,9 @@
 #pragma once
-#include <string>
 #include "Engine/core.h"
+#include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <unordered_map>
 
 namespace Engine
 {
@@ -12,17 +13,23 @@ namespace Engine
 		struct ShaderSorce
 		{
 		public:
+			std::string vertexPath;
 			std::string vertexShader;
+			std::string pixlePath;
 			std::string pixleShader;
-
-			std::vector<std::pair<std::string, int>> path;
 
 			void operator<<(const ShaderSorce& other)
 			{
-				if (this->vertexShader.empty()) this->vertexShader = other.vertexShader;
-				if (this->pixleShader.empty()) this->pixleShader = other.pixleShader;
-
-				path.push_back(other.path[0]);
+				if (this->vertexShader.empty())
+				{
+					this->vertexShader = other.vertexShader;
+					this->vertexPath = other.vertexPath;
+				};
+				if (this->pixleShader.empty())
+				{
+					this->pixleShader = other.pixleShader; 
+					this->pixlePath = other.pixlePath;
+				};
 			}
 		};
 
@@ -34,8 +41,10 @@ namespace Engine
 	public:
 		virtual ~Shader() {};
 
-		virtual void Bind() = 0;
-		virtual void Unbind() = 0;
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
+
+		virtual const std::string& GetName() const = 0;
 
 		virtual void UploadUniformInt(const std::string& name, const int value) = 0;
 		virtual void UploadUniformFloat4(const std::string& name, const glm::vec4& values) = 0;
@@ -50,9 +59,21 @@ namespace Engine
 		static ShaderSorce LoadShader(std::string file, int type);
 		static void ReloadShader(ShaderSorce& shaders);
 
-		static Ref<Shader> Create(Ref<Shader::ShaderSorce> src);
+		static Ref<Shader> Create(const std::string& name, Ref<Shader::ShaderSorce> src);
 
 	private:
 		virtual uint32_t GetUniformLocation(const std::string& name) const = 0;
+	};
+
+	class ShaderLibrary
+	{
+	public:
+		void Add(const Ref<Shader>& shader);
+		Ref<Shader> Load(const std::string& name, const std::string& path);
+		Ref<Shader> Load(const std::string& name, Ref<Shader::ShaderSorce> src);
+		Ref<Shader> Get(const std::string& name);
+
+	private:
+		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 	};
 }

@@ -48,9 +48,7 @@ private:
 class ExampleLayer : public Engine::Layer
 {
 public:
-	InputControler* input;
-
-	Engine::Ref<Engine::Shader> m_Shader, m_TextureShader;
+	Engine::ShaderLibrary m_ShaderLib;
 	Engine::Ref<Engine::VertexArray> m_VertexArray;
 	Engine::Ref<Engine::VertexBuffer> m_VertexBuffer;
 	Engine::Ref<Engine::IndexBuffer> m_IndexBuffer;
@@ -64,7 +62,6 @@ public:
 	ExampleLayer()
 		: Layer("Example"), m_Position(0.0f)
 	{
-		input = new InputControler(m_InputManeger);
 
 		m_Camera.SetPlayerInput(m_InputManeger);
 
@@ -97,22 +94,20 @@ public:
 
 		Engine::Ref<Engine::Shader::ShaderSorce> src = std::make_shared<Engine::Shader::ShaderSorce>();
 
-		/*src << Engine::Shader::LoadShader("C:\\Users\\alanj\\source\\repos\\GameEngine\\FlatColorShader.glsl");
-		m_Shader.reset(Engine::Shader::Create(src.vertexShader, src.pixleShader));*/
-
-		*src << Engine::Shader::LoadShader("Assets/Shaders/TextureShader.glsl");
-		m_TextureShader = Engine::Shader::Create(src);
+		auto TextureShader = m_ShaderLib.Load("TextureShader", "Assets/Shaders/TextureShader.glsl");
 
 		m_Texture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
 		
-		m_TextureShader->Bind();
-		m_TextureShader->UploadUniformInt("u_Texture", 0);
+		TextureShader->Bind();
+		TextureShader->UploadUniformInt("u_Texture", 0);
 
 	}
 
 	void OnUpdate() override
 	{
 		m_Camera.Update();
+
+		auto TextureShader = m_ShaderLib.Get("TextureShader");
 
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
@@ -138,7 +133,7 @@ public:
 		}*/
 
 		m_Texture->Bind(0);
-		Engine::Renderer::Submit(m_VertexArray, m_TextureShader, glm::translate(glm::mat4(1.0f), m_Position));
+		Engine::Renderer::Submit(m_VertexArray, TextureShader, glm::translate(glm::mat4(1.0f), m_Position));
 
 		//Engine::Renderer::Flush();
 	}

@@ -8,7 +8,7 @@ namespace Engine
 {
 	Ref<Texture2D> Texture2D::Create(const std::string& path, TextureAttribute& attribute)
 	{
-		ASSERT(path != "" ,"Path must be given");
+		CORE_ASSERT(path != "" ,"Path must be given");
 		
 		Ref<TextureAttribute> attrib = std::make_shared<TextureAttribute>(attribute);
 

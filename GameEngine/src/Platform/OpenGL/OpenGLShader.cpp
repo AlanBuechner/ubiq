@@ -4,8 +4,8 @@
 
 namespace Engine
 {
-	OpenGLShader::OpenGLShader(Ref<Shader::ShaderSorce> src)
-		: m_Src(src)
+	OpenGLShader::OpenGLShader(const std::string& name, Ref<Shader::ShaderSorce> src)
+		: m_Src(src), m_Name(name)
 	{
 		Compile();
 	}
@@ -15,14 +15,19 @@ namespace Engine
 		glDeleteProgram(m_RendererID);
 	}
 
-	void OpenGLShader::Bind()
+	void OpenGLShader::Bind() const
 	{
 		glUseProgram(m_RendererID);
 	}
 
-	void OpenGLShader::Unbind()
+	void OpenGLShader::Unbind() const 
 	{
 		glUseProgram(0);
+	}
+
+	const std::string& OpenGLShader::GetName() const
+	{
+		return m_Name;
 	}
 
 	uint32_t OpenGLShader::GetUniformLocation(const std::string & name) const
