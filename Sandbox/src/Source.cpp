@@ -70,10 +70,10 @@ public:
 
 		float vertices[4 * 5] =
 		{
-			-2.0f, -2.0f, 0.0f, 0.0f, 0.0f,
-			 2.0f, -2.0f, 0.0f, 2.0f, 0.0f,
-			 2.0f,  2.0f, 0.0f, 2.0f, 2.0f,
-			-2.0f,  2.0f, 0.0f, 0.0f, 2.0f
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
 		};
 
 		m_VertexBuffer = Engine::VertexBuffer::Create(vertices, sizeof(vertices));
@@ -95,11 +95,16 @@ public:
 		Engine::Ref<Engine::Shader::ShaderSorce> src = std::make_shared<Engine::Shader::ShaderSorce>();
 
 		auto TextureShader = m_ShaderLib.Load("TextureShader", "Assets/Shaders/TextureShader.glsl");
+		
+		Engine::TextureAttribute* textAttrib = new Engine::TextureAttribute();
+		textAttrib->AtlasRows = 2;
 
-		m_Texture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
+		m_Texture = Engine::Texture2D::Create("Assets/Images/UBIQ.png", *textAttrib);
 		
 		TextureShader->Bind();
 		TextureShader->UploadUniformInt("u_Texture", 0);
+		TextureShader->UploadUniformInt("u_AtlasRows", m_Texture->GetAttributes()->AtlasRows);
+		TextureShader->UploadUniformFloat2("u_AtlasPos", m_Texture->AtlasIndexToPosition(2));
 
 	}
 

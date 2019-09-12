@@ -125,4 +125,12 @@ namespace Engine
 		stbi_image_free(data);
 	}
 
+	inline glm::vec2 OpenGLTexture2D::AtlasIndexToPosition(int index) const
+	{
+		int atlasRows = m_Attribute->AtlasRows;
+		int c = index % atlasRows;
+		int r = index / atlasRows;
+		return { (float)c / (float)atlasRows, (float)r / (float)atlasRows };
+	}
+
 }

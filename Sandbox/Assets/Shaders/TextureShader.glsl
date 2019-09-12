@@ -7,10 +7,13 @@ uniform mat4 u_Transform;
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec2 a_TexCoord;
 
+uniform int u_AtlasRows;
+uniform vec2 u_AtlasPos;
+
 out vec2 v_TexCoord;
 
 void main() {
-	v_TexCoord = a_TexCoord;
+	v_TexCoord = (a_TexCoord/u_AtlasRows) + u_AtlasPos;
 	gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
 }
 

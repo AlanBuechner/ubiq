@@ -13,6 +13,8 @@ namespace Engine
 		virtual uint32_t GetHeight() const override { return m_Height; }
 		virtual void Bind(uint32_t slot) const override;
 		virtual void LoadFromFile(const std::string& path);
+		virtual Ref<TextureAttribute> GetAttributes() const override { return m_Attribute; }
+		virtual glm::vec2 AtlasIndexToPosition(int index) const override;
 
 	private:
 		std::string m_Path;
