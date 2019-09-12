@@ -7,8 +7,8 @@ uniform mat4 u_Transform;
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec2 a_TexCoord;
 
-uniform int u_AtlasRows;
-uniform vec2 u_AtlasPos;
+uniform int u_AtlasRows = 1;
+uniform vec2 u_AtlasPos = vec2(0, 0);
 
 out vec2 v_TexCoord;
 
