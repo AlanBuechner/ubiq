@@ -1,0 +1,6 @@
+prefix=C:/Users/alanj/Source/Repos/Ubiq/GameEngine/vendor/spdlog/out/install/x64-Debug
+includedir=${prefix}/include
+
+Name: spdlog
+Description: Super fast C++ logging library. 
+Version: 1.3.0
