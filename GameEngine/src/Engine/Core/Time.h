@@ -21,7 +21,7 @@ namespace Engine
 		static Time* Create();
 
 	protected:
-		float m_DeltaTime;
+		float m_DeltaTime = 0.0f;
 		float m_LastFrameTime = 0.0f;
 
 	private:
