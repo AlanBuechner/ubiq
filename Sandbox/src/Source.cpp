@@ -3,17 +3,21 @@
 #include <fstream>
 
 
-class Player : public Engine::OrthographicCamera
+class Player
 {
 public:
 	Player(float width, float height)
-		: Super(-width / 2, width / 2, -height / 2, height / 2)
-	{}
+	{
+		cam = new Engine::OrthographicCamera(-width / 2, width / 2, -height / 2, height / 2);
+	}
+
+	Engine::OrthographicCamera* cam = nullptr;
 	Engine::Scope<InputControler> Input;
 	float Speed = 1.0f;
 	glm::vec2 MoveDir = { 0.0f, 0.0f };
 	glm::vec2 pos = { 0.0f, 0.0f };
 	float rotation = 0.0f;
+	float y = 0.0f;
 	float FOV = 3.14f / 4;
 	float Speeed = 0.8f;
 
@@ -50,6 +54,8 @@ private:
 	void MouseMoved(glm::vec2& pos)
 	{
 		rotation -= pos.x / 500;
+		y += pos.y;
+		y = glm::clamp(y, -1500.0f, 1500.0f);
 	}
 };
 
@@ -213,23 +219,24 @@ public:
 		Engine::RenderCommand::SetClearColor({ 0.0f, 0.0f, 0.0f, 1 });
 		Engine::RenderCommand::Clear();
 
-		Engine::Renderer::BeginScene(*m_Player);
+		Engine::Renderer::BeginScene(*m_Player->cam);
 
 		float deltax = width / Reselution;
 		glm::vec3 position(-width / 2, 0.0f, 0.0f);
 		for (int x = 0; x < Reselution; x++)
 		{
+			position.y = m_Player->y;
 			float rotation = (m_Player->rotation + (m_Player->FOV / 2) - ((float)x * (m_Player->FOV / Reselution)));
 			Ray ray(m_Player->pos, rotation);
 
-			float closest = FindClosest(ray, m_MapIndexBuffer);
+			float closest = FindClosest(ray, m_MapIndexBuffer) * cos(rotation-m_Player->rotation);
 
 			float nscale = height / ((float)closest);
 
 			//DEBUG_INFO("{0}, {1}      PlayerPos: {2}, {3}       PlayerRotaion: {4}", closest, nscale, m_Player->pos.x, m_Player->pos.y, m_Player->rotation);
 			glm::mat4 scale = glm::scale(glm::mat4(1.0f), { deltax, nscale, 0.0f });
 
-			float color = nscale / 250;
+			float color = nscale / 300;
 			FlatShader->UploadUniformFloat4("u_Color", { color, color, color, 1.0f });
 			Engine::Renderer::Submit(m_VertexArray, FlatShader, glm::translate(glm::mat4(1.0f), position) * scale);
 			position.x += deltax;
