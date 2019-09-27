@@ -16,8 +16,7 @@ public:
 	float Speed = 1.0f;
 	glm::vec2 MoveDir = { 0.0f, 0.0f };
 	glm::vec2 pos = { 0.0f, 0.0f };
-	float rotation = 0.0f;
-	float y = 0.0f;
+	glm::vec2 rotation = { 0.0f, 0.0f };
 	float FOV = 3.14f / 4;
 	float Speeed = 0.8f;
 
@@ -40,8 +39,8 @@ public:
 
 	void Update()
 	{
-		glm::vec2 moveFB(glm::cos(rotation), glm::sin(rotation));
-		glm::vec2 moveRL(glm::sin(rotation), -glm::cos(rotation));
+		glm::vec2 moveFB(glm::cos(rotation.x), glm::sin(rotation.x));
+		glm::vec2 moveRL(glm::sin(rotation.x), -glm::cos(rotation.x));
 		pos += ((MoveDir.y * moveFB) + (MoveDir.x * moveRL)) * Speed * Time::GetDeltaTime();
 	}
 
@@ -53,9 +52,9 @@ private:
 
 	void MouseMoved(glm::vec2& pos)
 	{
-		rotation -= pos.x / 500;
-		y += pos.y;
-		y = glm::clamp(y, -1500.0f, 1500.0f);
+		rotation.x -= pos.x / 500;
+		rotation.y += pos.y;
+		rotation.y = glm::clamp(rotation.y, -1500.0f, 1500.0f);
 	}
 };
 
@@ -117,7 +116,7 @@ public:
 
 	Player* m_Player;
 
-	float Reselution = 200;
+	float Reselution = 400;
 	int height = 0;
 	int width = 0;
 
@@ -193,8 +192,8 @@ public:
 		float closest = MAXINT;
 		for (int j = 0; j < i.size() / 2; j++)
 		{
-			float p1 = i[j * 2];
-			float p2 = i[(j * 2) + 1];
+			uint32_t p1 = i[(int)j * (int)2];
+			uint32_t p2 = i[(j * 2) + 1];
 			glm::vec2 point1(m_MapVertexArray[p1 * 2], m_MapVertexArray[(p1 * 2) + 1]);
 			glm::vec2 point2(m_MapVertexArray[p2 * 2], m_MapVertexArray[(p2 * 2) + 1]);
 
@@ -225,18 +224,18 @@ public:
 		glm::vec3 position(-width / 2, 0.0f, 0.0f);
 		for (int x = 0; x < Reselution; x++)
 		{
-			position.y = m_Player->y;
-			float rotation = (m_Player->rotation + (m_Player->FOV / 2) - ((float)x * (m_Player->FOV / Reselution)));
+			position.y = m_Player->rotation.y;
+			float rotation = (m_Player->rotation.x + (m_Player->FOV / 2) - ((float)x * (m_Player->FOV / Reselution)));
 			Ray ray(m_Player->pos, rotation);
 
-			float closest = FindClosest(ray, m_MapIndexBuffer) * cos(rotation-m_Player->rotation);
+			float closest = FindClosest(ray, m_MapIndexBuffer);
 
-			float nscale = height / ((float)closest);
+			float yScale = height / ((float)closest * cos(rotation - m_Player->rotation.x));
 
 			//DEBUG_INFO("{0}, {1}      PlayerPos: {2}, {3}       PlayerRotaion: {4}", closest, nscale, m_Player->pos.x, m_Player->pos.y, m_Player->rotation);
-			glm::mat4 scale = glm::scale(glm::mat4(1.0f), { deltax, nscale, 0.0f });
+			glm::mat4 scale = glm::scale(glm::mat4(1.0f), { deltax, yScale, 0.0f });
 
-			float color = nscale / 300;
+			float color = yScale / 350;
 			FlatShader->UploadUniformFloat4("u_Color", { color, color, color, 1.0f });
 			Engine::Renderer::Submit(m_VertexArray, FlatShader, glm::translate(glm::mat4(1.0f), position) * scale);
 			position.x += deltax;
