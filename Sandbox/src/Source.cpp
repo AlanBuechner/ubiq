@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 
-
 class Player
 {
 public:
@@ -159,15 +158,13 @@ public:
 
 		m_MapVertexArray =
 		{
-			-5.0f, -5.0f,
-			-5.0f,  5.0f,
-			 5.0f,  5.0f,
-			 5.0f, -5.0f,
-			 0.0f, -5.0f,
-			-5.0f,  0.0f
+			-5.0f, -5.0f, 0.15f,
+			-5.0f,  5.0f, 0.0f,
+			 5.0f,  5.0f, 0.0f,
+			 5.0f, -5.0f, 0.0f,
 		};
 
-		m_MapIndexBuffer = { 0,1,  1,2,  2,3,  3,0, 4,5 };
+		m_MapIndexBuffer = { 0,1,  1,2,  2,3,  3,0 };
 
 		Engine::Ref<Engine::Shader::ShaderSorce> src = std::make_shared<Engine::Shader::ShaderSorce>();
 
@@ -176,26 +173,27 @@ public:
 		FlatShader->Bind();
 
 		std::ofstream myfile;
-		myfile.open("Assets/Map/Map.m", std::ios::out | std::ios::binary);
+		myfile.open("Assets/Map/Map.txt", std::ios::out | std::ios::binary);
 		if (myfile.is_open())
 		{
 			const char mapSize[2] = { m_MapVertexArray.size(), m_MapIndexBuffer.size() };
-			myfile.write(mapSize, 2);
+			myfile << mapSize;
 			myfile << *(char*)m_MapVertexArray.data();
 			myfile << *(char*)m_MapIndexBuffer.data();
 		}
 		myfile.close();
 	}
 
-	float FindClosest(Ray ray, std::vector<uint32_t> i)
+	float FindClosest(Ray ray, std::vector<uint32_t> i, glm::vec3* point = nullptr)
 	{
 		float closest = MAXINT;
+		glm::vec3 closestPoint(0.0f, 0.0f, 0.0f);
 		for (int j = 0; j < i.size() / 2; j++)
 		{
-			uint32_t p1 = i[(int)j * (int)2];
+			uint32_t p1 = i[j * 2];
 			uint32_t p2 = i[(j * 2) + 1];
-			glm::vec2 point1(m_MapVertexArray[p1 * 2], m_MapVertexArray[(p1 * 2) + 1]);
-			glm::vec2 point2(m_MapVertexArray[p2 * 2], m_MapVertexArray[(p2 * 2) + 1]);
+			glm::vec3 point1(m_MapVertexArray[p1 * 3], m_MapVertexArray[(p1 * 3) + 1], m_MapVertexArray[(p1 * 3) + 2]);
+			glm::vec3 point2(m_MapVertexArray[p2 * 3], m_MapVertexArray[(p2 * 3) + 1], m_MapVertexArray[(p2 * 3) + 2]);
 
 			glm::vec2 pos = ray.Intersecting(point1, point2);
 			const float dist = glm::distance(m_Player->pos, pos);
@@ -204,8 +202,16 @@ public:
 			if (dist < closest)
 			{
 				closest = dist;
+				glm::vec3 top = point1.z > point2.z ? point1 : point2;
+				glm::vec3 bottom = point1.z > point2.z ? point2 : point1;
+				float v0 = bottom.z > point2.z;
+				float v1 = top.z;
+				float t = glm::distance(glm::vec2(bottom.x, bottom.y), pos);
+				float interpulated = v0 + t * (v1 - v0);
+				closestPoint = glm::vec3(pos.x, pos.y, interpulated);
 			}
 		}
+		*point = closestPoint;
 		return closest;
 	}
 
@@ -228,9 +234,11 @@ public:
 			float rotation = (m_Player->rotation.x + (m_Player->FOV / 2) - ((float)x * (m_Player->FOV / Reselution)));
 			Ray ray(m_Player->pos, rotation);
 
-			float closest = FindClosest(ray, m_MapIndexBuffer);
+			glm::vec3* pos = new glm::vec3();
+			float closest = FindClosest(ray, m_MapIndexBuffer, pos);
 
 			float yScale = height / ((float)closest * cos(rotation - m_Player->rotation.x));
+			position.y += pos->z * yScale;
 
 			//DEBUG_INFO("{0}, {1}      PlayerPos: {2}, {3}       PlayerRotaion: {4}", closest, nscale, m_Player->pos.x, m_Player->pos.y, m_Player->rotation);
 			glm::mat4 scale = glm::scale(glm::mat4(1.0f), { deltax, yScale, 0.0f });
