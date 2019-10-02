@@ -1,6 +1,7 @@
 #include <Engine.h>
 #include <iostream>
 #include <fstream>
+#include <functional>
 
 class Player
 {
@@ -184,10 +185,9 @@ public:
 		myfile.close();
 	}
 
-	float FindClosest(Ray ray, std::vector<uint32_t> i, glm::vec3* point = nullptr)
+	std::vector<std::pair<float, glm::vec3>> FindClosest(Ray ray, std::vector<uint32_t> i)
 	{
-		float closest = MAXINT;
-		glm::vec3 closestPoint(0.0f, 0.0f, 0.0f);
+		std::vector<std::pair<float, glm::vec3>> intersections;
 		for (int j = 0; j < i.size() / 2; j++)
 		{
 			uint32_t p1 = i[j * 2];
@@ -199,20 +199,25 @@ public:
 			const float dist = glm::distance(m_Player->pos, pos);
 			if (dist == 0 || pos == glm::vec2(0.0f, 0.0f))
 				continue;
-			if (dist < closest)
+			else
 			{
-				closest = dist;
 				glm::vec3 top = point1.z > point2.z ? point1 : point2;
 				glm::vec3 bottom = point1.z > point2.z ? point2 : point1;
 				float v0 = bottom.z > point2.z;
 				float v1 = top.z;
 				float t = glm::distance(glm::vec2(bottom.x, bottom.y), pos);
 				float interpulated = v0 + t * (v1 - v0);
-				closestPoint = glm::vec3(pos.x, pos.y, interpulated);
+				glm::vec3 point = glm::vec3(pos.x, pos.y, interpulated);
+				intersections.push_back(std::pair(dist, point));
 			}
 		}
-		*point = closestPoint;
-		return closest;
+		std::sort(intersections.begin(), intersections.end(), [](std::pair<float, glm::vec3> a, std::pair<float, glm::vec3> b) 
+			{
+				auto [dist1, p1] = a;
+				auto [dist2, p2] = b;
+				return dist1 > dist2;
+			});
+		return intersections;
 	}
 
 	void OnUpdate() override
@@ -230,22 +235,25 @@ public:
 		glm::vec3 position(-width / 2, 0.0f, 0.0f);
 		for (int x = 0; x < Reselution; x++)
 		{
-			position.y = m_Player->rotation.y;
 			float rotation = (m_Player->rotation.x + (m_Player->FOV / 2) - ((float)x * (m_Player->FOV / Reselution)));
 			Ray ray(m_Player->pos, rotation);
 
-			glm::vec3* pos = new glm::vec3();
-			float closest = FindClosest(ray, m_MapIndexBuffer, pos);
+			std::vector<std::pair<float, glm::vec3>> intersections = FindClosest(ray, m_MapIndexBuffer);
 
-			float yScale = height / ((float)closest * cos(rotation - m_Player->rotation.x));
-			position.y += pos->z * yScale;
+			for (int i = 0; i < intersections.size(); i++)
+			{
+				position.y = m_Player->rotation.y;
+				auto [dist, point] = intersections[i];
+				float yScale = height / ((float)dist * cos(rotation - m_Player->rotation.x));
+				position.y += point.z * yScale;
 
-			//DEBUG_INFO("{0}, {1}      PlayerPos: {2}, {3}       PlayerRotaion: {4}", closest, nscale, m_Player->pos.x, m_Player->pos.y, m_Player->rotation);
-			glm::mat4 scale = glm::scale(glm::mat4(1.0f), { deltax, yScale, 0.0f });
+				//DEBUG_INFO("{0}, {1}      PlayerPos: {2}, {3}       PlayerRotaion: {4}", closest, nscale, m_Player->pos.x, m_Player->pos.y, m_Player->rotation);
+				glm::mat4 scale = glm::scale(glm::mat4(1.0f), { deltax, yScale, 0.0f });
 
-			float color = yScale / 350;
-			FlatShader->UploadUniformFloat4("u_Color", { color, color, color, 1.0f });
-			Engine::Renderer::Submit(m_VertexArray, FlatShader, glm::translate(glm::mat4(1.0f), position) * scale);
+				float color = yScale / 350;
+				FlatShader->UploadUniformFloat4("u_Color", { color, color, color, 1.0f });
+				Engine::Renderer::Submit(m_VertexArray, FlatShader, glm::translate(glm::mat4(1.0f), position) * scale);
+			}
 			position.x += deltax;
 		}
 
