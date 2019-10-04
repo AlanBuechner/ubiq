@@ -18,7 +18,9 @@ public:
 	glm::vec2 pos = { 0.0f, 0.0f };
 	glm::vec2 rotation = { 0.0f, 0.0f };
 	float FOV = 3.14f / 4;
-	float Speeed = 0.8f;
+	float RunSpeed = 2.0f;
+	float WalkSpeed = 1.0f;
+	float Speeed = WalkSpeed;
 
 	void SetPlayerInput(Engine::InputControlerManeger* maneger)
 	{
@@ -33,6 +35,9 @@ public:
 		Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 0.0f, -1.0f })));
 		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ -1.0f,  0.0f })));
 		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 1.0f,  0.0f })));
+
+		Input->BindEvent(KEYCODE_Q, KEY_PRESSED, BIND_AXIS(&Player::SetRun, true));
+		Input->BindEvent(KEYCODE_Q, KEY_RELEASED, BIND_AXIS(&Player::SetRun, false));
 
 		Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&Player::MouseMoved));
 	}
@@ -55,6 +60,11 @@ private:
 		rotation.x -= pos.x / 500;
 		rotation.y += pos.y;
 		rotation.y = glm::clamp(rotation.y, -1500.0f, 1500.0f);
+	}
+
+	void SetRun(bool v)
+	{
+		Speed = v ? RunSpeed : WalkSpeed;
 	}
 };
 
@@ -103,6 +113,26 @@ public:
 	float m_Rotation;
 };
 
+class Sprite
+{
+public:
+	Sprite(glm::vec3 p = { 0.0f, 0.0f, 0.0f } , float w = 1.0f)
+		: pos(p), Width(w)
+	{}
+
+	glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
+	float Width = 1.0f;
+
+	void GetBilbordPoints(glm::vec3* p1, glm::vec3* p2, const Player& player)
+	{	
+		glm::vec2 vecToPlayer = glm::vec3(player.pos, 0.0f) - pos;
+		float rotation = std::atan2(vecToPlayer.y, vecToPlayer.x);
+
+		*p1 = glm::vec3(glm::sin(rotation), -glm::cos(rotation), 0.0f) * (Width / 2);
+		*p2 = -*p1;
+	}
+};
+
 class ExampleLayer : public Engine::Layer
 {
 public:
@@ -114,9 +144,11 @@ public:
 	std::vector<float> m_MapVertexArray;
 	std::vector<uint32_t> m_MapIndexBuffer;
 
+	std::vector<Sprite> m_Sprites;
+
 	Player* m_Player;
 
-	float Reselution = 400;
+	const float Reselution = 400;
 	int height = 0;
 	int width = 0;
 
@@ -167,6 +199,8 @@ public:
 
 		m_MapIndexBuffer = { 0,1,  1,2,  2,3,  3,0 };
 
+		m_Sprites.push_back(Sprite());
+
 		Engine::Ref<Engine::Shader::ShaderSorce> src = std::make_shared<Engine::Shader::ShaderSorce>();
 
 		auto FlatShader = m_ShaderLib.Load("FlatShader", "Assets/Shaders/FlatColorShader.glsl");
@@ -203,7 +237,30 @@ public:
 			{
 				glm::vec3 top = point1.z > point2.z ? point1 : point2;
 				glm::vec3 bottom = point1.z > point2.z ? point2 : point1;
-				float v0 = bottom.z > point2.z;
+				float v0 = bottom.z;
+				float v1 = top.z;
+				float t = glm::distance(glm::vec2(bottom.x, bottom.y), pos);
+				float interpulated = v0 + t * (v1 - v0);
+				glm::vec3 point = glm::vec3(pos.x, pos.y, interpulated);
+				intersections.push_back(std::pair(dist, point));
+			}
+		}
+		for (int j = 0; j < m_Sprites.size(); j++)
+		{
+			Sprite& sprite = m_Sprites[j];
+			glm::vec3* point1 = new glm::vec3();
+			glm::vec3* point2 = new glm::vec3();
+			sprite.GetBilbordPoints(point1, point2, *m_Player);
+
+			glm::vec2 pos = ray.Intersecting(*point1, *point2);
+			const float dist = glm::distance(m_Player->pos, pos);
+			if (dist == 0 || pos == glm::vec2(0.0f, 0.0f))
+				continue;
+			else
+			{
+				glm::vec3 top = point1->z > point2->z ? *point1 : *point2;
+				glm::vec3 bottom = point1->z > point2->z ? *point2 : *point1;
+				float v0 = bottom.z;
 				float v1 = top.z;
 				float t = glm::distance(glm::vec2(bottom.x, bottom.y), pos);
 				float interpulated = v0 + t * (v1 - v0);
@@ -247,7 +304,6 @@ public:
 				float yScale = height / ((float)dist * cos(rotation - m_Player->rotation.x));
 				position.y += point.z * yScale;
 
-				//DEBUG_INFO("{0}, {1}      PlayerPos: {2}, {3}       PlayerRotaion: {4}", closest, nscale, m_Player->pos.x, m_Player->pos.y, m_Player->rotation);
 				glm::mat4 scale = glm::scale(glm::mat4(1.0f), { deltax, yScale, 0.0f });
 
 				float color = yScale / 350;
@@ -260,6 +316,7 @@ public:
 		Engine::Renderer::EndScene();
 
 		//Engine::Renderer::Flush();
+		DEBUG_INFO("FPS: {0}", 1/Engine::Time::GetDeltaTime());
 	}
 
 	void OnEvent(Engine::Event& event) override
