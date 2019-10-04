@@ -11,6 +11,7 @@ namespace Engine
 	class ImGuiLayer;
 	class Event;
 	class WindowCloseEvent;
+	class WindowResizeEvent;
 }
 
 namespace Engine
@@ -36,11 +37,13 @@ namespace Engine
 		void SendInputBuffer();
 
 		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 
 		Scope<Window> m_Window;
 		std::vector<Event*> m_InputBuffer;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
+		bool m_Minimized = false;
 		LayerStack m_LayerStack;
 
 	private:

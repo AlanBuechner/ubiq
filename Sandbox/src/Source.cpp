@@ -146,10 +146,6 @@ public:
 	void OnEvent(Engine::Event& event) override
 	{
 		Super::OnEvent(event);
-		if (event.GetEventType() == Engine::EventType::KeyPressed)
-		{
-			Engine::KeyPressedEvent& e = (Engine::KeyPressedEvent&)event;
-		}
 	}
 };
 

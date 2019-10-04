@@ -58,8 +58,11 @@ namespace Engine {
 			SendInputBuffer(); // sent the input buffer through the layer stack
 
 			// update the layer stack
-			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
+			if (!m_Minimized)
+			{
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate();
+			}
 
 			// render im gui layer
 			m_ImGuiLayer->Begin();
@@ -88,6 +91,7 @@ namespace Engine {
 			Event& e = *(*--i);
 			EventDispatcher dispatcher(e);
 			dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(&Application::OnWindowClose));
+			dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(&Application::OnWindowResize));
 			dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnKeyPressed, Input::s_Instance));
 			dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnKeyReleased, Input::s_Instance));
 			dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMousePressed, Input::s_Instance));
@@ -115,5 +119,19 @@ namespace Engine {
 		m_Running = false;
 		return true;
 	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+			m_Minimized = true;
+		else
+			m_Minimized = false;
+
+		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+		return false;
+	}
+
+
 
 }
