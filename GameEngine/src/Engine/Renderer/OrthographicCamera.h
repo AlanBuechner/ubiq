@@ -12,5 +12,8 @@ namespace Engine
 	public:
 		OrthographicCamera(float left, float right, float bottom, float top);
 		OrthographicCamera(float left, float right, float bottom, float top, float zNear, float zFar);
+
+		void SetProjection(float left, float right, float bottom, float top);
+		void SetProjection(float left, float right, float bottom, float top, float zNear, float zFar);
 	};
 }

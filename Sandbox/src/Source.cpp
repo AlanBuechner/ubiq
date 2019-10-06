@@ -1,50 +1,5 @@
 #include <Engine.h>
 
-class EditerCamera : public Engine::OrthographicCamera
-{
-public:
-	EditerCamera()
-		: Super(-1.6f, 1.6f, -0.9f, 0.9f)
-	{}
-	Engine::Scope<InputControler> Input;
-	float Speed = 1.0f;
-	glm::vec3 MoveDir = { 0.0f, 0.0f, 0.0f };
-
-	void SetPlayerInput(Engine::InputControlerManeger* maneger)
-	{
-		Input.reset(new InputControler(maneger));
-
-		Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f,  1.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  0.0f, -1.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({ -1.0f,  0.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&EditerCamera::Move, glm::vec3({  1.0f,  0.0f, 0.0f })));
-
-		Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  0.0f,  1.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  0.0f, -1.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({ -1.0f,  0.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&EditerCamera::Move, -glm::vec3({  1.0f,  0.0f, 0.0f })));
-
-		Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&EditerCamera::MouseMoved));
-	}
-
-	void Update()
-	{
-		Translate(MoveDir * Speed * Time::GetDeltaTime());
-	}
-
-private:
-	void Move(const glm::vec3& movedir)
-	{
-		MoveDir += movedir;
-	}
-
-	void MouseMoved(glm::vec2& pos)
-	{
-		//Rotate({ -pos.x * 0.1f, 0.0f, 1.0f, 0.0f});
-		//DEBUG_INFO("{0}, {1}", pos.x, pos.y);
-	}
-};
-
 class ExampleLayer : public Engine::Layer
 {
 public:
@@ -56,14 +11,16 @@ public:
 
 	glm::vec3 m_Position;
 
-	EditerCamera m_Camera;
+	Engine::Ref<Engine::OrthographicCameraControler> m_Camera;
 
 	bool set = false;
 	ExampleLayer()
 		: Layer("Example"), m_Position(0.0f)
 	{
 
-		m_Camera.SetPlayerInput(m_InputManeger);
+		m_Camera.reset(new Engine::OrthographicCameraControler(1.6, 1));
+
+		m_Camera->SetPlayerInput(m_InputManeger);
 
 
 		m_VertexArray = Engine::VertexArray::Create();
@@ -110,14 +67,14 @@ public:
 
 	void OnUpdate() override
 	{
-		m_Camera.Update();
+		m_Camera->OnUpdate();
 
 		auto TextureShader = m_ShaderLib.Get("TextureShader");
 
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
-		Engine::Renderer::BeginScene(m_Camera);
+		Engine::Renderer::BeginScene(*m_Camera->GetCamera());
 
 		/*glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
 
@@ -146,6 +103,8 @@ public:
 	void OnEvent(Engine::Event& event) override
 	{
 		Super::OnEvent(event);
+
+		m_Camera->OnEvent(event);
 	}
 };
 

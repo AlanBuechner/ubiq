@@ -280,7 +280,7 @@ namespace Engine
 		std::vector<int> m_ToUpdateMouse;
 
 		std::vector<int> m_KeysDown;
-		bool m_SendAllEventData = false;
+		bool m_SendAllEventData = true;
 		unsigned int m_SystemsNeedingAllTypedEvents = 0;
 		unsigned int m_SystemsNeedingAllPressedEvents = 0;
 		unsigned int m_SystemsNeedingAllRelesedEvents = 0;

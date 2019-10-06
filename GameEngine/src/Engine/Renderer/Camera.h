@@ -12,6 +12,8 @@ namespace Engine
 	public:
 		Camera(glm::mat4& projectionMatrix);
 
+		void SetProjectionMatrix(glm::mat4& projectionMatrix);
+
 		const glm::vec3& GetPosition() const { return m_Position; }
 		const glm::quat& GetRotation() const { return m_Rotation; }
 
