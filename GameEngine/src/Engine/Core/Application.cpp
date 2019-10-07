@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "Application.h"
-#include "Core/Time.h"
-#include "Input.h"
+#include "Time.h"
+#include "Input/Input.h"
 
 #include "Engine/Events/Event.h"
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/imGui/ImGuiLayer.h"
 
-#include "Renderer/Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 
 namespace Engine {
 

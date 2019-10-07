@@ -12,7 +12,7 @@ namespace Engine
 		m_Camera.reset(new OrthographicCamera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel));
 	}
 
-	void OrthographicCameraControler::SetPlayerInput(InputControlerManeger* maneger)
+	void OrthographicCameraControler::SetPlayerInput(Ref<InputControlerManeger> maneger)
 	{
 		Input.reset(new InputControler(maneger));
 

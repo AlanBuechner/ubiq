@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/core.h"
+#include "Engine/Core/core.h"
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>

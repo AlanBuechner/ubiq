@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core.h"
+#include "Engine/Core/core.h"
 #include "glm/vec2.hpp"
 
 #define BIND_ACTION(x) std::bind(x, this)
@@ -41,7 +41,7 @@ namespace Engine
 	{
 	public:
 
-		InputControler(InputControlerManeger* maneger);
+		InputControler(Ref<InputControlerManeger> maneger);
 		~InputControler();
 
 		void RaiseEvent(int key, int state);
@@ -57,7 +57,7 @@ namespace Engine
 		std::vector<EventData*> m_Events;
 		std::vector<MouseMoveEventData*> m_MouseMoveEvents;
 
-		InputControlerManeger* m_Maneger;
+		Ref<InputControlerManeger> m_Maneger;
 
 	};
 }

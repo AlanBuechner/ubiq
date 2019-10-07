@@ -1,10 +1,10 @@
 #pragma once
 
-#include "core.h"
+#include "Engine/Core/core.h"
 #include "KeyCodes.h"
 #include <map>
 #include <string>
-#include "Application.h"
+#include "Engine/Core/Application.h"
 #include <glm/glm.hpp>
 
 #define KEY_PRESSED		(int)Engine::Input::KeyPressed

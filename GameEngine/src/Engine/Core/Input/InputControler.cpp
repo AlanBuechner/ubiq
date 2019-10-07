@@ -5,7 +5,7 @@
 
 namespace Engine
 {
-	InputControler::InputControler(InputControlerManeger* maneger)
+	InputControler::InputControler(Ref<InputControlerManeger> maneger)
 	{
 		m_Maneger = maneger;
 		m_Maneger->AddControler(this);

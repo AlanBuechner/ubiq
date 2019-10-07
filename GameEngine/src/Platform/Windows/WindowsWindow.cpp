@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "WindowsWindow.h"
-#include "Engine/Log.h"
+#include "Engine/Core/Log.h"
 
-#include "Engine/InputControler.h"
+#include "Engine/Core/Input/InputControler.h"
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/MouseEvent.h"
 #include "Engine/Events/KeyEvent.h"
-#include "Engine/Input.h"
+#include "Engine/Core/Input/Input.h"
 
 namespace Engine 
 {

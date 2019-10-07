@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Time.h"
-#include "InputControler.h"
-#include "Input.h"
+#include "Core/Input/InputControler.h"
+#include "Core/Input/Input.h"
 #include <glm/glm.hpp>
 
 namespace Engine
@@ -17,7 +17,7 @@ namespace Engine
 	public:
 		OrthographicCameraControler(float aspectRatio, float zoom);
 
-		void SetPlayerInput(InputControlerManeger* maneger);
+		void SetPlayerInput(Ref<InputControlerManeger> maneger);
 
 		void OnEvent(Event& e);
 

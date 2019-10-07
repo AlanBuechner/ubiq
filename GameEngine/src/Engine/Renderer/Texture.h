@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/core.h"
+#include "Engine/Core/core.h"
 #include "TextureAttribute.h"
 #include <glm/glm.hpp>
 #include <string>

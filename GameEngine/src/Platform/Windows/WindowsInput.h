@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/core.h"
-#include "Engine/Input.h"
+#include "Engine/Core/core.h"
+#include "Engine/Core/Input/Input.h"
 
 #ifdef PLATFORM_WINDOWS
 

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Engine/Application.h"
-#include "Engine/Layer.h"
-#include "Engine/Log.h"
+#include "Engine/Core/Application.h"
+#include "Engine/Core/Layer.h"
+#include "Engine/Core/Log.h"
 #include "Engine/Core/Time.h"
 
 // Input
-#include "Engine/Input.h"
-#include "Engine/InputControler.h"
-#include "Engine/InputControlerManeger.h"
+#include "Engine/Core/Input/Input.h"
+#include "Engine/Core/Input/InputControler.h"
+#include "Engine/Core/Input/InputControlerManeger.h"
 
 // --- Renderer ---------------------------
 #include "Engine/Renderer/Renderer.h"
@@ -28,5 +28,5 @@
 #include "Engine/OrthographicCameraControler.h"
 
 // --- EntryPoint -------------------------
-#include "Engine/EntryPoint.h"
+#include "Engine/Core/EntryPoint.h"
 // ----------------------------------------

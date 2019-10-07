@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "Engine/core.h"
-#include "Engine/Log.h"
+#include "Engine/Core/core.h"
+#include "Engine/Core/Log.h"
 #include "Buffer.h"
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLBuffer.h"
