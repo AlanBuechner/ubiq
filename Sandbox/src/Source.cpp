@@ -116,21 +116,61 @@ public:
 class Sprite
 {
 public:
-	Sprite(glm::vec3 p = { 0.0f, 0.0f, 0.0f } , float w = 1.0f)
-		: pos(p), Width(w)
+	Sprite(glm::vec3 p = { 0.0f, 0.0f, 0.0f } , float w = 1.0f, int t = -1)
+		: pos(p), Width(w), texture(t)
 	{}
 
 	glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
 	float Width = 1.0f;
 
-	void GetBilbordPoints(glm::vec3* p1, glm::vec3* p2, const Player& player)
+	int texture = -1;
+
+	int GetBilbordPoints(glm::vec3* p1, glm::vec3* p2, const Player& player)
 	{	
 		glm::vec2 vecToPlayer = glm::vec3(player.pos, 0.0f) - pos;
 		float rotation = std::atan2(vecToPlayer.y, vecToPlayer.x);
 
 		*p1 = glm::vec3(glm::sin(rotation), -glm::cos(rotation), 0.0f) * (Width / 2);
 		*p2 = -*p1;
+
+		return texture;
 	}
+};
+
+void SaveMapData(std::vector<float> MapVertexArray, std::vector<uint32_t> MapIndexBuffer)
+{
+	std::ofstream out;
+	out.open("Assets/Map/Map.txt", std::ios::out | std::ios::binary);
+	if (out.is_open())
+	{
+		int size[] = { MapVertexArray.size(),  MapIndexBuffer.size() };
+		out.write((char*)(&size), sizeof(size));
+		out.write(reinterpret_cast<const char*>(MapVertexArray.data()), size[0] * sizeof(float));
+		out.write(reinterpret_cast<const char*>(MapIndexBuffer.data()), size[1] * sizeof(uint32_t));
+	}
+	out.close();
+}
+
+void LoadMapData(std::vector<float>* MapVertexArray, std::vector<uint32_t>* MapIndexBuffer)
+{
+	std::ifstream in;
+	in.open("Assets/Map/Map.txt", std::ios::in | std::ios::binary);
+	if (in.is_open())
+	{
+		int size[] = { 0,0 };
+		in.read((char*)(&size), sizeof(size));
+		MapVertexArray->resize(size[0]);
+		MapIndexBuffer->resize(size[1]);
+		in.read((char*)(MapVertexArray->data()), size[0] * sizeof(float));
+		in.read((char*)(MapIndexBuffer->data()), size[1] * sizeof(uint32_t));
+	}
+}
+
+struct intersectionData
+{
+	float dist;
+	glm::vec3 point;
+	int texture;
 };
 
 class ExampleLayer : public Engine::Layer
@@ -140,6 +180,7 @@ public:
 	Engine::Ref<Engine::VertexArray> m_VertexArray;
 	Engine::Ref<Engine::VertexBuffer> m_VertexBuffer;
 	Engine::Ref<Engine::IndexBuffer> m_IndexBuffer;
+	Engine::Ref<Engine::Texture2D> m_Texture;
 
 	std::vector<float> m_MapVertexArray;
 	std::vector<uint32_t> m_MapIndexBuffer;
@@ -166,18 +207,19 @@ public:
 
 		m_VertexArray = Engine::VertexArray::Create();
 
-		float vertices[4 * 3] =
+		float vertices[4 * 5] =
 		{
-			0.0f, -1.0f, 0.0f,
-			1.0f, -1.0f, 0.0f,
-			1.0f,  1.0f, 0.0f,
-			0.0f,  1.0f, 0.0f
+			0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+			1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			0.0f,  1.0f, 0.0f, 0.0f, 1.0f
 		};
 
 		m_VertexBuffer = Engine::VertexBuffer::Create(vertices, sizeof(vertices));
 
 		Engine::BufferLayout layout = {
 			{Engine::ShaderDataType::Float3, "a_Position"},
+			{Engine::ShaderDataType::Float2, "a_TexCoord"}
 		};
 
 		m_VertexBuffer->SetLayout(layout);
@@ -199,29 +241,22 @@ public:
 
 		m_MapIndexBuffer = { 0,1,  1,2,  2,3,  3,0 };
 
-		m_Sprites.push_back(Sprite());
+		m_Sprites.push_back(Sprite({ 0.0f, 0.0f, 0.0f }, 1.0f, 0));
 
 		Engine::Ref<Engine::Shader::ShaderSorce> src = std::make_shared<Engine::Shader::ShaderSorce>();
 
-		auto FlatShader = m_ShaderLib.Load("FlatShader", "Assets/Shaders/FlatColorShader.glsl");
+		auto FlatShader = m_ShaderLib.Load("FlatShader", "Assets/Shaders/FlatColorShader.shader");
 
 		FlatShader->Bind();
 
-		std::ofstream myfile;
-		myfile.open("Assets/Map/Map.txt", std::ios::out | std::ios::binary);
-		if (myfile.is_open())
-		{
-			const char mapSize[2] = { m_MapVertexArray.size(), m_MapIndexBuffer.size() };
-			myfile << mapSize;
-			myfile << *(char*)m_MapVertexArray.data();
-			myfile << *(char*)m_MapIndexBuffer.data();
-		}
-		myfile.close();
+		SaveMapData(m_MapVertexArray, m_MapIndexBuffer);
+
+		LoadMapData(&m_MapVertexArray, &m_MapIndexBuffer);
 	}
 
-	std::vector<std::pair<float, glm::vec3>> FindClosest(Ray ray, std::vector<uint32_t> i)
+	std::vector<intersectionData> FindClosest(Ray ray, std::vector<uint32_t> i)
 	{
-		std::vector<std::pair<float, glm::vec3>> intersections;
+		std::vector<intersectionData> intersections;
 		for (int j = 0; j < i.size() / 2; j++)
 		{
 			uint32_t p1 = i[j * 2];
@@ -242,7 +277,11 @@ public:
 				float t = glm::distance(glm::vec2(bottom.x, bottom.y), pos);
 				float interpulated = v0 + t * (v1 - v0);
 				glm::vec3 point = glm::vec3(pos.x, pos.y, interpulated);
-				intersections.push_back(std::pair(dist, point));
+				intersectionData data = { 0 };
+				data.dist = dist;
+				data.point = point;
+				data.texture = -1;
+				intersections.push_back(data);
 			}
 		}
 		for (int j = 0; j < m_Sprites.size(); j++)
@@ -250,7 +289,7 @@ public:
 			Sprite& sprite = m_Sprites[j];
 			glm::vec3* point1 = new glm::vec3();
 			glm::vec3* point2 = new glm::vec3();
-			sprite.GetBilbordPoints(point1, point2, *m_Player);
+			int texture = sprite.GetBilbordPoints(point1, point2, *m_Player);
 
 			glm::vec2 pos = ray.Intersecting(*point1, *point2);
 			const float dist = glm::distance(m_Player->pos, pos);
@@ -265,14 +304,16 @@ public:
 				float t = glm::distance(glm::vec2(bottom.x, bottom.y), pos);
 				float interpulated = v0 + t * (v1 - v0);
 				glm::vec3 point = glm::vec3(pos.x, pos.y, interpulated);
-				intersections.push_back(std::pair(dist, point));
+				intersectionData data = { 0 };
+				data.dist = dist;
+				data.point = point;
+				data.texture = texture;
+				intersections.push_back(data);
 			}
 		}
-		std::sort(intersections.begin(), intersections.end(), [](std::pair<float, glm::vec3> a, std::pair<float, glm::vec3> b) 
+		std::sort(intersections.begin(), intersections.end(), [](intersectionData a, intersectionData b)
 			{
-				auto [dist1, p1] = a;
-				auto [dist2, p2] = b;
-				return dist1 > dist2;
+				return a.dist > b.dist;
 			});
 		return intersections;
 	}
@@ -295,18 +336,19 @@ public:
 			float rotation = (m_Player->rotation.x + (m_Player->FOV / 2) - ((float)x * (m_Player->FOV / Reselution)));
 			Ray ray(m_Player->pos, rotation);
 
-			std::vector<std::pair<float, glm::vec3>> intersections = FindClosest(ray, m_MapIndexBuffer);
+			std::vector<intersectionData> intersections = FindClosest(ray, m_MapIndexBuffer);
 
 			for (int i = 0; i < intersections.size(); i++)
 			{
 				position.y = m_Player->rotation.y;
-				auto [dist, point] = intersections[i];
-				float yScale = height / ((float)dist * cos(rotation - m_Player->rotation.x));
-				position.y += point.z * yScale;
+				auto intersection = intersections[i];
+				float yScale = height / ((float)intersection.dist * cos(rotation - m_Player->rotation.x));
+				position.y += intersection.point.z * yScale;
 
 				glm::mat4 scale = glm::scale(glm::mat4(1.0f), { deltax, yScale, 0.0f });
 
 				float color = yScale / 350;
+
 				FlatShader->UploadUniformFloat4("u_Color", { color, color, color, 1.0f });
 				Engine::Renderer::Submit(m_VertexArray, FlatShader, glm::translate(glm::mat4(1.0f), position) * scale);
 			}
@@ -316,7 +358,7 @@ public:
 		Engine::Renderer::EndScene();
 
 		//Engine::Renderer::Flush();
-		DEBUG_INFO("FPS: {0}", 1/Engine::Time::GetDeltaTime());
+		//DEBUG_INFO("FPS: {0}", 1/Engine::Time::GetDeltaTime());
 	}
 
 	void OnEvent(Engine::Event& event) override
