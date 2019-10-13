@@ -36,8 +36,8 @@ namespace Engine {
 	class ENGINE_API MouseScrolledEvent : public Event
 	{
 	public:
-		MouseScrolledEvent(float xOffset, float yOffset)
-			: m_XOffset(xOffset), m_YOffset(yOffset) {}
+		MouseScrolledEvent(MouseMoveBindMode bindMode,float xOffset, float yOffset)
+			: m_MouseBindMode(bindMode), m_XOffset(xOffset), m_YOffset(yOffset) {}
 
 		inline float GetXOffset() const { return m_XOffset; }
 		inline float GetYOffset() const { return m_YOffset; }
@@ -51,7 +51,13 @@ namespace Engine {
 
 		EVENT_CLASS_TYPE(MouseScrolled)
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+
+		inline MouseMoveBindMode GetMouseBindMode()
+		{
+			return m_MouseBindMode;
+		}
 	private:
+		MouseMoveBindMode m_MouseBindMode;
 		float m_XOffset, m_YOffset;
 	};
 

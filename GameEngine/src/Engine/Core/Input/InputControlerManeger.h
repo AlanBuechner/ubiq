@@ -13,6 +13,7 @@ namespace Engine
 	class MouseButtonPressedEvent;
 	class MouseButtonReleasedEvent;
 	class MouseMovedEvent;
+	class MouseScrolledEvent;
 }
 
 namespace Engine
@@ -35,6 +36,7 @@ namespace Engine
 		bool OnMouseEvent(T& e);
 
 		bool OnMouseMoveEvent(MouseMovedEvent& e);
+		bool OnMouseScrollEvent(MouseScrolledEvent& e);
 
 		std::vector<InputControler*> m_Controlers;
 	};

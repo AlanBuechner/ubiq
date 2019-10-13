@@ -26,14 +26,14 @@ namespace Engine
 		inline Ref<OrthographicCamera> GetCamera() { return m_Camera; }
 	private:
 		void Move(const glm::vec3& movedir);
-		void MouseMoved(glm::vec2& pos);
 		void Run(bool run);
+		void OnMouseMoved(glm::vec2& delta);
+		void OnScrollWheel(glm::vec2& delta);
 
 		void SetZoomLevel(float zoom);
 		void SetAspectRatio(float aspectRatio);
 
 		bool OnWindowResize(WindowResizeEvent& e);
-		bool OnScrollWheel(MouseScrolledEvent& e);
 
 	private:
 		float m_AspectRatio;
@@ -45,5 +45,7 @@ namespace Engine
 		float m_RunSpeed = 2.0f;
 		float m_Speed = 1.0f;
 		glm::vec3 m_MoveDir = { 0.0f, 0.0f, 0.0f };
+
+		float m_ScrollSpeed = 0.5f;
 	};
 }

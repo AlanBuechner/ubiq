@@ -26,6 +26,7 @@ namespace Engine
 		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnMouseEvent<MouseButtonPressedEvent>));
 		dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnMouseEvent<MouseButtonReleasedEvent>));
 		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnMouseMoveEvent));
+		dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(&InputControlerManeger::OnMouseScrollEvent));
 	}
 
 	void InputControlerManeger::AddControler(InputControler* controler)
@@ -52,6 +53,17 @@ namespace Engine
 		for (auto i : m_Controlers)
 		{
 			i->RaiseMouseMoveEvent(e.GetMouseBindMode(), glm::vec2({e.GetX(), e.GetY()}));
+		}
+		return false;
+	}
+
+	bool InputControlerManeger::OnMouseScrollEvent(MouseScrolledEvent& e)
+	{
+		if (m_Controlers.empty())
+			return false;
+		for (auto i : m_Controlers)
+		{
+			i->RaiseMouseMoveEvent(e.GetMouseBindMode(), glm::vec2({e.GetXOffset(), e.GetYOffset()}));
 		}
 		return false;
 	}

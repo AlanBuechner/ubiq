@@ -29,14 +29,14 @@ namespace Engine
 		m_Input->BindEvent(KEYCODE_SHIFT, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Run, true));
 		m_Input->BindEvent(KEYCODE_SHIFT, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Run, false));
 
-		m_Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&OrthographicCameraControler::MouseMoved));
+		m_Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&OrthographicCameraControler::OnMouseMoved));
+		m_Input->BindMouseMoveEvent(MOUSE_SCROLL_WHEEL, BIND_MOUSEMOVE(&OrthographicCameraControler::OnScrollWheel));
 	}
 
 	void OrthographicCameraControler::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(&OrthographicCameraControler::OnWindowResize));
-		dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(&OrthographicCameraControler::OnScrollWheel));
 	}
 
 	void OrthographicCameraControler::OnUpdate()
@@ -49,9 +49,18 @@ namespace Engine
 		m_MoveDir += movedir;
 	}
 
-	void OrthographicCameraControler::MouseMoved(glm::vec2& pos)
+	void OrthographicCameraControler::OnMouseMoved(glm::vec2& delta)
 	{
 		
+	}
+
+	void OrthographicCameraControler::OnScrollWheel(glm::vec2& delta)
+	{
+		float TargetZoom = m_ZoomLevel - (m_ScrollSpeed * delta.y);
+		if (TargetZoom < 0.1f)
+			SetZoomLevel(0.1f);
+		else
+			SetZoomLevel(TargetZoom);
 	}
 
 	void OrthographicCameraControler::Run(bool run)
@@ -74,16 +83,6 @@ namespace Engine
 	bool OrthographicCameraControler::OnWindowResize(WindowResizeEvent& e)
 	{
 		SetAspectRatio((float)e.GetWidth() / (float)e.GetHeight());
-		return false;
-	}
-
-	bool OrthographicCameraControler::OnScrollWheel(MouseScrolledEvent& e)
-	{
-		float TargetZoom = m_ZoomLevel - e.GetYOffset();
-		if (TargetZoom < 0.1f)
-			SetZoomLevel(0.1f);
-		else
-			SetZoomLevel(m_ZoomLevel - e.GetYOffset());
 		return false;
 	}
 

@@ -9,6 +9,7 @@
 
 #define MOUSE_POSITON Engine::MouseMoveBindMode::CurserPosition
 #define MOUSE_DELTA Engine::MouseMoveBindMode::DeltaPosition
+#define MOUSE_SCROLL_WHEEL Engine::MouseMoveBindMode::ScrollWheel
 
 namespace Engine
 {
@@ -34,7 +35,8 @@ namespace Engine
 	enum class MouseMoveBindMode
 	{
 		CurserPosition,
-		DeltaPosition
+		DeltaPosition,
+		ScrollWheel
 	};
 
 	class ENGINE_API InputControler
