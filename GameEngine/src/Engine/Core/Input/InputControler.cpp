@@ -28,9 +28,33 @@ namespace Engine
 	{
 		for (auto i : m_Events)
 		{
-			if (i->Key == key && i->Type == state)
+			if (i->Type == state)
 			{
-				i->Function();
+				switch (i->Key)
+				{
+				case KEYCODE_SHIFT:
+					if (key == KEYCODE_LEFT_SHIFT || key == KEYCODE_RIGHT_SHIFT)
+					{
+						i->Function();
+					}
+					break;
+				case KEYCODE_CONTROL:
+					if (key == KEYCODE_LEFT_CONTROL || key == KEYCODE_RIGHT_CONTROL)
+					{
+						i->Function();
+					}
+					break;
+				case KEYCODE_ALT:
+					if (key == KEYCODE_LEFT_ALT || key == KEYCODE_RIGHT_ALT)
+					{
+						i->Function();
+					}
+					break;
+				default:
+					if(i->Key == key)
+						i->Function();
+					break;
+				}
 			}
 		}
 	}

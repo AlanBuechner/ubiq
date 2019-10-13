@@ -75,7 +75,6 @@ project "GameEngine"
 
 		defines
 		{
-			"PLATFORM_WINDOWS",
 			"BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
 		}
@@ -132,7 +131,6 @@ project "Sandbox"
 
 		defines
 		{
-			"PLATFORM_WINDOWS"
 		}
 
 	filter "configurations:Debug"

@@ -26,7 +26,3 @@
 
 // Camera Controlers
 #include "Engine/OrthographicCameraControler.h"
-
-// --- EntryPoint -------------------------
-#include "Engine/Core/EntryPoint.h"
-// ----------------------------------------

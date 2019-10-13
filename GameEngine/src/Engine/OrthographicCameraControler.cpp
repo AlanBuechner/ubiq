@@ -14,19 +14,22 @@ namespace Engine
 
 	void OrthographicCameraControler::SetPlayerInput(Ref<InputControlerManeger> maneger)
 	{
-		Input.reset(new InputControler(maneger));
+		m_Input.reset(new InputControler(maneger));
 
-		Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 0.0f,  1.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 0.0f, -1.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ -1.0f,  0.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 1.0f,  0.0f, 0.0f })));
+		m_Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 0.0f,  1.0f, 0.0f })));
+		m_Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 0.0f, -1.0f, 0.0f })));
+		m_Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ -1.0f,  0.0f, 0.0f })));
+		m_Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 1.0f,  0.0f, 0.0f })));
 
-		Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 0.0f,  1.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 0.0f, -1.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ -1.0f,  0.0f, 0.0f })));
-		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 1.0f,  0.0f, 0.0f })));
+		m_Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 0.0f,  1.0f, 0.0f })));
+		m_Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 0.0f, -1.0f, 0.0f })));
+		m_Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ -1.0f,  0.0f, 0.0f })));
+		m_Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 1.0f,  0.0f, 0.0f })));
 
-		Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&OrthographicCameraControler::MouseMoved));
+		m_Input->BindEvent(KEYCODE_SHIFT, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Run, true));
+		m_Input->BindEvent(KEYCODE_SHIFT, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Run, false));
+
+		m_Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&OrthographicCameraControler::MouseMoved));
 	}
 
 	void OrthographicCameraControler::OnEvent(Event& e)
@@ -38,17 +41,22 @@ namespace Engine
 
 	void OrthographicCameraControler::OnUpdate()
 	{
-		m_Camera->Translate(MoveDir * Speed * Time::GetDeltaTime());
+		m_Camera->Translate(m_MoveDir * m_Speed * Time::GetDeltaTime());
 	}
 
 	void OrthographicCameraControler::Move(const glm::vec3& movedir)
 	{
-		MoveDir += movedir;
+		m_MoveDir += movedir;
 	}
 
 	void OrthographicCameraControler::MouseMoved(glm::vec2& pos)
 	{
 		
+	}
+
+	void OrthographicCameraControler::Run(bool run)
+	{
+		m_Speed = run ? m_RunSpeed : m_WalkSpeed;
 	}
 
 	void OrthographicCameraControler::SetZoomLevel(float zoom)

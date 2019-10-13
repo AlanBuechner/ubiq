@@ -3,6 +3,33 @@
 
 #define ENABLE_ASSERTS
 
+#ifdef _WIN32
+	#ifdef _WIN64
+		#define PLATFORM_WINDOWS
+	#else
+		#error "x86 Buillds are not sapported"
+	#endif // _WIN64
+#elif defined(__APPLE__) || defined(__MACH__)
+	#include <TargetConditionals.h>
+	#if TARGET_IPHONE_SIMULATOR == 1
+		#error "IOS simulator is not sapported"
+	#elif TARGET_OS_IPHONE == 1
+		#define PLATFORM_IOS
+		#error "IOS is not sapported"
+	#elif TARGET_OS_MAC == 1
+		#define PLATFORM_MACOS
+		#error "MacOS is not sapported"
+	#endif
+#elif defined(__ANDROID__)
+	#define PLATFORM_ANDROID
+	#error "Android is not sapported"
+#elif defined(__linux__)
+	#define PLATFORM_LINUX
+	#error "Linux is not sapported"
+#else
+	#error "Unknown Platform!"
+#endif
+
 #ifdef PLATFORM_WINDOWS
 	#ifdef DYNAMIC_LINK
 		#ifdef BUILD_DLL
