@@ -3,9 +3,13 @@
 #include <fstream>
 #include <functional>
 
-bool ToCloce(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, float r)
+#define NOT_INTERACTING BIT(0)
+#define INTERSECTING BIT(1)
+#define TO_CLOSE BIT(2)
+
+int ToClose(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, float r)
 {
-		// i dont understand the math that well just read the artical -> https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection <-
+	// i dont understand the math that well just read the artical -> https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection <-
 	const float x1 = p1.x;
 	const float y1 = p1.y;
 	const float x2 = p2.x;
@@ -17,7 +21,7 @@ bool ToCloce(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, float r)
 	const float y4 = p4.y;
 
 	const float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-	if (den == 0.0f)
+	if (den == 0.0f) // check if the lines are parallel
 	{
 		return false;
 	}
@@ -28,8 +32,12 @@ bool ToCloce(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, float r)
 	float A = y1 - y2;
 	float B = x2 - x1;
 	float C = (x1*y2) - (x2*y1);
-
-	return (t > 0 && t < 1 && u > 0 && u < 1) || (glm::abs(A * x4 + B*y4 + C) / glm::sqrt(A*A + B*B)) <= r;
+	// check if the lines are intersecting
+	if (t > 0 && t < 1 && u > 0 && u < 1)
+		return INTERSECTING;
+	if ((glm::abs(A * x4 + B * y4 + C) / glm::sqrt(A * A + B * B)) <= r)
+		return TO_CLOSE;
+	return NOT_INTERACTING;
 }
 
 class Player
@@ -65,8 +73,8 @@ public:
 		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ -1.0f,  0.0f }))); // binds a to end moving left
 		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 1.0f,  0.0f }))); // binds d to end moving right
 
-		Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_PRESSED, BIND_AXIS(&Player::SetRun, true)); // starts runing
-		Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_RELEASED, BIND_AXIS(&Player::SetRun, false)); // ends runing
+		Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_PRESSED, BIND_AXIS(&Player::SetRun, true)); // starts running
+		Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_RELEASED, BIND_AXIS(&Player::SetRun, false)); // ends running
 
 		Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&Player::MouseMoved)); // binds the mouse delta 
 	}
@@ -84,7 +92,7 @@ public:
 			uint32_t p2 = MapIndexBuffer[(j * 2) + 1]; // gets the index for the second poiont in the wall
 			glm::vec2 point1(MapVertexArray[p1 * 3], MapVertexArray[(p1 * 3) + 1]); // gets the first point
 			glm::vec2 point2(MapVertexArray[p2 * 3], MapVertexArray[(p2 * 3) + 1]); // gets the second point
-			if (ToCloce(point1, point2, pos, newPos, m_ColitionRadius)) // checks if the player walked through the wall
+			if (ToClose(point1, point2, pos, newPos, m_ColitionRadius) & (INTERSECTING | TO_CLOSE)) // checks if the player walked through the wall
 			{
 				glm::vec2 wallVec = glm::normalize(point2 - point1); // gets a unit vector for the walls direction
 				deltaPos = glm::dot(deltaPos, wallVec) * wallVec; // gets the conponent of the player move vector that is paralel to the wall
@@ -138,18 +146,18 @@ public:
 		const float y4 = m_Position.y + dir.y;
 
 		const float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-		if (den == 0.0f)
+		if (den == 0.0f) // check if the lines are parallel
 		{
 			return {};
 		}
 		float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
 
 		float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
-		if (t > 0 && t < 1 && u > 0)
+		if (t > 0 && t < 1 && u > 0) // check if the lines are intersecting
 		{
-			float x = x1 + t * (x2 - x1);
-			float y = y1 + t * (y2 - y1);
-			return { x, y };
+			float x = x1 + t * (x2 - x1); // get the x component of the intersection point
+			float y = y1 + t * (y2 - y1); // get the y component of the intersection point
+			return { x, y }; // return the intersection point
 		}
 		else
 		{
@@ -367,7 +375,7 @@ public:
 
 	void OnUpdate() override
 	{
-		m_Player->Update(m_MapVertexArray, m_MapIndexBuffer);
+		m_Player->Update(m_MapVertexArray, m_MapIndexBuffer); // update the player
 
 		auto FlatShader = m_ShaderLib.Get("FlatShader"); // gets the shader the columns are going to use
 
@@ -407,7 +415,7 @@ public:
 		Engine::Renderer::EndScene();
 
 		//Engine::Renderer::Flush();
-		//DEBUG_INFO("FPS: {0}", 1/Engine::Time::GetDeltaTime());
+		DEBUG_INFO("FPS: {0}", 1/Engine::Time::GetDeltaTime());
 	}
 
 	void OnEvent(Engine::Event& event) override
