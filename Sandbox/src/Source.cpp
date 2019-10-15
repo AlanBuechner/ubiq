@@ -3,6 +3,35 @@
 #include <fstream>
 #include <functional>
 
+bool ToCloce(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, float r)
+{
+		// i dont understand the math that well just read the artical -> https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection <-
+	const float x1 = p1.x;
+	const float y1 = p1.y;
+	const float x2 = p2.x;
+	const float y2 = p2.y;
+
+	const float x3 = p3.x;
+	const float y3 = p3.y;
+	const float x4 = p4.x;
+	const float y4 = p4.y;
+
+	const float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+	if (den == 0.0f)
+	{
+		return false;
+	}
+	float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+
+	float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
+
+	float A = y1 - y2;
+	float B = x2 - x1;
+	float C = (x1*y2) - (x2*y1);
+
+	return (t > 0 && t < 1 && u > 0 && u < 1) || (glm::abs(A * x4 + B*y4 + C) / glm::sqrt(A*A + B*B)) <= r;
+}
+
 class Player
 {
 public:
@@ -20,6 +49,7 @@ public:
 	float RunSpeed = 2.0f; // the run speed
 	float WalkSpeed = 1.0f; // the walk speed
 	float Speed = WalkSpeed; // the speed
+	float m_ColitionRadius = 0.1f;
 
 	void SetPlayerInput(Engine::InputControlerManeger* maneger)
 	{
@@ -35,17 +65,34 @@ public:
 		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ -1.0f,  0.0f }))); // binds a to end moving left
 		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 1.0f,  0.0f }))); // binds d to end moving right
 
-		Input->BindEvent(KEYCODE_Q, KEY_PRESSED, BIND_AXIS(&Player::SetRun, true)); // starts runing
-		Input->BindEvent(KEYCODE_Q, KEY_RELEASED, BIND_AXIS(&Player::SetRun, false)); // ends runing
+		Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_PRESSED, BIND_AXIS(&Player::SetRun, true)); // starts runing
+		Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_RELEASED, BIND_AXIS(&Player::SetRun, false)); // ends runing
 
 		Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&Player::MouseMoved)); // binds the mouse delta 
 	}
 
-	void Update()
+	void Update(const std::vector<float> MapVertexArray, const std::vector<uint32_t> MapIndexBuffer)
 	{
 		glm::vec2 moveFB(glm::cos(rotation.x), glm::sin(rotation.x)); // gets the world dir to move forword
 		glm::vec2 moveRL(glm::sin(rotation.x), -glm::cos(rotation.x)); // gets the workd dir to move left 
-		pos += ((MoveDir.y * moveFB) + (MoveDir.x * moveRL)) * Speed * Time::GetDeltaTime(); // moves the player in the given dir
+		glm::vec2 deltaPos = ((MoveDir.y * moveFB) + (MoveDir.x * moveRL)) * Speed * Time::GetDeltaTime(); // the change in the position
+		glm::vec2 newPos = pos + deltaPos; // the new position
+
+		for (int j = 0; j < MapIndexBuffer.size() / 2; j++) // itorates over all walls in the map
+		{
+			uint32_t p1 = MapIndexBuffer[j * 2]; // gets the index for the first point in the wall
+			uint32_t p2 = MapIndexBuffer[(j * 2) + 1]; // gets the index for the second poiont in the wall
+			glm::vec2 point1(MapVertexArray[p1 * 3], MapVertexArray[(p1 * 3) + 1]); // gets the first point
+			glm::vec2 point2(MapVertexArray[p2 * 3], MapVertexArray[(p2 * 3) + 1]); // gets the second point
+			if (ToCloce(point1, point2, pos, newPos, m_ColitionRadius)) // checks if the player walked through the wall
+			{
+				glm::vec2 wallVec = glm::normalize(point2 - point1); // gets a unit vector for the walls direction
+				deltaPos = glm::dot(deltaPos, wallVec) * wallVec; // gets the conponent of the player move vector that is paralel to the wall
+				newPos = deltaPos + pos; // sets the new position to move in the new direction
+				j = 0; // sets the index back to 0 to see if the new position makes the player walk through another wall
+			}
+		}
+		pos = newPos; // sets the new position
 	}
 
 private:
@@ -146,7 +193,7 @@ void SaveMapData(std::vector<float> MapVertexArray, std::vector<uint32_t> MapInd
 	out.open(filePath, std::ios::out | std::ios::binary);
 	if (out.is_open()) // checks if the file is open
 	{
-		int size[] = { MapVertexArray.size(),  MapIndexBuffer.size() };
+		int size[] = { (int)MapVertexArray.size(),  (int)MapIndexBuffer.size() };
 		out.write((char*)(&size), sizeof(size)); // saves the size of the vertex and index arrays
 		out.write(reinterpret_cast<const char*>(MapVertexArray.data()), size[0] * sizeof(float)); // saves the vertex data
 		out.write(reinterpret_cast<const char*>(MapIndexBuffer.data()), size[1] * sizeof(uint32_t)); // saves the index data
@@ -204,7 +251,7 @@ public:
 		height = Engine::Application::Get().GetWindow().GetHeight(); // gets the height of the screen
 		width = Engine::Application::Get().GetWindow().GetWidth(); // gets the width of the screen
 
-		m_Player = new Player(width, height); // creates a player
+		m_Player = new Player((float)width, (float)height); // creates a player
 
 		m_Player->SetPlayerInput(m_InputManeger); // sets the players input events
 
@@ -237,7 +284,7 @@ public:
 		m_IndexBuffer = Engine::IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t)); // creats the index buffer
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer); // sets the index buffer for the vertex array
 
-		auto FlatShader = m_ShaderLib.Load("FlatShader", "Assets/Shaders/FlatColorShader.shader"); // creates a shader and adds it to the shader library
+		auto FlatShader = m_ShaderLib.Load("FlatShader", "Assets/Shaders/FlatColorShader.glsl"); // creates a shader and adds it to the shader library
 
 		FlatShader->Bind(); // binds the the shader
 
@@ -259,7 +306,7 @@ public:
 		LoadMapData(&m_MapVertexArray, &m_MapIndexBuffer, "Assets/Map/Map.txt"); // loads the map data from a file
 	}
 
-	std::vector<intersectionData> FindClosest(Ray ray, std::vector<uint32_t> i)
+	std::vector<intersectionData> FindClosest(Ray ray, const std::vector<uint32_t>& i)
 	{
 		std::vector<intersectionData> intersections; // all the intersections with the ray
 		for (int j = 0; j < i.size() / 2; j++) // itorates over all walls in the map
@@ -320,7 +367,7 @@ public:
 
 	void OnUpdate() override
 	{
-		m_Player->Update();
+		m_Player->Update(m_MapVertexArray, m_MapIndexBuffer);
 
 		auto FlatShader = m_ShaderLib.Get("FlatShader"); // gets the shader the columns are going to use
 
