@@ -256,7 +256,6 @@ public:
 
 		m_Player->SetPlayerInput(m_InputManeger); // sets the players input events
 
-
 		m_VertexArray = Engine::VertexArray::Create(); // creates a vertex array for the column
 
 		// psoition and UV coords for the column
