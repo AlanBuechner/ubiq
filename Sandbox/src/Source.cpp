@@ -3,11 +3,7 @@
 #include <fstream>
 #include <functional>
 
-#define NOT_INTERACTING BIT(0)
-#define INTERSECTING BIT(1)
-#define TO_CLOSE BIT(2)
-
-int ToClose(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, float r)
+bool ToClose(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, float r)
 {
 	// i dont understand the math that well just read the artical -> https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection <-
 	const float x1 = p1.x;
@@ -29,15 +25,12 @@ int ToClose(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, float r)
 
 	float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
 
-	float A = y1 - y2;
-	float B = x2 - x1;
-	float C = (x1*y2) - (x2*y1);
-	// check if the lines are intersecting
-	if (t > 0 && t < 1 && u > 0 && u < 1)
-		return INTERSECTING;
-	if ((glm::abs(A * x4 + B * y4 + C) / glm::sqrt(A * A + B * B)) <= r)
-		return TO_CLOSE;
-	return NOT_INTERACTING;
+	float A = y1 - y2; // the change in y
+	float B = x2 - x1; // the change in x
+	float C = (x1 * y2) - (x2 * y1); // a constent
+
+	// check if the lines are intersecting or if the final poitn is to close the the line
+	return (t > 0 && t < 1 && u > 0 && u < 1) || ((glm::abs(A * x4 + B * y4 + C) / glm::sqrt(A * A + B * B)) <= r);
 }
 
 class Player
@@ -45,46 +38,46 @@ class Player
 public:
 	Player(float width, float height)
 	{
-		cam = new Engine::OrthographicCamera(-width / 2, width / 2, -height / 2, height / 2); // crates a new camera with the given width and height of the camera
+		m_Camera = new Engine::OrthographicCamera(-width / 2, width / 2, -height / 2, height / 2); // crates a new camera with the given width and height of the camera
 	}
 
-	Engine::OrthographicCamera* cam = nullptr; // the camera
-	Engine::Scope<InputControler> Input; // the input controler
-	glm::vec2 MoveDir = { 0.0f, 0.0f }; // the direction to move in
-	glm::vec2 pos = { 0.0f, 0.0f }; // the position of the player
-	glm::vec2 rotation = { 0.0f, 0.0f }; // the rotation of the player
-	float FOV = 3.14f / 4; // the fov
-	float RunSpeed = 2.0f; // the run speed
-	float WalkSpeed = 1.0f; // the walk speed
-	float Speed = WalkSpeed; // the speed
+	Engine::OrthographicCamera* m_Camera = nullptr; // the camera
+	Engine::Scope<InputControler> m_Input; // the input controler
+	glm::vec2 m_MoveDir = { 0.0f, 0.0f }; // the direction to move in
+	glm::vec2 m_Position = { 0.0f, 0.0f }; // the position of the player
+	glm::vec2 m_Rotation = { 0.0f, 0.0f }; // the rotation of the player
+	float m_FOV = 3.14f / 4; // the fov
+	float m_RunSpeed = 2.0f; // the run speed
+	float m_WalkSpeed = 1.0f; // the walk speed
+	float m_Speed = m_WalkSpeed; // the speed
 	float m_ColitionRadius = 0.1f;
 
 	void SetPlayerInput(Engine::InputControlerManeger* maneger)
 	{
-		Input.reset(new InputControler(maneger)); // sets up the input controler
+		m_Input.reset(new InputControler(maneger)); // sets up the input controler
 
-		Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&Player::Move, glm::vec2({ 0.0f,  1.0f }))); // binds w to start moving forword
-		Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&Player::Move, glm::vec2({ 0.0f, -1.0f }))); // binds s to start moving back
-		Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&Player::Move, glm::vec2({ -1.0f,  0.0f }))); // binds a to start moving left
-		Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&Player::Move, glm::vec2({ 1.0f,  0.0f }))); // binds d to start moving right
+		m_Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&Player::Move, glm::vec2({ 0.0f,  1.0f }))); // binds w to start moving forword
+		m_Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&Player::Move, glm::vec2({ 0.0f, -1.0f }))); // binds s to start moving back
+		m_Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&Player::Move, glm::vec2({ -1.0f,  0.0f }))); // binds a to start moving left
+		m_Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&Player::Move, glm::vec2({ 1.0f,  0.0f }))); // binds d to start moving right
 
-		Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 0.0f,  1.0f }))); // binds w to end moving forword
-		Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 0.0f, -1.0f }))); // binds s to end moving back
-		Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ -1.0f,  0.0f }))); // binds a to end moving left
-		Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 1.0f,  0.0f }))); // binds d to end moving right
+		m_Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 0.0f,  1.0f }))); // binds w to end moving forword
+		m_Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 0.0f, -1.0f }))); // binds s to end moving back
+		m_Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ -1.0f,  0.0f }))); // binds a to end moving left
+		m_Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&Player::Move, -glm::vec2({ 1.0f,  0.0f }))); // binds d to end moving right
 
-		Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_PRESSED, BIND_AXIS(&Player::SetRun, true)); // starts running
-		Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_RELEASED, BIND_AXIS(&Player::SetRun, false)); // ends running
+		m_Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_PRESSED, BIND_AXIS(&Player::SetRun, true)); // starts running
+		m_Input->BindEvent(KEYCODE_LEFT_SHIFT, KEY_RELEASED, BIND_AXIS(&Player::SetRun, false)); // ends running
 
-		Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&Player::MouseMoved)); // binds the mouse delta 
+		m_Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&Player::MouseMoved)); // binds the mouse delta 
 	}
 
 	void Update(const std::vector<float> MapVertexArray, const std::vector<uint32_t> MapIndexBuffer)
 	{
-		glm::vec2 moveFB(glm::cos(rotation.x), glm::sin(rotation.x)); // gets the world dir to move forword
-		glm::vec2 moveRL(glm::sin(rotation.x), -glm::cos(rotation.x)); // gets the workd dir to move left 
-		glm::vec2 deltaPos = ((MoveDir.y * moveFB) + (MoveDir.x * moveRL)) * Speed * Time::GetDeltaTime(); // the change in the position
-		glm::vec2 newPos = pos + deltaPos; // the new position
+		glm::vec2 moveFB(glm::cos(m_Rotation.x), glm::sin(m_Rotation.x)); // gets the world dir to move forword
+		glm::vec2 moveRL(glm::sin(m_Rotation.x), -glm::cos(m_Rotation.x)); // gets the workd dir to move left 
+		glm::vec2 deltaPos = ((m_MoveDir.y * moveFB) + (m_MoveDir.x * moveRL)) * m_Speed * Time::GetDeltaTime(); // the change in the position
+		glm::vec2 newPos = m_Position + deltaPos; // the new position
 
 		for (int j = 0; j < MapIndexBuffer.size() / 2; j++) // itorates over all walls in the map
 		{
@@ -92,33 +85,33 @@ public:
 			uint32_t p2 = MapIndexBuffer[(j * 2) + 1]; // gets the index for the second poiont in the wall
 			glm::vec2 point1(MapVertexArray[p1 * 3], MapVertexArray[(p1 * 3) + 1]); // gets the first point
 			glm::vec2 point2(MapVertexArray[p2 * 3], MapVertexArray[(p2 * 3) + 1]); // gets the second point
-			if (ToClose(point1, point2, pos, newPos, m_ColitionRadius) & (INTERSECTING | TO_CLOSE)) // checks if the player walked through the wall
+			if (ToClose(point1, point2, m_Position, newPos, m_ColitionRadius)) // checks if the player walked through the wall
 			{
 				glm::vec2 wallVec = glm::normalize(point2 - point1); // gets a unit vector for the walls direction
 				deltaPos = glm::dot(deltaPos, wallVec) * wallVec; // gets the conponent of the player move vector that is paralel to the wall
-				newPos = deltaPos + pos; // sets the new position to move in the new direction
+				newPos = deltaPos + m_Position; // sets the new position to move in the new direction
 				j = 0; // sets the index back to 0 to see if the new position makes the player walk through another wall
 			}
 		}
-		pos = newPos; // sets the new position
+		m_Position = newPos; // sets the new position
 	}
 
 private:
 	void Move(const glm::vec2& movedir)
 	{
-		MoveDir += movedir; // sets the direction to move
+		m_MoveDir += movedir; // sets the direction to move
 	}
 
 	void MouseMoved(glm::vec2& pos)
 	{
-		rotation.x -= pos.x / 500; // sets the x rotation of the player
-		rotation.y += pos.y; // sets the y rotation of the player
-		rotation.y = glm::clamp(rotation.y, -1500.0f, 1500.0f); // clamps the y rotaion
+		m_Rotation.x -= pos.x / 500; // sets the x rotation of the player
+		m_Rotation.y += pos.y; // sets the y rotation of the player
+		m_Rotation.y = glm::clamp(m_Rotation.y, -1500.0f, 1500.0f); // clamps the y rotaion
 	}
 
 	void SetRun(bool v)
 	{
-		Speed = v ? RunSpeed : WalkSpeed; // sets the speed based on wether or not the player is runing
+		m_Speed = v ? m_RunSpeed : m_WalkSpeed; // sets the speed based on wether or not the player is runing
 	}
 };
 
@@ -183,7 +176,7 @@ public:
 
 	int GetBilbordPoints(glm::vec3* p1, glm::vec3* p2, const Player& player)
 	{	
-		glm::vec2 vecToPlayer = glm::vec3(player.pos, 0.0f) - pos; // gest a vector from the sprite to the player
+		glm::vec2 vecToPlayer = glm::vec3(player.m_Position, 0.0f) - pos; // gest a vector from the sprite to the player
 		float rotation = std::atan2(vecToPlayer.y, vecToPlayer.x); // gets the roation of the sprite to look at the player
 
 		// creates the poits of of the sprites
@@ -277,7 +270,7 @@ public:
 
 		m_VertexBuffer = Engine::VertexBuffer::Create(vertices, sizeof(vertices)); // creates the vectex buffer
 
-		// creates the layout of the verex data
+		// creates the layout of the vertex data
 		Engine::BufferLayout layout = {
 			{Engine::ShaderDataType::Float3, "a_Position"},
 			{Engine::ShaderDataType::Float2, "a_TexCoord"}
@@ -325,7 +318,7 @@ public:
 			glm::vec3 point2(m_MapVertexArray[p2 * 3], m_MapVertexArray[(p2 * 3) + 1], m_MapVertexArray[(p2 * 3) + 2]); // gets the second point
 
 			glm::vec2 pos = ray.Intersecting(point1, point2); // gets the intersection point
-			const float dist = glm::distance(m_Player->pos, pos); // gets the distance from the player to the intersection point
+			const float dist = glm::distance(m_Player->m_Position, pos); // gets the distance from the player to the intersection point
 			if (dist == 0 || pos == glm::vec2(0.0f, 0.0f)) // checks if the intersection point is valid
 				continue;
 			else
@@ -352,7 +345,7 @@ public:
 			int texture = sprite.GetBilbordPoints(point1, point2, *m_Player); // gets the billborded point of the sprite
 
 			glm::vec2 pos = ray.Intersecting(*point1, *point2); // finds the intersection point on the sprite
-			const float dist = glm::distance(m_Player->pos, pos); // gets the distance to the sprite
+			const float dist = glm::distance(m_Player->m_Position, pos); // gets the distance to the sprite
 			if (dist == 0 || pos == glm::vec2(0.0f, 0.0f)) // checks if the the point is valid
 				continue;
 			else
@@ -382,23 +375,23 @@ public:
 		Engine::RenderCommand::SetClearColor({ 0.0f, 0.0f, 0.0f, 1 }); // sets the clear color
 		Engine::RenderCommand::Clear(); // cleares the screen
 
-		Engine::Renderer::BeginScene(*m_Player->cam); // sets the camera for the renderer to use
+		Engine::Renderer::BeginScene(*m_Player->m_Camera); // sets the camera for the renderer to use
 
 		// ---------------- Map Rendering ------------------ //
 		float deltax = width / Reselution; // change in column poition on the screen
 		glm::vec3 position(-width / 2, 0.0f, 0.0f); // position to draw the column
 		for (int x = 0; x < Reselution; x++) // itorates over all column on the screen
 		{
-			float rotation = (m_Player->rotation.x + (m_Player->FOV / 2) - ((float)x * (m_Player->FOV / Reselution))); // gets the rotation of the ray
-			Ray ray(m_Player->pos, rotation); // creates the ray
+			float rotation = (m_Player->m_Rotation.x + (m_Player->m_FOV / 2) - ((float)x * (m_Player->m_FOV / Reselution))); // gets the rotation of the ray
+			Ray ray(m_Player->m_Position, rotation); // creates the ray
 
 			std::vector<intersectionData> intersections = FindClosest(ray, m_MapIndexBuffer); // finds all intersections with the map
 
 			for (int i = 0; i < intersections.size(); i++) // itorates over all intersections
 			{
-				position.y = m_Player->rotation.y; // sets the y component of the draw position to the players up/down look to emulate looking up/down
+				position.y = m_Player->m_Rotation.y; // sets the y component of the draw position to the players up/down look to emulate looking up/down
 				auto intersection = intersections[i]; // the current intersection
-				float yScale = height / ((float)intersection.dist * cos(rotation - m_Player->rotation.x)); // the scale of the column
+				float yScale = height / ((float)intersection.dist * cos(rotation - m_Player->m_Rotation.x)); // the scale of the column
 				position.y += intersection.point.z * yScale; // sets the hight of the wall
 
 				glm::mat4 scale = glm::scale(glm::mat4(1.0f), { deltax, yScale, 0.0f }); // creates the scale matrex for the column
