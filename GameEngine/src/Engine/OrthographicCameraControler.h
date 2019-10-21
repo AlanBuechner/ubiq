@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/Time.h"
-#include "Core/Input/InputControler.h"
-#include "Core/Input/Input.h"
+#include "CameraControler.h"
 #include <glm/glm.hpp>
 
 namespace Engine
@@ -12,30 +11,30 @@ namespace Engine
 
 namespace Engine
 {
-	class OrthographicCameraControler
+	class OrthographicCameraControler : public CameraControler<OrthographicCamera>
 	{
 	public:
-		OrthographicCameraControler(float aspectRatio, float zoom);
+		OrthographicCameraControler(float aspectRatio, float zoom, int controleType);
 
-		void SetPlayerInput(Ref<InputControlerManeger> maneger);
+		virtual void SetPlayerInput(Ref<InputControlerManeger> maneger) override;
 
-		void OnEvent(Event& e);
+		virtual void OnEvent(Event& e) override;
 
-		void OnUpdate();
+		virtual void OnUpdate() override;
 
-		inline Ref<OrthographicCamera> GetCamera() { return m_Camera; }
-	private:
+		virtual inline Ref<OrthographicCamera> GetCamera() override { return m_Camera; }
+	protected:
 		void Move(const glm::vec3& movedir);
 		void Run(bool run);
 		void OnMouseMoved(glm::vec2& delta);
 		void OnScrollWheel(glm::vec2& delta);
 
 		void SetZoomLevel(float zoom);
-		void SetAspectRatio(float aspectRatio);
+		virtual void SetAspectRatio(float aspectRatio) override;
 
-		bool OnWindowResize(WindowResizeEvent& e);
+		virtual bool OnWindowResize(WindowResizeEvent& e) override;
 
-	private:
+	protected:
 		float m_AspectRatio;
 		float m_ZoomLevel;
 		Ref<OrthographicCamera> m_Camera;
@@ -47,5 +46,10 @@ namespace Engine
 		glm::vec3 m_MoveDir = { 0.0f, 0.0f, 0.0f };
 
 		float m_ScrollSpeed = 0.5f;
+
+		int m_ControlerType = 0;
+
+		typedef OrthographicCameraControler Super;
+		
 	};
 }

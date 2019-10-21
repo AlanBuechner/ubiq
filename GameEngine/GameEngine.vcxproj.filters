@@ -1275,7 +1275,11 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+<<<<<<< Updated upstream
     <ClInclude Include="src\Engine\Renderer\Renderer2D.h" />
+=======
+    <ClInclude Include="src\Engine\CameraControler.h" />
+>>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">

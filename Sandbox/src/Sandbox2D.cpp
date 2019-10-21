@@ -3,7 +3,7 @@
 Sandbox2DLayer::Sandbox2DLayer()
 	: Super("Sandbox2D")
 {
-	m_Camera.reset(new Engine::OrthographicCameraControler(1.6f, 1.0f));
+	m_Camera.reset(new Engine::OrthographicCameraControler(1.6f, 1.0f, CAMERA_CONTROLER_2D));
 
 	m_Camera->SetPlayerInput(m_InputManeger);
 }

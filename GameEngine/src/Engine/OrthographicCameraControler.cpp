@@ -6,8 +6,8 @@
 
 namespace Engine
 {
-	OrthographicCameraControler::OrthographicCameraControler(float aspectRatio, float zoom)
-		: m_AspectRatio(aspectRatio), m_ZoomLevel(zoom)
+	OrthographicCameraControler::OrthographicCameraControler(float aspectRatio, float zoom, int controlerType)
+		: m_AspectRatio(aspectRatio), m_ZoomLevel(zoom), m_ControlerType(controlerType)
 	{
 		m_Camera.reset(new OrthographicCamera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel));
 	}
@@ -16,21 +16,46 @@ namespace Engine
 	{
 		m_Input.reset(new InputControler(maneger));
 
-		m_Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 0.0f,  1.0f, 0.0f })));
-		m_Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 0.0f, -1.0f, 0.0f })));
-		m_Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ -1.0f,  0.0f, 0.0f })));
-		m_Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 1.0f,  0.0f, 0.0f })));
+		if (m_ControlerType == CAMERA_CONTROLER_2D)
+		{
+			m_Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 0.0f,  1.0f, 0.0f })));
+			m_Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 0.0f, -1.0f, 0.0f })));
+			m_Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ -1.0f,  0.0f, 0.0f })));
+			m_Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ 1.0f,  0.0f, 0.0f })));
 
-		m_Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 0.0f,  1.0f, 0.0f })));
-		m_Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 0.0f, -1.0f, 0.0f })));
-		m_Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ -1.0f,  0.0f, 0.0f })));
-		m_Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 1.0f,  0.0f, 0.0f })));
+			m_Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 0.0f,  1.0f, 0.0f })));
+			m_Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 0.0f, -1.0f, 0.0f })));
+			m_Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ -1.0f,  0.0f, 0.0f })));
+			m_Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ 1.0f,  0.0f, 0.0f })));
 
-		m_Input->BindEvent(KEYCODE_SHIFT, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Run, true));
-		m_Input->BindEvent(KEYCODE_SHIFT, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Run, false));
+			// implement 2d mouse movment controles
 
-		m_Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&OrthographicCameraControler::OnMouseMoved));
-		m_Input->BindMouseMoveEvent(MOUSE_SCROLL_WHEEL, BIND_MOUSEMOVE(&OrthographicCameraControler::OnScrollWheel));
+			m_Input->BindEvent(KEYCODE_SHIFT, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Run, true));
+			m_Input->BindEvent(KEYCODE_SHIFT, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Run, false));
+
+			m_Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&OrthographicCameraControler::OnMouseMoved));
+			m_Input->BindMouseMoveEvent(MOUSE_SCROLL_WHEEL, BIND_MOUSEMOVE(&OrthographicCameraControler::OnScrollWheel));
+		}
+		else if (m_ControlerType == CAMERA_CONTROLER_3D)
+		{
+			m_Input->BindEvent(KEYCODE_W, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({  0.0f, 0.0f,  1.0f })));
+			m_Input->BindEvent(KEYCODE_S, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({  0.0f, 0.0f, -1.0f })));
+			m_Input->BindEvent(KEYCODE_A, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({ -1.0f, 0.0f,  0.0f })));
+			m_Input->BindEvent(KEYCODE_D, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Move, glm::vec3({  1.0f, 0.0f,  0.0f })));
+
+			m_Input->BindEvent(KEYCODE_W, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({  0.0f, 0.0f,  1.0f })));
+			m_Input->BindEvent(KEYCODE_S, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({  0.0f, 0.0f, -1.0f })));
+			m_Input->BindEvent(KEYCODE_A, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({ -1.0f, 0.0f,  0.0f })));
+			m_Input->BindEvent(KEYCODE_D, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Move, -glm::vec3({  1.0f, 0.0f,  0.0f })));
+
+			// implement 3d mouse movment controles
+
+			m_Input->BindEvent(KEYCODE_SHIFT, KEY_PRESSED, BIND_AXIS(&OrthographicCameraControler::Run, true));
+			m_Input->BindEvent(KEYCODE_SHIFT, KEY_RELEASED, BIND_AXIS(&OrthographicCameraControler::Run, false));
+
+			m_Input->BindMouseMoveEvent(MOUSE_DELTA, BIND_MOUSEMOVE(&OrthographicCameraControler::OnMouseMoved));
+			m_Input->BindMouseMoveEvent(MOUSE_SCROLL_WHEEL, BIND_MOUSEMOVE(&OrthographicCameraControler::OnScrollWheel));
+		}
 	}
 
 	void OrthographicCameraControler::OnEvent(Event& e)
@@ -85,5 +110,4 @@ namespace Engine
 		SetAspectRatio((float)e.GetWidth() / (float)e.GetHeight());
 		return false;
 	}
-
 }
