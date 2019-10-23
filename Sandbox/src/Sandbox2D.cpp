@@ -1,4 +1,21 @@
 #include "Sandbox2D.h"
+#include <Engine/Core/Memory/Memory.h>
+
+class Entity
+{
+public:
+	Entity()
+	{
+		DEBUG_INFO("created new Entity {0}, {1}", a, c);
+		name = "hello";
+	}
+
+	int a = 6;
+	float c = 4.5f;
+	std::string name;
+};
+
+Entity* entity;
 
 Sandbox2DLayer::Sandbox2DLayer()
 	: Super("Sandbox2D")
@@ -10,7 +27,8 @@ Sandbox2DLayer::Sandbox2DLayer()
 
 void Sandbox2DLayer::OnAttach()
 {
-	
+	entity = Engine::CreateObject<Entity>();
+	DEBUG_INFO("{0}", entity->name);
 }
 
 void Sandbox2DLayer::OnDetach()

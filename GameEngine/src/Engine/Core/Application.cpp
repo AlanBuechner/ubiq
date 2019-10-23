@@ -9,6 +9,8 @@
 
 #include "Engine/Renderer/Renderer.h"
 
+#include "Memory/Memory.h"
+
 namespace Engine {
 
 #define BIND_EVENT_FN_EXTERN(x, p) std::bind(x, p, std::placeholders::_1)
