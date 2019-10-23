@@ -3,11 +3,11 @@
 
 namespace Engine
 {
-	class LinearAllocator : public Allocator
+	class StackAllocator : public Allocator
 	{
 	public:
-		LinearAllocator(size_t size);
-		virtual ~LinearAllocator();
+		StackAllocator(size_t size);
+		virtual ~StackAllocator();
 
 		virtual void Init() override;
 		virtual void* allocate(size_t size, uint8_t alignment) override;
@@ -17,6 +17,10 @@ namespace Engine
 		void* m_Start = nullptr;
 		size_t m_Offset;
 	private:
-		LinearAllocator(LinearAllocator& linearAllocator);
+		StackAllocator(StackAllocator& linearAllocator);
+
+		struct AllocationHeader {
+			char padding;
+		};
 	};
 }

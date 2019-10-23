@@ -19,8 +19,9 @@ namespace Engine
 
 	void LinearAllocator::Init()
 	{
-		if (m_Start != nullptr) {
-			deallocate();
+		if (m_Start != nullptr) 
+		{
+			Reset();
 		}
 		m_Start = malloc(m_Size);
 		m_Offset = 0;
@@ -32,12 +33,14 @@ namespace Engine
 		size_t paddedAddress = 0;
 		const size_t currentAddress = (size_t)m_Start + m_Offset;
 
-		if (alignment != 0 && m_Offset % alignment != 0) {
+		if (alignment != 0 && m_Offset % alignment != 0) 
+		{
 			// Alignment is required. Find the next aligned memory address and update offset
 			padding = PointerMath::CalculatePadding(currentAddress, alignment);
 		}
 
-		if (m_Offset + padding + size > m_Size) {
+		if (m_Offset + padding + size > m_Size) 
+		{
 			return nullptr;
 		}
 
@@ -51,16 +54,16 @@ namespace Engine
 		return (void*)nextAddress;
 	}
 
-	void LinearAllocator::deallocate()
+	void LinearAllocator::deallocate(void* p)
 	{
-		m_Offset = 0;
-		m_Used = 0;
-		m_Peak = 0;
+		
 	}
 
 	void LinearAllocator::Reset()
 	{
-		deallocate();
+		m_Offset = 0;
+		m_Used = 0;
+		m_Peak = 0;
 	}
 
 }

@@ -1,16 +1,21 @@
+/*
+I got a lot of the code from https://github.com/mtrebi/memory-allocators
+*/
+
 #pragma once
 
 #include "LinearAllocator.h"
-#include <initializer_list>
+#include "StackAllocator.h"
 
 namespace Engine
 {
-	static LinearAllocator* Alloc = new LinearAllocator(SIZE_MAX);
+	static LinearAllocator* LinearAlloc = new LinearAllocator(SIZE_MAX);
+	static StackAllocator* StackAlloc = new StackAllocator(SIZE_MAX);
 
 	template<class T>
 	T* CreateObject()
 	{
-		T* M = (T*)Alloc->allocate(sizeof(T), 4);
+		T* M = (T*)StackAlloc->allocate(sizeof(T), 4);
 		M = new T();
 		return M;
 	}
