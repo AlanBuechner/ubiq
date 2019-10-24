@@ -10,8 +10,8 @@ namespace Engine
 		virtual ~StackAllocator();
 
 		virtual void Init() override;
-		virtual void* allocate(size_t size, uint8_t alignment) override;
-		virtual void deallocate(void* p) override;
+		virtual void* Allocate(size_t size, uint8_t alignment) override;
+		virtual void Deallocate(void* p) override;
 		virtual void Reset();
 	protected:
 		void* m_Start = nullptr;

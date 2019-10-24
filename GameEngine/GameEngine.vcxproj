@@ -155,7 +155,9 @@
     <ClInclude Include="src\Engine\Core\Memory\LinearAllocator.h" />
     <ClInclude Include="src\Engine\Core\Memory\Memory.h" />
     <ClInclude Include="src\Engine\Core\Memory\PointerMath.h" />
+    <ClInclude Include="src\Engine\Core\Memory\PoolAllocator.h" />
     <ClInclude Include="src\Engine\Core\Memory\StackAllocator.h" />
+    <ClInclude Include="src\Engine\Core\Memory\StackLinkedList.h" />
     <ClInclude Include="src\Engine\Core\Time.h" />
     <ClInclude Include="src\Engine\Core\Window.h" />
     <ClInclude Include="src\Engine\Core\core.h" />
@@ -564,6 +566,7 @@
     <ClCompile Include="src\Engine\Core\Log.cpp" />
     <ClCompile Include="src\Engine\Core\Memory\Allocator.cpp" />
     <ClCompile Include="src\Engine\Core\Memory\LinearAllocator.cpp" />
+    <ClCompile Include="src\Engine\Core\Memory\PoolAllocator.cpp" />
     <ClCompile Include="src\Engine\Core\Memory\StackAllocator.cpp" />
     <ClCompile Include="src\Engine\Core\Time.cpp" />
     <ClCompile Include="src\Engine\OrthographicCameraControler.cpp" />

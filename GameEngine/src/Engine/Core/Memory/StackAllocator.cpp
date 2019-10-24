@@ -27,7 +27,7 @@ namespace Engine
 		m_Offset = 0; // inital offset of 0
 	}
 
-	void* StackAllocator::allocate(size_t size, uint8_t alignment)
+	void* StackAllocator::Allocate(size_t size, uint8_t alignment)
 	{
 		const size_t currentAddress = (std::size_t)m_Start + m_Offset; // gets tge current address
 
@@ -54,7 +54,7 @@ namespace Engine
 		return (void*)nextAddress;
 	}
 
-	void StackAllocator::deallocate(void* p)
+	void StackAllocator::Deallocate(void* p)
 	{
 		// Move offset back to clear address
 		const std::size_t currentAddress = (std::size_t) p;

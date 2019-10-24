@@ -16,6 +16,7 @@ public:
 };
 
 Entity* entity;
+Entity* entity2;
 
 Sandbox2DLayer::Sandbox2DLayer()
 	: Super("Sandbox2D")
@@ -28,7 +29,10 @@ Sandbox2DLayer::Sandbox2DLayer()
 void Sandbox2DLayer::OnAttach()
 {
 	entity = Engine::CreateObject<Entity>();
+	entity2 = Engine::CreateObject<Entity>();
+	entity2->name = "this is another name";
 	DEBUG_INFO("{0}", entity->name);
+	DEBUG_INFO("{0}", entity2->name);
 }
 
 void Sandbox2DLayer::OnDetach()

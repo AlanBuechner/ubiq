@@ -27,7 +27,7 @@ namespace Engine
 		m_Offset = 0;
 	}
 
-	void* LinearAllocator::allocate(size_t size, uint8_t alignment)
+	void* LinearAllocator::Allocate(size_t size, uint8_t alignment)
 	{
 		size_t padding = 0;
 		size_t paddedAddress = 0;
@@ -54,7 +54,7 @@ namespace Engine
 		return (void*)nextAddress;
 	}
 
-	void LinearAllocator::deallocate(void* p)
+	void LinearAllocator::Deallocate(void* p)
 	{
 		
 	}

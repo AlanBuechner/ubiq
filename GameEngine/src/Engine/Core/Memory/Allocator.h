@@ -10,8 +10,8 @@ namespace Engine
 		Allocator(size_t size);
 		virtual ~Allocator();
 
-		virtual void* allocate(size_t size, uint8_t alignment = 4) = 0;
-		virtual void deallocate(void* p) = 0;
+		virtual void* Allocate(size_t size, uint8_t alignment = 4) = 0;
+		virtual void Deallocate(void* p) = 0;
 		virtual void Init() = 0;
 		size_t getSize() const { return m_Size; }
 
