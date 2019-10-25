@@ -39,6 +39,7 @@
     <ClCompile Include="src\Engine\Core\Memory\LinearAllocator.cpp" />
     <ClCompile Include="src\Engine\Core\Memory\StackAllocator.cpp" />
     <ClCompile Include="src\Engine\Core\Memory\PoolAllocator.cpp" />
+    <ClCompile Include="src\Engine\Core\Memory\FreeListAllocator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h" />
@@ -456,5 +457,7 @@
     <ClInclude Include="src\Engine\Core\Memory\StackAllocator.h" />
     <ClInclude Include="src\Engine\Core\Memory\StackLinkedList.h" />
     <ClInclude Include="src\Engine\Core\Memory\PoolAllocator.h" />
+    <ClInclude Include="src\Engine\Core\Memory\FreeListAllocator.h" />
+    <ClInclude Include="src\Engine\Core\Memory\SinglyLinkedList.h" />
   </ItemGroup>
 </Project>
