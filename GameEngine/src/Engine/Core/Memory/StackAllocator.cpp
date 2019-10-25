@@ -42,7 +42,7 @@ namespace Engine
 
 		const size_t nextAddress = currentAddress + padding; // gets the address of the new block of memory
 		const size_t headerAddress = nextAddress - sizeof(AllocationHeader); // gets the addres of the header
-		AllocationHeader allocationHeader{ padding };
+		AllocationHeader allocationHeader{ (char)padding };
 		AllocationHeader* headerPtr = (AllocationHeader*)headerAddress;
 		headerPtr = &allocationHeader;
 

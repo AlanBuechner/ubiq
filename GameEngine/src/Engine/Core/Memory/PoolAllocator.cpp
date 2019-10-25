@@ -38,7 +38,7 @@ namespace Engine
 		m_Used = 0;
 		m_Peak = 0;
 		// Create a linked-list with all free positions
-		const int nChunks = m_Size / m_ChunkSize;
+		const int nChunks = (int)(m_Size / m_ChunkSize);
 		for (int i = 0; i < nChunks; ++i) {
 			size_t address = (size_t) m_Start + i * m_ChunkSize;
 			m_FreeList.push((Node*)address);
