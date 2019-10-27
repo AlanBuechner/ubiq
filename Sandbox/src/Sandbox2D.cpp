@@ -5,19 +5,10 @@
 class Entity
 {
 public:
-	Entity()
-	{
-		DEBUG_INFO("created new Entity {0}, {1}", a, c);
-		name = "hello";
-	}
-
-	int a = 6;
-	float c = 4.5f;
-	std::string name;
+	Engine::UString name = "hello";
 };
 
-Entity* entity;
-Entity* entity2;
+Entity* e;
 
 Sandbox2DLayer::Sandbox2DLayer()
 	: Super("Sandbox2D")
@@ -29,16 +20,24 @@ Sandbox2DLayer::Sandbox2DLayer()
 
 void Sandbox2DLayer::OnAttach()
 {
-	entity = Engine::CreateObject<Entity>();
-	entity2 = Engine::CreateObject<Entity>();
-	entity2->name = "this is another name";
-	DEBUG_INFO("{0}", entity->name);
-	DEBUG_INFO("{0}", entity2->name);
-
-	Engine::UString str("t");
+	e = Engine::CreateObject<Entity>();
+	Engine::UString str = "this is a string this is alot longer then the other string";
 	Engine::UString otherStr("this is another string ");
-	DEBUG_INFO(otherStr + str);
-	DEBUG_INFO(str.Size());
+	Engine::UString str3("yet another string");
+	Engine::UString str4("yet another another string");
+	str3 += str4;
+	str4 = "this is rather difrent";
+	{
+		Engine::UString str5;
+		DEBUG_INFO(str5);
+	}
+	Engine::UString str6("yet another string");
+	DEBUG_INFO(str);
+	DEBUG_INFO(otherStr);
+	DEBUG_INFO(str3);
+	DEBUG_INFO(str4);
+	DEBUG_INFO(str6 + str4);
+	DEBUG_INFO(e->name + " hello world");
 }
 
 void Sandbox2DLayer::OnDetach()

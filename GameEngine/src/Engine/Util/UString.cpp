@@ -4,29 +4,34 @@
 
 namespace Engine
 {
-	FreeListAllocator* UString::alloc = new FreeListAllocator(sizeof(char) * 1000, FreeListAllocator::FindFirst);
+	FreeListAllocator* UString::s_UStringAllocator = new FreeListAllocator(sizeof(char) * 10000, FreeListAllocator::FindFirst);
 
 	UString::UString()
 	{
+		m_Data = (char*)s_UStringAllocator->Allocate(sizeof(char), 8);
+		strcpy(m_Data, "");
 	}
 
 	UString::UString(const char* str)
 	{
-		m_Data = (char*)alloc->Allocate(strlen(str), 8);
+		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str) + 1, 8);
 		strcpy(m_Data, str);
 	}
 
 	UString::UString(int size)
 	{
-		m_Data = (char*)alloc->Allocate(sizeof(char) * size, 8);
+		m_Data = (char*)s_UStringAllocator->Allocate(sizeof(char) * size, 8);
 	}
 
 	UString::UString(const UString& str)
 	{
-		if(m_Data != nullptr)
-			alloc->Deallocate((void*)m_Data);
-		m_Data = (char*)alloc->Allocate(strlen(str.m_Data), 8);
+		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str.m_Data) + 1, 8);
 		strcpy(m_Data, str.m_Data);
+	}
+
+	UString::~UString()
+	{
+		s_UStringAllocator->Deallocate(m_Data);
 	}
 
 	int UString::Size()
@@ -34,35 +39,84 @@ namespace Engine
 		return strlen(m_Data);
 	}
 
-	void UString::operator=(const UString& str)
+	char* UString::RawString()
 	{
-		if (m_Data != nullptr)
-			alloc->Deallocate((void*)m_Data);
-		m_Data = (char*)alloc->Allocate(strlen(str.m_Data), 8);
-		strcpy(m_Data, str.m_Data);
+		return m_Data;
 	}
 
+	char* UString::Begin()
+	{
+		return m_Data;
+	}
+
+	char* UString::End()
+	{
+		return m_Data + strlen(m_Data);
+	}
+
+	void UString::operator=(const UString& str)
+	{
+		s_UStringAllocator->Deallocate((void*)m_Data);
+		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str.m_Data) + 1, 8);
+		strcpy(m_Data, str.m_Data);
+	}
+	
+	void UString::operator=(const char* str)
+	{
+		s_UStringAllocator->Deallocate((void*)m_Data);
+		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str) + 1, 8);
+		strcpy(m_Data, str);
+	}
+	
 	bool UString::operator==(const UString& str)
 	{
 		return *m_Data == *str.m_Data;
 	}
 
+	bool UString::operator==(const char* str)
+	{
+		return *m_Data == *str;
+	}
+
 	void UString::operator+=(const UString& str)
 	{
 		char* temp = m_Data;
-		m_Data = (char*)alloc->Allocate(strlen(str.m_Data) + strlen(m_Data), 8);
+		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str.m_Data) + strlen(m_Data) + 1, 8);
 		strcpy(m_Data, temp);
 		strcpy(m_Data + strlen(m_Data), str.m_Data);
-		alloc->Deallocate((void*)m_Data);
+		s_UStringAllocator->Deallocate((void*)temp);
+	}
+
+	void UString::operator+=(const char* str)
+	{
+		char* temp = m_Data;
+		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str) + strlen(m_Data) + 1, 8);
+		strcpy(m_Data, temp);
+		strcpy(m_Data + strlen(m_Data), str);
+		s_UStringAllocator->Deallocate((void*)temp);
 	}
 
 	UString UString::operator+(const UString& str)
 	{
-		char* temp = (char*)alloc->Allocate(strlen(m_Data) + strlen(str.m_Data) ,8);
+		char* temp = (char*)s_UStringAllocator->Allocate(strlen(m_Data) + strlen(str.m_Data) + 1, 8);
 		strcpy(temp, m_Data);
 		strcpy(temp + strlen(m_Data), str.m_Data);
-		alloc->Deallocate(temp);
+		s_UStringAllocator->Deallocate(temp);
 		return UString(temp);
+	}
+
+	UString UString::operator+(const char* str)
+	{
+		char* temp = (char*)s_UStringAllocator->Allocate(strlen(m_Data) + strlen(str) + 1, 8);
+		strcpy(temp, m_Data);
+		strcpy(temp + strlen(m_Data), str);
+		s_UStringAllocator->Deallocate(temp);
+		return UString(temp);
+	}
+
+	char& UString::operator[](size_t i)
+	{
+		return m_Data[i];
 	}
 
 	std::ostream& operator<<(std::ostream& os, const UString& str)
