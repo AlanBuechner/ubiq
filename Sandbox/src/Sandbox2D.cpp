@@ -1,5 +1,6 @@
 #include "Sandbox2D.h"
 #include <Engine/Core/Memory/Memory.h>
+#include <Engine/Util/UString.h>
 
 class Entity
 {
@@ -33,6 +34,11 @@ void Sandbox2DLayer::OnAttach()
 	entity2->name = "this is another name";
 	DEBUG_INFO("{0}", entity->name);
 	DEBUG_INFO("{0}", entity2->name);
+
+	Engine::UString str("t");
+	Engine::UString otherStr("this is another string ");
+	DEBUG_INFO(otherStr + str);
+	DEBUG_INFO(str.Size());
 }
 
 void Sandbox2DLayer::OnDetach()

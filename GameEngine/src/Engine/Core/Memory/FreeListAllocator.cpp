@@ -32,6 +32,8 @@ namespace Engine
 		const size_t allocationHeaderSize = sizeof(FreeListAllocator::AllocationHeader);
 		const size_t freeHeaderSize = sizeof(FreeListAllocator::FreeHeader);
 
+		size += sizeof(Node);
+
 		ASSERT(size >= sizeof(Node) ,"Allocation size must be bigger");
 		ASSERT(alignment >= 8, "aligment must be at least 8");
 
