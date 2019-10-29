@@ -461,5 +461,6 @@
     <ClInclude Include="src\Engine\Core\Memory\FreeListAllocator.h" />
     <ClInclude Include="src\Engine\Core\Memory\SinglyLinkedList.h" />
     <ClInclude Include="src\Engine\Util\UString.h" />
+    <ClInclude Include="src\Engine\Util\UArray.h" />
   </ItemGroup>
 </Project>

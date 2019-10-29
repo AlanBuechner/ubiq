@@ -1,6 +1,7 @@
 #include "Sandbox2D.h"
 #include <Engine/Core/Memory/Memory.h>
 #include <Engine/Util/UString.h>
+#include <Engine/Util/UArray.h>
 
 class Entity
 {
@@ -38,6 +39,10 @@ void Sandbox2DLayer::OnAttach()
 	DEBUG_INFO(str4);
 	DEBUG_INFO(str6 + str4);
 	DEBUG_INFO(e->name + " hello world");
+
+	Engine::UArray<int> a = {1, 3};
+	a.PushBack(3);
+	DEBUG_INFO(a.Length());
 }
 
 void Sandbox2DLayer::OnDetach()
