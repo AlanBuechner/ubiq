@@ -16,15 +16,28 @@ namespace Engine
 
 		UArray(std::initializer_list<T> data);
 
+		UArray(UArray<T>& other);
+
+		~UArray();
+
+		T* Begin();
+
+		T* End();
+
 		size_t Size(); // size of the array in bytes
 
-		int Length(); // the number of elements in the array
+		size_t Length(); // the number of elements in the array
 
 		void ReSize(size_t size);
 
 		void PushBack(const T& data);
 
+		T PopBack();
+
 		T& operator[](size_t i);
+
+		void operator=(const UArray<T>& other);
+		bool operator==(const UArray<T>& other);
 
 	private:
 		T* m_Data = nullptr;
@@ -55,11 +68,44 @@ namespace Engine
 		if (m_Data != nullptr)
 			UArrayAlloc->Deallocate(m_Data);
 		m_Data = (T*)UArrayAlloc->Allocate(sizeof(data.begin()), 8);
-		m_Size = sizeof(data.begin()) / sizeof(T);
+		m_Size = data.size();
 		for (int i = 0; i < Length(); i++)
 		{
 			m_Data[i] = data.begin()[i];
 		}
+	}
+
+	template<class T>
+	inline UArray<T>::UArray(UArray<T>& other)
+	{
+		if (m_Data != nullptr)
+			UArrayAlloc->Deallocate(m_Data);
+		size_t size = other.Size();
+		size_t length = other.Length();
+		m_Data = (T*)UArrayAlloc->Allocate(size, 8);
+		for (int i = 0; i < length; i++)
+		{
+			m_Data[i] = other.m_Data[i];
+		}
+		m_Size = length;
+	}
+
+	template<class T>
+	inline UArray<T>::~UArray()
+	{
+		UArrayAlloc->Deallocate(m_Data);
+	}
+
+	template<class T>
+	inline T* UArray<T>::Begin()
+	{
+		return m_Data;
+	}
+
+	template<class T>
+	inline T* UArray<T>::End()
+	{
+		return return m_Data + Size();
 	}
 
 	template<class T>
@@ -69,7 +115,7 @@ namespace Engine
 	}
 
 	template<class T>
-	inline int UArray<T>::Length()
+	inline size_t UArray<T>::Length()
 	{
 		return m_Size;
 	}
@@ -84,22 +130,55 @@ namespace Engine
 		{
 			m_Data[i] = temp[i];
 		}
-		if (temp != nullptr)
-			UArrayAlloc->Deallocate(temp);
+		UArrayAlloc->Deallocate(temp);
 	}
 
 	template<class T>
 	inline void UArray<T>::PushBack(const T& data)
 	{
-		int lenght = Length();
-		ReSize(lenght +1);
-		m_Data[lenght] = data;
+		size_t length = Length();
+		ReSize(length +1);
+		m_Data[length] = data;
+	}
+
+	template<class T>
+	inline T UArray<T>::PopBack()
+	{
+		size_t newSize = Length() - 1;
+		T& toRetern = m_Data[newSize];
+		ReSize(newSize);
+		return toRetern;
 	}
 
 	template<class T>
 	inline T& UArray<T>::operator[](size_t i)
 	{
 		return m_Data[i];
+	}
+
+	template<class T>
+	inline void UArray<T>::operator=(const UArray<T>& other)
+	{
+		ReSize(other.Length());
+		for (int i = 0; i < Length(); i++)
+		{
+			m_Data[i] = other.m_Data[i];
+		}
+	}
+
+	template<class T>
+	inline bool UArray<T>::operator==(const UArray<T>& other)
+	{
+		if (Size() == sizeof(other.m_Data))
+		{
+			for (int i = 0; i < Length(); i++)
+			{
+				if (m_Data[i] != other.m_Data[i])
+					return false;
+			}
+			return true;
+		}
+		return false;
 	}
 
 }

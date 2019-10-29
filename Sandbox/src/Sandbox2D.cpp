@@ -21,28 +21,12 @@ Sandbox2DLayer::Sandbox2DLayer()
 
 void Sandbox2DLayer::OnAttach()
 {
-	e = Engine::CreateObject<Entity>();
-	Engine::UString str = "this is a string this is alot longer then the other string";
-	Engine::UString otherStr("this is another string ");
-	Engine::UString str3("yet another string");
-	Engine::UString str4("yet another another string");
-	str3 += str4;
-	str4 = "this is rather difrent";
-	{
-		Engine::UString str5;
-		DEBUG_INFO(str5);
-	}
-	Engine::UString str6("yet another string");
-	DEBUG_INFO(str);
-	DEBUG_INFO(otherStr);
-	DEBUG_INFO(str3);
-	DEBUG_INFO(str4);
-	DEBUG_INFO(str6 + str4);
-	DEBUG_INFO(e->name + " hello world");
-
-	Engine::UArray<int> a = {1, 3};
+	Engine::UArray<int> a = {1, 2};
+	Engine::UArray<int> a2(a);
 	a.PushBack(3);
-	DEBUG_INFO(a.Length());
+	a2.PushBack(3);
+	if(a == a2)
+		DEBUG_INFO(a2.PopBack());
 }
 
 void Sandbox2DLayer::OnDetach()

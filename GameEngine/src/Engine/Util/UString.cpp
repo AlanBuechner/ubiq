@@ -34,7 +34,7 @@ namespace Engine
 		s_UStringAllocator->Deallocate(m_Data);
 	}
 
-	int UString::Size()
+	const size_t UString::Size()
 	{
 		return strlen(m_Data);
 	}
@@ -70,7 +70,16 @@ namespace Engine
 	
 	bool UString::operator==(const UString& str)
 	{
-		return *m_Data == *str.m_Data;
+		if (Size() == strlen(str.m_Data))
+		{
+			for (int i = 0; i < Size(); i++)
+			{
+				if (m_Data[i] != str.m_Data[i])
+					return false;
+			}
+			return true;
+		}
+		return false;
 	}
 
 	bool UString::operator==(const char* str)

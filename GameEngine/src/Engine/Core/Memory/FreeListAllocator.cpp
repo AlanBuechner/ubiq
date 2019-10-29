@@ -59,7 +59,7 @@ namespace Engine
 		const size_t headerAddress = (size_t) affectedNode + alignmentPadding;
 		const size_t dataAddress = headerAddress + allocationHeaderSize;
 		((FreeListAllocator::AllocationHeader*) headerAddress)->blockSize = requiredSize;
-		((FreeListAllocator::AllocationHeader*) headerAddress)->padding = alignmentPadding;
+		((FreeListAllocator::AllocationHeader*) headerAddress)->padding = (char)alignmentPadding;
 
 		m_Used += requiredSize;
 		m_Peak = std::max(m_Peak, m_Used);

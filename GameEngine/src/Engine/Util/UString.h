@@ -17,7 +17,7 @@ namespace Engine
 		UString(const UString& str);
 		~UString();
 
-		int Size();
+		const size_t Size();
 		char* RawString();
 		char* Begin();
 		char* End();
