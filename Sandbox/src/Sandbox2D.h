@@ -19,4 +19,6 @@ private:
 
 	Engine::Ref<Engine::OrthographicCameraControler> m_Camera;
 
+	Engine::Ref<Engine::Texture2D> m_LogoTexture;
+
 };

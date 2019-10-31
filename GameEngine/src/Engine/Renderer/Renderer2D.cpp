@@ -12,7 +12,7 @@ namespace Engine
 	struct Renderer2DStroage
 	{
 		Ref<VertexArray> QuadVertexArray;
-		Ref<Shader> FlatColorShader;
+		Ref<ShaderLibrary> Library;
 	};
 
 	static Renderer2DStroage* s_Data;
@@ -26,7 +26,7 @@ namespace Engine
 		float vertices[4 * 5] =
 		{
 			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 
 			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
 			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f
 		};
@@ -47,11 +47,13 @@ namespace Engine
 		Ref<IndexBuffer> m_IndexBuffer = Engine::IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t));
 		s_Data->QuadVertexArray->SetIndexBuffer(m_IndexBuffer);
 
-		Engine::Ref<Engine::Shader::ShaderSorce> src = std::make_shared<Engine::Shader::ShaderSorce>();
+		s_Data->Library = std::make_shared<ShaderLibrary>();
 
-		*src << Shader::LoadShader("Assets/Shaders/FlatColorShader.glsl");
+		Ref<Shader> FlatShader = s_Data->Library->Load("FlatColorShader", "Assets/Shaders/FlatColorShader.glsl");
+		Ref<Shader> TextureShader = s_Data->Library->Load("TextureShader", "Assets/Shaders/TextureShader.glsl");
 
-		s_Data->FlatColorShader = Shader::Create("FlatColorShader", src);
+		TextureShader->Bind();
+		TextureShader->UploadUniformInt("u_Texture", 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -61,8 +63,12 @@ namespace Engine
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
-		s_Data->FlatColorShader->Bind();
-		s_Data->FlatColorShader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+		Ref<Shader> FlatShader = s_Data->Library->Get("FlatColorShader");
+		Ref<Shader> TextureShader = s_Data->Library->Get("TextureShader");
+		FlatShader->Bind();
+		FlatShader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+		TextureShader->Bind();
+		TextureShader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 	}
 
 	void Renderer2D::EndScene()
@@ -76,9 +82,30 @@ namespace Engine
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		s_Data->FlatColorShader->Bind();
-		s_Data->FlatColorShader->UploadUniformMat4("u_Transform", glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size, 0.0f }));
-		s_Data->FlatColorShader->UploadUniformFloat4("u_Color", color);
+		Ref<Shader> shader = s_Data->Library->Get("FlatColorShader");
+		shader->Bind();
+		shader->UploadUniformMat4("u_Transform", glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size, 0.0f }));
+		shader->UploadUniformFloat4("u_Color", color);
+
+		s_Data->QuadVertexArray->Bind();
+		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, int atlesIndex)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, atlesIndex);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, int atlesIndex)
+	{
+		Ref<Shader> shader = s_Data->Library->Get("TextureShader");
+		shader->Bind();
+		shader->UploadUniformMat4("u_Transform", glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size, 0.0f }));
+
+		shader->UploadUniformInt("u_AtlasRows", texture->GetAttributes()->AtlasRows);
+		shader->UploadUniformFloat2("u_AtlasPos", texture->AtlasIndexToPosition(atlesIndex));
+		
+		texture->Bind(0);
 
 		s_Data->QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);

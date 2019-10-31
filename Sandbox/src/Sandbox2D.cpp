@@ -26,6 +26,8 @@ void Sandbox2DLayer::OnAttach()
 	a2.PushBack(3);
 	if(a == a2)
 		DEBUG_INFO(a2.PopBack());
+
+	m_LogoTexture = Engine::Texture2D::Create("assets/Images/UBIQ.png");
 }
 
 void Sandbox2DLayer::OnDetach()
@@ -42,7 +44,8 @@ void Sandbox2DLayer::OnUpdate()
 
 	Engine::Renderer2D::BeginScene(*m_Camera->GetCamera());
 
-	Engine::Renderer2D::DrawQuad({ 1.0f, 1.0f }, { 1.0f, 1.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+	Engine::Renderer2D::DrawQuad({ 1.0f, 1.0f, 1.0f }, { 10.0f, 1.0f }, m_LogoTexture);
+	Engine::Renderer2D::DrawQuad({ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
 
 	Engine::Renderer2D::EndScene();
 	//Engine::Renderer::Flush();
