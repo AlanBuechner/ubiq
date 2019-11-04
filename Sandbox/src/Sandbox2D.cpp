@@ -18,6 +18,8 @@ Sandbox2DLayer::Sandbox2DLayer()
 	m_Camera->SetPlayerInput(m_InputManeger);
 }
 
+static Engine::FreeListAllocator* FreeAlloc = new Engine::FreeListAllocator(1000000000, Engine::FreeListAllocator::PlacementPolicy::FindFirst);
+
 void Sandbox2DLayer::OnAttach()
 {
 	Engine::UArray<int> a = {1, 2};
@@ -28,6 +30,9 @@ void Sandbox2DLayer::OnAttach()
 		DEBUG_INFO(a2.PopBack());
 
 	m_LogoTexture = Engine::Texture2D::Create("assets/Images/UBIQ.png");
+
+	Engine::SharedPtr<Entity> e = Engine::SharedPtr<Entity>::Create(*FreeAlloc);
+	DEBUG_INFO(e->name);
 }
 
 void Sandbox2DLayer::OnDetach()
