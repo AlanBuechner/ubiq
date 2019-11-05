@@ -13,7 +13,7 @@ Entity* e;
 Sandbox2DLayer::Sandbox2DLayer()
 	: Super("Sandbox2D")
 {
-	m_Camera.Reset(new Engine::OrthographicCameraControler(1.6f, 1.0f, CAMERA_CONTROLER_2D));
+	m_Camera = Engine::CreateSharedPtr<Engine::OrthographicCameraControler>(1.6f, 1.0f, CAMERA_CONTROLER_2D);
 
 	m_Camera->SetPlayerInput(m_InputManeger);
 }

@@ -1,9 +1,8 @@
-/*
-I got a lot of the code from https://github.com/mtrebi/memory-allocators
-*/
-
 #pragma once
 
+/*
+I got a lot of the allocator code from https://github.com/mtrebi/memory-allocators
+*/
 #include "LinearAllocator.h"
 #include "StackAllocator.h"
 #include "PoolAllocator.h"
@@ -13,7 +12,7 @@ namespace Engine
 {
 	static FreeListAllocator* DefalteAlloc = new FreeListAllocator(1000000000, Engine::FreeListAllocator::PlacementPolicy::FindFirst);
 
-	static struct RefCountedObj
+	struct RefCountedObj
 	{
 		uint8_t m_Count = 0;
 		void* m_Object = nullptr;

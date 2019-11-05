@@ -9,7 +9,7 @@ namespace Engine
 	OrthographicCameraControler::OrthographicCameraControler(float aspectRatio, float zoom, int controlerType)
 		: m_AspectRatio(aspectRatio), m_ZoomLevel(zoom), m_ControlerType(controlerType)
 	{
-		m_Camera.Reset(new OrthographicCamera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel));
+		m_Camera = CreateSharedPtr<OrthographicCamera>(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 	}
 
 	void OrthographicCameraControler::SetPlayerInput(Ref<InputControlerManeger> maneger)
