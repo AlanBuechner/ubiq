@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "Memory/Memory.h"
 
 #define ENABLE_ASSERTS
 
@@ -60,7 +61,7 @@
 namespace Engine
 {
 	template<typename T>
-	using Ref = std::shared_ptr<T>;
+	using Ref = SharedPtr<T>;
 
 	template<typename T>
 	using Scope = std::unique_ptr<T>;

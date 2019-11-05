@@ -13,12 +13,10 @@ Entity* e;
 Sandbox2DLayer::Sandbox2DLayer()
 	: Super("Sandbox2D")
 {
-	m_Camera.reset(new Engine::OrthographicCameraControler(1.6f, 1.0f, CAMERA_CONTROLER_2D));
+	m_Camera.Reset(new Engine::OrthographicCameraControler(1.6f, 1.0f, CAMERA_CONTROLER_2D));
 
 	m_Camera->SetPlayerInput(m_InputManeger);
 }
-
-static Engine::FreeListAllocator* FreeAlloc = new Engine::FreeListAllocator(1000000000, Engine::FreeListAllocator::PlacementPolicy::FindFirst);
 
 void Sandbox2DLayer::OnAttach()
 {
@@ -31,7 +29,7 @@ void Sandbox2DLayer::OnAttach()
 
 	m_LogoTexture = Engine::Texture2D::Create("assets/Images/UBIQ.png");
 
-	Engine::SharedPtr<Entity> e = Engine::SharedPtr<Entity>::Create(*FreeAlloc);
+	Engine::SharedPtr<Entity> e = Engine::CreateSharedPtr<Entity>();
 	DEBUG_INFO(e->name);
 }
 

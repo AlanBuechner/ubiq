@@ -11,24 +11,22 @@ I got a lot of the code from https://github.com/mtrebi/memory-allocators
 
 namespace Engine
 {
-	static LinearAllocator* LinearAlloc = new LinearAllocator(1000000000); // 1 Gigabyte of memory
-	static StackAllocator* StackAlloc = new StackAllocator(1000000000); // 1 Gigabyte of memory
-	//static PoolAllocator* PoolAlloc = new PoolAllocator(1000000000, sizeof(std::string) + sizeof(int) + sizeof(float)); // 1 Gigabyte of memory
-	static FreeListAllocator* FreeAlloc = new FreeListAllocator(1000000000, Engine::FreeListAllocator::PlacementPolicy::FindFirst);
+	static FreeListAllocator* DefalteAlloc = new FreeListAllocator(1000000000, Engine::FreeListAllocator::PlacementPolicy::FindFirst);
 
+	static struct RefCountedObj
+	{
+		uint8_t m_Count = 0;
+		void* m_Object = nullptr;
+		Allocator* m_Alloc = nullptr;
+	};
 
-	template<typename T>
+	template<class T>
 	class SharedPtr
 	{
-		struct Obj
-		{
-			uint8_t m_Count = 0;
-			T* m_Object = nullptr;
-			Allocator* m_Alloc = nullptr;
-		}* m_Object;
+		RefCountedObj* m_Object = nullptr;
 
 	public:
-		SharedPtr(Obj* object = nullptr)
+		SharedPtr(RefCountedObj* object = nullptr)
 		{
 			m_Object = object;
 			if(m_Object != nullptr)
@@ -55,6 +53,15 @@ namespace Engine
 			}
 		}
 
+		void Reset(T* obj)
+		{
+			if (m_Object == nullptr)
+			{
+				*this = CreateSharedPtrE<T>();
+			}
+			m_Object->m_Object = obj;
+		}
+
 		void operator=(const SharedPtr<T>& ptr)
 		{
 			if (m_Object != nullptr)
@@ -69,21 +76,48 @@ namespace Engine
 			}
 		}
 
-		static Obj* Create(Allocator& alloc, uint8_t alignment = 8)
+		T* operator->() const
 		{
-			Obj* start = (Obj*)alloc.Allocate(sizeof(Obj), alignment);
-			start = new(start) Obj();
-			start->m_Alloc = &alloc;
-			start->m_Object = (T*)alloc.Allocate(sizeof(T), alignment);
-			start->m_Object = new(start->m_Object) T();
-			return start;
+			return (T*)m_Object->m_Object;
 		}
-
-		T* operator->()
+		
+		T& operator*() const
 		{
-			return m_Object->m_Object;
+			return *(T*)m_Object->m_Object;
+		}
+		
+		template<class B>
+		operator SharedPtr<B>()
+		{
+			if (std::is_base_of<B, T>::value)
+				return SharedPtr<B>(m_Object);
+			return nullptr;
 		}
 	};
+
+	template<class T, class... _Ty>
+	SharedPtr<T> CreateSharedPtr(_Ty&& ... params)
+	{
+		size_t size = sizeof(RefCountedObj);
+		RefCountedObj* start = (RefCountedObj*)DefalteAlloc->Allocate(size, 8);
+		start = new(start) RefCountedObj();
+		start->m_Alloc = DefalteAlloc;
+		start->m_Object = (T*)DefalteAlloc->Allocate(sizeof(T), 8);
+		start->m_Object = new(start->m_Object) T(std::forward<_Ty>(params)...);
+		return SharedPtr<T>(start);
+	}
+
+	template<class T>
+	SharedPtr<T> CreateSharedPtrE()
+	{
+		size_t size = sizeof(RefCountedObj);
+		RefCountedObj* start = (RefCountedObj*)DefalteAlloc->Allocate(size, 8);
+		start = new(start) RefCountedObj();
+		start->m_Alloc = DefalteAlloc;
+		start->m_Object = (T*)DefalteAlloc->Allocate(sizeof(T), 8);
+		start->m_Object = nullptr;
+		return SharedPtr<T>(start);
+	}
 
 	template<class T>
 	T* CreateObject()

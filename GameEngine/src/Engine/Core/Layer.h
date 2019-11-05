@@ -33,5 +33,8 @@ namespace Engine
 		Ref<InputControlerManeger> m_InputManeger;
 
 		std::string m_DebugName;
+
+	private:
+		static FreeListAllocator* s_LayerAlloc;
 	};
 }

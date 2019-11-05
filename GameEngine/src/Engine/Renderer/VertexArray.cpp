@@ -13,7 +13,7 @@ namespace Engine
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return std::make_shared<OpenGLVertexArray>();
+			return CreateSharedPtr<OpenGLVertexArray>();
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;

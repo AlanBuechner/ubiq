@@ -10,7 +10,7 @@ namespace Engine
 	{
 		CORE_ASSERT(path != "" ,"Path must be given");
 		
-		Ref<TextureAttribute> attrib = std::make_shared<TextureAttribute>(attribute);
+		Ref<TextureAttribute> attrib = CreateSharedPtr<TextureAttribute>(attribute);
 
 		switch (Renderer::GetAPI())
 		{
@@ -18,7 +18,7 @@ namespace Engine
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return std::make_shared<OpenGLTexture2D>(path, attrib);
+			return CreateSharedPtr<OpenGLTexture2D>(path, attrib);
 		}
 		
 		CORE_ASSERT(false, "Unknown RendererAPI!");

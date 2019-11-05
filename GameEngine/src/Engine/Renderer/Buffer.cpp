@@ -15,7 +15,7 @@ namespace Engine
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return std::make_shared<OpenGLVertexBuffer>(vertices, size);
+			return CreateSharedPtr<OpenGLVertexBuffer>(vertices, size);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -29,7 +29,7 @@ namespace Engine
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return std::make_shared<OpenGLIndexBuffer>(indices, size);
+			return CreateSharedPtr<OpenGLIndexBuffer>(indices, size);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;

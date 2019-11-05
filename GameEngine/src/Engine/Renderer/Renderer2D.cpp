@@ -47,7 +47,7 @@ namespace Engine
 		Ref<IndexBuffer> m_IndexBuffer = Engine::IndexBuffer::Create(indeces, sizeof(indeces) / sizeof(uint32_t));
 		s_Data->QuadVertexArray->SetIndexBuffer(m_IndexBuffer);
 
-		s_Data->Library = std::make_shared<ShaderLibrary>();
+		s_Data->Library = CreateSharedPtr<ShaderLibrary>();
 
 		Ref<Shader> FlatShader = s_Data->Library->Load("FlatColorShader", "Assets/Shaders/FlatColorShader.glsl");
 		Ref<Shader> TextureShader = s_Data->Library->Load("TextureShader", "Assets/Shaders/TextureShader.glsl");
