@@ -14,7 +14,7 @@ namespace Engine
 
 	void OrthographicCameraControler::SetPlayerInput(Ref<InputControlerManeger> maneger)
 	{
-		m_Input.reset(new InputControler(maneger));
+		m_Input = CreateScopedPtr<InputControler>(maneger);
 
 		if (m_ControlerType == CAMERA_CONTROLER_2D)
 		{

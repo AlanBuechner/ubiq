@@ -22,7 +22,7 @@ namespace Engine {
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!")
 			s_Instance = this;
 
-		m_Window = std::unique_ptr<Window>(Window::Create()); // create a window
+		m_Window = CreateScopedPtr<Window>(Window::Create()); // create a window
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
 
 		Renderer::Init();

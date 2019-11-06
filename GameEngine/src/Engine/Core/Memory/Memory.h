@@ -43,11 +43,14 @@ namespace Engine
 		{
 			if (m_Object != nullptr)
 			{
-				m_Object->m_Count--;
-				if (m_Object->m_Count == 0)
+				if (m_Object->m_Object != nullptr)
 				{
-					m_Object->m_Alloc->Deallocate(m_Object->m_Object);
-					m_Object->m_Alloc->Deallocate(m_Object);
+					m_Object->m_Count--;
+					if (m_Object->m_Count == 0)
+					{
+						m_Object->m_Alloc->Deallocate(m_Object->m_Object);
+						m_Object->m_Alloc->Deallocate(m_Object);
+					}
 				}
 			}
 		}
@@ -57,6 +60,10 @@ namespace Engine
 			if (m_Object == nullptr)
 			{
 				*this = CreateSharedPtrE<T>();
+			}
+			if (m_Object->m_Object != nullptr)
+			{
+				m_Object->m_Alloc->Deallocate(m_Object->m_Object);
 			}
 			m_Object->m_Object = obj;
 		}
@@ -107,22 +114,105 @@ namespace Engine
 	}
 
 	template<class T>
-	SharedPtr<T> CreateSharedPtrE()
+	SharedPtr<T> CreateSharedPtr(T* obj)
 	{
 		size_t size = sizeof(RefCountedObj);
 		RefCountedObj* start = (RefCountedObj*)DefalteAlloc->Allocate(size, 8);
 		start = new(start) RefCountedObj();
 		start->m_Alloc = DefalteAlloc;
-		start->m_Object = (T*)DefalteAlloc->Allocate(sizeof(T), 8);
-		start->m_Object = nullptr;
+		start->m_Object = obj;
 		return SharedPtr<T>(start);
 	}
 
 	template<class T>
-	T* CreateObject()
+	SharedPtr<T> CreateSharedPtrE()
+	{
+		return CreateSharedPtr<T>(nullptr);
+	}
+
+	struct ScopedObj
+	{
+		void* m_Object = nullptr;
+		Allocator* m_Alloc = nullptr;
+	};
+
+	template<class T>
+	class ScopedPtr
+	{
+		ScopedObj* m_Object;
+
+	public:
+		ScopedPtr(ScopedObj* obj = nullptr)
+		{
+			m_Object = obj;
+		}
+
+		ScopedPtr(const ScopedPtr& ptr);
+
+		~ScopedPtr()
+		{
+			if (m_Object != nullptr)
+			{
+				if (m_Object->m_Object != nullptr)
+				{
+					m_Object->m_Alloc->Deallocate(m_Object->m_Object);
+					m_Object->m_Alloc->Deallocate(m_Object);
+					m_Object = nullptr;
+				}
+			}
+		}
+
+		void MoveOwnership(ScopedPtr& ptr)
+		{
+			ptr.m_Object = m_Object;
+			m_Object = nullptr;
+		}
+
+		T& operator*()
+		{
+			return *(T*)m_Object->m_Object;
+		}
+
+		T* operator->()
+		{
+			return (T*)m_Object->m_Object;
+		}
+	};
+
+	template<class T, class... _Ty>
+	ScopedPtr<T> CreateScopedPtr(_Ty&& ... params)
+	{
+		size_t size = sizeof(ScopedObj);
+		ScopedObj* start = (ScopedObj*)DefalteAlloc->Allocate(size, 8);
+		start = new(start) ScopedObj();
+		start->m_Alloc = DefalteAlloc;
+		start->m_Object = (T*)DefalteAlloc->Allocate(sizeof(T), 8);
+		start->m_Object = new(start->m_Object) T(std::forward<_Ty>(params)...);
+		return ScopedPtr<T>(start);
+	}
+
+	template<class T>
+	ScopedPtr<T> CreateScopedPtr(T* obj)
+	{
+		size_t size = sizeof(ScopedObj);
+		ScopedObj* start = (ScopedObj*)DefalteAlloc->Allocate(size, 8);
+		start = new(start) ScopedObj();
+		start->m_Alloc = DefalteAlloc;
+		start->m_Object = obj;
+		return ScopedPtr<T>(start);
+	}
+
+	template<class T, class... _Ty>
+	ScopedPtr<T> CreateScopedPtrE()
+	{
+		return CreateScopedPtr<T>(nullptr);
+	}
+
+	template<class T, class... _Ty>
+	T* CreateObject(_Ty&& ... params)
 	{
 		T* M = (T*)FreeAlloc->Allocate(sizeof(T), 8);
-		M = new(M) T();
+		M = new(M) T(std::forward<_Ty>(params)...);
 		return M;
 	}
 }

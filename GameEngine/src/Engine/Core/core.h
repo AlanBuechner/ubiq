@@ -64,7 +64,7 @@ namespace Engine
 	using Ref = SharedPtr<T>;
 
 	template<typename T>
-	using Scope = std::unique_ptr<T>;
+	using Scope = ScopedPtr<T>;
 
 	using byte = unsigned char;
 }
