@@ -1,5 +1,6 @@
 #include "Sandbox2D.h"
 #include <Engine/Core/Memory/Memory.h>
+#include <Engine/Util/Performance.h>
 
 
 class Entity
@@ -20,17 +21,21 @@ Sandbox2DLayer::Sandbox2DLayer()
 
 void Sandbox2DLayer::OnAttach()
 {
-	Engine::UArray<int> a = {1, 2};
-	Engine::UArray<int> a2(a);
-	a.PushBack(3);
-	a2.PushBack(3);
-	if(a == a2)
-		DEBUG_INFO(a2.PopBack());
-
 	m_LogoTexture = Engine::Texture2D::Create("assets/Images/UBIQ.png");
 
-	Engine::SharedPtr<Entity> e = Engine::CreateSharedPtr<Entity>();
-	DEBUG_INFO(e->name);
+	Engine::Timer t1;
+
+	t1.Start();
+	std::string s = "this is a string asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+	t1.End();
+
+	DEBUG_INFO("std::shared_ptr {0}", t1.GetMilliseconds());
+
+	t1.Start();
+	Engine::UString s2 = "this is a string asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+	t1.End();
+
+	DEBUG_INFO("Engine::SharedPtr {0}", t1.GetMilliseconds());
 }
 
 void Sandbox2DLayer::OnDetach()
