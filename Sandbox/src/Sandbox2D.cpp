@@ -29,13 +29,13 @@ void Sandbox2DLayer::OnAttach()
 	std::string s = "this is a string asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	t1.End();
 
-	DEBUG_INFO("std::string {0}", t1.GetMilliseconds());
+	DEBUG_INFO("std::string {0}", t1.GetMicroseconds());
 
 	t1.Start();
 	Engine::UString s2 = "this is a string asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	t1.End();
 
-	DEBUG_INFO("Engine::UString {0}", t1.GetMilliseconds());
+	DEBUG_INFO("Engine::UString {0}", t1.GetMicroseconds());
 }
 
 void Sandbox2DLayer::OnDetach()

@@ -36,6 +36,11 @@ namespace Engine
 		{
 			return m_Elapsed * 1000.0f;
 		}
+
+		double GetMicroseconds()
+		{
+			return m_Elapsed * 1000000.0f;
+		}
 	private:
 		TimePoint m_Start;
 		TimePoint m_End;

@@ -41,7 +41,6 @@
     <ClCompile Include="src\Engine\Core\Memory\PoolAllocator.cpp" />
     <ClCompile Include="src\Engine\Core\Memory\FreeListAllocator.cpp" />
     <ClCompile Include="src\Engine\Util\UString.cpp" />
-    <ClCompile Include="src\Engine\Core\Memory\Memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h" />
