@@ -29,13 +29,13 @@ void Sandbox2DLayer::OnAttach()
 	std::string s = "this is a string asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	t1.End();
 
-	DEBUG_INFO("std::shared_ptr {0}", t1.GetMilliseconds());
+	DEBUG_INFO("std::string {0}", t1.GetMilliseconds());
 
 	t1.Start();
 	Engine::UString s2 = "this is a string asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	t1.End();
 
-	DEBUG_INFO("Engine::SharedPtr {0}", t1.GetMilliseconds());
+	DEBUG_INFO("Engine::UString {0}", t1.GetMilliseconds());
 }
 
 void Sandbox2DLayer::OnDetach()
@@ -52,8 +52,8 @@ void Sandbox2DLayer::OnUpdate()
 
 	Engine::Renderer2D::BeginScene(*m_Camera->GetCamera());
 
-	Engine::Renderer2D::DrawQuad({ 1.0f, 1.0f, 1.0f }, { 10.0f, 1.0f }, m_LogoTexture);
-	Engine::Renderer2D::DrawQuad({ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
+	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 1.0f }, { 10.0f, 1.0f }, m_LogoTexture);
+	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
 
 	Engine::Renderer2D::EndScene();
 	//Engine::Renderer::Flush();

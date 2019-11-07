@@ -10,7 +10,27 @@ I got a lot of the allocator code from https://github.com/mtrebi/memory-allocato
 
 namespace Engine
 {
-	static FreeListAllocator* DefalteAlloc = new FreeListAllocator(1000000000, Engine::FreeListAllocator::PlacementPolicy::FindFirst);
+	static FreeListAllocator* DefaultAlloc = new FreeListAllocator(1000000000, Engine::FreeListAllocator::PlacementPolicy::FindFirst);
+
+	static Allocator* CurrentAlloc = DefaultAlloc;
+
+	struct Memory
+	{
+		static void SetAllocator(Allocator* alloc)
+		{
+			CurrentAlloc = alloc;
+		}
+
+		static Allocator* GetDefaultAlloc()
+		{
+			return DefaultAlloc;
+		}
+
+		static Allocator* GetCurrentAlloc()
+		{
+			return CurrentAlloc;
+		}
+	};
 
 	struct RefCountedObj
 	{
@@ -105,10 +125,10 @@ namespace Engine
 	SharedPtr<T> CreateSharedPtr(_Ty&& ... params)
 	{
 		size_t size = sizeof(RefCountedObj);
-		RefCountedObj* start = (RefCountedObj*)DefalteAlloc->Allocate(size, 8);
+		RefCountedObj* start = (RefCountedObj*)CurrentAlloc->Allocate(size, 8);
 		start = new(start) RefCountedObj();
-		start->m_Alloc = DefalteAlloc;
-		start->m_Object = (T*)DefalteAlloc->Allocate(sizeof(T), 8);
+		start->m_Alloc = CurrentAlloc;
+		start->m_Object = (T*)CurrentAlloc->Allocate(sizeof(T), 8);
 		start->m_Object = new(start->m_Object) T(std::forward<_Ty>(params)...);
 		return SharedPtr<T>(start);
 	}
@@ -117,9 +137,9 @@ namespace Engine
 	SharedPtr<T> CreateSharedPtr(T* obj)
 	{
 		size_t size = sizeof(RefCountedObj);
-		RefCountedObj* start = (RefCountedObj*)DefalteAlloc->Allocate(size, 8);
+		RefCountedObj* start = (RefCountedObj*)CurrentAlloc->Allocate(size, 8);
 		start = new(start) RefCountedObj();
-		start->m_Alloc = DefalteAlloc;
+		start->m_Alloc = CurrentAlloc;
 		start->m_Object = obj;
 		return SharedPtr<T>(start);
 	}
@@ -183,10 +203,10 @@ namespace Engine
 	ScopedPtr<T> CreateScopedPtr(_Ty&& ... params)
 	{
 		size_t size = sizeof(ScopedObj);
-		ScopedObj* start = (ScopedObj*)DefalteAlloc->Allocate(size, 8);
+		ScopedObj* start = (ScopedObj*)CurrentAlloc->Allocate(size, 8);
 		start = new(start) ScopedObj();
-		start->m_Alloc = DefalteAlloc;
-		start->m_Object = (T*)DefalteAlloc->Allocate(sizeof(T), 8);
+		start->m_Alloc = CurrentAlloc;
+		start->m_Object = (T*)CurrentAlloc->Allocate(sizeof(T), 8);
 		start->m_Object = new(start->m_Object) T(std::forward<_Ty>(params)...);
 		return ScopedPtr<T>(start);
 	}
@@ -195,9 +215,9 @@ namespace Engine
 	ScopedPtr<T> CreateScopedPtr(T* obj)
 	{
 		size_t size = sizeof(ScopedObj);
-		ScopedObj* start = (ScopedObj*)DefalteAlloc->Allocate(size, 8);
+		ScopedObj* start = (ScopedObj*)CurrentAlloc->Allocate(size, 8);
 		start = new(start) ScopedObj();
-		start->m_Alloc = DefalteAlloc;
+		start->m_Alloc = CurrentAlloc;
 		start->m_Object = obj;
 		return ScopedPtr<T>(start);
 	}
@@ -211,7 +231,7 @@ namespace Engine
 	template<class T, class... _Ty>
 	T* CreateObject(_Ty&& ... params)
 	{
-		T* M = (T*)FreeAlloc->Allocate(sizeof(T), 8);
+		T* M = (T*)CurrentAlloc->Allocate(sizeof(T), 8);
 		M = new(M) T(std::forward<_Ty>(params)...);
 		return M;
 	}
