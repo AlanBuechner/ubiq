@@ -6,5 +6,6 @@ namespace Engine
 	class OpenGLTime : public Time
 	{
 		virtual void UpdateDeltaTimeImpl() override;
+		virtual double GetTimeImpl() override;
 	};
 }

@@ -11,12 +11,16 @@ namespace Engine
 		Time() {}
 
 		static inline float GetDeltaTime() { return s_Instance->m_DeltaTime; }
-		static inline float GetSeconds() { return s_Instance->m_DeltaTime; }
-		static inline float GetMilliseconds() { return s_Instance->m_DeltaTime * 1000.0f; }
+		static inline float GetDeltaSeconds() { return s_Instance->m_DeltaTime; }
+		static inline float GetDeltaMilliseconds() { return s_Instance->m_DeltaTime * 1000.0f; }
+
+		static inline double GetTime() { return s_Instance->GetTimeImpl(); }
 
 	private:
 		static void UpdateDeltaTime() { s_Instance->UpdateDeltaTimeImpl(); }
 		virtual void UpdateDeltaTimeImpl() {}
+
+		virtual double GetTimeImpl() = 0;
 
 		static Time* Create();
 

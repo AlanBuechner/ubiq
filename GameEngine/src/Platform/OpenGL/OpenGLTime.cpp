@@ -10,4 +10,8 @@ namespace Engine
 		m_DeltaTime = time - m_LastFrameTime;
 		m_LastFrameTime = time;
 	}
+	double OpenGLTime::GetTimeImpl()
+	{
+		return (double)glfwGetTime();
+	}
 }
