@@ -16,17 +16,17 @@ namespace Engine
 
 	struct Memory
 	{
-		static void SetAllocator(Allocator* alloc)
+		static inline void SetAllocator(Allocator* alloc)
 		{
 			CurrentAlloc = alloc;
 		}
 
-		static Allocator* GetDefaultAlloc()
+		static inline Allocator* GetDefaultAlloc()
 		{
 			return DefaultAlloc;
 		}
 
-		static Allocator* GetCurrentAlloc()
+		static inline Allocator* GetCurrentAlloc()
 		{
 			return CurrentAlloc;
 		}

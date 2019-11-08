@@ -88,6 +88,18 @@ namespace Engine
 			return nullptr;
 	}
 
+	void ShaderLibrary::Init()
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::OpenGl:
+			ShaderAlloc = new PoolAllocator(sizeof(OpenGLShader) * 100, sizeof(OpenGLShader));
+			break;
+		default:
+			break;
+		}
+	}
+
 	void ShaderLibrary::Add(const Ref<Shader>& shader)
 	{
 		auto& name = shader->GetName();
@@ -99,7 +111,9 @@ namespace Engine
 	{
 		Ref<Shader::ShaderSorce> src = CreateSharedPtr<Shader::ShaderSorce>();
 		*src << Shader::LoadShader(path);
+		Memory::SetAllocator(ShaderAlloc);
 		auto shader = Shader::Create(name, src);
+		Memory::SetAllocator(Memory::GetDefaultAlloc());
 		Add(shader);
 		return shader;
 	}
@@ -116,4 +130,6 @@ namespace Engine
 		CORE_ASSERT(m_Shaders.find(name) != m_Shaders.end(), "Shader not found");
 		return m_Shaders[name];
 	}
+
+	PoolAllocator* ShaderLibrary::ShaderAlloc = nullptr;
 }

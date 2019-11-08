@@ -17,8 +17,6 @@ namespace Engine
 
 	void* PoolAllocator::Allocate(size_t size, uint8_t allinment)
 	{
-		ASSERT(size == m_ChunkSize, "allocation size must be the same as the chuck size");
-
 		Node* freePosition = m_FreeList.pop();
 
 		m_Used += m_ChunkSize;

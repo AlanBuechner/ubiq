@@ -68,6 +68,8 @@ namespace Engine
 	class ShaderLibrary
 	{
 	public:
+		static void Init();
+
 		void Add(const Ref<Shader>& shader);
 		Ref<Shader> Load(const std::string& name, const std::string& path);
 		Ref<Shader> Load(const std::string& name, Ref<Shader::ShaderSorce> src);
@@ -75,5 +77,7 @@ namespace Engine
 
 	private:
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
+
+		static PoolAllocator* ShaderAlloc;
 	};
 }

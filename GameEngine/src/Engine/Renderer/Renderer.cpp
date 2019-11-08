@@ -10,6 +10,7 @@ namespace Engine
 
 	void Renderer::Init()
 	{
+		ShaderLibrary::Init();
 		RenderCommand::Init();
 		Renderer2D::Init();
 	}
