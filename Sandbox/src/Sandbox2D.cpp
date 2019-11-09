@@ -1,6 +1,7 @@
 #include "Sandbox2D.h"
 #include <Engine/Core/Memory/Memory.h>
 #include <Engine/Util/Performance.h>
+#include <Engine/Util/UFileIO.h>
 
 
 class Entity
@@ -26,16 +27,26 @@ void Sandbox2DLayer::OnAttach()
 	Engine::Timer t1;
 
 	t1.Start();
-	std::string s = "this is a string asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+	std::shared_ptr<Entity> e = std::make_shared<Entity>();
 	t1.End();
 
-	DEBUG_INFO("std::string {0}", t1.GetMicroseconds());
+	DEBUG_INFO("std::shared_ptr {0}", t1.GetMicroseconds());
 
 	t1.Start();
-	Engine::UString s2 = "this is a string asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+	Engine::SharedPtr e2 = Engine::CreateSharedPtr<Entity>();
 	t1.End();
 
-	DEBUG_INFO("Engine::UString {0}", t1.GetMicroseconds());
+	DEBUG_INFO("Engine::SharedPtr {0}", t1.GetMicroseconds());
+
+	t1.Start();
+	Engine::UFileIO file;
+	file.Open("Assets/Shaders/FlatColorShader.glsl");
+	Engine::Ref<Engine::UString> str = file.ReadFromFile();
+	file.Close();
+	t1.End();
+
+	DEBUG_INFO("Engine::UFileIO {0}", t1.GetMicroseconds());
+
 }
 
 void Sandbox2DLayer::OnDetach()
@@ -52,7 +63,7 @@ void Sandbox2DLayer::OnUpdate()
 
 	Engine::Renderer2D::BeginScene(*m_Camera->GetCamera());
 
-	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 1.0f }, { 10.0f, 1.0f }, m_LogoTexture);
+	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 1.0f }, { 10.0f, 10.0f }, m_LogoTexture);
 	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
 
 	Engine::Renderer2D::EndScene();

@@ -10,12 +10,16 @@ namespace Engine
 	public:
 		UFileIO();
 
-		bool Open(UString& path);
+		bool Open(const UString& path);
 
-		Ref<UString> ReadFile(int charsToRead);
+		void Close();
+
+		Ref<UString> ReadFromFile(int charsToRead = 0);
 
 	private:
 		HANDLE m_hFile = nullptr;
+
+		const UString* m_Path;
 	};
 #endif // PLATFORM_WINDOWS
 

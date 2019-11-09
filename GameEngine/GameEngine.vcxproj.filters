@@ -41,6 +41,7 @@
     <ClCompile Include="src\Engine\Core\Memory\PoolAllocator.cpp" />
     <ClCompile Include="src\Engine\Core\Memory\FreeListAllocator.cpp" />
     <ClCompile Include="src\Engine\Util\UString.cpp" />
+    <ClCompile Include="src\Engine\Util\UFileIO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h" />
@@ -463,5 +464,6 @@
     <ClInclude Include="src\Engine\Util\UString.h" />
     <ClInclude Include="src\Engine\Util\UArray.h" />
     <ClInclude Include="src\Engine\Util\Performance.h" />
+    <ClInclude Include="src\Engine\Util\UFileIO.h" />
   </ItemGroup>
 </Project>

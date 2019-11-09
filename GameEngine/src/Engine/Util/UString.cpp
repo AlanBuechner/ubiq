@@ -39,7 +39,7 @@ namespace Engine
 		return strlen(m_Data);
 	}
 
-	char* UString::RawString()
+	char* UString::RawString() const
 	{
 		return m_Data;
 	}

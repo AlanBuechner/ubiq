@@ -184,6 +184,7 @@
     <ClInclude Include="src\Engine\imGui\ImGuiLayer.h" />
     <ClInclude Include="src\Engine\Util\Performance.h" />
     <ClInclude Include="src\Engine\Util\UArray.h" />
+    <ClInclude Include="src\Engine\Util\UFileIO.h" />
     <ClInclude Include="src\Engine\Util\UString.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
@@ -590,6 +591,7 @@
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Engine\imGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\imGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\Engine\Util\UFileIO.cpp" />
     <ClCompile Include="src\Engine\Util\UString.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
