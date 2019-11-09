@@ -34,7 +34,7 @@ namespace Engine
 		s_UStringAllocator->Deallocate(m_Data);
 	}
 
-	const size_t UString::Size()
+	const size_t UString::Size() const
 	{
 		return strlen(m_Data);
 	}
@@ -44,30 +44,31 @@ namespace Engine
 		return m_Data;
 	}
 
-	char* UString::Begin()
+	char* UString::Begin() const
 	{
 		return m_Data;
 	}
 
-	char* UString::End()
+	char* UString::End() const
 	{
 		return m_Data + strlen(m_Data);
 	}
 
 	UString UString::SubString(unsigned int start, unsigned int end)
 	{
-		if (end == start)
+		size_t size = (size_t)end - start;
+		if (size == 0)
 			return "";
 		ASSERT(end > start, "end cant be before start");
 		ASSERT(end < Size(), "end index out of bounds");
 
-		char* buffer = (char*)Memory::GetDefaultAlloc()->Allocate((size_t)(end - start) + 1, 8);
+		char* buffer = (char*)Memory::GetDefaultAlloc()->Allocate(size + 1, 8);
 
 		for (int i = 0; i < end - start; i++)
 		{
 			buffer[i] = m_Data[start + i];
 		}
-		buffer[end - start] = '\0';
+		buffer[size] = '\0';
 
 		Memory::GetDefaultAlloc()->Deallocate(buffer);
 
@@ -152,6 +153,29 @@ namespace Engine
 	{
 		os << str.m_Data;
 		return os;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const UStringView& str)
+	{
+		for (int i = 0; i < str.m_Size; i++)
+		{
+			os << str[i];
+		}
+		return os;
+	}
+
+	UStringView::UStringView(UString& String, int start, int end) :
+		m_Start(start), m_End(end), m_Size((size_t)end - start)
+	{
+		ASSERT(m_Size > 0, "can not have the end before the start");
+
+		m_String = &String;
+	}
+
+	char& UStringView::operator[](size_t i) const
+	{
+		ASSERT(i <= m_Size, "index out of bounds");
+		return m_String->m_Data[m_Start + i];
 	}
 
 }

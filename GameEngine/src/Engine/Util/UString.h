@@ -4,6 +4,7 @@
 namespace Engine
 {
 	class FreeListAllocator;
+	class UStringView;
 }
 
 namespace Engine
@@ -17,10 +18,10 @@ namespace Engine
 		UString(const UString& str);
 		~UString();
 
-		const size_t Size();
+		const size_t Size() const;
 		char* RawString() const;
-		char* Begin();
-		char* End();
+		char* Begin() const;
+		char* End() const;
 
 		UString SubString(unsigned int start, unsigned int end);
 
@@ -40,5 +41,23 @@ namespace Engine
 		char* m_Data = nullptr;
 
 		static FreeListAllocator* s_UStringAllocator;
+
+		friend UStringView;
+	};
+
+	class UStringView
+	{
+	public:
+		UStringView(UString& String, int start, int end);
+
+		char& operator[](size_t i) const;
+
+		friend std::ostream& operator<<(std::ostream& os, const UStringView& str);
+
+	private:
+		const UString* m_String;
+		size_t m_Size;
+		int m_Start;
+		int m_End;
 	};
 }
