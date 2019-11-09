@@ -46,6 +46,12 @@ void Sandbox2DLayer::OnAttach()
 	t1.End();
 
 	DEBUG_INFO("Engine::UFileIO {0}", t1.GetMicroseconds());
+	DEBUG_INFO(*str);
+
+	Engine::UString str2 = str->SubString(0, 3);
+
+	DEBUG_INFO(str2);
+
 
 }
 

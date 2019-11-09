@@ -22,6 +22,8 @@ namespace Engine
 		char* Begin();
 		char* End();
 
+		UString SubString(unsigned int start, unsigned int end);
+
 		void operator=(const UString& str);
 		void operator=(const char* str);
 		bool operator==(const UString& str);
@@ -34,7 +36,7 @@ namespace Engine
 
 		friend std::ostream& operator<<(std::ostream& os, const UString& str);
 
-	public:
+	private:
 		char* m_Data = nullptr;
 
 		static FreeListAllocator* s_UStringAllocator;

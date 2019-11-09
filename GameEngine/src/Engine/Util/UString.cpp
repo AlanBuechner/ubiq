@@ -54,6 +54,26 @@ namespace Engine
 		return m_Data + strlen(m_Data);
 	}
 
+	UString UString::SubString(unsigned int start, unsigned int end)
+	{
+		if (end == start)
+			return "";
+		ASSERT(end > start, "end cant be before start");
+		ASSERT(end < Size(), "end index out of bounds");
+
+		char* buffer = (char*)Memory::GetDefaultAlloc()->Allocate((size_t)(end - start) + 1, 8);
+
+		for (int i = 0; i < end - start; i++)
+		{
+			buffer[i] = m_Data[start + i];
+		}
+		buffer[end - start] = '\0';
+
+		Memory::GetDefaultAlloc()->Deallocate(buffer);
+
+		return UString(buffer);
+	}
+
 	void UString::operator=(const UString& str)
 	{
 		s_UStringAllocator->Deallocate((void*)m_Data);
