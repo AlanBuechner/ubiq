@@ -47,6 +47,7 @@ void Sandbox2DLayer::OnAttach()
 	{
 		str = file.ReadFromFile(100);
 		DEBUG_INFO(str);
+		DEBUG_INFO(file.GetFilePointer());
 	}
 	file.Close();
 	t1.End();

@@ -16,9 +16,11 @@ namespace Engine
 
 		unsigned int GetFileSize() const;
 
-		void SetCursor(int pos);
+		long GetFilePointer();
 
-		char* ReadFromFile(unsigned int charsToRead = 0, unsigned int start = 0);
+		void SetCursor(unsigned int pos);
+
+		char* ReadFromFile(unsigned int charsToRead = 0, unsigned int offset = 0);
 
 	private:
 		HANDLE m_hFile = nullptr;
