@@ -14,12 +14,14 @@ namespace Engine
 
 		void Close();
 
-		Ref<UString> ReadFromFile(int charsToRead = 0);
+		char* ReadFromFile(int charsToRead = 0);
 
 	private:
 		HANDLE m_hFile = nullptr;
 
 		const UString* m_Path;
+
+		PBYTE m_Str;
 	};
 #endif // PLATFORM_WINDOWS
 

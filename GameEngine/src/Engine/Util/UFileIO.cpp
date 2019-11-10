@@ -39,16 +39,15 @@ namespace Engine
 	void UFileIO::Close()
 	{
 		CloseHandle(m_hFile);
+		Memory::GetDefaultAlloc()->Deallocate(m_Str);
 	}
 
-	Ref<UString> UFileIO::ReadFromFile(int charsToRead)
+	char* UFileIO::ReadFromFile(int charsToRead)
 	{
-		if (charsToRead == 0)
+		// sets the chars to read to the size of the file
+		if (charsToRead == 0) 
 		{
-			struct stat stat_buf;
-			int rc = stat(m_Path->RawString(), &stat_buf);
-			charsToRead = stat_buf.st_size;
-			if (rc != 0)
+			if (!GetFileSizeEx(m_hFile, (PLARGE_INTEGER)&charsToRead))
 			{
 				DEBUG_ERROR("cant Read file size of {0}", *m_Path);
 				__debugbreak();
@@ -56,24 +55,28 @@ namespace Engine
 			}
 		}
 
-		char* buffer = (char*)Memory::GetDefaultAlloc()->Allocate((size_t)charsToRead, 8);
+		PBYTE buffer = (PBYTE)Memory::GetDefaultAlloc()->Allocate((size_t)charsToRead * sizeof(char), 8); // alocate memory for the buffer
 
 		DWORD bytesRead;
 
-		if (!ReadFile(m_hFile, (void*)buffer, charsToRead, &bytesRead, NULL))
+		if (!ReadFile(m_hFile, (void*)buffer, charsToRead * sizeof(char), &bytesRead, NULL)) // read from the file add save it to the buffer
 		{
 			DEBUG_ERROR("Can not Read From file {0} Error code: {1}", *m_Path, GetLastError());
 			__debugbreak();
 			return nullptr;
 		}
 
-		Ref<UString> str = CreateSharedPtr<UString>(bytesRead);
+		buffer[bytesRead] = '\0'; // null terminat the end of the file
 
-		*str = buffer;
+		// allocate memory for the new buffer 
+		// nesesary if the chars the user wanted to read was larger than the size of the file
+		m_Str = (PBYTE)Memory::GetDefaultAlloc()->Allocate((size_t)bytesRead, 8); 
 
-		Memory::GetDefaultAlloc()->Deallocate(buffer);
+		strcpy((char*)m_Str, (char*)buffer); // copy over the data
 
-		return str;
+		Memory::GetDefaultAlloc()->Deallocate(buffer); // dealocate the memory used by the buffer
+
+		return (char*)m_Str;
 	}
 
 #endif // PLATFORM_WINDOWS
