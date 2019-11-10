@@ -42,18 +42,36 @@ namespace Engine
 		Memory::GetDefaultAlloc()->Deallocate(m_Str);
 	}
 
-	char* UFileIO::ReadFromFile(int charsToRead)
+	unsigned int UFileIO::GetFileSize() const
 	{
-		// sets the chars to read to the size of the file
+		unsigned int fileSize = NULL;
+		if (!GetFileSizeEx(m_hFile, (PLARGE_INTEGER)&fileSize))
+		{
+			DEBUG_ERROR("cant Read file size of {0}", *m_Path);
+			__debugbreak();
+		}
+		return fileSize;
+	}
+
+	void UFileIO::SetCursor(int pos)
+	{
+		SetFilePointer(m_hFile, pos, NULL, FILE_BEGIN);
+	}
+
+	char* UFileIO::ReadFromFile(unsigned int charsToRead, unsigned int start)
+	{
+		// if charsToRead is 0 read the rest of the file
 		if (charsToRead == 0) 
 		{
-			if (!GetFileSizeEx(m_hFile, (PLARGE_INTEGER)&charsToRead))
+			charsToRead = GetFileSize(); // gets the file size
+			if (charsToRead == NULL)
 			{
-				DEBUG_ERROR("cant Read file size of {0}", *m_Path);
-				__debugbreak();
 				return nullptr;
 			}
+			charsToRead -= start;
 		}
+
+		SetFilePointer(m_hFile, start, NULL, FILE_CURRENT);
 
 		PBYTE buffer = (PBYTE)Memory::GetDefaultAlloc()->Allocate((size_t)charsToRead * sizeof(char), 8); // alocate memory for the buffer
 
@@ -68,9 +86,13 @@ namespace Engine
 
 		buffer[bytesRead] = '\0'; // null terminat the end of the file
 
+		// dealocats the memory from the last read to prevent memory leak
+		if(m_Str != nullptr)
+			Memory::GetDefaultAlloc()->Deallocate(m_Str);
+
 		// allocate memory for the new buffer 
 		// nesesary if the chars the user wanted to read was larger than the size of the file
-		m_Str = (PBYTE)Memory::GetDefaultAlloc()->Allocate((size_t)bytesRead, 8); 
+		m_Str = (PBYTE)Memory::GetDefaultAlloc()->Allocate(strlen((char*)buffer) * sizeof(char), 8); 
 
 		strcpy((char*)m_Str, (char*)buffer); // copy over the data
 

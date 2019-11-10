@@ -38,15 +38,20 @@ void Sandbox2DLayer::OnAttach()
 
 	DEBUG_INFO("Engine::SharedPtr {0}", t1.GetMicroseconds());
 
+
 	t1.Start();
+	Engine::UString str;
 	Engine::UFileIO file;
 	file.Open("Assets/Shaders/FlatColorShader.glsl");
-	Engine::UString str = file.ReadFromFile();
+	for (int i = 0; i < 5; i++)
+	{
+		str = file.ReadFromFile(100);
+		DEBUG_INFO(str);
+	}
 	file.Close();
 	t1.End();
 
 	DEBUG_INFO("Engine::UFileIO {0}", t1.GetMicroseconds());
-	DEBUG_INFO(str);
 
 	t1.Start();
 	Engine::UString str2 = str.SubString(0, 5);
