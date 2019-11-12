@@ -44,13 +44,13 @@ namespace Engine
 
 	unsigned int UFileIO::GetFileSize() const
 	{
-		unsigned int fileSize = NULL;
-		if (!GetFileSizeEx(m_hFile, (PLARGE_INTEGER)&fileSize))
+		LARGE_INTEGER fileSize;
+		if (!GetFileSizeEx(m_hFile, &fileSize))
 		{
 			DEBUG_ERROR("Cant Read file size of {0}", *m_Path);
 			__debugbreak();
 		}
-		return fileSize;
+		return fileSize.QuadPart;
 	}
 
 	long UFileIO::GetFilePointer()
