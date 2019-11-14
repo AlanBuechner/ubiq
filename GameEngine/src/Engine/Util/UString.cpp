@@ -64,7 +64,7 @@ namespace Engine
 
 		char* buffer = (char*)Memory::GetDefaultAlloc()->Allocate(size + 1, 8);
 
-		for (int i = 0; i < end - start; i++)
+		for (unsigned int i = 0; i < end - start; i++)
 		{
 			buffer[i] = m_Data[start + i];
 		}
@@ -73,6 +73,29 @@ namespace Engine
 		Memory::GetDefaultAlloc()->Deallocate(buffer);
 
 		return UString(buffer);
+	}
+
+	bool UString::Find(const char* match)
+	{
+		size_t matchSize = strlen(match);
+		if (matchSize > Size())
+		{
+			return false;
+		}
+
+		for (int i = 0; i < Size() - matchSize; i++)
+		{
+			for (int j = 0; j < matchSize; j++)
+			{
+				if (m_Data[i + j] != match[j])
+					break;
+				else if (j == matchSize - 1)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	void UString::operator=(const UString& str)

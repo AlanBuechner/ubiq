@@ -50,7 +50,7 @@ namespace Engine
 			DEBUG_ERROR("Cant Read file size of {0}", *m_Path);
 			__debugbreak();
 		}
-		return fileSize.QuadPart;
+		return (unsigned int)fileSize.QuadPart;
 	}
 
 	long UFileIO::GetFilePointer()

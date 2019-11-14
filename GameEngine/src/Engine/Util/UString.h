@@ -25,6 +25,8 @@ namespace Engine
 
 		UString SubString(unsigned int start, unsigned int end);
 
+		bool Find(const char* match);
+
 		void operator=(const UString& str);
 		void operator=(const char* str);
 		bool operator==(const UString& str);

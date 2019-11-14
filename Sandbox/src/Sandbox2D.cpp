@@ -48,6 +48,7 @@ void Sandbox2DLayer::OnAttach()
 	t1.End();
 	DEBUG_INFO("Engine::UFileIO {0}", t1.GetMicroseconds());
 	DEBUG_INFO(str);
+	DEBUG_INFO(str.Find("}"));
 }
 
 void Sandbox2DLayer::OnDetach()
