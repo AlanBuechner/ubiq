@@ -58,11 +58,18 @@ void Sandbox2DLayer::OnDetach()
 
 void Sandbox2DLayer::OnUpdate()
 {
+	CREATE_PROFILE_FUNCTION();
+
+	Engine::Timer timer = CREATE_PROFILE();
+
+	timer.Start("Camera Update");
 	m_Camera->OnUpdate();
+	timer.End();
 
 	Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 	Engine::RenderCommand::Clear();
 
+	timer.Start("Rendrer");
 	Engine::Renderer2D::BeginScene(*m_Camera->GetCamera());
 
 	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 1.0f }, { 10.0f, 10.0f }, m_LogoTexture);
@@ -70,6 +77,8 @@ void Sandbox2DLayer::OnUpdate()
 
 	Engine::Renderer2D::EndScene();
 	//Engine::Renderer::Flush();
+
+	timer.End();
 }
 
 void Sandbox2DLayer::OnImGuiRender()

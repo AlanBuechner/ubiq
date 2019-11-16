@@ -59,6 +59,38 @@ namespace Engine
 		Fn m_Func;
 	};
 
+	template<typename Fn>
+	class TimerScoped
+	{
+	public:
+		TimerScoped(const char* name, Fn&& func) :
+			m_Func(func), m_Name(name)
+		{
+			m_Start = Time::GetTime();
+		}
+
+		~TimerScoped()
+		{
+			m_End = Time::GetTime();
+			m_Elapsed = m_End - m_Start;
+			m_Func({ m_Name, (float)GetMilliseconds() });
+		}
+
+		double GetMilliseconds()
+		{
+			return m_Elapsed * 1000.0f;
+		}
+	private:
+		double m_Start;
+		double m_End;
+
+		double m_Elapsed;
+
+		const char* m_Name;
+
+		Fn m_Func;
+	};
+
 	class Performance
 	{
 	public:
@@ -87,3 +119,5 @@ namespace Engine
 }
 
 #define CREATE_PROFILE() Engine::Timer([&](Engine::Performance::ProfileResult profileResult) { Engine::Performance::PushResult(profileResult); });
+#define CREATE_PROFILE_SCOPE(name) Engine::TimerScoped timer##__LINE__(name, [&](Engine::Performance::ProfileResult profileResult) { Engine::Performance::PushResult(profileResult); });
+#define CREATE_PROFILE_FUNCTION() CREATE_PROFILE_SCOPE(__FUNCSIG__)
