@@ -24,29 +24,29 @@ void Sandbox2DLayer::OnAttach()
 {
 	m_LogoTexture = Engine::Texture2D::Create("assets/Images/UBIQ.png");
 
-	Engine::Timer t1;
+	Engine::Timer timer = CREATE_PROFILE();
 
-	t1.Start();
+	timer.Start("std::shared_ptr");
 	std::shared_ptr<Entity> e = std::make_shared<Entity>();
-	t1.End();
+	timer.End();
 
-	DEBUG_INFO("std::shared_ptr {0}", t1.GetMicroseconds());
+	timer.PrintTime();
 
-	t1.Start();
+	timer.Start("Engine::SharedPtr");
 	Engine::SharedPtr e2 = Engine::CreateSharedPtr<Entity>();
-	t1.End();
+	timer.End();
 
-	DEBUG_INFO("Engine::SharedPtr {0}", t1.GetMicroseconds());
+	timer.PrintTime();
 
 
-	t1.Start();
+	timer.Start("Engine::UFileIO");
 	Engine::UString str;
 	Engine::UFileIO file;
 	file.Open("Assets/Shaders/FlatColorShader.glsl");
 	str = file.ReadFromFile();
 	file.Close();
-	t1.End();
-	DEBUG_INFO("Engine::UFileIO {0}", t1.GetMicroseconds());
+	timer.End();
+	timer.PrintTime();
 	DEBUG_INFO(str);
 	DEBUG_INFO(str.Find("}"));
 }

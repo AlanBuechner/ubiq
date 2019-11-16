@@ -11,6 +11,8 @@
 
 #include "Memory/Memory.h"
 
+#include "Engine/Util/Performance.h"
+
 namespace Engine {
 
 #define BIND_EVENT_FN_EXTERN(x, p) std::bind(x, p, std::placeholders::_1)
@@ -70,6 +72,7 @@ namespace Engine {
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
+			Performance::Render();
 			m_ImGuiLayer->End();
 
 			// update the window

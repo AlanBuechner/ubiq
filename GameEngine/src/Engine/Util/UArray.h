@@ -34,6 +34,8 @@ namespace Engine
 
 		T PopBack();
 
+		void Clear();
+
 		T& operator[](size_t i);
 
 		void operator=(const UArray<T>& other);
@@ -148,6 +150,12 @@ namespace Engine
 		T& toRetern = m_Data[newSize];
 		ReSize(newSize);
 		return toRetern;
+	}
+
+	template<class T>
+	inline void UArray<T>::Clear()
+	{
+		ReSize(0);
 	}
 
 	template<class T>
