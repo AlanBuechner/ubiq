@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Util/Performance.h"
 
 #ifdef PLATFORM_WINDOWS
 
@@ -9,7 +10,9 @@ int main(int argc, char** argv)
 	Engine::Log::Init();
 
 	auto app = Engine::CreateApplication();
+	Engine::Instrumentor::Get().BeginSession("Runtime");
 	app->Run();
+	Engine::Instrumentor::Get().EndSession();
 	delete app;
 }
 

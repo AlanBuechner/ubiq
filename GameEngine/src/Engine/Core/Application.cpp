@@ -53,30 +53,41 @@ namespace Engine {
 
 	void Application::Run()
 	{
+		CREATE_PROFILE_FUNCTIONI();
+		Engine::InstrumentationTimer timer = CREATE_PROFILEI();
 		CORE_INFO("Runing Application");
 		while (m_Running)
 		{
+			CREATE_PROFILE_SCOPEI("Fram");
 			Time::UpdateDeltaTime();
 
+			timer.Start("Handle Input");
 			Input::UpdateKeyState(); // update the key stats
 			SendInputBuffer(); // sent the input buffer through the layer stack
+			timer.End();
 
+			timer.Start("Update Layers");
 			// update the layer stack
 			if (!m_Minimized)
 			{
 				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate();
 			}
+			timer.End();
 
+			timer.Start("ImGui Render");
 			// render im gui layer
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
 			Performance::Render();
 			m_ImGuiLayer->End();
+			timer.End();
 
+			timer.Start("Update the Window");
 			// update the window
 			m_Window->OnUpdate();
+			timer.End();
 		}
 	}
 

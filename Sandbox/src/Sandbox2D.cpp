@@ -38,7 +38,6 @@ void Sandbox2DLayer::OnAttach()
 
 	timer.PrintTime();
 
-
 	timer.Start("Engine::UFileIO");
 	Engine::UString str;
 	Engine::UFileIO file;
@@ -58,9 +57,9 @@ void Sandbox2DLayer::OnDetach()
 
 void Sandbox2DLayer::OnUpdate()
 {
-	CREATE_PROFILE_FUNCTION();
+	CREATE_PROFILE_FUNCTIONI();
 
-	Engine::Timer timer = CREATE_PROFILE();
+	Engine::InstrumentationTimer timer = CREATE_PROFILEI();
 
 	timer.Start("Camera Update");
 	m_Camera->OnUpdate();
