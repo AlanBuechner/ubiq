@@ -1,0 +1,25 @@
+{
+    "FreeList": 
+    [
+        {
+            "id": 1,
+            "name" : "defult allocator",
+            "alloc": 
+            [
+                {
+                    "start": 1,
+                    "end": 2,
+                    "header": 
+                    [
+                        {
+                            "size": 1,
+                            "padding": 0
+                        }
+                    ],
+                    "body" : "",
+                    "next": 0
+                }
+            ]
+        }
+    ]
+}

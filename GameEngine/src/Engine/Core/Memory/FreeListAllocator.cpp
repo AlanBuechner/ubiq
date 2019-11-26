@@ -32,7 +32,7 @@ namespace Engine
 		const size_t allocationHeaderSize = sizeof(FreeListAllocator::AllocationHeader);
 		const size_t freeHeaderSize = sizeof(FreeListAllocator::FreeHeader);
 
-		size += sizeof(Node);
+		size += sizeof(Node); // size of the allocation and the footer for the linked list
 
 		ASSERT(size >= sizeof(Node) ,"Allocation size must be bigger");
 		ASSERT(alignment >= 8, "aligment must be at least 8");
@@ -40,7 +40,7 @@ namespace Engine
 		size_t padding;
 		Node* affectedNode;
 		Node* previousNode;
-		FindLocation(size, alignment, padding, previousNode, affectedNode);
+		FindLocation(size, alignment, padding, previousNode, affectedNode); // finds a locatrion in memory to put the new allocation
 		ASSERT(affectedNode != nullptr, "not enough memory");
 
 		const size_t alignmentPadding = padding - allocationHeaderSize;
@@ -71,14 +71,15 @@ namespace Engine
 	{
 		// Insert it in a sorted position by the address number
 		const size_t currentAddress = (size_t) p;
-		const size_t headerAddress = currentAddress - sizeof(FreeListAllocator::AllocationHeader);
-		const FreeListAllocator::AllocationHeader* allocationHeader{ (FreeListAllocator::AllocationHeader*) headerAddress };
+		const size_t headerAddress = currentAddress - sizeof(FreeListAllocator::AllocationHeader); // the address of the allocation header
+		const FreeListAllocator::AllocationHeader* allocationHeader{ (FreeListAllocator::AllocationHeader*) headerAddress }; // crates copy of the allocation header
 
-		Node* freeNode = (Node*)(headerAddress);
-		freeNode->data.blockSize = allocationHeader->blockSize + allocationHeader->padding;
+		Node* freeNode = (Node*)(headerAddress); // the node that needs to be freed
+		freeNode->data.blockSize = allocationHeader->blockSize + allocationHeader->padding; // sets the size of the node that is being freed
 		freeNode->next = nullptr;
 
-		Node* it = m_FreeList.head;
+		// find the previus node in the linked list and free the node we are dealocating
+		Node* it = m_FreeList.head; // current node is head of the linked list
 		Node* itPrev = nullptr;
 		while (it != nullptr) {
 			if (p < it) {

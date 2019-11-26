@@ -26,28 +26,15 @@ void Sandbox2DLayer::OnAttach()
 
 	Engine::Timer timer = CREATE_PROFILE();
 
-	timer.Start("std::shared_ptr");
-	std::shared_ptr<Entity> e = std::make_shared<Entity>();
-	timer.End();
-
-	timer.PrintTime();
-
-	timer.Start("Engine::SharedPtr");
-	Engine::SharedPtr e2 = Engine::CreateSharedPtr<Entity>();
-	timer.End();
-
-	timer.PrintTime();
-
 	timer.Start("Engine::UFileIO");
-	Engine::UString str;
 	Engine::UFileIO file;
 	file.Open("Assets/Shaders/FlatColorShader.glsl");
-	str = file.ReadFromFile();
+	Engine::UString str = file.ReadFromFile();
 	file.Close();
 	timer.End();
-	timer.PrintTime();
+
 	DEBUG_INFO(str);
-	DEBUG_INFO(str.Find("}"));
+	DEBUG_INFO(str.Find("aaa"));
 }
 
 void Sandbox2DLayer::OnDetach()

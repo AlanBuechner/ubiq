@@ -10,6 +10,11 @@ namespace Engine
 	public:
 		UFileIO();
 
+		~UFileIO()
+		{
+
+		}
+
 		bool Open(const UString& path);
 
 		void Close();
@@ -25,7 +30,7 @@ namespace Engine
 	private:
 		HANDLE m_hFile = nullptr;
 
-		const UString* m_Path;
+		UString m_Path;
 
 		PBYTE m_Str = nullptr;
 	};

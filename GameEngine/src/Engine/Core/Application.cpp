@@ -58,7 +58,7 @@ namespace Engine {
 		CORE_INFO("Runing Application");
 		while (m_Running)
 		{
-			CREATE_PROFILE_SCOPEI("Fram");
+			CREATE_PROFILE_SCOPEI("Frame");
 			Time::UpdateDeltaTime();
 
 			timer.Start("Handle Input");

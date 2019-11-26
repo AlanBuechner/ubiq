@@ -8,25 +8,24 @@ namespace Engine
 
 	UString::UString()
 	{
-		m_Data = (char*)s_UStringAllocator->Allocate(sizeof(char), 8);
-		strcpy(m_Data, "");
+		Resize(0);
 	}
 
 	UString::UString(const char* str)
 	{
-		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str) + 1, 8);
-		strcpy(m_Data, str);
+		Resize(strlen(str));
+		CopyOver(str);
 	}
 
 	UString::UString(int size)
 	{
-		m_Data = (char*)s_UStringAllocator->Allocate(sizeof(char) * size, 8);
+		Resize(size);
 	}
 
 	UString::UString(const UString& str)
 	{
-		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str.m_Data) + 1, 8);
-		strcpy(m_Data, str.m_Data);
+		Resize(str.Size());
+		CopyOver(str.RawString());
 	}
 
 	UString::~UString()
@@ -36,7 +35,7 @@ namespace Engine
 
 	const size_t UString::Size() const
 	{
-		return strlen(m_Data);
+		return m_Size;
 	}
 
 	char* UString::RawString() const
@@ -75,9 +74,9 @@ namespace Engine
 		return UString(buffer);
 	}
 
-	bool UString::Find(const char* match)
+	bool UString::Find(const UString& match)
 	{
-		size_t matchSize = strlen(match);
+		size_t matchSize = strlen(match.RawString());
 		if (matchSize > Size())
 		{
 			return false;
@@ -100,16 +99,14 @@ namespace Engine
 
 	void UString::operator=(const UString& str)
 	{
-		s_UStringAllocator->Deallocate((void*)m_Data);
-		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str.m_Data) + 1, 8);
-		strcpy(m_Data, str.m_Data);
+		Resize(str.Size());
+		CopyOver(str.RawString());
 	}
 	
 	void UString::operator=(const char* str)
 	{
-		s_UStringAllocator->Deallocate((void*)m_Data);
-		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str) + 1, 8);
-		strcpy(m_Data, str);
+		Resize(strlen(str));
+		CopyOver(str);
 	}
 	
 	bool UString::operator==(const UString& str)
@@ -128,32 +125,35 @@ namespace Engine
 
 	bool UString::operator==(const char* str)
 	{
-		return *m_Data == *str;
+		if (Size() == strlen(str))
+		{
+			for (int i = 0; i < Size(); i++)
+			{
+				if (m_Data[i] != str[i])
+					return false;
+			}
+			return true;
+		}
+		return false;
 	}
 
 	void UString::operator+=(const UString& str)
 	{
-		char* temp = m_Data;
-		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str.m_Data) + strlen(m_Data) + 1, 8);
-		strcpy(m_Data, temp);
-		strcpy(m_Data + strlen(m_Data), str.m_Data);
-		s_UStringAllocator->Deallocate((void*)temp);
+		Resize(strlen(str.m_Data) + strlen(m_Data) + 1);
+		strcat(m_Data, str.m_Data);
 	}
 
 	void UString::operator+=(const char* str)
 	{
-		char* temp = m_Data;
-		m_Data = (char*)s_UStringAllocator->Allocate(strlen(str) + strlen(m_Data) + 1, 8);
-		strcpy(m_Data, temp);
-		strcpy(m_Data + strlen(m_Data), str);
-		s_UStringAllocator->Deallocate((void*)temp);
+		Resize(strlen(str) + strlen(m_Data) + 1);
+		strcat(m_Data, str);
 	}
 
 	UString UString::operator+(const UString& str)
 	{
 		char* temp = (char*)s_UStringAllocator->Allocate(strlen(m_Data) + strlen(str.m_Data) + 1, 8);
 		strcpy(temp, m_Data);
-		strcpy(temp + strlen(m_Data), str.m_Data);
+		strcat(temp, str.m_Data);
 		s_UStringAllocator->Deallocate(temp);
 		return UString(temp);
 	}
@@ -162,14 +162,40 @@ namespace Engine
 	{
 		char* temp = (char*)s_UStringAllocator->Allocate(strlen(m_Data) + strlen(str) + 1, 8);
 		strcpy(temp, m_Data);
-		strcpy(temp + strlen(m_Data), str);
+		strcat(temp, str);
 		s_UStringAllocator->Deallocate(temp);
 		return UString(temp);
 	}
 
-	char& UString::operator[](size_t i)
+	char& UString::operator[](size_t i) const
 	{
 		return m_Data[i];
+	}
+
+	void UString::Resize(size_t size)
+	{
+		m_Size = size;
+		char* temp = m_Data;
+		m_Data = (char*)s_UStringAllocator->Allocate(size + 1, 8);
+		m_Data[size] = 0;
+		if (temp != nullptr)
+		{
+			CopyOver(temp);
+			s_UStringAllocator->Deallocate(temp);
+		}
+	}
+
+	void UString::CopyOver(const char* data)
+	{
+		if (data != nullptr && m_Data != nullptr)
+		{
+			for (int i = 0; i < m_Size; i++)
+			{
+				m_Data[i] = data[i];
+				if (m_Data[i] == '\0')
+					break;
+			}
+		}
 	}
 
 	std::ostream& operator<<(std::ostream& os, const UString& str)
@@ -200,5 +226,6 @@ namespace Engine
 		ASSERT(i <= m_Size, "index out of bounds");
 		return m_String->m_Data[m_Start + i];
 	}
+
 
 }

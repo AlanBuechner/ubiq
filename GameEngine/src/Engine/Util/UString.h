@@ -25,7 +25,7 @@ namespace Engine
 
 		UString SubString(unsigned int start, unsigned int end);
 
-		bool Find(const char* match);
+		bool Find(const UString& match);
 
 		void operator=(const UString& str);
 		void operator=(const char* str);
@@ -35,12 +35,18 @@ namespace Engine
 		void operator+=(const char* str);
 		UString operator+(const UString& str);
 		UString operator+(const char* str);
-		char& operator[](size_t i);
+		char& operator[](size_t i) const;
 
 		friend std::ostream& operator<<(std::ostream& os, const UString& str);
 
 	private:
+		void Resize(size_t size);
+
+		void CopyOver(const char* data);
+
 		char* m_Data = nullptr;
+
+		size_t m_Size = 0;
 
 		static FreeListAllocator* s_UStringAllocator;
 

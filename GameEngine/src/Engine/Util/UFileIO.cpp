@@ -32,14 +32,15 @@ namespace Engine
 			return false;
 		}
 		m_hFile = hFile;
-		m_Path = &path;
+		m_Path = path;
 		return true;
 	}
 
 	void UFileIO::Close()
 	{
 		CloseHandle(m_hFile);
-		Memory::GetDefaultAlloc()->Deallocate(m_Str);
+		if(m_Str != nullptr)
+			Memory::GetDefaultAlloc()->Deallocate(m_Str);
 	}
 
 	unsigned int UFileIO::GetFileSize() const
@@ -47,7 +48,7 @@ namespace Engine
 		LARGE_INTEGER fileSize;
 		if (!GetFileSizeEx(m_hFile, &fileSize))
 		{
-			DEBUG_ERROR("Cant Read file size of {0}", *m_Path);
+			DEBUG_ERROR("Cant Read file size of {0}", m_Path);
 			__debugbreak();
 		}
 		return (unsigned int)fileSize.QuadPart;
@@ -96,7 +97,7 @@ namespace Engine
 
 		if (!ReadFile(m_hFile, (void*)buffer, charsToRead * sizeof(char), &bytesRead, NULL)) // read from the file add save it to the buffer
 		{
-			DEBUG_ERROR("Cant Read From file {0} Error code: {1}", *m_Path, GetLastError());
+			DEBUG_ERROR("Cant Read From file {0} Error code: {1}", m_Path, GetLastError());
 			__debugbreak();
 			return nullptr;
 		}
