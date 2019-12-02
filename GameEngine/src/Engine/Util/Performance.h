@@ -66,9 +66,9 @@ namespace Engine
 			m_End = Time::GetTime();
 			m_Elapsed = m_End - m_Start;
 
-			long long start = m_Start * 1000000.0f;
-			long long end = m_End * 1000000.0f;
-			uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
+			long long start = (long long)(m_Start * 1000000.0f);
+			long long end = (long long)(m_End * 1000000.0f);
+			uint32_t threadID = (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
 			ProfileResult result = { m_Name, start, end, threadID };
 			m_Func(result);
 		}
@@ -122,9 +122,9 @@ namespace Engine
 			m_End = Time::GetTime();
 			m_Elapsed = m_End - m_Start;
 
-			long long start = m_Start * 1000000.0f;
-			long long end = m_End * 1000000.0f;
-			uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
+			long long start = (long long)(m_Start * 1000000.0f);
+			long long end = (long long)(m_End * 1000000.0f);
+			uint32_t threadID = (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
 			ProfileResult result = { m_Name, start, end, threadID };
 
 			Instrumentor::Get().WriteProfile(result);
@@ -209,9 +209,9 @@ namespace Engine
 			m_End = Time::GetTime();
 			m_Elapsed = m_End - m_Start;
 
-			long long start = m_Start * 1000000.0f;
-			long long end = m_End * 1000000.0f;
-			uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
+			long long start = (long long)(m_Start * 1000000.0f);
+			long long end = (long long)(m_End * 1000000.0f);
+			uint32_t threadID = (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
 			ProfileResult result = { m_Name, start, end, threadID };
 			
 			Instrumentor::Get().WriteProfile(result);
