@@ -1,7 +1,12 @@
 $(document).ready(function()
 {
+    var drag = false;
+    var alt = true;
+
     var scale = 100.0;
+    var xoffset = 0.0;
     var wheelPos = 0;
+    var lastX = 0;
 
     var Allocator;
 
@@ -16,8 +21,33 @@ $(document).ready(function()
             return;
         scale = targetScale;
         wheelPos += e.originalEvent.wheelDelta / 120;
-        console.log(scale);
+        xoffset -= lastX - scale;
+        if(xoffset > 0)
+            xoffset = 0;
         displayData(Allocator);
+    });
+
+    $("#data").bind("mousedown", function(e){
+        if(e.button == 0){
+            drag = true;
+        }
+    });
+
+    $("#data").bind("mouseup", function(e){
+        if(e.button == 0){
+            drag = false;
+        }
+    });
+
+    $("#data").bind("mousemove", function(e){
+        if(drag && alt)
+        {
+            xoffset -= (lastX - e.pageX);
+            if(xoffset > 0)
+                xoffset = 0;
+            displayData(Allocator);
+        }
+        lastX = e.pageX;
     });
 
     $("#btnLoad").click(function(){
@@ -72,29 +102,37 @@ $(document).ready(function()
 
         ctx.clearRect(0, 0, data.width, data.height);
 
-        var allocatorHeight = 10;
-        var newYOffset = 0;
+        var allocatorHeight = 30;
+        const deltaYOffset = 50;
+        var newYOffset = deltaYOffset;
 
         a.forEach(function(e) {
-            AddAllocatorSnap(e);
+            AddAllocator(e);
         });
 
-        function AddAllocatorSnap(e)
+        function AddAllocator(e)
         {
-            ctx.fillStyle = "#FF0000";
-            ctx.fillRect(0, newYOffset, e.size * scale, allocatorHeight);
+            ctx.fillStyle = "#000000";
+            ctx.font = "30px Arial";
+            ctx.fillText(e.name, 50, newYOffset - 10);
 
-            e.alloc.forEach(function(alloc){
-                AddAllocation(alloc);
+            e.SnapShots.forEach(function(snapShot){
+                ctx.fillStyle = "#FF0000";
+                ctx.fillRect(xoffset, newYOffset, e.size * scale, allocatorHeight);
+
+                snapShot.alloc.forEach(function(alloc){
+                    AddAllocation(alloc);
+                });
+                newYOffset += allocatorHeight + deltaYOffset/2;
             });
 
             function AddAllocation(alloc)
             {
                 ctx.fillStyle = "#00FF00";
-                ctx.fillRect(alloc.start * scale, newYOffset, (alloc.end - alloc.start) * scale, allocatorHeight);
+                ctx.fillRect((alloc.start * scale) + xoffset, newYOffset, (alloc.end - alloc.start) * scale, allocatorHeight);
             }
 
-            newYOffset += allocatorHeight + 10;
+            newYOffset += allocatorHeight + deltaYOffset;
         }
     }
 

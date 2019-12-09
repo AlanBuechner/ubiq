@@ -6,54 +6,113 @@
             "id" : 1,
             "name" : "defult allocator",
             "size" : 1000000000,
-            "alloc": 
+            "SnapShots":
             [
                 {
-                    "start": 0,
-                    "end": 1,
-                    "header": 
+                    "alloc": 
                     [
                         {
-                            "size": 1,
-                            "padding": 0
+                            "start": 0,
+                            "end": 1,
+                            "header": 
+                            [
+                                {
+                                    "size": 1,
+                                    "padding": 0
+                                }
+                            ],
+                            "body" : "2",
+                            "next" : 1
                         }
-                    ],
-                    "body" : "2",
-                    "next" : 1
+                    ]
+                },
+                {
+                    "alloc": 
+                    [
+                        {
+                            "start": 0,
+                            "end": 1,
+                            "header": 
+                            [
+                                {
+                                    "size": 1,
+                                    "padding": 0
+                                }
+                            ],
+                            "body" : "2",
+                            "next" : 1
+                        },
+                        {
+                            "start": 2,
+                            "end": 3,
+                            "header": 
+                            [
+                                {
+                                    "size": 1,
+                                    "padding": 0
+                                }
+                            ],
+                            "body" : "2",
+                            "next" : 0
+                        }
+                    ]
                 }
             ]
         },
         {
             "id" : 2,
-            "name" : "defult allocator",
+            "name" : "defult allocator2",
             "size" : 1000000000,
-            "alloc": 
+            "SnapShots":
             [
                 {
-                    "start": 0,
-                    "end": 1,
-                    "header": 
+                    "alloc": 
                     [
                         {
-                            "size": 1,
-                            "padding": 0
+                            "start": 0,
+                            "end": 1,
+                            "header": 
+                            [
+                                {
+                                    "size": 1,
+                                    "padding": 0
+                                }
+                            ],
+                            "body" : "2",
+                            "next" : 1
                         }
-                    ],
-                    "body" : "2",
-                    "next" : 1
+                    ]
                 },
                 {
-                    "start": 2,
-                    "end": 3,
-                    "header": 
+                    "alloc": 
                     [
                         {
-                            "size": 1,
-                            "padding": 0
+                            "start": 0,
+                            "end": 1,
+                            "header": 
+                            [
+                                {
+                                    "size": 1,
+                                    "padding": 0
+                                }
+                            ],
+                            "body" : "2",
+                            "next" : 1
+                        },
+                        {
+                            "start": 2,
+                            "end": 3,
+                            "header": 
+                            [
+                                {
+                                    "size": 1,
+                                    "padding": 0
+                                }
+                            ],
+                            "body" : "2",
+                            "next" : 0
                         }
-                    ],
-                    "body" : "2",
-                    "next" : 0
+                    ]
                 }
             ]
         }
