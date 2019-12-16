@@ -5,7 +5,7 @@ $(document).ready(function()
 
     var wheelPos = 0;
     var scale = Math.pow(2, wheelPos);
-    var index = -1;
+    var index = 0;
     var xoffset = 0.0;
     var lastX = 0;
 
@@ -84,8 +84,10 @@ $(document).ready(function()
 
             wheelPos = 0;
             scale = Math.pow(2, wheelPos);
-            xoffset = -parseInt($("body").css('width').replace("px", ""))/2;
+            index = (-parseInt($("body").css('width').replace("px", ""))/2)/scale;
             lastX = 0;
+
+            recalculateOffset();
 
             displayData(newArr);
         }
@@ -148,7 +150,24 @@ $(document).ready(function()
             function AddAllocation(alloc)
             {
                 ctx.fillStyle = "#00FF00";
-                ctx.fillRect((alloc.start * scale) + xoffset + windowMid, newYOffset, (alloc.end - alloc.start) * scale, allocatorHeight);
+                var xStart = (alloc.start * scale) + xoffset + windowMid;
+                var size = (alloc.end - alloc.start) * scale;
+                ctx.fillRect(xStart, newYOffset, size, allocatorHeight);
+
+                var text = "";
+                for(var i = 0; i < alloc.body.length; i++)
+                {
+                    if((i+1) * 10 > size)
+                    {
+                        break;
+                    }
+                    text += alloc.body.charAt(i);
+                }
+
+                ctx.font = "10px Arial";
+                ctx.fillStyle = "#000000";
+                ctx.fillText(text, xStart + (size/2) - ((text.length*5)/2), newYOffset+(allocatorHeight/2));
+
             }
 
             newYOffset += allocatorHeight + deltaYOffset;
