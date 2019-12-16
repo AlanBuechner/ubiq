@@ -3,9 +3,10 @@ $(document).ready(function()
     var drag = false;
     var alt = true;
 
-    var scale = 100.0;
-    var xoffset = 0.0;
     var wheelPos = 0;
+    var scale = Math.pow(2, wheelPos);
+    var index = -1;
+    var xoffset = 0.0;
     var lastX = 0;
 
     var Allocator;
@@ -16,14 +17,13 @@ $(document).ready(function()
     });
 
     $("#data").bind("mousewheel",function(e){
+        var lastScale = scale;
         var targetScale = Math.pow(2, wheelPos + e.originalEvent.wheelDelta / 120);
         if(targetScale <= 0.0)
             return;
         scale = targetScale;
         wheelPos += e.originalEvent.wheelDelta / 120;
-        xoffset -= lastX - scale;
-        if(xoffset > 0)
-            xoffset = 0;
+        recalculateOffset();
         displayData(Allocator);
     });
 
@@ -42,9 +42,12 @@ $(document).ready(function()
     $("#data").bind("mousemove", function(e){
         if(drag && alt)
         {
-            xoffset -= (lastX - e.pageX);
-            if(xoffset > 0)
-                xoffset = 0;
+            index -= (lastX - e.pageX)/scale;
+            var windowWidth = parseInt($("body").css('width').replace("px", ""));
+            if(xoffset > windowWidth){
+                xoffset = windowWidth;
+            }
+            recalculateOffset();
             displayData(Allocator);
         }
         lastX = e.pageX;
@@ -78,9 +81,24 @@ $(document).ready(function()
         function receivedText(e) {
             let lines = e.target.result;
             var newArr = JSON.parse(lines);
+
+            wheelPos = 0;
+            scale = Math.pow(2, wheelPos);
+            xoffset = -parseInt($("body").css('width').replace("px", ""))/2;
+            lastX = 0;
+
             displayData(newArr);
         }
     });
+
+    function recalculateOffset()
+    {
+        var windowWidth = parseInt($("body").css('width').replace("px", ""));
+        xoffset = index * scale;
+        if(xoffset > windowWidth){
+            xoffset = windowWidth;
+        }
+    }
 
     function displayData(allocator)
     {
@@ -99,6 +117,7 @@ $(document).ready(function()
     {
         var data = document.getElementById("data");
         var ctx = data.getContext("2d");
+        var windowMid = parseInt($("body").css('width').replace("px", ""))/2;
 
         ctx.clearRect(0, 0, data.width, data.height);
 
@@ -118,7 +137,7 @@ $(document).ready(function()
 
             e.SnapShots.forEach(function(snapShot){
                 ctx.fillStyle = "#FF0000";
-                ctx.fillRect(xoffset, newYOffset, e.size * scale, allocatorHeight);
+                ctx.fillRect(xoffset + windowMid, newYOffset, e.size * scale, allocatorHeight);
 
                 snapShot.alloc.forEach(function(alloc){
                     AddAllocation(alloc);
@@ -129,7 +148,7 @@ $(document).ready(function()
             function AddAllocation(alloc)
             {
                 ctx.fillStyle = "#00FF00";
-                ctx.fillRect((alloc.start * scale) + xoffset, newYOffset, (alloc.end - alloc.start) * scale, allocatorHeight);
+                ctx.fillRect((alloc.start * scale) + xoffset + windowMid, newYOffset, (alloc.end - alloc.start) * scale, allocatorHeight);
             }
 
             newYOffset += allocatorHeight + deltaYOffset;
