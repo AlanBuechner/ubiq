@@ -16,7 +16,7 @@ $(document).ready(function()
         displayData(Allocator);
     });
 
-    $("#data").bind("mousewheel",function(e){
+    $(document).bind("mousewheel",function(e){
         var lastScale = scale;
         var targetScale = Math.pow(2, wheelPos + e.originalEvent.wheelDelta / 120);
         if(targetScale <= 0.0)
@@ -27,19 +27,19 @@ $(document).ready(function()
         displayData(Allocator);
     });
 
-    $("#data").bind("mousedown", function(e){
+    $(document).bind("mousedown", function(e){
         if(e.button == 0){
             drag = true;
         }
     });
 
-    $("#data").bind("mouseup", function(e){
+    $(document).bind("mouseup", function(e){
         if(e.button == 0){
             drag = false;
         }
     });
 
-    $("#data").bind("mousemove", function(e){
+    $(document).bind("mousemove", function(e){
         if(drag && alt)
         {
             index -= (lastX - e.pageX)/scale;
@@ -161,56 +161,36 @@ $(document).ready(function()
                 ctx.fillStyle = "#d10099";
                 ctx.fillRect(headerStart, newYOffset, headerSize * scale, allocatorHeight);
 
-                var text = "";
-                for(var i = 0; i < "header".length; i++)
-                {
-                    if((i+1) * 10 > headerSize * scale)
-                    {
-                        break;
-                    }
-                    text += "header".charAt(i);
-                }
-
-                ctx.font = "10px Arial";
-                ctx.fillStyle = "#000000";
-                ctx.fillText(text, headerStart + (headerSize * scale/2) - ((text.length*5)/2), newYOffset+(allocatorHeight/2));
+                drawTextinRegen("header", headerStart, newYOffset, headerSize * scale, allocatorHeight);
                 
                 // draw body
                 ctx.fillStyle = "#00FF00";
                 ctx.fillRect(xStart, newYOffset, size, allocatorHeight);
-                text = "";
-                for(var i = 0; i < alloc.body.length; i++)
-                {
-                    if((i+1) * 10 > size)
-                    {
-                        break;
-                    }
-                    text += alloc.body.charAt(i);
-                }
 
-                ctx.font = "10px Arial";
-                ctx.fillStyle = "#000000";
-                ctx.fillText(text, xStart + (size/2) - ((text.length*5)/2), newYOffset+(allocatorHeight/2));
+                drawTextinRegen(alloc.body, xStart, newYOffset, size, allocatorHeight);
 
                 // draw footer
                 ctx.fillStyle = "#1D32FF";
                 ctx.fillRect(footerStart, newYOffset, scale, allocatorHeight);
 
-                ctx.fillStyle = "#00FF00";
-                ctx.fillRect(xStart, newYOffset, size, allocatorHeight);
-                text = "";
-                for(var i = 0; i < alloc.next.toString().length; i++)
-                {
-                    if((i+1) * 10 > scale)
-                    {
-                        break;
-                    }
-                    text += alloc.next.toString().charAt(i);
-                }
+                drawTextinRegen(alloc.next.toString(), footerStart, newYOffset, scale, allocatorHeight);
 
-                ctx.font = "10px Arial";
-                ctx.fillStyle = "#000000";
-                ctx.fillText(text, footerStart + (scale/2) - ((text.length*5)/2), newYOffset+(allocatorHeight/2));
+                function drawTextinRegen(text, startx, starty, sizex, sizey)
+                {
+                    var newText = "";
+                    for(var i = 0; i < text.length; i++)
+                    {
+                        if((i+1) * 10 > sizex)
+                        {
+                            break;
+                        }
+                        newText += text.charAt(i);
+                    }
+
+                    ctx.font = "10px Arial";
+                    ctx.fillStyle = "#000000";
+                    ctx.fillText(newText, startx + (sizex/2) - ((newText.length*5)/2), starty+(sizey/2));
+                }
             }
 
             newYOffset += allocatorHeight + deltaYOffset;
