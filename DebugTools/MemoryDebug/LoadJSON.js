@@ -175,6 +175,16 @@ $(document).ready(function()
 
                 drawTextinRegen(alloc.next.toString(), footerStart, newYOffset, scale, allocatorHeight);
 
+                // draw arrow to next
+                ctx.fillStyle = "#000000";
+                ctx.fillRect(footerStart + (scale/2), newYOffset+allocatorHeight, 2, allocatorHeight/2);
+
+                if(alloc.next != 0)
+                {
+                    ctx.fillRect((alloc.next * scale) + xoffset + windowMid, newYOffset+allocatorHeight, 2, allocatorHeight/2);
+                    ctx.fillRect(footerStart + (scale/2), newYOffset+(allocatorHeight*(3/2)), ((alloc.next * scale) + xoffset + windowMid) - (footerStart + (scale/2)) + 2, 2);
+                }
+
                 function drawTextinRegen(text, startx, starty, sizex, sizey)
                 {
                     var newText = "";
