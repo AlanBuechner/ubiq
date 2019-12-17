@@ -137,6 +137,8 @@ $(document).ready(function()
             ctx.font = "30px Arial";
             ctx.fillText(e.name, 50, newYOffset - 10);
 
+            var headerSize = e.headerSize;
+
             e.SnapShots.forEach(function(snapShot){
                 ctx.fillStyle = "#FF0000";
                 ctx.fillRect(xoffset + windowMid, newYOffset, e.size * scale, allocatorHeight);
@@ -149,12 +151,34 @@ $(document).ready(function()
 
             function AddAllocation(alloc)
             {
-                ctx.fillStyle = "#00FF00";
-                var xStart = (alloc.start * scale) + xoffset + windowMid;
-                var size = (alloc.end - alloc.start) * scale;
-                ctx.fillRect(xStart, newYOffset, size, allocatorHeight);
+                var start = (alloc.start + headerSize);
+                var headerStart = (alloc.start * scale) + xoffset + windowMid;
+                var xStart = (start * scale) + xoffset + windowMid;
+                var size = (alloc.header[0].size - headerSize - 1) * scale;
+                var footerStart = ((alloc.start + alloc.header[0].size - 1) * scale) + xoffset + windowMid;
+
+                // draw header
+                ctx.fillStyle = "#d10099";
+                ctx.fillRect(headerStart, newYOffset, headerSize * scale, allocatorHeight);
 
                 var text = "";
+                for(var i = 0; i < "header".length; i++)
+                {
+                    if((i+1) * 10 > headerSize * scale)
+                    {
+                        break;
+                    }
+                    text += "header".charAt(i);
+                }
+
+                ctx.font = "10px Arial";
+                ctx.fillStyle = "#000000";
+                ctx.fillText(text, headerStart + (headerSize * scale/2) - ((text.length*5)/2), newYOffset+(allocatorHeight/2));
+                
+                // draw body
+                ctx.fillStyle = "#00FF00";
+                ctx.fillRect(xStart, newYOffset, size, allocatorHeight);
+                text = "";
                 for(var i = 0; i < alloc.body.length; i++)
                 {
                     if((i+1) * 10 > size)
@@ -168,6 +192,25 @@ $(document).ready(function()
                 ctx.fillStyle = "#000000";
                 ctx.fillText(text, xStart + (size/2) - ((text.length*5)/2), newYOffset+(allocatorHeight/2));
 
+                // draw footer
+                ctx.fillStyle = "#1D32FF";
+                ctx.fillRect(footerStart, newYOffset, scale, allocatorHeight);
+
+                ctx.fillStyle = "#00FF00";
+                ctx.fillRect(xStart, newYOffset, size, allocatorHeight);
+                text = "";
+                for(var i = 0; i < alloc.next.toString().length; i++)
+                {
+                    if((i+1) * 10 > scale)
+                    {
+                        break;
+                    }
+                    text += alloc.next.toString().charAt(i);
+                }
+
+                ctx.font = "10px Arial";
+                ctx.fillStyle = "#000000";
+                ctx.fillText(text, footerStart + (scale/2) - ((text.length*5)/2), newYOffset+(allocatorHeight/2));
             }
 
             newYOffset += allocatorHeight + deltaYOffset;
