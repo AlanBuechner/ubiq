@@ -119,7 +119,8 @@ $(document).ready(function()
     {
         var data = document.getElementById("data");
         var ctx = data.getContext("2d");
-        var windowMid = parseInt($("body").css('width').replace("px", ""))/2;
+        var windowWidth = parseInt($("body").css('width').replace("px", ""));
+        var windowMid = windowWidth/2;
 
         ctx.clearRect(0, 0, data.width, data.height);
 
@@ -136,6 +137,25 @@ $(document).ready(function()
             ctx.fillStyle = "#000000";
             ctx.font = "30px Arial";
             ctx.fillText(e.name, 50, newYOffset - 10);
+
+            ctx.fillRect(0, newYOffset, windowWidth, 2);
+
+            var segments = (windowWidth/scale);
+            var segmentSpasing = scale;
+
+            while(segments > 100)
+            {
+                segments /= 10;
+                segmentSpasing *= 10;
+            }
+            
+            for(var i = 0; i < segments; i++)
+            {
+                ctx.fillRect(i*segmentSpasing + (xoffset%segmentSpasing) + windowMid, newYOffset, 2, 10);
+                ctx.fillRect(windowMid - (i*segmentSpasing - (xoffset%segmentSpasing)), newYOffset, 2, 10);
+            }
+
+            newYOffset += deltaYOffset;
 
             var headerSize = e.headerSize;
 
