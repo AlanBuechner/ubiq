@@ -1,7 +1,6 @@
 $(document).ready(function()
 {
     var drag = false;
-    var alt = true;
 
     var wheelPos = 0;
     var scale = Math.pow(2, wheelPos);
@@ -27,20 +26,24 @@ $(document).ready(function()
         displayData(Allocator);
     });
 
+    var initMouseX;
+
     $(document).bind("mousedown", function(e){
         if(e.button == 0){
             drag = true;
+            initMouseX = e.pageX;
         }
     });
 
     $(document).bind("mouseup", function(e){
         if(e.button == 0){
             drag = false;
+            displayData(Allocator);
         }
     });
 
     $(document).bind("mousemove", function(e){
-        if(drag && alt)
+        if(drag && e.altKey)
         {
             index -= (lastX - e.pageX)/scale;
             var windowWidth = parseInt($("body").css('width').replace("px", ""));
@@ -49,6 +52,23 @@ $(document).ready(function()
             }
             recalculateOffset();
             displayData(Allocator);
+        }
+        else if(drag)
+        {
+            var data = document.getElementById("data");
+            var ctx = data.getContext("2d");
+            displayData(Allocator);
+            var ypos = 55;
+            var height = 10;
+            ctx.fillStyle = "#4287f5aa";
+            ctx.fillRect(initMouseX-8, 0, e.pageX-initMouseX, data.height);
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(initMouseX-8, ypos, e.pageX-initMouseX, 2);
+            ctx.fillRect(initMouseX-8, ypos-(height/2), 2, height+2);
+            ctx.fillRect(e.pageX-10, ypos-(height/2), 2, height+2);
+            ctx.font = "10px Arial";
+            var text = ((e.pageX-initMouseX)/scale) + "bytes";
+            ctx.fillText(text, initMouseX + ((e.pageX-initMouseX)/2) - ((text.length*5)/2), ypos + 20);
         }
         lastX = e.pageX;
     });
