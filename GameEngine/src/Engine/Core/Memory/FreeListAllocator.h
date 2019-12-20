@@ -1,6 +1,8 @@
 #pragma once
 #include "Allocator.h"
 #include "SinglyLinkedList.h"
+#include <iostream>
+#include <fstream>
 
 namespace Engine
 {
@@ -27,14 +29,22 @@ namespace Engine
 		void* m_Start = nullptr;
 		PlacementPolicy m_Policy;
 		SinglyLinkedList<FreeHeader> m_FreeList;
+
+		// memory debuging
+		std::ofstream m_OutputStream;
+		std::string m_Name;
 	public:
-		FreeListAllocator(size_t size, PlacementPolicy policy );
+		FreeListAllocator(size_t size, PlacementPolicy policy);
 		virtual ~FreeListAllocator();
 
 		virtual void Init() override;
 		virtual void* Allocate(size_t size, uint8_t alignment) override;
 		virtual void Deallocate(void* p) override;
 		virtual void Reset();
+
+		virtual void StartMemoryDebuging(std::string name, const std::string& path);
+		virtual void TakeSnapShot();
+		virtual void StopMemoryDebuging();
 	private:
 		FreeListAllocator(FreeListAllocator& freeListAllocator);
 

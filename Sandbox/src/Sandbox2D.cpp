@@ -22,6 +22,10 @@ Sandbox2DLayer::Sandbox2DLayer()
 
 void Sandbox2DLayer::OnAttach()
 {
+	Engine::FreeListAllocator* alloc = Engine::UString::s_UStringAllocator;
+
+	alloc->StartMemoryDebuging("String Allocator", "test.json");
+
 	m_LogoTexture = Engine::Texture2D::Create("assets/Images/UBIQ.png");
 
 	Engine::Timer timer = CREATE_PROFILE();
@@ -32,9 +36,12 @@ void Sandbox2DLayer::OnAttach()
 	Engine::UString str = file.ReadFromFile();
 	file.Close();
 	timer.End();
+	alloc->TakeSnapShot();
 
 	DEBUG_INFO(str);
 	DEBUG_INFO(str.Find("aaa"));
+
+	alloc->StopMemoryDebuging();
 }
 
 void Sandbox2DLayer::OnDetach()

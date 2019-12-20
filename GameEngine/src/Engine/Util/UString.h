@@ -39,6 +39,7 @@ namespace Engine
 
 		friend std::ostream& operator<<(std::ostream& os, const UString& str);
 
+		static FreeListAllocator* s_UStringAllocator;
 	private:
 		void Resize(size_t size);
 
@@ -48,7 +49,6 @@ namespace Engine
 
 		size_t m_Size = 0;
 
-		static FreeListAllocator* s_UStringAllocator;
 
 		friend UStringView;
 	};

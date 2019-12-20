@@ -107,6 +107,64 @@ namespace Engine
 		m_FreeList.insert(nullptr, firstNode);
 	}
 
+	void FreeListAllocator::StartMemoryDebuging(std::string name, const std::string& path)
+	{
+		m_Name = name;
+		m_OutputStream.open(path);
+		m_OutputStream << "{";
+		m_OutputStream << "\"type\" : \"FreeList\",";
+		m_OutputStream << "\"allocator\" :[{";
+		m_OutputStream << "\"id\" : 1,";
+		m_OutputStream << "\"name\" : \"" << name << "\",";
+		m_OutputStream << "\"size\" : " << m_Size << ",";
+		m_OutputStream << "\"headerSize\" : " << sizeof(AllocationHeader) << ",";
+		m_OutputStream <<"\"SnapShots\" :[";
+	}
+
+	uint16_t snapShot = 0;
+
+	void FreeListAllocator::TakeSnapShot()
+	{
+		if (snapShot != 0)
+			m_OutputStream << ",";
+
+		m_OutputStream << "{";
+		m_OutputStream << "\"alloc\":[";
+
+		// start allocations
+
+		Node* it = m_FreeList.head; // current node is head of the linked list
+		Node* itPrev = nullptr;
+		while (it != nullptr) 
+		{
+			FreeListAllocator::AllocationHeader* header = (FreeListAllocator::AllocationHeader*)(itPrev == nullptr ? (size_t)m_Start : (size_t)itPrev + (size_t)itPrev->data.blockSize);
+
+			m_OutputStream << "{";
+			m_OutputStream << "\"start\": " << (int)(header - (size_t)m_Start) << ","; // the start of the allocation
+			m_OutputStream << "\"header\" :[{"; // the header memory
+			m_OutputStream << "\"size\": " << (int)(header->blockSize + sizeof(FreeListAllocator::AllocationHeader) + sizeof(Node::next)) << ","; // the size of the allocation
+			m_OutputStream << "\"padding\" : " << 0 << " }],"; // the padding
+			m_OutputStream << "\"body\" : \"222222222222222\","; // the information in the allocation
+			m_OutputStream << "\"next\" : " << (int)((it->next == nullptr ? 0 : it->next) - (size_t)m_Start) << ""; // the next node in the list
+			m_OutputStream << "}"; // close the allocation
+
+			itPrev = it;
+			it = it->next;
+			if(it != nullptr)
+				m_OutputStream << ",";
+		}
+
+		// close snapshot
+		m_OutputStream << "]}";
+	}
+
+	void FreeListAllocator::StopMemoryDebuging()
+	{
+		m_OutputStream << "]}]}";
+
+		m_OutputStream.close();
+	}
+
 	void FreeListAllocator::Coalescence(Node* previousNode, Node* freeNode)
 	{
 		if (freeNode->next != nullptr &&
