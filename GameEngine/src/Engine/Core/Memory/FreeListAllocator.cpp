@@ -137,6 +137,8 @@ namespace Engine
 
 	void FreeListAllocator::TakeSnapShot()
 	{
+		if (!m_OutputStream.is_open())
+			return;
 
 		if (snapShot != 0)
 			m_OutputStream << ",";
@@ -151,9 +153,15 @@ namespace Engine
 			m_OutputStream << "{";
 			m_OutputStream << "\"start\":" << (uint32_t)((size_t)header - (size_t)m_Start) << ","; // the start of the allocation
 			m_OutputStream << "\"header\":[{"; // the header memory
-			m_OutputStream << "\"size\":" << (uint32_t)(header->blockSize) << ","; // the size of the allocation
+			uint32_t size = (uint32_t)(header->blockSize - sizeof(Node));
+			m_OutputStream << "\"size\":" << size << ","; // the size of the allocation
 			m_OutputStream << "\"padding\":" << (uint32_t)header->padding << " }],"; // the padding
-			m_OutputStream << "\"body\":\"222222222222222\""; // the information in the allocation
+			char* buffer = new char[size];
+			for (int j = 0; j < size; j++)
+			{
+				buffer[j] = *(char*)(allocations[i] + j);
+			}
+			m_OutputStream << "\"body\":\"" << "" << "\""; // the information in the allocation
 			m_OutputStream << "}"; // close the allocation
 
 			if (i < allocations.size()-1)
@@ -176,7 +184,14 @@ namespace Engine
 			itPrev = it;
 			it = it->next;
 			if (it != nullptr)
+			{
+				if ((size_t)it - (size_t)m_Start > m_Size)
+				{
+					DEBUG_ERROR("{0} is out of bounds", (size_t)it);
+					break;
+				}
 				m_OutputStream << ",";
+			}
 		}
 
 		// close snapShot
@@ -213,7 +228,7 @@ namespace Engine
 			FindFirstLocation(size, alignment, padding, previousNode, foundNode);
 			break;
 		case FreeListAllocator::PlacementPolicy::FindBest:
-			//FindBestLocation(size, alignment, padding, previousNode, foundNode); // Need to fix
+			FindBestLocation(size, alignment, padding, previousNode, foundNode); // Need to fix
 			break;
 		default:
 			break;
@@ -247,8 +262,8 @@ namespace Engine
 			* itPrev = nullptr;
 
 		while (it != nullptr) {
-			padding = PointerMath::CalculatePaddingWithHeader((size_t)it, alignment, sizeof(FreeListAllocator::AllocationHeader));
-			const size_t requiredSpace = size + padding;
+			padding = PointerMath::CalculatePaddingWithHeader((std::size_t)it, alignment, sizeof(FreeListAllocator::AllocationHeader));
+			const std::size_t requiredSpace = size + padding;
 			if (it->data.blockSize >= requiredSpace) {
 				break;
 			}

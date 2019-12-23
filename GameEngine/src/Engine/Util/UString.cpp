@@ -177,11 +177,13 @@ namespace Engine
 		m_Size = size;
 		char* temp = m_Data;
 		m_Data = (char*)s_UStringAllocator->Allocate(size + 1, 8);
+		s_UStringAllocator->TakeSnapShot();
 		m_Data[size] = 0;
 		if (temp != nullptr)
 		{
 			CopyOver(temp);
 			s_UStringAllocator->Deallocate(temp);
+			s_UStringAllocator->TakeSnapShot();
 		}
 	}
 
