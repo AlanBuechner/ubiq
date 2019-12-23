@@ -40,12 +40,12 @@ void Sandbox2DLayer::OnAttach()
 	DEBUG_INFO(str);
 	DEBUG_INFO(str.Find("a"));
 
-	alloc->StopMemoryDebuging();
 }
 
 void Sandbox2DLayer::OnDetach()
 {
-
+	Engine::FreeListAllocator* alloc = Engine::UString::s_UStringAllocator;
+	alloc->StopMemoryDebuging();
 }
 
 void Sandbox2DLayer::OnUpdate()
@@ -64,7 +64,6 @@ void Sandbox2DLayer::OnUpdate()
 	timer.Start("Rendrer");
 	Engine::Renderer2D::BeginScene(*m_Camera->GetCamera());
 
-	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 1.0f }, { 10.0f, 10.0f }, m_LogoTexture);
 	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
 
 	Engine::Renderer2D::EndScene();

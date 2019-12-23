@@ -6,6 +6,7 @@ $(document).ready(function()
     var scale = Math.pow(2, wheelPos);
     var index = 0;
     var xoffset = 0.0;
+    var yoffset = 0.0;
     var lastX = 0;
 
     var Allocator;
@@ -16,13 +17,24 @@ $(document).ready(function()
     });
 
     $(document).bind("mousewheel",function(e){
-        var lastScale = scale;
-        var targetScale = Math.pow(2, wheelPos + e.originalEvent.wheelDelta / 120);
-        if(targetScale <= 0.0)
-            return;
-        scale = targetScale;
-        wheelPos += e.originalEvent.wheelDelta / 120;
-        recalculateOffset();
+        if(e.altKey)
+        {
+            var targetScale = Math.pow(2, wheelPos + e.originalEvent.wheelDelta / 120);
+            if(targetScale <= 0.0)
+                return;
+            scale = targetScale;
+            wheelPos += e.originalEvent.wheelDelta / 120;
+            recalculateOffset();
+        }
+        else
+        {
+            var speed = 1
+            if(e.shiftKey)
+                speed = 2;
+            yoffset += speed * e.originalEvent.wheelDelta/12
+            if(yoffset > 0)
+                yoffset = 0;
+        }
         displayData(Allocator);
     });
 
@@ -105,6 +117,7 @@ $(document).ready(function()
             wheelPos = 0;
             scale = Math.pow(2, wheelPos);
             index = (-parseInt($("body").css('width').replace("px", ""))/2)/scale;
+            yoffset = 0;
             lastX = 0;
 
             recalculateOffset();
@@ -146,7 +159,7 @@ $(document).ready(function()
 
         var allocatorHeight = 30;
         const deltaYOffset = 50;
-        var newYOffset = deltaYOffset;
+        var newYOffset = deltaYOffset + yoffset;
 
         a.forEach(function(e) {
             AddAllocator(e);
