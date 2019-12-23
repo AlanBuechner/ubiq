@@ -7,7 +7,8 @@
             "name" : "default allocator",
             "size" : 1000000000,
             "headerSize" : 3,
-            "SnapShots":
+            "listHeaderSize" : 3,
+            "snapShots":
             [
                 {
                     "alloc": 
@@ -21,7 +22,13 @@
                                     "padding": 0
                                 }
                             ],
-                            "body" : "222222222222222",
+                            "body" : "222222222222222"
+                        }
+                    ],
+                    "linkedList" : 
+                    [
+                        {
+                            "start" : 5,
                             "next" : 0
                         }
                     ]
@@ -38,11 +45,10 @@
                                     "padding": 0
                                 }
                             ],
-                            "body" : "2",
-                            "next" : 10
+                            "body" : "2"
                         },
                         {
-                            "start": 6,
+                            "start": 10,
                             "header": 
                             [
                                 {
@@ -50,62 +56,17 @@
                                     "padding": 0
                                 }
                             ],
-                            "body" : "2",
-                            "next" : 0
+                            "body" : "2"
                         }
-                    ]
-                }
-            ]
-        },
-        {
-            "id" : 1,
-            "name" : "default allocator 2",
-            "size" : 1000000000,
-            "headerSize" : 3,
-            "SnapShots":
-            [
-                {
-                    "alloc": 
+                    ],
+                    "linkedList" : 
                     [
                         {
-                            "start": 0,
-                            "header": 
-                            [
-                                {
-                                    "size": 5,
-                                    "padding": 0
-                                }
-                            ],
-                            "body" : "222222222222222",
-                            "next" : 0
-                        }
-                    ]
-                },
-                {
-                    "alloc": 
-                    [
-                        {
-                            "start": 0,
-                            "header": 
-                            [
-                                {
-                                    "size": 5,
-                                    "padding": 0
-                                }
-                            ],
-                            "body" : "2",
-                            "next" : 10
+                            "start" : 5,
+                            "next" : 15
                         },
                         {
-                            "start": 6,
-                            "header": 
-                            [
-                                {
-                                    "size": 5,
-                                    "padding": 0
-                                }
-                            ],
-                            "body" : "2",
+                            "start" : 15,
                             "next" : 0
                         }
                     ]

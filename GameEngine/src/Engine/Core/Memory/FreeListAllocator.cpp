@@ -64,6 +64,8 @@ namespace Engine
 		m_Used += requiredSize;
 		m_Peak = std::max(m_Peak, m_Used);
 
+		allocations.push_back(dataAddress);
+
 		return (void*)dataAddress;
 	}
 
@@ -92,6 +94,15 @@ namespace Engine
 
 		m_Used -= freeNode->data.blockSize;
 
+		for (int i = 0; i < allocations.size(); i++)
+		{
+			if ((void*)allocations[i] == p)
+			{
+				allocations.erase(allocations.begin() + i);
+				break;
+			}
+		}
+
 		// Merge contiguous nodes
 		Coalescence(itPrev, freeNode);
 	}
@@ -117,44 +128,58 @@ namespace Engine
 		m_OutputStream << "\"id\" : 1,";
 		m_OutputStream << "\"name\" : \"" << name << "\",";
 		m_OutputStream << "\"size\" : " << m_Size << ",";
-		m_OutputStream << "\"headerSize\" : " << sizeof(AllocationHeader) << ",";
-		m_OutputStream <<"\"SnapShots\" :[";
+		m_OutputStream << "\"headerSize\" : " << (uint32_t)sizeof(AllocationHeader) << ",";
+		m_OutputStream << "\"listHeaderSize\" : " << (uint32_t)sizeof(FreeHeader) << ",";
+		m_OutputStream <<"\"snapShots\" :[";
 	}
 
 	uint16_t snapShot = 0;
 
 	void FreeListAllocator::TakeSnapShot()
 	{
+
 		if (snapShot != 0)
 			m_OutputStream << ",";
 
 		m_OutputStream << "{";
 		m_OutputStream << "\"alloc\":[";
 
-		// start allocations
-
-		Node* it = m_FreeList.head; // current node is head of the linked list
-		Node* itPrev = nullptr;
-		while (it != nullptr) 
+		for (int i = 0; i < allocations.size(); i++)
 		{
-			FreeListAllocator::AllocationHeader* header = (FreeListAllocator::AllocationHeader*)(itPrev == nullptr ? (size_t)m_Start : (size_t)itPrev + (size_t)itPrev->data.blockSize);
+			FreeListAllocator::AllocationHeader* header = (FreeListAllocator::AllocationHeader*)(allocations[i] - sizeof(AllocationHeader));
 
 			m_OutputStream << "{";
-			m_OutputStream << "\"start\": " << (int)(header - (size_t)m_Start) << ","; // the start of the allocation
-			m_OutputStream << "\"header\" :[{"; // the header memory
-			m_OutputStream << "\"size\": " << (int)(header->blockSize + sizeof(FreeListAllocator::AllocationHeader) + sizeof(Node::next)) << ","; // the size of the allocation
-			m_OutputStream << "\"padding\" : " << 0 << " }],"; // the padding
-			m_OutputStream << "\"body\" : \"222222222222222\","; // the information in the allocation
-			m_OutputStream << "\"next\" : " << (int)((it->next == nullptr ? 0 : it->next) - (size_t)m_Start) << ""; // the next node in the list
+			m_OutputStream << "\"start\":" << (uint32_t)((size_t)header - (size_t)m_Start) << ","; // the start of the allocation
+			m_OutputStream << "\"header\":[{"; // the header memory
+			m_OutputStream << "\"size\":" << (uint32_t)(header->blockSize) << ","; // the size of the allocation
+			m_OutputStream << "\"padding\":" << (uint32_t)header->padding << " }],"; // the padding
+			m_OutputStream << "\"body\":\"222222222222222\""; // the information in the allocation
 			m_OutputStream << "}"; // close the allocation
 
-			itPrev = it;
-			it = it->next;
-			if(it != nullptr)
+			if (i < allocations.size()-1)
 				m_OutputStream << ",";
 		}
 
-		// close snapshot
+		snapShot++;
+		// close allocation
+		m_OutputStream << "],\"linkedList\":[";
+
+		Node* it = m_FreeList.head; // current node is head of the linked list
+		Node* itPrev = nullptr;
+		while (it != nullptr)
+		{
+			m_OutputStream << "{";
+			m_OutputStream << "\"start\":" << (uint32_t)((size_t)it- (size_t)m_Start) << ",";
+			m_OutputStream << "\"next\":" << (uint32_t)((it->next == nullptr ? 0 : ((size_t)it->next- (size_t)m_Start)));
+			m_OutputStream << "}";
+
+			itPrev = it;
+			it = it->next;
+			if (it != nullptr)
+				m_OutputStream << ",";
+		}
+
+		// close snapShot
 		m_OutputStream << "]}";
 	}
 

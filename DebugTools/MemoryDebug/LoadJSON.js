@@ -67,7 +67,7 @@ $(document).ready(function()
             ctx.fillRect(initMouseX-8, ypos-(height/2), 2, height+2);
             ctx.fillRect(e.pageX-10, ypos-(height/2), 2, height+2);
             ctx.font = "10px Arial";
-            var text = ((e.pageX-initMouseX)/scale) + "bytes";
+            var text = (Math.abs(e.pageX-initMouseX)/scale) + "bytes";
             ctx.fillText(text, initMouseX + ((e.pageX-initMouseX)/2) - ((text.length*5)/2), ypos + 20);
         }
         lastX = e.pageX;
@@ -179,12 +179,15 @@ $(document).ready(function()
 
             var headerSize = e.headerSize;
 
-            e.SnapShots.forEach(function(snapShot){
+            e.snapShots.forEach(function(snapShot){
                 ctx.fillStyle = "#FF0000";
                 ctx.fillRect(xoffset + windowMid, newYOffset, e.size * scale, allocatorHeight);
 
                 snapShot.alloc.forEach(function(alloc){
                     AddAllocation(alloc);
+                });
+                snapShot.linkedList.forEach(function(list){
+                    addLink(list);
                 });
                 newYOffset += allocatorHeight + deltaYOffset/2;
             });
@@ -194,8 +197,7 @@ $(document).ready(function()
                 var start = (alloc.start + headerSize);
                 var headerStart = (alloc.start * scale) + xoffset + windowMid;
                 var xStart = (start * scale) + xoffset + windowMid;
-                var size = (alloc.header[0].size - headerSize - 1) * scale;
-                var footerStart = ((alloc.start + alloc.header[0].size - 1) * scale) + xoffset + windowMid;
+                var size = (alloc.header[0].size - headerSize) * scale;
 
                 // draw header
                 ctx.fillStyle = "#d10099";
@@ -208,24 +210,30 @@ $(document).ready(function()
                 ctx.fillRect(xStart, newYOffset, size, allocatorHeight);
 
                 drawTextinRegen(alloc.body, xStart, newYOffset, size, allocatorHeight);
+            }
 
-                // draw footer
+            function addLink(link)
+            {
+                var start = (link.start * scale) + xoffset + windowMid;
+                var next = link.next;
+
                 ctx.fillStyle = "#1D32FF";
-                ctx.fillRect(footerStart, newYOffset, scale, allocatorHeight);
+                ctx.fillRect(start, newYOffset, scale * e.listHeaderSize, allocatorHeight);
 
-                drawTextinRegen(alloc.next.toString(), footerStart, newYOffset, scale, allocatorHeight);
+                drawTextinRegen(next.toString(), start, newYOffset, scale * e.listHeaderSize, allocatorHeight);
 
                 // draw arrow to next
                 ctx.fillStyle = "#000000";
-                ctx.fillRect(footerStart + (scale/2), newYOffset+allocatorHeight, 2, allocatorHeight/2);
+                ctx.fillRect(start + (scale*e.listHeaderSize/2), newYOffset+allocatorHeight, 2, allocatorHeight/2);
 
-                if(alloc.next != 0)
+                if(next != 0)
                 {
-                    ctx.fillRect((alloc.next * scale) + xoffset + windowMid, newYOffset+allocatorHeight, 2, allocatorHeight/2);
-                    ctx.fillRect(footerStart + (scale/2), newYOffset+(allocatorHeight*(3/2)), ((alloc.next * scale) + xoffset + windowMid) - (footerStart + (scale/2)) + 2, 2);
+                    ctx.fillRect((next * scale) + xoffset + windowMid, newYOffset+allocatorHeight, 2, allocatorHeight/2);
+                    ctx.fillRect(start + (scale*e.listHeaderSize/2), newYOffset+(allocatorHeight*(3/2)), ((next * scale) + xoffset + windowMid) - (start + (scale*e.listHeaderSize/2)) + 2, 2);
                 }
+            }
 
-                function drawTextinRegen(text, startx, starty, sizex, sizey)
+            function drawTextinRegen(text, startx, starty, sizex, sizey)
                 {
                     var newText = "";
                     for(var i = 0; i < text.length; i++)
@@ -241,7 +249,6 @@ $(document).ready(function()
                     ctx.fillStyle = "#000000";
                     ctx.fillText(newText, startx + (sizex/2) - ((newText.length*5)/2), starty+(sizey/2));
                 }
-            }
 
             newYOffset += allocatorHeight + deltaYOffset;
         }

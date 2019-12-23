@@ -3,6 +3,7 @@
 #include "SinglyLinkedList.h"
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 namespace Engine
 {
@@ -29,6 +30,8 @@ namespace Engine
 		void* m_Start = nullptr;
 		PlacementPolicy m_Policy;
 		SinglyLinkedList<FreeHeader> m_FreeList;
+
+		std::vector<size_t> allocations;
 
 		// memory debuging
 		std::ofstream m_OutputStream;
