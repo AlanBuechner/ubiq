@@ -160,7 +160,7 @@ namespace Engine
 			m_OutputStream << "\"size\":" << size << ","; // the size of the allocation
 			m_OutputStream << "\"padding\":" << (uint32_t)header->padding << " }],"; // the padding
 			char* buffer = new char[size];
-			for (int j = 0; j < size; j++)
+			for (uint32_t j = 0; j < size; j++)
 			{
 				buffer[j] = *(char*)(allocations[i] + j);
 			}
