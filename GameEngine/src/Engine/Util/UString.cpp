@@ -31,6 +31,7 @@ namespace Engine
 	UString::~UString()
 	{
 		s_UStringAllocator->Deallocate(m_Data);
+		s_UStringAllocator->TakeSnapShot();
 	}
 
 	const size_t UString::Size() const

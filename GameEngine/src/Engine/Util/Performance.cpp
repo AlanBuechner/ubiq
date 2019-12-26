@@ -64,19 +64,22 @@ namespace Engine
 
 	void Performance::Render()
 	{
-		ImGui::Begin("Profiler");
-
-		for (int i = 0; i < m_ProfileResults.Length(); i++)
+		if (m_ProfileResults.Length() != 0)
 		{
-			auto& result = m_ProfileResults[i];
-			UString buffer = "%.3fms  ";
-			buffer += result.name;
-			ImGui::Text(buffer.RawString(), ((float)result.end - (float)result.start)/1000.0f);
+			ImGui::Begin("Profiler");
+
+			for (int i = 0; i < m_ProfileResults.Length(); i++)
+			{
+				auto& result = m_ProfileResults[i];
+				UString buffer = "%.3fms  ";
+				buffer += result.name;
+				ImGui::Text(buffer.RawString(), ((float)result.end - (float)result.start) / 1000.0f);
+			}
+
+			m_ProfileResults.Clear();
+
+			ImGui::End();
 		}
-
-		m_ProfileResults.Clear();
-
-		ImGui::End();
 	}
 
 }

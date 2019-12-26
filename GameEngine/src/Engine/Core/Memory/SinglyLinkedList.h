@@ -31,7 +31,8 @@ namespace Engine
 				}
 				head = newNode;
 			}
-			else {
+			else 
+			{
 				if (previousNode->next == nullptr) {
 					// Is the last node
 					previousNode->next = newNode;

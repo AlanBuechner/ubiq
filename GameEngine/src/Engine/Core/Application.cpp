@@ -21,15 +21,25 @@ namespace Engine {
 
 	Application::Application()
 	{
-		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!")
-			s_Instance = this;
+		CREATE_PROFILE_FUNCTIONI();
+		auto timer = CREATE_PROFILEI();
+		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!");
+		s_Instance = this;
 
+		timer.Start("Create Window");
 		m_Window = CreateScopedPtr<Window>(Window::Create()); // create a window
+		timer.End();
+		timer.Start("set event callback");
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
+		timer.End();
 
+		timer.Start("Renderer Init");
 		Renderer::Init();
+		timer.End();
 
+		timer.Start("Generate layer stack");
 		GenLayerStack(); // generate the starting layer stack
+		timer.End();
 	}
 
 	Application::~Application()

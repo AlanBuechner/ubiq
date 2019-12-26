@@ -30,8 +30,13 @@ public:
 	Sandbox() :
 		Engine::Application()
 	{
+		auto timer = CREATE_PROFILEI();
+		timer.Start("ExampleLayer");
 		PushLayer(new ExampleLayer());
+		timer.End();
+		timer.Start("Sandbox2DLayer");
 		PushLayer(new Sandbox2DLayer());
+		timer.End();
 	}
 
 	~Sandbox()
@@ -43,5 +48,6 @@ public:
 
 Engine::Application* Engine::CreateApplication()
 {
+	CREATE_PROFILE_FUNCTIONI();
 	return new Sandbox();
 }

@@ -32,15 +32,15 @@ namespace Engine
 		const size_t allocationHeaderSize = sizeof(FreeListAllocator::AllocationHeader);
 		const size_t freeHeaderSize = sizeof(FreeListAllocator::FreeHeader);
 
-		size += sizeof(Node); // size of the allocation and the footer for the linked list
+		size += allocationHeaderSize; // size of the allocation and the allocation header
+		size += alignment - (size % alignment); // size is always aligned
 
-		ASSERT(size >= sizeof(Node) ,"Allocation size must be bigger");
 		ASSERT(alignment >= 8, "aligment must be at least 8");
 
 		size_t padding;
 		Node* affectedNode;
 		Node* previousNode;
-		FindLocation(size, alignment, padding, previousNode, affectedNode); // finds a locatrion in memory to put the new allocation
+		FindLocation(size, alignment, padding, previousNode, affectedNode); // finds a location in memory to put the new allocation
 		ASSERT(affectedNode != nullptr, "not enough memory");
 
 		const size_t alignmentPadding = padding - allocationHeaderSize;
@@ -50,7 +50,7 @@ namespace Engine
 
 		if (rest > 0) {
 			// We have to split the block into the data block and a free block of size 'rest'
-			Node* newFreeNode = (Node*)((size_t) affectedNode + requiredSize);
+			Node* newFreeNode = (Node*)((size_t)affectedNode + requiredSize);
 			newFreeNode->data.blockSize = rest;
 			m_FreeList.insert(affectedNode, newFreeNode);
 		}
@@ -94,6 +94,7 @@ namespace Engine
 
 		m_Used -= freeNode->data.blockSize;
 
+		// remove allocation form the allocations array
 		for (int i = 0; i < allocations.size(); i++)
 		{
 			if ((void*)allocations[i] == p)
@@ -131,6 +132,7 @@ namespace Engine
 		m_OutputStream << "\"headerSize\" : " << (uint32_t)sizeof(AllocationHeader) << ",";
 		m_OutputStream << "\"listHeaderSize\" : " << (uint32_t)sizeof(FreeHeader) << ",";
 		m_OutputStream <<"\"snapShots\" :[";
+		m_OutputStream.flush();
 	}
 
 	uint16_t snapShot = 0;
@@ -142,6 +144,7 @@ namespace Engine
 
 		if (snapShot != 0)
 			m_OutputStream << ",";
+		snapShot++;
 
 		m_OutputStream << "{";
 		m_OutputStream << "\"alloc\":[";
@@ -163,12 +166,12 @@ namespace Engine
 			}
 			m_OutputStream << "\"body\":\"" << "" << "\""; // the information in the allocation
 			m_OutputStream << "}"; // close the allocation
+			m_OutputStream.flush();
 
 			if (i < allocations.size()-1)
 				m_OutputStream << ",";
 		}
 
-		snapShot++;
 		// close allocation
 		m_OutputStream << "],\"linkedList\":[";
 
@@ -178,8 +181,9 @@ namespace Engine
 		{
 			m_OutputStream << "{";
 			m_OutputStream << "\"start\":" << (uint32_t)((size_t)it- (size_t)m_Start) << ",";
-			m_OutputStream << "\"next\":" << (uint32_t)((it->next == nullptr ? 0 : ((size_t)it->next- (size_t)m_Start)));
+			m_OutputStream << "\"next\":" << (uint32_t)((it->next == nullptr ? 0 : ((size_t)it->next - (size_t)m_Start)));
 			m_OutputStream << "}";
+			m_OutputStream.flush();
 
 			itPrev = it;
 			it = it->next;
@@ -196,6 +200,7 @@ namespace Engine
 
 		// close snapShot
 		m_OutputStream << "]}";
+		m_OutputStream.flush();
 	}
 
 	void FreeListAllocator::StopMemoryDebuging()
@@ -208,15 +213,19 @@ namespace Engine
 	void FreeListAllocator::Coalescence(Node* previousNode, Node* freeNode)
 	{
 		if (freeNode->next != nullptr &&
-			(std::size_t) freeNode + freeNode->data.blockSize == (std::size_t) freeNode->next) {
+			(std::size_t) freeNode + freeNode->data.blockSize == (std::size_t) freeNode->next)
+		{
 			freeNode->data.blockSize += freeNode->next->data.blockSize;
 			m_FreeList.remove(freeNode, freeNode->next);
 		}
-
-		if (previousNode != nullptr &&
-			(std::size_t) previousNode + previousNode->data.blockSize == (std::size_t) freeNode) {
-			previousNode->data.blockSize += freeNode->data.blockSize;
-			m_FreeList.remove(previousNode, freeNode);
+		if (previousNode != nullptr) 
+		{
+			size_t dist = (std::size_t)previousNode + previousNode->data.blockSize - (size_t)m_Start;
+			if (dist + (size_t)m_Start == (std::size_t) freeNode)
+			{
+				previousNode->data.blockSize += freeNode->data.blockSize;
+				m_FreeList.remove(previousNode, freeNode);
+			}
 		}
 	}
 

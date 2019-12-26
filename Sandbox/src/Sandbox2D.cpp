@@ -31,21 +31,22 @@ void Sandbox2DLayer::OnAttach()
 	Engine::Timer timer = CREATE_PROFILE();
 
 	timer.Start("Engine::UFileIO");
+	Engine::UString str;
 	Engine::UFileIO file;
 	file.Open("Assets/Shaders/FlatColorShader.glsl");
-	Engine::UString str = file.ReadFromFile();
+	str = file.ReadFromFile();
 	file.Close();
 	timer.End();
 
 	DEBUG_INFO(str);
-	DEBUG_INFO(str.Find("a"));
+	DEBUG_INFO(str.Find("aaaaaaa"));
+	alloc->StopMemoryDebuging();
 
 }
 
 void Sandbox2DLayer::OnDetach()
 {
-	Engine::FreeListAllocator* alloc = Engine::UString::s_UStringAllocator;
-	alloc->StopMemoryDebuging();
+
 }
 
 void Sandbox2DLayer::OnUpdate()

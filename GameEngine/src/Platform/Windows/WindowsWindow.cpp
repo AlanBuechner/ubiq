@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "WindowsWindow.h"
 #include "Engine/Core/Log.h"
+#include "Engine/Util/Performance.h"
 
 #include "Engine/Core/Input/InputControler.h"
 #include "Engine/Events/ApplicationEvent.h"
@@ -25,6 +26,7 @@ namespace Engine
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		Init(props); // initializes the window
 	}
 
@@ -35,6 +37,7 @@ namespace Engine
 
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+		auto time = CREATE_PROFILEI();
 		m_Data.Title = props.Title; // sets the window title
 		m_Data.Width = props.Width; // sets the width of the window
 		m_Data.Height = props.Height; // sets the hight of the window
