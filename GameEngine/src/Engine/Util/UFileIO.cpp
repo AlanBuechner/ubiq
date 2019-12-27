@@ -17,6 +17,9 @@ namespace Engine
 
 	bool Engine::UFileIO::Open(const UString& path)
 	{
+		if (m_hFile != 0)
+			Close();
+
 		HANDLE hFile = CreateFileA((LPCSTR)path.RawString(), 
 			GENERIC_READ | GENERIC_WRITE, 
 			FILE_SHARE_READ | FILE_SHARE_WRITE, 
@@ -25,10 +28,22 @@ namespace Engine
 			FILE_ATTRIBUTE_NORMAL,
 			NULL);
 
+		if (hFile == INVALID_HANDLE_VALUE && GetLastError() == 2)
+		{
+			hFile = CreateFileA((LPCSTR)path.RawString(),
+				GENERIC_READ | GENERIC_WRITE,
+				FILE_SHARE_READ | FILE_SHARE_WRITE,
+				NULL,
+				CREATE_ALWAYS,
+				FILE_ATTRIBUTE_NORMAL,
+				NULL);
+		}
+
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
 			DEBUG_ERROR("Cant open File {0} Error code: {1}", path, GetLastError());
 			__debugbreak();
+			Close();
 			return false;
 		}
 		m_hFile = hFile;
@@ -41,6 +56,8 @@ namespace Engine
 		CloseHandle(m_hFile);
 		if(m_Str != nullptr)
 			Memory::GetDefaultAlloc()->Deallocate(m_Str);
+		m_Str = nullptr;
+		m_hFile = nullptr;
 	}
 
 	unsigned int UFileIO::GetFileSize() const
@@ -88,6 +105,7 @@ namespace Engine
 			{
 				DEBUG_ERROR("Cant set file Pointer Error code: {0}", GetLastError());
 				__debugbreak();
+				Close();
 			}
 		}
 
@@ -95,10 +113,11 @@ namespace Engine
 
 		DWORD bytesRead;
 
-		if (!ReadFile(m_hFile, (void*)buffer, charsToRead * sizeof(char), &bytesRead, NULL)) // read from the file add save it to the buffer
+		if (!ReadFile(m_hFile, (void*)buffer, charsToRead * sizeof(char), &bytesRead, NULL)) // read from the file and save it to the buffer
 		{
 			DEBUG_ERROR("Cant Read From file {0} Error code: {1}", m_Path, GetLastError());
 			__debugbreak();
+			Close();
 			return nullptr;
 		}
 
@@ -117,6 +136,18 @@ namespace Engine
 		Memory::GetDefaultAlloc()->Deallocate(buffer); // dealocate the memory used by the buffer
 
 		return (char*)m_Str;
+	}
+
+	void UFileIO::WriteToFile(UString& data)
+	{
+		DWORD dwBytesWritten = 0;
+		int errorFlags = WriteFile(m_hFile, data.RawString(), data.Size(), &dwBytesWritten, nullptr);
+
+		if (errorFlags == FALSE)
+		{
+			DEBUG_ERROR("Cant Write to file {0} Error code: {1}", m_Path, GetLastError());
+			Close();
+		}
 	}
 
 #endif // PLATFORM_WINDOWS

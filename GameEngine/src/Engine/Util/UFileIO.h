@@ -27,6 +27,8 @@ namespace Engine
 
 		char* ReadFromFile(unsigned int charsToRead = 0, unsigned int offset = 0);
 
+		void WriteToFile(UString& data);
+
 	private:
 		HANDLE m_hFile = nullptr;
 

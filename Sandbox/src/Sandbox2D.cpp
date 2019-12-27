@@ -26,7 +26,7 @@ void Sandbox2DLayer::OnAttach()
 
 	alloc->StartMemoryDebuging("String Allocator", "test.json");
 
-	m_LogoTexture = Engine::Texture2D::Create("assets/Images/UBIQ.png");
+	m_LogoTexture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
 
 	Engine::Timer timer = CREATE_PROFILE();
 
@@ -40,6 +40,10 @@ void Sandbox2DLayer::OnAttach()
 
 	DEBUG_INFO(str);
 	DEBUG_INFO(str.Find("aaaaaaa"));
+
+	file.Open("Assets/text.txt");
+	file.WriteToFile(str);
+	file.Close();
 	alloc->StopMemoryDebuging();
 
 }
