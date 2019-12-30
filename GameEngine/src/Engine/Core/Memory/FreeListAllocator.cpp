@@ -66,21 +66,6 @@ namespace Engine
 
 		allocations.push_back(dataAddress);
 
-		Node* it = m_FreeList.head; // current node is head of the linked list
-		while (it != nullptr)
-		{
-			it = it->next;
-			if (it != nullptr)
-			{
-				size_t dist = (size_t)it - (size_t)m_Start;
-				if (dist > m_Size)
-				{
-					DEBUG_ERROR("{0} is out of bounds", (size_t)it);
-					break;
-				}
-			}
-		}
-
 		return (void*)dataAddress;
 	}
 
