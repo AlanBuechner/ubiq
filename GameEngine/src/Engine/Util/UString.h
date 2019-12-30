@@ -26,6 +26,7 @@ namespace Engine
 		UString SubString(unsigned int start, unsigned int end);
 
 		int Find(const UString& match);
+		int Find(const char match);
 
 		void operator=(const UString& str);
 		void operator=(const char* str);
@@ -50,6 +51,9 @@ namespace Engine
 		void Resize(size_t size);
 
 		void CopyOver(const char* data);
+
+		void* Allocate(size_t size);
+		void Deallocate(void* p);
 
 		static size_t IntLength(int i);
 

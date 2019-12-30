@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-	FreeListAllocator* UString::s_UStringAllocator = new FreeListAllocator(sizeof(char) * 10000, FreeListAllocator::FindFirst);
+	FreeListAllocator* UString::s_UStringAllocator = new FreeListAllocator(sizeof(char) * 1000000, FreeListAllocator::FindFirst);
 
 	UString::UString()
 	{
@@ -31,7 +31,7 @@ namespace Engine
 
 	UString::~UString()
 	{
-		s_UStringAllocator->Deallocate(m_Data);
+		Deallocate(m_Data);
 		s_UStringAllocator->TakeSnapShot();
 	}
 
@@ -60,8 +60,8 @@ namespace Engine
 		size_t size = (size_t)end - start;
 		if (size == 0)
 			return "";
-		ASSERT(end > start, "end cant be before start");
-		ASSERT(end < Size(), "end index out of bounds");
+		ASSERT(end >= start, "end cant be before start");
+		ASSERT(end <= Size(), "end index out of bounds");
 
 		char* buffer = (char*)Memory::GetDefaultAlloc()->Allocate(size + 1, 8);
 
@@ -95,6 +95,16 @@ namespace Engine
 					return i;
 				}
 			}
+		}
+		return -1;
+	}
+
+	int UString::Find(const char match)
+	{
+		for (int i = 0; i < Size(); i++)
+		{
+			if (m_Data[i] == match)
+				return i;
 		}
 		return -1;
 	}
@@ -166,29 +176,29 @@ namespace Engine
 
 	UString UString::operator+(const UString& str)
 	{
-		char* temp = (char*)s_UStringAllocator->Allocate(strlen(m_Data) + strlen(str.m_Data) + 1, 8);
+		char* temp = (char*)Allocate(strlen(m_Data) + strlen(str.m_Data) + 1);
 		strcpy(temp, m_Data);
 		strcat(temp, str.m_Data);
-		s_UStringAllocator->Deallocate(temp);
+		Deallocate(temp);
 		return UString(temp);
 	}
 
 	UString UString::operator+(const char* str)
 	{
-		char* temp = (char*)s_UStringAllocator->Allocate(strlen(m_Data) + strlen(str) + 1, 8);
+		char* temp = (char*)Allocate(strlen(m_Data) + strlen(str) + 1);
 		strcpy(temp, m_Data);
 		strcat(temp, str);
-		s_UStringAllocator->Deallocate(temp);
+		Deallocate(temp);
 		return UString(temp);
 	}
 
 	UString UString::operator+(const int num)
 	{
 		size_t numSize = IntLength(num);
-		char* temp = (char*)s_UStringAllocator->Allocate(strlen(m_Data) + numSize + 1, 8);
+		char* temp = (char*)Allocate(strlen(m_Data) + numSize + 1);
 		strcpy(temp, m_Data);
 		_itoa(num, temp+strlen(m_Data), 10);
-		s_UStringAllocator->Deallocate(temp);
+		Deallocate(temp);
 		return UString(temp);
 	}
 
@@ -206,13 +216,13 @@ namespace Engine
 	{
 		m_Size = size;
 		char* temp = m_Data;
-		m_Data = (char*)s_UStringAllocator->Allocate(size + 1, 8);
+		m_Data = (char*)Allocate(size + 1);
 		s_UStringAllocator->TakeSnapShot();
 		m_Data[size] = 0;
 		if (temp != nullptr)
 		{
 			CopyOver(temp);
-			s_UStringAllocator->Deallocate(temp);
+			Deallocate(temp);
 			s_UStringAllocator->TakeSnapShot();
 		}
 	}
@@ -228,6 +238,16 @@ namespace Engine
 					break;
 			}
 		}
+	}
+
+	void* UString::Allocate(size_t size)
+	{
+		return s_UStringAllocator->Allocate(size, 8);
+	}
+
+	void UString::Deallocate(void* p)
+	{
+		s_UStringAllocator->Deallocate(p);
 	}
 
 	size_t UString::IntLength(int num)

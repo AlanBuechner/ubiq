@@ -9,7 +9,6 @@ int main(int argc, char** argv)
 
 {
 	Engine::Log::Init();
-
 	Engine::Instrumentor::Get().BeginSession("Startup", "startup.json");
 	auto app = Engine::CreateApplication();
 	Engine::Instrumentor::Get().EndSession();

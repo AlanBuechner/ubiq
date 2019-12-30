@@ -2,6 +2,7 @@
 #include <Engine/Core/Memory/Memory.h>
 #include <Engine/Util/Performance.h>
 #include <Engine/Util/UFileIO.h>
+#include <Engine/Util/FStream.h>
 
 class Entity
 {
@@ -21,33 +22,18 @@ Sandbox2DLayer::Sandbox2DLayer()
 
 void Sandbox2DLayer::OnAttach()
 {
+	m_LogoTexture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
 	Engine::FreeListAllocator* alloc = Engine::UString::s_UStringAllocator;
 
-	alloc->StartMemoryDebuging("String Allocator", "test.json");
-
-	m_LogoTexture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
-
-	Engine::Timer timer = CREATE_PROFILE();
-
-	timer.Start("Engine::UFileIO");
 	Engine::UString str;
-	Engine::UFileIO file;
-	file.Open("Assets/Shaders/FlatColorShader.glsl");
-	str = file.ReadFromFile();
-	file.Close();
-	timer.End();
-
-	DEBUG_INFO(str);
-	DEBUG_INFO(str.Find("aaaaaaa"));
-
-	Engine::UString str1(100);
-	str1 += 20;
-	DEBUG_INFO("{0}", str1 + 20);
-
-	file.Open("Assets/text.txt");
-	file.WriteToFile(str);
-	file.Close();
-	alloc->StopMemoryDebuging();
+	Engine::IFStream stream;
+	stream.Open("Assets/Shaders/FlatColorShader.glsl");
+	while (!stream.EndOfFile())
+	{
+		stream.ReadLine(str);
+		DEBUG_INFO(str);
+	}
+	stream.Close();
 }
 
 void Sandbox2DLayer::OnDetach()

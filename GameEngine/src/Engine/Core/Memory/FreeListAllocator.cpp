@@ -66,6 +66,21 @@ namespace Engine
 
 		allocations.push_back(dataAddress);
 
+		Node* it = m_FreeList.head; // current node is head of the linked list
+		while (it != nullptr)
+		{
+			it = it->next;
+			if (it != nullptr)
+			{
+				size_t dist = (size_t)it - (size_t)m_Start;
+				if (dist > m_Size)
+				{
+					DEBUG_ERROR("{0} is out of bounds", (size_t)it);
+					break;
+				}
+			}
+		}
+
 		return (void*)dataAddress;
 	}
 
@@ -184,7 +199,8 @@ namespace Engine
 			it = it->next;
 			if (it != nullptr)
 			{
-				if ((size_t)it - (size_t)m_Start > m_Size)
+				size_t dist = (size_t)it - (size_t)m_Start;
+				if (dist > m_Size)
 				{
 					DEBUG_ERROR("{0} is out of bounds", (size_t)it);
 					break;
@@ -267,7 +283,7 @@ namespace Engine
 
 		while (it != nullptr) {
 			padding = PointerMath::CalculatePaddingWithHeader((std::size_t)it, alignment, sizeof(FreeListAllocator::AllocationHeader));
-			const std::size_t requiredSpace = size + padding;
+			const std::size_t requiredSpace = size + padding + sizeof(Node);
 			if (it->data.blockSize >= requiredSpace) {
 				break;
 			}
