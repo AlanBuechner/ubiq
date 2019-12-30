@@ -119,10 +119,10 @@ namespace Engine
 		m_FreeList.insert(nullptr, firstNode);
 	}
 
-	void FreeListAllocator::StartMemoryDebuging(std::string name, const std::string& path)
+	void FreeListAllocator::StartMemoryDebuging(const UString& name, const UString& path)
 	{
-		m_Name = name;
-		m_OutputStream.open(path);
+		m_Name = name.RawString();
+		m_OutputStream.open(path.RawString());
 		m_OutputStream << "{";
 		m_OutputStream << "\"type\" : \"FreeList\",";
 		m_OutputStream << "\"allocator\" :[{";
@@ -159,11 +159,6 @@ namespace Engine
 			uint32_t size = (uint32_t)(header->blockSize - sizeof(Node));
 			m_OutputStream << "\"size\":" << size << ","; // the size of the allocation
 			m_OutputStream << "\"padding\":" << (uint32_t)header->padding << " }],"; // the padding
-			char* buffer = new char[size];
-			for (uint32_t j = 0; j < size; j++)
-			{
-				buffer[j] = *(char*)(allocations[i] + j);
-			}
 			m_OutputStream << "\"body\":\"" << "" << "\""; // the information in the allocation
 			m_OutputStream << "}"; // close the allocation
 			m_OutputStream.flush();

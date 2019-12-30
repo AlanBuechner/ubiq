@@ -3,7 +3,6 @@
 #include <Engine/Util/Performance.h>
 #include <Engine/Util/UFileIO.h>
 
-
 class Entity
 {
 public:
@@ -41,11 +40,14 @@ void Sandbox2DLayer::OnAttach()
 	DEBUG_INFO(str);
 	DEBUG_INFO(str.Find("aaaaaaa"));
 
+	Engine::UString str1(100);
+	str1 += 20;
+	DEBUG_INFO("{0}", str1 + 20);
+
 	file.Open("Assets/text.txt");
 	file.WriteToFile(str);
 	file.Close();
 	alloc->StopMemoryDebuging();
-
 }
 
 void Sandbox2DLayer::OnDetach()

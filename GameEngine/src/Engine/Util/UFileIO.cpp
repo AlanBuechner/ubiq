@@ -141,7 +141,7 @@ namespace Engine
 	void UFileIO::WriteToFile(UString& data)
 	{
 		DWORD dwBytesWritten = 0;
-		int errorFlags = WriteFile(m_hFile, data.RawString(), data.Size(), &dwBytesWritten, nullptr);
+		int errorFlags = WriteFile(m_hFile, data.RawString(), (DWORD)data.Size(), &dwBytesWritten, nullptr);
 
 		if (errorFlags == FALSE)
 		{

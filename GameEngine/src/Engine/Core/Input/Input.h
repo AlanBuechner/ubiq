@@ -2,8 +2,8 @@
 
 #include "Engine/Core/core.h"
 #include "KeyCodes.h"
+#include "Engine/Util/UString.h"
 #include <map>
-#include <string>
 #include "Engine/Core/Application.h"
 #include <glm/glm.hpp>
 
@@ -33,7 +33,6 @@ namespace Engine
 	public:
 		KeyCode();
 
-		static inline int GetKeyCode(std::string key) { return s_Instance->GetKeyCodeImpl(key); }
 		static inline int OglToUbiq(int key) { return s_Instance->OglToUbiqImpl(key); }
 		static inline int UbiqToOgl(int key) { return s_Instance->UbiqToOglImpl(key); }
 		static inline int OglToUbiqMouse(int key) { return s_Instance->OglToUbiqMouseImpl(key); }
@@ -184,12 +183,10 @@ namespace Engine
 		};
 
 	protected:
-		inline int GetKeyCodeImpl(std::string key) { return m_AsciiToUbiq[key]; }
 		inline int OglToUbiqImpl(int key) { return m_OglToUbiq[key]; }
 		inline int UbiqToOglImpl(int key) { return m_UbiqToOgl[key]; }
 		inline int OglToUbiqMouseImpl(int key) { return m_OglToUbiqMouse[key]; }
 
-		std::map<std::string, int> m_AsciiToUbiq;
 		std::map<int, int> m_OglToUbiq;
 		std::map<int, int> m_UbiqToOgl;
 		std::map<int, int> m_OglToUbiqMouse;

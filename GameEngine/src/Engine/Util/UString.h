@@ -14,7 +14,7 @@ namespace Engine
 	public:
 		UString();
 		UString(const char* str);
-		UString(int size);
+		UString(int num);
 		UString(const UString& str);
 		~UString();
 
@@ -25,17 +25,23 @@ namespace Engine
 
 		UString SubString(unsigned int start, unsigned int end);
 
-		bool Find(const UString& match);
+		int Find(const UString& match);
 
 		void operator=(const UString& str);
 		void operator=(const char* str);
+		void operator=(const int num);
 		bool operator==(const UString& str);
 		bool operator==(const char* str);
 		void operator+=(const UString& str);
 		void operator+=(const char* str);
+		void operator+=(const int num);
 		UString operator+(const UString& str);
 		UString operator+(const char* str);
+		UString operator+(const int num);
 		char& operator[](size_t i) const;
+
+		// cast
+		operator char();
 
 		friend std::ostream& operator<<(std::ostream& os, const UString& str);
 
@@ -44,6 +50,8 @@ namespace Engine
 		void Resize(size_t size);
 
 		void CopyOver(const char* data);
+
+		static size_t IntLength(int i);
 
 		char* m_Data = nullptr;
 

@@ -15,7 +15,7 @@ namespace Engine
 		virtual void Init() = 0;
 		size_t getSize() const { return m_Size; }
 
-		/*virtual void StartMemoryDebuging(std::string name, const std::string& path) = 0;
+		/*virtual void StartMemoryDebuging(UString name, const UString& path) = 0;
 		virtual void TakeSnapShot() = 0;
 		virtual void StopMemoryDebuging() = 0;*/
 

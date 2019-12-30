@@ -7,9 +7,9 @@ namespace Engine
 {
 	UArray<ProfileResult> Performance::m_ProfileResults;
 
-	void Instrumentor::BeginSession(const std::string& name, const std::string& filepath)
+	void Instrumentor::BeginSession(const UString& name, const UString& filepath)
 	{
-		m_OutputStream.open(filepath);
+		m_OutputStream.open(filepath.RawString());
 		WriteHeader();
 		m_CurrentSession = new InstrumentationSession{ name };
 	}

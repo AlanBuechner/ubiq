@@ -1,6 +1,7 @@
 #pragma once
 #include "Allocator.h"
 #include "SinglyLinkedList.h"
+#include "Engine/Util/UString.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -35,7 +36,7 @@ namespace Engine
 
 		// memory debuging
 		std::ofstream m_OutputStream;
-		std::string m_Name;
+		char* m_Name;
 	public:
 		FreeListAllocator(size_t size, PlacementPolicy policy);
 		virtual ~FreeListAllocator();
@@ -45,7 +46,7 @@ namespace Engine
 		virtual void Deallocate(void* p) override;
 		virtual void Reset();
 
-		virtual void StartMemoryDebuging(std::string name, const std::string& path);
+		virtual void StartMemoryDebuging(const UString& name, const UString& path);
 		virtual void TakeSnapShot();
 		virtual void StopMemoryDebuging();
 	private:

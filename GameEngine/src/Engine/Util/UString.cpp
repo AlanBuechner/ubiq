@@ -17,9 +17,10 @@ namespace Engine
 		CopyOver(str);
 	}
 
-	UString::UString(int size)
+	UString::UString(int num)
 	{
-		Resize(size);
+		Resize(IntLength(num));
+		_itoa(num, m_Data, 10);
 	}
 
 	UString::UString(const UString& str)
@@ -75,9 +76,9 @@ namespace Engine
 		return UString(buffer);
 	}
 
-	bool UString::Find(const UString& match)
+	int UString::Find(const UString& match)
 	{
-		size_t matchSize = strlen(match.RawString());
+		size_t matchSize = match.Size();
 		if (matchSize > Size())
 		{
 			return false;
@@ -91,11 +92,11 @@ namespace Engine
 					break;
 				else if (j == matchSize - 1)
 				{
-					return true;
+					return i;
 				}
 			}
 		}
-		return false;
+		return -1;
 	}
 
 	void UString::operator=(const UString& str)
@@ -108,6 +109,12 @@ namespace Engine
 	{
 		Resize(strlen(str));
 		CopyOver(str);
+	}
+
+	void UString::operator=(const int num)
+	{
+		Resize(IntLength(num));
+		_itoa(num, m_Data, 10);
 	}
 	
 	bool UString::operator==(const UString& str)
@@ -150,6 +157,13 @@ namespace Engine
 		strcat(m_Data, str);
 	}
 
+	void UString::operator+=(const int num)
+	{
+		size_t size = Size();
+		Resize(size + IntLength(num));
+		_itoa(num, m_Data+size, 10);
+	}
+
 	UString UString::operator+(const UString& str)
 	{
 		char* temp = (char*)s_UStringAllocator->Allocate(strlen(m_Data) + strlen(str.m_Data) + 1, 8);
@@ -168,9 +182,24 @@ namespace Engine
 		return UString(temp);
 	}
 
+	UString UString::operator+(const int num)
+	{
+		size_t numSize = IntLength(num);
+		char* temp = (char*)s_UStringAllocator->Allocate(strlen(m_Data) + numSize + 1, 8);
+		strcpy(temp, m_Data);
+		_itoa(num, temp+strlen(m_Data), 10);
+		s_UStringAllocator->Deallocate(temp);
+		return UString(temp);
+	}
+
 	char& UString::operator[](size_t i) const
 	{
 		return m_Data[i];
+	}
+
+	UString::operator char()
+	{
+		return m_Data[0];
 	}
 
 	void UString::Resize(size_t size)
@@ -199,6 +228,26 @@ namespace Engine
 					break;
 			}
 		}
+	}
+
+	size_t UString::IntLength(int num)
+	{
+		if (num == 0)
+		{
+			return 1;
+		}
+		int numSize = 0;
+		if (num < 0)
+		{
+			num = -num;
+			numSize++;
+		}
+		while (num > 0)
+		{
+			num /= 10;
+			numSize++;
+		}
+		return numSize;
 	}
 
 	std::ostream& operator<<(std::ostream& os, const UString& str)
