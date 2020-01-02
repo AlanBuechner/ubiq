@@ -27,12 +27,16 @@ void Sandbox2DLayer::OnAttach()
 
 	Engine::UString str;
 	Engine::IFStream stream;
+	Engine::OFStream oStream;
 	stream.Open("Assets/Shaders/FlatColorShader.glsl");
+	oStream.Open("Assets/text.txt");
 	while (!stream.EndOfFile())
 	{
 		stream.ReadLine(str);
+		oStream.Write(str);
 		DEBUG_INFO(str);
 	}
+	oStream.Close();
 	stream.Close();
 }
 

@@ -15,7 +15,7 @@ namespace Engine
 
 		}
 
-		bool Open(const UString& path);
+		bool Open(const UString& path, bool trunk = false);
 
 		void Close();
 
@@ -29,12 +29,16 @@ namespace Engine
 
 		void WriteToFile(UString& data);
 
+		inline bool IsOpen() { return m_IsOpen; }
+
 	private:
 		HANDLE m_hFile = nullptr;
 
 		UString m_Path;
 
 		PBYTE m_Str = nullptr;
+
+		bool m_IsOpen;
 	};
 #endif // PLATFORM_WINDOWS
 

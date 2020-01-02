@@ -24,4 +24,23 @@ namespace Engine
 
 		uint32_t m_Line;
 	};
+
+	class OFStream
+	{
+	public:
+		OFStream();
+		~OFStream();
+
+		void Open(const UString& path);
+		void Close();
+
+		void Write(const UString& data);
+		void WriteLine(const UString& data);
+
+		void Flush();
+
+	private:
+		UFileIO m_File;
+		UString m_Data;
+	};
 }

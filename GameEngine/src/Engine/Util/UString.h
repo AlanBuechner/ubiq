@@ -36,9 +36,9 @@ namespace Engine
 		void operator+=(const UString& str);
 		void operator+=(const char* str);
 		void operator+=(const int num);
-		UString operator+(const UString& str);
-		UString operator+(const char* str);
-		UString operator+(const int num);
+		UString operator+(const UString& str) const;
+		UString operator+(const char* str) const;
+		UString operator+(const int num) const;
 		char& operator[](size_t i) const;
 
 		// cast
@@ -52,8 +52,8 @@ namespace Engine
 
 		void CopyOver(const char* data);
 
-		void* Allocate(size_t size);
-		void Deallocate(void* p);
+		void* Allocate(size_t size) const;
+		void Deallocate(void* p) const;
 
 		static size_t IntLength(int i);
 

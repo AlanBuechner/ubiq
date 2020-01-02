@@ -15,7 +15,7 @@ namespace Engine
 	{
 	}
 
-	bool Engine::UFileIO::Open(const UString& path)
+	bool Engine::UFileIO::Open(const UString& path, bool trunk)
 	{
 		if (m_hFile != 0)
 			Close();
@@ -24,7 +24,7 @@ namespace Engine
 			GENERIC_READ | GENERIC_WRITE, 
 			FILE_SHARE_READ | FILE_SHARE_WRITE, 
 			NULL, 
-			CREATE_NEW | OPEN_EXISTING,
+			CREATE_NEW | OPEN_EXISTING | (trunk & TRUNCATE_EXISTING),
 			FILE_ATTRIBUTE_NORMAL,
 			NULL);
 
@@ -34,7 +34,7 @@ namespace Engine
 				GENERIC_READ | GENERIC_WRITE,
 				FILE_SHARE_READ | FILE_SHARE_WRITE,
 				NULL,
-				CREATE_ALWAYS,
+				CREATE_ALWAYS | (trunk & TRUNCATE_EXISTING),
 				FILE_ATTRIBUTE_NORMAL,
 				NULL);
 		}
@@ -46,8 +46,15 @@ namespace Engine
 			Close();
 			return false;
 		}
+
+		if (trunk)
+		{
+			SetEndOfFile(hFile);
+		}
+
 		m_hFile = hFile;
 		m_Path = path;
+		m_IsOpen = true;
 		return true;
 	}
 
@@ -58,6 +65,7 @@ namespace Engine
 			Memory::GetDefaultAlloc()->Deallocate(m_Str);
 		m_Str = nullptr;
 		m_hFile = nullptr;
+		m_IsOpen = false;
 	}
 
 	unsigned int UFileIO::GetFileSize() const

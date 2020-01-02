@@ -131,7 +131,7 @@ namespace Engine
 		m_OutputStream << "\"size\" : " << m_Size << ",";
 		m_OutputStream << "\"headerSize\" : " << (uint32_t)sizeof(AllocationHeader) << ",";
 		m_OutputStream << "\"listHeaderSize\" : " << (uint32_t)sizeof(FreeHeader) << ",";
-		m_OutputStream <<"\"snapShots\" :[";
+		m_OutputStream << "\"snapShots\" :[";
 		m_OutputStream.flush();
 	}
 

@@ -174,7 +174,7 @@ namespace Engine
 		_itoa(num, m_Data+size, 10);
 	}
 
-	UString UString::operator+(const UString& str)
+	UString UString::operator+(const UString& str) const
 	{
 		char* temp = (char*)Allocate(strlen(m_Data) + strlen(str.m_Data) + 1);
 		strcpy(temp, m_Data);
@@ -183,7 +183,7 @@ namespace Engine
 		return UString(temp);
 	}
 
-	UString UString::operator+(const char* str)
+	UString UString::operator+(const char* str) const
 	{
 		char* temp = (char*)Allocate(strlen(m_Data) + strlen(str) + 1);
 		strcpy(temp, m_Data);
@@ -192,7 +192,7 @@ namespace Engine
 		return UString(temp);
 	}
 
-	UString UString::operator+(const int num)
+	UString UString::operator+(const int num) const
 	{
 		size_t numSize = IntLength(num);
 		char* temp = (char*)Allocate(strlen(m_Data) + numSize + 1);
@@ -240,12 +240,12 @@ namespace Engine
 		}
 	}
 
-	void* UString::Allocate(size_t size)
+	void* UString::Allocate(size_t size) const
 	{
 		return s_UStringAllocator->Allocate(size, 8);
 	}
 
-	void UString::Deallocate(void* p)
+	void UString::Deallocate(void* p) const
 	{
 		s_UStringAllocator->Deallocate(p);
 	}
