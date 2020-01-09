@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-	static FreeListAllocator* UArrayAlloc = new FreeListAllocator(1000000000, FreeListAllocator::FindFirst);
+	static FreeListAllocator* UArrayAlloc = new FreeListAllocator(1000000000, FreeListAllocator::FindFirst, 8);
 
 	template<class T>
 	class UArray
@@ -51,7 +51,7 @@ namespace Engine
 	{
 		if (m_Data != nullptr)
 			UArrayAlloc->Deallocate(m_Data);
-		m_Data = (T*)UArrayAlloc->Allocate(0, 8);
+		m_Data = (T*)UArrayAlloc->Allocate(0);
 		m_Size = 0;
 	}
 
@@ -60,7 +60,7 @@ namespace Engine
 	{
 		if (m_Data != nullptr)
 			UArrayAlloc->Deallocate(m_Data);
-		m_Data = (T*)UArrayAlloc->Allocate(sizeof(T) * size, 8);
+		m_Data = (T*)UArrayAlloc->Allocate(sizeof(T) * size);
 		m_Size = size;
 	}
 
@@ -69,7 +69,7 @@ namespace Engine
 	{
 		if (m_Data != nullptr)
 			UArrayAlloc->Deallocate(m_Data);
-		m_Data = (T*)UArrayAlloc->Allocate(sizeof(data.begin()), 8);
+		m_Data = (T*)UArrayAlloc->Allocate(sizeof(data.begin()));
 		m_Size = data.size();
 		for (int i = 0; i < Length(); i++)
 		{
@@ -84,7 +84,7 @@ namespace Engine
 			UArrayAlloc->Deallocate(m_Data);
 		size_t size = other.Size();
 		size_t length = other.Length();
-		m_Data = (T*)UArrayAlloc->Allocate(size, 8);
+		m_Data = (T*)UArrayAlloc->Allocate(size);
 		for (int i = 0; i < length; i++)
 		{
 			m_Data[i] = other.m_Data[i];
@@ -126,7 +126,7 @@ namespace Engine
 	inline void UArray<T>::ReSize(size_t size)
 	{
 		T* temp = m_Data;
-		m_Data = (T*)UArrayAlloc->Allocate(sizeof(T) * size, 8);
+		m_Data = (T*)UArrayAlloc->Allocate(sizeof(T) * size);
 		m_Size = size;
 		for (int i = 0; i < Length(); i++)
 		{

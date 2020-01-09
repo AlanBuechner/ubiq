@@ -4,8 +4,8 @@
 
 namespace Engine
 {
-	FreeListAllocator::FreeListAllocator(size_t size, PlacementPolicy policy)
-		: Super(size), m_Policy(policy)
+	FreeListAllocator::FreeListAllocator(size_t size, PlacementPolicy policy, uint8_t alignment)
+		: Super(size), m_Policy(policy), m_Alignment(alignment)
 	{
 		Init();
 	}
@@ -31,6 +31,8 @@ namespace Engine
 	{
 		const size_t allocationHeaderSize = sizeof(FreeListAllocator::AllocationHeader);
 		const size_t freeHeaderSize = sizeof(FreeListAllocator::FreeHeader);
+
+		alignment = m_Alignment;
 
 		size += allocationHeaderSize; // size of the allocation and the allocation header
 		size += alignment - (size % alignment); // size is always aligned
@@ -106,6 +108,57 @@ namespace Engine
 
 		// Merge contiguous nodes
 		Coalescence(itPrev, freeNode);
+	}
+
+	bool FreeListAllocator::ResizeAllocation(void* p, size_t newSize)
+	{
+		AllocationHeader* header = (AllocationHeader*)((size_t)p - sizeof(AllocationHeader)); // allocation header
+		Node* freeListNode = (Node*)((size_t)header + header->blockSize); // if a free list node is at the end it will be hear
+
+		size_t size = header->blockSize - sizeof(Node) - sizeof(AllocationHeader);
+
+		if (size == newSize)
+			return true; // the allocaton is allredy the requierd size
+
+		if (size < newSize) // if we are incresing the size of the allocaton
+		{
+
+			Node* it = m_FreeList.head; // the start of the free list
+			Node* itPrev = nullptr;
+			while (it != nullptr)
+			{
+				if (it == freeListNode) // if the node is the one at the end of the allocaton
+				{
+					size_t bytesAdded = newSize - size;
+					size_t requierdSizeToAdd = bytesAdded + (bytesAdded%m_Alignment);
+					size_t requierdSize = size + requierdSizeToAdd + sizeof(AllocationHeader) + sizeof(Node);
+					if (it->data.blockSize > requierdSizeToAdd + sizeof(Node))
+					{
+						Node* next = it->next;
+						header->blockSize = requierdSize; // resize the allocation
+						size_t rest = it->data.blockSize - requierdSize; // find the rest of the free node
+						Node* newFreeNode = (Node*)((size_t)header + requierdSize); // create the free node
+						newFreeNode->data.blockSize = rest; // set the free nodes size
+						newFreeNode->next = next; // set the next node
+						if(itPrev != nullptr) // has previous node
+							itPrev->next = newFreeNode; // set the previous nodes next to the new node;
+						else // head of the list
+							m_FreeList.head = newFreeNode; // set the head to the new node
+						return true;
+					}
+					else
+						return false; // not enough space to resize
+				}
+
+				itPrev = it;
+				it = it->next;
+			}
+			return false; // no node after the allocation so no resizeing can be done
+		}
+		else // if we are decresing the allocation size
+		{
+			return false; // not implemented
+		}
 	}
 
 	void FreeListAllocator::Reset()

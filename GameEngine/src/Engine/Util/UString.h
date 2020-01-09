@@ -42,7 +42,7 @@ namespace Engine
 		char& operator[](size_t i) const;
 
 		// cast
-		operator char();
+		operator char(); // returns the first char in the string
 
 		friend std::ostream& operator<<(std::ostream& os, const UString& str);
 

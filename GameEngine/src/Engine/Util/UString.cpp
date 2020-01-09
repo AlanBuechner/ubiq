@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-	FreeListAllocator* UString::s_UStringAllocator = new FreeListAllocator(sizeof(char) * 1000000, FreeListAllocator::FindFirst);
+	FreeListAllocator* UString::s_UStringAllocator = new FreeListAllocator(sizeof(char) * 1000000, FreeListAllocator::FindFirst, 8);
 
 	UString::UString()
 	{
@@ -215,14 +215,28 @@ namespace Engine
 	void UString::Resize(size_t size)
 	{
 		m_Size = size;
-		char* temp = m_Data;
-		m_Data = (char*)Allocate(size + 1);
-		s_UStringAllocator->TakeSnapShot();
-		m_Data[size] = 0;
-		if (temp != nullptr)
+		if (m_Data != nullptr)
 		{
-			CopyOver(temp);
-			Deallocate(temp);
+			if (!s_UStringAllocator->ResizeAllocation(m_Data, size))
+			{
+				// cant resize allocation
+				char* temp = m_Data;
+				m_Data = (char*)Allocate(size + 1);
+				s_UStringAllocator->TakeSnapShot();
+				m_Data[size] = 0;
+
+				CopyOver(temp);
+				Deallocate(temp);
+				s_UStringAllocator->TakeSnapShot();
+			}
+			else // resized allocation
+			{
+				s_UStringAllocator->TakeSnapShot();
+			}
+		}
+		else
+		{
+			m_Data = (char*)Allocate(size + 1);
 			s_UStringAllocator->TakeSnapShot();
 		}
 	}

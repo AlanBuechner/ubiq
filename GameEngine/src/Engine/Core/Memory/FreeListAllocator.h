@@ -37,13 +37,16 @@ namespace Engine
 		// memory debuging
 		std::ofstream m_OutputStream;
 		char* m_Name;
+
+		const uint8_t m_Alignment;
 	public:
-		FreeListAllocator(size_t size, PlacementPolicy policy);
+		FreeListAllocator(size_t size, PlacementPolicy policy, uint8_t alignment);
 		virtual ~FreeListAllocator();
 
 		virtual void Init() override;
-		virtual void* Allocate(size_t size, uint8_t alignment) override;
+		virtual void* Allocate(size_t size, uint8_t alignment = 0) override; // dont use alignment
 		virtual void Deallocate(void* p) override;
+		bool ResizeAllocation(void* p, size_t newSize);
 		virtual void Reset();
 
 		virtual void StartMemoryDebuging(const UString& name, const UString& path);

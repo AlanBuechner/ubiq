@@ -10,7 +10,7 @@ I got a lot of the allocator code from https://github.com/mtrebi/memory-allocato
 
 namespace Engine
 {
-	static FreeListAllocator* DefaultAlloc = new FreeListAllocator(1000000000, Engine::FreeListAllocator::PlacementPolicy::FindFirst);
+	static FreeListAllocator* DefaultAlloc = new FreeListAllocator(1000000000, Engine::FreeListAllocator::PlacementPolicy::FindFirst, 8);
 
 	static Allocator* CurrentAlloc = DefaultAlloc;
 
