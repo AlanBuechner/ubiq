@@ -24,6 +24,10 @@ void Sandbox2DLayer::OnAttach()
 {
 	m_LogoTexture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
 
+	Engine::FreeListAllocator* stringAlloc = Engine::UString::s_UStringAllocator;
+
+	stringAlloc->StartMemoryDebuging("test", "test.json");
+
 	Engine::UString str;
 	Engine::IFStream stream;
 	Engine::OFStream oStream;
@@ -37,6 +41,8 @@ void Sandbox2DLayer::OnAttach()
 	}
 	oStream.Close();
 	stream.Close();
+
+	stringAlloc->StopMemoryDebuging();
 
 	Engine::FreeListAllocator* alloc = new Engine::FreeListAllocator(1000, Engine::FreeListAllocator::FindFirst, 8);
 	alloc->StartMemoryDebuging("resize test", "ResizeTest.json");

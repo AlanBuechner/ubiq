@@ -136,10 +136,11 @@ namespace Engine
 					{
 						Node* next = it->next;
 						header->blockSize = requierdSize; // resize the allocation
-						size_t rest = it->data.blockSize - requierdSize; // find the rest of the free node
+						size_t rest = it->data.blockSize - requierdSizeToAdd; // find the rest of the free node
 						Node* newFreeNode = (Node*)((size_t)header + requierdSize); // create the free node
 						newFreeNode->data.blockSize = rest; // set the free nodes size
 						newFreeNode->next = next; // set the next node
+						m_Used -= requierdSizeToAdd;
 						if(itPrev != nullptr) // has previous node
 							itPrev->next = newFreeNode; // set the previous nodes next to the new node;
 						else // head of the list
@@ -229,6 +230,7 @@ namespace Engine
 		{
 			m_OutputStream << "{";
 			m_OutputStream << "\"start\":" << (uint32_t)((size_t)it- (size_t)m_Start) << ",";
+			m_OutputStream << "\"size\":" << it->data.blockSize << ",";
 			m_OutputStream << "\"next\":" << (uint32_t)((it->next == nullptr ? 0 : ((size_t)it->next - (size_t)m_Start)));
 			m_OutputStream << "}";
 			m_OutputStream.flush();

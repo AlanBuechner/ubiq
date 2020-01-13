@@ -223,7 +223,6 @@ namespace Engine
 				char* temp = m_Data;
 				m_Data = (char*)Allocate(size + 1);
 				s_UStringAllocator->TakeSnapShot();
-				m_Data[size] = 0;
 
 				CopyOver(temp);
 				Deallocate(temp);
@@ -239,6 +238,7 @@ namespace Engine
 			m_Data = (char*)Allocate(size + 1);
 			s_UStringAllocator->TakeSnapShot();
 		}
+		m_Data[size] = 0; // null termenats the end of the string
 	}
 
 	void UString::CopyOver(const char* data)

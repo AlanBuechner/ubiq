@@ -235,6 +235,9 @@ $(document).ready(function()
 
                 drawTextinRegen(next.toString(), start, newYOffset, scale * e.listHeaderSize, allocatorHeight);
 
+                // draw size of free region
+                ctx.fillRect(start, newYOffset + allocatorHeight*(2/3), scale*link.size, 2);
+
                 // draw arrow to next
                 ctx.fillStyle = "#000000";
                 ctx.fillRect(start + (scale*e.listHeaderSize/2), newYOffset+allocatorHeight, 2, allocatorHeight/2);
