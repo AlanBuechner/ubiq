@@ -25,7 +25,7 @@ namespace Engine
 
 	void Instrumentor::WriteProfile(const ProfileResult& result)
 	{
-		if (!recordData)
+		if (!m_RecordData)
 			return;
 
 		if (m_ProfileCount++ > 0)
@@ -61,7 +61,7 @@ namespace Engine
 
 	void Instrumentor::RecordData(bool record)
 	{
-		recordData = record;
+		m_RecordData = record;
 	}
 
 	Instrumentor& Instrumentor::Get()
