@@ -43,17 +43,6 @@ void Sandbox2DLayer::OnAttach()
 	stream.Close();
 
 	stringAlloc->StopMemoryDebuging();
-
-	Engine::FreeListAllocator* alloc = new Engine::FreeListAllocator(1000, Engine::FreeListAllocator::FindFirst, 8);
-	alloc->StartMemoryDebuging("resize test", "ResizeTest.json");
-	alloc->TakeSnapShot();
-	void* p = alloc->Allocate(10);
-	alloc->TakeSnapShot();
-	alloc->ResizeAllocation(p, 5);
-	alloc->TakeSnapShot();
-	alloc->Deallocate(p);
-	alloc->TakeSnapShot();
-	alloc->StopMemoryDebuging();
 }
 
 void Sandbox2DLayer::OnDetach()

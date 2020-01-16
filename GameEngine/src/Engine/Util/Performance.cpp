@@ -25,6 +25,9 @@ namespace Engine
 
 	void Instrumentor::WriteProfile(const ProfileResult& result)
 	{
+		if (!recordData)
+			return;
+
 		if (m_ProfileCount++ > 0)
 			m_OutputStream << ",";
 
@@ -54,6 +57,11 @@ namespace Engine
 	{
 		m_OutputStream << "]}";
 		m_OutputStream.flush();
+	}
+
+	void Instrumentor::RecordData(bool record)
+	{
+		recordData = record;
 	}
 
 	Instrumentor& Instrumentor::Get()

@@ -28,9 +28,10 @@ namespace Engine
 		InstrumentationSession* m_CurrentSession;
 		std::ofstream m_OutputStream;
 		int m_ProfileCount;
+		bool m_RecordData;
 	public:
-		Instrumentor()
-			: m_CurrentSession(nullptr), m_ProfileCount(0)
+		Instrumentor(bool record = false)
+			: m_CurrentSession(nullptr), m_ProfileCount(0), m_RecordData(record)
 		{
 		}
 
@@ -43,6 +44,8 @@ namespace Engine
 		void WriteHeader();
 
 		void WriteFooter();
+
+		void RecordData(bool record);
 
 		static Instrumentor& Get();
 	};
