@@ -39,6 +39,7 @@ namespace Engine
 		char* m_Name;
 
 		const uint8_t m_Alignment;
+		uint16_t snapShot = 0;
 	public:
 		FreeListAllocator(size_t size, PlacementPolicy policy, uint8_t alignment);
 		virtual ~FreeListAllocator();

@@ -113,14 +113,16 @@ namespace Engine
 	bool FreeListAllocator::ResizeAllocation(void* p, size_t newSize)
 	{
 		AllocationHeader* header = (AllocationHeader*)((size_t)p - sizeof(AllocationHeader)); // allocation header
-		Node* freeListNode = (Node*)((size_t)header + header->blockSize); // if a free list node is at the end it will be hear
+		Node* freeListNode = (Node*)((size_t)header + header->blockSize); // if a free list node is at the end it will be here
 
-		size_t size = header->blockSize - sizeof(Node) - sizeof(AllocationHeader);
+		size_t allocationSize = header->blockSize - sizeof(Node) - sizeof(AllocationHeader);
+		size_t requierdAllocationSize = newSize + m_Alignment - (newSize % m_Alignment);
+		size_t requierdSize = requierdAllocationSize + sizeof(AllocationHeader) + sizeof(Node);
 
-		if (size == newSize)
+		if (allocationSize == requierdAllocationSize)
 			return true; // the allocaton is allredy the requierd size
 
-		if (size < newSize) // if we are incresing the size of the allocaton
+		if (allocationSize < requierdAllocationSize) // if we are incresing the size of the allocaton
 		{
 
 			Node* it = m_FreeList.head; // the start of the free list
@@ -129,13 +131,11 @@ namespace Engine
 			{
 				if (it == freeListNode) // if the node is the one at the end of the allocaton
 				{
-					size_t bytesAdded = newSize - size;
-					size_t requierdSizeToAdd = bytesAdded + (bytesAdded%m_Alignment);
-					size_t requierdSize = size + requierdSizeToAdd + sizeof(AllocationHeader) + sizeof(Node);
+					size_t requierdSizeToAdd = requierdAllocationSize - requierdSize;
 					if (it->data.blockSize > requierdSizeToAdd + sizeof(Node))
 					{
 						Node* next = it->next;
-						header->blockSize = requierdSize; // resize the allocation
+						header->blockSize = requierdSize; // resize the allocations
 						size_t rest = it->data.blockSize - requierdSizeToAdd; // find the rest of the free node
 						Node* newFreeNode = (Node*)((size_t)header + requierdSize); // create the free node
 						newFreeNode->data.blockSize = rest; // set the free nodes size
@@ -158,7 +158,37 @@ namespace Engine
 		}
 		else // if we are decresing the allocation size
 		{
-			return false; // not implemented
+			Node* it = m_FreeList.head;
+			Node* itPrev = nullptr;
+			while (it != nullptr)
+			{
+				if ((size_t)it > (size_t)header)
+				{
+					size_t blockSize = it->data.blockSize;
+					size_t allocationSizeRemoved = allocationSize - requierdAllocationSize;
+					header->blockSize = requierdSize; // set the size of the new allocation
+					Node* newFreeNode = (Node*)((size_t)header + requierdSize); // the new node
+					if (itPrev != nullptr) // add the node to the list
+						itPrev->next = newFreeNode;
+					else
+						m_FreeList.head = newFreeNode;
+					if ((size_t)it == (size_t)freeListNode) // if the node is at the end of the allocation
+					{
+						newFreeNode->next = it->next;
+						newFreeNode->data.blockSize = blockSize + allocationSizeRemoved;
+					}
+					else // there is a allocation between the allocation and the node
+					{
+						newFreeNode->next = it;
+						newFreeNode->data.blockSize = allocationSizeRemoved;
+					}
+					return true;
+				}
+				itPrev = it;
+				it = it->next;
+			}
+
+			return false; // if you have rached this section of code you have brough the program to a stait that i dident think was posible
 		}
 	}
 
@@ -188,8 +218,6 @@ namespace Engine
 		m_OutputStream << "\"snapShots\" :[";
 		m_OutputStream.flush();
 	}
-
-	uint16_t snapShot = 0;
 
 	void FreeListAllocator::TakeSnapShot()
 	{

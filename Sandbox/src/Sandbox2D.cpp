@@ -49,7 +49,7 @@ void Sandbox2DLayer::OnAttach()
 	alloc->TakeSnapShot();
 	void* p = alloc->Allocate(10);
 	alloc->TakeSnapShot();
-	alloc->ResizeAllocation(p, 20);
+	alloc->ResizeAllocation(p, 5);
 	alloc->TakeSnapShot();
 	alloc->Deallocate(p);
 	alloc->TakeSnapShot();
