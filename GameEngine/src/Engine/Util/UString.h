@@ -5,6 +5,7 @@ namespace Engine
 {
 	class FreeListAllocator;
 	class UStringView;
+	class IFStream;
 }
 
 namespace Engine
@@ -63,6 +64,7 @@ namespace Engine
 
 
 		friend UStringView;
+		friend IFStream;
 	};
 
 	class UStringView

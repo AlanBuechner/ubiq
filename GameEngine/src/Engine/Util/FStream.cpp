@@ -33,7 +33,21 @@ namespace Engine
 			eof = true;
 		}
 		line = m_Data.SubString(0, location);
-		m_Data = m_Data.SubString(location + (eof ? 0 : 1), (unsigned int)m_Data.Size());
+		location += (eof ? 0 : 1);
+		UString::s_UStringAllocator->TakeSnapShot();
+		void* newData = UString::s_UStringAllocator->MoveAllocatonStart(m_Data.m_Data, location);
+		UString::s_UStringAllocator->TakeSnapShot();
+		if (newData != nullptr)
+		{
+			m_Data.m_Data = (char*)newData;
+		}
+		else
+		{
+			// cant move allocaton start
+			// make a copy of allocaton
+			m_Data = m_Data.SubString(location + (eof ? 0 : 1), (unsigned int)m_Data.Size());
+		}
+		// move start of allocation
 	}
 
 	bool IFStream::EndOfFile()

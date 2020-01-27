@@ -32,7 +32,7 @@ namespace Engine
 	UString::~UString()
 	{
 		Deallocate(m_Data);
-		s_UStringAllocator->TakeSnapShot();
+		//s_UStringAllocator->TakeSnapShot();
 	}
 
 	const size_t UString::Size() const
@@ -222,21 +222,21 @@ namespace Engine
 				// cant resize allocation
 				char* temp = m_Data;
 				m_Data = (char*)Allocate(size + 1);
-				s_UStringAllocator->TakeSnapShot();
+				//s_UStringAllocator->TakeSnapShot();
 
 				CopyOver(temp);
 				Deallocate(temp);
-				s_UStringAllocator->TakeSnapShot();
+				//s_UStringAllocator->TakeSnapShot();
 			}
 			else // resized allocation
 			{
-				s_UStringAllocator->TakeSnapShot();
+				//s_UStringAllocator->TakeSnapShot();
 			}
 		}
 		else
 		{
 			m_Data = (char*)Allocate(size + 1);
-			s_UStringAllocator->TakeSnapShot();
+			//s_UStringAllocator->TakeSnapShot();
 		}
 		m_Data[size] = 0; // null termenats the end of the string
 	}
