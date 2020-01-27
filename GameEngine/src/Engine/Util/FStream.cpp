@@ -26,17 +26,14 @@ namespace Engine
 	void IFStream::ReadLine(UString& line)
 	{
 		int location = m_Data.Find('\n');
+		bool eof = false;
 		if (location == -1)
 		{
 			location = (int)m_Data.Size();
-			line = m_Data.SubString(0, location);
-			m_Data = m_Data.SubString(location, (unsigned int)m_Data.Size());
+			eof = true;
 		}
-		else
-		{
-			line = m_Data.SubString(0, location);
-			m_Data = m_Data.SubString(location + 1, (unsigned int)m_Data.Size());
-		}
+		line = m_Data.SubString(0, location);
+		m_Data = m_Data.SubString(location + (eof ? 0 : 1), (unsigned int)m_Data.Size());
 	}
 
 	bool IFStream::EndOfFile()
