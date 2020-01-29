@@ -24,8 +24,6 @@ void Sandbox2DLayer::OnAttach()
 {
 	m_LogoTexture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
 
-	Engine::FreeListAllocator* stringAlloc = Engine::UString::s_UStringAllocator;
-
 	Engine::UString str;
 	Engine::IFStream stream;
 	Engine::OFStream oStream;
