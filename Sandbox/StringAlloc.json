@@ -1,0 +1,1 @@
+{"type" : "FreeList","allocator" :[{"id" : 1,"name" : "StringAlloc","size" : 1000000,"headerSize" : 16,"listHeaderSize" : 8,"snapShots" :[]}]}

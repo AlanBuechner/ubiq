@@ -192,53 +192,6 @@ namespace Engine
 		}
 	}
 
-	void* FreeListAllocator::MoveAllocatonStart(void* p, size_t offset)
-	{
-		AllocationHeader* header = (AllocationHeader*)((size_t)p - sizeof(AllocationHeader));
-		size_t blockSize = header->blockSize;
-		size_t padding = header->padding;
-
-		size_t newAllocationStart = (size_t)p + offset;
-
-		Node* it = m_FreeList.head;
-		Node* itPrev = nullptr;
-		while (it != nullptr)
-		{
-			if ((size_t)it > (size_t)p)
-			{
-				if (itPrev == nullptr)
-				{
-					// head allocaton
-					return nullptr;
-				}
-				else if ((size_t)itPrev + itPrev->data.blockSize == (size_t)header)
-				{
-					// no allocatons between
-					// reise free node
-					itPrev->data.blockSize += offset;
-
-					// make new header
-					AllocationHeader* newHeader = (AllocationHeader*)(newAllocationStart);
-					newHeader->blockSize = blockSize;
-					newHeader->padding = padding;
-					return (void*)newHeader;
-				}
-				else
-				{
-					if (offset > sizeof(Node))
-					{
-						// create new node
-						Node* newNode = (Node*)(newAllocationStart - sizeof(AllocationHeader) - sizeof(Node));
-					}
-					return nullptr;
-				}
-			}
-			itPrev = it;
-			it = it->next;
-		}
-		return nullptr;
-	}
-
 	void FreeListAllocator::Reset()
 	{
 		m_Used = 0;

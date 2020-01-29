@@ -26,8 +26,6 @@ void Sandbox2DLayer::OnAttach()
 
 	Engine::FreeListAllocator* stringAlloc = Engine::UString::s_UStringAllocator;
 
-	stringAlloc->StartMemoryDebuging("test", "test.json");
-
 	Engine::UString str;
 	Engine::IFStream stream;
 	Engine::OFStream oStream;
@@ -41,8 +39,6 @@ void Sandbox2DLayer::OnAttach()
 	}
 	oStream.Close();
 	stream.Close();
-
-	stringAlloc->StopMemoryDebuging();
 }
 
 void Sandbox2DLayer::OnDetach()
