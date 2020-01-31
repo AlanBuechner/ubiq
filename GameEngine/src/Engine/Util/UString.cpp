@@ -76,7 +76,7 @@ namespace Engine
 		return UString(buffer);
 	}
 
-	int UString::Find(const UString& match)
+	int UString::Find(const UString& match, const unsigned start)
 	{
 		size_t matchSize = match.Size();
 		if (matchSize > Size())
@@ -84,7 +84,7 @@ namespace Engine
 			return false;
 		}
 
-		for (int i = 0; i < Size() - matchSize; i++)
+		for (int i = start; i < Size() - matchSize; i++)
 		{
 			for (int j = 0; j < matchSize; j++)
 			{
@@ -99,9 +99,9 @@ namespace Engine
 		return -1;
 	}
 
-	int UString::Find(const char match)
+	int UString::Find(const char match, const unsigned start)
 	{
-		for (int i = 0; i < Size(); i++)
+		for (int i = start; i < Size(); i++)
 		{
 			if (m_Data[i] == match)
 				return i;

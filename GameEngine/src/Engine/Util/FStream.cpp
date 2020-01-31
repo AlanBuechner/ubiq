@@ -25,22 +25,21 @@ namespace Engine
 
 	void IFStream::ReadLine(UString& line)
 	{
-		int location = m_Data.Find('\n');
+		int location = m_Data.Find('\n', m_Offset+1);
 		bool eof = false;
 		if (location == -1)
 		{
 			location = (int)m_Data.Size();
 			eof = true;
 		}
-		line = m_Data.SubString(0, location);
+		line = m_Data.SubString(m_Offset, location);
 		location += (eof ? 0 : 1);
-		m_Data = m_Data.SubString(location, (unsigned int)m_Data.Size());
-
+		m_Offset = location;
 	}
 
 	bool IFStream::EndOfFile()
 	{
-		return m_Data.Size() == 0;
+		return m_Offset >= m_Data.Size();
 	}
 
 	/*------------------ OFStream --------------------*/

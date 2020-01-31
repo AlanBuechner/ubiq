@@ -22,7 +22,7 @@ namespace Engine
 		UFileIO m_File;
 		UString m_Data;
 
-		uint32_t m_Line;
+		uint32_t m_Offset = 0;
 	};
 
 	class OFStream
