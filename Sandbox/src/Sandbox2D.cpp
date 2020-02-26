@@ -25,18 +25,26 @@ void Sandbox2DLayer::OnAttach()
 	m_LogoTexture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
 
 	Engine::UString str;
-	Engine::IFStream stream;
-	Engine::OFStream oStream;
-	stream.Open("Assets/Shaders/FlatColorShader.glsl");
-	oStream.Open("Assets/text.txt");
-	while (!stream.EndOfFile())
-	{
-		stream.ReadLine(str);
-		oStream.Write(str);
-		DEBUG_INFO(str);
-	}
-	oStream.Close();
-	stream.Close();
+
+	float i = 200.205445632521452641454f;
+
+	str = i;
+
+	DEBUG_INFO(i);
+	DEBUG_INFO(str);
+
+	//Engine::IFStream stream;
+	//Engine::OFStream oStream;
+	//stream.Open("Assets/Shaders/FlatColorShader.glsl");
+	//oStream.Open("Assets/text.txt");
+	//while (!stream.EndOfFile())
+	//{
+	//	stream.ReadLine(str);
+	//	oStream.Write(str);
+	//	DEBUG_INFO(str);
+	//}
+	//oStream.Close();
+	//stream.Close();
 }
 
 void Sandbox2DLayer::OnDetach()

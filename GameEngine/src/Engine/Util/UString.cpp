@@ -20,7 +20,19 @@ namespace Engine
 	UString::UString(int num)
 	{
 		Resize(IntLength(num));
-		_itoa(num, m_Data, 10);
+		sprintf(m_Data, "%i", num);
+	}
+
+	UString::UString(unsigned int num)
+	{
+		Resize(IntLength(num));
+		sprintf(m_Data, "%u", num);
+	}
+
+	UString::UString(float num)
+	{
+		Resize(FloatLength(num));
+		sprintf(m_Data, "%f", num);
 	}
 
 	UString::UString(const UString& str)
@@ -124,7 +136,19 @@ namespace Engine
 	void UString::operator=(const int num)
 	{
 		Resize(IntLength(num));
-		_itoa(num, m_Data, 10);
+		sprintf(m_Data, "%i", num);
+	}
+
+	void UString::operator=(const unsigned int num)
+	{
+		Resize(IntLength(num));
+		sprintf(m_Data, "%u", num);
+	}
+
+	void UString::operator=(const float num)
+	{
+		Resize(FloatLength(num));
+		sprintf(m_Data, "%f", num);
 	}
 	
 	bool UString::operator==(const UString& str)
@@ -171,7 +195,21 @@ namespace Engine
 	{
 		size_t size = Size();
 		Resize(size + IntLength(num));
-		_itoa(num, m_Data+size, 10);
+		sprintf(m_Data + size, "%i", num);
+	}
+
+	void UString::operator+=(const unsigned int num)
+	{
+		size_t size = Size();
+		Resize(size + IntLength(num));
+		sprintf(m_Data + size, "%u", num);
+	}
+
+	void UString::operator+=(const float num)
+	{
+		size_t size = Size();
+		Resize(size + FloatLength(num));
+		sprintf(m_Data + size, "%f", num);
 	}
 
 	UString UString::operator+(const UString& str) const
@@ -264,24 +302,30 @@ namespace Engine
 		s_UStringAllocator->Deallocate(p);
 	}
 
-	size_t UString::IntLength(int num)
+	size_t UString::IntLength(int val)
 	{
-		if (num == 0)
+		if (val == 0)
 		{
 			return 1;
 		}
 		int numSize = 0;
-		if (num < 0)
+		if (val < 0)
 		{
-			num = -num;
+			val = -val;
 			numSize++;
 		}
-		while (num > 0)
+		while (val > 0)
 		{
-			num /= 10;
+			val /= 10;
 			numSize++;
 		}
 		return numSize;
+	}
+
+	size_t UString::FloatLength(float val)
+	{
+		char buffer[200];
+		return sprintf(buffer, "%f", val);
 	}
 
 	std::ostream& operator<<(std::ostream& os, const UString& str)
@@ -312,6 +356,4 @@ namespace Engine
 		ASSERT(i <= m_Size, "index out of bounds");
 		return m_String->m_Data[m_Start + i];
 	}
-
-
 }
