@@ -192,8 +192,20 @@ namespace Engine
 	{
 		return m_Data.VSync; // returns the v-sync state
 	}
+
+	void WindowsWindow::SetViewport(float width, float height)
+	{
+		glfwSetWindowSize(m_Window, width, height);
+	}
+
+	void WindowsWindow::SetAspectRatio(float aspect)
+	{
+		glfwSetWindowAspectRatio(m_Window, aspect * 100.0f, 100);
+	}
+
 	inline void* WindowsWindow::GetNativeWindow() const
 	{
 		return m_Window;
 	}
+
 }

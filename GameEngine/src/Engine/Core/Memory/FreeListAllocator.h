@@ -48,7 +48,6 @@ namespace Engine
 		virtual void* Allocate(size_t size, uint8_t alignment = 0) override; // dont use alignment
 		virtual void Deallocate(void* p) override;
 		bool ResizeAllocation(void* p, size_t newSize);
-		void* MoveAllocatonStart(void* p, size_t offset); // used by input file stream when reading
 		virtual void Reset();
 
 		virtual void StartMemoryDebuging(const UString& name, const UString& path);

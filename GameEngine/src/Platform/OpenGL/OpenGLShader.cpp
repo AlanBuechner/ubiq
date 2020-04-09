@@ -161,6 +161,12 @@ namespace Engine
 		glUniform1i(location, value);
 	}
 
+	void OpenGLShader::UploadUniformIntArray(const std::string& name, const int* values, uint32_t count)
+	{
+		uint32_t location = GetUniformLocation(name);
+		glUniform1iv(location, count, values);
+	}
+
 	void OpenGLShader::UploadUniformFloat4(const std::string & name, const glm::vec4 & values)
 	{
 		uint32_t location = GetUniformLocation(name);

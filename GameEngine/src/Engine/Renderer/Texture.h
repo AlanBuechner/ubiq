@@ -19,6 +19,8 @@ namespace Engine
 		virtual void LoadFromFile(const std::string& path) = 0;
 		virtual Ref<TextureAttribute> GetAttributes() const = 0;
 		virtual glm::vec2 AtlasIndexToPosition(int index) const = 0;
+
+		virtual bool operator==(const Texture& other) const = 0;
 	};
 
 	class Texture2D : public Texture
@@ -26,5 +28,6 @@ namespace Engine
 	public:
 		static Ref<Texture2D> Create(const std::string& path = "", TextureAttribute& attribute = *TextureAttribute::Default);
 		static Ref<Texture2D> Create(const uint32_t width, const uint32_t height, TextureAttribute& attribute = *TextureAttribute::Default);
+
 	};
 }

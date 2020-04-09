@@ -15,7 +15,7 @@ Entity* e;
 Sandbox2DLayer::Sandbox2DLayer()
 	: Super("Sandbox2D")
 {
-	m_Camera = Engine::CreateSharedPtr<Engine::OrthographicCameraControler>(1.6f, 1.0f, CAMERA_CONTROLER_2D);
+	m_Camera = Engine::CreateSharedPtr<Engine::OrthographicCameraControler>(1.6, 1.0f, CAMERA_CONTROLER_2D);
 
 	m_Camera->SetPlayerInput(m_InputManeger);
 }
@@ -58,12 +58,14 @@ void Sandbox2DLayer::OnUpdate()
 	Engine::RenderCommand::Clear();
 
 	timer.Start("Rendrer");
-	Engine::Renderer2D::BeginScene(*m_Camera->GetCamera());
+	Engine::Renderer2D::BeginScene(m_Camera->GetCamera().Get());
 
-	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
+	//Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
+
+	Engine::Renderer2D::DrawQuad({ -0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f }, 45.0f, m_LogoTexture);
 
 	Engine::Renderer2D::EndScene();
-	//Engine::Renderer::Flush();
+	Engine::Renderer2D::Flush();
 
 	timer.End();
 }

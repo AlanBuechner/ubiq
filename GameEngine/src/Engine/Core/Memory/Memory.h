@@ -88,6 +88,11 @@ namespace Engine
 			m_Object->m_Object = obj;
 		}
 
+		T& Get() const
+		{
+			return *(T*)m_Object->m_Object;
+		}
+
 		void operator=(const SharedPtr<T>& ptr)
 		{
 			if (m_Object != nullptr)
@@ -106,10 +111,10 @@ namespace Engine
 		{
 			return (T*)m_Object->m_Object;
 		}
-		
+
 		T& operator*() const
 		{
-			return *(T*)m_Object->m_Object;
+			return Get();
 		}
 		
 		template<class B>

@@ -19,6 +19,11 @@ namespace Engine
 		virtual Ref<TextureAttribute> GetAttributes() const override { return m_Attribute; }
 		virtual glm::vec2 AtlasIndexToPosition(int index) const override;
 
+		virtual bool operator==(const Texture& other) const override
+		{
+			return m_RendererID == ((OpenGLTexture2D&)other).m_RendererID;
+		}
+
 	private:
 		std::string m_Path;
 

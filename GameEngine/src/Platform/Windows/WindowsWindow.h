@@ -25,6 +25,9 @@ namespace Engine
 		virtual void SetVSync(bool enabled) override; // enables v-sync
 		virtual bool IsVSync() const override; // returns wither or not v-sync is enabled
 
+		virtual void SetViewport(float width, float height) override;
+		virtual void SetAspectRatio(float aspect) override;
+
 		inline virtual void* GetNativeWindow() const;
 	private:
 		virtual void Init(const WindowProps& props); // initialize the window

@@ -15,6 +15,7 @@ namespace Engine
 		virtual const std::string& GetName() const override;
 
 		virtual void UploadUniformInt(const std::string& name, const int value) override;
+		virtual void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count) override;
 		virtual void UploadUniformFloat4(const std::string& name, const glm::vec4& values)override;
 		virtual void UploadUniformFloat3(const std::string& name, const glm::vec3& values)override;
 		virtual void UploadUniformFloat2(const std::string& name, const glm::vec2& values)override;

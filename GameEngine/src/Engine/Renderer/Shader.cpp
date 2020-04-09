@@ -110,7 +110,7 @@ namespace Engine
 	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& path)
 	{
 		Ref<Shader::ShaderSorce> src = CreateSharedPtr<Shader::ShaderSorce>();
-		*src << Shader::LoadShader(path);
+		src.Get() << Shader::LoadShader(path);
 		Memory::SetAllocator(ShaderAlloc);
 		auto shader = Shader::Create(name, src);
 		Memory::SetAllocator(Memory::GetDefaultAlloc());

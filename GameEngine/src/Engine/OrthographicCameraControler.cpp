@@ -6,9 +6,20 @@
 
 namespace Engine
 {
+	OrthographicCameraControler::OrthographicCameraControler(int controlerType)
+		: m_ZoomLevel(1.0f), m_ControlerType(controlerType)
+	{
+		Window& window = Application::Get().GetWindow();
+		m_AspectRatio = (float)window.GetWidth() / (float)window.GetHeight();
+
+		m_Camera = CreateSharedPtr<OrthographicCamera>(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+	}
+
 	OrthographicCameraControler::OrthographicCameraControler(float aspectRatio, float zoom, int controlerType)
 		: m_AspectRatio(aspectRatio), m_ZoomLevel(zoom), m_ControlerType(controlerType)
 	{
+		Window& window = Application::Get().GetWindow();
+		window.SetViewport(window.GetHeight() * aspectRatio, window.GetHeight());
 		m_Camera = CreateSharedPtr<OrthographicCamera>(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 	}
 

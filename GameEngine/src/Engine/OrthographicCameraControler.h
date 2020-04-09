@@ -14,6 +14,7 @@ namespace Engine
 	class OrthographicCameraControler : public CameraControler<OrthographicCamera>
 	{
 	public:
+		OrthographicCameraControler(int controleType);
 		OrthographicCameraControler(float aspectRatio, float zoom, int controleType);
 
 		virtual void SetPlayerInput(Ref<InputControlerManeger> maneger) override;

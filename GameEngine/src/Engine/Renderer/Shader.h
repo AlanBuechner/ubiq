@@ -47,6 +47,7 @@ namespace Engine
 		virtual const std::string& GetName() const = 0;
 
 		virtual void UploadUniformInt(const std::string& name, const int value) = 0;
+		virtual void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count) = 0;
 		virtual void UploadUniformFloat4(const std::string& name, const glm::vec4& values) = 0;
 		virtual void UploadUniformFloat3(const std::string& name, const glm::vec3& values) = 0;
 		virtual void UploadUniformFloat2(const std::string& name, const glm::vec2& values) = 0;
