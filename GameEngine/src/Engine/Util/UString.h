@@ -16,6 +16,8 @@ namespace Engine
 		UString();
 		UString(const char* str);
 		UString(int num);
+		UString(unsigned int num);
+		UString(float num);
 		UString(const UString& str);
 		~UString();
 
@@ -32,14 +34,22 @@ namespace Engine
 		void operator=(const UString& str);
 		void operator=(const char* str);
 		void operator=(const int num);
+		void operator=(const unsigned int num);
+		void operator=(const float num);
+
 		bool operator==(const UString& str);
 		bool operator==(const char* str);
+
 		void operator+=(const UString& str);
 		void operator+=(const char* str);
 		void operator+=(const int num);
+		void operator+=(const unsigned int num);
+		void operator+=(const float num);
+
 		UString operator+(const UString& str) const;
 		UString operator+(const char* str) const;
 		UString operator+(const int num) const;
+
 		char& operator[](size_t i) const;
 
 		// cast
@@ -56,12 +66,12 @@ namespace Engine
 		void* Allocate(size_t size) const;
 		void Deallocate(void* p) const;
 
-		static size_t IntLength(int i);
+		static size_t IntLength(int val);
+		static size_t FloatLength(float val);
 
 		char* m_Data = nullptr;
 
 		size_t m_Size = 0;
-
 
 		friend UStringView;
 		friend IFStream;
