@@ -6,6 +6,8 @@
 #include "Shader.h"
 #include "OrthographicCamera.h"
 
+#include "Engine/Util/Performance.h"
+
 namespace Engine
 {
 	struct QuadVertex
@@ -18,9 +20,9 @@ namespace Engine
 
 	struct Renderer2DData
 	{
-		const uint32_t MaxQuades = 10000;
-		const uint32_t MaxVertices = MaxQuades * 4;
-		const uint32_t MaxIndices = MaxQuades * 6;
+		static const uint32_t MaxQuades = 10000;
+		static const uint32_t MaxVertices = MaxQuades * 4;
+		static const uint32_t MaxIndices = MaxQuades * 6;
 		static const uint32_t MaxTextureSlots = 32; // TODO: RendererCaps
 
 		Ref<VertexArray> QuadVertexArray;
@@ -36,12 +38,16 @@ namespace Engine
 		uint32_t TextureSlotIndex = 1;
 
 		glm::vec4 QuadVertexPositions[4];
+
+		Renderer2D::Statistics Stats;
 	};
 
 	static Renderer2DData s_Data;
 
 	void Renderer2D::Init()
 	{
+		CREATE_PROFILE_FUNCTIONI();
+
 		s_Data.QuadVertexArray = Engine::VertexArray::Create();
 
 		s_Data.QuadVertexBuffer = Engine::VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
@@ -113,30 +119,55 @@ namespace Engine
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
+		CREATE_PROFILE_FUNCTIONI();
+
 		Ref<Shader> TextureShader = s_Data.Library->Get("TextureShader");
 		TextureShader->Bind();
 		TextureShader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
-		s_Data.TextureSlotIndex = 1;
+		BeginBatch();
 	}
 
 	void Renderer2D::EndScene()
 	{
+		CREATE_PROFILE_FUNCTIONI();
+
 		uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
 		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
+
+		Flush();
 	}
 
 	void Renderer2D::Flush()
 	{
+		CREATE_PROFILE_FUNCTIONI();
+
 		for (int i = 0; i < s_Data.TextureSlotIndex; i++)
 		{
 			s_Data.TextureSlots[i].Get().Bind(i);
 		}
 
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+
+		s_Data.Stats.DrawCalls++;
+	}
+
+	void Renderer2D::ResetStats()
+	{
+		memset(&s_Data.Stats, 0, sizeof(Statistics));
+	}
+
+	Renderer2D::Statistics Renderer2D::GetStats()
+	{
+		return s_Data.Stats;
+	}
+
+	void Renderer2D::BeginBatch()
+	{
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+		s_Data.TextureSlotIndex = 1;
 	}
 
 
@@ -153,6 +184,13 @@ namespace Engine
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
+		CREATE_PROFILE_FUNCTIONI();
+
+		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+		{
+			EndScene();
+			BeginBatch();
+		}
 
 		const float textIndex = 0.0f; // white texture
 
@@ -160,31 +198,33 @@ namespace Engine
 			glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f }) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_Data.QuadVertexBufferPtr->Position = s_Data.QuadVertexPositions[0] * transform;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
 		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
 		s_Data.QuadVertexBufferPtr++;
 
-		s_Data.QuadVertexBufferPtr->Position = s_Data.QuadVertexPositions[1] * transform;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
 		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
 		s_Data.QuadVertexBufferPtr++;
 
-		s_Data.QuadVertexBufferPtr->Position = s_Data.QuadVertexPositions[2] * transform;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
 		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
 		s_Data.QuadVertexBufferPtr++;
 
-		s_Data.QuadVertexBufferPtr->Position = s_Data.QuadVertexPositions[3] * transform;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
 		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadIndexCount += 6;
+
+		s_Data.Stats.QuadCount++;
 
 
 		/*Ref<Shader> shader = s_Data.Library->Get("TextureShader");
@@ -222,6 +262,14 @@ namespace Engine
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, int atlesIndex)
 	{
+		CREATE_PROFILE_FUNCTIONI();
+
+		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+		{
+			EndScene();
+			BeginBatch();
+		}
+
 		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		float textureIndex = 0.0f;
 
@@ -245,31 +293,33 @@ namespace Engine
 								glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f }) * 
 								glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_Data.QuadVertexBufferPtr->Position = s_Data.QuadVertexPositions[0] * transform;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
-		s_Data.QuadVertexBufferPtr->Position = s_Data.QuadVertexPositions[1] * transform;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
-		s_Data.QuadVertexBufferPtr->Position = s_Data.QuadVertexPositions[2] * transform;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
-		s_Data.QuadVertexBufferPtr->Position = s_Data.QuadVertexPositions[3] * transform;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadIndexCount += 6;
+
+		s_Data.Stats.QuadCount++;
 
 		/*Ref<Shader> shader = s_Data.Library->Get("TextureShader");
 

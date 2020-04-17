@@ -3,6 +3,7 @@
 #include <Engine/Util/Performance.h>
 #include <Engine/Util/UFileIO.h>
 #include <Engine/Util/FStream.h>
+#include <imgui/imgui.h>
 
 class Entity
 {
@@ -54,6 +55,7 @@ void Sandbox2DLayer::OnDetach()
 
 void Sandbox2DLayer::OnUpdate()
 {
+	Engine::Instrumentor::Get().RecordData(false);
 	CREATE_PROFILE_FUNCTIONI();
 
 	Engine::InstrumentationTimer timer = CREATE_PROFILEI();
@@ -66,21 +68,35 @@ void Sandbox2DLayer::OnUpdate()
 	Engine::RenderCommand::Clear();
 
 	timer.Start("Rendrer");
+	Engine::Renderer2D::ResetStats();
 	Engine::Renderer2D::BeginScene(m_Camera->GetCamera().Get());
 
 	//Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
 
-	Engine::Renderer2D::DrawQuad({ -0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f }, 45.0f, m_LogoTexture);
+	for (float x = -5.0f; x < 5.0f; x += 0.5f) 
+	{
+		for (float y = -5.0f; y < 5.0f; y += 0.5f)
+		{
+			glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+			Engine::Renderer2D::DrawQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, 0.0f, color);
+		}
+	}
 
 	Engine::Renderer2D::EndScene();
-	Engine::Renderer2D::Flush();
 
 	timer.End();
+	Engine::Instrumentor::Get().RecordData(false);
 }
 
 void Sandbox2DLayer::OnImGuiRender()
 {
-	
+	ImGui::Begin("Statistics");
+	ImGui::Text("Renderer2D Statis:");
+	Engine::Renderer2D::Statistics stats = Engine::Renderer2D::GetStats();
+	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+	ImGui::Text("Quads: %d", stats.QuadCount);
+
+	ImGui::End();
 }
 
 void Sandbox2DLayer::OnEvent(Engine::Event& event)
