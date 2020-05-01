@@ -202,6 +202,10 @@ namespace Engine
 	inline glm::vec2 OpenGLTexture2D::AtlasIndexToPosition(int index) const
 	{
 		int atlasRows = m_Attribute->AtlasRows;
+
+		if (index > atlasRows * atlasRows - 1)
+			DEBUG_WARN("Atlas Index {0} can not be used with only {1} Atlas positions", index, atlasRows * atlasRows);
+
 		int c = index % atlasRows;
 		int r = index / atlasRows;
 		return { (float)c / (float)atlasRows, (float)r / (float)atlasRows };

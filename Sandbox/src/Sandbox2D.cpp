@@ -71,16 +71,16 @@ void Sandbox2DLayer::OnUpdate()
 	Engine::Renderer2D::ResetStats();
 	Engine::Renderer2D::BeginScene(m_Camera->GetCamera().Get());
 
-	//Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
+	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, 0, m_LogoTexture);
 
-	for (float x = -5.0f; x < 5.0f; x += 0.5f) 
+	/*for (float x = -5.0f; x < 5.0f; x += 0.5f) 
 	{
 		for (float y = -5.0f; y < 5.0f; y += 0.5f)
 		{
 			glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
 			Engine::Renderer2D::DrawQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, 0.0f, color);
 		}
-	}
+	}*/
 
 	Engine::Renderer2D::EndScene();
 

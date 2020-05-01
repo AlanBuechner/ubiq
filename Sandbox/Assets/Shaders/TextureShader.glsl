@@ -8,16 +8,13 @@ layout(location = 1) in vec4 a_Color;
 layout(location = 2) in vec2 a_TexCoord;
 layout(location = 3) in float a_TexIndex;
 
-uniform int u_AtlasRows = 1;
-uniform vec2 u_AtlasPos;
-
 out vec2 v_TexCoord;
 out vec4 v_Color;
 out float v_TexIndex;
 
 void main() {
 	v_Color = a_Color;
-	v_TexCoord = (a_TexCoord/u_AtlasRows) + u_AtlasPos;
+	v_TexCoord = a_TexCoord;
 	v_TexIndex = a_TexIndex;
 	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
