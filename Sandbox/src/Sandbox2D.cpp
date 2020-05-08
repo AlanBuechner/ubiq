@@ -21,9 +21,12 @@ Sandbox2DLayer::Sandbox2DLayer()
 	m_Camera->SetPlayerInput(m_InputManeger);
 }
 
+Engine::Ref<Engine::SubTexture2D> m_Texture;
+
 void Sandbox2DLayer::OnAttach()
 {
 	m_LogoTexture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
+	m_Texture = Engine::SubTexture2D::Create(m_LogoTexture, { 2,2 }, { 0,0 }, { 2,2 });
 
 	Engine::UString str;
 
@@ -71,7 +74,7 @@ void Sandbox2DLayer::OnUpdate()
 	Engine::Renderer2D::ResetStats();
 	Engine::Renderer2D::BeginScene(m_Camera->GetCamera().Get());
 
-	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, 0, m_LogoTexture);
+	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, 0, m_Texture);
 
 	/*for (float x = -5.0f; x < 5.0f; x += 0.5f) 
 	{

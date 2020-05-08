@@ -21,8 +21,6 @@ namespace Engine
 
 		MinMagFilter Min = MinMagFilter::Linear, Mag = MinMagFilter::Linear;
 
-		int AtlasRows = 1;
-
 		static TextureAttribute* Default;
 	};
 }

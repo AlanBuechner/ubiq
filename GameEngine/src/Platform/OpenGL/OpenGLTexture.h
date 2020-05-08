@@ -17,7 +17,6 @@ namespace Engine
 		virtual void Bind(uint32_t slot) const override;
 		virtual void LoadFromFile(const std::string& path);
 		virtual Ref<TextureAttribute> GetAttributes() const override { return m_Attribute; }
-		virtual glm::vec2 AtlasIndexToPosition(int index) const override;
 
 		virtual bool operator==(const Texture& other) const override
 		{

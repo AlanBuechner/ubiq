@@ -39,6 +39,8 @@ namespace Engine
 
 		glm::vec4 QuadVertexPositions[4];
 
+		glm::vec2 TextureCoords[4];
+
 		Renderer2D::Statistics Stats;
 	};
 
@@ -68,7 +70,7 @@ namespace Engine
 		uint32_t* quadIndeces = new uint32_t[s_Data.MaxIndices];
 
 		uint32_t offset = 0;
-		for (uint32_t i = 0; i < s_Data.MaxIndices; i+=6)
+		for (uint32_t i = 0; i < s_Data.MaxIndices; i += 6)
 		{
 			quadIndeces[i + 0] = offset + 0;
 			quadIndeces[i + 1] = offset + 1;
@@ -86,7 +88,7 @@ namespace Engine
 
 		delete[] quadIndeces;
 
-		s_Data.WhiteTexture = Texture2D::Create(1,1);
+		s_Data.WhiteTexture = Texture2D::Create(1, 1);
 		uint32_t whiteTexureData = 0xffffffff;
 		s_Data.WhiteTexture->SetData(&whiteTexureData, sizeof(whiteTexureData));
 
@@ -107,9 +109,14 @@ namespace Engine
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
 		s_Data.QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data.QuadVertexPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data.QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
+		s_Data.QuadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
+		s_Data.QuadVertexPositions[2] = { 0.5f,  0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+
+		s_Data.TextureCoords[0] = { 0,0 };
+		s_Data.TextureCoords[1] = { 1,0 };
+		s_Data.TextureCoords[2] = { 1,1 };
+		s_Data.TextureCoords[3] = { 0,1 };
 	}
 
 	void Renderer2D::Shutdown()
@@ -200,25 +207,25 @@ namespace Engine
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+		s_Data.QuadVertexBufferPtr->TexCoord = s_Data.TextureCoords[0];
 		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
+		s_Data.QuadVertexBufferPtr->TexCoord = s_Data.TextureCoords[1];
 		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
+		s_Data.QuadVertexBufferPtr->TexCoord = s_Data.TextureCoords[2];
 		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
+		s_Data.QuadVertexBufferPtr->TexCoord = s_Data.TextureCoords[3];
 		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
 		s_Data.QuadVertexBufferPtr++;
 
@@ -247,20 +254,35 @@ namespace Engine
 
 	}
 
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& texture)
+	{
+		DrawQuad(position, size, texture->GetTexture(), texture->GetTextCordes());
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& texture)
+	{
+		DrawQuad(position, size, texture->GetTexture(), texture->GetTextCordes());
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture)
+	{
+		DrawQuad(position, size, rotation, texture->GetTexture(), texture->GetTextCordes());
+	}
+
 
 
 	// draw textured quad --------------------------------------
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, int atlesIndex)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2* textCoords)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, 0.0f, texture, atlesIndex);
+		DrawQuad({ position.x, position.y, 0.0f }, size, 0.0f, texture, textCoords);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, int atlesIndex)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2* textCoords)
 	{
-		DrawQuad(position, size, 0.0f, texture, atlesIndex);
+		DrawQuad(position, size, 0.0f, texture, textCoords);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, int atlasIndex)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, const glm::vec2* textCoords)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
@@ -289,34 +311,42 @@ namespace Engine
 			s_Data.TextureSlotIndex++;
 		}
 
+		glm::vec2* textureCoords = s_Data.TextureCoords;
+
+		if (textCoords != nullptr)
+		{
+			textureCoords = new glm::vec2[4];
+			textureCoords[0] = textCoords[0];
+			textureCoords[1] = textCoords[1];
+			textureCoords[2] = textCoords[2];
+			textureCoords[3] = textCoords[3];
+		}
+
 		glm::mat4 transform =	glm::translate(glm::mat4(1.0f), position) *
 								glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f }) * 
 								glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		float atlasRows = (float)texture->GetAttributes()->AtlasRows;
-		glm::vec2 atlasPos = texture->AtlasIndexToPosition(atlasIndex);
-
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = atlasPos;
+		s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[0];
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = { (1 / atlasRows) + atlasPos.x, atlasPos.y };
+		s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[1];
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = { (1 / atlasRows) + atlasPos.x, (1 / atlasRows) + atlasPos.y };
+		s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[2];
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = { atlasPos.x, (1 / atlasRows) + atlasPos.y };
+		s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[3];
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
