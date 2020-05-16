@@ -181,108 +181,86 @@ namespace Engine
 	// draw colord quad --------------------------------------
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		DrawQuad({position.x, position.y, 0.0f}, size, 0.0f, color);
+		DrawQuad({position.x, position.y, 0.0f}, size, 0.0f, color, s_Data.WhiteTexture, s_Data.TextureCoords);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		DrawQuad(position, size, 0.0f, color);
+		DrawQuad(position, size, 0.0f, color, s_Data.WhiteTexture, s_Data.TextureCoords);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
-		CREATE_PROFILE_FUNCTIONI();
-
-		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-		{
-			EndScene();
-			BeginBatch();
-		}
-
-		const float textIndex = 0.0f; // white texture
-
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
-			glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f }) *
-			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
-		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
-		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = s_Data.TextureCoords[0];
-		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
-		s_Data.QuadVertexBufferPtr++;
-
-		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
-		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = s_Data.TextureCoords[1];
-		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
-		s_Data.QuadVertexBufferPtr++;
-
-		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
-		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = s_Data.TextureCoords[2];
-		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
-		s_Data.QuadVertexBufferPtr++;
-
-		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
-		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = s_Data.TextureCoords[3];
-		s_Data.QuadVertexBufferPtr->TexIndex = textIndex;
-		s_Data.QuadVertexBufferPtr++;
-
-		s_Data.QuadIndexCount += 6;
-
-		s_Data.Stats.QuadCount++;
-
-
-		/*Ref<Shader> shader = s_Data.Library->Get("TextureShader");
-		s_Data.WhiteTexture->Bind(0);
-
-		glm::mat4 rotationMat = glm::mat4(1.0f);
-		if (rotation != 0.0f)
-		{
-			rotationMat = glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f });
-		}
-
-		shader->UploadUniformMat4("u_Transform", glm::translate(glm::mat4(1.0f), position) * rotationMat * glm::scale(glm::mat4(1.0f), { size, 0.0f }));
-
-		shader->UploadUniformFloat("u_TilingFactor", 1.0f);
-
-		s_Data.QuadVertexArray->Bind();
-		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);*/
-
-
-
+		DrawQuad(position, size, rotation, color, s_Data.WhiteTexture, s_Data.TextureCoords);
 	}
 
+	// draw sub textured quad ---------------------------------
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& texture)
 	{
-		DrawQuad(position, size, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuad({ position.x, position.y, 0.0f }, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes());
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& texture)
 	{
-		DrawQuad(position, size, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuad(position, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes());
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture)
 	{
-		DrawQuad(position, size, rotation, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuad(position, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes());
 	}
 
+	// draw sub texture tinted quad ----------------------------
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture)
+	{
+		DrawQuad({position.x, position.y, 0.0f}, size, 0.0f, color, texture->GetTexture(), texture->GetTextCordes());
+	}
 
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture)
+	{
+		DrawQuad(position, size, 0.0f, color, texture->GetTexture(), texture->GetTextCordes());
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float rotation, const Ref<SubTexture2D>& texture)
+	{
+		DrawQuad(position, size, rotation, color, texture->GetTexture(), texture->GetTextCordes());
+	}
 
 	// draw textured quad --------------------------------------
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2* textCoords)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, 0.0f, texture, textCoords);
+		DrawQuad({ position.x, position.y, 0.0f }, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2* textCoords)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture)
 	{
-		DrawQuad(position, size, 0.0f, texture, textCoords);
+		DrawQuad(position, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, const glm::vec2* textCoords)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture)
+	{
+		DrawQuad(position, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords);
+	}
+
+	// draw textured tinted quad
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, 0.0f, color, texture, s_Data.TextureCoords);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture)
+	{
+		DrawQuad(position, size, 0.0f, color, texture, s_Data.TextureCoords);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float rotation, const Ref<Texture2D>& texture)
+	{
+		DrawQuad(position, size, rotation, color, texture, s_Data.TextureCoords);
+	}
+
+
+	// draw quad implementation
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[])
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
@@ -292,7 +270,6 @@ namespace Engine
 			BeginBatch();
 		}
 
-		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		float textureIndex = 0.0f;
 
 		for (int i = 1; i < s_Data.TextureSlotIndex; i++)
@@ -311,68 +288,37 @@ namespace Engine
 			s_Data.TextureSlotIndex++;
 		}
 
-		glm::vec2* textureCoords = s_Data.TextureCoords;
-
-		if (textCoords != nullptr)
-		{
-			textureCoords = new glm::vec2[4];
-			textureCoords[0] = textCoords[0];
-			textureCoords[1] = textCoords[1];
-			textureCoords[2] = textCoords[2];
-			textureCoords[3] = textCoords[3];
-		}
-
-		glm::mat4 transform =	glm::translate(glm::mat4(1.0f), position) *
-								glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f }) * 
-								glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
+			glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f }) *
+			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[0];
+		s_Data.QuadVertexBufferPtr->TexCoord = textCoords[0];
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[1];
+		s_Data.QuadVertexBufferPtr->TexCoord = textCoords[1];
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[2];
+		s_Data.QuadVertexBufferPtr->TexCoord = textCoords[2];
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
 		s_Data.QuadVertexBufferPtr->Color = color;
-		s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[3];
+		s_Data.QuadVertexBufferPtr->TexCoord = textCoords[3];
 		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadIndexCount += 6;
 
 		s_Data.Stats.QuadCount++;
-
-		/*Ref<Shader> shader = s_Data.Library->Get("TextureShader");
-
-		glm::mat4 rotationMat = glm::mat4(1.0f);
-		if (rotation != 0.0f)
-		{
-			rotationMat = glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f });
-		}
-		shader->UploadUniformMat4("u_Transform", glm::translate(glm::mat4(1.0f), position) * rotationMat * glm::scale(glm::mat4(1.0f), { size, 0.0f }));
-
-		shader->UploadUniformInt("u_AtlasRows", texture->GetAttributes()->AtlasRows);
-		shader->UploadUniformFloat2("u_AtlasPos", texture->AtlasIndexToPosition(atlesIndex));
-
-		shader->UploadUniformFloat4("u_Color", { 1.0f, 1.0f, 1.0f, 1.0f });
-		shader->UploadUniformFloat("u_TilingFactor", 1.0f);
-
-		texture->Bind(0);
-
-		s_Data.QuadVertexArray->Bind();
-		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);*/
 	}
 
 }

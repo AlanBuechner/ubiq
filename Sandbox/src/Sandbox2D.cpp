@@ -74,7 +74,7 @@ void Sandbox2DLayer::OnUpdate()
 	Engine::Renderer2D::ResetStats();
 	Engine::Renderer2D::BeginScene(m_Camera->GetCamera().Get());
 
-	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, 0, m_Texture);
+	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
 
 	/*for (float x = -5.0f; x < 5.0f; x += 0.5f) 
 	{
