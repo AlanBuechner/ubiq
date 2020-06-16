@@ -19,10 +19,12 @@ namespace Engine
 	class ENGINE_API Application
 	{
 	public:
-		Application();
+		Application(const std::string& name = "");
 		virtual ~Application();
 
 		void Run();
+
+		void Close();
 
 		void OnEvent(Event& e);
 

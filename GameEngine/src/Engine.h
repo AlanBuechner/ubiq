@@ -19,6 +19,7 @@
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/SubTexture.h"
+#include "Engine/Renderer/FrameBuffer.h"
 #include "Engine/Renderer/VertexArray.h"
 // Camera
 #include "Engine/Renderer/Camera.h"

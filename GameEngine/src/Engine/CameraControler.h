@@ -32,8 +32,9 @@ namespace Engine
 
 		virtual Ref<C> GetCamera() = 0;
 
+		virtual void SetCameraAspectRatio(float aspectRatio) = 0;
+
 	protected:
-		virtual void SetAspectRatio(float aspectRatio) = 0;
 
 		virtual bool OnWindowResize(WindowResizeEvent& e) = 0;
 

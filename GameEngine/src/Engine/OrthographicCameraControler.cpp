@@ -80,6 +80,23 @@ namespace Engine
 		m_Camera->Translate(m_MoveDir * m_Speed * Time::GetDeltaTime());
 	}
 
+	void OrthographicCameraControler::SetCameraSize(float width, float height)
+	{
+		SetCameraAspectRatio(width / height);
+	}
+
+	void OrthographicCameraControler::SetCameraZoomLevel(float zoom)
+	{
+		m_ZoomLevel = zoom;
+		m_Camera->SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+	}
+
+	void OrthographicCameraControler::SetCameraAspectRatio(float aspectRatio)
+	{
+		m_AspectRatio = aspectRatio;
+		m_Camera->SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+	}
+
 	void OrthographicCameraControler::Move(const glm::vec3& movedir)
 	{
 		m_MoveDir += movedir;
@@ -94,9 +111,9 @@ namespace Engine
 	{
 		float TargetZoom = m_ZoomLevel - (m_ScrollSpeed * delta.y);
 		if (TargetZoom < 0.1f)
-			SetZoomLevel(0.1f);
+			SetCameraZoomLevel(0.1f);
 		else
-			SetZoomLevel(TargetZoom);
+			SetCameraZoomLevel(TargetZoom);
 	}
 
 	void OrthographicCameraControler::Run(bool run)
@@ -104,21 +121,9 @@ namespace Engine
 		m_Speed = run ? m_RunSpeed : m_WalkSpeed;
 	}
 
-	void OrthographicCameraControler::SetZoomLevel(float zoom)
-	{
-		m_ZoomLevel = zoom;
-		m_Camera->SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
-	}
-
-	void OrthographicCameraControler::SetAspectRatio(float aspectRatio)
-	{
-		m_AspectRatio = aspectRatio;
-		m_Camera->SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
-	}
-
 	bool OrthographicCameraControler::OnWindowResize(WindowResizeEvent& e)
 	{
-		SetAspectRatio((float)e.GetWidth() / (float)e.GetHeight());
+		SetCameraAspectRatio((float)e.GetWidth() / (float)e.GetHeight());
 		return false;
 	}
 }

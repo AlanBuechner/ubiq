@@ -21,14 +21,12 @@ Sandbox2DLayer::Sandbox2DLayer()
 	m_Camera->SetPlayerInput(m_InputManeger);
 }
 
-Engine::Ref<Engine::SubTexture2D> m_Texture;
-
 void Sandbox2DLayer::OnAttach()
 {
 	m_LogoTexture = Engine::Texture2D::Create("Assets/Images/UBIQ.png");
 	m_Texture = Engine::SubTexture2D::Create(m_LogoTexture, { 2,2 }, { 0,0 }, { 2,2 });
 
-	Engine::UString str;
+	/*Engine::UString str;
 
 	float i = 200.205445632521452641454f;
 
@@ -37,18 +35,18 @@ void Sandbox2DLayer::OnAttach()
 	DEBUG_INFO(i);
 	DEBUG_INFO(str);
 
-	//Engine::IFStream stream;
-	//Engine::OFStream oStream;
-	//stream.Open("Assets/Shaders/FlatColorShader.glsl");
-	//oStream.Open("Assets/text.txt");
-	//while (!stream.EndOfFile())
-	//{
-	//	stream.ReadLine(str);
-	//	oStream.Write(str);
-	//	DEBUG_INFO(str);
-	//}
-	//oStream.Close();
-	//stream.Close();
+	Engine::IFStream stream;
+	Engine::OFStream oStream;
+	stream.Open("Assets/Shaders/FlatColorShader.glsl");
+	oStream.Open("Assets/text.txt");
+	while (!stream.EndOfFile())
+	{
+		stream.ReadLine(str);
+		oStream.Write(str);
+		DEBUG_INFO(str);
+	}
+	oStream.Close();
+	stream.Close();*/
 }
 
 void Sandbox2DLayer::OnDetach()
@@ -67,15 +65,17 @@ void Sandbox2DLayer::OnUpdate()
 	m_Camera->OnUpdate();
 	timer.End();
 
+	timer.Start("Rendrer");
+	Engine::Renderer2D::ResetStats();
 	Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 	Engine::RenderCommand::Clear();
 
-	timer.Start("Rendrer");
-	Engine::Renderer2D::ResetStats();
 	Engine::Renderer2D::BeginScene(m_Camera->GetCamera().Get());
 
-	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
 	Engine::Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
+	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
+
+	Engine::Renderer2D::DrawQuad({ 2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.5f, 0.5f, 0.5f, 1.0f });
 
 	/*for (float x = -5.0f; x < 5.0f; x += 0.5f) 
 	{
@@ -94,13 +94,18 @@ void Sandbox2DLayer::OnUpdate()
 
 void Sandbox2DLayer::OnImGuiRender()
 {
+
+
 	ImGui::Begin("Statistics");
+
+
 	ImGui::Text("Renderer2D Statis:");
 	Engine::Renderer2D::Statistics stats = Engine::Renderer2D::GetStats();
 	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 	ImGui::Text("Quads: %d", stats.QuadCount);
 
 	ImGui::End();
+
 }
 
 void Sandbox2DLayer::OnEvent(Engine::Event& event)

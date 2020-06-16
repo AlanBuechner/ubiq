@@ -19,7 +19,7 @@ namespace Engine {
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
+	Application::Application(const std::string& name)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		auto timer = CREATE_PROFILEI();
@@ -27,7 +27,7 @@ namespace Engine {
 		s_Instance = this;
 
 		timer.Start("Create Window");
-		m_Window = CreateScopedPtr<Window>(Window::Create()); // create a window
+		m_Window = CreateScopedPtr<Window>(Window::Create(name)); // create a window
 		timer.End();
 		timer.Start("set event callback");
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
@@ -99,6 +99,11 @@ namespace Engine {
 			m_Window->OnUpdate();
 			timer.End();
 		}
+	}
+
+	void Application::Close()
+	{
+		m_Running = false;
 	}
 
 	void Application::GenLayerStack()

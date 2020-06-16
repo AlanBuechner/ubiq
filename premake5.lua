@@ -147,3 +147,57 @@ project "Sandbox"
 		defines "DIST"
 		runtime "Release"
 		optimize "on"
+
+project "USG"
+	location "USG-Editor"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs
+	{
+		"GameEngine/vendor/spdlog/include",
+		"GameEngine/src",
+		"GameEngine/vendor",
+		"%{IncludeDir.glm}"
+	}
+
+	links
+	{
+		"GameEngine",
+		"GLAD",
+		"GLFW",
+		"ImGui"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+		defines
+		{
+		}
+
+	filter "configurations:Debug"
+		defines "DEBUG"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		defines "RELEASE"
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
+		defines "DIST"
+		runtime "Release"
+		optimize "on"

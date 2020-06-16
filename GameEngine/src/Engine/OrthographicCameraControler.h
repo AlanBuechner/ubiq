@@ -24,14 +24,17 @@ namespace Engine
 		virtual void OnUpdate() override;
 
 		virtual inline Ref<OrthographicCamera> GetCamera() override { return m_Camera; }
+
+		void SetCameraSize(float width, float height);
+
+		void SetCameraZoomLevel(float zoom);
+		virtual void SetCameraAspectRatio(float aspectRatio) override;
+
 	protected:
 		void Move(const glm::vec3& movedir);
 		void Run(bool run);
 		void OnMouseMoved(glm::vec2& delta);
 		void OnScrollWheel(glm::vec2& delta);
-
-		void SetZoomLevel(float zoom);
-		virtual void SetAspectRatio(float aspectRatio) override;
 
 		virtual bool OnWindowResize(WindowResizeEvent& e) override;
 
