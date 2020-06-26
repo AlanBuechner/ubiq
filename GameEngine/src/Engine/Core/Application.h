@@ -31,11 +31,18 @@ namespace Engine
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
+		inline static bool InEditer() { return s_Instance->m_InEditer; }
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window;  }
 
-	private:
+	public:
+		bool m_BlockInput = false;
+
+	protected:
+		bool m_InEditer = false;
 		void GenLayerStack();
+
+	private:
 		void SendInputBuffer();
 
 		bool OnWindowClose(WindowCloseEvent& e);
@@ -43,9 +50,11 @@ namespace Engine
 
 		Scope<Window> m_Window;
 		std::vector<Event*> m_InputBuffer;
-		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		bool m_Minimized = false;
+
+
+		ImGuiLayer* m_ImGuiLayer = nullptr;
 		LayerStack m_LayerStack;
 
 	private:

@@ -14,7 +14,11 @@ namespace Engine
 		{
 			auto timer = CREATE_PROFILEI();
 			timer.Start("EditorLayer");
-			PushLayer(new EditorLayer());
+			m_InEditer = true; // tell the engine that we are in the editor
+			m_BlockInput = true; // block input by default
+			PushLayer(new EditorLayer()); // set the editor layer
+			GenLayerStack();
+
 			timer.End();
 		}
 

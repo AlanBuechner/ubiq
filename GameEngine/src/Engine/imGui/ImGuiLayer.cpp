@@ -71,6 +71,11 @@ namespace Engine
 		//ImGui::ShowDemoWindow(&show);
 	}
 
+	void ImGuiLayer::OnEvent(Event& e)
+	{
+		
+	}
+
 	void ImGuiLayer::Begin()
 	{
 		ImGui_ImplOpenGL3_NewFrame();

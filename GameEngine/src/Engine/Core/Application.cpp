@@ -36,10 +36,6 @@ namespace Engine {
 		timer.Start("Renderer Init");
 		Renderer::Init();
 		timer.End();
-
-		timer.Start("Generate layer stack");
-		GenLayerStack(); // generate the starting layer stack
-		timer.End();
 	}
 
 	Application::~Application()
@@ -108,9 +104,12 @@ namespace Engine {
 
 	void Application::GenLayerStack()
 	{
-		// create im gui layer
-		m_ImGuiLayer = new ImGuiLayer();
-		PushOverlay(m_ImGuiLayer);
+		if (m_InEditer)
+		{
+			// create im gui layer
+			m_ImGuiLayer = new ImGuiLayer();
+			PushOverlay(m_ImGuiLayer);
+		}
 	}
 
 	void Application::SendInputBuffer()
@@ -131,17 +130,33 @@ namespace Engine {
 
 		Input::GetUpdatedEventList(m_InputBuffer);
 
-		for (auto i = m_InputBuffer.end(); i != m_InputBuffer.begin();)
+		if (m_BlockInput) // send input through the layerstack if the viewport is focused
 		{
-			Event& e = *(*--i);
-			for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+
+			for (auto i = m_InputBuffer.end(); i != m_InputBuffer.begin();)
 			{
-				(*--it)->OnEvent(e);
-				if (e.Handled)
-					break;
+				Event& e = *(*--i);
+
+				m_ImGuiLayer->OnEvent(e);
+
+				delete* i;
 			}
-			delete *i;
 		}
+		else // only send input to the imgui layer if viewport is not focused
+		{
+			for (auto i = m_InputBuffer.end(); i != m_InputBuffer.begin();)
+			{
+				Event& e = *(*--i);
+				for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+				{
+					(*--it)->OnEvent(e);
+					if (e.Handled)
+						break;
+				}
+				delete* i;
+			}
+		}
+
 		m_InputBuffer.clear();
 	}
 

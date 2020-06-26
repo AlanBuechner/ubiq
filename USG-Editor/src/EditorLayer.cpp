@@ -42,7 +42,8 @@ namespace Engine
 		InstrumentationTimer timer = CREATE_PROFILEI();
 
 		timer.Start("Camera Update");
-		m_Camera->OnUpdate();
+		if(!Application::Get().m_BlockInput)
+			m_Camera->OnUpdate();
 		timer.End();
 
 		timer.Start("Rendrer");
@@ -149,7 +150,8 @@ namespace Engine
 
 			// Game window
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-			ImGui::Begin("Game");
+			ImGui::Begin("Viewport");
+			Application::Get().m_BlockInput = !ImGui::IsWindowFocused();
 
 			ImVec2 viewPortPanalSize = ImGui::GetContentRegionAvail();
 			if (m_ViewPortSize != *(glm::vec2*)&viewPortPanalSize)
