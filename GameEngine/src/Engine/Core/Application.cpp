@@ -5,6 +5,7 @@
 
 #include "Engine/Events/Event.h"
 #include "Engine/Events/ApplicationEvent.h"
+
 #include "Engine/imGui/ImGuiLayer.h"
 
 #include "Engine/Renderer/Renderer.h"
@@ -21,6 +22,7 @@ namespace Engine {
 
 	Application::Application(const std::string& name)
 	{
+
 		CREATE_PROFILE_FUNCTIONI();
 		auto timer = CREATE_PROFILEI();
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!");
@@ -130,31 +132,16 @@ namespace Engine {
 
 		Input::GetUpdatedEventList(m_InputBuffer);
 
-		if (m_BlockInput) // send input through the layerstack if the viewport is focused
+		for (auto i = m_InputBuffer.end(); i != m_InputBuffer.begin();)
 		{
-
-			for (auto i = m_InputBuffer.end(); i != m_InputBuffer.begin();)
+			Event& e = *(*--i);
+			for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 			{
-				Event& e = *(*--i);
-
-				m_ImGuiLayer->OnEvent(e);
-
-				delete* i;
+				(*--it)->OnEvent(e);
+				if (e.Handled)
+					break;
 			}
-		}
-		else // only send input to the imgui layer if viewport is not focused
-		{
-			for (auto i = m_InputBuffer.end(); i != m_InputBuffer.begin();)
-			{
-				Event& e = *(*--i);
-				for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
-				{
-					(*--it)->OnEvent(e);
-					if (e.Handled)
-						break;
-				}
-				delete* i;
-			}
+			delete* i;
 		}
 
 		m_InputBuffer.clear();

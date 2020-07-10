@@ -3,6 +3,8 @@
 #include <Engine/Util/Performance.h>
 #include <Engine/Util/UFileIO.h>
 #include <Engine/Util/FStream.h>
+
+//#include "Engine/imGui/ImGuiLayer.h"
 #include <imgui/imgui.h>
 
 namespace Engine
@@ -42,8 +44,7 @@ namespace Engine
 		InstrumentationTimer timer = CREATE_PROFILEI();
 
 		timer.Start("Camera Update");
-		if(!Application::Get().m_BlockInput)
-			m_Camera->OnUpdate();
+		m_Camera->OnUpdate();
 		timer.End();
 
 		timer.Start("Rendrer");
@@ -151,7 +152,7 @@ namespace Engine
 			// Game window
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			ImGui::Begin("Viewport");
-			Application::Get().m_BlockInput = !ImGui::IsWindowFocused();
+			Application::Get().GetImGuiLayer()->SetBlockEvents(!ImGui::IsWindowFocused());
 
 			ImVec2 viewPortPanalSize = ImGui::GetContentRegionAvail();
 			if (m_ViewPortSize != *(glm::vec2*)&viewPortPanalSize)

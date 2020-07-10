@@ -2,8 +2,8 @@
 
 #include "Engine/Core/Layer.h"
 #include "Engine/Events/ApplicationEvent.h"
-#include "Engine/Events/KeyEvent.h"
 #include "Engine/Events/MouseEvent.h"
+#include "Engine/Events/KeyEvent.h"
 
 namespace Engine
 {
@@ -22,7 +22,10 @@ namespace Engine
 		void Begin();
 		void End();
 
+		void SetBlockEvents(bool block) { m_BlockEvents = block; }
+
 	private:
+		bool m_BlockEvents = true;
 		float m_time = 0.0f;
 
 	};

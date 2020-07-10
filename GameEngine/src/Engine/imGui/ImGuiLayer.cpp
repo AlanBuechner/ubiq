@@ -6,6 +6,14 @@
 #include "imgui.h"
 #include "Engine/Core/Application.h"
 
+#include "Engine/Events/ApplicationEvent.h"
+#include "Engine/Events/KeyEvent.h"
+#include "Engine/Events/MouseEvent.h"
+
+#include "Engine/Events/ApplicationEvent.h"
+#include "Engine/Events/KeyEvent.h"
+#include "Engine/Events/MouseEvent.h"
+
 // tmep
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
@@ -73,7 +81,12 @@ namespace Engine
 
 	void ImGuiLayer::OnEvent(Event& e)
 	{
-		
+		if (m_BlockEvents)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		}
 	}
 
 	void ImGuiLayer::Begin()

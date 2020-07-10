@@ -5,11 +5,12 @@
 #include "Window.h"
 #include "LayerStack.h"
 
+#include "Engine/imGui/ImGuiLayer.h"
+
 namespace Engine
 {
 	class Layer;
 	class ImGuiLayer;
-	class Event;
 	class WindowCloseEvent;
 	class WindowResizeEvent;
 }
@@ -31,12 +32,11 @@ namespace Engine
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
+		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+
 		inline static bool InEditer() { return s_Instance->m_InEditer; }
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window;  }
-
-	public:
-		bool m_BlockInput = false;
 
 	protected:
 		bool m_InEditer = false;
@@ -53,8 +53,7 @@ namespace Engine
 		bool m_Running = true;
 		bool m_Minimized = false;
 
-
-		ImGuiLayer* m_ImGuiLayer = nullptr;
+		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
 
 	private:
