@@ -18,6 +18,7 @@ IncludeDir["Glad"] = "GameEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "GameEngine/vendor/imgui"
 IncludeDir["glm"] = "GameEngine/vendor/Glm"
 IncludeDir["stb_image"] = "GameEngine/vendor/stb_image"
+IncludeDir["entt"] = "GameEngine/vendor/entt/include"
 
 include "GameEngine/vendor/GLFW"
 include "GameEngine/vendor/Glad"
@@ -59,7 +60,8 @@ project "GameEngine"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 
 	links 
@@ -115,7 +117,8 @@ project "Sandbox"
 		"GameEngine/vendor/spdlog/include",
 		"GameEngine/src",
 		"GameEngine/vendor",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
@@ -169,7 +172,8 @@ project "USG"
 		"GameEngine/vendor/spdlog/include",
 		"GameEngine/src",
 		"GameEngine/vendor",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links

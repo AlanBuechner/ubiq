@@ -26,30 +26,35 @@ namespace Engine
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color);
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
 
 		// draw sub textured quad
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& texture);
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& texture);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture);
+		static void DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& texture);
 
 		// draw sub textured tinted quad
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, float rotation, const Ref<SubTexture2D>& texture);
+		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float rotation, const Ref<SubTexture2D>& texture);
+		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture);
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& texture);
 
 		// draw textured qaud
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture);
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture);
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture);
 
 		// draw textured tinted qaud
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, float rotation, const Ref<Texture2D>& texture);
+		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float rotation, const Ref<Texture2D>& texture);
+		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture);
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture);
 
 		struct Statistics
 		{
@@ -64,7 +69,8 @@ namespace Engine
 
 	private:
 
-		static void DrawQuadImpl (const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[]);
+		static void DrawQuadImpl(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[]);
+		static void DrawQuadImpl(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[]);
 
 		static void BeginBatch();
 	};

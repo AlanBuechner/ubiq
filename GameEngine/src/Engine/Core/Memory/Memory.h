@@ -88,9 +88,9 @@ namespace Engine
 			m_Object->m_Object = obj;
 		}
 
-		T& Get() const
+		T* Get() const
 		{
-			return *(T*)m_Object->m_Object;
+			return (T*)m_Object->m_Object;
 		}
 
 		void operator=(const SharedPtr<T>& ptr)

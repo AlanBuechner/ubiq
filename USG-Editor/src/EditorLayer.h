@@ -22,6 +22,8 @@ namespace Engine
 
 		Ref<OrthographicCameraControler> m_Camera;
 
+		Ref<Scene> m_ActiveScene;
+
 		Ref<Texture2D> m_LogoTexture;
 		Ref<SubTexture2D> m_Texture;
 

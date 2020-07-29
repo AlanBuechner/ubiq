@@ -4,7 +4,6 @@
 #include <Engine/Util/UFileIO.h>
 #include <Engine/Util/FStream.h>
 
-//#include "Engine/imGui/ImGuiLayer.h"
 #include <imgui/imgui.h>
 
 namespace Engine
@@ -29,6 +28,12 @@ namespace Engine
 		fbSpec.Height = window.GetHeight();
 
 		m_FrameBuffer = FrameBuffer::Create(fbSpec);
+
+		m_ActiveScene = CreateSharedPtr<Scene>();
+
+		Entity entity = m_ActiveScene->CreateEntity();
+
+		entity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 	}
 
 	void EditorLayer::OnDetach()
@@ -38,42 +43,32 @@ namespace Engine
 
 	void EditorLayer::OnUpdate()
 	{
-		Instrumentor::Get().RecordData(false);
 		CREATE_PROFILE_FUNCTIONI();
 
 		InstrumentationTimer timer = CREATE_PROFILEI();
 
+		// update camera
 		timer.Start("Camera Update");
 		m_Camera->OnUpdate();
 		timer.End();
 
+		// setup renderer
 		timer.Start("Rendrer");
 		Renderer2D::ResetStats();
 		m_FrameBuffer->Bind();
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		RenderCommand::Clear();
 
-		Renderer2D::BeginScene(m_Camera->GetCamera().Get());
+		// start rendering
+		Renderer2D::BeginScene(*m_Camera->GetCamera().Get());
 
-		Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
-		Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
-
-		Renderer2D::DrawQuad({ 2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.5f, 0.5f, 0.5f, 1.0f });
-
-		/*for (float x = -5.0f; x < 5.0f; x += 0.5f)
-		{
-			for (float y = -5.0f; y < 5.0f; y += 0.5f)
-			{
-				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-				Renderer2D::DrawQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, 0.0f, color);
-			}
-		}*/
+		// update scene
+		m_ActiveScene->OnUpdate();
 
 		Renderer2D::EndScene();
 		m_FrameBuffer->Unbind();
 
 		timer.End();
-		Instrumentor::Get().RecordData(false);
 	}
 
 	void EditorLayer::OnImGuiRender()
