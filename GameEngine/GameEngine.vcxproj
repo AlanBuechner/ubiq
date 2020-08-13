@@ -163,6 +163,7 @@
     <ClInclude Include="src\Engine\Core\Scene\Entity.h" />
     <ClInclude Include="src\Engine\Core\Scene\Scene.h" />
     <ClInclude Include="src\Engine\Core\Scene\SceneCamera.h" />
+    <ClInclude Include="src\Engine\Core\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Engine\Core\Time.h" />
     <ClInclude Include="src\Engine\Core\Window.h" />
     <ClInclude Include="src\Engine\Core\core.h" />

@@ -1336,6 +1336,7 @@
     <ClInclude Include="src\Engine\Core\Scene\Components.h" />
     <ClInclude Include="src\Engine\Core\Scene\Entity.h" />
     <ClInclude Include="src\Engine\Core\Scene\SceneCamera.h" />
+    <ClInclude Include="src\Engine\Core\Scene\ScriptableEntity.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">

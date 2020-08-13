@@ -34,6 +34,38 @@ namespace Engine
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("camera");
 		m_CameraEntity.AddComponent<CameraComponent>();
+
+		class CameraMovment : public ScriptableEntity
+		{
+		public:
+			void OnCreate()
+			{
+				GetComponent<TransformComponent>();
+			}
+
+			void OnDestroy()
+			{
+
+			}
+
+			void OnUpdate()
+			{
+				auto& transform = GetComponent<TransformComponent>().Transform;
+				const float speed = 5.0f;
+				float deltaTime = Time::GetDeltaTime();
+
+				if (Input::GetKeyDown(KeyCode::A))
+					transform[3][0] -= speed * deltaTime;
+				if (Input::GetKeyDown(KeyCode::D))
+					transform[3][0] += speed * deltaTime;
+				if (Input::GetKeyDown(KeyCode::W))
+					transform[3][1] += speed * deltaTime;
+				if (Input::GetKeyDown(KeyCode::S))
+					transform[3][1] -= speed * deltaTime;
+			}
+		};
+
+		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraMovment>();
 	}
 
 	void EditorLayer::OnDetach()
