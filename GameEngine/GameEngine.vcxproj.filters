@@ -66,9 +66,6 @@
     <ClInclude Include="src\Engine.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\CameraControler.h">
-      <Filter>src\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Core\Application.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
@@ -143,9 +140,6 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Events\MouseEvent.h">
       <Filter>src\Engine\Events</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\OrthographicCameraControler.h">
-      <Filter>src\Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
@@ -1341,6 +1335,7 @@
     <ClInclude Include="src\Engine\Core\Scene\Scene.h" />
     <ClInclude Include="src\Engine\Core\Scene\Components.h" />
     <ClInclude Include="src\Engine\Core\Scene\Entity.h" />
+    <ClInclude Include="src\Engine\Core\Scene\SceneCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1382,13 +1377,7 @@
     <ClCompile Include="src\Engine\Core\Time.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\OrthographicCameraControler.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp">
-      <Filter>src\Engine\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Renderer\Camera.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\FrameBuffer.cpp">
@@ -1483,5 +1472,6 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Core\Scene\Scene.cpp" />
     <ClCompile Include="src\Engine\Core\Scene\Entity.cpp" />
+    <ClCompile Include="src\Engine\Core\Scene\SceneCamera.cpp" />
   </ItemGroup>
 </Project>

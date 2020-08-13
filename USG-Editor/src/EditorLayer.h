@@ -20,12 +20,12 @@ namespace Engine
 		virtual void OnEvent(Event& event) override;
 	private:
 
-		Ref<OrthographicCameraControler> m_Camera;
-
 		Ref<Scene> m_ActiveScene;
 
 		Ref<Texture2D> m_LogoTexture;
 		Ref<SubTexture2D> m_Texture;
+
+		Entity m_CameraEntity;
 
 		glm::vec2 m_ViewPortSize;
 		Ref<FrameBuffer> m_FrameBuffer;

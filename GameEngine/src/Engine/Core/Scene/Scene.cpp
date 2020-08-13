@@ -37,12 +37,54 @@ namespace Engine
 
 	void Scene::OnUpdate()
 	{
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
-		{
-			auto& [transform, mesh] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
-			Renderer2D::DrawQuad(transform.Transform, mesh.Color);
+		Camera* mainCamera = nullptr;
+		glm::mat4* mainCameraTransform = nullptr;
+		{
+			auto view = m_Registry.view<CameraComponent, TransformComponent>();
+			for (auto entity : view)
+			{
+				auto& [camera, transform] = view.get<CameraComponent, TransformComponent>(entity);
+
+				if (camera.Primary)
+				{
+					mainCamera = &camera.Camera;
+					mainCameraTransform = &transform.Transform;
+					break;
+				}
+			}
+		}
+
+		if (mainCamera)
+		{
+			Renderer2D::BeginScene(*mainCamera, *mainCameraTransform);
+
+			// render sprites
+			auto sprite = entt::get<SpriteRendererComponent>;
+			auto group = m_Registry.group<TransformComponent>(sprite);
+			for (auto entity : group)
+			{
+				auto& [transform, mesh] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+				Renderer2D::DrawQuad(transform.Transform, mesh.Color);
+			}
+			Renderer2D::EndScene();
+		}
+	}
+
+	void Scene::OnViewportResize(uint32_t width, uint32_t height)
+	{
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			auto& cameraComponent = view.get<CameraComponent>(entity);
+			if (!cameraComponent.FixedAspectRatio)
+			{
+				cameraComponent.Camera.SetViewportSize(width, height);
+			}
 		}
 	}
 

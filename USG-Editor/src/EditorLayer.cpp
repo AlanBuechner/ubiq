@@ -12,9 +12,6 @@ namespace Engine
 	EditorLayer::EditorLayer()
 		: Super("EditorLayer")
 	{
-		m_Camera = CreateSharedPtr<OrthographicCameraControler>(1.6, 1.0f, CAMERA_CONTROLER_2D);
-
-		m_Camera->SetPlayerInput(m_InputManeger);
 	}
 
 	void EditorLayer::OnAttach()
@@ -34,6 +31,9 @@ namespace Engine
 		Entity entity = m_ActiveScene->CreateEntity();
 
 		entity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+
+		m_CameraEntity = m_ActiveScene->CreateEntity("camera");
+		m_CameraEntity.AddComponent<CameraComponent>();
 	}
 
 	void EditorLayer::OnDetach()
@@ -47,10 +47,15 @@ namespace Engine
 
 		InstrumentationTimer timer = CREATE_PROFILEI();
 
-		// update camera
-		timer.Start("Camera Update");
-		m_Camera->OnUpdate();
-		timer.End();
+		// resize
+		if (FrameBufferSpecification spec = m_FrameBuffer->GetSpecification();
+			m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
+			(spec.Width != m_ViewPortSize.x || spec.Height != m_ViewPortSize.y))
+		{
+			m_FrameBuffer->Resize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+		}
 
 		// setup renderer
 		timer.Start("Rendrer");
@@ -59,13 +64,9 @@ namespace Engine
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		RenderCommand::Clear();
 
-		// start rendering
-		Renderer2D::BeginScene(*m_Camera->GetCamera().Get());
-
 		// update scene
 		m_ActiveScene->OnUpdate();
 
-		Renderer2D::EndScene();
 		m_FrameBuffer->Unbind();
 
 		timer.End();
@@ -152,10 +153,7 @@ namespace Engine
 			ImVec2 viewPortPanalSize = ImGui::GetContentRegionAvail();
 			if (m_ViewPortSize != *(glm::vec2*)&viewPortPanalSize)
 			{
-				m_FrameBuffer->Resize((uint32_t)viewPortPanalSize.x, (uint32_t)viewPortPanalSize.y);
 				m_ViewPortSize = { viewPortPanalSize.x, viewPortPanalSize.y };
-
-				m_Camera->SetCameraSize(viewPortPanalSize.x, viewPortPanalSize.y);
 			}
 			uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 			ImGui::Image((void*)textureID, viewPortPanalSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -178,7 +176,5 @@ namespace Engine
 	void EditorLayer::OnEvent(Event& event)
 	{
 		Super::OnEvent(event);
-
-		m_Camera->OnEvent(event);
 	}
 }

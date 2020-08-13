@@ -42,7 +42,7 @@ namespace Engine
 		operator bool() const { return (uint32_t)m_EntityID != 0; }
 
 	private:
-		entt::entity m_EntityID{ 0 };
+		entt::entity m_EntityID{ entt::null };
 		Scene* m_Scene = nullptr;
 	};
 }

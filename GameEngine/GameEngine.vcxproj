@@ -141,7 +141,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h" />
-    <ClInclude Include="src\Engine\CameraControler.h" />
     <ClInclude Include="src\Engine\Core\Application.h" />
     <ClInclude Include="src\Engine\Core\EntryPoint.h" />
     <ClInclude Include="src\Engine\Core\Input\Input.h" />
@@ -163,6 +162,7 @@
     <ClInclude Include="src\Engine\Core\Scene\Components.h" />
     <ClInclude Include="src\Engine\Core\Scene\Entity.h" />
     <ClInclude Include="src\Engine\Core\Scene\Scene.h" />
+    <ClInclude Include="src\Engine\Core\Scene\SceneCamera.h" />
     <ClInclude Include="src\Engine\Core\Time.h" />
     <ClInclude Include="src\Engine\Core\Window.h" />
     <ClInclude Include="src\Engine\Core\core.h" />
@@ -170,7 +170,6 @@
     <ClInclude Include="src\Engine\Events\Event.h" />
     <ClInclude Include="src\Engine\Events\KeyEvent.h" />
     <ClInclude Include="src\Engine\Events\MouseEvent.h" />
-    <ClInclude Include="src\Engine\OrthographicCameraControler.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
     <ClInclude Include="src\Engine\Renderer\Camera.h" />
     <ClInclude Include="src\Engine\Renderer\FrameBuffer.h" />
@@ -584,10 +583,9 @@
     <ClCompile Include="src\Engine\Core\Memory\StackAllocator.cpp" />
     <ClCompile Include="src\Engine\Core\Scene\Entity.cpp" />
     <ClCompile Include="src\Engine\Core\Scene\Scene.cpp" />
+    <ClCompile Include="src\Engine\Core\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Engine\Core\Time.cpp" />
-    <ClCompile Include="src\Engine\OrthographicCameraControler.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
-    <ClCompile Include="src\Engine\Renderer\Camera.cpp" />
     <ClCompile Include="src\Engine\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="src\Engine\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp" />

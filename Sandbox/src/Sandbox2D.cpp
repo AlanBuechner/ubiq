@@ -16,9 +16,6 @@ Entity* e;
 Sandbox2DLayer::Sandbox2DLayer()
 	: Super("Sandbox2D")
 {
-	m_Camera = Engine::CreateSharedPtr<Engine::OrthographicCameraControler>(1.6, 1.0f, CAMERA_CONTROLER_2D);
-
-	m_Camera->SetPlayerInput(m_InputManeger);
 }
 
 void Sandbox2DLayer::OnAttach()
@@ -61,16 +58,12 @@ void Sandbox2DLayer::OnUpdate()
 
 	Engine::InstrumentationTimer timer = CREATE_PROFILEI();
 
-	timer.Start("Camera Update");
-	m_Camera->OnUpdate();
-	timer.End();
-
 	timer.Start("Rendrer");
 	Engine::Renderer2D::ResetStats();
 	Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 	Engine::RenderCommand::Clear();
 
-	Engine::Renderer2D::BeginScene(*m_Camera->GetCamera().Get());
+	//Engine::Renderer2D::BeginScene(*m_Camera->GetCamera().Get());
 
 	Engine::Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
 	Engine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_LogoTexture);
@@ -111,6 +104,4 @@ void Sandbox2DLayer::OnImGuiRender()
 void Sandbox2DLayer::OnEvent(Engine::Event& event)
 {
 	Super::OnEvent(event);
-
-	m_Camera->OnEvent(event);
 }

@@ -16,12 +16,12 @@ namespace Engine
 
 	void OrthographicCamera::SetProjection(float left, float right, float bottom, float top)
 	{
-		SetProjectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f));
+		//SetProjectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f));
 	}
 
 	void OrthographicCamera::SetProjection(float left, float right, float bottom, float top, float zNear, float zFar)
 	{
-		SetProjectionMatrix(glm::ortho(left, right, bottom, top, zNear, zFar));
+		//SetProjectionMatrix(glm::ortho(left, right, bottom, top, zNear, zFar));
 	}
 
 }

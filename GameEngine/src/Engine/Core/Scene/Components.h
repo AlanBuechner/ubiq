@@ -1,6 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
 
+#include "Engine/Renderer/Camera.h"
+#include "SceneCamera.h"
+
 namespace Engine
 {
 	struct TagComponent
@@ -36,5 +39,15 @@ namespace Engine
 		SpriteRendererComponent(const glm::vec4& color) :
 			Color(color)
 		{}
+	};
+
+	struct CameraComponent
+	{
+		Engine::SceneCamera Camera;
+		bool Primary = true;
+		bool FixedAspectRatio = false;
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent&) = default;
 	};
 }

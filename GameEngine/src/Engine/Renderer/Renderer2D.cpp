@@ -4,7 +4,7 @@
 #include "Engine/Core/core.h"
 #include "Renderer.h"
 #include "Shader.h"
-#include "OrthographicCamera.h"
+#include "Camera.h"
 
 #include "Engine/Util/Performance.h"
 
@@ -124,13 +124,15 @@ namespace Engine
 		
 	}
 
-	void Renderer2D::BeginScene(const OrthographicCamera& camera)
+	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
+		glm::mat4 viewProj = camera.GetProjectionMatrix() * glm::inverse(transform);
+
 		Ref<Shader> TextureShader = s_Data.Library->Get("TextureShader");
 		TextureShader->Bind();
-		TextureShader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+		TextureShader->UploadUniformMat4("u_ViewProjection", viewProj);
 
 		BeginBatch();
 	}

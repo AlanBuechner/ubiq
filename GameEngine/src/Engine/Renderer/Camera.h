@@ -10,43 +10,16 @@ namespace Engine
 		typedef Engine::Camera Super;
 
 	public:
-		Camera(glm::mat4& projectionMatrix);
+		Camera() = default;
+		Camera(const glm::mat4& projectionMatrix) :
+			m_ProjectionMatrix(projectionMatrix)
+		{}
 
-		void SetProjectionMatrix(glm::mat4& projectionMatrix);
+		virtual ~Camera() = default;
 
-		const glm::vec3& GetPosition() const { return m_Position; }
-		const glm::quat& GetRotation() const { return m_Rotation; }
-
-		void SetPosition(const glm::vec3& position) { m_Position = position; RecalculateViewMatrix(); }
-		void SetRotation(const glm::quat& rotation) { m_Rotation = rotation;  RecalculateViewMatrix();  RecalculateDirectionVectors(); }
-
-		void Translate(const glm::vec3& translation) { m_Position += translation; RecalculateViewMatrix(); }
-		void Rotate(const glm::quat& rotation) { m_Rotation += rotation; RecalculateViewMatrix();  RecalculateDirectionVectors(); }
-
-		const glm::mat3& GetRotationMatrix() const { return m_RotationMatrix; }
 		const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
-		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
-		const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
 
-		inline const glm::vec3& ForwordVector() const { return m_ForwordVector; }
-		inline const glm::vec3& UpVector() const { return m_UpVector; }
-		inline const glm::vec3& RightVector() const { return m_RightVector; }
-
-	private:
-		void RecalculateViewMatrix();
-		void RecalculateDirectionVectors();
-
-	private:
-		glm::mat4 m_ProjectionMatrix;
-		glm::mat4 m_ViewMatrix;
-		glm::mat4 m_ViewProjectionMatrix;
-		glm::mat4 m_RotationMatrix;
-
-		glm::vec3 m_ForwordVector	= { 0.0f, 0.0f, 1.0f };
-		glm::vec3 m_UpVector		= { 0.0f, 1.0f, 0.0f };
-		glm::vec3 m_RightVector		= { 1.0f, 0.0f, 0.0f };
-
-		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
-		glm::quat m_Rotation = { 0.0f, 1.0f, 0.0f, 0.0f };
+	protected:
+		glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
 	};
 }
