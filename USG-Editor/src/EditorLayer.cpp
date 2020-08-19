@@ -38,17 +38,17 @@ namespace Engine
 		class CameraMovment : public ScriptableEntity
 		{
 		public:
-			void OnCreate()
+			virtual void OnCreate() override
 			{
 				GetComponent<TransformComponent>();
 			}
 
-			void OnDestroy()
+			virtual void OnDestroy() override
 			{
 
 			}
 
-			void OnUpdate()
+			virtual void OnUpdate() override
 			{
 				auto& transform = GetComponent<TransformComponent>().Transform;
 				const float speed = 5.0f;
