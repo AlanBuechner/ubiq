@@ -3,6 +3,8 @@
 #include <Engine.h>
 #include <glm/glm.hpp>
 
+#include "Panels/SceneHierarchyPanel.h"
+
 namespace Engine
 {
 
@@ -29,6 +31,8 @@ namespace Engine
 
 		glm::vec2 m_ViewPortSize;
 		Ref<FrameBuffer> m_FrameBuffer;
+
+		SceneHierarchyPanel m_HierarchyPanel;
 
 	};
 }

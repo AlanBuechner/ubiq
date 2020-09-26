@@ -66,6 +66,8 @@ namespace Engine
 		};
 
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraMovment>();
+
+		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -165,6 +167,8 @@ namespace Engine
 
 				ImGui::EndMenuBar();
 			}
+
+			m_HierarchyPanel.OnImGuiRender();
 
 			ImGui::Begin("Statistics");
 

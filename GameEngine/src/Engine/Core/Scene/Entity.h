@@ -39,10 +39,14 @@ namespace Engine
 			m_Scene->m_Registry.remove<T>(m_EntityID);
 		}
 
-		operator bool() const { return (uint32_t)m_EntityID != 0; }
+		operator bool() const { return (uint32_t)m_EntityID != 0 && m_Scene != nullptr; }
+		operator uint32_t() const { return (uint32_t)m_EntityID; }
+
+		bool operator == (const Entity& other) const { return m_EntityID == other.m_EntityID && m_Scene == other.m_Scene; }
+		bool operator != (const Entity& other) const { return !(*this == other); }
 
 	private:
-		entt::entity m_EntityID{ entt::null };
+		entt::entity m_EntityID = { entt::null };
 		Scene* m_Scene = nullptr;
 	};
 }
