@@ -28,8 +28,6 @@ namespace Engine
 
 		m_ActiveScene = CreateSharedPtr<Scene>();
 
-		Entity e = m_ActiveScene->CreateEntity("empty");
-
 		Entity entity = m_ActiveScene->CreateEntity();
 
 		entity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
