@@ -156,6 +156,17 @@ namespace Engine
 				ImGui::TreePop();
 			}
 		}
+
+		if (entity.HasComponent<SpriteRendererComponent>())
+		{
+			if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer"))
+			{
+				auto& color = entity.GetComponent<SpriteRendererComponent>().Color;
+
+				ImGui::DragFloat3("Color", glm::value_ptr(color), 0.01f, 0.0f, 1.0f);
+			}
+			ImGui::TreePop();
+		}
 	}
 
 }
