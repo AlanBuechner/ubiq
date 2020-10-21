@@ -35,7 +35,7 @@ namespace Engine
 
 		// get main camera
 		Camera* mainCamera = nullptr;
-		glm::mat4* mainCameraTransform = nullptr;
+		glm::mat4 cameraTransform;
 		{
 			auto view = m_Registry.view<CameraComponent, TransformComponent>();
 			for (auto entity : view)
@@ -45,7 +45,7 @@ namespace Engine
 				if (camera.Primary)
 				{
 					mainCamera = &camera.Camera;
-					mainCameraTransform = &transform.Transform;
+					cameraTransform = transform.GetTransform();
 					break;
 				}
 			}
@@ -53,7 +53,7 @@ namespace Engine
 
 		if (mainCamera)
 		{
-			Renderer2D::BeginScene(*mainCamera, *mainCameraTransform);
+			Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
 			// render sprites
 			auto sprite = entt::get<SpriteRendererComponent>;
@@ -62,7 +62,7 @@ namespace Engine
 			{
 				auto [transform, mesh] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
-				Renderer2D::DrawQuad(transform.Transform, mesh.Color);
+				Renderer2D::DrawQuad(transform.GetTransform(), mesh.Color);
 			}
 			Renderer2D::EndScene();
 		}

@@ -50,18 +50,18 @@ namespace Engine
 
 			virtual void OnUpdate() override
 			{
-				auto& transform = GetComponent<TransformComponent>().Transform;
+				glm::vec3& position = GetComponent<TransformComponent>().Position;
 				const float speed = 5.0f;
 				float deltaTime = Time::GetDeltaTime();
 
 				if (Input::GetKeyDown(KeyCode::A))
-					transform[3][0] -= speed * deltaTime;
+					position.x -= speed * deltaTime;
 				if (Input::GetKeyDown(KeyCode::D))
-					transform[3][0] += speed * deltaTime;
+					position.x += speed * deltaTime;
 				if (Input::GetKeyDown(KeyCode::W))
-					transform[3][1] += speed * deltaTime;
+					position.y += speed * deltaTime;
 				if (Input::GetKeyDown(KeyCode::S))
-					transform[3][1] -= speed * deltaTime;
+					position.y -= speed * deltaTime;
 			}
 		};
 
