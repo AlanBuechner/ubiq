@@ -156,7 +156,8 @@ namespace Engine
 			s_Data.TextureSlots[i].Get()->Bind(i);
 		}
 
-		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+		if(s_Data.QuadIndexCount != 0)
+			RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 
 		s_Data.Stats.DrawCalls++;
 	}
