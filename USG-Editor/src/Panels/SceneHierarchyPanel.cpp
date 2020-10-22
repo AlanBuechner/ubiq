@@ -32,6 +32,16 @@ namespace Engine
 		{
 			m_Selected = {};
 		}
+
+		// right click on blank space
+		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		{
+			if (ImGui::MenuItem("Create Empty Entity"))
+			{
+				m_Context->CreateEntity("Empty Entity");
+			}
+			ImGui::EndPopup();
+		}
 		
 		ImGui::End();
 
@@ -39,8 +49,32 @@ namespace Engine
 		ImGui::Begin("Properties");
 
 		if (m_Selected)
+		{
 			DrawComponents(m_Selected);
 
+			if (ImGui::Button("Add Component"))
+			{
+				ImGui::OpenPopup("AddComponent");
+			}
+
+			if (ImGui::BeginPopup("AddComponent"))
+			{
+
+				if (ImGui::MenuItem("Camera"))
+				{
+					m_Selected.AddComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Sprite Renderer"))
+				{
+					m_Selected.AddComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+		}
 		ImGui::End();
 	}
 
@@ -56,22 +90,67 @@ namespace Engine
 		{
 			m_Selected = entity;
 		}
+
+		bool entityDeleted = false;
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Delete Entity"))
+			{
+				entityDeleted = true;
+			}
+			ImGui::EndPopup();
+		}
+
 		if (open)
 		{
 			ImGui::TreePop();
 		}
+
+		if (entityDeleted) 
+		{
+			m_Context->DestroyEntity(entity);
+			if (m_Selected == entity)
+				m_Selected = {};
+		}
 	}
 
 	template<typename T>
-	void DrawComponent(Entity& ent, const char* name, const std::function<void()> func)
+	void DrawComponent(Entity& ent, const char* name, const std::function<void()> func, bool canRemove = true)
 	{
 		if (ent.HasComponent<T>())
 		{
-			if (ImGui::TreeNodeEx((void*)typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, name))
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
+			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap, name);
+
+			ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
+			
+			if (ImGui::Button("+", ImVec2 {20, 20}))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+
+			ImGui::PopStyleVar();
+
+			bool removeComponent = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				if (canRemove && ImGui::MenuItem("Remove Component"))
+				{
+					removeComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+
+			if (open)
 			{
 				func();
 				ImGui::TreePop();
 			}
+
+			if (removeComponent)
+				ent.RemoveComponent<T>();
 		}
 	}
 
@@ -152,7 +231,7 @@ namespace Engine
 			DrawVec3Control("Rotation", rotation, 0.0f);
 			tc.Rotation = glm::radians(rotation);
 			DrawVec3Control("Scale", tc.Scale, 1.0f);
-		});
+		}, false);
 
 		DrawComponent<CameraComponent>(entity, "Camera", [&]() {
 			auto& cameraComponent = entity.GetComponent<CameraComponent>();

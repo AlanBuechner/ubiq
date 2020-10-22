@@ -29,7 +29,9 @@ namespace Engine
 		T& AddComponent(Args&&... args)
 		{
 			CORE_ASSERT(!HasComponent<T>(), "Entity alredy has component");
-			return m_Scene->m_Registry.emplace<T>(m_EntityID, std::forward<Args>(args)...);
+			T& component = m_Scene->m_Registry.emplace<T>(m_EntityID, std::forward<Args>(args)...);
+			m_Scene->OnComponentAdded<T>(*this, component);
+			return component;
 		}
 
 		template<typename T>
@@ -40,6 +42,7 @@ namespace Engine
 		}
 
 		operator bool() const { return m_EntityID != entt::null && m_Scene != nullptr; }
+		operator entt::entity() const { return m_EntityID; }
 		operator uint32_t() const { return (uint32_t)m_EntityID; }
 
 		bool operator == (const Entity& other) const { return m_EntityID == other.m_EntityID && m_Scene == other.m_Scene; }
