@@ -133,7 +133,7 @@ namespace Engine
 			}
 
 			// When using ImGuiDockNodeFlags_PassthruDockspace, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
-			if (opt_flags & ImGuiDockNodeFlags_PassthruDockspace)
+			if (opt_flags & ImGuiDockNodeFlags_PassthruCentralNode)// ImGuiDockNodeFlags_PassthruDockspace)
 				window_flags |= ImGuiWindowFlags_NoBackground;
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
