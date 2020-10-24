@@ -155,6 +155,9 @@
     <ClInclude Include="src\Panels\PropertiesPanel.h" />
     <ClInclude Include="src\Panels\SceneHierarchyPanel.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="premake5.lua" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
