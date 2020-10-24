@@ -151,7 +151,7 @@ project "Sandbox"
 		runtime "Release"
 		optimize "on"
 
-project "USG"
+project "USG-Editor"
 	location "USG-Editor"
 	kind "ConsoleApp"
 	language "C++"
