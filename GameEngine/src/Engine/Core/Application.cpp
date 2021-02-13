@@ -64,6 +64,8 @@ namespace Engine {
 		CREATE_PROFILE_FUNCTIONI();
 		Engine::InstrumentationTimer timer = CREATE_PROFILEI();
 		CORE_INFO("Runing Application");
+		
+
 		while (m_Running)
 		{
 			CREATE_PROFILE_SCOPEI("Frame");

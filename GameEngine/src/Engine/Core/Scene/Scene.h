@@ -32,6 +32,7 @@ namespace Engine
 		entt::registry m_Registry;
 
 		friend class Entity;
+		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
 	};
 }

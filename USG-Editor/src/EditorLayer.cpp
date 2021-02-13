@@ -6,6 +6,12 @@
 
 #include <imgui/imgui.h>
 
+#include <Engine/Core/Scene/SceneSerializer.h>
+
+#include <Engine/Util/PlatformUtils.h>
+
+#include <memory>
+
 namespace Engine
 {
 
@@ -27,7 +33,7 @@ namespace Engine
 		m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
 		m_ActiveScene = CreateSharedPtr<Scene>();
-
+#if 0
 		Entity entity = m_ActiveScene->CreateEntity();
 
 		entity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
@@ -67,7 +73,13 @@ namespace Engine
 
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraMovment>();
 
+
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Deserialize("Assets/Scenes/Example.ubiq");
+#endif
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+
 	}
 
 	void EditorLayer::OnDetach()
@@ -159,6 +171,22 @@ namespace Engine
 					// which we can't undo at the moment without finer window depth/z control.
 					//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
+					if (ImGui::MenuItem("New", "Ctrl+N"))
+					{
+						NewScene();
+					}
+
+					if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					{
+						OpenScene();
+
+					}
+
+					if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					{
+						SaveSceneAs();
+					}
+
 					if (ImGui::MenuItem("Exit"))
 						Application::Get().Close();
 
@@ -209,8 +237,86 @@ namespace Engine
 		}
 	}
 
-	void EditorLayer::OnEvent(Event& event)
+	void EditorLayer::OnEvent(Event& e)
 	{
-		Super::OnEvent(event);
+		Super::OnEvent(e);
+
+		EventDispatcher dispacher(e);
+		dispacher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(&EditorLayer::OnKeyPressed));
 	}
+
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+	{
+		return false; // TODO : fix crash
+
+		bool controlPressed = Input::GetKeyDown(KeyCode::LEFT_CONTROL) || Input::GetKeyDown(KeyCode::RIGHT_CONTROL);
+		bool shiftPressed = Input::GetKeyDown(KeyCode::LEFT_SHIFT) || Input::GetKeyDown(KeyCode::RIGHT_SHIFT);
+
+
+		switch (e.GetKeyCode())
+		{
+		case KeyCode::S:
+		{
+			if (controlPressed && shiftPressed)
+			{
+				SaveSceneAs();
+			}
+			break;
+		}
+		case KeyCode::N:
+		{
+			if (controlPressed)
+			{
+				NewScene();
+			}
+			break;
+		}
+		case KeyCode::O:
+		{
+			if (controlPressed)
+			{
+				OpenScene();
+			}
+			break;
+		}
+		default:
+			break;
+		}
+
+		return true;
+	}
+
+	void EditorLayer::NewScene()
+	{
+		m_ActiveScene = CreateSharedPtr<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+		m_HierarchyPanel.SetContext(m_ActiveScene);
+	}
+
+	void EditorLayer::OpenScene()
+	{
+		NewScene();
+
+		std::string filepath = Engine::FileDialogs::OpenFile("Ubiq Scene (*.ubiq)\0*.ubiq\0");
+		if (!filepath.empty())
+		{
+			m_ActiveScene = CreateSharedPtr<Scene>();
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+			m_HierarchyPanel.SetContext(m_ActiveScene);
+
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(filepath);
+		}
+	}
+
+	void EditorLayer::SaveSceneAs()
+	{
+		std::string filepath = Engine::FileDialogs::SaveFile("Ubiq Scene (*.ubiq)\0*.ubiq\0");
+		if (!filepath.empty())
+		{
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(filepath);
+		}
+	}
+
 }

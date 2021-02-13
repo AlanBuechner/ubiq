@@ -19,10 +19,12 @@ IncludeDir["ImGui"] = "GameEngine/vendor/imgui"
 IncludeDir["glm"] = "GameEngine/vendor/Glm"
 IncludeDir["stb_image"] = "GameEngine/vendor/stb_image"
 IncludeDir["entt"] = "GameEngine/vendor/entt/include"
+IncludeDir["yaml"] = "GameEngine/vendor/yaml-cpp/include"
 
 include "GameEngine/vendor/GLFW"
 include "GameEngine/vendor/Glad"
 include "GameEngine/vendor/imgui"
+include "GameEngine/vendor/yaml-cpp"
 
 project "GameEngine"
 	location "GameEngine"
@@ -61,7 +63,8 @@ project "GameEngine"
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml}"
 	}
 
 	links 
@@ -69,6 +72,7 @@ project "GameEngine"
 		"GLFW",
 		"Glad",
 		"ImGui",
+		"Yaml",
 		"opengl32.lib"
 	}
 
