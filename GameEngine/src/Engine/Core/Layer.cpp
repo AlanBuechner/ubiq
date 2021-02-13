@@ -8,12 +8,13 @@ namespace Engine {
 	Layer::Layer(const std::string& debugName)
 		: m_DebugName(debugName)
 	{
-		m_InputManeger = CreateSharedPtr<InputControlerManeger>();
+		m_InputManeger = std::make_shared<InputControlerManeger>();
 	}
 
 	Layer::~Layer()
 	{
-		m_InputManeger.~SharedPtr();
+		m_InputManeger.~shared_ptr();
 	}
+
 	inline void Layer::OnEvent(Event & event) { m_InputManeger->Update(event); }
 }

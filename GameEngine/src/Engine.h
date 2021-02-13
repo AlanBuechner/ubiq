@@ -29,10 +29,6 @@
 #include "Engine/Renderer/PerspectiveCamera.h"
 // ----------------------------------------
 
-// Utility
-#include "Engine/Util/UString.h"
-#include "Engine/Util/UArray.h"
-
 // ECS ------------------------------------
 #include "Engine/Core/Scene/Scene.h"
 #include "Engine/Core/Scene/Components.h"

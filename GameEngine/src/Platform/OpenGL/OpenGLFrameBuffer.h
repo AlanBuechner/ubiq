@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-	class OpenGLFrameBuffer : FrameBuffer
+	class OpenGLFrameBuffer : public FrameBuffer
 	{
 	public:
 		OpenGLFrameBuffer(const FrameBufferSpecification& spec);

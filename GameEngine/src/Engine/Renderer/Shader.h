@@ -78,7 +78,5 @@ namespace Engine
 
 	private:
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
-
-		static PoolAllocator* ShaderAlloc;
 	};
 }

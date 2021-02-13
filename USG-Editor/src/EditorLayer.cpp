@@ -1,8 +1,5 @@
 ﻿#include "EditorLayer.h"
-#include <Engine/Core/Memory/Memory.h>
 #include <Engine/Util/Performance.h>
-#include <Engine/Util/UFileIO.h>
-#include <Engine/Util/FStream.h>
 
 #include <imgui/imgui.h>
 
@@ -32,7 +29,7 @@ namespace Engine
 
 		m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
-		m_ActiveScene = CreateSharedPtr<Scene>();
+		m_ActiveScene = std::make_shared<Scene>();
 #if 0
 		Entity entity = m_ActiveScene->CreateEntity();
 
@@ -288,7 +285,7 @@ namespace Engine
 
 	void EditorLayer::NewScene()
 	{
-		m_ActiveScene = CreateSharedPtr<Scene>();
+		m_ActiveScene = std::make_shared<Scene>();
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
@@ -300,7 +297,7 @@ namespace Engine
 		std::string filepath = Engine::FileDialogs::OpenFile("Ubiq Scene (*.ubiq)\0*.ubiq\0");
 		if (!filepath.empty())
 		{
-			m_ActiveScene = CreateSharedPtr<Scene>();
+			m_ActiveScene = std::make_shared<Scene>();
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
 			m_HierarchyPanel.SetContext(m_ActiveScene);
 

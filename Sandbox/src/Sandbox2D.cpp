@@ -1,14 +1,11 @@
 ﻿#include "Sandbox2D.h"
-#include <Engine/Core/Memory/Memory.h>
 #include <Engine/Util/Performance.h>
-#include <Engine/Util/UFileIO.h>
-#include <Engine/Util/FStream.h>
 #include <imgui/imgui.h>
 
 class Entity
 {
 public:
-	Engine::UString name = "hello";
+	std::string name = "hello";
 };
 
 Entity* e;

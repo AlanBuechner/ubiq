@@ -82,7 +82,7 @@ namespace Engine
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return CreateSharedPtr<OpenGLShader>(name, src);
+			return std::make_shared<OpenGLShader>(name, src);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!")
 			return nullptr;
@@ -93,7 +93,6 @@ namespace Engine
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::OpenGl:
-			ShaderAlloc = new PoolAllocator(sizeof(OpenGLShader) * 100, sizeof(OpenGLShader));
 			break;
 		default:
 			break;
@@ -109,11 +108,9 @@ namespace Engine
 
 	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& path)
 	{
-		Ref<Shader::ShaderSorce> src = CreateSharedPtr<Shader::ShaderSorce>();
-		*src.Get() << Shader::LoadShader(path);
-		Memory::SetAllocator(ShaderAlloc);
+		Ref<Shader::ShaderSorce> src = std::make_shared<Shader::ShaderSorce>();
+		*src.get() << Shader::LoadShader(path);
 		auto shader = Shader::Create(name, src);
-		Memory::SetAllocator(Memory::GetDefaultAlloc());
 		Add(shader);
 		return shader;
 	}
@@ -130,6 +127,4 @@ namespace Engine
 		CORE_ASSERT(m_Shaders.find(name) != m_Shaders.end(), "Shader not found");
 		return m_Shaders[name];
 	}
-
-	PoolAllocator* ShaderLibrary::ShaderAlloc = nullptr;
 }

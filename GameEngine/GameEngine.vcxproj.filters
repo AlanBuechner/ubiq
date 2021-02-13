@@ -96,33 +96,6 @@
     <ClInclude Include="src\Engine\Core\Log.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Core\Memory\Allocator.h">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Core\Memory\FreeListAllocator.h">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Core\Memory\LinearAllocator.h">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Core\Memory\Memory.h">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Core\Memory\PointerMath.h">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Core\Memory\PoolAllocator.h">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Core\Memory\SinglyLinkedList.h">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Core\Memory\StackAllocator.h">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Core\Memory\StackLinkedList.h">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Core\Scene\Components.h">
       <Filter>src\Engine\Core\Scene</Filter>
     </ClInclude>
@@ -204,19 +177,7 @@
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Util\FStream.h">
-      <Filter>src\Engine\Util</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Util\Performance.h">
-      <Filter>src\Engine\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Util\UArray.h">
-      <Filter>src\Engine\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Util\UFileIO.h">
-      <Filter>src\Engine\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Util\UString.h">
       <Filter>src\Engine\Util</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\imGui\ImGuiLayer.h">
@@ -1375,21 +1336,6 @@
     <ClCompile Include="src\Engine\Core\Log.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Core\Memory\Allocator.cpp">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Core\Memory\FreeListAllocator.cpp">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Core\Memory\LinearAllocator.cpp">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Core\Memory\PoolAllocator.cpp">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Core\Memory\StackAllocator.cpp">
-      <Filter>src\Engine\Core\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\Core\Scene\Entity.cpp">
       <Filter>src\Engine\Core\Scene</Filter>
     </ClCompile>
@@ -1441,16 +1387,7 @@
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Util\FStream.cpp">
-      <Filter>src\Engine\Util</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\Util\Performance.cpp">
-      <Filter>src\Engine\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Util\UFileIO.cpp">
-      <Filter>src\Engine\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Util\UString.cpp">
       <Filter>src\Engine\Util</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\imGui\ImGuiBuild.cpp">

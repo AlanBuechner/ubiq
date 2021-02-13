@@ -34,7 +34,5 @@ namespace Engine
 
 		std::string m_DebugName;
 
-	private:
-		static FreeListAllocator* s_LayerAlloc;
 	};
 }

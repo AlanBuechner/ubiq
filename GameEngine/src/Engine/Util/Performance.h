@@ -5,8 +5,7 @@
 #include <fstream>
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Time.h"
-#include "UArray.h"
-#include "UString.h"
+#include <string>
 
 namespace Engine
 {
@@ -19,7 +18,7 @@ namespace Engine
 
 	struct InstrumentationSession
 	{
-		UString Name;
+		std::string Name;
 	};
 
 	class Instrumentor
@@ -35,7 +34,7 @@ namespace Engine
 		{
 		}
 
-		void BeginSession(const UString& name, const UString& filepath = "results.json");
+		void BeginSession(const std::string& name, const std::string& filepath = "results.json");
 
 		void EndSession();
 
@@ -59,7 +58,7 @@ namespace Engine
 		{	
 		}
 
-		void Start(const UString& name)
+		void Start(const std::string& name)
 		{
 			m_Name = name;
 			m_Start = Time::GetTime();
@@ -73,7 +72,7 @@ namespace Engine
 			long long start = (long long)(m_Start * 1000000.0f);
 			long long end = (long long)(m_End * 1000000.0f);
 			uint32_t threadID = (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.RawString(), start, end, threadID };
+			ProfileResult result = { m_Name.c_str(), start, end, threadID };
 			m_Func(result);
 		}
 
@@ -102,7 +101,7 @@ namespace Engine
 
 		double m_Elapsed;
 
-		UString m_Name;
+		std::string m_Name;
 
 		Fn m_Func;
 	};
@@ -115,7 +114,7 @@ namespace Engine
 
 		}
 
-		void Start(const UString& name)
+		void Start(const std::string& name)
 		{
 			m_Name = name;
 			m_Start = Time::GetTime();
@@ -129,7 +128,7 @@ namespace Engine
 			long long start = (long long)(m_Start * 1000000.0f);
 			long long end = (long long)(m_End * 1000000.0f);
 			uint32_t threadID = (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.RawString(), start, end, threadID };
+			ProfileResult result = { m_Name.c_str(), start, end, threadID };
 
 			Instrumentor::Get().WriteProfile(result);
 		}
@@ -159,14 +158,14 @@ namespace Engine
 
 		double m_Elapsed;
 
-		UString m_Name;
+		std::string m_Name;
 	};
 
 	template<typename Fn>
 	class TimerScoped
 	{
 	public:
-		TimerScoped(const UString& name, Fn&& func) :
+		TimerScoped(const std::string& name, Fn&& func) :
 			m_Func(func), m_Name(name)
 		{
 			m_Start = Time::GetTime();
@@ -194,7 +193,7 @@ namespace Engine
 
 		double m_Elapsed;
 
-		const UString& m_Name;
+		const std::string& m_Name;
 
 		Fn m_Func;
 	};
@@ -202,7 +201,7 @@ namespace Engine
 	class InstrumentationTimerScoped
 	{
 	public:
-		InstrumentationTimerScoped(const UString& name) :
+		InstrumentationTimerScoped(const std::string& name) :
 			m_Name(name)
 		{
 			m_Start = Time::GetTime();
@@ -216,7 +215,7 @@ namespace Engine
 			long long start = (long long)(m_Start * 1000000.0f);
 			long long end = (long long)(m_End * 1000000.0f);
 			uint32_t threadID = (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.RawString(), start, end, threadID };
+			ProfileResult result = { m_Name.c_str(), start, end, threadID };
 			
 			Instrumentor::Get().WriteProfile(result);
 		}
@@ -231,7 +230,7 @@ namespace Engine
 
 		double m_Elapsed;
 
-		const UString& m_Name;
+		const std::string& m_Name;
 	};
 
 	class Performance
@@ -244,13 +243,13 @@ namespace Engine
 
 		static void PushResult(ProfileResult result)
 		{
-			m_ProfileResults.PushBack(result);
+			m_ProfileResults.push_back(result);
 		}
 
 		static void Render();
 
 	private:
-		static UArray<ProfileResult> m_ProfileResults;
+		static std::vector<ProfileResult> m_ProfileResults;
 		
 	};
 }

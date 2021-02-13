@@ -24,7 +24,7 @@ namespace Engine
 
 		m_Context->m_Registry.each([&](auto entityID) {
 
-			Entity entity{ entityID, m_Context.Get() };
+			Entity entity{ entityID, m_Context.get() };
 
 			DrawEntityNode(entity);
 		});

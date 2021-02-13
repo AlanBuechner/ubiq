@@ -98,7 +98,7 @@ namespace Engine
 			samplers[i] = i;
 		}
 
-		s_Data.Library = CreateSharedPtr<ShaderLibrary>();
+		s_Data.Library = std::make_shared<ShaderLibrary>();
 
 		Ref<Shader> TextureShader = s_Data.Library->Load("TextureShader", "Assets/Shaders/TextureShader.glsl");
 
@@ -153,7 +153,7 @@ namespace Engine
 
 		for (int i = 0; i < s_Data.TextureSlotIndex; i++)
 		{
-			s_Data.TextureSlots[i].Get()->Bind(i);
+			s_Data.TextureSlots[i].get()->Bind(i);
 		}
 
 		if(s_Data.QuadIndexCount != 0)
@@ -348,7 +348,7 @@ namespace Engine
 
 		for (int i = 1; i < s_Data.TextureSlotIndex; i++)
 		{
-			if (s_Data.TextureSlots[i].Get() == texture.Get())
+			if (s_Data.TextureSlots[i].get() == texture.get())
 			{
 				textureIndex = (float)i;
 				break;

@@ -1,15 +1,14 @@
 #include "pch.h"
 #include "Performance.h"
 #include "imgui.h"
-#include "UString.h"
 
 namespace Engine
 {
-	UArray<ProfileResult> Performance::m_ProfileResults;
+	std::vector<ProfileResult> Performance::m_ProfileResults;
 
-	void Instrumentor::BeginSession(const UString& name, const UString& filepath)
+	void Instrumentor::BeginSession(const std::string& name, const std::string& filepath)
 	{
-		m_OutputStream.open(filepath.RawString());
+		m_OutputStream.open(filepath.c_str());
 		WriteHeader();
 		m_CurrentSession = new InstrumentationSession{ name };
 	}
@@ -72,19 +71,19 @@ namespace Engine
 
 	void Performance::Render()
 	{
-		if (m_ProfileResults.Length() != 0)
+		if (m_ProfileResults.size() != 0)
 		{
 			ImGui::Begin("Profiler");
 
-			for (int i = 0; i < m_ProfileResults.Length(); i++)
+			for (int i = 0; i < m_ProfileResults.size(); i++)
 			{
 				auto& result = m_ProfileResults[i];
-				UString buffer = "%.3fms  ";
+				std::string buffer = "%.3fms  ";
 				buffer += result.name;
-				ImGui::Text(buffer.RawString(), ((float)result.end - (float)result.start) / 1000.0f);
+				ImGui::Text(buffer.c_str(), ((float)result.end - (float)result.start) / 1000.0f);
 			}
 
-			m_ProfileResults.Clear();
+			m_ProfileResults.clear();
 
 			ImGui::End();
 		}

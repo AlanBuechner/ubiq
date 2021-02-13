@@ -44,10 +44,10 @@ namespace Engine
 		}
 		else
 		{
-			float orthLeft = -0.5 * m_AspectRatio * m_OrthgraphicSize;
-			float orthRight = 0.5 * m_AspectRatio * m_OrthgraphicSize;
-			float orthBottom = -0.5 * m_OrthgraphicSize;
-			float orthTop = 0.5 * m_OrthgraphicSize;
+			float orthLeft = -0.5f * m_AspectRatio * m_OrthgraphicSize;
+			float orthRight = 0.5f * m_AspectRatio * m_OrthgraphicSize;
+			float orthBottom = -0.5f * m_OrthgraphicSize;
+			float orthTop = 0.5f * m_OrthgraphicSize;
 
 			m_ProjectionMatrix = glm::ortho(orthLeft, orthRight, orthBottom, orthTop, m_OrthgraphicNear, m_OrthgraphicFar);
 		}

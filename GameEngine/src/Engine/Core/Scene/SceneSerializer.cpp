@@ -2,6 +2,7 @@
 #include "SceneSerializer.h"
 #include "Components.h"
 
+#include <fstream>
 #include <yaml-cpp/yaml.h>
 
 namespace YAML 
@@ -162,7 +163,7 @@ namespace Engine
 		out << YAML::Value << YAML::BeginSeq;
 		m_Scene->m_Registry.each([&](auto entityID)
 			{
-				Entity entity = {entityID, m_Scene.Get()};
+				Entity entity = {entityID, m_Scene.get()};
 				if (!entity)
 					return;
 

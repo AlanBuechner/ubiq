@@ -18,7 +18,7 @@ namespace Engine
 
 	const Ref<SubTexture2D> SubTexture2D::Create(Ref<Texture2D> texture, glm::vec2 regions, glm::vec2 position, glm::vec2 size)
 	{
-		return CreateSharedPtr<SubTexture2D>(texture, regions, position, size);
+		return std::make_shared<SubTexture2D>(texture, regions, position, size);
 	}
 
 }

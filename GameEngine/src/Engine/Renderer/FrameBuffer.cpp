@@ -15,7 +15,7 @@ namespace Engine
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return CreateSharedPtr<OpenGLFrameBuffer>(spec);
+			return std::make_shared<OpenGLFrameBuffer>(spec);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
