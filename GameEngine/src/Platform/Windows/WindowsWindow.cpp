@@ -195,12 +195,12 @@ namespace Engine
 
 	void WindowsWindow::SetViewport(float width, float height)
 	{
-		glfwSetWindowSize(m_Window, width, height);
+		glfwSetWindowSize(m_Window, (int)width, (int)height);
 	}
 
 	void WindowsWindow::SetAspectRatio(float aspect)
 	{
-		glfwSetWindowAspectRatio(m_Window, aspect * 100.0f, 100);
+		glfwSetWindowAspectRatio(m_Window, (int)(aspect * 100.0f), 100);
 	}
 
 	inline void* WindowsWindow::GetNativeWindow() const

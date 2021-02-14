@@ -41,6 +41,8 @@ namespace Engine
 		glm::vec2 m_ViewPortSize;
 		Ref<FrameBuffer> m_FrameBuffer;
 
+		int m_GizmoType = -1;
+
 		SceneHierarchyPanel m_HierarchyPanel;
 
 	};

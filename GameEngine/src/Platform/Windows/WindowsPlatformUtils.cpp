@@ -16,8 +16,8 @@ namespace Engine
 		OPENFILENAMEA ofn;
 		CHAR szFile[260] = { 0 };
 
-		ZeroMemory(&ofn, sizeof(ofn));
-		ofn.lStructSize = sizeof(ofn);
+		ZeroMemory(&ofn, sizeof(OPENFILENAME));
+		ofn.lStructSize = sizeof(OPENFILENAME);
 		ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
 		ofn.lpstrFile = szFile;
 		ofn.nMaxFile = sizeof(szFile);

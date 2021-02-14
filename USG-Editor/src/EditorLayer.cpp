@@ -9,6 +9,11 @@
 
 #include <memory>
 
+#include <ImGuizmo/ImGuizmo.h>
+
+#include "Engine/Math/Math.h"
+
+
 namespace Engine
 {
 
@@ -219,6 +224,44 @@ namespace Engine
 			uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 			ImGui::Image((void*)textureID, viewPortPanalSize, ImVec2(0, 1), ImVec2(1, 0));
 
+			// Gizmos
+			Entity selected = m_HierarchyPanel.GetSelectedEntity();
+			if (selected && m_GizmoType != -1)
+			{
+
+				// camera
+				auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+				const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+				const glm::mat4& cameraProjection = camera.GetProjectionMatrix();
+				glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+				// transform
+				auto& tc = selected.GetComponent<TransformComponent>(); // get the transform component
+				glm::mat4 transform = tc.GetTransform(); // get the transform matrix
+
+				ImGuizmo::SetOrthographic(camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic);
+				ImGuizmo::SetDrawlist();
+
+				float windowWidth = (float)ImGui::GetWindowWidth();
+				float windowHeight = (float)ImGui::GetWindowHeight();
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+				
+				ImGuizmo::Manipulate(	glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+										(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
+
+				if (ImGuizmo::IsUsing())
+				{
+					glm::vec3 position, rotation, scale;
+					Math::DecomposeTransform(transform, position, rotation, scale);
+
+					glm::vec3 deltaRotation = rotation - tc.Rotation;
+					tc.Position = position;
+					tc.Rotation += deltaRotation;
+					tc.Scale = scale;
+				}
+
+			}
+
 			ImGui::End();
 			ImGui::PopStyleVar();
 
@@ -244,7 +287,6 @@ namespace Engine
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
-		return false; // TODO : fix crash
 
 		bool controlPressed = Input::GetKeyDown(KeyCode::LEFT_CONTROL) || Input::GetKeyDown(KeyCode::RIGHT_CONTROL);
 		bool shiftPressed = Input::GetKeyDown(KeyCode::LEFT_SHIFT) || Input::GetKeyDown(KeyCode::RIGHT_SHIFT);
@@ -255,27 +297,36 @@ namespace Engine
 		case KeyCode::S:
 		{
 			if (controlPressed && shiftPressed)
-			{
 				SaveSceneAs();
-			}
 			break;
 		}
 		case KeyCode::N:
 		{
 			if (controlPressed)
-			{
 				NewScene();
-			}
 			break;
 		}
 		case KeyCode::O:
 		{
 			if (controlPressed)
 			{
-				OpenScene();
+				//OpenScene(); // TODO : fix crash
 			}
 			break;
 		}
+
+		case KeyCode::Q:
+			m_GizmoType = -1;
+			break;
+		case KeyCode::W:
+			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+			break;
+		case KeyCode::E:
+			m_GizmoType = ImGuizmo::OPERATION::SCALE;
+			break;
+		case KeyCode::R:
+			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+			break;
 		default:
 			break;
 		}
@@ -297,10 +348,6 @@ namespace Engine
 		std::string filepath = Engine::FileDialogs::OpenFile("Ubiq Scene (*.ubiq)\0*.ubiq\0");
 		if (!filepath.empty())
 		{
-			m_ActiveScene = std::make_shared<Scene>();
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
-			m_HierarchyPanel.SetContext(m_ActiveScene);
-
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Deserialize(filepath);
 		}

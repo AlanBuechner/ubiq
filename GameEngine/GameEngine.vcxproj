@@ -77,7 +77,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;BUILD_DLL;GLFW_INCLUDE_NONE;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\Glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\Glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;vendor\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -97,7 +97,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;BUILD_DLL;GLFW_INCLUDE_NONE;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\Glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\Glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;vendor\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -121,7 +121,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;BUILD_DLL;GLFW_INCLUDE_NONE;DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\Glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\Glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;vendor\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -163,6 +163,7 @@
     <ClInclude Include="src\Engine\Events\Event.h" />
     <ClInclude Include="src\Engine\Events\KeyEvent.h" />
     <ClInclude Include="src\Engine\Events\MouseEvent.h" />
+    <ClInclude Include="src\Engine\Math\Math.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
     <ClInclude Include="src\Engine\Renderer\Camera.h" />
     <ClInclude Include="src\Engine\Renderer\FrameBuffer.h" />
@@ -556,6 +557,7 @@
     <ClInclude Include="vendor\Glm\glm\vec3.hpp" />
     <ClInclude Include="vendor\Glm\glm\vec4.hpp" />
     <ClInclude Include="vendor\Glm\glm\vector_relational.hpp" />
+    <ClInclude Include="vendor\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
@@ -571,6 +573,7 @@
     <ClCompile Include="src\Engine\Core\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Engine\Core\Scene\SceneSerializer.cpp" />
     <ClCompile Include="src\Engine\Core\Time.cpp" />
+    <ClCompile Include="src\Engine\Math\Math.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Engine\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="src\Engine\Renderer\OrthographicCamera.cpp" />
@@ -600,6 +603,11 @@
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
