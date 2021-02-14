@@ -297,7 +297,7 @@ namespace Engine
 		case KeyCode::S:
 		{
 			if (controlPressed && shiftPressed)
-				SaveSceneAs();
+				//SaveSceneAs(); // TODO : fix crash
 			break;
 		}
 		case KeyCode::N:
@@ -343,11 +343,10 @@ namespace Engine
 
 	void EditorLayer::OpenScene()
 	{
-		NewScene();
-
 		std::string filepath = Engine::FileDialogs::OpenFile("Ubiq Scene (*.ubiq)\0*.ubiq\0");
 		if (!filepath.empty())
 		{
+			NewScene();
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Deserialize(filepath);
 		}
