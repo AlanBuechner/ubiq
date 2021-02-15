@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "Panels/SceneHierarchyPanel.h"
+#include "Engine/Renderer/EditorCamera.h"
 
 namespace Engine
 {
@@ -30,6 +31,8 @@ namespace Engine
 		void SaveSceneAs();
 
 	private:
+
+		EditorCamera m_EditorCamera;
 
 		Ref<Scene> m_ActiveScene;
 

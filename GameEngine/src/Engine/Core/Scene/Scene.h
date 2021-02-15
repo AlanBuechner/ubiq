@@ -5,6 +5,7 @@
 namespace Engine
 {
 	class Entity;
+	class EditorCamera;
 }
 
 namespace Engine
@@ -15,7 +16,8 @@ namespace Engine
 		Scene();
 		~Scene();
 
-		void OnUpdate();
+		void OnUpdateEditor(const EditorCamera& camera);
+		void OnUpdateRuntime();
 		void OnViewportResize(uint32_t width, uint32_t height);
 
 		Entity CreateEntity(const std::string& name = "");

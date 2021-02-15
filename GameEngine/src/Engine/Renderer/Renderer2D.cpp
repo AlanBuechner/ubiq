@@ -5,6 +5,7 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "EditorCamera.h"
 
 #include "Engine/Util/Performance.h"
 
@@ -129,6 +130,19 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 
 		glm::mat4 viewProj = camera.GetProjectionMatrix() * glm::inverse(transform);
+
+		Ref<Shader> TextureShader = s_Data.Library->Get("TextureShader");
+		TextureShader->Bind();
+		TextureShader->UploadUniformMat4("u_ViewProjection", viewProj);
+
+		BeginBatch();
+	}
+
+	void Renderer2D::BeginScene(const EditorCamera& camera)
+	{
+		CREATE_PROFILE_FUNCTIONI();
+
+		glm::mat4 viewProj = camera.GetViewProjection();
 
 		Ref<Shader> TextureShader = s_Data.Library->Get("TextureShader");
 		TextureShader->Bind();

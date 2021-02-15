@@ -35,6 +35,10 @@ namespace Engine
 		m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
 		m_ActiveScene = std::make_shared<Scene>();
+
+
+		m_EditorCamera = EditorCamera();
+
 #if 0
 		Entity entity = m_ActiveScene->CreateEntity();
 
@@ -101,9 +105,12 @@ namespace Engine
 			(spec.Width != m_ViewPortSize.x || spec.Height != m_ViewPortSize.y))
 		{
 			m_FrameBuffer->Resize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+			m_EditorCamera.SetViewportSize(m_ViewPortSize.x, m_ViewPortSize.y);
 
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
 		}
+
+		m_EditorCamera.OnUpdate();
 
 		// setup renderer
 		timer.Start("Rendrer");
@@ -113,7 +120,7 @@ namespace Engine
 		RenderCommand::Clear();
 
 		// update scene
-		m_ActiveScene->OnUpdate();
+		m_ActiveScene->OnUpdateEditor(m_EditorCamera);
 
 		m_FrameBuffer->Unbind();
 
@@ -229,17 +236,21 @@ namespace Engine
 			if (selected && m_GizmoType != -1)
 			{
 
-				// camera
-				auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-				const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-				const glm::mat4& cameraProjection = camera.GetProjectionMatrix();
-				glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+				// camera runtime
+				//auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+				//const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+				//const glm::mat4& cameraProjection = camera.GetProjectionMatrix();
+				//glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+				// camera editor
+				const glm::mat4& cameraProjection = m_EditorCamera.GetProjectionMatrix();
+				glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
 
 				// transform
 				auto& tc = selected.GetComponent<TransformComponent>(); // get the transform component
 				glm::mat4 transform = tc.GetTransform(); // get the transform matrix
 
-				ImGuizmo::SetOrthographic(camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic);
+				ImGuizmo::SetOrthographic(false);
 				ImGuizmo::SetDrawlist();
 
 				float windowWidth = (float)ImGui::GetWindowWidth();
@@ -280,6 +291,8 @@ namespace Engine
 	void EditorLayer::OnEvent(Event& e)
 	{
 		Super::OnEvent(e);
+
+		m_EditorCamera.OnEvent(e);
 
 		EventDispatcher dispacher(e);
 		dispacher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(&EditorLayer::OnKeyPressed));

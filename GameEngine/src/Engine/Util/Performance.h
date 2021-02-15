@@ -29,7 +29,7 @@ namespace Engine
 		int m_ProfileCount;
 		bool m_RecordData;
 	public:
-		Instrumentor(bool record = true)
+		Instrumentor(bool record = false)
 			: m_CurrentSession(nullptr), m_ProfileCount(0), m_RecordData(record)
 		{
 		}

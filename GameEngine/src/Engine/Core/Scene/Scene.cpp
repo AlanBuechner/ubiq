@@ -5,8 +5,10 @@
 #include "Entity.h"
 
 #include "Engine/Renderer/Renderer2D.h"
+#include "Engine/Renderer/EditorCamera.h"
 
 #include "glm/glm.hpp"
+
 
 namespace Engine
 {
@@ -18,7 +20,23 @@ namespace Engine
 	{
 	}
 
-	void Scene::OnUpdate()
+	void Scene::OnUpdateEditor(const EditorCamera& camera)
+	{
+		Renderer2D::BeginScene(camera);
+
+		// render sprites
+		auto sprite = entt::get<SpriteRendererComponent>;
+		auto group = m_Registry.group<TransformComponent>(sprite);
+		for (auto entity : group)
+		{
+			auto [transform, mesh] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+			Renderer2D::DrawQuad(transform.GetTransform(), mesh.Color);
+		}
+		Renderer2D::EndScene();
+	}
+
+	void Scene::OnUpdateRuntime()
 	{
 
 		// update scripts

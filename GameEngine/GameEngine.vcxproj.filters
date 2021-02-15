@@ -1321,6 +1321,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Math\Math.h" />
+    <ClInclude Include="src\Engine\Renderer\EditorCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1450,5 +1451,6 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Math\Math.cpp" />
+    <ClCompile Include="src\Engine\Renderer\EditorCamera.cpp" />
   </ItemGroup>
 </Project>
