@@ -178,7 +178,14 @@ namespace Engine
 			RIGHT_SUPER = KEYCODE_RIGHT_SUPER,
 			
 			MENU = KEYCODE_MENU,
-			LAST = KEYCODE_LAST
+			LAST = KEYCODE_LAST,
+		};
+
+		enum 
+		{
+			LEFT_MOUSE = MOUSE_LBUTTON,
+			RIGHT_MOUSE = MOUSE_RBUTTON,
+			MIDDLE_MOUSE = MOUSE_MBUTTON
 		};
 
 	protected:

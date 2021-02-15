@@ -331,7 +331,7 @@ namespace Engine
 		case KeyCode::Q:
 			m_GizmoType = -1;
 			break;
-		case KeyCode::W:
+		case KeyCode::T:
 			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
 			break;
 		case KeyCode::E:

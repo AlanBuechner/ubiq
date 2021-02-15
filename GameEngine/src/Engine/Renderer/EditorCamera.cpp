@@ -3,6 +3,7 @@
 
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Core/Input/KeyCodes.h"
+#include "Engine/Core/Time.h"
 
 #include <glfw/glfw3.h>
 
@@ -61,19 +62,51 @@ namespace Engine
 
 	void EditorCamera::OnUpdate()
 	{
-		if (Input::GetKeyDown(KeyCode::LEFT_ALT))
-		{
-			const glm::vec2& mouse{ Input::GetMousePosition().x, Input::GetMousePosition().y };
-			glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
-			m_InitialMousePosition = mouse;
+		const float moveSpeed = 2.0f;
+		const float runSpeed = 4.0f;
+		float speed = moveSpeed;
 
-			if (Input::GetMouseButtonDown(2)) // right mouse button
-				MousePan(delta);
-			else if (Input::GetMouseButtonDown(4)) // middle mouse button
+		const glm::vec2& mouse{ Input::GetMousePosition().x, Input::GetMousePosition().y };
+		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
+		m_InitialMousePosition = mouse;
+
+		bool alt = Input::GetKeyDown(KeyCode::LEFT_ALT) || Input::GetKeyDown(KeyCode::RIGHT_ALT);
+		bool shift = Input::GetKeyDown(KeyCode::LEFT_SHIFT) || Input::GetKeyDown(KeyCode::RIGHT_SHIFT);
+
+		bool rMouse = Input::GetMouseButtonDown(KeyCode::RIGHT_MOUSE);
+		bool lMouse = Input::GetMouseButtonDown(KeyCode::LEFT_MOUSE);
+		bool mMouse = Input::GetMouseButtonDown(KeyCode::MIDDLE_MOUSE);
+
+		bool wKey = Input::GetKeyDown(KeyCode::W);
+		bool sKey = Input::GetKeyDown(KeyCode::S);
+		bool aKey = Input::GetKeyDown(KeyCode::A);
+		bool dKey = Input::GetKeyDown(KeyCode::D);
+
+		if (rMouse)
+			if (alt)
+				MouseRotateAboutFocal(delta);
+			else
 				MouseRotate(delta);
-			else if (Input::GetMouseButtonDown(1)) // left mouse button
-				MouseZoom(delta.y);
+		else if (mMouse)
+			MousePan(delta);
+		else if (lMouse && alt)
+			MouseZoom(delta.y);
+
+		if (shift)
+			speed = runSpeed;
+
+		if (rMouse && !alt) {
+			if (wKey)
+				MoveFB(speed);
+			if (sKey)
+				MoveFB(-speed);
+
+			if (aKey)
+				MoveRL(-speed);
+			if (dKey)
+				MoveRL(speed);
 		}
+
 
 		UpdateView();
 	}
@@ -99,11 +132,19 @@ namespace Engine
 		m_FocalPoint += GetUpDirection() * delta.y * ySpeed * m_Distance;
 	}
 
+	void EditorCamera::MouseRotateAboutFocal(const glm::vec2& delta)
+	{
+		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
+		m_Yaw += yawSign * delta.x * RotationSpeed();
+		m_Pitch += delta.y * RotationSpeed();
+	}
+
 	void EditorCamera::MouseRotate(const glm::vec2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
 		m_Yaw += yawSign * delta.x * RotationSpeed();
 		m_Pitch += delta.y * RotationSpeed();
+		m_FocalPoint = CalculateFocal();
 	}
 
 	void EditorCamera::MouseZoom(float delta)
@@ -114,6 +155,16 @@ namespace Engine
 			m_FocalPoint += GetForwardDirection();
 			m_Distance = 1.0f;
 		}
+	}
+
+	void EditorCamera::MoveFB(float speed)
+	{
+		m_FocalPoint += GetForwardDirection() * speed * Time::GetDeltaTime();
+	}
+
+	void EditorCamera::MoveRL(float speed)
+	{
+		m_FocalPoint += GetRightDirection() * speed * Time::GetDeltaTime();
 	}
 
 	glm::vec3 EditorCamera::GetUpDirection() const
@@ -134,6 +185,11 @@ namespace Engine
 	glm::vec3 EditorCamera::CalculatePosition() const
 	{
 		return m_FocalPoint - GetForwardDirection() * m_Distance;
+	}
+
+	glm::vec3 EditorCamera::CalculateFocal() const
+	{
+		return m_Position + GetForwardDirection() * m_Distance;
 	}
 
 	glm::quat EditorCamera::GetOrientation() const

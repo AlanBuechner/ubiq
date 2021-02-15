@@ -14,7 +14,7 @@ namespace Engine
 		EditorCamera(float fov, float aspectRatio, float nearClip, float farClip);
 
 		void OnUpdate();
-		void OnEvent(Event & e);
+		void OnEvent(Event& e);
 
 		inline float GetDistance() const { return m_Distance; }
 		inline void SetDistance(float distance) { m_Distance = distance; }
@@ -36,13 +36,18 @@ namespace Engine
 		void UpdateProjection();
 		void UpdateView();
 
-		bool OnMouseScroll(MouseScrolledEvent & e);
+		bool OnMouseScroll(MouseScrolledEvent& e);
 
-		void MousePan(const glm::vec2 & delta);
-		void MouseRotate(const glm::vec2 & delta);
+		void MousePan(const glm::vec2& delta);
+		void MouseRotateAboutFocal(const glm::vec2& delta);
+		void MouseRotate(const glm::vec2& delta);
 		void MouseZoom(float delta);
+		
+		void MoveFB(float speed);
+		void MoveRL(float speed);
 
 		glm::vec3 CalculatePosition() const;
+		glm::vec3 CalculateFocal() const;
 
 		std::pair<float, float> PanSpeed() const;
 		float RotationSpeed() const;
