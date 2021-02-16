@@ -38,22 +38,22 @@ namespace Engine
 	std::pair<float, float> EditorCamera::PanSpeed() const
 	{
 		float x = std::min(m_ViewportWidth / 1000.0f, 2.4f); // max = 2.4f
-		float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
+		float xFactor = (0.0366f * (x * x) - 0.1778f * x + 0.3021f) * 30;
 
 		float y = std::min(m_ViewportHeight / 1000.0f, 2.4f); // max = 2.4f
-		float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
+		float yFactor = (0.0366f * (y * y) - 0.1778f * y + 0.3021f) * 30;
 
 		return { xFactor, yFactor };
 	}
 
 	float EditorCamera::RotationSpeed() const
 	{
-		return 0.8f;
+		return 0.8f * 30;
 	}
 
 	float EditorCamera::ZoomSpeed() const
 	{
-		float distance = m_Distance * 0.2f;
+		float distance = m_Distance * 0.2f * 30;
 		distance = std::max(distance, 0.0f);
 		float speed = distance * distance;
 		speed = std::min(speed, 100.0f); // max speed = 100
@@ -128,28 +128,28 @@ namespace Engine
 	void EditorCamera::MousePan(const glm::vec2& delta)
 	{
 		auto [xSpeed, ySpeed] = PanSpeed();
-		m_FocalPoint += -GetRightDirection() * delta.x * xSpeed * m_Distance;
-		m_FocalPoint += GetUpDirection() * delta.y * ySpeed * m_Distance;
+		m_FocalPoint += -GetRightDirection() * delta.x * xSpeed * m_Distance * Time::GetDeltaTime();
+		m_FocalPoint += GetUpDirection() * delta.y * ySpeed * m_Distance * Time::GetDeltaTime();
 	}
 
 	void EditorCamera::MouseRotateAboutFocal(const glm::vec2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
-		m_Yaw += yawSign * delta.x * RotationSpeed();
-		m_Pitch += delta.y * RotationSpeed();
+		m_Yaw += yawSign * delta.x * RotationSpeed() * Time::GetDeltaTime();
+		m_Pitch += delta.y * RotationSpeed() * Time::GetDeltaTime();
 	}
 
 	void EditorCamera::MouseRotate(const glm::vec2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
-		m_Yaw += yawSign * delta.x * RotationSpeed();
-		m_Pitch += delta.y * RotationSpeed();
+		m_Yaw += yawSign * delta.x * RotationSpeed() * Time::GetDeltaTime();
+		m_Pitch += delta.y * RotationSpeed() * Time::GetDeltaTime();
 		m_FocalPoint = CalculateFocal();
 	}
 
 	void EditorCamera::MouseZoom(float delta)
 	{
-		m_Distance -= delta * ZoomSpeed();
+		m_Distance -= delta * ZoomSpeed() * Time::GetDeltaTime();
 		if (m_Distance < 1.0f)
 		{
 			m_FocalPoint += GetForwardDirection();
