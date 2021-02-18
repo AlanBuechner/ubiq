@@ -28,6 +28,7 @@ namespace Engine
 		m_Texture = SubTexture2D::Create(m_LogoTexture, { 2,2 }, { 0,0 }, { 2,2 });
 
 		FrameBufferSpecification fbSpec;
+		fbSpec.Attachments = { FramBufferTextureFormat::RGBA8, FramBufferTextureFormat::Depth };
 		Window& window = Application::Get().GetWindow();
 		fbSpec.Width = window.GetWidth();
 		fbSpec.Height = window.GetHeight();
@@ -84,6 +85,7 @@ namespace Engine
 		SceneSerializer serializer(m_ActiveScene);
 		serializer.Deserialize("Assets/Scenes/Example.ubiq");
 #endif
+
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
 	}
