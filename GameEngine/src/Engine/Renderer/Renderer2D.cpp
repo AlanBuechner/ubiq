@@ -343,7 +343,7 @@ namespace Engine
 	// draw sprite component
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
 	{
-		DrawQuadImpl(transform, src.Color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
+		DrawQuadImpl(transform, src.Color, (src.Texture ? src.Texture : s_Data.WhiteTexture), s_Data.TextureCoords, entityID);
 	}
 
 

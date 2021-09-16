@@ -6,6 +6,7 @@
 #include "Engine/Core/Layer.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Time.h"
+#include "Engine/Util/Utils.h"
 
 // Input
 #include "Engine/Core/Input/Input.h"

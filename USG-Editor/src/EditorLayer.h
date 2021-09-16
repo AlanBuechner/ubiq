@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
+
 #include "Engine/Renderer/EditorCamera.h"
 
 namespace Engine
@@ -49,6 +51,7 @@ namespace Engine
 		int m_GizmoType = -1;
 
 		SceneHierarchyPanel m_HierarchyPanel;
+		ContentBrowserPanel m_ContentPanel;
 
 		Entity m_HoveredEntity;
 

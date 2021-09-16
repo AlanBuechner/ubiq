@@ -245,6 +245,7 @@ namespace Engine
 			}
 
 			m_HierarchyPanel.OnImGuiRender();
+			m_ContentPanel.OnImGuiRender();
 
 			ImGui::Begin("Statistics");
 
@@ -374,14 +375,19 @@ namespace Engine
 				m_OpenScene = true; // TODO : fix crash and move open scene call back
 			break;
 		}
+		}
 
+		// imguizmo keybord shortcuts
+		switch (e.GetKeyCode())
+		{
 		case KeyCode::Q:
 			m_GizmoType = -1;
 			break;
+		case KeyCode::G:
 		case KeyCode::T:
 			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
 			break;
-		case KeyCode::E:
+		case KeyCode::S:
 			m_GizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
 		case KeyCode::R:

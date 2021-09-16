@@ -304,8 +304,19 @@ namespace Engine
 		});
 
 		DrawComponent<SpriteRendererComponent>(entity, "Sprite Renderer", [&](){
-			auto& color = entity.GetComponent<SpriteRendererComponent>().Color;
+			auto& component = entity.GetComponent<SpriteRendererComponent>();
+			auto& color = component.Color;
 			ImGui::ColorEdit4("Color", glm::value_ptr(color));
+
+			ImGui::Button("Texture", ImVec2(0,0));
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					component.Texture = Texture2D::Create(GetStr(path));
+				}
+			}
 		});
 	}
 
