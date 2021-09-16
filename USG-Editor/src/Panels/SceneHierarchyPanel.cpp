@@ -79,6 +79,11 @@ namespace Engine
 		ImGui::End();
 	}
 
+	void SceneHierarchyPanel::SelectEntity(Entity e) 
+	{ 
+		m_Selected = e; 
+	}
+
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
 		auto& tc = entity.GetComponent<TagComponent>();

@@ -247,7 +247,7 @@ namespace Engine
 
 	private:
 		// keybord
-		inline KeyState GetKeyStateImpl(int keycode) { return m_KeyStates[keycode]; }
+		KeyState GetKeyStateImpl(int keycode);
 
 		// mouse
 		inline KeyState GetMouseButtonStateImpl(int button) { return m_MouseStates[button]; }

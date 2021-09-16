@@ -8,6 +8,8 @@ namespace Engine
 {
 	class Camera;
 	class EditorCamera;
+
+	class SpriteRendererComponent;
 }
 
 namespace Engine
@@ -58,6 +60,9 @@ namespace Engine
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture);
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture);
 
+		// draw sprite component
+		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID);
+
 		struct Statistics
 		{
 			uint32_t DrawCalls = 0;
@@ -71,8 +76,8 @@ namespace Engine
 
 	private:
 
-		static void DrawQuadImpl(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[]);
-		static void DrawQuadImpl(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[]);
+		static void DrawQuadImpl(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[], int entityID = -1);
+		static void DrawQuadImpl(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[], int entityID = -1);
 
 		static void BeginBatch();
 	};

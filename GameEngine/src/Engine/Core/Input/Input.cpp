@@ -249,7 +249,7 @@ namespace Engine
 		}
 	}
 	
-	inline bool Input::isKeyBinded(int key, int type)
+	bool Input::isKeyBinded(int key, int type)
 	{
 		for (BindedKeyData i : m_BindedKeys)
 		{
@@ -259,5 +259,38 @@ namespace Engine
 			}
 		}
 		return false;
+	}
+
+
+	Input::KeyState Input::GetKeyStateImpl(int keycode)
+	{
+		KeyState l;
+		KeyState r;
+		switch (keycode)
+		{
+		case KeyCode::ALT:
+			l = m_KeyStates[KeyCode::LEFT_ALT];
+			r = m_KeyStates[KeyCode::RIGHT_ALT];
+			break;
+		case KeyCode::CONTROL:
+			l = m_KeyStates[KeyCode::LEFT_CONTROL];
+			r = m_KeyStates[KeyCode::RIGHT_CONTROL];
+			break;
+		case KeyCode::SHIFT:
+			l = m_KeyStates[KeyCode::LEFT_SHIFT];
+			r = m_KeyStates[KeyCode::RIGHT_SHIFT];
+			break;
+		default:
+			return m_KeyStates[keycode];
+			break;
+		}
+
+		if (l == Down || r == Down)
+			return Down;
+		if (l == KeyPressed || r == KeyPressed)
+			return KeyPressed;
+		if (l == KeyReleased || r == KeyReleased)
+			return KeyReleased;
+		return Up;
 	}
 }

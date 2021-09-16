@@ -28,7 +28,7 @@ namespace Engine
 		m_Texture = SubTexture2D::Create(m_LogoTexture, { 2,2 }, { 0,0 }, { 2,2 });
 
 		FrameBufferSpecification fbSpec;
-		fbSpec.Attachments = { FramBufferTextureFormat::RGBA8, FramBufferTextureFormat::Depth };
+		fbSpec.Attachments = { FrameBufferTextureFormat::RGBA8, FrameBufferTextureFormat::RED_INTEGER, FrameBufferTextureFormat::Depth };
 		Window& window = Application::Get().GetWindow();
 		fbSpec.Width = window.GetWidth();
 		fbSpec.Height = window.GetHeight();
@@ -36,7 +36,6 @@ namespace Engine
 		m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
 		m_ActiveScene = std::make_shared<Scene>();
-
 
 		m_EditorCamera = EditorCamera();
 
@@ -99,6 +98,18 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
+		if (m_SaveScene)
+		{
+			SaveSceneAs();
+			m_SaveScene = false;
+		}
+
+		if (m_OpenScene)
+		{
+			OpenScene();
+			m_OpenScene = false;
+		}
+
 		InstrumentationTimer timer = CREATE_PROFILEI();
 
 		// resize
@@ -121,8 +132,34 @@ namespace Engine
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		RenderCommand::Clear();
 
+		m_FrameBuffer->ClearAttachment(1, -1);
+
 		// update scene
 		m_ActiveScene->OnUpdateEditor(m_EditorCamera);
+
+		if (Input::GetMouseButtonPressed(KeyCode::LEFT_MOUSE) && !Input::GetKeyDown(KeyCode::ALT) && !ImGuizmo::IsOver())
+		{
+
+			auto [mx, my] = ImGui::GetMousePos();
+			mx -= m_ViewportBounds[0].x;
+			my -= m_ViewportBounds[0].y;
+			glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+
+			my = viewportSize.y - my; // flip y cord
+
+			int mousex = (int)mx;
+			int mousey = (int)my;
+
+			if ((mousex >= 0 && mousex < (int)viewportSize.x) && (mousey >= 0 && mousey < (int)viewportSize.y))
+			{
+				int entityID = m_FrameBuffer->ReadPixle(1, mousex, mousey);
+				if (entityID == -1)
+					m_HierarchyPanel.SelectEntity({});
+				else
+					m_HierarchyPanel.SelectEntity({(entt::entity)entityID, m_ActiveScene.get()});
+				
+			}
+		}
 
 		m_FrameBuffer->Unbind();
 
@@ -211,7 +248,6 @@ namespace Engine
 
 			ImGui::Begin("Statistics");
 
-
 			ImGui::Text("Renderer2D Statis:");
 			Renderer2D::Statistics stats = Renderer2D::GetStats();
 			ImGui::Text("Draw Calls: %d", stats.DrawCalls);
@@ -223,6 +259,9 @@ namespace Engine
 			// Game window
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			ImGui::Begin("Viewport");
+
+			auto viewportOffset = ImGui::GetCursorPos();
+
 			Application::Get().GetImGuiLayer()->SetBlockEvents(!ImGui::IsWindowFocused());
 
 			ImVec2 viewPortPanalSize = ImGui::GetContentRegionAvail();
@@ -232,6 +271,14 @@ namespace Engine
 			}
 			uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 			ImGui::Image((void*)textureID, viewPortPanalSize, ImVec2(0, 1), ImVec2(1, 0));
+
+			ImVec2 minBound = ImGui::GetWindowPos();
+			minBound.x += viewportOffset.x;
+			minBound.y += viewportOffset.y;
+
+			ImVec2 maxBound = { minBound.x + viewPortPanalSize.x, minBound.y + viewPortPanalSize.y };
+			m_ViewportBounds[0] = { minBound.x, minBound.y };
+			m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 			// Gizmos
 			Entity selected = m_HierarchyPanel.GetSelectedEntity();
@@ -281,9 +328,9 @@ namespace Engine
 
 			// Console window
 
-			ImGui::Begin("Console");
+			//ImGui::Begin("Console");
 
-			ImGui::End();
+			//ImGui::End();
 
 
 			ImGui::End();
@@ -303,8 +350,8 @@ namespace Engine
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
 
-		bool controlPressed = Input::GetKeyDown(KeyCode::LEFT_CONTROL) || Input::GetKeyDown(KeyCode::RIGHT_CONTROL);
-		bool shiftPressed = Input::GetKeyDown(KeyCode::LEFT_SHIFT) || Input::GetKeyDown(KeyCode::RIGHT_SHIFT);
+		bool controlPressed = Input::GetKeyDown(KeyCode::CONTROL);
+		bool shiftPressed = Input::GetKeyDown(KeyCode::SHIFT);
 
 
 		switch (e.GetKeyCode())
@@ -312,7 +359,7 @@ namespace Engine
 		case KeyCode::S:
 		{
 			if (controlPressed && shiftPressed)
-				//SaveSceneAs(); // TODO : fix crash
+				m_SaveScene = true; // TODO : fix crash and move save scene call back
 			break;
 		}
 		case KeyCode::N:
@@ -324,9 +371,7 @@ namespace Engine
 		case KeyCode::O:
 		{
 			if (controlPressed)
-			{
-				//OpenScene(); // TODO : fix crash
-			}
+				m_OpenScene = true; // TODO : fix crash and move open scene call back
 			break;
 		}
 

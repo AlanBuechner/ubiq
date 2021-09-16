@@ -183,6 +183,7 @@
     <ClInclude Include="src\Engine\Util\Performance.h" />
     <ClInclude Include="src\Engine\Util\PlatformUtils.h" />
     <ClInclude Include="src\Engine\imGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Engine\Util\Utils.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLFrameBuffer.h" />
@@ -592,6 +593,7 @@
     <ClCompile Include="src\Engine\Util\Performance.cpp" />
     <ClCompile Include="src\Engine\imGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\imGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\Engine\Util\Utils.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLFrameBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />

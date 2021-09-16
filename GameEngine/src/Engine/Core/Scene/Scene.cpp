@@ -29,9 +29,9 @@ namespace Engine
 		auto group = m_Registry.group<TransformComponent>(sprite);
 		for (auto entity : group)
 		{
-			auto [transform, mesh] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
-			Renderer2D::DrawQuad(transform.GetTransform(), mesh.Color);
+			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
 		}
 		Renderer2D::EndScene();
 	}

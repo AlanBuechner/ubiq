@@ -4,12 +4,13 @@
 
 namespace Engine
 {
-	enum class FramBufferTextureFormat
+	enum class FrameBufferTextureFormat
 	{
 		None = 0,
 
 		// Color
 		RGBA8,
+		RED_INTEGER,
 
 		// Depth/Stencil
 		DEPTH24STENCIL8,
@@ -17,25 +18,25 @@ namespace Engine
 		Depth = DEPTH24STENCIL8
 	};
 
-	struct FramBufferTextureSpecification
+	struct FrameBufferTextureSpecification
 	{
-		FramBufferTextureSpecification() = default;
-		FramBufferTextureSpecification(FramBufferTextureFormat format) :
+		FrameBufferTextureSpecification() = default;
+		FrameBufferTextureSpecification(FrameBufferTextureFormat format) :
 			TextureFormat(format) 
 		{}
 
-		FramBufferTextureFormat TextureFormat = FramBufferTextureFormat::None;
+		FrameBufferTextureFormat TextureFormat = FrameBufferTextureFormat::None;
 
 	};
 
 	struct FrameBufferAttachmentSpecification
 	{
 		FrameBufferAttachmentSpecification() = default;
-		FrameBufferAttachmentSpecification(std::initializer_list<FramBufferTextureSpecification> attachments) :
+		FrameBufferAttachmentSpecification(std::initializer_list<FrameBufferTextureSpecification> attachments) :
 			Attachments(attachments)
 		{}
 
-		std::vector<FramBufferTextureSpecification> Attachments;
+		std::vector<FrameBufferTextureSpecification> Attachments;
 	};
 
 	struct FrameBufferSpecification
@@ -59,6 +60,9 @@ namespace Engine
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 
 		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
+		virtual int ReadPixle(uint32_t attachment, int x, int y) = 0;
+
+		virtual void ClearAttachment(uint32_t attachmentIndex, int value) = 0;
 
 		virtual const FrameBufferSpecification& GetSpecification() const = 0;
 

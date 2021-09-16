@@ -44,9 +44,17 @@ namespace Engine
 		glm::vec2 m_ViewPortSize;
 		Ref<FrameBuffer> m_FrameBuffer;
 
+		glm::vec2 m_ViewportBounds[2];
+
 		int m_GizmoType = -1;
 
 		SceneHierarchyPanel m_HierarchyPanel;
 
+		Entity m_HoveredEntity;
+
+		bool m_TransformingEntity = false;
+
+		bool m_OpenScene = false;
+		bool m_SaveScene = false;
 	};
 }

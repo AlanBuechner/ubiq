@@ -70,8 +70,8 @@ namespace Engine
 		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 		m_InitialMousePosition = mouse;
 
-		bool alt = Input::GetKeyDown(KeyCode::LEFT_ALT) || Input::GetKeyDown(KeyCode::RIGHT_ALT);
-		bool shift = Input::GetKeyDown(KeyCode::LEFT_SHIFT) || Input::GetKeyDown(KeyCode::RIGHT_SHIFT);
+		bool alt = Input::GetKeyDown(KeyCode::ALT);
+		bool shift = Input::GetKeyDown(KeyCode::SHIFT);
 
 		bool rMouse = Input::GetMouseButtonDown(KeyCode::RIGHT_MOUSE);
 		bool lMouse = Input::GetMouseButtonDown(KeyCode::LEFT_MOUSE);
