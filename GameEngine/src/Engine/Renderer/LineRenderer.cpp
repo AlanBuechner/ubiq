@@ -112,6 +112,12 @@ namespace Engine
 
 	void LineRenderer::DrawLine(glm::vec3 p1, glm::vec3 p2, const glm::vec4 color, const glm::mat4& transform)
 	{
+		if (s_Data.IndexCount + 2 > s_Data.MaxIndices || s_Data.VertexCount + 2 > s_Data.MaxVertices)
+		{
+			EndScene();
+			BeginBatch();
+		}
+
 		s_Data.LineVertexBufferPtr->Position = transform * glm::vec4(p1, 1.0f);
 		s_Data.LineVertexBufferPtr->Color = color;
 		s_Data.LineVertexBufferPtr++;
@@ -129,6 +135,32 @@ namespace Engine
 		s_Data.IndexCount += 2;
 		s_Data.VertexCount += 2;
 
+	}
+
+	void LineRenderer::DrawLineMesh(LineMesh& mesh, const glm::mat4& transform)
+	{
+		if (s_Data.IndexCount + mesh.m_Indices.size() > s_Data.MaxIndices || s_Data.VertexCount + mesh.m_Vertices.size() > s_Data.MaxVertices)
+		{
+			EndScene();
+			BeginBatch();
+		}
+
+		for (uint32_t i = 0; i < mesh.m_Vertices.size(); i++)
+		{
+			s_Data.LineVertexBufferPtr->Position = transform * glm::vec4(mesh.m_Vertices[i].Position, 1.0f);
+			s_Data.LineVertexBufferPtr->Color = mesh.m_Vertices[i].Color;
+			s_Data.LineVertexBufferPtr++;
+		}
+
+		for (uint32_t i = 0; i < mesh.m_Indices.size(); i++)
+		{
+			*s_Data.LineIndexBufferPtr = s_Data.VertexCount + mesh.m_Indices[i];
+			s_Data.LineIndexBufferPtr++;
+		}
+
+
+		s_Data.IndexCount += mesh.m_Indices.size();
+		s_Data.VertexCount += mesh.m_Vertices.size();
 	}
 
 }

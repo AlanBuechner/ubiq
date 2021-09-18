@@ -280,26 +280,26 @@ namespace Engine
 					camera.SetPerspectiveVerticalFOV(glm::radians(fov));
 
 				float nearClip = camera.GetPerspectiveNearClip();
-				if (ImGui::DragFloat("Near Clip", &nearClip))
+				if (ImGui::DragFloat("Near Clip", &nearClip, 0.1f))
 					camera.SetPerspectiveNearClip(nearClip);
 
 				float farClip = camera.GetPerspectiveFarClip();
-				if (ImGui::DragFloat("Far Clip", &farClip))
+				if (ImGui::DragFloat("Far Clip", &farClip, 0.1f))
 					camera.SetPerspectiveFarClip(farClip);
 			}
 
 			if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
 			{
 				float size = camera.GetOrthographicSize();
-				if (ImGui::DragFloat("Size", &size))
+				if (ImGui::DragFloat("Size", &size, 0.1f))
 					camera.SetOrthographicSize(size);
 
 				float nearClip = camera.GetOrthographicNearClip();
-				if (ImGui::DragFloat("Near Clip", &nearClip))
+				if (ImGui::DragFloat("Near Clip", &nearClip, 0.1f))
 					camera.SetOrthographicNearClip(nearClip);
 
 				float farClip = camera.GetOrthographicFarClip();
-				if (ImGui::DragFloat("Far Clip", &farClip))
+				if (ImGui::DragFloat("Far Clip", &farClip, 0.1f))
 					camera.SetOrthographicFarClip(farClip);
 			}
 		});

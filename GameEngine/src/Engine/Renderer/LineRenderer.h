@@ -13,6 +13,12 @@ namespace Engine
 	{
 		glm::vec3 Position;
 		glm::vec4 Color;
+	};
+
+	struct LineMesh
+	{
+		std::vector<LineVertex> m_Vertices;
+		std::vector<uint32_t> m_Indices;
 
 	};
 
@@ -35,6 +41,7 @@ namespace Engine
 	public:
 
 		static void DrawLine(glm::vec3 p1, glm::vec3 p2, const glm::vec4 color, const glm::mat4& transform = glm::mat4(1.0f));
+		static void DrawLineMesh(LineMesh& mesh, const glm::mat4& transform = glm::mat4(1.0f));
 
 	};
 }

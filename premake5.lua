@@ -80,8 +80,8 @@ project "GameEngine"
 		"opengl32.lib"
 	}
 
-	filter "files:vendor/ImGuizmo/**.cpp"
-	flags { "NoPCH" }
+	filter "files:GameEngine/vendor/ImGuizmo/**.cpp"
+		flags { "NoPCH" }
 
 	filter "system:windows"
 		systemversion "latest"

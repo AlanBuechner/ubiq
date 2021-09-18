@@ -19,6 +19,9 @@
     <Filter Include="src\Engine\Events">
       <UniqueIdentifier>{B624EAB0-223B-E846-6BB2-7368D707B9CE}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Math">
+      <UniqueIdentifier>{2B817A79-970C-E83D-A01D-6B320C28443E}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
     </Filter>
@@ -135,16 +138,25 @@
     <ClInclude Include="src\Engine\Events\MouseEvent.h">
       <Filter>src\Engine\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Math\Math.h">
+      <Filter>src\Engine\Math</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Camera.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\EditorCamera.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\FrameBuffer.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\GraphicsContext.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\LineRenderer.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\OrthographicCamera.h">
@@ -184,6 +196,9 @@
       <Filter>src\Engine\Util</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Util\PlatformUtils.h">
+      <Filter>src\Engine\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Util\Utils.h">
       <Filter>src\Engine\Util</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\imGui\ImGuiLayer.h">
@@ -1320,10 +1335,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Math\Math.h" />
-    <ClInclude Include="src\Engine\Renderer\EditorCamera.h" />
-    <ClInclude Include="src\Engine\Util\Utils.h" />
-    <ClInclude Include="src\Engine\Renderer\LineRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1362,10 +1373,19 @@
     <ClCompile Include="src\Engine\Core\Time.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Math\Math.cpp">
+      <Filter>src\Engine\Math</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\EditorCamera.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\FrameBuffer.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\LineRenderer.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\OrthographicCamera.cpp">
@@ -1402,6 +1422,9 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Util\Performance.cpp">
+      <Filter>src\Engine\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Util\Utils.cpp">
       <Filter>src\Engine\Util</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\imGui\ImGuiBuild.cpp">
@@ -1452,9 +1475,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Math\Math.cpp" />
-    <ClCompile Include="src\Engine\Renderer\EditorCamera.cpp" />
-    <ClCompile Include="src\Engine\Util\Utils.cpp" />
-    <ClCompile Include="src\Engine\Renderer\LineRenderer.cpp" />
   </ItemGroup>
 </Project>
