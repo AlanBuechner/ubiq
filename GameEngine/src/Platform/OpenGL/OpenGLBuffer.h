@@ -26,6 +26,7 @@ namespace Engine
 	class ENGINE_API OpenGLIndexBuffer : public IndexBuffer
 	{
 	public:
+		OpenGLIndexBuffer(uint32_t count);
 		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
 		virtual ~OpenGLIndexBuffer();
 
@@ -33,6 +34,8 @@ namespace Engine
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
+
+		virtual void SetData(const uint32_t* data, uint32_t count) override;
 
 	private:
 		uint32_t m_RendererID;

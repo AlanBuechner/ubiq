@@ -140,6 +140,7 @@ namespace Engine
 		Ref<Shader> TextureShader = s_Data.Library->Get("TextureShader");
 		TextureShader->Bind();
 		TextureShader->UploadUniformMat4("u_ViewProjection", viewProj);
+		s_Data.QuadVertexArray->Bind();
 
 		BeginBatch();
 	}
@@ -153,6 +154,7 @@ namespace Engine
 		Ref<Shader> TextureShader = s_Data.Library->Get("TextureShader");
 		TextureShader->Bind();
 		TextureShader->UploadUniformMat4("u_ViewProjection", viewProj);
+		s_Data.QuadVertexArray->Bind();
 
 		BeginBatch();
 	}

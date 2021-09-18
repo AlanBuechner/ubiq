@@ -31,6 +31,11 @@ namespace Engine
 			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
 
+		inline static void DrawLineIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0)
+		{
+			s_RendererAPI->DrawLineIndexed(vertexArray, indexCount);
+		}
+
 	private:
 		static RendererAPI* s_RendererAPI;
 	};

@@ -94,7 +94,10 @@ namespace Engine
 
 		// update scene
 		if (m_SceneState == SceneState::Edit)
+		{
+			DrawCustomGizmo();
 			m_ActiveScene->OnUpdateEditor(m_EditorCamera);
+		}
 		else if (m_SceneState == SceneState::Play)
 			m_ActiveScene->OnUpdateRuntime();
 
@@ -302,6 +305,52 @@ namespace Engine
 		return true;
 	}
 
+	void EditorLayer::DrawCustomGizmo()
+	{
+		// draw camera frustom
+		Entity selected = m_HierarchyPanel.GetSelectedEntity();
+		if (selected && selected.HasComponent<CameraComponent>())
+		{
+			auto& tc = selected.GetComponent<TransformComponent>();
+			auto& cam = selected.GetComponent<CameraComponent>().Camera;
+
+			LineRenderer::BeginScene(m_EditorCamera);
+
+			const glm::mat4& proj = cam.GetProjectionMatrix();
+			const glm::mat4& transform = tc.GetTransform();
+			glm::mat4 t = glm::inverse(proj);
+			glm::vec4 ltb = t * glm::vec4{ -1, 1, 0, 1 };
+			glm::vec4 ltf = t * glm::vec4{ -1, 1, 1, 1 };
+
+			glm::vec4 rtb = t * glm::vec4{ 1, 1, 0, 1 };
+			glm::vec4 rtf = t * glm::vec4{ 1, 1, 1, 1 };
+
+			glm::vec4 lbb = t * glm::vec4{ -1, -1, 0, 1 };
+			glm::vec4 lbf = t * glm::vec4{ -1, -1, 1, 1 };
+
+			glm::vec4 rbb = t * glm::vec4{ 1, -1, 0, 1 };
+			glm::vec4 rbf = t * glm::vec4{ 1, -1, 1, 1 };
+
+			LineRenderer::DrawLine(ltb / ltb.w, ltf / ltf.w, { 1,1,1,1 }, transform);
+			LineRenderer::DrawLine(rtb / rtb.w, rtf / rtf.w, { 1,1,1,1 }, transform);
+			LineRenderer::DrawLine(lbb / lbb.w, lbf / lbf.w, { 1,1,1,1 }, transform);
+			LineRenderer::DrawLine(rbb / rbb.w, rbf / rbf.w, { 1,1,1,1 }, transform);
+
+			LineRenderer::DrawLine(ltb / ltb.w, rtb / rtb.w, { 1,1,1,1 }, transform);
+			LineRenderer::DrawLine(rtb / rtb.w, rbb / rbb.w, { 1,1,1,1 }, transform);
+			LineRenderer::DrawLine(rbb / rbb.w, lbb / lbb.w, { 1,1,1,1 }, transform);
+			LineRenderer::DrawLine(lbb / lbb.w, ltb / ltb.w, { 1,1,1,1 }, transform);
+
+			LineRenderer::DrawLine(ltf / ltf.w, rtf / rtf.w, { 1,1,1,1 }, transform);
+			LineRenderer::DrawLine(rtf / rtf.w, rbf / rbf.w, { 1,1,1,1 }, transform);
+			LineRenderer::DrawLine(rbf / rbf.w, lbf / lbf.w, { 1,1,1,1 }, transform);
+			LineRenderer::DrawLine(lbf / lbf.w, ltf / ltf.w, { 1,1,1,1 }, transform);
+
+			LineRenderer::EndScene();
+
+		}
+	}
+
 	void EditorLayer::UI_Toolbar()
 	{
 
@@ -355,46 +404,41 @@ namespace Engine
 		m_ViewportBounds[0] = { minBound.x, minBound.y };
 		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
-		// Gizmos
 		Entity selected = m_HierarchyPanel.GetSelectedEntity();
-		if (m_SceneState != SceneState::Play && selected && m_GizmoType != -1)
+		if (m_SceneState != SceneState::Play && selected)
 		{
-
-			// camera runtime
-			//auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-			//const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-			//const glm::mat4& cameraProjection = camera.GetProjectionMatrix();
-			//glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
-
-			// camera editor
-			const glm::mat4& cameraProjection = m_EditorCamera.GetProjectionMatrix();
-			glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
-
-			// transform
-			auto& tc = selected.GetComponent<TransformComponent>(); // get the transform component
-			glm::mat4 transform = tc.GetTransform(); // get the transform matrix
-
-			ImGuizmo::SetOrthographic(false);
-			ImGuizmo::SetDrawlist();
-
-			float windowWidth = (float)ImGui::GetWindowWidth();
-			float windowHeight = (float)ImGui::GetWindowHeight();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-
-			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-				(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
-
-			if (ImGuizmo::IsUsing())
+			// Gizmos
+			if (m_GizmoType != -1)
 			{
-				glm::vec3 position, rotation, scale;
-				Math::DecomposeTransform(transform, position, rotation, scale);
+				// camera editor
+				const glm::mat4& cameraProjection = m_EditorCamera.GetProjectionMatrix();
+				glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
 
-				glm::vec3 deltaRotation = rotation - tc.Rotation;
-				tc.Position = position;
-				tc.Rotation += deltaRotation;
-				tc.Scale = scale;
+				// transform
+				auto& tc = selected.GetComponent<TransformComponent>(); // get the transform component
+				glm::mat4 transform = tc.GetTransform(); // get the transform matrix
+
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetDrawlist();
+
+				float windowWidth = (float)ImGui::GetWindowWidth();
+				float windowHeight = (float)ImGui::GetWindowHeight();
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+					(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
+
+				if (ImGuizmo::IsUsing())
+				{
+					glm::vec3 position, rotation, scale;
+					Math::DecomposeTransform(transform, position, rotation, scale);
+
+					glm::vec3 deltaRotation = rotation - tc.Rotation;
+					tc.Position = position;
+					tc.Rotation += deltaRotation;
+					tc.Scale = scale;
+				}
 			}
-
 		}
 
 		ImGui::End();

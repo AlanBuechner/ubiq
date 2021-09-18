@@ -14,9 +14,10 @@
 #include "Engine/Core/Input/InputControlerManeger.h"
 
 // --- Renderer ---------------------------
+#include "Engine/Renderer/RenderCommand.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Renderer2D.h"
-#include "Engine/Renderer/RenderCommand.h"
+#include "Engine/Renderer/LineRenderer.h"
 
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/Shader.h"

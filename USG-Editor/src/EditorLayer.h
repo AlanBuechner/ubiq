@@ -43,6 +43,8 @@ namespace Engine
 
 		bool OnKeyPressed(KeyPressedEvent& e);
 
+		void DrawCustomGizmo();
+
 		void UI_Toolbar();
 		void UI_Viewport();
 

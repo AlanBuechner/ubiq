@@ -28,6 +28,7 @@ namespace Engine
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
 		glCreateVertexArrays(1, &m_RendererID);
+		Bind();
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()

@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Renderer2D.h"
+#include "LineRenderer.h"
 
 namespace Engine
 {
@@ -12,6 +13,7 @@ namespace Engine
 	{
 		ShaderLibrary::Init();
 		RenderCommand::Init();
+		LineRenderer::Init();
 		Renderer2D::Init();
 	}
 

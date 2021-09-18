@@ -5,6 +5,7 @@
 #include "Entity.h"
 
 #include "Engine/Renderer/Renderer2D.h"
+#include "Engine/Renderer/LineRenderer.h"
 #include "Engine/Renderer/EditorCamera.h"
 
 #include "glm/glm.hpp"
@@ -23,6 +24,7 @@ namespace Engine
 
 	void Scene::OnUpdateEditor(const EditorCamera& camera)
 	{
+
 		Renderer2D::BeginScene(camera);
 
 		// render sprites

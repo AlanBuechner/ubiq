@@ -1323,6 +1323,7 @@
     <ClInclude Include="src\Engine\Math\Math.h" />
     <ClInclude Include="src\Engine\Renderer\EditorCamera.h" />
     <ClInclude Include="src\Engine\Util\Utils.h" />
+    <ClInclude Include="src\Engine\Renderer\LineRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1454,5 +1455,6 @@
     <ClCompile Include="src\Engine\Math\Math.cpp" />
     <ClCompile Include="src\Engine\Renderer\EditorCamera.cpp" />
     <ClCompile Include="src\Engine\Util\Utils.cpp" />
+    <ClCompile Include="src\Engine\Renderer\LineRenderer.cpp" />
   </ItemGroup>
 </Project>
