@@ -157,6 +157,7 @@ namespace Engine
 			{
 				func();
 				ImGui::TreePop();
+				ImGui::Spacing();
 			}
 
 			if (removeComponent)
@@ -316,6 +317,7 @@ namespace Engine
 					const wchar_t* path = (const wchar_t*)payload->Data;
 					component.Texture = Texture2D::Create(GetStr(path));
 				}
+				ImGui::EndDragDropTarget();
 			}
 		});
 	}

@@ -14,6 +14,7 @@ namespace Engine
 {
 	Scene::Scene()
 	{
+		m_CameraIcon = Texture2D::Create("Resources/CameraIcon.png");
 	}
 
 	Scene::~Scene()
@@ -26,13 +27,27 @@ namespace Engine
 
 		// render sprites
 		auto sprite = entt::get<SpriteRendererComponent>;
-		auto group = m_Registry.group<TransformComponent>(sprite);
-		for (auto entity : group)
+		auto spriteGroup = m_Registry.group<TransformComponent>(sprite);
+		for (auto entity : spriteGroup)
 		{
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto [transform, sprite] = spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
 			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
 		}
+
+		// render icons
+		auto cameraView = m_Registry.view<CameraComponent, TransformComponent>();
+		for (auto entity : cameraView)
+		{
+			auto [cam, transform] = cameraView.get<CameraComponent, TransformComponent>(entity);
+			TransformComponent t = transform;
+			t.Rotation = { -camera.GetPitch(), -camera.GetYaw(), 0 };
+			t.Scale = { 1,1,1 };
+
+			Renderer2D::DrawQuad(t.GetTransform(), m_CameraIcon, (int)entity);
+
+		}
+
 		Renderer2D::EndScene();
 	}
 
@@ -82,6 +97,7 @@ namespace Engine
 
 				Renderer2D::DrawQuad(transform.GetTransform(), mesh.Color);
 			}
+
 			Renderer2D::EndScene();
 		}
 	}

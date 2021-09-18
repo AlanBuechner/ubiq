@@ -2,6 +2,8 @@
 #include "entt.hpp"
 #include "Engine/Core/Time.h"
 
+#include "Engine/Renderer/Texture.h"
+
 namespace Engine
 {
 	class Entity;
@@ -34,6 +36,8 @@ namespace Engine
 		uint32_t m_ViewportHeight = 0;
 
 		entt::registry m_Registry;
+
+		Ref<Texture2D> m_CameraIcon;
 
 		friend class Entity;
 		friend class SceneSerializer;

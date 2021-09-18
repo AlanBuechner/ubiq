@@ -13,9 +13,19 @@ namespace Engine
 
 	class EditorLayer : public Layer
 	{
+		static EditorLayer* s_Instance;
+
+		enum class SceneState
+		{
+			Edit = 0,
+			Play = 1,
+		};
+
 	public:
 		EditorLayer();
 		~EditorLayer() = default;
+
+		static EditorLayer* Get() { return s_Instance; }
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
@@ -24,22 +34,27 @@ namespace Engine
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& event) override;
 
+		void LoadScene(const std::string& file);
+
 	private:
-
-		bool OnKeyPressed(KeyPressedEvent& e);
-
 		void NewScene();
 		void OpenScene();
 		void SaveSceneAs();
+
+		bool OnKeyPressed(KeyPressedEvent& e);
+
+		void UI_Toolbar();
+		void UI_Viewport();
+
+		void OnScenePlay();
+		void OnSceneStop();
+
 
 	private:
 
 		EditorCamera m_EditorCamera;
 
 		Ref<Scene> m_ActiveScene;
-
-		Ref<Texture2D> m_LogoTexture;
-		Ref<SubTexture2D> m_Texture;
 
 		Entity m_CameraEntity;
 
@@ -53,7 +68,10 @@ namespace Engine
 		SceneHierarchyPanel m_HierarchyPanel;
 		ContentBrowserPanel m_ContentPanel;
 
-		Entity m_HoveredEntity;
+		Ref<Texture2D> m_PlayButton;
+		Ref<Texture2D> m_StopButton;
+
+		SceneState m_SceneState = SceneState::Edit;
 
 		bool m_TransformingEntity = false;
 

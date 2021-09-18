@@ -202,140 +202,140 @@ namespace Engine
 
 
 	// draw colord quad --------------------------------------
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, int entityID)
 	{
-		DrawQuadImpl({position.x, position.y, 0.0f}, size, 0.0f, color, s_Data.WhiteTexture, s_Data.TextureCoords);
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, s_Data.WhiteTexture, s_Data.TextureCoords);
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID)
 	{
-		DrawQuadImpl(position, size, 0.0f, color, s_Data.WhiteTexture, s_Data.TextureCoords);
+		DrawQuadImpl(position, size, 0.0f, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, int entityID)
 	{
-		DrawQuadImpl(position, size, rotation, color, s_Data.WhiteTexture, s_Data.TextureCoords);
+		DrawQuadImpl(position, size, rotation, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID)
 	{
-		DrawQuadImpl(transform, color, s_Data.WhiteTexture, s_Data.TextureCoords);
+		DrawQuadImpl(transform, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
 
 
 
 	// draw sub textured quad ---------------------------------
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(position, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuadImpl(position, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(position, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuadImpl(position, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& texture)
+	/*void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(transform, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes());
-	}
+		DrawQuadImpl(transform, { 1.0f, 1.0f, 1.0f, 1.0f }, texture->GetTexture(), texture->GetTextCordes(), entityID);
+	}*/
 
 
 
 	// draw sub texture tinted quad ----------------------------
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl({position.x, position.y, 0.0f}, size, 0.0f, color, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(position, size, 0.0f, color, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuadImpl(position, size, 0.0f, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(position, size, rotation, color, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuadImpl(position, size, rotation, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(transform, color, texture->GetTexture(), texture->GetTextCordes());
+		DrawQuadImpl(transform, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
 
 
 	// draw textured quad --------------------------------------
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords);
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords);
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(position, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords);
+		DrawQuadImpl(position, size, 0.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(position, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords);
+		DrawQuadImpl(position, size, rotation, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords, entityID);
 	}
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(transform, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords);
+		DrawQuadImpl(transform, { 1.0f, 1.0f, 1.0f, 1.0f }, texture, s_Data.TextureCoords, entityID);
 	}
 
 
 
 	// draw textured tinted quad
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, color, texture, s_Data.TextureCoords);
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, color, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, texture, s_Data.TextureCoords);
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(position, size, 0.0f, color, texture, s_Data.TextureCoords);
+		DrawQuadImpl(position, size, 0.0f, color, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(position, size, rotation, color, texture, s_Data.TextureCoords);
+		DrawQuadImpl(position, size, rotation, color, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
 	{
-		DrawQuadImpl(transform, color, texture, s_Data.TextureCoords);
+		DrawQuadImpl(transform, color, texture, s_Data.TextureCoords, entityID);
 	}
 
 
