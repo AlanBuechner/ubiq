@@ -15,6 +15,7 @@ namespace Engine
 		Ref<Texture2D> GetFileIcon(std::filesystem::directory_entry file);
 
 		std::string CreateNewFile(const std::string& name, const std::string& ext);
+		std::string ChangeFileLocation(const std::filesystem::path& src, const std::filesystem::path& dest);
 
 	private:
 		std::filesystem::path m_CurrentDirectory;
