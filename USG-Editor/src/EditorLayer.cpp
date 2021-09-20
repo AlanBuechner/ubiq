@@ -369,10 +369,10 @@ namespace Engine
 
 		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar);
 
-		float size = ImGui::GetWindowHeight() - 4.0f;
-		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x*0.5)-(size*0.5f));
+		float Size = ImGui::GetWindowHeight() - 4.0f;
+		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x*0.5)-(Size*0.5f));
 		Ref<Texture2D> button = (m_SceneState == SceneState::Edit ? m_PlayButton : m_StopButton);
-		if (ImGui::ImageButton((ImTextureID)button->GetRendererID(), { size, size }, { 0,0 }, {1,1}, 0))
+		if (ImGui::ImageButton((ImTextureID)button->GetRendererID(), { Size, Size }, { 0,0 }, {1,1}, 0))
 		{
 			if (m_SceneState == SceneState::Edit)
 				OnScenePlay();
@@ -455,10 +455,12 @@ namespace Engine
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
+		m_ActiveScene->OnRuntimeStart();
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
+		m_ActiveScene->OnRuntimeStop();
 		m_SceneState = SceneState::Edit;
 	}
 

@@ -21,11 +21,13 @@ IncludeDir["stb_image"] = "GameEngine/vendor/stb_image"
 IncludeDir["entt"] = "GameEngine/vendor/entt/include"
 IncludeDir["yaml"] = "GameEngine/vendor/yaml-cpp/include"
 IncludeDir["ImGuizmo"] = "GameEngine/vendor/ImGuizmo"
+IncludeDir["Box2D"] = "GameEngine/vendor/Box2D"
 
 include "GameEngine/vendor/GLFW"
 include "GameEngine/vendor/Glad"
 include "GameEngine/vendor/imgui"
 include "GameEngine/vendor/yaml-cpp"
+include "GameEngine/vendor/Box2D"
 
 project "GameEngine"
 	location "GameEngine"
@@ -68,7 +70,8 @@ project "GameEngine"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.Box2D}/Include",
 	}
 
 	links 
@@ -77,6 +80,7 @@ project "GameEngine"
 		"Glad",
 		"ImGui",
 		"Yaml",
+		"Box2D",
 		"opengl32.lib"
 	}
 
@@ -137,6 +141,7 @@ project "Sandbox"
 		"GameEngine",
 		"GLAD",
 		"GLFW",
+		"Box2D",
 		"ImGui"
 	}
 

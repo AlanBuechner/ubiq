@@ -61,16 +61,40 @@ namespace Engine
 			if (ImGui::BeginPopup("AddComponent"))
 			{
 
-				if (ImGui::MenuItem("Camera"))
+				if (!m_Selected.HasComponent<CameraComponent>())
 				{
-					m_Selected.AddComponent<CameraComponent>();
-					ImGui::CloseCurrentPopup();
+					if (ImGui::MenuItem("Camera"))
+					{
+						m_Selected.AddComponent<CameraComponent>();
+						ImGui::CloseCurrentPopup();
+					}
 				}
 
-				if (ImGui::MenuItem("Sprite Renderer"))
+				if (!m_Selected.HasComponent<SpriteRendererComponent>())
 				{
-					m_Selected.AddComponent<SpriteRendererComponent>();
-					ImGui::CloseCurrentPopup();
+					if (ImGui::MenuItem("Sprite Renderer"))
+					{
+						m_Selected.AddComponent<SpriteRendererComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				if (!m_Selected.HasComponent<Rigidbody2DComponent>())
+				{
+					if (ImGui::MenuItem("Rigidbody 2D"))
+					{
+						m_Selected.AddComponent<Rigidbody2DComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				if (!m_Selected.HasComponent<BoxCollider2DComponent>())
+				{
+					if (ImGui::MenuItem("Box Collider 2D"))
+					{
+						m_Selected.AddComponent<BoxCollider2DComponent>();
+						ImGui::CloseCurrentPopup();
+					}
 				}
 
 				ImGui::EndPopup();
@@ -165,6 +189,50 @@ namespace Engine
 		}
 	}
 
+	static void DrawVec2Control(const std::string label, glm::vec2& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+	{
+		ImGui::PushID(label.c_str());
+		ImGui::Columns(2);
+
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		if (ImGui::Button("X", buttonSize))
+			values.x = resetValue;
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
+		if (ImGui::Button("Y", buttonSize))
+			values.y = resetValue;
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		ImGui::PopStyleVar();
+		ImGui::Columns(1);
+		ImGui::PopID();
+	}
+
 	static void DrawVec3Control(const std::string label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
 		ImGui::PushID(label.c_str());
@@ -255,7 +323,6 @@ namespace Engine
 			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
 			if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
 			{
-
 				for (int i = 0; i < 2; i++)
 				{
 					bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
@@ -290,9 +357,9 @@ namespace Engine
 
 			if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
 			{
-				float size = camera.GetOrthographicSize();
-				if (ImGui::DragFloat("Size", &size, 0.1f))
-					camera.SetOrthographicSize(size);
+				float Size = camera.GetOrthographicSize();
+				if (ImGui::DragFloat("Size", &Size, 0.1f))
+					camera.SetOrthographicSize(Size);
 
 				float nearClip = camera.GetOrthographicNearClip();
 				if (ImGui::DragFloat("Near Clip", &nearClip, 0.1f))
@@ -319,6 +386,44 @@ namespace Engine
 				}
 				ImGui::EndDragDropTarget();
 			}
+		});
+
+		DrawComponent<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&]() {
+			auto& component = entity.GetComponent<Rigidbody2DComponent>();
+
+			const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+			const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
+			if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+			{
+				for (uint32_t i = 0; i < 3; i++)
+				{
+					bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+					if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
+					{
+						currentBodyTypeString = bodyTypeStrings[i];
+						component.Type = (Rigidbody2DComponent::BodyType)i;
+					}
+
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+			ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+		});
+
+		DrawComponent<BoxCollider2DComponent>(entity, "Box Collider 2D", [&]() {
+			auto& component = entity.GetComponent<BoxCollider2DComponent>();
+
+			DrawVec2Control("Offset", component.Offset, 0.0f);
+			DrawVec2Control("SIze", component.Size, 0.0f);
+
+			ImGui::DragFloat("Density", &component.Density, 0.1f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.1f);
+			ImGui::DragFloat("Restitution", &component.Restitution, 0.1f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.1f);
+
 		});
 	}
 

@@ -1,1 +1,6 @@
-
+[submodule "GameEngine/vendor/imgui"]
+	path = GameEngine/vendor/imgui
+	url = https://github.com/AlanBuechner/imgui.git
+[submodule "GameEngine/vendor/yaml-cpp"]
+	path = GameEngine/vendor/yaml-cpp
+	url = https://github.com/AlanBuechner/yaml-cpp.git

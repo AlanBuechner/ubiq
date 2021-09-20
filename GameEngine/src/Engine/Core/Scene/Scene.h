@@ -4,6 +4,8 @@
 
 #include "Engine/Renderer/Texture.h"
 
+class b2World;
+
 namespace Engine
 {
 	class Entity;
@@ -17,6 +19,9 @@ namespace Engine
 	public:
 		Scene();
 		~Scene();
+
+		void OnRuntimeStart();
+		void OnRuntimeStop();
 
 		void OnUpdateEditor(const EditorCamera& camera);
 		void OnUpdateRuntime();
@@ -36,6 +41,8 @@ namespace Engine
 		uint32_t m_ViewportHeight = 0;
 
 		entt::registry m_Registry;
+
+		b2World* m_World = nullptr;
 
 		Ref<Texture2D> m_CameraIcon;
 

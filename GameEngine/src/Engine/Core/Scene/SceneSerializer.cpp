@@ -7,6 +7,30 @@
 
 namespace YAML 
 {
+
+	template<>
+	struct convert<glm::vec2>
+	{
+		static Node encode(const glm::vec2& rhs)
+		{
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec2& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 2)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			return true;
+		}
+	};
+
 	template<>
 	struct convert<glm::vec3>
 	{
@@ -64,6 +88,13 @@ namespace YAML
 
 namespace Engine
 {
+
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+		return out;
+	}
 
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
 	{
@@ -150,6 +181,40 @@ namespace Engine
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<Rigidbody2DComponent>())
+		{
+			out << YAML::Key << "Rigidbody2DComponent";
+			out << YAML::BeginMap;
+
+			auto& component = entity.GetComponent<Rigidbody2DComponent>();
+			out << YAML::Key << "Type";
+			switch (component.Type)
+			{
+			case Engine::Rigidbody2DComponent::BodyType::Static:	out << YAML::Value << "Static"; break;
+			case Engine::Rigidbody2DComponent::BodyType::Dynamic:	out << YAML::Value << "Dynamic"; break;
+			case Engine::Rigidbody2DComponent::BodyType::Kinematic:	out << YAML::Value << "Kinematic"; break;
+			}
+			out << YAML::Key << "FixedRotation" << YAML::Value << component.FixedRotation;
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<BoxCollider2DComponent>())
+		{
+			out << YAML::Key << "BoxCollider2DComponent";
+			out << YAML::BeginMap;
+
+			auto& component = entity.GetComponent<BoxCollider2DComponent>();
+			out << YAML::Key << "Offset" << YAML::Value << component.Offset;
+			out << YAML::Key << "Size" << YAML::Value << component.Size;
+			out << YAML::Key << "Density" << YAML::Value << component.Density;
+			out << YAML::Key << "Friction" << YAML::Value << component.Friction;
+			out << YAML::Key << "Restitution" << YAML::Value << component.Restitution;
+			out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.RestitutionThreshold;
+
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 	}
 
@@ -226,7 +291,6 @@ namespace Engine
 				{
 					auto& cc = deserializedEntity.AddComponent<CameraComponent>();
 
-
 					auto camera = cameraComponent["Camera"];
 					cc.Camera.SetProjectionType((SceneCamera::ProjectionType)camera["ProjectionType"].as<int>());
 					cc.Camera.SetPerspectiveVerticalFOV(camera["PerspectiveFOV"].as<float>());
@@ -246,6 +310,31 @@ namespace Engine
 				{
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+				}
+
+				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];
+				if (rigidbody2DComponent)
+				{
+					auto& rbc = deserializedEntity.AddComponent<Rigidbody2DComponent>();
+
+					std::string type = rigidbody2DComponent["Type"].as<std::string>();
+					if (type == "Static") rbc.Type = Rigidbody2DComponent::BodyType::Static;
+					else if (type == "Dynamic") rbc.Type = Rigidbody2DComponent::BodyType::Dynamic;
+					else if (type == "Kinematic") rbc.Type = Rigidbody2DComponent::BodyType::Kinematic;
+
+					rbc.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
+				}
+
+				auto boxCollider2DComponent = entity["BoxCollider2DComponent"];
+				if (boxCollider2DComponent)
+				{
+					auto& bcc = deserializedEntity.AddComponent<BoxCollider2DComponent>();
+					bcc.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
+					bcc.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
+					bcc.Density = boxCollider2DComponent["Density"].as<float>();
+					bcc.Friction = boxCollider2DComponent["Friction"].as<float>();
+					bcc.Restitution = boxCollider2DComponent["Restitution"].as<float>();
+					bcc.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
 				}
 			}
 		}
