@@ -3,3 +3,6 @@
 bin/
 bin-int/
 Sandbox/*.json
+
+*.sln
+*.vsxproj*
