@@ -310,6 +310,40 @@ namespace Engine
 
 	void EditorLayer::DrawCustomGizmo()
 	{
+
+		// draw grid lines
+		{
+			glm::vec3 camPos = m_EditorCamera.GetPosition();
+
+			LineMesh mesh;
+			const glm::vec4 color = { 0.5f,0.5f,0.5f,1 };
+			const float extent = 20.0f;
+			const int lines = 40;
+			const float dist = extent*2 / lines;
+			for (uint32_t i = 0; i <= lines; i++)
+			{
+				float posz = (dist * i) - extent;
+				mesh.m_Vertices.push_back({ { -extent	,0 , posz }, { color.x, color.y, color.z, 0.0f } });
+				mesh.m_Vertices.push_back({ { 0			,0 , posz }, { color.x, color.y, color.z, color.w - (color.w * (abs(posz) / extent)) } });
+				mesh.m_Vertices.push_back({ { extent	,0 , posz }, { color.x, color.y, color.z, 0.0f } });
+
+				mesh.m_Indices.push_back((i*3)+0);
+				mesh.m_Indices.push_back((i*3)+1);
+				mesh.m_Indices.push_back((i*3)+1);
+				mesh.m_Indices.push_back((i*3)+2);
+			}
+			
+
+			glm::mat4 matz =	glm::translate(glm::mat4(1.0f), { camPos.x, 0, camPos.z - fmod(camPos.z, dist) });
+			glm::mat4 matx =	glm::translate(glm::mat4(1.0f), { camPos.x - fmod(camPos.x, dist), 0, camPos.z })
+								* glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), { 0,1,0 });
+
+			LineRenderer::BeginScene(m_EditorCamera);
+			LineRenderer::DrawLineMesh(mesh, matz);
+			LineRenderer::DrawLineMesh(mesh, matx);
+			LineRenderer::EndScene();
+		}
+
 		// draw camera frustom
 		Entity selected = m_HierarchyPanel.GetSelectedEntity();
 		if (selected && selected.HasComponent<CameraComponent>())
