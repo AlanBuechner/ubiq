@@ -27,7 +27,7 @@ namespace Engine {
 		s_Instance = this;
 
 		timer.Start("Create Window");
-		m_Window = std::unique_ptr<Window>(Window::Create(name)); // create a window
+		m_Window = std::unique_ptr<Window>(Window::Create({ name, 1280, 720, true })); // create a window
 		timer.End();
 		timer.Start("set event callback");
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back

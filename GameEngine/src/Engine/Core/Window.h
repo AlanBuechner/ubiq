@@ -10,11 +10,10 @@ namespace Engine {
 		std::string Title;
 		uint32_t Width;
 		uint32_t Height;
+		bool FullScreen;
 
-		WindowProps(const std::string& title = "Game Engine",
-			uint32_t width = 1280,
-			uint32_t height = 720)
-			: Title(title), Width(width), Height(height)
+		WindowProps(const std::string& title = "Game Engine", uint32_t width = 1280, uint32_t height = 720, bool fullscreen = false)
+			: Title(title), Width(width), Height(height), FullScreen(fullscreen)
 		{
 		}
 	};

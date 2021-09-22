@@ -180,7 +180,7 @@ namespace Engine
 			{
 				auto [transform, mesh] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
-				Renderer2D::DrawQuad(transform.GetTransform(), mesh.Color);
+				Renderer2D::DrawSprite(transform.GetTransform(), mesh, -1);
 			}
 
 			Renderer2D::EndScene();

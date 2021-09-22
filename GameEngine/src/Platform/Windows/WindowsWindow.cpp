@@ -41,8 +41,9 @@ namespace Engine
 		m_Data.Title = props.Title; // sets the window title
 		m_Data.Width = props.Width; // sets the width of the window
 		m_Data.Height = props.Height; // sets the hight of the window
+		m_Data.FullScreen = props.FullScreen;
 
-		CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		CORE_INFO("Creating window {0} ({1}, {2}), {3}", props.Title, props.Width, props.Height, props.FullScreen);
 
 		// handels if the window hasent be initalized
 		if (!s_GLFWInitialized)
@@ -54,6 +55,7 @@ namespace Engine
 			s_GLFWInitialized = true;
 		}
 
+		glfwWindowHint(GLFW_MAXIMIZED, props.FullScreen ? GLFW_TRUE : GLFW_FALSE);
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr); // creates the window
 
 		m_Context = new OpenGLContext(m_Window);

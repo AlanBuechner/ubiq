@@ -40,6 +40,7 @@ namespace Engine
 		{
 			std::string Title; // window title
 			unsigned int Width, Height; // windows width and hight
+			bool FullScreen;
 			bool VSync; // v-sync
 
 			EventCallbackFn EventCallback;
