@@ -1,5 +1,5 @@
 #shader vertex
-#version 330 core
+#version 450 core
 
 uniform mat4 u_ViewProjection;
 
@@ -23,7 +23,8 @@ void main() {
 
 
 #shader fragment
-#version 330 core
+#version 450 core
+
 layout(location = 0) out vec4 color;
 
 in vec4 v_Color;

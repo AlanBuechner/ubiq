@@ -320,6 +320,8 @@ namespace Engine
 			const float extent = 20.0f;
 			const int lines = 40;
 			const float dist = extent*2 / lines;
+			mesh.m_Vertices.reserve((lines+1)*3);
+			mesh.m_Indices.reserve((lines+1)*4);
 			for (uint32_t i = 0; i <= lines; i++)
 			{
 				float posz = (dist * i) - extent;
