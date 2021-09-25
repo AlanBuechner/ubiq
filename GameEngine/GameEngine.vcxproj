@@ -161,6 +161,7 @@
     <ClInclude Include="src\Engine\Core\Scene\SceneSerializer.h" />
     <ClInclude Include="src\Engine\Core\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Engine\Core\Time.h" />
+    <ClInclude Include="src\Engine\Core\UUID.h" />
     <ClInclude Include="src\Engine\Core\Window.h" />
     <ClInclude Include="src\Engine\Core\core.h" />
     <ClInclude Include="src\Engine\Events\ApplicationEvent.h" />
@@ -580,6 +581,7 @@
     <ClCompile Include="src\Engine\Core\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Engine\Core\Scene\SceneSerializer.cpp" />
     <ClCompile Include="src\Engine\Core\Time.cpp" />
+    <ClCompile Include="src\Engine\Core\UUID.cpp" />
     <ClCompile Include="src\Engine\Math\Math.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Engine\Renderer\EditorCamera.cpp" />

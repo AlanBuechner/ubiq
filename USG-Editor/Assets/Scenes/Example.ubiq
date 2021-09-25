@@ -1,6 +1,15 @@
 Scene: Name
 Entities:
-  - Entity: 1
+  - Entity: 6913065709047291394
+    TagComponent:
+      Tag: Entity
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 1, 0, 1]
+  - Entity: 4396416136430387384
     TagComponent:
       Tag: Camera
     TransformComponent:
@@ -18,12 +27,3 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
-  - Entity: 0
-    TagComponent:
-      Tag: Entity
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0, 1, 0, 1]

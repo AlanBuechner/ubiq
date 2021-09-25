@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SceneSerializer.h"
 #include "Components.h"
+#include "Entity.h"
 
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -118,8 +119,7 @@ namespace Engine
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
 		out << YAML::BeginMap;
-		out << YAML::Key << "Entity";
-		out << YAML::Value << (uint32_t)entity;
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
 
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -275,7 +275,7 @@ namespace Engine
 					name = tag.as<std::string>();
 				}
 
-				Entity deserializedEntity = m_Scene->CreateEntity(name);
+				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)

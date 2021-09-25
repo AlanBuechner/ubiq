@@ -1,15 +1,15 @@
 Scene: Name
 Entities:
-  - Entity: 2
+  - Entity: 1458793893167851688
     TagComponent:
-      Tag: Empty Entity
+      Tag: Entity
     TransformComponent:
-      Position: [-2.24890709, 0.539850473, -1.68532109]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [1, 0, 0, 1]
-  - Entity: 1
+      Color: [0, 1, 0, 1]
+  - Entity: 11693751238415598823
     TagComponent:
       Tag: Camera
     TransformComponent:
@@ -27,12 +27,12 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
-  - Entity: 0
+  - Entity: 10084387321895164666
     TagComponent:
-      Tag: Entity
+      Tag: Empty Entity
     TransformComponent:
-      Position: [0, 0, 0]
+      Position: [-2.24890709, 0.539850473, -1.68532109]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [0, 1, 0, 1]
+      Color: [1, 0, 0, 1]

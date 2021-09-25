@@ -1,7 +1,10 @@
 #pragma once
 #include "Scene.h"
-
 #include "entt.hpp"
+#include "Components.h"
+
+#include "Engine/Core/UUID.h"
+
 
 namespace Engine
 {
@@ -44,6 +47,8 @@ namespace Engine
 		operator bool() const { return m_EntityID != entt::null && m_Scene != nullptr; }
 		operator entt::entity() const { return m_EntityID; }
 		operator uint32_t() const { return (uint32_t)m_EntityID; }
+
+		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
 
 		bool operator == (const Entity& other) const { return m_EntityID == other.m_EntityID && m_Scene == other.m_Scene; }
 		bool operator != (const Entity& other) const { return !(*this == other); }

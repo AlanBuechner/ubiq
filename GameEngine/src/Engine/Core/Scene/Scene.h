@@ -3,6 +3,7 @@
 #include "Engine/Core/Time.h"
 
 #include "Engine/Renderer/Texture.h"
+#include "Engine/Core/UUID.h"
 
 class b2World;
 
@@ -28,6 +29,7 @@ namespace Engine
 		void OnViewportResize(uint32_t width, uint32_t height);
 
 		Entity CreateEntity(const std::string& name = "");
+		Entity CreateEntityWithUUID(const UUID uuid, const std::string& name = "");
 		void DestroyEntity(Entity entity);
 
 		Entity GetPrimaryCameraEntity();

@@ -2,7 +2,9 @@
 #include "Scene.h"
 
 #include "Components.h"
+#include "ScriptableEntity.h" 
 #include "Entity.h"
+#include "Engine/Core/UUID.h"
 
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/LineRenderer.h"
@@ -41,6 +43,7 @@ namespace Engine
 
 	void Scene::OnRuntimeStart()
 	{
+
 		m_World = new b2World({0.0f, -9.81f});
 
 		auto view = m_Registry.view<Rigidbody2DComponent>();
@@ -205,7 +208,13 @@ namespace Engine
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
+		return CreateEntityWithUUID(UUID(), name);
+	}
+
+	Entity Scene::CreateEntityWithUUID(const UUID uuid, const std::string& name)
+	{
 		Entity entity{ m_Registry.create(), this };
+		entity.AddComponent<IDComponent>(uuid);
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
 		entity.AddComponent<TransformComponent>();
@@ -231,7 +240,13 @@ namespace Engine
 	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
-		static_assert(false);
+		//static_assert(false);
+	}
+
+	template<>
+	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component)
+	{
+
 	}
 
 	template<>

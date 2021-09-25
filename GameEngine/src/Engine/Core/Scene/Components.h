@@ -7,12 +7,27 @@
 
 #include "Engine/Renderer/Camera.h"
 #include "SceneCamera.h"
-#include "ScriptableEntity.h"
 
 #include "Engine/Renderer/Texture.h"
 
+#include "Engine/Core/UUID.h"
+
 namespace Engine
 {
+	class ScriptableEntity;
+}
+
+namespace Engine
+{
+	struct IDComponent
+	{
+		UUID ID;
+
+		IDComponent() = default;
+		IDComponent(const IDComponent&) = default;
+	};
+
+
 	struct TagComponent
 	{
 		std::string Tag;
