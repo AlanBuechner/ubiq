@@ -6,6 +6,8 @@
 #include "Entity.h"
 #include "Engine/Core/UUID.h"
 
+#include "Engine/Physics/Physics2D.h"
+
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/LineRenderer.h"
 #include "Engine/Renderer/EditorCamera.h"
@@ -16,19 +18,6 @@
 #include "box2d/b2_body.h"
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
-
-b2BodyType GetB2BodyType(Engine::Rigidbody2DComponent::BodyType type)
-{
-	switch (type)
-	{
-	case Engine::Rigidbody2DComponent::BodyType::Static:	return b2BodyType::b2_staticBody;
-	case Engine::Rigidbody2DComponent::BodyType::Dynamic:	return b2BodyType::b2_dynamicBody;
-	case Engine::Rigidbody2DComponent::BodyType::Kinematic:	return b2BodyType::b2_kinematicBody;
-	}
-
-	CORE_ASSERT(false, "Unknown body type");
-	return b2_staticBody;
-}
 
 namespace Engine
 {
@@ -43,47 +32,12 @@ namespace Engine
 
 	void Scene::OnRuntimeStart()
 	{
-
-		m_World = new b2World({0.0f, -9.81f});
-
-		auto view = m_Registry.view<Rigidbody2DComponent>();
-		for (auto e : view)
-		{
-			Entity entity = { e, this };
-			auto& transform = entity.GetComponent<TransformComponent>();
-			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-
-			b2BodyDef bodyDef;
-			bodyDef.type = GetB2BodyType(rb2d.Type);
-			bodyDef.position.Set(transform.Position.x, transform.Position.y);
-			bodyDef.angle = transform.Rotation.z;
-
-			b2Body* body = m_World->CreateBody(&bodyDef);
-			body->SetFixedRotation(rb2d.FixedRotation);
-			rb2d.RuntimeBody = body;
-
-			if (entity.HasComponent<BoxCollider2DComponent>())
-			{
-				auto& bc2d = entity.GetComponent<BoxCollider2DComponent>();
-				b2PolygonShape shape;
-				shape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
-
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &shape;
-				fixtureDef.density = bc2d.Density;
-				fixtureDef.friction = bc2d.Friction;
-				fixtureDef.restitution = bc2d.Restitution;
-				fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
-
-				bc2d.RuntimeFixture = body->CreateFixture(&fixtureDef);
-			}
-		}
+		Physics2D::OnPhysicsStart(this);
 	}
 
 	void Scene::OnRuntimeStop()
 	{
-		delete m_World;
-		m_World = nullptr;
+		Physics2D::OnPhysicsStop();
 	}
 
 	void Scene::OnUpdateEditor(const EditorCamera& camera)
@@ -133,26 +87,7 @@ namespace Engine
 		});
 
 		// Physics
-		{
-			const int32_t velocityIterations = 6;
-			const int32_t positionIterations = 2;
-			m_World->Step(Time::GetDeltaTime(), velocityIterations, positionIterations);
-
-			auto view = m_Registry.view<Rigidbody2DComponent>();
-			for (auto e : view)
-			{
-				Entity entity = { e, this };
-
-				auto& transform = entity.GetComponent<TransformComponent>();
-				auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-
-				b2Body* body = (b2Body*)rb2d.RuntimeBody;
-				const auto& position = body->GetPosition();
-				transform.Position.x = position.x;
-				transform.Position.y = position.y;
-				transform.Rotation.z = body->GetAngle();
-			}
-		}
+		Physics2D::OnPysicsUpdate();
 
 		// get main camera
 		Camera* mainCamera = nullptr;

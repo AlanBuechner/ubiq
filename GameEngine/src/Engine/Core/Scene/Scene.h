@@ -5,8 +5,6 @@
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Core/UUID.h"
 
-class b2World;
-
 namespace Engine
 {
 	class Entity;
@@ -44,12 +42,11 @@ namespace Engine
 
 		entt::registry m_Registry;
 
-		b2World* m_World = nullptr;
-
 		Ref<Texture2D> m_CameraIcon;
 
 		friend class Entity;
 		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
+		friend class Physics2D;
 	};
 }

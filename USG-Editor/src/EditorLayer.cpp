@@ -23,6 +23,22 @@ namespace Engine
 	{
 		if (s_Instance == nullptr)
 			s_Instance = this;
+
+		m_GridMesh.m_Vertices.reserve((m_GridLines + 1) * 3);
+		m_GridMesh.m_Indices.reserve((m_GridLines + 1) * 4);
+		for (uint32_t i = 0; i <= m_GridLines; i++)
+		{
+			float posz = (m_GridLineOffset * i) - m_GridExtent;
+			m_GridMesh.m_Vertices.push_back({ { -m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
+			m_GridMesh.m_Vertices.push_back({ { 0			,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, m_GridColor.w - (m_GridColor.w * (abs(posz) / m_GridExtent)) } });
+			m_GridMesh.m_Vertices.push_back({ { m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
+
+			m_GridMesh.m_Indices.push_back((i * 3) + 0);
+			m_GridMesh.m_Indices.push_back((i * 3) + 1);
+			m_GridMesh.m_Indices.push_back((i * 3) + 1);
+			m_GridMesh.m_Indices.push_back((i * 3) + 2);
+		}
+
 	}
 
 	void EditorLayer::OnAttach()
@@ -315,34 +331,13 @@ namespace Engine
 		{
 			glm::vec3 camPos = m_EditorCamera.GetPosition();
 
-			LineMesh mesh;
-			const glm::vec4 color = { 0.5f,0.5f,0.5f,1 };
-			const float extent = 20.0f;
-			const int lines = 40;
-			const float dist = extent*2 / lines;
-			mesh.m_Vertices.reserve((lines+1)*3);
-			mesh.m_Indices.reserve((lines+1)*4);
-			for (uint32_t i = 0; i <= lines; i++)
-			{
-				float posz = (dist * i) - extent;
-				mesh.m_Vertices.push_back({ { -extent	,0 , posz }, { color.x, color.y, color.z, 0.0f } });
-				mesh.m_Vertices.push_back({ { 0			,0 , posz }, { color.x, color.y, color.z, color.w - (color.w * (abs(posz) / extent)) } });
-				mesh.m_Vertices.push_back({ { extent	,0 , posz }, { color.x, color.y, color.z, 0.0f } });
-
-				mesh.m_Indices.push_back((i*3)+0);
-				mesh.m_Indices.push_back((i*3)+1);
-				mesh.m_Indices.push_back((i*3)+1);
-				mesh.m_Indices.push_back((i*3)+2);
-			}
-			
-
-			glm::mat4 matz =	glm::translate(glm::mat4(1.0f), { camPos.x, 0, camPos.z - fmod(camPos.z, dist) });
-			glm::mat4 matx =	glm::translate(glm::mat4(1.0f), { camPos.x - fmod(camPos.x, dist), 0, camPos.z })
+			glm::mat4 matz =	glm::translate(glm::mat4(1.0f), { camPos.x, 0, camPos.z - fmod(camPos.z, m_GridLineOffset) });
+			glm::mat4 matx =	glm::translate(glm::mat4(1.0f), { camPos.x - fmod(camPos.x, m_GridLineOffset), 0, camPos.z })
 								* glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), { 0,1,0 });
 
 			LineRenderer::BeginScene(m_EditorCamera);
-			LineRenderer::DrawLineMesh(mesh, matz);
-			LineRenderer::DrawLineMesh(mesh, matx);
+			LineRenderer::DrawLineMesh(m_GridMesh, matz);
+			LineRenderer::DrawLineMesh(m_GridMesh, matx);
 			LineRenderer::EndScene();
 		}
 
