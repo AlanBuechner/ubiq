@@ -170,6 +170,7 @@
     <ClInclude Include="src\Engine\Events\MouseEvent.h" />
     <ClInclude Include="src\Engine\Math\Math.h" />
     <ClInclude Include="src\Engine\Physics\Physics2D.h" />
+    <ClInclude Include="src\Engine\Physics\PhysicsComponent.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
     <ClInclude Include="src\Engine\Renderer\Camera.h" />
     <ClInclude Include="src\Engine\Renderer\EditorCamera.h" />

@@ -7,6 +7,7 @@
 #include "Engine/Core/UUID.h"
 
 #include "Engine/Physics/Physics2D.h"
+#include "Engine/Physics/PhysicsComponent.h"
 
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/LineRenderer.h"

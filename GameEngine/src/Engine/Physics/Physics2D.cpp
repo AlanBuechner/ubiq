@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Physics2D.h"
+#include "PhysicsComponent.h"
 
 #include "Engine/Core/Scene/Entity.h"
 #include "Engine/Core/Scene/Scene.h"
@@ -126,6 +127,11 @@ namespace Engine
 	void Physics2D::SetGravity(glm::vec2 g)
 	{
 		s_World->SetGravity({ g.x, g.y });
+	}
+
+	bool Physics2D::RayCast(glm::vec2 point, glm::vec2 dir, float dist, RayCastHit& outHit)
+	{
+		return RayCast(point, point + glm::normalize(dir)*dist, outHit);
 	}
 
 	bool Physics2D::RayCast(glm::vec2 p1, glm::vec2 p2, RayCastHit& outHit)

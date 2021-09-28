@@ -3,6 +3,8 @@
 #include "Components.h"
 #include "Entity.h"
 
+#include "Engine/Physics/PhysicsComponent.h"
+
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 

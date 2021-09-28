@@ -1337,6 +1337,7 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Core\UUID.h" />
     <ClInclude Include="src\Engine\Physics\Physics2D.h" />
+    <ClInclude Include="src\Engine\Physics\PhysicsComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">

@@ -32,6 +32,7 @@ namespace Engine
 		static void SetGravity(float g);
 		static void SetGravity(glm::vec2 g);
 
+		static bool RayCast(glm::vec2 point, glm::vec2 dir, float dist, RayCastHit& outHit);
 		static bool RayCast(glm::vec2 p1, glm::vec2 p2, RayCastHit& outHit);
 
 	private:

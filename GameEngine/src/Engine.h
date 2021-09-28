@@ -37,3 +37,8 @@
 #include "Engine/Core/Scene/Entity.h"
 #include "Engine/Core/Scene/ScriptableEntity.h"
 // ----------------------------------------
+
+// Physics --------------------------------
+#include "Engine/Physics/Physics2D.h"
+#include "Engine/Physics/PhysicsComponent.h"
+// ----------------------------------------
