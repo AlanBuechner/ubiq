@@ -10,6 +10,7 @@
 #include "box2d/b2_body.h"
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_circle_shape.h"
 
 b2World* Engine::Physics2D::s_World = nullptr;
 Engine::Scene* Engine::Physics2D::s_Scene = nullptr;
@@ -68,6 +69,23 @@ namespace Engine
 				fixtureDef.userData.pointer = (uintptr_t)e;
 
 				bc2d.RuntimeFixture = body->CreateFixture(&fixtureDef);
+			}
+
+			if (entity.HasComponent<CircleColliderComponent>())
+			{
+				auto& cc2d = entity.GetComponent<CircleColliderComponent>();
+				b2CircleShape shape;
+				shape.m_radius = cc2d.Size * glm::max(transform.Scale.x, transform.Scale.y);
+
+				b2FixtureDef fixtureDef;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = cc2d.Density;
+				fixtureDef.friction = cc2d.Friction;
+				fixtureDef.restitution = cc2d.Restitution;
+				fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
+				fixtureDef.userData.pointer = (uintptr_t)e;
+
+				cc2d.RuntimeFixture = body->CreateFixture(&fixtureDef);
 			}
 		}
 

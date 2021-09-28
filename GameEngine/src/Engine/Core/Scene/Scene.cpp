@@ -210,6 +210,7 @@ namespace Engine
 		CopyComponent<CameraComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<Rigidbody2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<BoxCollider2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+		CopyComponent<CircleColliderComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 
 		return newScene;
 	}
@@ -264,6 +265,12 @@ namespace Engine
 
 	template<>
 	void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
+	{
+
+	}
+	
+	template<>
+	void Scene::OnComponentAdded<CircleColliderComponent>(Entity entity, CircleColliderComponent& component)
 	{
 
 	}
