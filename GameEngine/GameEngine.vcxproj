@@ -586,6 +586,7 @@
     <ClCompile Include="src\Engine\Core\UUID.cpp" />
     <ClCompile Include="src\Engine\Math\Math.cpp" />
     <ClCompile Include="src\Engine\Physics\Physics2D.cpp" />
+    <ClCompile Include="src\Engine\Physics\PhysicsComponent.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Engine\Renderer\EditorCamera.cpp" />
     <ClCompile Include="src\Engine\Renderer\FrameBuffer.cpp" />

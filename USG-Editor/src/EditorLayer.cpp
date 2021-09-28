@@ -115,7 +115,7 @@ namespace Engine
 			m_ActiveScene->OnUpdateEditor(m_EditorCamera);
 		}
 		else if (m_SceneState == SceneState::Play)
-			m_ActiveScene->OnUpdateRuntime();
+			m_PlayScene->OnUpdateRuntime();
 
 		if (Input::GetMouseButtonPressed(KeyCode::LEFT_MOUSE) && !Input::GetKeyDown(KeyCode::ALT) && !ImGuizmo::IsOver())
 		{
@@ -264,6 +264,9 @@ namespace Engine
 
 	void EditorLayer::LoadScene(const std::string& file)
 	{
+		if (m_SceneState == SceneState::Play)
+			OnSceneStop();
+
 		NewScene();
 		SceneSerializer serializer(m_ActiveScene);
 		serializer.Deserialize(file);
@@ -486,12 +489,15 @@ namespace Engine
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
-		m_ActiveScene->OnRuntimeStart();
+		m_PlayScene = Scene::Copy(m_ActiveScene);
+		m_HierarchyPanel.SetContext(m_PlayScene);
+		m_PlayScene->OnRuntimeStart();
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
-		m_ActiveScene->OnRuntimeStop();
+		m_PlayScene->OnRuntimeStop();
+		m_HierarchyPanel.SetContext(m_ActiveScene);
 		m_SceneState = SceneState::Edit;
 	}
 

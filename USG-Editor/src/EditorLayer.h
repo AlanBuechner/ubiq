@@ -62,6 +62,7 @@ namespace Engine
 		EditorCamera m_EditorCamera;
 
 		Ref<Scene> m_ActiveScene;
+		Ref<Scene> m_PlayScene;
 
 		Entity m_CameraEntity;
 

@@ -32,6 +32,8 @@ namespace Engine
 
 		Entity GetPrimaryCameraEntity();
 
+		static Ref<Scene> Copy(Ref<Scene> scene);
+
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);

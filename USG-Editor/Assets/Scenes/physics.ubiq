@@ -1,16 +1,16 @@
 Scene: Name
 Entities:
-  - Entity: 6424714203630301456
+  - Entity: 10182382264921500222
     TagComponent:
-      Tag: Entity
+      Tag: Empty Entity
     TransformComponent:
-      Position: [0, 0, 0]
+      Position: [0, -1.13443851, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [14.8000002, 0.600000024, 1]
     SpriteRendererComponent:
-      Color: [0, 1, 0, 1]
+      Color: [1, 0, 0, 1]
     Rigidbody2DComponent:
-      Type: Dynamic
+      Type: Static
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]
@@ -37,3 +37,22 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
+  - Entity: 6424714203630301456
+    TagComponent:
+      Tag: Entity
+    TransformComponent:
+      Position: [0, 2.20652819, 0]
+      Rotation: [0, -2.66311474e-07, 0.918350756]
+      Scale: [1, 0.999999821, 1]
+    SpriteRendererComponent:
+      Color: [0, 1, 0, 1]
+    Rigidbody2DComponent:
+      Type: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5

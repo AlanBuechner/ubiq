@@ -1480,5 +1480,6 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Core\UUID.cpp" />
     <ClCompile Include="src\Engine\Physics\Physics2D.cpp" />
+    <ClCompile Include="src\Engine\Physics\PhysicsComponent.cpp" />
   </ItemGroup>
 </Project>

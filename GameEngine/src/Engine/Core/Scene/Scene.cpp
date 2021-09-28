@@ -174,6 +174,47 @@ namespace Engine
 	}
 
 	template<typename T>
+	static void CopyComponent(entt::registry& dest, entt::registry& src, const std::unordered_map<UUID, entt::entity>& map)
+	{
+		auto view = src.view<T>();
+		for (auto srcEntity : view)
+		{
+			entt::entity destEntity = map.at(src.get<IDComponent>(srcEntity).ID);
+			auto& srcComponent = src.get<T>(srcEntity);
+			dest.emplace_or_replace<T>(destEntity, srcComponent);
+		}
+	}
+
+	Ref<Scene> Scene::Copy(Ref<Scene> scene)
+	{
+		Ref<Scene> newScene = std::make_shared<Scene>();
+
+		newScene->m_ViewportWidth = scene->m_ViewportWidth;
+		newScene->m_ViewportHeight = scene->m_ViewportHeight;
+
+		std::unordered_map<UUID, entt::entity> enttMap;
+
+		auto& srcSceneRegistry = scene->m_Registry;
+		auto& destSceneRegisry = newScene->m_Registry;
+		auto idView = srcSceneRegistry.view<IDComponent>();
+		for (auto e : idView)
+		{
+			auto uuid = srcSceneRegistry.get<IDComponent>(e).ID;
+			const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
+			Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
+			enttMap[uuid] = newEntity;
+		}
+
+		CopyComponent<TransformComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+		CopyComponent<SpriteRendererComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+		CopyComponent<CameraComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+		CopyComponent<Rigidbody2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+		CopyComponent<BoxCollider2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+
+		return newScene;
+	}
+
+	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
 		//static_assert(false);
