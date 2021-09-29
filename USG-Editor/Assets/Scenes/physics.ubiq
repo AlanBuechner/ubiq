@@ -23,7 +23,7 @@ Entities:
     TagComponent:
       Tag: Entity
     TransformComponent:
-      Position: [0, 2.20652819, 0]
+      Position: [-3.35276127e-07, 2.17316842, 9.53674316e-07]
       Rotation: [0, -2.66311474e-07, 0.918350756]
       Scale: [1, 0.999999821, 1]
     SpriteRendererComponent:

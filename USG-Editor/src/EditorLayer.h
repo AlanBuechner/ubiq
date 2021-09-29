@@ -39,6 +39,7 @@ namespace Engine
 	private:
 		void NewScene();
 		void OpenScene();
+		void SaveScene();
 		void SaveSceneAs();
 
 		bool OnKeyPressed(KeyPressedEvent& e);
@@ -60,6 +61,8 @@ namespace Engine
 		LineMesh m_GridMesh;
 
 		EditorCamera m_EditorCamera;
+
+		std::filesystem::path m_LoadedScene;
 
 		Ref<Scene> m_ActiveScene;
 		Ref<Scene> m_PlayScene;

@@ -267,6 +267,8 @@ namespace Engine
 		if (m_SceneState == SceneState::Play)
 			OnSceneStop();
 
+		m_LoadedScene = file;
+
 		NewScene();
 		SceneSerializer serializer(m_ActiveScene);
 		serializer.Deserialize(file);
@@ -287,6 +289,8 @@ namespace Engine
 			{
 				if (controlPressed && shiftPressed)
 					m_SaveScene = true; // TODO : fix crash and move save scene call back
+				else if (controlPressed)
+					SaveScene();
 				break;
 			}
 			case KeyCode::N:
@@ -516,6 +520,15 @@ namespace Engine
 			NewScene();
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Deserialize(filepath);
+		}
+	}
+
+	void EditorLayer::SaveScene()
+	{
+		if (!m_LoadedScene.empty())
+		{
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(m_LoadedScene.string());
 		}
 	}
 
