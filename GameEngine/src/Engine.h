@@ -42,3 +42,8 @@
 #include "Engine/Physics/Physics2D.h"
 #include "Engine/Physics/PhysicsComponent.h"
 // ----------------------------------------
+
+// Mesh -----------------------------------
+#include "Engine/Core/Mesh.h"
+#include "Engine/Core/MeshLoader.h"
+// ----------------------------------------

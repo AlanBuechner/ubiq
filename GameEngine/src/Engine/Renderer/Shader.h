@@ -10,6 +10,18 @@ namespace Engine
 	class Shader
 	{
 	public:
+		struct Uniform
+		{
+			std::string name;
+			enum Type {
+				Float, Int,
+				Float2, Int2,
+				Float3, Int3,
+				Float4, Int4,
+				Mat2, Mat3, Mat4
+			} type;
+		};
+
 		struct ShaderSorce
 		{
 		public:

@@ -22,6 +22,9 @@
     <Filter Include="src\Engine\Math">
       <UniqueIdentifier>{2B817A79-970C-E83D-A01D-6B320C28443E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Physics">
+      <UniqueIdentifier>{8496B3FD-707A-7453-D9DA-6EA6C5DD5ED5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
     </Filter>
@@ -99,6 +102,12 @@
     <ClInclude Include="src\Engine\Core\Log.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Core\Mesh.h">
+      <Filter>src\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Core\MeshLoader.h">
+      <Filter>src\Engine\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Core\Scene\Components.h">
       <Filter>src\Engine\Core\Scene</Filter>
     </ClInclude>
@@ -118,6 +127,9 @@
       <Filter>src\Engine\Core\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Time.h">
+      <Filter>src\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Core\UUID.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Window.h">
@@ -140,6 +152,12 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Math\Math.h">
       <Filter>src\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Physics\Physics2D.h">
+      <Filter>src\Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Physics\PhysicsComponent.h">
+      <Filter>src\Engine\Physics</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
@@ -1335,9 +1353,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Core\UUID.h" />
-    <ClInclude Include="src\Engine\Physics\Physics2D.h" />
-    <ClInclude Include="src\Engine\Physics\PhysicsComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1361,6 +1376,9 @@
     <ClCompile Include="src\Engine\Core\Log.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Core\MeshLoader.cpp">
+      <Filter>src\Engine\Core</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Core\Scene\Entity.cpp">
       <Filter>src\Engine\Core\Scene</Filter>
     </ClCompile>
@@ -1376,8 +1394,17 @@
     <ClCompile Include="src\Engine\Core\Time.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Core\UUID.cpp">
+      <Filter>src\Engine\Core</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Math\Math.cpp">
       <Filter>src\Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Physics\Physics2D.cpp">
+      <Filter>src\Engine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Physics\PhysicsComponent.cpp">
+      <Filter>src\Engine\Physics</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp">
       <Filter>src\Engine\Renderer</Filter>
@@ -1478,8 +1505,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Core\UUID.cpp" />
-    <ClCompile Include="src\Engine\Physics\Physics2D.cpp" />
-    <ClCompile Include="src\Engine\Physics\PhysicsComponent.cpp" />
   </ItemGroup>
 </Project>

@@ -30,6 +30,49 @@ namespace Engine
 		return m_Name;
 	}
 
+	std::vector<Shader::Uniform> OpenGLShader::GetUniforms()
+	{
+		const GLsizei bufSize = 16; // maximum name length
+		GLchar name[bufSize]; // variable name in GLSL
+		GLsizei length; // name length
+
+		GLint size; // size of the variable
+		GLenum type; // type of the variable (float, vec3 or mat4, etc)
+
+		int count;
+		glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORMS, &count);
+		std::vector< Shader::Uniform> uniforms(count);
+
+		for (uint32_t i = 0; i < (uint32_t)count; i++)
+		{
+			glGetActiveUniform(m_RendererID, (GLuint)i, bufSize, &length, &size, &type, name);
+
+			Shader::Uniform& uniform = uniforms[i];
+			uniform.name = name;
+			
+			switch (type)
+			{
+			case GL_FLOAT: uniform.type = Shader::Uniform::Float; break;
+			case GL_FLOAT_VEC2: uniform.type = Shader::Uniform::Float2; break;
+			case GL_FLOAT_VEC3: uniform.type = Shader::Uniform::Float3; break;
+			case GL_FLOAT_VEC4: uniform.type = Shader::Uniform::Float4; break;
+
+			case GL_INT: uniform.type = Shader::Uniform::Int; break;
+			case GL_INT_VEC2: uniform.type = Shader::Uniform::Int2; break;
+			case GL_INT_VEC3: uniform.type = Shader::Uniform::Int3; break;
+			case GL_INT_VEC4: uniform.type = Shader::Uniform::Int4; break;
+
+			case GL_FLOAT_MAT2: uniform.type = Shader::Uniform::Mat2; break;
+			case GL_FLOAT_MAT3: uniform.type = Shader::Uniform::Mat3; break;
+			case GL_FLOAT_MAT4: uniform.type = Shader::Uniform::Mat4; break;
+			default:
+				break;
+			}
+		}
+
+		return uniforms;
+	}
+
 	uint32_t OpenGLShader::GetUniformLocation(const std::string & name) const
 	{
 		if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())

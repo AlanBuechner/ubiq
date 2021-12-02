@@ -30,7 +30,7 @@ namespace Engine
 		{
 			float posz = (m_GridLineOffset * i) - m_GridExtent;
 			m_GridMesh.m_Vertices.push_back({ { -m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
-			m_GridMesh.m_Vertices.push_back({ { 0			,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, m_GridColor.w - (m_GridColor.w * (abs(posz) / m_GridExtent)) } });
+			m_GridMesh.m_Vertices.push_back({ { 0				,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, m_GridColor.w - (m_GridColor.w * (abs(posz) / m_GridExtent)) } });
 			m_GridMesh.m_Vertices.push_back({ { m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
 
 			m_GridMesh.m_Indices.push_back((i * 3) + 0);
@@ -60,6 +60,19 @@ namespace Engine
 		m_EditorCamera = EditorCamera();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		Engine::VertexLayout layout = {
+			{Engine::VertexDataType::Position3},
+			{Engine::VertexDataType::UV},
+			{Engine::VertexDataType::Normal},
+		};
+
+		Ref<Mesh> mesh = Engine::MeshLoader::LoadStaticMesh("Assets/Models/ogre.obj", layout);
+
+		auto& meshComp = m_ActiveScene->CreateEntity().AddComponent<MeshRendererComponent>(mesh);
+		meshComp.Texture = Texture2D::Create("Assets/Images/ogre_diffuse.bmp");
+		ShaderLibrary library;
+		meshComp.Shader = library.Load("MeshShader", "Assets/Shaders/MeshShader.glsl");
 
 	}
 

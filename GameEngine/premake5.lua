@@ -40,6 +40,7 @@ project "GameEngine"
 		"%{IncludeDir.yaml}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.Box2D}/Include",
+		"%{IncludeDir.Assimp}/include",
 	}
 
 	links 
@@ -49,6 +50,8 @@ project "GameEngine"
 		"ImGui",
 		"Yaml",
 		"Box2D",
+		"vendor/Assimp/lib/%{cfg.buildcfg}/assimp-vc142-mtd.lib",
+		"vendor/Assimp/lib/%{cfg.buildcfg}/assimp-vc142-mtd.lib",
 		"opengl32.lib"
 	}
 

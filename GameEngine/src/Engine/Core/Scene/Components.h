@@ -9,6 +9,11 @@
 #include "SceneCamera.h"
 
 #include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/Buffer.h"
+#include "Engine/Renderer/VertexArray.h"
+#include "Engine/Renderer/Shader.h"
+
+#include "Engine/Core/Mesh.h"
 
 #include "Engine/Core/UUID.h"
 
@@ -73,6 +78,35 @@ namespace Engine
 		SpriteRendererComponent(const glm::vec4& color) :
 			Color(color)
 		{}
+	};
+
+	struct MeshRendererComponent
+	{
+		Ref<VertexArray> vao;
+		Ref<Texture2D> Texture;
+		Ref<Shader> Shader;
+
+		MeshRendererComponent() = default;
+		MeshRendererComponent(Ref<Mesh> mesh)
+		{
+			vao = Engine::VertexArray::Create();
+
+			Ref<VertexBuffer> vbo = Engine::VertexBuffer::Create((float*)mesh->vertices.data(), mesh->vertices.size() * sizeof(Mesh::Vertex));
+
+			Engine::BufferLayout layout = {
+				{Engine::ShaderDataType::Float3, "a_Position"},
+				{Engine::ShaderDataType::Float2, "a_TexCoord"},
+				{Engine::ShaderDataType::Float3, "a_Normal"}
+			};
+
+			vbo->SetLayout(layout);
+
+			vao->AddVertexBuffer(vbo);
+
+			Ref<IndexBuffer> ibo = Engine::IndexBuffer::Create(mesh->indices.data(), mesh->indices.size());
+
+			vao->SetIndexBuffer(ibo);
+		}
 	};
 
 	struct CameraComponent

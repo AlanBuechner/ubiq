@@ -9,6 +9,7 @@
 #include "Engine/Physics/Physics2D.h"
 #include "Engine/Physics/PhysicsComponent.h"
 
+#include "Engine/Renderer/RenderCommand.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/LineRenderer.h"
 #include "Engine/Renderer/EditorCamera.h"
@@ -44,32 +45,51 @@ namespace Engine
 	void Scene::OnUpdateEditor(const EditorCamera& camera)
 	{
 
-		Renderer2D::BeginScene(camera);
-
-		// render sprites
-		auto sprite = entt::get<SpriteRendererComponent>;
-		auto spriteGroup = m_Registry.group<TransformComponent>(sprite);
-		for (auto entity : spriteGroup)
 		{
-			auto [transform, sprite] = spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
+			Renderer2D::BeginScene(camera);
 
-			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+			// render sprites
+			auto sprite = entt::get<SpriteRendererComponent>;
+			auto spriteGroup = m_Registry.group<TransformComponent>(sprite);
+			for (auto entity : spriteGroup)
+			{
+				auto [transform, sprite] = spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
+
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+			}
+
+			// render icons
+			auto cameraView = m_Registry.view<CameraComponent, TransformComponent>();
+			for (auto entity : cameraView)
+			{
+				auto [cam, transform] = cameraView.get<CameraComponent, TransformComponent>(entity);
+				TransformComponent t = transform;
+				t.Rotation = { -camera.GetPitch(), -camera.GetYaw(), 0 };
+				t.Scale = { 1,1,1 };
+
+				Renderer2D::DrawQuad(t.GetTransform(), m_CameraIcon, (int)entity);
+
+			}
+
+			Renderer2D::EndScene();
 		}
 
-		// render icons
-		auto cameraView = m_Registry.view<CameraComponent, TransformComponent>();
-		for (auto entity : cameraView)
 		{
-			auto [cam, transform] = cameraView.get<CameraComponent, TransformComponent>(entity);
-			TransformComponent t = transform;
-			t.Rotation = { -camera.GetPitch(), -camera.GetYaw(), 0 };
-			t.Scale = { 1,1,1 };
+			auto view = m_Registry.view<MeshRendererComponent, TransformComponent>();
+			for (auto entity : view)
+			{
+				auto [mesh, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
 
-			Renderer2D::DrawQuad(t.GetTransform(), m_CameraIcon, (int)entity);
+				mesh.Shader->Bind();
+				mesh.Shader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjection());
+				mesh.Shader->UploadUniformMat4("u_Transform", transform.GetTransform());
+				mesh.Shader->UploadUniformInt("u_Texture", 1);
 
+				mesh.Texture->Bind(1);
+				mesh.vao->Bind();
+				RenderCommand::DrawIndexed(mesh.vao);
+			}
 		}
-
-		Renderer2D::EndScene();
 	}
 
 	void Scene::OnUpdateRuntime()
@@ -247,6 +267,12 @@ namespace Engine
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent& component)
 	{
 
 	}
