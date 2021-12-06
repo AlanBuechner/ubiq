@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <unordered_map>
+#include "Light.h"
 
 namespace Engine
 {
@@ -67,6 +68,8 @@ namespace Engine
 		virtual void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) = 0;
 		virtual void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) = 0;
 		virtual void UploadUniformMat2(const std::string& name, const glm::mat2& matrix) = 0;
+
+		virtual void UploadPointLight(const std::string& name, uint32_t i, const PointLight& light) = 0;
 
 		static ShaderSorce LoadShader(std::string file);
 		static ShaderSorce LoadShader(std::string file, int type);

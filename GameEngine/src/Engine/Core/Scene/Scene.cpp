@@ -10,6 +10,7 @@
 #include "Engine/Physics/PhysicsComponent.h"
 
 #include "Engine/Renderer/RenderCommand.h"
+#include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/LineRenderer.h"
 #include "Engine/Renderer/EditorCamera.h"
@@ -75,20 +76,18 @@ namespace Engine
 		}
 
 		{
+			Renderer::BeginScene(camera);
+			Renderer::SubmitPointLight({ {1,1,0}, {1,1,1}, 5.0f, 1, 1, 0.5f });
+
 			auto view = m_Registry.view<MeshRendererComponent, TransformComponent>();
 			for (auto entity : view)
 			{
 				auto [mesh, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
 
-				mesh.Shader->Bind();
-				mesh.Shader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjection());
-				mesh.Shader->UploadUniformMat4("u_Transform", transform.GetTransform());
-				mesh.Shader->UploadUniformInt("u_Texture", 1);
-
-				mesh.Texture->Bind(1);
-				mesh.vao->Bind();
-				RenderCommand::DrawIndexed(mesh.vao);
+				Renderer::Submit(mesh.vao, mesh.mat, transform.GetTransform());
 			}
+
+			Renderer::EndScene();
 		}
 	}
 

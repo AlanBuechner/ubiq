@@ -252,4 +252,15 @@ namespace Engine
 		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
+	void OpenGLShader::UploadPointLight(const std::string& name, uint32_t i, const PointLight& light)
+	{
+		std::string l = name + "[" + std::to_string(i) + "].";
+		UploadUniformFloat3(l + "position", light.position);
+		UploadUniformFloat3(l + "color", light.color);
+		UploadUniformFloat(l + "diffuseIntensity", light.diffuseIntensity);
+		UploadUniformFloat(l + "attConst", light.attConst);
+		UploadUniformFloat(l + "attLin", light.attLin);
+		UploadUniformFloat(l + "attQuad", light.attQuad);
+	}
+
 }

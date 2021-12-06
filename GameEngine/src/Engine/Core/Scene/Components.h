@@ -12,6 +12,7 @@
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Material.h"
 
 #include "Engine/Core/Mesh.h"
 
@@ -83,8 +84,7 @@ namespace Engine
 	struct MeshRendererComponent
 	{
 		Ref<VertexArray> vao;
-		Ref<Texture2D> Texture;
-		Ref<Shader> Shader;
+		Ref<Material> mat;
 
 		MeshRendererComponent() = default;
 		MeshRendererComponent(Ref<Mesh> mesh)
@@ -106,6 +106,8 @@ namespace Engine
 			Ref<IndexBuffer> ibo = Engine::IndexBuffer::Create(mesh->indices.data(), mesh->indices.size());
 
 			vao->SetIndexBuffer(ibo);
+
+			mat = std::make_shared<Material>();
 		}
 	};
 

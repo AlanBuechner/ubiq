@@ -70,10 +70,19 @@ namespace Engine
 		Ref<Mesh> mesh = Engine::MeshLoader::LoadStaticMesh("Assets/Models/ogre.obj", layout);
 
 		auto& meshComp = m_ActiveScene->CreateEntity().AddComponent<MeshRendererComponent>(mesh);
-		meshComp.Texture = Texture2D::Create("Assets/Images/ogre_diffuse.bmp");
-		ShaderLibrary library;
-		meshComp.Shader = library.Load("MeshShader", "Assets/Shaders/MeshShader.glsl");
+		meshComp.mat->diffuse = Texture2D::Create("Assets/Images/ogre_diffuse.bmp");
+		uint32_t whiteTexureData = 0xffffffff;
+		meshComp.mat->speculur = Texture2D::Create(1, 1);
+		meshComp.mat->speculur->SetData(&whiteTexureData, sizeof(whiteTexureData));
+		meshComp.mat->shader = ShaderLibrary().Load("MeshShader", "Assets/Shaders/MeshShader.glsl");
 
+		/*for (auto& v : mesh->vertices)
+			std::cout << v.position.x << ", " << (0.5-v.position.y) << ", " << v.position.z << ", " << (1-v.uv.x) * 16 << ", " << (1-v.uv.y) * 16 << "," << std::endl;
+
+		for (auto& i : mesh->indices)
+			std::cout << i << ", ";*/
+		
+		Renderer::SetAmbientLight({ 0.5f, 0.5f, 0.5f });
 	}
 
 	void EditorLayer::OnDetach()

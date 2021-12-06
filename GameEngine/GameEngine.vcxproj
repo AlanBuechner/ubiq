@@ -178,7 +178,9 @@
     <ClInclude Include="src\Engine\Renderer\EditorCamera.h" />
     <ClInclude Include="src\Engine\Renderer\FrameBuffer.h" />
     <ClInclude Include="src\Engine\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\Engine\Renderer\Light.h" />
     <ClInclude Include="src\Engine\Renderer\LineRenderer.h" />
+    <ClInclude Include="src\Engine\Renderer\Material.h" />
     <ClInclude Include="src\Engine\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h" />
     <ClInclude Include="src\Engine\Renderer\RenderCommand.h" />

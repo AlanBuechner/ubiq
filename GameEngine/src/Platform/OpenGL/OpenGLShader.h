@@ -25,6 +25,8 @@ namespace Engine
 		virtual void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) override;
 		virtual void UploadUniformMat2(const std::string& name, const glm::mat2& matrix) override;
 
+		virtual void UploadPointLight(const std::string& name, uint32_t i, const PointLight& light) override;
+
 
 	private:
 		virtual uint32_t GetUniformLocation(const std::string& name) const;
