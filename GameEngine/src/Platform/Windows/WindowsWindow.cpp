@@ -164,7 +164,7 @@ namespace Engine
 			MouseMovedEvent* cursorPositionEvent = new MouseMovedEvent(MOUSE_POSITON, (float)xPos, (float)yPos); // creates new mouse moved event
 			data.EventCallback(*cursorPositionEvent);
 
-			glm::vec2 PrevMousePos = Input::GetPreviousMousePosition();
+			Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
 			MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)xPos - PrevMousePos.x , (float)yPos - PrevMousePos.y); // creates new mouse moved event
 			data.EventCallback(*deltaMousePostionEvent);
 		});

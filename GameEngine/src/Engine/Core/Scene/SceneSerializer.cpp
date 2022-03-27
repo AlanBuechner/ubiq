@@ -12,9 +12,9 @@ namespace YAML
 {
 
 	template<>
-	struct convert<glm::vec2>
+	struct convert<Math::Vector2>
 	{
-		static Node encode(const glm::vec2& rhs)
+		static Node encode(const Math::Vector2& rhs)
 		{
 			Node node;
 			node.push_back(rhs.x);
@@ -23,7 +23,7 @@ namespace YAML
 			return node;
 		}
 
-		static bool decode(const Node& node, glm::vec2& rhs)
+		static bool decode(const Node& node, Math::Vector2& rhs)
 		{
 			if (!node.IsSequence() || node.size() != 2)
 				return false;
@@ -35,9 +35,9 @@ namespace YAML
 	};
 
 	template<>
-	struct convert<glm::vec3>
+	struct convert<Math::Vector3>
 	{
-		static Node encode(const glm::vec3& rhs)
+		static Node encode(const Math::Vector3& rhs)
 		{
 			Node node;
 			node.push_back(rhs.x);
@@ -47,7 +47,7 @@ namespace YAML
 			return node;
 		}
 
-		static bool decode(const Node& node, glm::vec3& rhs)
+		static bool decode(const Node& node, Math::Vector3& rhs)
 		{
 			if (!node.IsSequence() || node.size() != 3)
 				return false;
@@ -92,14 +92,14 @@ namespace YAML
 namespace Engine
 {
 
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)
+	YAML::Emitter& operator<<(YAML::Emitter& out, const Math::Vector2& v)
 	{
 		out << YAML::Flow;
 		out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
 		return out;
 	}
 
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
+	YAML::Emitter& operator<<(YAML::Emitter& out, const Math::Vector3& v)
 	{
 		out << YAML::Flow;
 		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
@@ -299,9 +299,9 @@ namespace Engine
 				if (transformComponent)
 				{
 					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
-					tc.Position = transformComponent["Position"].as<glm::vec3>();
-					tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
-					tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+					tc.Position = transformComponent["Position"].as<Math::Vector3>();
+					tc.Rotation = transformComponent["Rotation"].as<Math::Vector3>();
+					tc.Scale = transformComponent["Scale"].as<Math::Vector3>();
 				}
 
 				auto cameraComponent = entity["CameraComponent"];
@@ -347,8 +347,8 @@ namespace Engine
 				if (boxCollider2DComponent)
 				{
 					auto& bcc = deserializedEntity.AddComponent<BoxCollider2DComponent>();
-					bcc.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
-					bcc.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
+					bcc.Offset = boxCollider2DComponent["Offset"].as<Math::Vector2>();
+					bcc.Size = boxCollider2DComponent["Size"].as<Math::Vector2>();
 					bcc.Density = boxCollider2DComponent["Density"].as<float>();
 					bcc.Friction = boxCollider2DComponent["Friction"].as<float>();
 					bcc.Restitution = boxCollider2DComponent["Restitution"].as<float>();
@@ -359,7 +359,7 @@ namespace Engine
 				if (circleCollider2DComponent)
 				{
 					auto& bcc = deserializedEntity.AddComponent<CircleColliderComponent>();
-					bcc.Offset = circleCollider2DComponent["Offset"].as<glm::vec2>();
+					bcc.Offset = circleCollider2DComponent["Offset"].as<Math::Vector2>();
 					bcc.Size = circleCollider2DComponent["Size"].as<float>();
 					bcc.Density = circleCollider2DComponent["Density"].as<float>();
 					bcc.Friction = circleCollider2DComponent["Friction"].as<float>();

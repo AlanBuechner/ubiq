@@ -24,8 +24,8 @@ namespace Engine
 		if (s_Instance == nullptr)
 			s_Instance = this;
 
-		m_GridMesh.m_Vertices.reserve((m_GridLines + 1) * 3);
-		m_GridMesh.m_Indices.reserve((m_GridLines + 1) * 4);
+		m_GridMesh.m_Vertices.reserve((size_t)(m_GridLines + 1) * 3);
+		m_GridMesh.m_Indices.reserve((size_t)(m_GridLines + 1) * 4);
 		for (uint32_t i = 0; i <= m_GridLines; i++)
 		{
 			float posz = (m_GridLineOffset * i) - m_GridExtent;
@@ -147,7 +147,7 @@ namespace Engine
 			auto [mx, my] = ImGui::GetMousePos();
 			mx -= m_ViewportBounds[0].x;
 			my -= m_ViewportBounds[0].y;
-			glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+			Math::Vector2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
 
 			my = viewportSize.y - my; // flip y cord
 
@@ -360,11 +360,11 @@ namespace Engine
 
 		// draw grid lines
 		{
-			glm::vec3 camPos = m_EditorCamera.GetPosition();
+			Math::Vector3 camPos = m_EditorCamera.GetPosition();
 
-			glm::mat4 matz =	glm::translate(glm::mat4(1.0f), { camPos.x, 0, camPos.z - fmod(camPos.z, m_GridLineOffset) });
-			glm::mat4 matx =	glm::translate(glm::mat4(1.0f), { camPos.x - fmod(camPos.x, m_GridLineOffset), 0, camPos.z })
-								* glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), { 0,1,0 });
+			Math::Mat4 matz =	glm::translate(Math::Mat4(1.0f), { camPos.x, 0, camPos.z - fmod(camPos.z, m_GridLineOffset) });
+			Math::Mat4 matx =	glm::translate(Math::Mat4(1.0f), { camPos.x - fmod(camPos.x, m_GridLineOffset), 0, camPos.z })
+								* glm::rotate(Math::Mat4(1.0f), glm::radians(90.0f), { 0,1,0 });
 
 			LineRenderer::BeginScene(m_EditorCamera);
 			LineRenderer::DrawLineMesh(m_GridMesh, matz);
@@ -372,7 +372,7 @@ namespace Engine
 			LineRenderer::EndScene();
 		}
 
-		// draw camera frustom
+		// draw camera frustum
 		Entity selected = m_HierarchyPanel.GetSelectedEntity();
 		if (selected && selected.HasComponent<CameraComponent>())
 		{
@@ -381,8 +381,8 @@ namespace Engine
 
 			LineRenderer::BeginScene(m_EditorCamera);
 
-			const glm::mat4& proj = glm::inverse(cam.GetProjectionMatrix());
-			const glm::mat4& transform = tc.GetTransform();
+			const Math::Mat4& proj = glm::inverse(cam.GetProjectionMatrix());
+			const Math::Mat4& transform = tc.GetTransform();
 			glm::vec4 ltn = proj * glm::vec4{ -1, 1, 0, 1 };
 			glm::vec4 ltf = proj * glm::vec4{ -1, 1, 1, 1 };
 
@@ -432,7 +432,7 @@ namespace Engine
 		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar);
 
 		float Size = ImGui::GetWindowHeight() - 4.0f;
-		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x*0.5)-(Size*0.5f));
+		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x*0.5f)-(Size*0.5f));
 		Ref<Texture2D> button = (m_SceneState == SceneState::Edit ? m_PlayButton : m_StopButton);
 		if (ImGui::ImageButton((ImTextureID)button->GetRendererID(), { Size, Size }, { 0,0 }, {1,1}, 0))
 		{
@@ -458,7 +458,7 @@ namespace Engine
 		Application::Get().GetImGuiLayer()->SetBlockEvents(!ImGui::IsWindowFocused());
 
 		ImVec2 viewPortPanalSize = ImGui::GetContentRegionAvail();
-		if (m_ViewPortSize != *(glm::vec2*)&viewPortPanalSize)
+		if (m_ViewPortSize != *(Math::Vector2*)&viewPortPanalSize)
 		{
 			m_ViewPortSize = { viewPortPanalSize.x, viewPortPanalSize.y };
 		}
@@ -476,16 +476,16 @@ namespace Engine
 		Entity selected = m_HierarchyPanel.GetSelectedEntity();
 		if (m_SceneState != SceneState::Play && selected)
 		{
-			// Gizmos
+			// Gizmo's
 			if (m_GizmoType != -1)
 			{
 				// camera editor
-				const glm::mat4& cameraProjection = m_EditorCamera.GetProjectionMatrix();
-				glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
+				const Math::Mat4& cameraProjection = m_EditorCamera.GetProjectionMatrix();
+				Math::Mat4 cameraView = m_EditorCamera.GetViewMatrix();
 
 				// transform
 				auto& tc = selected.GetComponent<TransformComponent>(); // get the transform component
-				glm::mat4 transform = tc.GetTransform(); // get the transform matrix
+				Math::Mat4 transform = tc.GetTransform(); // get the transform matrix
 
 				ImGuizmo::SetOrthographic(false);
 				ImGuizmo::SetDrawlist();
@@ -499,10 +499,10 @@ namespace Engine
 
 				if (ImGuizmo::IsUsing())
 				{
-					glm::vec3 position, rotation, scale;
+					Math::Vector3 position, rotation, scale;
 					Math::DecomposeTransform(transform, position, rotation, scale);
 
-					glm::vec3 deltaRotation = rotation - tc.Rotation;
+					Math::Vector3 deltaRotation = rotation - tc.Rotation;
 					tc.Position = position;
 					tc.Rotation += deltaRotation;
 					tc.Scale = scale;

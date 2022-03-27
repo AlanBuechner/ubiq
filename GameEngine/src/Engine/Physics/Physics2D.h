@@ -15,8 +15,8 @@ namespace Engine
 
 	struct RayCastHit
 	{
-		glm::vec2 point;
-		glm::vec2 normal;
+		Math::Vector2 point;
+		Math::Vector2 normal;
 		float distanceSqr;
 		Entity entity;
 	};
@@ -28,12 +28,12 @@ namespace Engine
 		static void OnPhysicsStop();
 		static void OnPysicsUpdate();
 
-		static glm::vec2 GetGravity();
+		static Math::Vector2 GetGravity();
 		static void SetGravity(float g);
-		static void SetGravity(glm::vec2 g);
+		static void SetGravity(Math::Vector2 g);
 
-		static bool RayCast(glm::vec2 point, glm::vec2 dir, float dist, RayCastHit& outHit);
-		static bool RayCast(glm::vec2 p1, glm::vec2 p2, RayCastHit& outHit);
+		static bool RayCast(Math::Vector2 point, Math::Vector2 dir, float dist, RayCastHit& outHit);
+		static bool RayCast(Math::Vector2 p1, Math::Vector2 p2, RayCastHit& outHit);
 
 	private:
 		static b2World* s_World;

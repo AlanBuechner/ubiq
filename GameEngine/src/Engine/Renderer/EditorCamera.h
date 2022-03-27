@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "Engine/Events/Event.h"
 #include "Engine/Events/MouseEvent.h"
-#include <glm/glm.hpp>
+#include "Engine/Math/Math.h"
 
 namespace Engine
 {
@@ -21,14 +21,14 @@ namespace Engine
 
 		inline void SetViewportSize(float width, float height) { m_ViewportWidth = width; m_ViewportHeight = height; UpdateProjection(); }
 
-		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
-		glm::mat4 GetViewProjection() const { return m_ProjectionMatrix * m_ViewMatrix; }
+		const Math::Mat4& GetViewMatrix() const { return m_ViewMatrix; }
+		Math::Mat4 GetViewProjection() const { return m_ProjectionMatrix * m_ViewMatrix; }
 
-		glm::vec3 GetUpDirection() const;
-		glm::vec3 GetRightDirection() const;
-		glm::vec3 GetForwardDirection() const;
-		const glm::vec3& GetPosition() const { return m_Position; }
-		glm::quat GetOrientation() const;
+		Math::Vector3 GetUpDirection() const;
+		Math::Vector3 GetRightDirection() const;
+		Math::Vector3 GetForwardDirection() const;
+		const Math::Vector3& GetPosition() const { return m_Position; }
+		Math::Quaternion GetOrientation() const;
 
 		float GetPitch() const { return m_Pitch; }
 		float GetYaw() const { return m_Yaw; }
@@ -38,16 +38,16 @@ namespace Engine
 
 		bool OnMouseScroll(MouseScrolledEvent& e);
 
-		void MousePan(const glm::vec2& delta);
-		void MouseRotateAboutFocal(const glm::vec2& delta);
-		void MouseRotate(const glm::vec2& delta);
+		void MousePan(const Math::Vector2& delta);
+		void MouseRotateAboutFocal(const Math::Vector2& delta);
+		void MouseRotate(const Math::Vector2& delta);
 		void MouseZoom(float delta);
 		
 		void MoveFB(float speed);
 		void MoveRL(float speed);
 
-		glm::vec3 CalculatePosition() const;
-		glm::vec3 CalculateFocal() const;
+		Math::Vector3 CalculatePosition() const;
+		Math::Vector3 CalculateFocal() const;
 
 		std::pair<float, float> PanSpeed() const;
 		float RotationSpeed() const;
@@ -56,11 +56,11 @@ namespace Engine
 	private:
 		float m_FOV = 45.0f, m_AspectRatio = 1.778f, m_NearClip = 0.1f, m_FarClip = 10000.0f;
 
-		glm::mat4 m_ViewMatrix;
-		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
+		Math::Mat4 m_ViewMatrix;
+		Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
+		Math::Vector3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
 
-		glm::vec2 m_InitialMousePosition = { 0.0f, 0.0f };
+		Math::Vector2 m_InitialMousePosition = { 0.0f, 0.0f };
 
 		float m_Distance = 10.0f;
 		float m_Pitch, m_Yaw;

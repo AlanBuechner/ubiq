@@ -1,7 +1,7 @@
 #pragma once
 #include "Types.h"
 
-namespace Engine::Math
+namespace Math
 {
 	float Angle(const Quaternion& q);
 	float Length(const Quaternion& q);

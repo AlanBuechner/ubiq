@@ -216,13 +216,13 @@ namespace Engine
 		glUniform4f(location, values.x, values.y, values.z, values.w);
 	}
 
-	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& values)
+	void OpenGLShader::UploadUniformFloat3(const std::string& name, const Math::Vector3& values)
 	{
 		uint32_t location = GetUniformLocation(name);
 		glUniform3f(location, values.x, values.y, values.z);
 	}
 
-	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& values)
+	void OpenGLShader::UploadUniformFloat2(const std::string& name, const Math::Vector2& values)
 	{
 		uint32_t location = GetUniformLocation(name);
 		glUniform2f(location, values.x, values.y);
@@ -234,13 +234,13 @@ namespace Engine
 		glUniform1f(location, value);
 	}
 
-	void OpenGLShader::UploadUniformMat4(const std::string & name, const glm::mat4 & matrix)
+	void OpenGLShader::UploadUniformMat4(const std::string & name, const Math::Mat4 & matrix)
 	{
 		uint32_t location = GetUniformLocation(name);
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
-	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix)
+	void OpenGLShader::UploadUniformMat3(const std::string& name, const Math::Mat3& matrix)
 	{
 		uint32_t location = GetUniformLocation(name);
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));

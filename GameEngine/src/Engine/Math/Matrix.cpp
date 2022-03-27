@@ -4,7 +4,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
-namespace Engine::Math
+namespace Math
 {
 	Mat4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar)
 	{
@@ -52,7 +52,7 @@ namespace Engine::Math
 	}
 
 
-	bool DecomposeTransform(const glm::mat4& transform, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
+	bool DecomposeTransform(const glm::mat4& transform, Math::Vector3& position, Math::Vector3& rotation, Math::Vector3& scale)
 	{
 
 		using namespace glm;

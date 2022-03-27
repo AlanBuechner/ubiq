@@ -24,23 +24,23 @@ namespace Engine
 
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
-		static void BeginScene(const Camera& camera, const glm::mat4& transform);
+		static void BeginScene(const Camera& camera, const Math::Mat4& transform);
 		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
 
-		static void Submit(const Ref<VertexArray>& vertexArray, const Ref<Material>& mat, const glm::mat4& transform = glm::mat4(1.0f));
+		static void Submit(const Ref<VertexArray>& vertexArray, const Ref<Material>& mat, const Math::Mat4& transform = Math::Mat4(1.0f));
 		static void SubmitPointLight(const PointLight& light);
-		static void SetAmbientLight(glm::vec3 l) { m_SceneData->ambientLight = l; }
+		static void SetAmbientLight(Math::Vector3 l) { m_SceneData->ambientLight = l; }
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
 	private:
 		struct SceneData
 		{
-			glm::mat4 ViewMatrix;
-			glm::mat4 ProjectionMatrix;
+			Math::Mat4 ViewMatrix;
+			Math::Mat4 ProjectionMatrix;
 			std::vector<PointLight> PointLights;
-			glm::vec3 ambientLight;
+			Math::Vector3 ambientLight;
 		};
 
 		static SceneData* m_SceneData;

@@ -1,7 +1,7 @@
 #pragma once
 #include "Types.h"
 
-namespace Engine::Math
+namespace Math
 {
 	float Length(const Vector2& v);
 	float Length(const Vector3& v);

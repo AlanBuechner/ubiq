@@ -1,7 +1,7 @@
 #pragma once
 #include "Types.h"
 
-namespace Engine::Math
+namespace Math
 {
 	Mat4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
 	Mat4 Perspective(float fovy, float aspect, float zNear, float zFar);

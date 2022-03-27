@@ -30,7 +30,7 @@ namespace Engine
 
 		ImGui::Text("%s", m_CurrentDirectory.string().c_str());
 
-		const int windowWidth = ImGui::GetContentRegionAvail().x;
+		const uint32_t windowWidth = (uint32_t)ImGui::GetContentRegionAvail().x;
 		int padding = 10;
 		int columnCount = windowWidth / (m_ImageSize + padding);
 

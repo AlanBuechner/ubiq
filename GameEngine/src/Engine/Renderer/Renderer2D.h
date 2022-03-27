@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <Engine/Math/Math.h>
 #include "Texture.h"
 #include "SubTexture.h"
 
@@ -9,7 +9,7 @@ namespace Engine
 	class Camera;
 	class EditorCamera;
 
-	class SpriteRendererComponent;
+	struct SpriteRendererComponent;
 }
 
 namespace Engine
@@ -20,48 +20,48 @@ namespace Engine
 		static void Init();
 		static void Shutdown();
 
-		static void BeginScene(const Camera& camera, const glm::mat4& transform);
+		static void BeginScene(const Camera& camera, const Math::Mat4& transform);
 		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
 		static void Flush();
 
 		// draw colored quaad
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const glm::vec4& color, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const glm::vec4& color, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const glm::vec4& color, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, int entityID = -1);
+		static void DrawQuad(const Math::Mat4& transform, const glm::vec4& color, int entityID = -1);
 
 		// draw sub textured quad
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& texture, int entityID = -1);
-		//static void DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Ref<SubTexture2D>& texture, int entityID = -1);
+		//static void DrawQuad(const Math::Mat4& transform, const Ref<SubTexture2D>& texture, int entityID = -1);
 
 		// draw sub textured tinted quad
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
 
 		// draw textured qaud
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Mat4& transform, const Ref<Texture2D>& texture, int entityID = -1);
 
 		// draw textured tinted qaud
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
 
 		// draw sprite component
-		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID);
+		static void DrawSprite(const Math::Mat4& transform, SpriteRendererComponent& src, int entityID);
 
 		struct Statistics
 		{
@@ -76,8 +76,8 @@ namespace Engine
 
 	private:
 
-		static void DrawQuadImpl(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[], int entityID = -1);
-		static void DrawQuadImpl(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2 textCoords[], int entityID = -1);
+		static void DrawQuadImpl(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID = -1);
+		static void DrawQuadImpl(const Math::Mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID = -1);
 
 		static void BeginBatch();
 	};

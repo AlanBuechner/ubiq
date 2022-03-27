@@ -9,7 +9,7 @@ namespace Engine
 
 	Input* Input::s_Instance = new WindowsInput();
 
-	glm::vec2 WindowsInput::QueryMousePosition()
+	Math::Vector2 WindowsInput::QueryMousePosition()
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double xpos, ypos;

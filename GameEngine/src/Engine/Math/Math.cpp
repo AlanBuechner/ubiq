@@ -2,10 +2,10 @@
 #include "Math.h"
 
 #include <glm/gtc/noise.hpp>
-#include <glm/glm.hpp>
+#include <Engine/Math/Math.h>
 #include <math.h>
 
-namespace Engine::Math
+namespace Math
 {
 	// trig
 	float Sin(float x)

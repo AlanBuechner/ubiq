@@ -1,6 +1,6 @@
 #pragma once
 #include "core.h"
-#include <glm\glm.hpp>
+#include <Engine/Math/Math.h>
 
 #include <vector>
 
@@ -8,10 +8,10 @@ namespace Engine
 {
 	struct RendererVertex
 	{
-		glm::vec3 position;
-		glm::vec2 uv;
-		glm::vec3 normal;
-		glm::vec3 tangent;
+		Math::Vector3 position;
+		Math::Vector2 uv;
+		Math::Vector3 normal;
+		Math::Vector3 tangent;
 	};
 
 	template<class V>

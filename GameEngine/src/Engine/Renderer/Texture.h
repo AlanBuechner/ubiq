@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/core.h"
 #include "TextureAttribute.h"
-#include <glm/glm.hpp>
+#include <Engine/Math/Math.h>
 #include <string>
 
 namespace Engine

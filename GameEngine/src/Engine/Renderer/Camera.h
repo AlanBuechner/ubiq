@@ -1,5 +1,5 @@
 #pragma once
-#include <glm/glm.hpp>
+#include <Engine/Math/Math.h>
 #include <glm/gtc/quaternion.hpp>
 
 namespace Engine
@@ -11,15 +11,15 @@ namespace Engine
 
 	public:
 		Camera() = default;
-		Camera(const glm::mat4& projectionMatrix) :
+		Camera(const Math::Mat4& projectionMatrix) :
 			m_ProjectionMatrix(projectionMatrix)
 		{}
 
 		virtual ~Camera() = default;
 
-		const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
+		const Math::Mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 
 	protected:
-		glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
+		Math::Mat4 m_ProjectionMatrix = Math::Mat4(1.0f);
 	};
 }

@@ -47,3 +47,13 @@
 #include "Engine/Core/Mesh.h"
 #include "Engine/Core/MeshLoader.h"
 // ----------------------------------------
+
+
+// Math -----------------------------------
+#include "Engine/Math/Math.h"
+#include "Engine/Math/Types.h"
+#include "Engine/Math/Vector.h"
+#include "Engine/Math/Matrix.h"
+#include "Engine/Math/Quaternion.h"
+// ----------------------------------------
+

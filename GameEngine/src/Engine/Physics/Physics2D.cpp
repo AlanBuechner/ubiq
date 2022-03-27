@@ -131,7 +131,7 @@ namespace Engine
 		}
 	}
 
-	glm::vec2 Physics2D::GetGravity()
+	Math::Vector2 Physics2D::GetGravity()
 	{
 		b2Vec2 g = s_World->GetGravity();
 		return {g.x, g.y};
@@ -142,27 +142,27 @@ namespace Engine
 		s_World->SetGravity({0.0f, g});
 	}
 
-	void Physics2D::SetGravity(glm::vec2 g)
+	void Physics2D::SetGravity(Math::Vector2 g)
 	{
 		s_World->SetGravity({ g.x, g.y });
 	}
 
-	bool Physics2D::RayCast(glm::vec2 point, glm::vec2 dir, float dist, RayCastHit& outHit)
+	bool Physics2D::RayCast(Math::Vector2 point, Math::Vector2 dir, float dist, RayCastHit& outHit)
 	{
 		return RayCast(point, point + glm::normalize(dir)*dist, outHit);
 	}
 
-	bool Physics2D::RayCast(glm::vec2 p1, glm::vec2 p2, RayCastHit& outHit)
+	bool Physics2D::RayCast(Math::Vector2 p1, Math::Vector2 p2, RayCastHit& outHit)
 	{
 
 		class Callback : public b2RayCastCallback
 		{
 		public:
-			Callback(glm::vec2& p1, glm::vec2& p2, RayCastHit& outHit) :
+			Callback(Math::Vector2& p1, Math::Vector2& p2, RayCastHit& outHit) :
 				p1(p1), p2(p2), outHit(outHit)
 			{}
 
-			glm::vec2 &p1, &p2;
+			Math::Vector2&p1, &p2;
 			RayCastHit& outHit;
 
 			bool hit = false;
@@ -172,7 +172,7 @@ namespace Engine
 			{
 				outHit.point = { point.x, point.y };
 				outHit.normal = { normal.x, normal.y };
-				glm::vec2 dir = p1 - outHit.point;
+				Math::Vector2 dir = p1 - outHit.point;
 				outHit.distanceSqr = dir.x * dir.x + dir.y * dir.y;
 				outHit.entity = { (entt::entity)fixture->GetUserData().pointer, s_Scene };
 				hit = true;

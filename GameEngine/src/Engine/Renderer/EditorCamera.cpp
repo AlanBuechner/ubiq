@@ -30,8 +30,8 @@ namespace Engine
 		// m_Yaw = m_Pitch = 0.0f; // Lock the camera's rotation
 		m_Position = CalculatePosition();
 
-		glm::quat orientation = GetOrientation();
-		m_ViewMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::toMat4(orientation);
+		Math::Quaternion orientation = GetOrientation();
+		m_ViewMatrix = glm::translate(Math::Mat4(1.0f), m_Position) * glm::toMat4(orientation);
 		m_ViewMatrix = glm::inverse(m_ViewMatrix);
 	}
 
@@ -66,8 +66,8 @@ namespace Engine
 		const float runSpeed = 4.0f;
 		float speed = moveSpeed;
 
-		const glm::vec2& mouse{ Input::GetMousePosition().x, Input::GetMousePosition().y };
-		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
+		const Math::Vector2& mouse{ Input::GetMousePosition().x, Input::GetMousePosition().y };
+		Math::Vector2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 		m_InitialMousePosition = mouse;
 
 		bool alt = Input::GetKeyDown(KeyCode::ALT);
@@ -125,21 +125,21 @@ namespace Engine
 		return false;
 	}
 
-	void EditorCamera::MousePan(const glm::vec2& delta)
+	void EditorCamera::MousePan(const Math::Vector2& delta)
 	{
 		auto [xSpeed, ySpeed] = PanSpeed();
 		m_FocalPoint += -GetRightDirection() * delta.x * xSpeed * m_Distance * Time::GetDeltaTime();
 		m_FocalPoint += GetUpDirection() * delta.y * ySpeed * m_Distance * Time::GetDeltaTime();
 	}
 
-	void EditorCamera::MouseRotateAboutFocal(const glm::vec2& delta)
+	void EditorCamera::MouseRotateAboutFocal(const Math::Vector2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
 		m_Yaw += yawSign * delta.x * RotationSpeed() * Time::GetDeltaTime();
 		m_Pitch += delta.y * RotationSpeed() * Time::GetDeltaTime();
 	}
 
-	void EditorCamera::MouseRotate(const glm::vec2& delta)
+	void EditorCamera::MouseRotate(const Math::Vector2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
 		m_Yaw += yawSign * delta.x * RotationSpeed() * Time::GetDeltaTime();
@@ -167,33 +167,33 @@ namespace Engine
 		m_FocalPoint += GetRightDirection() * speed * Time::GetDeltaTime();
 	}
 
-	glm::vec3 EditorCamera::GetUpDirection() const
+	Math::Vector3 EditorCamera::GetUpDirection() const
 	{
-		return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f));
+		return glm::rotate(GetOrientation(), Math::Vector3(0.0f, 1.0f, 0.0f));
 	}
 
-	glm::vec3 EditorCamera::GetRightDirection() const
+	Math::Vector3 EditorCamera::GetRightDirection() const
 	{
-		return glm::rotate(GetOrientation(), glm::vec3(1.0f, 0.0f, 0.0f));
+		return glm::rotate(GetOrientation(), Math::Vector3(1.0f, 0.0f, 0.0f));
 	}
 
-	glm::vec3 EditorCamera::GetForwardDirection() const
+	Math::Vector3 EditorCamera::GetForwardDirection() const
 	{
-		return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
+		return glm::rotate(GetOrientation(), Math::Vector3(0.0f, 0.0f, -1.0f));
 	}
 
-	glm::vec3 EditorCamera::CalculatePosition() const
+	Math::Vector3 EditorCamera::CalculatePosition() const
 	{
 		return m_FocalPoint - GetForwardDirection() * m_Distance;
 	}
 
-	glm::vec3 EditorCamera::CalculateFocal() const
+	Math::Vector3 EditorCamera::CalculateFocal() const
 	{
 		return m_Position + GetForwardDirection() * m_Distance;
 	}
 
-	glm::quat EditorCamera::GetOrientation() const
+	Math::Quaternion EditorCamera::GetOrientation() const
 	{
-		return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f));
+		return Math::Quaternion(Math::Vector3(-m_Pitch, -m_Yaw, 0.0f));
 	}
 }

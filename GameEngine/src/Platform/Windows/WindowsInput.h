@@ -10,7 +10,7 @@ namespace Engine
 	class WindowsInput : public Input
 	{
 	protected:
-		virtual glm::vec2 QueryMousePosition() override;
+		virtual Math::Vector2 QueryMousePosition() override;
 	};
 }
 

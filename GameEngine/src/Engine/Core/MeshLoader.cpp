@@ -8,22 +8,22 @@
 namespace Engine
 {
 
-	glm::vec3 GetPosition(aiMesh* mesh, uint32_t index)
+	Math::Vector3 GetPosition(aiMesh* mesh, uint32_t index)
 	{
 		return { mesh->mVertices[index].x, mesh->mVertices[index].y, mesh->mVertices[index].z };
 	}
 
-	glm::vec3 GetNormal(aiMesh* mesh, uint32_t index)
+	Math::Vector3 GetNormal(aiMesh* mesh, uint32_t index)
 	{
 		return { mesh->mNormals[index].x, mesh->mNormals[index].y, mesh->mNormals[index].z };
 	}
 
-	glm::vec3 GetTangent(aiMesh* mesh, uint32_t index)
+	Math::Vector3 GetTangent(aiMesh* mesh, uint32_t index)
 	{
 		return { mesh->mTangents[index].x, mesh->mTangents[index].y, mesh->mTangents[index].z };
 	}
 
-	glm::vec2 GetUVCoords(aiMesh* mesh, uint32_t index)
+	Math::Vector2 GetUVCoords(aiMesh* mesh, uint32_t index)
 	{
 		if (mesh->mTextureCoords[0] == nullptr)
 			return { 0.0f, 0.0f };
@@ -36,10 +36,10 @@ namespace Engine
 	{
 		for (uint32_t i = 0; i < node->mNumMeshes; i++)
 		{
-			uint32_t vertexOffset = mesh->vertices.size();
+			uint32_t vertexOffset = (uint32_t)mesh->vertices.size();
 			aiMesh* m = scene->mMeshes[node->mMeshes[i]];
 
-			mesh->vertices.resize(vertexOffset + m->mNumVertices);
+			mesh->vertices.resize((size_t)vertexOffset + m->mNumVertices);
 
 			// vertices
 			for (uint32_t v = 0; v < m->mNumVertices; v++)
@@ -66,7 +66,7 @@ namespace Engine
 			}
 
 			// indices
-			mesh->indices.reserve(m->mNumFaces*3);
+			mesh->indices.reserve((size_t)m->mNumFaces*3);
 			for (uint32_t j = 0; j < m->mNumFaces; j++)
 			{
 				for (uint32_t k = 0; k < 3; k++)

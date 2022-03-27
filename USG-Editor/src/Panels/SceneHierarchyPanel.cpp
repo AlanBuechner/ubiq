@@ -208,7 +208,7 @@ namespace Engine
 		}
 	}
 
-	static void DrawVec2Control(const std::string label, glm::vec2& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+	static void DrawVec2Control(const std::string label, Math::Vector2& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
 		ImGui::PushID(label.c_str());
 		ImGui::Columns(2);
@@ -252,7 +252,7 @@ namespace Engine
 		ImGui::PopID();
 	}
 
-	static void DrawVec3Control(const std::string label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+	static void DrawVec3Control(const std::string label, Math::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
 		ImGui::PushID(label.c_str());
 		ImGui::Columns(2);
@@ -325,7 +325,7 @@ namespace Engine
 		DrawComponent<TransformComponent>(entity, "Transform", [&]() {
 			auto& tc = entity.GetComponent<TransformComponent>();
 			DrawVec3Control("Position", tc.Position, 0.0f);
-			glm::vec3 rotation = glm::degrees(tc.Rotation);
+			Math::Vector3 rotation = glm::degrees(tc.Rotation);
 			DrawVec3Control("Rotation", rotation, 0.0f);
 			tc.Rotation = glm::radians(rotation);
 			DrawVec3Control("Scale", tc.Scale, 1.0f);

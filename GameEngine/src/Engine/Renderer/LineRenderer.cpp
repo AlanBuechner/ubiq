@@ -63,9 +63,9 @@ namespace Engine
 	{
 	}
 
-	void LineRenderer::BeginScene(const Camera& camera, const glm::mat4& transform)
+	void LineRenderer::BeginScene(const Camera& camera, const Math::Mat4& transform)
 	{
-		glm::mat4 viewProj = camera.GetProjectionMatrix() * glm::inverse(transform);
+		Math::Mat4 viewProj = camera.GetProjectionMatrix() * glm::inverse(transform);
 
 		Ref<Shader> LineShader = s_Data.Library->Get("LineShader");
 		LineShader->Bind();
@@ -77,7 +77,7 @@ namespace Engine
 
 	void LineRenderer::BeginScene(const EditorCamera& camera)
 	{
-		glm::mat4 viewProj = camera.GetViewProjection();
+		Math::Mat4 viewProj = camera.GetViewProjection();
 
 		Ref<Shader> LineShader = s_Data.Library->Get("LineShader");
 		LineShader->Bind();
@@ -110,7 +110,7 @@ namespace Engine
 		s_Data.LineIndexBufferPtr = s_Data.LineIndexBufferBase;
 	}
 
-	void LineRenderer::DrawLine(glm::vec3 p1, glm::vec3 p2, const glm::vec4 color, const glm::mat4& transform)
+	void LineRenderer::DrawLine(Math::Vector3 p1, Math::Vector3 p2, const glm::vec4 color, const Math::Mat4& transform)
 	{
 		if (s_Data.IndexCount + 2 > s_Data.MaxIndices || s_Data.VertexCount + 2 > s_Data.MaxVertices)
 		{
@@ -137,7 +137,7 @@ namespace Engine
 
 	}
 
-	void LineRenderer::DrawLineMesh(LineMesh& mesh, const glm::mat4& transform)
+	void LineRenderer::DrawLineMesh(LineMesh& mesh, const Math::Mat4& transform)
 	{
 		if (s_Data.IndexCount + mesh.m_Indices.size() > s_Data.MaxIndices || s_Data.VertexCount + mesh.m_Vertices.size() > s_Data.MaxVertices)
 		{
@@ -159,8 +159,8 @@ namespace Engine
 		}
 
 
-		s_Data.IndexCount += mesh.m_Indices.size();
-		s_Data.VertexCount += mesh.m_Vertices.size();
+		s_Data.IndexCount += (uint32_t)mesh.m_Indices.size();
+		s_Data.VertexCount += (uint32_t)mesh.m_Vertices.size();
 	}
 
 }

@@ -3,12 +3,12 @@
 
 namespace Engine
 {
-	SubTexture2D::SubTexture2D(Ref<Texture2D> texture, glm::vec2 regions, glm::vec2 position, glm::vec2 size) :
+	SubTexture2D::SubTexture2D(Ref<Texture2D> texture, Math::Vector2 regions, Math::Vector2 position, Math::Vector2 size) :
 		m_Texture(texture)
 	{
-		glm::vec2 normalizedPosition = { position.x / regions.x, position.y / regions.y };
+		Math::Vector2 normalizedPosition = { position.x / regions.x, position.y / regions.y };
 
-		m_TexCoords = new glm::vec2[4];
+		m_TexCoords = new Math::Vector2[4];
 
 		m_TexCoords[0] = normalizedPosition;
 		m_TexCoords[1] = { (size.x / regions.x) + normalizedPosition.x, normalizedPosition.y };
@@ -16,7 +16,7 @@ namespace Engine
 		m_TexCoords[3] = { normalizedPosition.x, (size.y / regions.y) + normalizedPosition.y };
 	}
 
-	const Ref<SubTexture2D> SubTexture2D::Create(Ref<Texture2D> texture, glm::vec2 regions, glm::vec2 position, glm::vec2 size)
+	const Ref<SubTexture2D> SubTexture2D::Create(Ref<Texture2D> texture, Math::Vector2 regions, Math::Vector2 position, Math::Vector2 size)
 	{
 		return std::make_shared<SubTexture2D>(texture, regions, position, size);
 	}

@@ -13,7 +13,7 @@ namespace Engine
 
 	InputControler::~InputControler()
 	{
-		// remove controler from maneger
+		// remove controller from maneger
 		m_Maneger->RemoveControler(this);
 		
 		// unbind events
@@ -59,7 +59,7 @@ namespace Engine
 		}
 	}
 
-	void InputControler::RaiseMouseMoveEvent(MouseMoveBindMode bindMode, glm::vec2& pos)
+	void InputControler::RaiseMouseMoveEvent(MouseMoveBindMode bindMode, Math::Vector2& pos)
 	{
 		for (auto i : m_MouseMoveEvents)
 		{
@@ -97,7 +97,7 @@ namespace Engine
 		}
 	}
 
-	MouseMoveEventData* InputControler::BindMouseMoveEvent(MouseMoveBindMode bindMode, std::function<void(glm::vec2&)> func)
+	MouseMoveEventData* InputControler::BindMouseMoveEvent(MouseMoveBindMode bindMode, std::function<void(Math::Vector2&)> func)
 	{
 		MouseMoveEventData* action = new MouseMoveEventData;
 		action->Function = func;

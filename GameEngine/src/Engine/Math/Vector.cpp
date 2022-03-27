@@ -1,7 +1,7 @@
 #include <pch.h>
 #include "Vector.h"
 
-namespace Engine::Math
+namespace Math
 {
 	float Length(const Vector2& v)
 	{

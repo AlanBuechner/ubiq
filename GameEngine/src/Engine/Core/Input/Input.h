@@ -4,7 +4,7 @@
 #include "KeyCodes.h"
 #include <map>
 #include "Engine/Core/Application.h"
-#include <glm/glm.hpp>
+#include "Engine/Math/Math.h"
 
 #define KEY_PRESSED		(int)Engine::Input::KeyPressed
 #define KEY_RELEASED	(int)Engine::Input::KeyReleased
@@ -218,7 +218,7 @@ namespace Engine
 			MouseDown = EventType::MouseButtonDown
 		};
 
-		// keybord
+		// keyboard
 		inline static KeyState GetKeyState(int keycode) { return s_Instance->GetKeyStateImpl(keycode); }
 		inline static bool GetKeyDown(int keycode) { return (GetKeyState(keycode) == Input::Down); }
 		inline static bool GetKeyUp(int keycode) { return (GetKeyState(keycode) == Input::Up); }
@@ -232,8 +232,8 @@ namespace Engine
 		inline static bool GetMouseButtonPressed(int button) { return (GetMouseButtonState(button) == Input::MousePressed); }
 		inline static bool GetMouseButtonReleased(int button) { return (GetMouseButtonState(button) == Input::MouseReleased); }
 
-		inline static glm::vec2 GetMousePosition() { return s_Instance->m_MousePosition; }
-		inline static glm::vec2 GetPreviousMousePosition() { return s_Instance->m_PreviousMousePosition; }
+		inline static Math::Vector2 GetMousePosition() { return s_Instance->m_MousePosition; }
+		inline static Math::Vector2 GetPreviousMousePosition() { return s_Instance->m_PreviousMousePosition; }
 
 		static void SendAllEventData(bool sendAll) { s_Instance->m_SendAllEventData = sendAll; }
 		static void SendAllTypedEvents(bool sendTyped) { sendTyped ? s_Instance->m_SystemsNeedingAllTypedEvents++ : s_Instance->m_SystemsNeedingAllTypedEvents--; }
@@ -246,13 +246,13 @@ namespace Engine
 		static void UnbindKey(int key, int type);
 
 	private:
-		// keybord
+		// keyboard
 		KeyState GetKeyStateImpl(int keycode);
 
 		// mouse
 		inline KeyState GetMouseButtonStateImpl(int button) { return m_MouseStates[button]; }
 
-		virtual glm::vec2 QueryMousePosition() = 0;
+		virtual Math::Vector2 QueryMousePosition() = 0;
 
 		void SetKeyState(int key, KeyState state) { m_KeyStates[key] = state; }
 		void SetMouseButtonState(int button, KeyState state) { m_MouseStates[button] = state; }
@@ -291,8 +291,8 @@ namespace Engine
 		unsigned int m_SystemsNeedingAllMouseMoveEvents = 0;
 		std::vector<BindedKeyData> m_BindedKeys;
 
-		glm::vec2 m_MousePosition;
-		glm::vec2 m_PreviousMousePosition;
+		Math::Vector2 m_MousePosition;
+		Math::Vector2 m_PreviousMousePosition;
 	};
 }
 

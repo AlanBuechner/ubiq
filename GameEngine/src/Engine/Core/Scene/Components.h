@@ -1,5 +1,5 @@
 #pragma once
-#include <glm/glm.hpp>
+#include <Engine/Math/Math.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -47,24 +47,24 @@ namespace Engine
 
 	struct TransformComponent
 	{
-		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
+		Math::Vector3 Position = { 0.0f, 0.0f, 0.0f };
+		Math::Vector3 Rotation = { 0.0f, 0.0f, 0.0f };
+		Math::Vector3 Scale = { 1.0f, 1.0f, 1.0f };
 
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const glm::vec3& position) :
+		TransformComponent(const Math::Vector3& position) :
 			Position(position)
 		{}
 
-		glm::mat4 GetTransform() const
+		Math::Mat4 GetTransform() const
 		{
-			glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+			Math::Mat4 rotation = glm::toMat4(Math::Quaternion(Rotation));
 
-			return glm::translate(glm::mat4(1.0f), Position) * 
+			return glm::translate(Math::Mat4(1.0f), Position) * 
 				rotation * 
-				glm::scale(glm::mat4(1.0f), Scale);
+				glm::scale(Math::Mat4(1.0f), Scale);
 				
 		}
 	};
@@ -91,7 +91,7 @@ namespace Engine
 		{
 			vao = Engine::VertexArray::Create();
 
-			Ref<VertexBuffer> vbo = Engine::VertexBuffer::Create((float*)mesh->vertices.data(), mesh->vertices.size() * sizeof(Mesh::Vertex));
+			Ref<VertexBuffer> vbo = Engine::VertexBuffer::Create((float*)mesh->vertices.data(), (uint32_t)(mesh->vertices.size() * sizeof(Mesh::Vertex)));
 
 			Engine::BufferLayout layout = {
 				{Engine::ShaderDataType::Float3, "a_Position"},
@@ -104,7 +104,7 @@ namespace Engine
 
 			vao->AddVertexBuffer(vbo);
 
-			Ref<IndexBuffer> ibo = Engine::IndexBuffer::Create(mesh->indices.data(), mesh->indices.size());
+			Ref<IndexBuffer> ibo = Engine::IndexBuffer::Create(mesh->indices.data(), (uint32_t)mesh->indices.size());
 
 			vao->SetIndexBuffer(ibo);
 

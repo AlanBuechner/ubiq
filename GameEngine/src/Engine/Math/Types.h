@@ -2,7 +2,7 @@
 #include "glm\glm.hpp"
 #include "glm\gtc\quaternion.hpp"
 
-namespace Engine::Math
+namespace Math
 {
 	using Vector2 = glm::vec2;
 	using Vector3 = glm::vec3;

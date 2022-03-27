@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Engine.h>
-#include <glm/glm.hpp>
+#include <Engine/Math/Math.h>
 
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/ContentBrowserPanel.h"
@@ -56,7 +56,7 @@ namespace Engine
 	private:
 		const glm::vec4 m_GridColor = { 0.5f,0.5f,0.5f,1 };
 		const float m_GridExtent = 40.0f;
-		const int m_GridLines = 80;
+		const uint32_t m_GridLines = 80;
 		const float m_GridLineOffset = m_GridExtent * 2 / m_GridLines;
 		LineMesh m_GridMesh;
 
@@ -69,10 +69,10 @@ namespace Engine
 
 		Entity m_CameraEntity;
 
-		glm::vec2 m_ViewPortSize;
+		Math::Vector2 m_ViewPortSize;
 		Ref<FrameBuffer> m_FrameBuffer;
 
-		glm::vec2 m_ViewportBounds[2];
+		Math::Vector2 m_ViewportBounds[2];
 
 		int m_GizmoType = -1;
 

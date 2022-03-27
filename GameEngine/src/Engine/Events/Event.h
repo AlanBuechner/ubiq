@@ -17,7 +17,7 @@ namespace Engine {
 		MouseButtonPressed, MouseButtonReleased, MouseButtonDown, MouseMoved, MouseScrolled
 	};
 
-	// event categorys
+	// event category's
 	enum EventCategory
 	{
 		None = 0,
@@ -38,7 +38,7 @@ namespace Engine {
 	{
 	public:
 		Event() {}
-		bool Handled = false; // if the event has been handeld
+		bool Handled = false; // if the event has been handled
 
 		virtual EventType GetEventType() const = 0;
 		virtual const char* GetName() const = 0;

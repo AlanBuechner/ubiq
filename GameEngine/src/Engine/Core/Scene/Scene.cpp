@@ -111,7 +111,7 @@ namespace Engine
 
 		// get main camera
 		Camera* mainCamera = nullptr;
-		glm::mat4 cameraTransform;
+		Math::Mat4 cameraTransform;
 		{
 			auto view = m_Registry.view<CameraComponent, TransformComponent>();
 			for (auto entity : view)

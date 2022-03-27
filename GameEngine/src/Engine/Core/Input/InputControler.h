@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Engine/Core/core.h"
-#include "glm/vec2.hpp"
+#include "Engine/Math/Math.h"
 
 #define BIND_ACTION(x) std::bind(x, this)
 #define BIND_AXIS(x, p) std::bind(x, this, p)
@@ -28,7 +28,7 @@ namespace Engine
 
 	struct ENGINE_API MouseMoveEventData
 	{
-		std::function<void(glm::vec2& pos)> Function;
+		std::function<void(Math::Vector2& pos)> Function;
 		int BindMode;
 	};
 
@@ -47,12 +47,12 @@ namespace Engine
 		~InputControler();
 
 		void RaiseEvent(int key, int state);
-		void RaiseMouseMoveEvent(MouseMoveBindMode bindMode, glm::vec2& pos);
+		void RaiseMouseMoveEvent(MouseMoveBindMode bindMode, Math::Vector2& pos);
 
 		EventData* BindEvent(int key, int state, std::function<void()> func);
 		void UnbindKey(EventData* event);
 
-		MouseMoveEventData* BindMouseMoveEvent(MouseMoveBindMode bindMode, std::function<void(glm::vec2&)> func);
+		MouseMoveEventData* BindMouseMoveEvent(MouseMoveBindMode bindMode, std::function<void(Math::Vector2&)> func);
 		void UnbindMouseEvent(MouseMoveEventData* event);
 
 	private:

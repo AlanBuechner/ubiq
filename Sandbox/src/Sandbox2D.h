@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Engine.h>
-#include <glm/glm.hpp>
+#include <Engine/Math/Math.h>
 
 class Sandbox2DLayer : public Engine::Layer
 {

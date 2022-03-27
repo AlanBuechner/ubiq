@@ -31,7 +31,7 @@ namespace Engine
 		m_SceneData->ProjectionMatrix = camera.GetProjectionMatrix();
 	}
 
-	void Renderer::BeginScene(const Camera& camera, const glm::mat4& transform)
+	void Renderer::BeginScene(const Camera& camera, const Math::Mat4& transform)
 	{
 		m_SceneData->ViewMatrix = transform;
 		m_SceneData->ProjectionMatrix = camera.GetProjectionMatrix();
@@ -43,7 +43,7 @@ namespace Engine
 		m_SceneData->PointLights.reserve(MAX_LIGHTS);
 	}
 
-	void Renderer::Submit(const Ref<VertexArray>& vertexArray, const Ref<Material>& mat, const glm::mat4& transform)
+	void Renderer::Submit(const Ref<VertexArray>& vertexArray, const Ref<Material>& mat, const Math::Mat4& transform)
 	{
 		mat->shader->Bind();
 
@@ -64,7 +64,7 @@ namespace Engine
 		if (mat->normal)
 			mat->normal->Bind(3);
 
-		mat->shader->UploadUniformInt("numLights", m_SceneData->PointLights.size());
+		mat->shader->UploadUniformInt("numLights", (uint32_t)m_SceneData->PointLights.size());
 		for (uint32_t i = 0; i < m_SceneData->PointLights.size(); i++)
 			mat->shader->UploadPointLight("pointLights", i, m_SceneData->PointLights[i]);
 		mat->shader->UploadUniformFloat3("ambientLight", m_SceneData->ambientLight);

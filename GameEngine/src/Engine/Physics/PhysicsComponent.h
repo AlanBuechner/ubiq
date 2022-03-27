@@ -1,5 +1,5 @@
 #pragma once
-#include <glm/glm.hpp>
+#include "Engine/Math/Math.h"
 
 namespace Engine
 {
@@ -18,15 +18,15 @@ namespace Engine
 		Rigidbody2DComponent() = default;
 		Rigidbody2DComponent(const Rigidbody2DComponent& other) = default;
 
-		void AddForce(glm::vec2 force);
-		void AddForce(glm::vec2 force, glm::vec2 point);
+		void AddForce(Math::Vector2 force);
+		void AddForce(Math::Vector2 force, Math::Vector2 point);
 
 	};
 
 	struct BoxCollider2DComponent
 	{
-		glm::vec2 Offset = { 0.0f, 0.0f };
-		glm::vec2 Size = { 0.5f, 0.5f };
+		Math::Vector2 Offset = { 0.0f, 0.0f };
+		Math::Vector2 Size = { 0.5f, 0.5f };
 
 		float Density = 1.0f;
 		float Friction = 0.5f;
@@ -41,7 +41,7 @@ namespace Engine
 
 	struct CircleColliderComponent
 	{
-		glm::vec2 Offset = { 0.0f, 0.0f };
+		Math::Vector2 Offset = { 0.0f, 0.0f };
 		float Size = 0.5f;
 
 		float Density = 1.0f;

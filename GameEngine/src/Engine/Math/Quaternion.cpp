@@ -1,7 +1,7 @@
 #include <pch.h>
 #include "Quaternion.h"
 
-namespace Engine::Math
+namespace Math
 {
 	Vector3 Axis(const Quaternion& q)
 	{
