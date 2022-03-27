@@ -96,7 +96,8 @@ namespace Engine
 			Engine::BufferLayout layout = {
 				{Engine::ShaderDataType::Float3, "a_Position"},
 				{Engine::ShaderDataType::Float2, "a_TexCoord"},
-				{Engine::ShaderDataType::Float3, "a_Normal"}
+				{Engine::ShaderDataType::Float3, "a_Normal"},
+				{Engine::ShaderDataType::Float3, "a_Tangent"}
 			};
 
 			vbo->SetLayout(layout);

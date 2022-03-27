@@ -12,7 +12,8 @@ namespace Engine
 		None = 0,
 		Position3, Position4,
 		UV,
-		Normal
+		Normal,
+		Tangent,
 	};
 
 	struct VertexElement
@@ -35,6 +36,7 @@ namespace Engine
 			case Engine::VertexDataType::None:
 				Size = 0;
 				break;
+			case Engine::VertexDataType::Tangent:
 			case Engine::VertexDataType::Normal:
 			case Engine::VertexDataType::Position3:
 				Size = sizeof(float) * 3;

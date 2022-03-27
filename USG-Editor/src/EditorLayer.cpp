@@ -65,12 +65,14 @@ namespace Engine
 			{Engine::VertexDataType::Position3},
 			{Engine::VertexDataType::UV},
 			{Engine::VertexDataType::Normal},
+			{Engine::VertexDataType::Tangent}
 		};
 
 		Ref<Mesh> mesh = Engine::MeshLoader::LoadStaticMesh("Assets/Models/ogre.obj", layout);
 
 		auto& meshComp = m_ActiveScene->CreateEntity().AddComponent<MeshRendererComponent>(mesh);
 		meshComp.mat->diffuse = Texture2D::Create("Assets/Images/ogre_diffuse.bmp");
+		meshComp.mat->normal = Texture2D::Create("Assets/Images/ogre_normal.bmp");
 		uint32_t whiteTexureData = 0xffffffff;
 		meshComp.mat->speculur = Texture2D::Create(1, 1);
 		meshComp.mat->speculur->SetData(&whiteTexureData, sizeof(whiteTexureData));

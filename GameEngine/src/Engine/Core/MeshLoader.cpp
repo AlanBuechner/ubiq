@@ -18,6 +18,11 @@ namespace Engine
 		return { mesh->mNormals[index].x, mesh->mNormals[index].y, mesh->mNormals[index].z };
 	}
 
+	glm::vec3 GetTangent(aiMesh* mesh, uint32_t index)
+	{
+		return { mesh->mTangents[index].x, mesh->mTangents[index].y, mesh->mTangents[index].z };
+	}
+
 	glm::vec2 GetUVCoords(aiMesh* mesh, uint32_t index)
 	{
 		if (mesh->mTextureCoords[0] == nullptr)
@@ -53,6 +58,11 @@ namespace Engine
 				{
 					mesh->vertices[v].normal = GetNormal(m, v);
 				}
+
+				if (layout.HasElement(VertexDataType::Tangent))
+				{
+					mesh->vertices[i].tangent = GetTangent(m, v);
+				}
 			}
 
 			// indices
@@ -76,7 +86,8 @@ namespace Engine
 		auto model = imp.ReadFile(file,
 			aiProcess_Triangulate |
 			aiProcess_JoinIdenticalVertices |
-			(layout.HasElement(VertexDataType::None) ? aiProcess_GenNormals : 0) |
+			(layout.HasElement(VertexDataType::Normal) ? aiProcess_GenNormals : 0) |
+			(layout.HasElement(VertexDataType::Tangent) ? aiProcess_CalcTangentSpace : 0) |
 			aiProcess_FlipWindingOrder
 		);
 

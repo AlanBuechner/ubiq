@@ -11,5 +11,6 @@ namespace Engine
 		Ref<Shader> shader;
 		Ref<Texture2D> diffuse;
 		Ref<Texture2D> speculur;
+		Ref<Texture2D> normal;
 	};
 }

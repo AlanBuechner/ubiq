@@ -53,12 +53,16 @@ namespace Engine
 
 		mat->shader->UploadUniformInt("u_Diffuse", 1);
 		mat->shader->UploadUniformInt("u_Specular", 2);
+		mat->shader->UploadUniformInt("u_NormalMap", 3);
 
 		if (mat->diffuse)
 			mat->diffuse->Bind(1);
 
 		if (mat->speculur)
 			mat->speculur->Bind(2);
+
+		if (mat->normal)
+			mat->normal->Bind(3);
 
 		mat->shader->UploadUniformInt("numLights", m_SceneData->PointLights.size());
 		for (uint32_t i = 0; i < m_SceneData->PointLights.size(); i++)
