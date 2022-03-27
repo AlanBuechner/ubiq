@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/core.h"
+#include "Engine/Core/Core.h"
 
 #include "Engine/Core/Application.h"
 #include "Engine/Core/Layer.h"

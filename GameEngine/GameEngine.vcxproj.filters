@@ -135,7 +135,7 @@
     <ClInclude Include="src\Engine\Core\Window.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Core\core.h">
+    <ClInclude Include="src\Engine\Core\Core.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Events\ApplicationEvent.h">

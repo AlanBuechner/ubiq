@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine\Core\core.h"
+#include "Engine\Core\Core.h"
 #include "RenderCommand.h"
 #include "Material.h"
 

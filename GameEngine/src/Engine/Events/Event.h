@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-#include "Engine/Core/core.h"
+#include "Engine/Core/Core.h"
 #include <string>
 #include <functional>
 

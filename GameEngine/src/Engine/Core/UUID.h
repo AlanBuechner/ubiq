@@ -1,6 +1,6 @@
 #pragma once
 #include <xhash>
-
+#include "Core.h"
 
 namespace Engine
 {

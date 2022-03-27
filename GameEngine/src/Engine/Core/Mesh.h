@@ -1,5 +1,5 @@
 #pragma once
-#include "core.h"
+#include "Core.h"
 #include <Engine/Math/Math.h>
 
 #include <vector>

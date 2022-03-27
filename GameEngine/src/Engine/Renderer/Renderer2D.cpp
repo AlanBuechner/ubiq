@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Renderer2D.h"
 
-#include "Engine/Core/core.h"
+#include "Engine/Core/Core.h"
 #include "Renderer.h"
 #include "Shader.h"
 #include "Camera.h"

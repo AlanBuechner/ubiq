@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Engine/Core/core.h"
+#include "Engine/Core/Core.h"
 #include "Engine/Core/Log.h"
 #include "Buffer.h"
 #include "Renderer.h"

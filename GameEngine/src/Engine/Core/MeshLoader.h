@@ -1,5 +1,5 @@
 #pragma once
-#include "core.h"
+#include "Core.h"
 #include "Mesh.h"
 #include <vector>
 #include <string>
