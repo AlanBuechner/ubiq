@@ -50,8 +50,7 @@ project "GameEngine"
 		"ImGui",
 		"Yaml",
 		"Box2D",
-		"vendor/Assimp/lib/%{cfg.buildcfg}/assimp-vc142-mtd.lib",
-		"vendor/Assimp/lib/%{cfg.buildcfg}/assimp-vc142-mtd.lib",
+		"%{IncludeDir.Assimp}/assimp-vc140-mt.lib",
 		"opengl32.lib"
 	}
 

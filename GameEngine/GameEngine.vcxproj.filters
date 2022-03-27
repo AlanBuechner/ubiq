@@ -153,6 +153,18 @@
     <ClInclude Include="src\Engine\Math\Math.h">
       <Filter>src\Engine\Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Math\Matrix.h">
+      <Filter>src\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Math\Quaternion.h">
+      <Filter>src\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Math\Types.h">
+      <Filter>src\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Math\Vector.h">
+      <Filter>src\Engine\Math</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Physics\Physics2D.h">
       <Filter>src\Engine\Physics</Filter>
     </ClInclude>
@@ -174,7 +186,13 @@
     <ClInclude Include="src\Engine\Renderer\GraphicsContext.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Light.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\LineRenderer.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Material.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\OrthographicCamera.h">
@@ -1353,8 +1371,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Renderer\Material.h" />
-    <ClInclude Include="src\Engine\Renderer\Light.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1400,6 +1416,15 @@
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Math\Math.cpp">
+      <Filter>src\Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Math\Matrix.cpp">
+      <Filter>src\Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Math\Quaternion.cpp">
+      <Filter>src\Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Math\Vector.cpp">
       <Filter>src\Engine\Math</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Physics\Physics2D.cpp">

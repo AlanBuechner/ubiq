@@ -6,3 +6,4 @@ Sandbox/*.json
 
 *.sln
 *.vsxproj*
+*.vcxproj*

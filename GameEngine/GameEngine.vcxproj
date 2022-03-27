@@ -115,7 +115,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>vendor\Assimp\lib\Release\assimp-vc142-mtd.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vendor\Assimp\assimp-vc140-mt.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -140,7 +140,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>vendor\Assimp\lib\Dist\assimp-vc142-mtd.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vendor\Assimp\assimp-vc140-mt.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -171,6 +171,10 @@
     <ClInclude Include="src\Engine\Events\KeyEvent.h" />
     <ClInclude Include="src\Engine\Events\MouseEvent.h" />
     <ClInclude Include="src\Engine\Math\Math.h" />
+    <ClInclude Include="src\Engine\Math\Matrix.h" />
+    <ClInclude Include="src\Engine\Math\Quaternion.h" />
+    <ClInclude Include="src\Engine\Math\Types.h" />
+    <ClInclude Include="src\Engine\Math\Vector.h" />
     <ClInclude Include="src\Engine\Physics\Physics2D.h" />
     <ClInclude Include="src\Engine\Physics\PhysicsComponent.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
@@ -590,6 +594,9 @@
     <ClCompile Include="src\Engine\Core\Time.cpp" />
     <ClCompile Include="src\Engine\Core\UUID.cpp" />
     <ClCompile Include="src\Engine\Math\Math.cpp" />
+    <ClCompile Include="src\Engine\Math\Matrix.cpp" />
+    <ClCompile Include="src\Engine\Math\Quaternion.cpp" />
+    <ClCompile Include="src\Engine\Math\Vector.cpp" />
     <ClCompile Include="src\Engine\Physics\Physics2D.cpp" />
     <ClCompile Include="src\Engine\Physics\PhysicsComponent.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
