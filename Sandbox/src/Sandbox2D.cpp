@@ -71,7 +71,7 @@ void Sandbox2DLayer::OnUpdate()
 	{
 		for (float y = -5.0f; y < 5.0f; y += 0.5f)
 		{
-			glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+			Math::Vector4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
 			Engine::Renderer2D::DrawQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, 0.0f, color);
 		}
 	}*/

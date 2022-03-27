@@ -12,7 +12,7 @@ namespace Engine
 	struct LineVertex
 	{
 		Math::Vector3 Position;
-		glm::vec4 Color;
+		Math::Vector4 Color;
 	};
 
 	struct LineMesh
@@ -40,7 +40,7 @@ namespace Engine
 
 	public:
 
-		static void DrawLine(Math::Vector3 p1, Math::Vector3 p2, const glm::vec4 color, const Math::Mat4& transform = Math::Mat4(1.0f));
+		static void DrawLine(Math::Vector3 p1, Math::Vector3 p2, const Math::Vector4 color, const Math::Mat4& transform = Math::Mat4(1.0f));
 		static void DrawLineMesh(LineMesh& mesh, const Math::Mat4& transform = Math::Mat4(1.0f));
 
 	};

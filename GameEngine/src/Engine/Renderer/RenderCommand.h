@@ -16,7 +16,7 @@ namespace Engine
 			s_RendererAPI->SetViewPort(x, y, width, height);
 		}
 
-		inline static void SetClearColor(const glm::vec4& color)
+		inline static void SetClearColor(const Math::Vector4& color)
 		{
 			s_RendererAPI->SetClearColor(color);
 		}

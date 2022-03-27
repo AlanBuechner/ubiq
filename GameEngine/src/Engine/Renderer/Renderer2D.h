@@ -26,11 +26,11 @@ namespace Engine
 		static void Flush();
 
 		// draw colored quaad
-		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const Math::Mat4& transform, const glm::vec4& color, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, int entityID = -1);
+		static void DrawQuad(const Math::Mat4& transform, const Math::Vector4& color, int entityID = -1);
 
 		// draw sub textured quad
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Ref<SubTexture2D>& texture, int entityID = -1);
@@ -40,11 +40,11 @@ namespace Engine
 		//static void DrawQuad(const Math::Mat4& transform, const Ref<SubTexture2D>& texture, int entityID = -1);
 
 		// draw sub textured tinted quad
-		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
-		static void DrawQuad(const Math::Mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Mat4& transform, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
 
 		// draw textured qaud
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Ref<Texture2D>& texture, int entityID = -1);
@@ -54,11 +54,11 @@ namespace Engine
 		static void DrawQuad(const Math::Mat4& transform, const Ref<Texture2D>& texture, int entityID = -1);
 
 		// draw textured tinted qaud
-		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
-		static void DrawQuad(const Math::Mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const Math::Mat4& transform, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
 
 		// draw sprite component
 		static void DrawSprite(const Math::Mat4& transform, SpriteRendererComponent& src, int entityID);
@@ -76,8 +76,8 @@ namespace Engine
 
 	private:
 
-		static void DrawQuadImpl(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID = -1);
-		static void DrawQuadImpl(const Math::Mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID = -1);
+		static void DrawQuadImpl(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID = -1);
+		static void DrawQuadImpl(const Math::Mat4& transform, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID = -1);
 
 		static void BeginBatch();
 	};

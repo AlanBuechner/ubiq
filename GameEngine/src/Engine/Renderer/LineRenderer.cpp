@@ -110,7 +110,7 @@ namespace Engine
 		s_Data.LineIndexBufferPtr = s_Data.LineIndexBufferBase;
 	}
 
-	void LineRenderer::DrawLine(Math::Vector3 p1, Math::Vector3 p2, const glm::vec4 color, const Math::Mat4& transform)
+	void LineRenderer::DrawLine(Math::Vector3 p1, Math::Vector3 p2, const Math::Vector4 color, const Math::Mat4& transform)
 	{
 		if (s_Data.IndexCount + 2 > s_Data.MaxIndices || s_Data.VertexCount + 2 > s_Data.MaxVertices)
 		{
@@ -118,14 +118,14 @@ namespace Engine
 			BeginBatch();
 		}
 
-		s_Data.LineVertexBufferPtr->Position = transform * glm::vec4(p1, 1.0f);
+		s_Data.LineVertexBufferPtr->Position = transform * Math::Vector4(p1, 1.0f);
 		s_Data.LineVertexBufferPtr->Color = color;
 		s_Data.LineVertexBufferPtr++;
 
 		*s_Data.LineIndexBufferPtr = s_Data.VertexCount + 0;
 		s_Data.LineIndexBufferPtr++;
 
-		s_Data.LineVertexBufferPtr->Position = transform * glm::vec4(p2, 1.0f);
+		s_Data.LineVertexBufferPtr->Position = transform * Math::Vector4(p2, 1.0f);
 		s_Data.LineVertexBufferPtr->Color = color;
 		s_Data.LineVertexBufferPtr++;
 
@@ -147,7 +147,7 @@ namespace Engine
 
 		for (uint32_t i = 0; i < mesh.m_Vertices.size(); i++)
 		{
-			s_Data.LineVertexBufferPtr->Position = transform * glm::vec4(mesh.m_Vertices[i].Position, 1.0f);
+			s_Data.LineVertexBufferPtr->Position = transform * Math::Vector4(mesh.m_Vertices[i].Position, 1.0f);
 			s_Data.LineVertexBufferPtr->Color = mesh.m_Vertices[i].Color;
 			s_Data.LineVertexBufferPtr++;
 		}

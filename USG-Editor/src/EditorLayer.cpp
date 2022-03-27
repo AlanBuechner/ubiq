@@ -383,17 +383,17 @@ namespace Engine
 
 			const Math::Mat4& proj = glm::inverse(cam.GetProjectionMatrix());
 			const Math::Mat4& transform = tc.GetTransform();
-			glm::vec4 ltn = proj * glm::vec4{ -1, 1, 0, 1 };
-			glm::vec4 ltf = proj * glm::vec4{ -1, 1, 1, 1 };
+			Math::Vector4 ltn = proj * Math::Vector4{ -1, 1, 0, 1 };
+			Math::Vector4 ltf = proj * Math::Vector4{ -1, 1, 1, 1 };
 
-			glm::vec4 rtn = proj * glm::vec4{ 1, 1, 0, 1 };
-			glm::vec4 rtf = proj * glm::vec4{ 1, 1, 1, 1 };
+			Math::Vector4 rtn = proj * Math::Vector4{ 1, 1, 0, 1 };
+			Math::Vector4 rtf = proj * Math::Vector4{ 1, 1, 1, 1 };
 
-			glm::vec4 lbn = proj * glm::vec4{ -1, -1, 0, 1 };
-			glm::vec4 lbf = proj * glm::vec4{ -1, -1, 1, 1 };
+			Math::Vector4 lbn = proj * Math::Vector4{ -1, -1, 0, 1 };
+			Math::Vector4 lbf = proj * Math::Vector4{ -1, -1, 1, 1 };
 
-			glm::vec4 rbn = proj * glm::vec4{ 1, -1, 0, 1 };
-			glm::vec4 rbf = proj * glm::vec4{ 1, -1, 1, 1 };
+			Math::Vector4 rbn = proj * Math::Vector4{ 1, -1, 0, 1 };
+			Math::Vector4 rbf = proj * Math::Vector4{ 1, -1, 1, 1 };
 
 			LineMesh mesh;
 			mesh.m_Vertices = {

@@ -61,9 +61,9 @@ namespace YAML
 
 
 	template<>
-	struct convert<glm::vec4>
+	struct convert<Math::Vector4>
 	{
-		static Node encode(const glm::vec4& rhs)
+		static Node encode(const Math::Vector4& rhs)
 		{
 			Node node;
 			node.push_back(rhs.x);
@@ -74,7 +74,7 @@ namespace YAML
 			return node;
 		}
 
-		static bool decode(const Node& node, glm::vec4& rhs)
+		static bool decode(const Node& node, Math::Vector4& rhs)
 		{
 			if (!node.IsSequence() || node.size() != 4)
 				return false;
@@ -106,7 +106,7 @@ namespace Engine
 		return out;
 	}
 
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v)
+	YAML::Emitter& operator<<(YAML::Emitter& out, const Math::Vector4& v)
 	{
 		out << YAML::Flow;
 		out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
@@ -327,7 +327,7 @@ namespace Engine
 				if (spriteRendererComponent)
 				{
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
-					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+					src.Color = spriteRendererComponent["Color"].as<Math::Vector4>();
 				}
 
 				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];

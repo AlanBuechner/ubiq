@@ -210,7 +210,7 @@ namespace Engine
 		glUniform1iv(location, count, values);
 	}
 
-	void OpenGLShader::UploadUniformFloat4(const std::string & name, const glm::vec4 & values)
+	void OpenGLShader::UploadUniformFloat4(const std::string & name, const Math::Vector4 & values)
 	{
 		uint32_t location = GetUniformLocation(name);
 		glUniform4f(location, values.x, values.y, values.z, values.w);
@@ -246,7 +246,7 @@ namespace Engine
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
-	void OpenGLShader::UploadUniformMat2(const std::string& name, const glm::mat2& matrix)
+	void OpenGLShader::UploadUniformMat2(const std::string& name, const Math::Mat2& matrix)
 	{
 		uint32_t location = GetUniformLocation(name);
 		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(matrix));

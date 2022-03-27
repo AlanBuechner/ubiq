@@ -71,12 +71,12 @@ namespace Engine
 
 	struct SpriteRendererComponent
 	{
-		glm::vec4 Color{ 1.0f,1.0f, 1.0f, 1.0f };
+		Math::Vector4 Color{ 1.0f,1.0f, 1.0f, 1.0f };
 		Ref<Texture2D> Texture;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
-		SpriteRendererComponent(const glm::vec4& color) :
+		SpriteRendererComponent(const Math::Vector4& color) :
 			Color(color)
 		{}
 	};

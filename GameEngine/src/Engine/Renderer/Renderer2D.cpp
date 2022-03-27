@@ -15,7 +15,7 @@ namespace Engine
 	struct QuadVertex
 	{
 		Math::Vector3 Position;
-		glm::vec4 Color;
+		Math::Vector4 Color;
 		Math::Vector2 TexCoord;
 		float TexIndex;
 
@@ -43,7 +43,7 @@ namespace Engine
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1;
 
-		glm::vec4 QuadVertexPositions[4];
+		Math::Vector4 QuadVertexPositions[4];
 
 		Math::Vector2 TextureCoords[4];
 
@@ -204,27 +204,27 @@ namespace Engine
 
 
 	// draw colored quad --------------------------------------
-	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const glm::vec4& color, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, int entityID)
 	{
 		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const glm::vec4& color, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, int entityID)
 	{
 		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const glm::vec4& color, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, int entityID)
 	{
 		DrawQuadImpl(position, size, 0.0f, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, int entityID)
 	{
 		DrawQuadImpl(position, size, rotation, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Mat4& transform, const glm::vec4& color, int entityID)
+	void Renderer2D::DrawQuad(const Math::Mat4& transform, const Math::Vector4& color, int entityID)
 	{
 		DrawQuadImpl(transform, color, s_Data.WhiteTexture, s_Data.TextureCoords, entityID);
 	}
@@ -260,27 +260,27 @@ namespace Engine
 
 
 	// draw sub texture tinted quad ----------------------------
-	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
 		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
 		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
 		DrawQuadImpl(position, size, 0.0f, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
 		DrawQuadImpl(position, size, rotation, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Mat4& transform, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID)
 	{
 		DrawQuadImpl(transform, color, texture->GetTexture(), texture->GetTextCordes(), entityID);
 	}
@@ -315,27 +315,27 @@ namespace Engine
 
 
 	// draw textured tinted quad
-	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID)
 	{
 		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, color, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID)
 	{
 		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID)
 	{
 		DrawQuadImpl(position, size, 0.0f, color, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID)
 	{
 		DrawQuadImpl(position, size, rotation, color, texture, s_Data.TextureCoords, entityID);
 	}
 
-	void Renderer2D::DrawQuad(const Math::Mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, int entityID)
+	void Renderer2D::DrawQuad(const Math::Mat4& transform, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID)
 	{
 		DrawQuadImpl(transform, color, texture, s_Data.TextureCoords, entityID);
 	}
@@ -351,7 +351,7 @@ namespace Engine
 
 
 	// draw quad implementation
-	void Renderer2D::DrawQuadImpl(const Math::Vector3& position, const Math::Vector2& size, float rotation, const glm::vec4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID)
+	void Renderer2D::DrawQuadImpl(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
@@ -363,7 +363,7 @@ namespace Engine
 		DrawQuadImpl(transform, color, texture, textCoords);
 	}
 
-	void Renderer2D::DrawQuadImpl(const Math::Mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID)
+	void Renderer2D::DrawQuadImpl(const Math::Mat4& transform, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID)
 	{
 
 		CREATE_PROFILE_FUNCTIONI();

@@ -61,13 +61,13 @@ namespace Engine
 
 		virtual void UploadUniformInt(const std::string& name, const int value) = 0;
 		virtual void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count) = 0;
-		virtual void UploadUniformFloat4(const std::string& name, const glm::vec4& values) = 0;
+		virtual void UploadUniformFloat4(const std::string& name, const Math::Vector4& values) = 0;
 		virtual void UploadUniformFloat3(const std::string& name, const Math::Vector3& values) = 0;
 		virtual void UploadUniformFloat2(const std::string& name, const Math::Vector2& values) = 0;
 		virtual void UploadUniformFloat(const std::string& name, const float value) = 0;
 		virtual void UploadUniformMat4(const std::string& name, const Math::Mat4& matrix) = 0;
 		virtual void UploadUniformMat3(const std::string& name, const Math::Mat3& matrix) = 0;
-		virtual void UploadUniformMat2(const std::string& name, const glm::mat2& matrix) = 0;
+		virtual void UploadUniformMat2(const std::string& name, const Math::Mat2& matrix) = 0;
 
 		virtual void UploadPointLight(const std::string& name, uint32_t i, const PointLight& light) = 0;
 
