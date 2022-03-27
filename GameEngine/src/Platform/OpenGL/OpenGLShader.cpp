@@ -43,7 +43,7 @@ namespace Engine
 		glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORMS, &count);
 		std::vector< Shader::Uniform> uniforms(count);
 
-		for (uint32_t i = 0; i < (uint32_t)count; i++)
+		for (uint32 i = 0; i < (uint32)count; i++)
 		{
 			glGetActiveUniform(m_RendererID, (GLuint)i, bufSize, &length, &size, &type, name);
 
@@ -73,11 +73,11 @@ namespace Engine
 		return uniforms;
 	}
 
-	uint32_t OpenGLShader::GetUniformLocation(const std::string & name) const
+	uint32 OpenGLShader::GetUniformLocation(const std::string & name) const
 	{
 		if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
 			return m_UniformLocationCache[name];
-		uint32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		uint32 location = glGetUniformLocation(m_RendererID, name.c_str());
 		if (location == -1)
 		{
 			CORE_ERROR("Uniform {0} was not found!", name);
@@ -200,59 +200,59 @@ namespace Engine
 
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int value)
 	{
-		uint32_t location = GetUniformLocation(name);
+		uint32 location = GetUniformLocation(name);
 		glUniform1i(location, value);
 	}
 
-	void OpenGLShader::UploadUniformIntArray(const std::string& name, const int* values, uint32_t count)
+	void OpenGLShader::UploadUniformIntArray(const std::string& name, const int* values, uint32 count)
 	{
-		uint32_t location = GetUniformLocation(name);
+		uint32 location = GetUniformLocation(name);
 		glUniform1iv(location, count, values);
 	}
 
 	void OpenGLShader::UploadUniformFloat4(const std::string & name, const Math::Vector4 & values)
 	{
-		uint32_t location = GetUniformLocation(name);
+		uint32 location = GetUniformLocation(name);
 		glUniform4f(location, values.x, values.y, values.z, values.w);
 	}
 
 	void OpenGLShader::UploadUniformFloat3(const std::string& name, const Math::Vector3& values)
 	{
-		uint32_t location = GetUniformLocation(name);
+		uint32 location = GetUniformLocation(name);
 		glUniform3f(location, values.x, values.y, values.z);
 	}
 
 	void OpenGLShader::UploadUniformFloat2(const std::string& name, const Math::Vector2& values)
 	{
-		uint32_t location = GetUniformLocation(name);
+		uint32 location = GetUniformLocation(name);
 		glUniform2f(location, values.x, values.y);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, const float value)
 	{
-		uint32_t location = GetUniformLocation(name);
+		uint32 location = GetUniformLocation(name);
 		glUniform1f(location, value);
 	}
 
 	void OpenGLShader::UploadUniformMat4(const std::string & name, const Math::Mat4 & matrix)
 	{
-		uint32_t location = GetUniformLocation(name);
+		uint32 location = GetUniformLocation(name);
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	void OpenGLShader::UploadUniformMat3(const std::string& name, const Math::Mat3& matrix)
 	{
-		uint32_t location = GetUniformLocation(name);
+		uint32 location = GetUniformLocation(name);
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	void OpenGLShader::UploadUniformMat2(const std::string& name, const Math::Mat2& matrix)
 	{
-		uint32_t location = GetUniformLocation(name);
+		uint32 location = GetUniformLocation(name);
 		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
-	void OpenGLShader::UploadPointLight(const std::string& name, uint32_t i, const PointLight& light)
+	void OpenGLShader::UploadPointLight(const std::string& name, uint32 i, const PointLight& light)
 	{
 		std::string l = name + "[" + std::to_string(i) + "].";
 		UploadUniformFloat3(l + "position", light.position);

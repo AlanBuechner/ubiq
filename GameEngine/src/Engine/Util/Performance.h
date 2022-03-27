@@ -13,7 +13,7 @@ namespace Engine
 	{
 		const char* name;
 		long long start, end;
-		uint32_t ThreadID;
+		uint32 ThreadID;
 	};
 
 	struct InstrumentationSession
@@ -71,7 +71,7 @@ namespace Engine
 
 			long long start = (long long)(m_Start * 1000000.0f);
 			long long end = (long long)(m_End * 1000000.0f);
-			uint32_t threadID = (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
+			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
 			ProfileResult result = { m_Name.c_str(), start, end, threadID };
 			m_Func(result);
 		}
@@ -127,7 +127,7 @@ namespace Engine
 
 			long long start = (long long)(m_Start * 1000000.0f);
 			long long end = (long long)(m_End * 1000000.0f);
-			uint32_t threadID = (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
+			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
 			ProfileResult result = { m_Name.c_str(), start, end, threadID };
 
 			Instrumentor::Get().WriteProfile(result);
@@ -178,7 +178,7 @@ namespace Engine
 
 			long long start = m_Start * 1000000.0f;
 			long long end = m_End * 1000000.0f;
-			uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
+			uint32 threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
 			ProfileResult result = { m_Name.RawString(), start, end, threadID };
 			m_Func(result);
 		}
@@ -214,7 +214,7 @@ namespace Engine
 
 			long long start = (long long)(m_Start * 1000000.0f);
 			long long end = (long long)(m_End * 1000000.0f);
-			uint32_t threadID = (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
+			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
 			ProfileResult result = { m_Name.c_str(), start, end, threadID };
 			
 			Instrumentor::Get().WriteProfile(result);

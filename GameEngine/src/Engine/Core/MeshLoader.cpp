@@ -8,22 +8,22 @@
 namespace Engine
 {
 
-	Math::Vector3 GetPosition(aiMesh* mesh, uint32_t index)
+	Math::Vector3 GetPosition(aiMesh* mesh, uint32 index)
 	{
 		return { mesh->mVertices[index].x, mesh->mVertices[index].y, mesh->mVertices[index].z };
 	}
 
-	Math::Vector3 GetNormal(aiMesh* mesh, uint32_t index)
+	Math::Vector3 GetNormal(aiMesh* mesh, uint32 index)
 	{
 		return { mesh->mNormals[index].x, mesh->mNormals[index].y, mesh->mNormals[index].z };
 	}
 
-	Math::Vector3 GetTangent(aiMesh* mesh, uint32_t index)
+	Math::Vector3 GetTangent(aiMesh* mesh, uint32 index)
 	{
 		return { mesh->mTangents[index].x, mesh->mTangents[index].y, mesh->mTangents[index].z };
 	}
 
-	Math::Vector2 GetUVCoords(aiMesh* mesh, uint32_t index)
+	Math::Vector2 GetUVCoords(aiMesh* mesh, uint32 index)
 	{
 		if (mesh->mTextureCoords[0] == nullptr)
 			return { 0.0f, 0.0f };
@@ -34,15 +34,15 @@ namespace Engine
 
 	void ProcessNode(aiNode* node, const aiScene* scene, Ref<Mesh> mesh, VertexLayout layout)
 	{
-		for (uint32_t i = 0; i < node->mNumMeshes; i++)
+		for (uint32 i = 0; i < node->mNumMeshes; i++)
 		{
-			uint32_t vertexOffset = (uint32_t)mesh->vertices.size();
+			uint32 vertexOffset = (uint32)mesh->vertices.size();
 			aiMesh* m = scene->mMeshes[node->mMeshes[i]];
 
 			mesh->vertices.resize((size_t)vertexOffset + m->mNumVertices);
 
 			// vertices
-			for (uint32_t v = 0; v < m->mNumVertices; v++)
+			for (uint32 v = 0; v < m->mNumVertices; v++)
 			{
 				if (layout.HasElement(VertexDataType::Position3))
 				{
@@ -67,15 +67,15 @@ namespace Engine
 
 			// indices
 			mesh->indices.reserve((size_t)m->mNumFaces*3);
-			for (uint32_t j = 0; j < m->mNumFaces; j++)
+			for (uint32 j = 0; j < m->mNumFaces; j++)
 			{
-				for (uint32_t k = 0; k < 3; k++)
+				for (uint32 k = 0; k < 3; k++)
 					mesh->indices.push_back(m->mFaces[j].mIndices[k]);
 			}
 
 		}
 
-		for (uint32_t i = 0; i < node->mNumChildren; i++)
+		for (uint32 i = 0; i < node->mNumChildren; i++)
 			ProcessNode(node->mChildren[i], scene, mesh, layout);
 	}
 
@@ -91,7 +91,7 @@ namespace Engine
 			aiProcess_FlipWindingOrder
 		);
 
-		Ref<Mesh> mesh = std::make_shared<Mesh>();
+		Ref<Mesh> mesh = CreateRef<Mesh>();
 
 		ProcessNode(model->mRootNode, model, mesh, layout);
 

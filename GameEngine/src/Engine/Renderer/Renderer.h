@@ -22,7 +22,7 @@ namespace Engine
 	public:
 		static void Init();
 
-		static void OnWindowResize(uint32_t width, uint32_t height);
+		static void OnWindowResize(uint32 width, uint32 height);
 
 		static void BeginScene(const Camera& camera, const Math::Mat4& transform);
 		static void BeginScene(const EditorCamera& camera);

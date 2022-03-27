@@ -12,21 +12,21 @@ namespace Engine
 
 	struct LineRendererData
 	{
-		static const uint32_t LineVertexCount = 2;
-		static const uint32_t MaxLines = 10000;
-		static const uint32_t MaxVertices = MaxLines * LineVertexCount;
-		static const uint32_t MaxIndices = MaxLines * 2;
+		static const uint32 LineVertexCount = 2;
+		static const uint32 MaxLines = 10000;
+		static const uint32 MaxVertices = MaxLines * LineVertexCount;
+		static const uint32 MaxIndices = MaxLines * 2;
 
 		Ref<VertexArray> LineVertexArray;
 		Ref<VertexBuffer> LineVertexBuffer;
 		Ref<IndexBuffer> LineIndexBuffer;
 		Ref<ShaderLibrary> Library;
 
-		uint32_t VertexCount = 0;
-		uint32_t IndexCount = 0;
+		uint32 VertexCount = 0;
+		uint32 IndexCount = 0;
 
-		uint32_t* LineIndexBufferBase = nullptr;
-		uint32_t* LineIndexBufferPtr = nullptr;
+		uint32* LineIndexBufferBase = nullptr;
+		uint32* LineIndexBufferPtr = nullptr;
 
 		LineVertex* LineVertexBufferBase = nullptr;
 		LineVertex* LineVertexBufferPtr = nullptr;
@@ -50,12 +50,12 @@ namespace Engine
 
 		s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxVertices];
 
-		s_Data.LineIndexBufferBase = new uint32_t[s_Data.MaxIndices];
+		s_Data.LineIndexBufferBase = new uint32[s_Data.MaxIndices];
 
 		s_Data.LineIndexBuffer = Engine::IndexBuffer::Create(s_Data.MaxIndices);
 		s_Data.LineVertexArray->SetIndexBuffer(s_Data.LineIndexBuffer);
 
-		s_Data.Library = std::make_shared<ShaderLibrary>();
+		s_Data.Library = CreateRef<ShaderLibrary>();
 		Ref<Shader> TextureShader = s_Data.Library->Load("LineShader", "Assets/Shaders/LineShader.glsl");
 	}
 
@@ -145,22 +145,22 @@ namespace Engine
 			BeginBatch();
 		}
 
-		for (uint32_t i = 0; i < mesh.m_Vertices.size(); i++)
+		for (uint32 i = 0; i < mesh.m_Vertices.size(); i++)
 		{
 			s_Data.LineVertexBufferPtr->Position = transform * Math::Vector4(mesh.m_Vertices[i].Position, 1.0f);
 			s_Data.LineVertexBufferPtr->Color = mesh.m_Vertices[i].Color;
 			s_Data.LineVertexBufferPtr++;
 		}
 
-		for (uint32_t i = 0; i < mesh.m_Indices.size(); i++)
+		for (uint32 i = 0; i < mesh.m_Indices.size(); i++)
 		{
 			*s_Data.LineIndexBufferPtr = s_Data.VertexCount + mesh.m_Indices[i];
 			s_Data.LineIndexBufferPtr++;
 		}
 
 
-		s_Data.IndexCount += (uint32_t)mesh.m_Indices.size();
-		s_Data.VertexCount += (uint32_t)mesh.m_Vertices.size();
+		s_Data.IndexCount += (uint32)mesh.m_Indices.size();
+		s_Data.VertexCount += (uint32)mesh.m_Vertices.size();
 	}
 
 }

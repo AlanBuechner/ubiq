@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-	static const uint32_t MaxFramBufferSize = 8192;
+	static const uint32 MaxFramBufferSize = 8192;
 
 	namespace Utils
 	{
@@ -23,17 +23,17 @@ namespace Engine
 			return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 		}
 
-		static void CreateTextures(bool multisample, uint32_t* outID, uint32_t count)
+		static void CreateTextures(bool multisample, uint32* outID, uint32 count)
 		{
 			glCreateTextures(TextureTarget(multisample), count, outID);
 		}
 
-		static void BindTexture(bool multisampled, uint32_t id)
+		static void BindTexture(bool multisampled, uint32 id)
 		{
 			glBindTexture(TextureTarget(multisampled), id);
 		}
 
-		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, uint32_t width, uint32_t height, int index)
+		static void AttachColorTexture(uint32 id, int samples, GLenum internalFormat, GLenum format, uint32 width, uint32 height, int index)
 		{
 			bool multisampled = samples > 1;
 			if (multisampled)
@@ -52,7 +52,7 @@ namespace Engine
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+index, TextureTarget(multisampled), id, 0);
 		}
 
-		static void AttachDepthTexture(uint32_t id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height)
+		static void AttachDepthTexture(uint32 id, int samples, GLenum format, GLenum attachmentType, uint32 width, uint32 height)
 		{
 			bool multisampled = samples > 1;
 			if (multisampled)
@@ -137,10 +137,10 @@ namespace Engine
 				switch (m_ColorAttachmentSpecs[i].TextureFormat)
 				{
 				case FrameBufferTextureFormat::RGBA8:
-					Utils::AttachColorTexture(m_ColorAttachments[(int)i], m_Spec.Samples, GL_RGBA8, GL_RGBA, m_Spec.Width, m_Spec.Height, (uint32_t)i);
+					Utils::AttachColorTexture(m_ColorAttachments[(int)i], m_Spec.Samples, GL_RGBA8, GL_RGBA, m_Spec.Width, m_Spec.Height, (uint32)i);
 					break;
 				case FrameBufferTextureFormat::RED_INTEGER:
-					Utils::AttachColorTexture(m_ColorAttachments[(int)i], m_Spec.Samples, GL_R32I, GL_RED_INTEGER, m_Spec.Width, m_Spec.Height, (uint32_t)i);
+					Utils::AttachColorTexture(m_ColorAttachments[(int)i], m_Spec.Samples, GL_R32I, GL_RED_INTEGER, m_Spec.Width, m_Spec.Height, (uint32)i);
 					break;
 				default:
 					break;
@@ -191,7 +191,7 @@ namespace Engine
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
+	void OpenGLFrameBuffer::Resize(uint32 width, uint32 height)
 	{
 		if (width == 0 || height == 0 || width > MaxFramBufferSize || height > MaxFramBufferSize)
 		{
@@ -205,7 +205,7 @@ namespace Engine
 		Invalidate();
 	}
 
-	int OpenGLFrameBuffer::ReadPixle(uint32_t index, int x, int y)
+	int OpenGLFrameBuffer::ReadPixle(uint32 index, int x, int y)
 	{
 		CORE_ASSERT(index < m_ColorAttachments.size(), "");
 		glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
@@ -214,7 +214,7 @@ namespace Engine
 		return pixleData;
 	}
 
-	void OpenGLFrameBuffer::ClearAttachment(uint32_t attachmentIndex, int value)
+	void OpenGLFrameBuffer::ClearAttachment(uint32 attachmentIndex, int value)
 	{
 		CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "");
 

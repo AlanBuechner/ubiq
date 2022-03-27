@@ -91,7 +91,7 @@ namespace Engine
 		{
 			vao = Engine::VertexArray::Create();
 
-			Ref<VertexBuffer> vbo = Engine::VertexBuffer::Create((float*)mesh->vertices.data(), (uint32_t)(mesh->vertices.size() * sizeof(Mesh::Vertex)));
+			Ref<VertexBuffer> vbo = Engine::VertexBuffer::Create((float*)mesh->vertices.data(), (uint32)(mesh->vertices.size() * sizeof(Mesh::Vertex)));
 
 			Engine::BufferLayout layout = {
 				{Engine::ShaderDataType::Float3, "a_Position"},
@@ -104,11 +104,11 @@ namespace Engine
 
 			vao->AddVertexBuffer(vbo);
 
-			Ref<IndexBuffer> ibo = Engine::IndexBuffer::Create(mesh->indices.data(), (uint32_t)mesh->indices.size());
+			Ref<IndexBuffer> ibo = Engine::IndexBuffer::Create(mesh->indices.data(), (uint32)mesh->indices.size());
 
 			vao->SetIndexBuffer(ibo);
 
-			mat = std::make_shared<Material>();
+			mat = CreateRef<Material>();
 		}
 	};
 

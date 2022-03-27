@@ -18,7 +18,7 @@ namespace Engine
 	struct LineMesh
 	{
 		std::vector<LineVertex> m_Vertices;
-		std::vector<uint32_t> m_Indices;
+		std::vector<uint32> m_Indices;
 
 	};
 

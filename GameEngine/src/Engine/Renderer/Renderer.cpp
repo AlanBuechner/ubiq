@@ -20,7 +20,7 @@ namespace Engine
 		m_SceneData->PointLights.reserve(MAX_LIGHTS);
 	}
 
-	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
+	void Renderer::OnWindowResize(uint32 width, uint32 height)
 	{
 		RenderCommand::SetViewPort(0, 0, width, height);
 	}
@@ -64,8 +64,8 @@ namespace Engine
 		if (mat->normal)
 			mat->normal->Bind(3);
 
-		mat->shader->UploadUniformInt("numLights", (uint32_t)m_SceneData->PointLights.size());
-		for (uint32_t i = 0; i < m_SceneData->PointLights.size(); i++)
+		mat->shader->UploadUniformInt("numLights", (uint32)m_SceneData->PointLights.size());
+		for (uint32 i = 0; i < m_SceneData->PointLights.size(); i++)
 			mat->shader->UploadPointLight("pointLights", i, m_SceneData->PointLights[i]);
 		mat->shader->UploadUniformFloat3("ambientLight", m_SceneData->ambientLight);
 

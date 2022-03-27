@@ -41,9 +41,9 @@ namespace Engine
 
 	struct FrameBufferSpecification
 	{
-		uint32_t Width, Height;
+		uint32 Width, Height;
 		FrameBufferAttachmentSpecification Attachments;
-		uint32_t Samples = 1;
+		uint32 Samples = 1;
 
 		bool SwapChainTarget = false;
 	};
@@ -57,12 +57,12 @@ namespace Engine
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		virtual void Resize(uint32_t width, uint32_t height) = 0;
+		virtual void Resize(uint32 width, uint32 height) = 0;
 
-		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
-		virtual int ReadPixle(uint32_t attachment, int x, int y) = 0;
+		virtual uint32 GetColorAttachmentRendererID(uint32 index = 0) const = 0;
+		virtual int ReadPixle(uint32 attachment, int x, int y) = 0;
 
-		virtual void ClearAttachment(uint32_t attachmentIndex, int value) = 0;
+		virtual void ClearAttachment(uint32 attachmentIndex, int value) = 0;
 
 		virtual const FrameBufferSpecification& GetSpecification() const = 0;
 

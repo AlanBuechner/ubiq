@@ -53,7 +53,7 @@ namespace Engine
 
 		CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
 
-		uint32_t index = 0;
+		uint32 index = 0;
 		auto& layout = vertexBuffer->GetLayout();
 		for (auto& element : layout)
 		{

@@ -8,7 +8,7 @@ namespace Engine {
 	Layer::Layer(const std::string& debugName)
 		: m_DebugName(debugName)
 	{
-		m_InputManeger = std::make_shared<InputControlerManeger>();
+		m_InputManeger = CreateRef<InputControlerManeger>();
 	}
 
 	Layer::~Layer()

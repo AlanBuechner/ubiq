@@ -16,7 +16,7 @@ namespace Engine
 		std::vector<Shader::Uniform> GetUniforms();
 
 		virtual void UploadUniformInt(const std::string& name, const int value) override;
-		virtual void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count) override;
+		virtual void UploadUniformIntArray(const std::string& name, const int* values, uint32 count) override;
 		virtual void UploadUniformFloat4(const std::string& name, const Math::Vector4& values) override;
 		virtual void UploadUniformFloat3(const std::string& name, const Math::Vector3& values) override;
 		virtual void UploadUniformFloat2(const std::string& name, const Math::Vector2& values) override;
@@ -25,18 +25,18 @@ namespace Engine
 		virtual void UploadUniformMat3(const std::string& name, const Math::Mat3& matrix) override;
 		virtual void UploadUniformMat2(const std::string& name, const Math::Mat2& matrix) override;
 
-		virtual void UploadPointLight(const std::string& name, uint32_t i, const PointLight& light) override;
+		virtual void UploadPointLight(const std::string& name, uint32 i, const PointLight& light) override;
 
 
 	private:
-		virtual uint32_t GetUniformLocation(const std::string& name) const;
+		virtual uint32 GetUniformLocation(const std::string& name) const;
 
 		void Compile();
 
 	private:
-		uint32_t m_RendererID;
+		uint32 m_RendererID;
 		std::string m_Name;
-		mutable std::unordered_map<std::string, uint32_t> m_UniformLocationCache;
+		mutable std::unordered_map<std::string, uint32> m_UniformLocationCache;
 
 		Ref<ShaderSorce> m_Src;
 	};

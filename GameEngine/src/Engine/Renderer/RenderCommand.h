@@ -11,7 +11,7 @@ namespace Engine
 			s_RendererAPI->Init();
 		}
 
-		inline static void SetViewPort(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+		inline static void SetViewPort(uint32 x, uint32 y, uint32 width, uint32 height)
 		{
 			s_RendererAPI->SetViewPort(x, y, width, height);
 		}
@@ -26,12 +26,12 @@ namespace Engine
 			s_RendererAPI->Clear();
 		}
 
-		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0)
+		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32 indexCount = 0)
 		{
 			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
 
-		inline static void DrawLineIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0)
+		inline static void DrawLineIndexed(const Ref<VertexArray>& vertexArray, uint32 indexCount = 0)
 		{
 			s_RendererAPI->DrawLineIndexed(vertexArray, indexCount);
 		}

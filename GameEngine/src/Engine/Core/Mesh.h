@@ -21,7 +21,7 @@ namespace Engine
 		using Vertex = V;
 
 		std::vector<V> vertices;
-		std::vector<uint32_t> indices;
+		std::vector<uint32> indices;
 	};
 
 	using Mesh = TMesh<RendererVertex>;

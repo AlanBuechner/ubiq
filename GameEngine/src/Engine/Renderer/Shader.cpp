@@ -82,7 +82,7 @@ namespace Engine
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGl:
-			return std::make_shared<OpenGLShader>(name, src);
+			return CreateRef<OpenGLShader>(name, src);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!")
 			return nullptr;
@@ -108,7 +108,7 @@ namespace Engine
 
 	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& path)
 	{
-		Ref<Shader::ShaderSorce> src = std::make_shared<Shader::ShaderSorce>();
+		Ref<Shader::ShaderSorce> src = CreateRef<Shader::ShaderSorce>();
 		*src.get() << Shader::LoadShader(path);
 		auto shader = Shader::Create(name, src);
 		Add(shader);

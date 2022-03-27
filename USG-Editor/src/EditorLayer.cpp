@@ -26,7 +26,7 @@ namespace Engine
 
 		m_GridMesh.m_Vertices.reserve((size_t)(m_GridLines + 1) * 3);
 		m_GridMesh.m_Indices.reserve((size_t)(m_GridLines + 1) * 4);
-		for (uint32_t i = 0; i <= m_GridLines; i++)
+		for (uint32 i = 0; i <= m_GridLines; i++)
 		{
 			float posz = (m_GridLineOffset * i) - m_GridExtent;
 			m_GridMesh.m_Vertices.push_back({ { -m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
@@ -55,7 +55,7 @@ namespace Engine
 
 		m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
-		m_ActiveScene = std::make_shared<Scene>();
+		m_ActiveScene = CreateRef<Scene>();
 
 		m_EditorCamera = EditorCamera();
 
@@ -73,7 +73,7 @@ namespace Engine
 		auto& meshComp = m_ActiveScene->CreateEntity().AddComponent<MeshRendererComponent>(mesh);
 		meshComp.mat->diffuse = Texture2D::Create("Assets/Images/ogre_diffuse.bmp");
 		meshComp.mat->normal = Texture2D::Create("Assets/Images/ogre_normal.bmp");
-		uint32_t whiteTexureData = 0xffffffff;
+		uint32 whiteTexureData = 0xffffffff;
 		meshComp.mat->speculur = Texture2D::Create(1, 1);
 		meshComp.mat->speculur->SetData(&whiteTexureData, sizeof(whiteTexureData));
 		meshComp.mat->shader = ShaderLibrary().Load("MeshShader", "Assets/Shaders/MeshShader.glsl");
@@ -115,10 +115,10 @@ namespace Engine
 			m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
 			(spec.Width != m_ViewPortSize.x || spec.Height != m_ViewPortSize.y))
 		{
-			m_FrameBuffer->Resize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+			m_FrameBuffer->Resize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 			m_EditorCamera.SetViewportSize(m_ViewPortSize.x, m_ViewPortSize.y);
 
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+			m_ActiveScene->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		}
 
 		m_EditorCamera.OnUpdate();
@@ -462,7 +462,7 @@ namespace Engine
 		{
 			m_ViewPortSize = { viewPortPanalSize.x, viewPortPanalSize.y };
 		}
-		uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
+		uint32 textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, viewPortPanalSize, ImVec2(0, 1), ImVec2(1, 0));
 
 		ImVec2 minBound = ImGui::GetWindowPos();
@@ -531,8 +531,8 @@ namespace Engine
 
 	void EditorLayer::NewScene()
 	{
-		m_ActiveScene = std::make_shared<Scene>();
-		m_ActiveScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 

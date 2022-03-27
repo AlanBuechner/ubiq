@@ -18,7 +18,7 @@ namespace Engine
 
 	const Ref<SubTexture2D> SubTexture2D::Create(Ref<Texture2D> texture, Math::Vector2 regions, Math::Vector2 position, Math::Vector2 size)
 	{
-		return std::make_shared<SubTexture2D>(texture, regions, position, size);
+		return CreateRef<SubTexture2D>(texture, regions, position, size);
 	}
 
 }

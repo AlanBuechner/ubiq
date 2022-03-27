@@ -13,7 +13,7 @@ namespace Engine
 		LoadFromFile(path);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const uint32_t width, const uint32_t height, Ref<TextureAttribute> attrib) :
+	OpenGLTexture2D::OpenGLTexture2D(const uint32 width, const uint32 height, Ref<TextureAttribute> attrib) :
 		m_Width(width), m_Height(height), m_Attribute(attrib)
 	{
 		m_InternalFormat = GL_RGBA8;
@@ -88,12 +88,12 @@ namespace Engine
 		glDeleteTextures(1, &m_RendererID);
 	}
 
-	void OpenGLTexture2D::SetData(void* data, uint32_t size)
+	void OpenGLTexture2D::SetData(void* data, uint32 size)
 	{
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_Format, GL_UNSIGNED_BYTE, data);
 	}
 
-	void OpenGLTexture2D::Bind(uint32_t slot) const
+	void OpenGLTexture2D::Bind(uint32 slot) const
 	{
 		glBindTextureUnit(slot, m_RendererID);
 	}

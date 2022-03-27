@@ -283,7 +283,7 @@ namespace Engine
 		{
 			for (auto entity : entities)
 			{
-				uint64_t uuid = entity["Entity"].as<uint64_t>();
+				uint64 uuid = entity["Entity"].as<uint64>();
 
 				std::string name;
 				auto tagComponent = entity["TagComponent"];

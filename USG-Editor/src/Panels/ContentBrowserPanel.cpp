@@ -30,7 +30,7 @@ namespace Engine
 
 		ImGui::Text("%s", m_CurrentDirectory.string().c_str());
 
-		const uint32_t windowWidth = (uint32_t)ImGui::GetContentRegionAvail().x;
+		const uint32 windowWidth = (uint32)ImGui::GetContentRegionAvail().x;
 		int padding = 10;
 		int columnCount = windowWidth / (m_ImageSize + padding);
 
@@ -183,7 +183,7 @@ namespace Engine
 		std::string newName = name;
 		if (ext.empty()) // create directory
 		{
-			uint32_t i = 1;
+			uint32 i = 1;
 			while (!std::filesystem::create_directory(m_CurrentDirectory / newName))
 				newName = name + " (" + std::to_string(i++) + ")";
 		}
@@ -201,7 +201,7 @@ namespace Engine
 		std::filesystem::path ext = src.extension();
 
 		std::filesystem::path newPath = dest / (name.string() + ext.string());
-		for (uint32_t i = 1; std::filesystem::exists(newPath); i++)
+		for (uint32 i = 1; std::filesystem::exists(newPath); i++)
 			newPath = dest / ( name.string() + " (" + std::to_string(i) + ")" + ext.string());
 
 		std::filesystem::rename(src, newPath);

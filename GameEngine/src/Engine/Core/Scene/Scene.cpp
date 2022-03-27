@@ -145,7 +145,7 @@ namespace Engine
 		}
 	}
 
-	void Scene::OnViewportResize(uint32_t width, uint32_t height)
+	void Scene::OnViewportResize(uint32 width, uint32 height)
 	{
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
@@ -206,7 +206,7 @@ namespace Engine
 
 	Ref<Scene> Scene::Copy(Ref<Scene> scene)
 	{
-		Ref<Scene> newScene = std::make_shared<Scene>();
+		Ref<Scene> newScene = CreateRef<Scene>();
 
 		newScene->m_ViewportWidth = scene->m_ViewportWidth;
 		newScene->m_ViewportHeight = scene->m_ViewportHeight;

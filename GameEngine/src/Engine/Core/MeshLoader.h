@@ -19,8 +19,8 @@ namespace Engine
 	struct VertexElement
 	{
 		VertexDataType type;
-		uint32_t Offset;
-		uint32_t Size;
+		uint32 Offset;
+		uint32 Size;
 
 		VertexElement(VertexDataType type) :
 			type(type)
@@ -63,7 +63,7 @@ namespace Engine
 		}
 
 		inline const std::vector<VertexElement>& GetElements() const { return m_Elements; }
-		inline const uint32_t GetStride() const { return m_Stride; }
+		inline const uint32 GetStride() const { return m_Stride; }
 
 		inline std::vector<VertexElement>::iterator begin() { return m_Elements.begin(); }
 		inline std::vector<VertexElement>::iterator end() { return m_Elements.end(); }
@@ -87,7 +87,7 @@ namespace Engine
 	private:
 		void CalculateOffsetsAndStride()
 		{
-			uint32_t offset = 0;
+			uint32 offset = 0;
 			m_Stride = 0;
 			for (auto& element : m_Elements)
 			{
@@ -99,7 +99,7 @@ namespace Engine
 
 	private:
 		std::vector<VertexElement> m_Elements;
-		uint32_t m_Stride = 0;
+		uint32 m_Stride = 0;
 	};
 
 	class MeshLoader

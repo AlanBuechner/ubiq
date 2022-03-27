@@ -13,7 +13,7 @@ namespace Engine
 		Bool
 	};
 
-	static uint32_t ShaderDataTypeSize(ShaderDataType type)
+	static uint32 ShaderDataTypeSize(ShaderDataType type)
 	{
 		switch (type)
 		{
@@ -37,8 +37,8 @@ namespace Engine
 	{
 		std::string Name;
 		ShaderDataType Type;
-		uint32_t Offset;
-		uint32_t Size;
+		uint32 Offset;
+		uint32 Size;
 		bool Normalized;
 
 		BufferElement(){}
@@ -46,7 +46,7 @@ namespace Engine
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
 		{}
 
-		uint32_t GetComponentCount()
+		uint32 GetComponentCount()
 		{
 			switch (Type)
 			{
@@ -78,7 +78,7 @@ namespace Engine
 		}
 
 		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
-		inline const uint32_t GetStride() const { return m_Stride; }
+		inline const uint32 GetStride() const { return m_Stride; }
 
 		std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
 		std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
@@ -87,7 +87,7 @@ namespace Engine
 	private:
 		void CalculateOffsetsAndStride()
 		{
-			uint32_t offset = 0;
+			uint32 offset = 0;
 			m_Stride = 0;
 			for (auto& element : m_Elements)
 			{
@@ -98,7 +98,7 @@ namespace Engine
 		}
 	private:
 		std::vector<BufferElement> m_Elements;
-		uint32_t m_Stride = 0;
+		uint32 m_Stride = 0;
 	};
 
 	class VertexBuffer
@@ -112,10 +112,10 @@ namespace Engine
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 		virtual BufferLayout& GetLayout() = 0;
 
-		virtual void SetData(const void* data, uint32_t size) = 0;
+		virtual void SetData(const void* data, uint32 size) = 0;
 
-		static Ref<VertexBuffer> Create(uint32_t size);
-		static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
+		static Ref<VertexBuffer> Create(uint32 size);
+		static Ref<VertexBuffer> Create(float* vertices, uint32 size);
 	};
 
 	class IndexBuffer
@@ -123,14 +123,14 @@ namespace Engine
 	public:
 		virtual ~IndexBuffer() {}
 
-		virtual uint32_t GetCount() = 0;
+		virtual uint32 GetCount() = 0;
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void SetData(const uint32_t* data, uint32_t count) = 0;
+		virtual void SetData(const uint32* data, uint32 count) = 0;
 
-		static Ref<IndexBuffer> Create(uint32_t count);
-		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
+		static Ref<IndexBuffer> Create(uint32 count);
+		static Ref<IndexBuffer> Create(uint32* indices, uint32 count);
 	};
 }

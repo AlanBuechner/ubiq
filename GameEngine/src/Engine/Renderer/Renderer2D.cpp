@@ -25,23 +25,23 @@ namespace Engine
 
 	struct Renderer2DData
 	{
-		static const uint32_t QuadVertexCount = 4;
-		static const uint32_t MaxQuades = 10000;
-		static const uint32_t MaxVertices = MaxQuades * QuadVertexCount;
-		static const uint32_t MaxIndices = MaxQuades * 6;
-		static const uint32_t MaxTextureSlots = 32; // TODO: RendererCaps
+		static const uint32 QuadVertexCount = 4;
+		static const uint32 MaxQuades = 10000;
+		static const uint32 MaxVertices = MaxQuades * QuadVertexCount;
+		static const uint32 MaxIndices = MaxQuades * 6;
+		static const uint32 MaxTextureSlots = 32; // TODO: RendererCaps
 
 		Ref<VertexArray> QuadVertexArray;
 		Ref<VertexBuffer> QuadVertexBuffer;
 		Ref<ShaderLibrary> Library;
 		Ref<Texture2D> WhiteTexture;
 
-		uint32_t QuadIndexCount = 0;
+		uint32 QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase = nullptr;
 		QuadVertex* QuadVertexBufferPtr = nullptr;
 
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
-		uint32_t TextureSlotIndex = 1;
+		uint32 TextureSlotIndex = 1;
 
 		Math::Vector4 QuadVertexPositions[4];
 
@@ -74,10 +74,10 @@ namespace Engine
 
 		s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices];
 
-		uint32_t* quadIndeces = new uint32_t[s_Data.MaxIndices];
+		uint32* quadIndeces = new uint32[s_Data.MaxIndices];
 
-		uint32_t offset = 0;
-		for (uint32_t i = 0; i < s_Data.MaxIndices; i += 6)
+		uint32 offset = 0;
+		for (uint32 i = 0; i < s_Data.MaxIndices; i += 6)
 		{
 			quadIndeces[i + 0] = offset + 0;
 			quadIndeces[i + 1] = offset + 1;
@@ -96,7 +96,7 @@ namespace Engine
 		delete[] quadIndeces;
 
 		s_Data.WhiteTexture = Texture2D::Create(1, 1);
-		uint32_t whiteTexureData = 0xffffffff;
+		uint32 whiteTexureData = 0xffffffff;
 		s_Data.WhiteTexture->SetData(&whiteTexureData, sizeof(whiteTexureData));
 
 		int32_t samplers[s_Data.MaxTextureSlots];
@@ -105,7 +105,7 @@ namespace Engine
 			samplers[i] = i;
 		}
 
-		s_Data.Library = std::make_shared<ShaderLibrary>();
+		s_Data.Library = CreateRef<ShaderLibrary>();
 
 		Ref<Shader> TextureShader = s_Data.Library->Load("TextureShader", "Assets/Shaders/TextureShader.glsl");
 
@@ -163,7 +163,7 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
-		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
+		uint32 dataSize = (uint32)((uint8*)s_Data.QuadVertexBufferPtr - (uint8*)s_Data.QuadVertexBufferBase);
 		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
 		Flush();
@@ -173,7 +173,7 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
-		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+		for (uint32 i = 0; i < s_Data.TextureSlotIndex; i++)
 		{
 			s_Data.TextureSlots[i].get()->Bind(i);
 		}
@@ -376,7 +376,7 @@ namespace Engine
 
 		float textureIndex = 0.0f;
 
-		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+		for (uint32 i = 1; i < s_Data.TextureSlotIndex; i++)
 		{
 			if (s_Data.TextureSlots[i].get() == texture.get())
 			{
@@ -392,7 +392,7 @@ namespace Engine
 			s_Data.TextureSlotIndex++;
 		}
 
-		for (uint32_t i = 0; i < s_Data.QuadVertexCount; i++)
+		for (uint32 i = 0; i < s_Data.QuadVertexCount; i++)
 		{
 
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];

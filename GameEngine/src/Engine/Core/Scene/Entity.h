@@ -46,7 +46,7 @@ namespace Engine
 
 		operator bool() const { return m_EntityID != entt::null && m_Scene != nullptr; }
 		operator entt::entity() const { return m_EntityID; }
-		operator uint32_t() const { return (uint32_t)m_EntityID; }
+		operator uint32() const { return (uint32)m_EntityID; }
 
 		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
 

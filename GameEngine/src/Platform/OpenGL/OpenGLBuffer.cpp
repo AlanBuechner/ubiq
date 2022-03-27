@@ -7,14 +7,14 @@ namespace Engine
 {
 	// VertexBuffer -------------------------------------------------------------------------------------
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32 size)
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32 size)
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
@@ -36,7 +36,7 @@ namespace Engine
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	void OpenGLVertexBuffer::SetData(const void* data, uint32_t size)
+	void OpenGLVertexBuffer::SetData(const void* data, uint32 size)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
@@ -44,19 +44,19 @@ namespace Engine
 
 	// IndexBuffer ---------------------------------------------------------------------------------------
 
-	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t count)
+	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32 count)
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32), nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
+	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32* indices, uint32 count)
 		: m_Count(count)
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32), indices, GL_STATIC_DRAW);
 	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
@@ -74,10 +74,10 @@ namespace Engine
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	void OpenGLIndexBuffer::SetData(const uint32_t* data, uint32_t count)
+	void OpenGLIndexBuffer::SetData(const uint32* data, uint32 count)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, count*sizeof(uint32_t), data);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, count*sizeof(uint32), data);
 	}
 
 }

@@ -16,7 +16,7 @@ namespace Engine
 		SceneCamera();
 		virtual ~SceneCamera() = default;
 
-		void SetViewportSize(uint32_t width, uint32_t height);
+		void SetViewportSize(uint32 width, uint32 height);
 
 		void SetOrthgraphic(float size, float nearClip, float farClip);
 		float GetOrthographicSize() { return m_OrthgraphicSize; }

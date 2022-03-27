@@ -30,7 +30,7 @@ namespace Engine
 		RecalculateProjection();
 	}
 
-	void SceneCamera::SetViewportSize(uint32_t width, uint32_t height)
+	void SceneCamera::SetViewportSize(uint32 width, uint32 height)
 	{
 		m_AspectRatio = (float)width / (float)height;
 		RecalculateProjection();

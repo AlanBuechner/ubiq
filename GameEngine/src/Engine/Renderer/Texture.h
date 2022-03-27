@@ -12,12 +12,12 @@ namespace Engine
 	public:
 		virtual ~Texture() = default;
 
-		virtual uint32_t GetWidth() const = 0;
-		virtual uint32_t GetHeight() const = 0;
-		virtual uint32_t GetRendererID() const = 0;
+		virtual uint32 GetWidth() const = 0;
+		virtual uint32 GetHeight() const = 0;
+		virtual uint32 GetRendererID() const = 0;
 
-		virtual void SetData(void* data, uint32_t size) = 0;
-		virtual void Bind(uint32_t slot) const = 0;
+		virtual void SetData(void* data, uint32 size) = 0;
+		virtual void Bind(uint32 slot) const = 0;
 		virtual void LoadFromFile(const std::string& path) = 0;
 		virtual Ref<TextureAttribute> GetAttributes() const = 0;
 
@@ -28,7 +28,7 @@ namespace Engine
 	{
 	public:
 		static Ref<Texture2D> Create(const std::string& path = "", TextureAttribute& attribute = *TextureAttribute::Default);
-		static Ref<Texture2D> Create(const uint32_t width, const uint32_t height, TextureAttribute& attribute = *TextureAttribute::Default);
+		static Ref<Texture2D> Create(const uint32 width, const uint32 height, TextureAttribute& attribute = *TextureAttribute::Default);
 
 	};
 }

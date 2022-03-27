@@ -8,11 +8,11 @@ namespace Engine {
 	struct WindowProps
 	{
 		std::string Title;
-		uint32_t Width;
-		uint32_t Height;
+		uint32 Width;
+		uint32 Height;
 		bool FullScreen;
 
-		WindowProps(const std::string& title = "Game Engine", uint32_t width = 1280, uint32_t height = 720, bool fullscreen = false)
+		WindowProps(const std::string& title = "Game Engine", uint32 width = 1280, uint32 height = 720, bool fullscreen = false)
 			: Title(title), Width(width), Height(height), FullScreen(fullscreen)
 		{
 		}
@@ -28,8 +28,8 @@ namespace Engine {
 
 		virtual void OnUpdate() = 0; // updates the window
 
-		virtual uint32_t GetWidth() const = 0; // gets the width of the window
-		virtual uint32_t GetHeight() const = 0; // gets the hight of the window
+		virtual uint32 GetWidth() const = 0; // gets the width of the window
+		virtual uint32 GetHeight() const = 0; // gets the hight of the window
 
 		// Window attributes
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;

@@ -60,7 +60,7 @@ namespace Engine
 		virtual const std::string& GetName() const = 0;
 
 		virtual void UploadUniformInt(const std::string& name, const int value) = 0;
-		virtual void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count) = 0;
+		virtual void UploadUniformIntArray(const std::string& name, const int* values, uint32 count) = 0;
 		virtual void UploadUniformFloat4(const std::string& name, const Math::Vector4& values) = 0;
 		virtual void UploadUniformFloat3(const std::string& name, const Math::Vector3& values) = 0;
 		virtual void UploadUniformFloat2(const std::string& name, const Math::Vector2& values) = 0;
@@ -69,7 +69,7 @@ namespace Engine
 		virtual void UploadUniformMat3(const std::string& name, const Math::Mat3& matrix) = 0;
 		virtual void UploadUniformMat2(const std::string& name, const Math::Mat2& matrix) = 0;
 
-		virtual void UploadPointLight(const std::string& name, uint32_t i, const PointLight& light) = 0;
+		virtual void UploadPointLight(const std::string& name, uint32 i, const PointLight& light) = 0;
 
 		static ShaderSorce LoadShader(std::string file);
 		static ShaderSorce LoadShader(std::string file, int type);
@@ -78,7 +78,7 @@ namespace Engine
 		static Ref<Shader> Create(const std::string& name, Ref<Shader::ShaderSorce> src);
 
 	private:
-		virtual uint32_t GetUniformLocation(const std::string& name) const = 0;
+		virtual uint32 GetUniformLocation(const std::string& name) const = 0;
 	};
 
 	class ShaderLibrary

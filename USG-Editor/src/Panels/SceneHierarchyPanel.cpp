@@ -133,7 +133,7 @@ namespace Engine
 
 		ImGuiTreeNodeFlags flags = ( m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		bool open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tc.Tag.c_str());
+		bool open = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity, flags, tc.Tag.c_str());
 
 		if (ImGui::IsItemClicked())
 		{
@@ -414,7 +414,7 @@ namespace Engine
 			const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
 			if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
 			{
-				for (uint32_t i = 0; i < 3; i++)
+				for (uint32 i = 0; i < 3; i++)
 				{
 					bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
 					if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
