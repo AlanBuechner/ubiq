@@ -51,7 +51,7 @@ namespace Engine
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
 					const auto droppath = (fs::path)(const wchar_t*)payload->Data;
-					ChangeFileLocation(droppath, m_CurrentDirectory.parent_path());
+					Application::Get().GetAssetManager().MoveAsset(droppath, m_CurrentDirectory.parent_path());
 				}
 				ImGui::EndDragDropTarget();
 			}
@@ -88,7 +88,7 @@ namespace Engine
 				{
 					const auto droppath = (fs::path)(const wchar_t*)payload->Data;
 					if (droppath != path)
-						ChangeFileLocation(droppath, path);
+						Application::Get().GetAssetManager().MoveAsset(droppath, path);
 				}
 				ImGui::EndDragDropTarget();
 			}
@@ -96,7 +96,7 @@ namespace Engine
 			if (ImGui::BeginPopupContextItem(("##" + std::to_string(itemID)).c_str()))
 			{
 				if (ImGui::MenuItem("Remove"))
-					fs::remove(path);
+					Application::Get().GetAssetManager().DeleteAsset(path);
 				ImGui::EndPopup();
 			}
 
@@ -118,10 +118,10 @@ namespace Engine
 
 			if (!m_OldFileName.empty() && m_OldFileName == filename)
 			{
-				if (ImGui::InputText("##CangeFileName", &m_NewFileName, ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue)
+				if (ImGui::InputText("##ChangeFileName", &m_NewFileName, ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue)
 					|| Input::GetKeyPressed(KeyCode::ENTER))
 				{
-					fs::rename(path, m_CurrentDirectory / m_NewFileName.c_str());
+					Application::Get().GetAssetManager().RenameAsset(path, m_NewFileName);
 					m_OldFileName.clear();
 				}
 
@@ -197,19 +197,4 @@ namespace Engine
 
 		return newName;
 	}
-
-	std::string ContentBrowserPanel::ChangeFileLocation(const fs::path& src, const fs::path& dest)
-	{
-		fs::path name = src.stem();
-		fs::path ext = src.extension();
-
-		fs::path newPath = dest / (name.string() + ext.string());
-		for (uint32 i = 1; fs::exists(newPath); i++)
-			newPath = dest / ( name.string() + " (" + std::to_string(i) + ")" + ext.string());
-
-		fs::rename(src, newPath);
-		return newPath.string();
-	}
-
-
 }

@@ -53,6 +53,10 @@ namespace Engine
 
 		void Init(const fs::path& assetDirectory);
 
+		void DeleteAsset(const fs::path& assetPath);
+		void RenameAsset(const fs::path& oldPath, const fs::path& newName);
+		void MoveAsset(const fs::path& oldPath, const fs::path& newDir);
+
 		template<class T>
 		Ref<T> GetAsset(UUID assetID)
 		{
@@ -70,9 +74,13 @@ namespace Engine
 		}
 
 	private:
-		void ProcessDirectory(fs::path directory, std::vector<fs::path>& foundAssets, std::vector<fs::path>& foundMetas);
+		void UpdateDirectory(const fs::path& dir);
 
-		UUID GetUUIDFromMeta(fs::path metaFile);
+		fs::path GetValidName(const fs::path& name);
+		void ChangePath(const fs::path& oldPath, const fs::path& newPath);
+
+		void ProcessDirectory(const fs::path& directory, std::vector<fs::path>& foundAssets, std::vector<fs::path>& foundMetas);
+		UUID GetAssetUUIDFromPath(const fs::path& metaFile);
 
 	};
 }
