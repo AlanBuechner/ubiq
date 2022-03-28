@@ -2,11 +2,12 @@
 #include "Engine/Core/Core.h"
 #include "TextureAttribute.h"
 #include <Engine/Math/Math.h>
+#include <Engine/AssetManager/AssetManager.h>
 #include <string>
 
 namespace Engine
 {
-	class Texture
+	class Texture : public Asset
 	{
 
 	public:

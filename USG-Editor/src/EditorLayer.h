@@ -62,7 +62,7 @@ namespace Engine
 
 		EditorCamera m_EditorCamera;
 
-		std::filesystem::path m_LoadedScene;
+		fs::path m_LoadedScene;
 
 		Ref<Scene> m_ActiveScene;
 		Ref<Scene> m_PlayScene;

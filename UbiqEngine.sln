@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 16
+# Visual Studio Version 16
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{85327545-F1F4-A8CF-3AA5-375CA6A681AD}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig

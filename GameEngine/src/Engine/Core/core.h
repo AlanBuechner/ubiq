@@ -78,7 +78,6 @@ namespace Engine
 	}
 
 	using byte = unsigned char;
-
 }
 
 using uint8 = uint8_t;

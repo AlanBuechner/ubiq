@@ -2,6 +2,8 @@
 #include <filesystem>
 #include <Engine.h>
 
+namespace fs = std::filesystem;
+
 namespace Engine
 {
 	class ContentBrowserPanel
@@ -12,13 +14,13 @@ namespace Engine
 		void OnImGuiRender();
 
 	private:
-		Ref<Texture2D> GetFileIcon(std::filesystem::directory_entry file);
+		Ref<Texture2D> GetFileIcon(fs::directory_entry file);
 
 		std::string CreateNewFile(const std::string& name, const std::string& ext);
-		std::string ChangeFileLocation(const std::filesystem::path& src, const std::filesystem::path& dest);
+		std::string ChangeFileLocation(const fs::path& src, const fs::path& dest);
 
 	private:
-		std::filesystem::path m_CurrentDirectory;
+		fs::path m_CurrentDirectory;
 		int m_ImageSize = 64;
 
 		std::string m_OldFileName;

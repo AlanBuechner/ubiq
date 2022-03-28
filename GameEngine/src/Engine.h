@@ -57,3 +57,6 @@
 #include "Engine/Math/Quaternion.h"
 // ----------------------------------------
 
+// Asset Manager --------------------------
+#include "Engine/AssetManager/AssetManager.h"
+// ----------------------------------------

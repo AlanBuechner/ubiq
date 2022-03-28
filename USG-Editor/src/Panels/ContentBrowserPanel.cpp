@@ -11,7 +11,7 @@
 namespace Engine
 {
 	// get from project file
-	static const std::filesystem::path s_AssetsDirectory = "Assets";
+	static const fs::path s_AssetsDirectory = "Assets";
 
 	ContentBrowserPanel::ContentBrowserPanel() :
 		m_CurrentDirectory(s_AssetsDirectory)
@@ -22,6 +22,10 @@ namespace Engine
 		m_ImageFileIcon = Texture2D::Create("Resources/ImageFileIcon.png");
 		m_FolderIcon = Texture2D::Create("Resources/FolderIcon.png");
 		m_BackIcon = Texture2D::Create("Resources/BackIcon.png");
+
+		AssetManager assetManager;
+		assetManager.Init("Resources");
+		assetManager.GetAsset<Texture2D>(UUID());
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
@@ -50,19 +54,19 @@ namespace Engine
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
-					const auto droppath = (std::filesystem::path)(const wchar_t*)payload->Data;
+					const auto droppath = (fs::path)(const wchar_t*)payload->Data;
 					ChangeFileLocation(droppath, m_CurrentDirectory.parent_path());
 				}
 				ImGui::EndDragDropTarget();
 			}
-			if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			if(ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				m_CurrentDirectory = m_CurrentDirectory.parent_path();
 			ImGui::Text("%s", "Back");
 			ImGui::NextColumn();
 		}
 
 		int itemID = 1;
-		for (auto& p : std::filesystem::directory_iterator(m_CurrentDirectory))
+		for (auto& p : fs::directory_iterator(m_CurrentDirectory))
 		{
 			auto& path = p.path();
 			std::string filename = path.filename().string();
@@ -83,7 +87,7 @@ namespace Engine
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
-					const auto droppath = (std::filesystem::path)(const wchar_t*)payload->Data;
+					const auto droppath = (fs::path)(const wchar_t*)payload->Data;
 					if (droppath != path)
 						ChangeFileLocation(droppath, path);
 				}
@@ -93,7 +97,7 @@ namespace Engine
 			if (ImGui::BeginPopupContextItem(("##" + std::to_string(itemID)).c_str()))
 			{
 				if (ImGui::MenuItem("Remove"))
-					std::filesystem::remove(path);
+					fs::remove(path);
 				ImGui::EndPopup();
 			}
 
@@ -118,7 +122,7 @@ namespace Engine
 				if (ImGui::InputText("##CangeFileName", &m_NewFileName, ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue)
 					|| Input::GetKeyPressed(KeyCode::ENTER))
 				{
-					std::filesystem::rename(path, m_CurrentDirectory / m_NewFileName.c_str());
+					fs::rename(path, m_CurrentDirectory / m_NewFileName.c_str());
 					m_OldFileName.clear();
 				}
 
@@ -159,7 +163,7 @@ namespace Engine
 		ImGui::End();
 	}
 
-	Ref<Texture2D> ContentBrowserPanel::GetFileIcon(std::filesystem::directory_entry file)
+	Ref<Texture2D> ContentBrowserPanel::GetFileIcon(fs::directory_entry file)
 	{
 		if (file.is_directory())
 			return m_FolderIcon;
@@ -184,7 +188,7 @@ namespace Engine
 		if (ext.empty()) // create directory
 		{
 			uint32 i = 1;
-			while (!std::filesystem::create_directory(m_CurrentDirectory / newName))
+			while (!fs::create_directory(m_CurrentDirectory / newName))
 				newName = name + " (" + std::to_string(i++) + ")";
 		}
 		else
@@ -195,16 +199,16 @@ namespace Engine
 		return newName;
 	}
 
-	std::string ContentBrowserPanel::ChangeFileLocation(const std::filesystem::path& src, const std::filesystem::path& dest)
+	std::string ContentBrowserPanel::ChangeFileLocation(const fs::path& src, const fs::path& dest)
 	{
-		std::filesystem::path name = src.stem();
-		std::filesystem::path ext = src.extension();
+		fs::path name = src.stem();
+		fs::path ext = src.extension();
 
-		std::filesystem::path newPath = dest / (name.string() + ext.string());
-		for (uint32 i = 1; std::filesystem::exists(newPath); i++)
+		fs::path newPath = dest / (name.string() + ext.string());
+		for (uint32 i = 1; fs::exists(newPath); i++)
 			newPath = dest / ( name.string() + " (" + std::to_string(i) + ")" + ext.string());
 
-		std::filesystem::rename(src, newPath);
+		fs::rename(src, newPath);
 		return newPath.string();
 	}
 
