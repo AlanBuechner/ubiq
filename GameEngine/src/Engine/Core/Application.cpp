@@ -36,6 +36,8 @@ namespace Engine {
 		timer.Start("Renderer Init");
 		Renderer::Init();
 		timer.End();
+
+		m_AssetManager.Init("Assets");
 	}
 
 	Application::~Application()

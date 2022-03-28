@@ -22,10 +22,6 @@ namespace Engine
 		m_ImageFileIcon = Texture2D::Create("Resources/ImageFileIcon.png");
 		m_FolderIcon = Texture2D::Create("Resources/FolderIcon.png");
 		m_BackIcon = Texture2D::Create("Resources/BackIcon.png");
-
-		AssetManager assetManager;
-		assetManager.Init("Resources");
-		assetManager.GetAsset<Texture2D>(UUID());
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
@@ -70,6 +66,9 @@ namespace Engine
 		{
 			auto& path = p.path();
 			std::string filename = path.filename().string();
+
+			if(path.extension().string() == ".meta")
+				continue;
 
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			ImGui::PushID(itemID);

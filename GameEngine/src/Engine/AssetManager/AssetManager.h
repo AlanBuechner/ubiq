@@ -9,8 +9,36 @@ namespace fs = std::filesystem;
 
 namespace Engine
 {
+	class Asset;
+	template<class T>
+	class AssetRef;
+	class AssetManager;
+
 	class Asset
 	{};
+
+	template<class T>
+	class AssetRef
+	{
+	private:
+		UUID m_AssetID;
+		std::weak_ptr<T> m_Asset;
+		AssetManager* m_AssetManager;
+	public:
+
+		AssetRef(UUID assetID, AssetManager* assetManager) :
+			m_AssetID(assetID), m_AssetManager(assetManager)
+		{}
+
+		T* GetAsset()
+		{
+			if (!m_Asset.expired())
+				return m_Asset.data();
+
+			// load asset from asset manager
+		}
+
+	};
 
 	class AssetManager
 	{
@@ -42,8 +70,9 @@ namespace Engine
 		}
 
 	private:
-		void ProcessDirectory(fs::path directory);
+		void ProcessDirectory(fs::path directory, std::vector<fs::path>& foundAssets, std::vector<fs::path>& foundMetas);
 
+		UUID GetUUIDFromMeta(fs::path metaFile);
 
 	};
 }

@@ -4,3 +4,6 @@
 [submodule "GameEngine/vendor/yaml-cpp"]
 	path = GameEngine/vendor/yaml-cpp
 	url = https://github.com/AlanBuechner/yaml-cpp.git
+[submodule "GameEngine/vendor/json"]
+	path = GameEngine/vendor/json
+	url = https://github.com/AlanBuechner/json

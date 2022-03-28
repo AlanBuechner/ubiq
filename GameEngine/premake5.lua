@@ -41,6 +41,7 @@ project "GameEngine"
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.Box2D}/Include",
 		"%{IncludeDir.Assimp}/include",
+		"%{IncludeDir.json}/single_include",
 	}
 
 	links 

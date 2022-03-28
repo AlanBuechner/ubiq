@@ -1379,6 +1379,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine\AssetManager\AssetManager.cpp">
+      <Filter>src\Engine\AssetManager</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Core\Application.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
@@ -1538,6 +1541,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\AssetManager\AssetManager.cpp" />
   </ItemGroup>
 </Project>

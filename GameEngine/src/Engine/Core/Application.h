@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.h"
+#include "Engine/AssetManager/AssetManager.h"
 
 #include "Window.h"
 #include "LayerStack.h"
@@ -38,6 +39,8 @@ namespace Engine
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window;  }
 
+		inline AssetManager& GetAssetManager() { return m_AssetManager; }
+
 	protected:
 		bool m_InEditer = false;
 		void GenLayerStack();
@@ -55,6 +58,8 @@ namespace Engine
 
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
+
+		AssetManager m_AssetManager;
 
 	private:
 		static Application* s_Instance;
