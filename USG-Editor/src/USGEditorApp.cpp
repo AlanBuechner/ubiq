@@ -1,5 +1,6 @@
 #include <Engine.h>
 #include "EditorLayer.h"
+#include "Panels/EditorAssets.h"
 #include <Engine/Core/EntryPoint.h>
 
 namespace Engine
@@ -17,6 +18,7 @@ namespace Engine
 			m_InEditer = true; // tell the engine that we are in the editor
 			PushLayer(new EditorLayer()); // set the editor layer
 			GenLayerStack();
+			EditorAssets::Init();
 
 			timer.End();
 		}

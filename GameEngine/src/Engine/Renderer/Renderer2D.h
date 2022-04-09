@@ -25,7 +25,7 @@ namespace Engine
 		static void EndScene();
 		static void Flush();
 
-		// draw colored quaad
+		// draw colored quad
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, int entityID = -1);
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, int entityID = -1);
 		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, int entityID = -1);
@@ -46,14 +46,14 @@ namespace Engine
 		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
 		static void DrawQuad(const Math::Mat4& transform, const Math::Vector4& color, const Ref<SubTexture2D>& texture, int entityID = -1);
 
-		// draw textured qaud
+		// draw textured quad
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Ref<Texture2D>& texture, int entityID = -1);
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Ref<Texture2D>& texture, int entityID = -1);
 		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Ref<Texture2D>& texture, int entityID = -1);
 		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Ref<Texture2D>& texture, int entityID = -1);
 		static void DrawQuad(const Math::Mat4& transform, const Ref<Texture2D>& texture, int entityID = -1);
 
-		// draw textured tinted qaud
+		// draw textured tinted quad
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
 		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);

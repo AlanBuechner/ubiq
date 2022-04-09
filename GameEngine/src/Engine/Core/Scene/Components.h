@@ -18,6 +18,8 @@
 
 #include "Engine/Core/UUID.h"
 
+#include "Engine/Core/UUID.h"
+
 namespace Engine
 {
 	class ScriptableEntity;

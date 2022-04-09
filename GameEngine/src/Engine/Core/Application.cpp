@@ -94,11 +94,18 @@ namespace Engine {
 			m_ImGuiLayer->End();
 			timer.End();
 
+			m_AssetManager.Clean();
+
 			timer.Start("Update the Window");
 			// update the window
 			m_Window->OnUpdate();
 			timer.End();
 		}
+
+		// destroy
+
+		m_AssetManager.Destroy();
+
 	}
 
 	void Application::Close()

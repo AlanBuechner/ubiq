@@ -16,6 +16,7 @@
     <ClInclude Include="src\Panels\SceneHierarchyPanel.h">
       <Filter>Panels</Filter>
     </ClInclude>
+    <ClInclude Include="src\Panels\EditorAssets.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EditorLayer.cpp" />
@@ -29,5 +30,6 @@
       <Filter>Panels</Filter>
     </ClCompile>
     <ClCompile Include="src\USGEditorApp.cpp" />
+    <ClCompile Include="src\Panels\EditorAssets.cpp" />
   </ItemGroup>
 </Project>

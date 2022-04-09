@@ -52,6 +52,7 @@ namespace Engine
 		void OnScenePlay();
 		void OnSceneStop();
 
+		int GetEntityIDAtMousePosition(bool& inWindow);
 
 	private:
 		const Math::Vector4 m_GridColor = { 0.5f,0.5f,0.5f,1 };
@@ -88,5 +89,7 @@ namespace Engine
 
 		bool m_OpenScene = false;
 		bool m_SaveScene = false;
+
+		fs::path m_DropPath;
 	};
 }

@@ -143,29 +143,16 @@ namespace Engine
 
 		if (Input::GetMouseButtonPressed(KeyCode::LEFT_MOUSE) && !Input::GetKeyDown(KeyCode::ALT) && !ImGuizmo::IsOver())
 		{
-
-			auto [mx, my] = ImGui::GetMousePos();
-			mx -= m_ViewportBounds[0].x;
-			my -= m_ViewportBounds[0].y;
-			Math::Vector2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-
-			my = viewportSize.y - my; // flip y cord
-
-			int mousex = (int)mx;
-			int mousey = (int)my;
-
-			if ((mousex >= 0 && mousex < (int)viewportSize.x) && (mousey >= 0 && mousey < (int)viewportSize.y))
+			bool inWindow;
+			int entityID = GetEntityIDAtMousePosition(inWindow);
+			if (inWindow)
 			{
-				int entityID = m_FrameBuffer->ReadPixle(1, mousex, mousey);
 				if (entityID == -1)
 					m_HierarchyPanel.SelectEntity({});
 				else
-					m_HierarchyPanel.SelectEntity({(entt::entity)entityID, m_ActiveScene.get()});
-				
+					m_HierarchyPanel.SelectEntity({ (entt::entity)entityID, m_ActiveScene.get() });
 			}
 		}
-
-		m_FrameBuffer->Unbind();
 
 		timer.End();
 	}
@@ -274,6 +261,8 @@ namespace Engine
 
 			ImGui::End();
 		}
+
+		m_FrameBuffer->Unbind();
 	}
 
 	void EditorLayer::OnEvent(Event& e)
@@ -464,6 +453,22 @@ namespace Engine
 		}
 		uint32 textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, viewPortPanalSize, ImVec2(0, 1), ImVec2(1, 0));
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				bool inWindow;
+				int entityID = GetEntityIDAtMousePosition(inWindow);
+				if (entityID != -1)
+				{
+					Entity e = { (entt::entity)entityID, m_ActiveScene.get() };
+					fs::path path = (const wchar_t*)payload->Data;
+					if (e.HasComponent<SpriteRendererComponent>())
+						e.GetComponent<SpriteRendererComponent>().Texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(path);
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
 
 		ImVec2 minBound = ImGui::GetWindowPos();
 		minBound.x += viewportOffset.x;
@@ -527,6 +532,28 @@ namespace Engine
 		m_PlayScene->OnRuntimeStop();
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 		m_SceneState = SceneState::Edit;
+	}
+
+	int EditorLayer::GetEntityIDAtMousePosition(bool& inWindow)
+	{
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		my -= m_ViewportBounds[0].y;
+		Math::Vector2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+
+		my = viewportSize.y - my; // flip y cord
+
+		int mousex = (int)mx;
+		int mousey = (int)my;
+
+		if ((mousex >= 0 && mousex < (int)viewportSize.x) && (mousey >= 0 && mousey < (int)viewportSize.y))
+		{
+			inWindow = true;
+			return m_FrameBuffer->ReadPixle(1, mousex, mousey);
+		}
+
+		inWindow = false;
+		return -1;
 	}
 
 	void EditorLayer::NewScene()

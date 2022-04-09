@@ -1,9 +1,14 @@
 #include "SceneHierarchyPanel.h"
+#include "Engine/AssetManager/AssetManager.h"
+#include "EditorAssets.h"
+#include <Engine/Core/UUID.h>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
 #include <glm/gtc/type_ptr.hpp>
+
+#include <filesystem>
 
 namespace Engine
 {
@@ -307,6 +312,27 @@ namespace Engine
 		ImGui::PopID();
 	}
 
+	static void DrawTextureControl(const std::string& lable, Ref<Texture2D>& texture)
+	{
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, 140);
+		ImGui::Image((ImTextureID)(texture ? texture : EditorAssets::s_NoTextureIcon)->GetRendererID(), { 100,100 }, { 0,1 }, { 1,0 });
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				fs::path path = (const wchar_t*)payload->Data;
+				texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(path);
+			}
+			ImGui::EndDragDropTarget();
+		}
+		ImGui::NextColumn();
+		ImGui::Text(lable.c_str());
+		if (ImGui::Button("Clear"))
+			texture = Ref<Texture2D>();
+		ImGui::Columns(1);
+	}
+
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
@@ -395,16 +421,8 @@ namespace Engine
 			auto& color = component.Color;
 			ImGui::ColorEdit4("Color", glm::value_ptr(color));
 
-			ImGui::Button("Texture", ImVec2(0,0));
-			if (ImGui::BeginDragDropTarget())
-			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-				{
-					const wchar_t* path = (const wchar_t*)payload->Data;
-					component.Texture = Texture2D::Create(GetStr(path));
-				}
-				ImGui::EndDragDropTarget();
-			}
+			DrawTextureControl("Texture", component.Texture);
+			
 		});
 
 		DrawComponent<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&]() {

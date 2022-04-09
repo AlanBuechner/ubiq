@@ -16,20 +16,11 @@ namespace Engine
 	private:
 		Ref<Texture2D> GetFileIcon(fs::directory_entry file);
 
-		std::string CreateNewFile(const std::string& name, const std::string& ext);
-
 	private:
 		fs::path m_CurrentDirectory;
 		int m_ImageSize = 64;
 
 		std::string m_OldFileName;
 		std::string m_NewFileName;
-
-		Ref<Texture2D> m_DefaultFileIcon;
-		Ref<Texture2D> m_ShaderFileIcon;
-		Ref<Texture2D> m_SceneFileIcon;
-		Ref<Texture2D> m_ImageFileIcon;
-		Ref<Texture2D> m_FolderIcon;
-		Ref<Texture2D> m_BackIcon;
 	};
 }

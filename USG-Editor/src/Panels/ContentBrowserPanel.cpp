@@ -1,6 +1,7 @@
 #include <Engine.h>
 #include "ContentBrowserPanel.h"
 #include "../EditorLayer.h"
+#include "EditorAssets.h"
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -16,12 +17,7 @@ namespace Engine
 	ContentBrowserPanel::ContentBrowserPanel() :
 		m_CurrentDirectory(s_AssetsDirectory)
 	{
-		m_DefaultFileIcon = Texture2D::Create("Resources/DefaultFileIcon.png");
-		m_ShaderFileIcon = Texture2D::Create("Resources/ShaderFileIcon.png");
-		m_SceneFileIcon = Texture2D::Create("Resources/SceneFileIcon.png");
-		m_ImageFileIcon = Texture2D::Create("Resources/ImageFileIcon.png");
-		m_FolderIcon = Texture2D::Create("Resources/FolderIcon.png");
-		m_BackIcon = Texture2D::Create("Resources/BackIcon.png");
+		Application::Get().GetAssetManager().GetAsset<Texture2D>(0);
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
@@ -44,7 +40,7 @@ namespace Engine
 		if (m_CurrentDirectory != s_AssetsDirectory)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-			ImGui::ImageButton((ImTextureID)m_BackIcon->GetRendererID(), imageSize, { 0,1 }, { 1,0 });
+			ImGui::ImageButton((ImTextureID)EditorAssets::s_BackIcon->GetRendererID(), imageSize, { 0,1 }, { 1,0 });
 			ImGui::PopStyleColor();
 			if (ImGui::BeginDragDropTarget())
 			{
@@ -79,6 +75,7 @@ namespace Engine
 			{
 				const wchar_t* itempath = path.c_str();
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itempath, (wcslen(itempath) + 1) * sizeof(wchar_t));
+				ImGui::Image((ImTextureID)Application::Get().GetAssetManager().GetAsset<Texture2D>(path)->GetRendererID(), {50,50}, { 0,1 }, { 1,0 });
 				ImGui::EndDragDropSource();
 			}
 
@@ -110,7 +107,6 @@ namespace Engine
 						EditorLayer::Get()->LoadScene(path.string());
 					else
 						system(path.string().c_str());
-
 				}
 			}
 
@@ -118,10 +114,12 @@ namespace Engine
 
 			if (!m_OldFileName.empty() && m_OldFileName == filename)
 			{
+				ImGui::SetKeyboardFocusHere(0);
 				if (ImGui::InputText("##ChangeFileName", &m_NewFileName, ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue)
-					|| Input::GetKeyPressed(KeyCode::ENTER))
+					|| Input::GetKeyPressed(KeyCode::ENTER) || (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsItemHovered()))
 				{
-					Application::Get().GetAssetManager().RenameAsset(path, m_NewFileName);
+					if (m_NewFileName != m_OldFileName)
+						Application::Get().GetAssetManager().RenameAsset(path, m_NewFileName);
 					m_OldFileName.clear();
 				}
 
@@ -148,7 +146,7 @@ namespace Engine
 			{
 				if (ImGui::MenuItem("Folder"))
 				{
-					m_OldFileName = CreateNewFile("New Folder", "");
+					m_OldFileName = Application::Get().GetAssetManager().CreateFolder(m_CurrentDirectory / "New Folder").string();
 					m_NewFileName = m_OldFileName;
 				}
 				
@@ -165,36 +163,19 @@ namespace Engine
 	Ref<Texture2D> ContentBrowserPanel::GetFileIcon(fs::directory_entry file)
 	{
 		if (file.is_directory())
-			return m_FolderIcon;
+			return EditorAssets::s_FolderIcon;
 
 		std::string ext = file.path().extension().string();
 
 		if (ext == ".glsl")
-			return m_ShaderFileIcon;
+			return EditorAssets::s_ShaderFileIcon;
 
 		if (ext == ".ubiq")
-			return m_SceneFileIcon;
+			return EditorAssets::s_SceneFileIcon;
 
-		if (ext == ".png" || ext == ".jpg" || ext == "jpeg")
-			return m_ImageFileIcon;
+		if (ext == ".png" || ext == ".jpg" || ext == "jpeg" || ext == ".bmp")
+			return Application::Get().GetAssetManager().GetAsset<Texture2D>(file.path());//EditorAssets::s_ImageFileIcon;
 
-		return m_DefaultFileIcon;
-	}
-
-	std::string ContentBrowserPanel::CreateNewFile(const std::string& name, const std::string& ext)
-	{
-		std::string newName = name;
-		if (ext.empty()) // create directory
-		{
-			uint32 i = 1;
-			while (!fs::create_directory(m_CurrentDirectory / newName))
-				newName = name + " (" + std::to_string(i++) + ")";
-		}
-		else
-		{
-			// todo
-		}
-
-		return newName;
+		return EditorAssets::s_DefaultFileIcon;
 	}
 }

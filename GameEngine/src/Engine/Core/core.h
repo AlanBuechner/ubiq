@@ -77,6 +77,9 @@ namespace Engine
 		return std::make_unique<T>(std::forward<Args>(args)...);
 	}
 
+	template<typename T>
+	using Weak = std::weak_ptr<T>;
+
 	using byte = unsigned char;
 }
 

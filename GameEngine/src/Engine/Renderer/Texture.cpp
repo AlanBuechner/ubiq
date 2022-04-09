@@ -24,6 +24,7 @@ namespace Engine
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
+
 	Ref<Texture2D> Texture2D::Create(const uint32 width, const uint32 height, TextureAttribute& attribute)
 	{
 		CORE_ASSERT(width != 0 && height != 0, "width and height cant be 0");

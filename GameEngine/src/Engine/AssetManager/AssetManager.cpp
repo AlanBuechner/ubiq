@@ -1,16 +1,45 @@
 #include "pch.h"
 #include "AssetManager.h"
+#include "Engine/Core/Application.h"
+#include "Engine/Util/Utils.h"
+#include "Engine/Core/Time.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <Windows.h>
+#include <shlobj_core.h>
 
 namespace Engine
 {
 	void AssetManager::Init(const fs::path& assetDirectory)
 	{
 		m_RootDirectory = assetDirectory;
-
 		UpdateDirectory(m_RootDirectory);
+		m_DirectoryWatchThread = std::thread(WatchDirectory, this);
+	}
 
+	void AssetManager::Destroy()
+	{
+		m_DirectoryWatchThread.detach();
+	}
+
+	void AssetManager::Clean()
+	{
+		if (Time::GetTime() > m_NextCleanTime)
+		{
+			CORE_INFO("cleaning cashed assets");
+			std::vector<std::unordered_map<UUID, Ref<Asset>>::iterator> unusedAssets;
+
+			for (std::unordered_map<UUID, Ref<Asset>>::iterator asset = m_CashedAssets.begin(); asset != m_CashedAssets.end(); asset++)
+			{
+				if (asset->second.use_count() == 1)
+					unusedAssets.push_back(asset);
+			}
+
+			for (auto& asset : unusedAssets)
+				m_CashedAssets.erase(asset);
+
+			m_NextCleanTime = Time::GetTime() + m_CleanDelay;
+		}
 	}
 
 	void AssetManager::DeleteAsset(const fs::path& assetPath)
@@ -41,14 +70,27 @@ namespace Engine
 		ChangePath(oldPath, GetValidName(newDir / oldPath.filename()));
 	}
 
+	fs::path AssetManager::CreateFolder(const fs::path& path)
+	{
+		fs::path newPath = GetValidName(path);
+		fs::create_directories(newPath);
+		return newPath;
+	}
+
 	void AssetManager::UpdateDirectory(const fs::path& dir)
 	{
+		if (!fs::exists(dir))
+		{
+			fs::create_directory(dir);
+			return;
+		}
+
 		CORE_INFO("starting directory update");
 		// get all assets in filesystem
 		std::vector<fs::path> foundAssets, foundMetas;
 		ProcessDirectory(dir, foundAssets, foundMetas);
 
-		// match files with meta's
+		// match files with meta files
 		for (auto asset : foundAssets)
 		{
 			auto metai = std::find(foundMetas.begin(), foundMetas.end(), asset.string() + ".meta");
@@ -130,6 +172,53 @@ namespace Engine
 			return UUID(f["UUID"].get<uint64>());
 		}
 		return 0;
+	}
+
+	// TODO
+	void AssetManager::WatchDirectory(AssetManager* assetManager)
+	{
+		return;
+
+#if defined(PLATFORM_WINDOWS)
+		FILE_NOTIFY_INFORMATION strFileNotifyInfo[1024];
+		DWORD dwBytesReturned = 0;
+
+		HANDLE hDir = CreateFile(
+			assetManager->m_RootDirectory.c_str(),
+			FILE_LIST_DIRECTORY,
+			FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS,
+			NULL
+		);
+
+		if (hDir == INVALID_HANDLE_VALUE)
+		{
+			CORE_ERROR("Failed to get handle to root directorym {0}", GetLastError());
+			return;
+		}
+
+		DWORD changeFlags = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE;
+
+		while (true)
+		{
+			if (ReadDirectoryChangesW(hDir, (LPVOID)&strFileNotifyInfo, sizeof(strFileNotifyInfo), 
+				TRUE, changeFlags, &dwBytesReturned, NULL, NULL) != 0)
+			{
+				FILE_NOTIFY_INFORMATION& info = strFileNotifyInfo[0];
+				switch (info.Action)
+				{
+				case FILE_ACTION_ADDED:
+				case FILE_ACTION_MODIFIED:
+					assetManager->UpdateDirectory(assetManager->m_RootDirectory);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+#endif
 	}
 
 }
