@@ -15,15 +15,24 @@ namespace Engine
 	static const fs::path s_AssetsDirectory = "Assets";
 
 	ContentBrowserPanel::ContentBrowserPanel() :
-		m_CurrentDirectory(s_AssetsDirectory)
+		m_RootDirectory(s_AssetsDirectory), m_CurrentDirectory(s_AssetsDirectory)
 	{
-		Application::Get().GetAssetManager().GetAsset<Texture2D>(0);
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Content Browser");
+		ImGui::BeginChild("HierarchyView", { 200, ImGui::GetContentRegionAvail().y });
 
+		DrawDirectory(m_RootDirectory);
+
+		ImGui::EndChild();
+
+		ImGui::SameLine(0);
+		ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+		ImGui::SameLine();
+
+		ImGui::BeginChild("FolderView", { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y });
 		fs::path dir = m_CurrentDirectory;
 		std::vector<fs::path> m_Directorys;
 		while (dir.has_parent_path())
@@ -166,7 +175,49 @@ namespace Engine
 			ImGui::EndPopup();
 		}
 
+		ImGui::EndChild();
+
 		ImGui::End();
+	}
+
+	void ContentBrowserPanel::DrawDirectory(fs::path dir)
+	{
+		ImGui::PushID(dir.c_str());
+		int itemID = 0;
+		for (auto& p : fs::directory_iterator(dir))
+		{
+			auto& path = p.path();
+			std::string filename = path.filename().string();
+
+			if (path.extension().string() == ".meta")
+				continue;
+
+			ImGui::PushID(++itemID);
+
+			if (p.is_directory())
+			{
+				ImGuiTreeNodeFlags flags = (path == m_CurrentDirectory ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+				bool open = ImGui::TreeNodeEx(path.c_str(), flags, path.filename().string().c_str());
+				//bool open = ImGui::TreeNode(path.filename().string().c_str());
+
+				if (open)
+				{
+					DrawDirectory(path);
+					ImGui::TreePop();
+				}
+			}
+			else
+			{
+				ImGui::Indent();
+				ImGui::Text(path.filename().string().c_str());
+				ImGui::Unindent();
+			}
+
+			ImGui::PopID();
+		}
+
+		ImGui::PopID();
+
 	}
 
 	Ref<Texture2D> ContentBrowserPanel::GetFileIcon(fs::directory_entry file)
