@@ -463,7 +463,7 @@ namespace Engine
 				{
 					Entity e = { (entt::entity)entityID, m_ActiveScene.get() };
 					fs::path path = (const wchar_t*)payload->Data;
-					if (e.HasComponent<SpriteRendererComponent>())
+					if (Texture2D::ValidExtention(path.extension().string()) && e.HasComponent<SpriteRendererComponent>())
 						e.GetComponent<SpriteRendererComponent>().Texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(path);
 				}
 			}

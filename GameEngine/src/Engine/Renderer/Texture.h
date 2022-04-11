@@ -31,5 +31,7 @@ namespace Engine
 		static Ref<Texture2D> Create(const std::string& path = "", TextureAttribute& attribute = *TextureAttribute::Default);
 		static Ref<Texture2D> Create(const uint32 width, const uint32 height, TextureAttribute& attribute = *TextureAttribute::Default);
 
+		static bool ValidExtention(const std::string& ext);
+
 	};
 }

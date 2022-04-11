@@ -179,6 +179,8 @@ namespace Engine
 
 			auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
 			out << YAML::Key << "Color" << YAML::Value << spriteRenderer.Color;
+			if (spriteRenderer.Texture)
+				out << YAML::Key << "TextureID" << YAML::Value << spriteRenderer.Texture->GetAssetID();
 
 			out << YAML::EndMap;
 		}
@@ -328,6 +330,8 @@ namespace Engine
 				{
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<Math::Vector4>();
+					if (spriteRendererComponent["TextureID"])
+						src.Texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(spriteRendererComponent["TextureID"].as<uint64>());
 				}
 
 				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];

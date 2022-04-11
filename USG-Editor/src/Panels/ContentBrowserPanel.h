@@ -13,8 +13,12 @@ namespace Engine
 
 		void OnImGuiRender();
 
+		void SetDirectory(fs::path& path) { m_CurrentDirectory = path; }
+
 	private:
 		Ref<Texture2D> GetFileIcon(fs::directory_entry file);
+
+		void FileDropTarget(fs::path path);
 
 	private:
 		fs::path m_CurrentDirectory;

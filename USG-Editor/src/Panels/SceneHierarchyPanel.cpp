@@ -1,6 +1,7 @@
 #include "SceneHierarchyPanel.h"
 #include "Engine/AssetManager/AssetManager.h"
 #include "EditorAssets.h"
+#include "EditorLayer.h"
 #include <Engine/Core/UUID.h>
 
 #include <imgui/imgui.h>
@@ -250,11 +251,12 @@ namespace Engine
 		ImGui::SameLine();
 		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
-		ImGui::SameLine();
 
 		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 		ImGui::PopID();
+
+		ImGui::Spacing();
 	}
 
 	static void DrawVec3Control(const std::string label, Math::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
@@ -310,10 +312,13 @@ namespace Engine
 		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 		ImGui::PopID();
+
+		ImGui::Spacing();
 	}
 
 	static void DrawTextureControl(const std::string& lable, Ref<Texture2D>& texture)
 	{
+		ImGui::PushID(lable.c_str());
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, 140);
 		ImGui::Image((ImTextureID)(texture ? texture : EditorAssets::s_NoTextureIcon)->GetRendererID(), { 100,100 }, { 0,1 }, { 1,0 });
@@ -322,15 +327,25 @@ namespace Engine
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
 				fs::path path = (const wchar_t*)payload->Data;
-				texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(path);
+				if(Texture2D::ValidExtention(path.extension().string()))
+					texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(path);
 			}
 			ImGui::EndDragDropTarget();
 		}
 		ImGui::NextColumn();
 		ImGui::Text(lable.c_str());
+		if (texture)
+		{
+			fs::path path = Application::Get().GetAssetManager().GetAssetPath(texture->GetAssetID());
+			if (ImGui::Button(path.string().c_str()))
+			{
+				EditorLayer::Get()->GetContantBrowser().SetDirectory(path.parent_path());
+			}
+		}
 		if (ImGui::Button("Clear"))
 			texture = Ref<Texture2D>();
 		ImGui::Columns(1);
+		ImGui::PopID();
 	}
 
 	void SceneHierarchyPanel::DrawComponents(Entity entity)

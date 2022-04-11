@@ -38,7 +38,7 @@ namespace Engine
 			for (auto& asset : unusedAssets)
 				m_CashedAssets.erase(asset);
 
-			m_NextCleanTime = Time::GetTime() + m_CleanDelay;
+			m_NextCleanTime = (float)Time::GetTime() + m_CleanDelay;
 		}
 	}
 

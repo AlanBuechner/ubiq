@@ -36,6 +36,8 @@ namespace Engine
 
 		void LoadScene(const std::string& file);
 
+		ContentBrowserPanel& GetContantBrowser() { return m_ContentPanel; }
+
 	private:
 		void NewScene();
 		void OpenScene();

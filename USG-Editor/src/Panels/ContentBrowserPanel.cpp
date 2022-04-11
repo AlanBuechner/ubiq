@@ -24,7 +24,31 @@ namespace Engine
 	{
 		ImGui::Begin("Content Browser");
 
-		ImGui::Text("%s", m_CurrentDirectory.string().c_str());
+		fs::path dir = m_CurrentDirectory;
+		std::vector<fs::path> m_Directorys;
+		while (dir.has_parent_path())
+			m_Directorys.push_back(dir = dir.parent_path());
+
+		for (int i = m_Directorys.size()-1; i >= 0; i--)
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {0,0});
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2,2});
+			if (ImGui::Button(m_Directorys[i].filename().string().c_str()))
+				m_CurrentDirectory = m_Directorys[i];
+			FileDropTarget(m_Directorys[i]);
+			ImGui::SameLine();
+			ImGui::Text("/");
+			ImGui::SameLine();
+			ImGui::PopStyleVar(2);
+		}
+
+		ImGui::Text("%s", m_CurrentDirectory.filename().string().c_str());
+		ImGui::SameLine(ImGui::GetWindowWidth() - 180);
+		ImGui::PushItemWidth(100);
+		ImGui::SliderInt("Image Size", &m_ImageSize, 16, 512);
+		ImGui::PopItemWidth();
+
+		ImGui::Separator();
 
 		const uint32 windowWidth = (uint32)ImGui::GetContentRegionAvail().x;
 		int padding = 10;
@@ -42,15 +66,7 @@ namespace Engine
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			ImGui::ImageButton((ImTextureID)EditorAssets::s_BackIcon->GetRendererID(), imageSize, { 0,1 }, { 1,0 });
 			ImGui::PopStyleColor();
-			if (ImGui::BeginDragDropTarget())
-			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-				{
-					const auto droppath = (fs::path)(const wchar_t*)payload->Data;
-					Application::Get().GetAssetManager().MoveAsset(droppath, m_CurrentDirectory.parent_path());
-				}
-				ImGui::EndDragDropTarget();
-			}
+			FileDropTarget(m_CurrentDirectory.parent_path());
 			if(ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				m_CurrentDirectory = m_CurrentDirectory.parent_path();
 			ImGui::Text("%s", "Back");
@@ -68,27 +84,22 @@ namespace Engine
 
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			ImGui::PushID(itemID);
-			ImGui::ImageButton((ImTextureID)GetFileIcon(p)->GetRendererID(), imageSize, { 0,1 }, { 1,0 });
+			Ref<Texture2D> icon = GetFileIcon(p);
+			if(icon)
+				ImGui::ImageButton((ImTextureID)icon->GetRendererID(), imageSize, { 0,1 }, { 1,0 });
 			ImGui::PopStyleColor();
 
 			if (ImGui::BeginDragDropSource())
 			{
 				const wchar_t* itempath = path.c_str();
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itempath, (wcslen(itempath) + 1) * sizeof(wchar_t));
-				ImGui::Image((ImTextureID)Application::Get().GetAssetManager().GetAsset<Texture2D>(path)->GetRendererID(), {50,50}, { 0,1 }, { 1,0 });
+				if(Texture2D::ValidExtention(path.extension().string()))
+					ImGui::Image((ImTextureID)Application::Get().GetAssetManager().GetAsset<Texture2D>(path)->GetRendererID(), {50,50}, { 0,1 }, { 1,0 });
 				ImGui::EndDragDropSource();
 			}
 
-			if (p.is_directory() && ImGui::BeginDragDropTarget())
-			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-				{
-					const auto droppath = (fs::path)(const wchar_t*)payload->Data;
-					if (droppath != path)
-						Application::Get().GetAssetManager().MoveAsset(droppath, path);
-				}
-				ImGui::EndDragDropTarget();
-			}
+			if (p.is_directory())
+				FileDropTarget(path);
 
 			if (ImGui::BeginPopupContextItem(("##" + std::to_string(itemID)).c_str()))
 			{
@@ -155,8 +166,6 @@ namespace Engine
 			ImGui::EndPopup();
 		}
 
-		//ImGui::SliderInt("Image Size", &m_ImageSize, 16, 512);
-
 		ImGui::End();
 	}
 
@@ -173,9 +182,24 @@ namespace Engine
 		if (ext == ".ubiq")
 			return EditorAssets::s_SceneFileIcon;
 
-		if (ext == ".png" || ext == ".jpg" || ext == "jpeg" || ext == ".bmp")
+		if (Texture2D::ValidExtention(ext))
 			return Application::Get().GetAssetManager().GetAsset<Texture2D>(file.path());//EditorAssets::s_ImageFileIcon;
 
 		return EditorAssets::s_DefaultFileIcon;
 	}
+
+	void ContentBrowserPanel::FileDropTarget(fs::path path)
+	{
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const auto droppath = (fs::path)(const wchar_t*)payload->Data;
+				if (droppath != path)
+					Application::Get().GetAssetManager().MoveAsset(droppath, path);
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
+
 }

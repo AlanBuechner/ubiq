@@ -14,7 +14,15 @@ namespace Engine
 	class AssetManager;
 
 	class Asset
-	{};
+	{
+	public:
+		inline UUID GetAssetID() { return m_AssetID; }
+
+	private:
+		UUID m_AssetID = 0;
+
+		friend AssetManager;
+	};
 
 	class AssetManager
 	{
@@ -58,7 +66,9 @@ namespace Engine
 				const auto pathLocation = m_AssetPaths.find(assetID);
 				if (pathLocation != m_AssetPaths.end())
 				{
-					auto data = std::make_pair(assetID, T::Create(pathLocation->second.string()));
+					Ref<T> asset = T::Create(pathLocation->second.string());
+					asset->m_AssetID = assetID;
+					auto data = std::make_pair(assetID, asset);
 					m_CashedAssets.insert(data);
 					return data.second;
 				}
@@ -72,6 +82,8 @@ namespace Engine
 		{
 			return GetAsset<T>(GetAssetUUIDFromPath(path));
 		}
+
+		inline fs::path GetAssetPath(UUID id) { return m_AssetPaths[id]; }
 
 	private:
 		void UpdateDirectory(const fs::path& dir);
