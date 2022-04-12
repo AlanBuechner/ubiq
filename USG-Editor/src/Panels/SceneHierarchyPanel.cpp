@@ -4,6 +4,8 @@
 #include "EditorLayer.h"
 #include <Engine/Core/UUID.h>
 
+#include "PropertiesPanel.h"
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
@@ -214,140 +216,6 @@ namespace Engine
 		}
 	}
 
-	static void DrawVec2Control(const std::string label, Math::Vector2& values, float resetValue = 0.0f, float columnWidth = 100.0f)
-	{
-		ImGui::PushID(label.c_str());
-		ImGui::Columns(2);
-
-		ImGui::SetColumnWidth(0, columnWidth);
-		ImGui::Text(label.c_str());
-		ImGui::NextColumn();
-
-		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
-
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		if (ImGui::Button("X", buttonSize))
-			values.x = resetValue;
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
-		if (ImGui::Button("Y", buttonSize))
-			values.y = resetValue;
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-		ImGui::PopStyleVar();
-		ImGui::Columns(1);
-		ImGui::PopID();
-
-		ImGui::Spacing();
-	}
-
-	static void DrawVec3Control(const std::string label, Math::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
-	{
-		ImGui::PushID(label.c_str());
-		ImGui::Columns(2);
-
-		ImGui::SetColumnWidth(0, columnWidth);
-		ImGui::Text(label.c_str());
-		ImGui::NextColumn();
-
-		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
-
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-		ImGui::PushStyleColor(ImGuiCol_Button,			ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,	ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive,	ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
-		if (ImGui::Button("X", buttonSize))
-			values.x = resetValue;
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button,			ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,	ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive,	ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
-		if (ImGui::Button("Y", buttonSize))
-			values.y = resetValue;
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button,			ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,	ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive,	ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		if (ImGui::Button("Z", buttonSize))
-			values.z = resetValue;
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-		ImGui::PopStyleVar();
-		ImGui::Columns(1);
-		ImGui::PopID();
-
-		ImGui::Spacing();
-	}
-
-	static void DrawTextureControl(const std::string& lable, Ref<Texture2D>& texture)
-	{
-		ImGui::PushID(lable.c_str());
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, 140);
-		ImGui::Image((ImTextureID)(texture ? texture : EditorAssets::s_NoTextureIcon)->GetRendererID(), { 100,100 }, { 0,1 }, { 1,0 });
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-			{
-				fs::path path = (const wchar_t*)payload->Data;
-				if(Texture2D::ValidExtention(path.extension().string()))
-					texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(path);
-			}
-			ImGui::EndDragDropTarget();
-		}
-		ImGui::NextColumn();
-		ImGui::Text(lable.c_str());
-		if (texture)
-		{
-			fs::path path = Application::Get().GetAssetManager().GetAssetPath(texture->GetAssetID());
-			if (ImGui::Button(path.string().c_str()))
-			{
-				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
-			}
-		}
-		if (ImGui::Button("Clear"))
-			texture = Ref<Texture2D>();
-		ImGui::Columns(1);
-		ImGui::PopID();
-	}
-
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
@@ -365,11 +233,11 @@ namespace Engine
 
 		DrawComponent<TransformComponent>(entity, "Transform", [&]() {
 			auto& tc = entity.GetComponent<TransformComponent>();
-			DrawVec3Control("Position", tc.Position, 0.0f);
+			PropertysPanel::DrawVec3Control("Position", tc.Position, 0.0f);
 			Math::Vector3 rotation = glm::degrees(tc.Rotation);
-			DrawVec3Control("Rotation", rotation, 0.0f);
+			PropertysPanel::DrawVec3Control("Rotation", rotation, 0.0f);
 			tc.Rotation = glm::radians(rotation);
-			DrawVec3Control("Scale", tc.Scale, 1.0f);
+			PropertysPanel::DrawVec3Control("Scale", tc.Scale, 1.0f);
 		}, false);
 
 		DrawComponent<CameraComponent>(entity, "Camera", [&]() {
@@ -403,30 +271,30 @@ namespace Engine
 			if (camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
 			{
 				float fov = glm::degrees(camera.GetPerspectiveVerticalFOV());
-				if (ImGui::DragFloat("FOV", &fov))
+				if (PropertysPanel::DrawFloatControl("FOV", fov, 45.0f))
 					camera.SetPerspectiveVerticalFOV(glm::radians(fov));
 
 				float nearClip = camera.GetPerspectiveNearClip();
-				if (ImGui::DragFloat("Near Clip", &nearClip, 0.1f))
+				if (PropertysPanel::DrawFloatControl("Near Clip", nearClip, 0.01f))
 					camera.SetPerspectiveNearClip(nearClip);
 
 				float farClip = camera.GetPerspectiveFarClip();
-				if (ImGui::DragFloat("Far Clip", &farClip, 0.1f))
+				if (PropertysPanel::DrawFloatControl("Far Clip", farClip, 1000.0f))
 					camera.SetPerspectiveFarClip(farClip);
 			}
 
 			if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
 			{
 				float Size = camera.GetOrthographicSize();
-				if (ImGui::DragFloat("Size", &Size, 0.1f))
+				if (PropertysPanel::DrawFloatControl("Size", Size, 10.0f))
 					camera.SetOrthographicSize(Size);
 
 				float nearClip = camera.GetOrthographicNearClip();
-				if (ImGui::DragFloat("Near Clip", &nearClip, 0.1f))
+				if (PropertysPanel::DrawFloatControl("Near Clip", nearClip, -1.0f))
 					camera.SetOrthographicNearClip(nearClip);
 
 				float farClip = camera.GetOrthographicFarClip();
-				if (ImGui::DragFloat("Far Clip", &farClip, 0.1f))
+				if (PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
 					camera.SetOrthographicFarClip(farClip);
 			}
 		});
@@ -436,7 +304,7 @@ namespace Engine
 			auto& color = component.Color;
 			ImGui::ColorEdit4("Color", glm::value_ptr(color));
 
-			DrawTextureControl("Texture", component.Texture);
+			PropertysPanel::DrawTextureControl("Texture", component.Texture);
 			
 		});
 
@@ -468,8 +336,8 @@ namespace Engine
 		DrawComponent<BoxCollider2DComponent>(entity, "Box Collider 2D", [&]() {
 			auto& component = entity.GetComponent<BoxCollider2DComponent>();
 
-			DrawVec2Control("Offset", component.Offset, 0.0f);
-			DrawVec2Control("Size", component.Size, 0.0f);
+			PropertysPanel::DrawVec2Control("Offset", component.Offset, 0.0f);
+			PropertysPanel::DrawVec2Control("Size", component.Size, 0.0f);
 
 			ImGui::DragFloat("Density", &component.Density, 0.1f);
 			ImGui::DragFloat("Friction", &component.Friction, 0.1f);
@@ -481,13 +349,13 @@ namespace Engine
 		DrawComponent<CircleColliderComponent>(entity, "Circle Collider 2D", [&]() {
 			auto& component = entity.GetComponent<CircleColliderComponent>();
 
-			DrawVec2Control("Offset", component.Offset, 0.0f);
+			PropertysPanel::DrawVec2Control("Offset", component.Offset, 0.0f);
 
-			ImGui::DragFloat("Size", &component.Size, 0.1f);
-			ImGui::DragFloat("Density", &component.Density, 0.1f);
-			ImGui::DragFloat("Friction", &component.Friction, 0.1f);
-			ImGui::DragFloat("Restitution", &component.Restitution, 0.1f);
-			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.1f);
+			PropertysPanel::DrawFloatControl("Size", component.Size, 0.5f);
+			PropertysPanel::DrawFloatControl("Density", component.Density, 1.0f);
+			PropertysPanel::DrawFloatControl("Friction", component.Friction, 0.5f);
+			PropertysPanel::DrawFloatControl("Restitution", component.Restitution, 0.0f);
+			PropertysPanel::DrawFloatControl("Restitution Threshold", component.RestitutionThreshold, 0.5f);
 
 		});
 

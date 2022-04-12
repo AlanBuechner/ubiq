@@ -1,6 +1,212 @@
 #include "PropertiesPanel.h"
+#include "EditorLayer.h"
+#include "EditorAssets.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 namespace Engine
 {
+	bool PropertysPanel::DrawFloatControl(const std::string& label, float& value, float resetValue, float columnWidth)
+	{
+		bool changed = false;
+
+		ImGui::PushID(label.c_str());
+		ImGui::Columns(2);
+
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.4f, 0.4f, 0.4f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.5f, 0.5f, 0.5f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.4f, 0.4f, 0.4f, 1.0f });
+		if (ImGui::Button("V", buttonSize)) {
+			value = resetValue;
+			changed = true;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		if (ImGui::DragFloat("##X", &value, 0.01f, 0.0f, 0.0f, "%.2f"))
+			changed = true;
+		ImGui::PopItemWidth();
+
+		ImGui::PopStyleVar();
+		ImGui::Columns(1);
+		ImGui::PopID();
+
+		ImGui::Spacing();
+
+		return changed;
+	}
+
+	bool PropertysPanel::DrawVec2Control(const std::string& label, Math::Vector2& values, float resetValue, float columnWidth)
+	{
+		bool changed = false;
+
+		ImGui::PushID(label.c_str());
+		ImGui::Columns(2);
+
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		if (ImGui::Button("X", buttonSize)) {
+			values.x = resetValue;
+			changed = true;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		if (ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f"))
+			changed = true;
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
+		if (ImGui::Button("Y", buttonSize)) {
+			values.y = resetValue;
+			changed = true;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		if (ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f"))
+			changed = true;
+		ImGui::PopItemWidth();
+
+		ImGui::PopStyleVar();
+		ImGui::Columns(1);
+		ImGui::PopID();
+
+		ImGui::Spacing();
+
+		return changed;
+	}
+
+	bool PropertysPanel::DrawVec3Control(const std::string& label, Math::Vector3& values, float resetValue, float columnWidth)
+	{
+		bool changed = false;
+
+		ImGui::PushID(label.c_str());
+		ImGui::Columns(2);
+
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		if (ImGui::Button("X", buttonSize)) {
+			values.x = resetValue;
+			changed = true;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		if (ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f"))
+			changed = true;
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
+		if (ImGui::Button("Y", buttonSize)){
+			values.y = resetValue;
+			changed = true;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		if (ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f"))
+			changed = true;
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+		if (ImGui::Button("Z", buttonSize)){
+			values.z = resetValue;
+			changed = true;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+
+		ImGui::PopStyleVar();
+		ImGui::Columns(1);
+		ImGui::PopID();
+
+		ImGui::Spacing();
+
+		return changed;
+	}
+
+	bool PropertysPanel::DrawTextureControl(const std::string& lable, Ref<Texture2D>& texture)
+	{
+		bool changed = false;
+
+		ImGui::PushID(lable.c_str());
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, 100);
+		ImGui::Image((ImTextureID)(texture ? texture : EditorAssets::s_NoTextureIcon)->GetRendererID(), { 70,70 }, { 0,1 }, { 1,0 });
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				fs::path path = (const wchar_t*)payload->Data;
+				if (Texture2D::ValidExtention(path.extension().string())) {
+					texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(path);
+					changed = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+		ImGui::NextColumn();
+		ImGui::Text(lable.c_str());
+		if (texture)
+		{
+			fs::path path = Application::Get().GetAssetManager().GetAssetPath(texture->GetAssetID());
+			if (ImGui::Button(path.string().c_str()))
+				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
+			
+		}
+		if (ImGui::Button("Clear")) {
+			texture = Ref<Texture2D>();
+			changed = true;
+		}
+		ImGui::Columns(1);
+		ImGui::PopID();
+
+		return changed;
+	}
 
 }
