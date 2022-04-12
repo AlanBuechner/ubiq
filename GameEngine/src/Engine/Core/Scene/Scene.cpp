@@ -179,6 +179,9 @@ namespace Engine
 
 	void Scene::DestroyEntity(Entity entity)
 	{
+		if (entity.GetTransform().Parent)
+			entity.GetTransform().Parent.GetTransform().RemoveChild(entity);
+
 		for (auto& child : entity.GetTransform().GetChildren())
 			DestroyEntity(child);
 
