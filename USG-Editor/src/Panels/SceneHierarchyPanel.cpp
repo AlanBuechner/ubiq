@@ -23,7 +23,7 @@ namespace Engine
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& context)
 	{
 		m_Context = context;
-		m_Selected = {};
+		m_Selected = Entity::null;
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
@@ -34,31 +34,19 @@ namespace Engine
 
 			Entity entity{ entityID, m_Context.get() };
 
-			DrawEntityNode(entity);
+			if(entity.GetTransform().GetParent() == Entity::null)
+				DrawEntityNode(entity);
 		});
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 		{
-			m_Selected = {};
+			m_Selected = Entity::null;
 		}
 
 		// right click on blank space
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
-			if (ImGui::MenuItem("Create Empty Entity"))
-			{
-				m_Context->CreateEntity("Empty Entity");
-			}
-
-			if (ImGui::MenuItem("Create Sprite"))
-			{
-				m_Context->CreateEntity("Sprite").AddComponent<SpriteRendererComponent>();
-			}
-
-			if (ImGui::MenuItem("Create Camera"))
-			{
-				m_Context->CreateEntity("Camera").AddComponent<CameraComponent>();
-			}
+			CreateNewEntity();
 			ImGui::EndPopup();
 		}
 		
@@ -132,16 +120,48 @@ namespace Engine
 
 	void SceneHierarchyPanel::SelectEntity(Entity e) 
 	{ 
-		m_Selected = e; 
+		m_Selected = e;
+	}
+
+	void SceneHierarchyPanel::CreateNewEntity(Entity parent)
+	{
+		bool entityAdded = false;
+		Entity createdEntity;
+		if (ImGui::MenuItem("Create Empty Entity"))
+		{
+			createdEntity = m_Context->CreateEntity("Empty Entity");
+			entityAdded = true;
+		}
+
+		if (ImGui::MenuItem("Create Sprite"))
+		{
+			(createdEntity = m_Context->CreateEntity("Sprite")).AddComponent<SpriteRendererComponent>();
+			entityAdded = true;
+		}
+
+		if (ImGui::MenuItem("Create Camera"))
+		{
+			(createdEntity = m_Context->CreateEntity("Camera")).AddComponent<CameraComponent>();
+			entityAdded = true;
+		}
+
+		if (entityAdded && parent)
+		{
+			auto& tc = parent.GetTransform();
+			tc.AddChild(createdEntity);
+		
+		}
+		
 	}
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
-		auto& tc = entity.GetComponent<TagComponent>();
+		auto children = entity.GetTransform().GetChildren();
+		ImGuiTreeNodeFlags flags = ( m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
+			(children.size() == 0 ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow) |
+			ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		ImGuiTreeNodeFlags flags = ( m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-
-		bool open = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity, flags, tc.Tag.c_str());
+		bool open = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity, flags, entity.GetTag().c_str());
 
 		if (ImGui::IsItemClicked())
 		{
@@ -155,11 +175,23 @@ namespace Engine
 			{
 				entityDeleted = true;
 			}
+			if (ImGui::BeginMenu("Create"))
+			{
+				CreateNewEntity(entity);
+				ImGui::EndMenu();
+			}
 			ImGui::EndPopup();
 		}
 
+		children = entity.GetTransform().GetChildren(); // update children array
+
 		if (open)
 		{
+			for (uint32_t i = 0; i < children.size(); i++)
+			{
+				Entity child = children[i];
+				DrawEntityNode(child);
+			}
 			ImGui::TreePop();
 		}
 

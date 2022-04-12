@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "EditorCamera.h"
+#include "Engine/Core/Scene/Entity.h"
 #include "Engine/Core/Scene/Components.h"
 
 #include "Engine/Util/Performance.h"

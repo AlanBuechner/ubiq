@@ -15,8 +15,8 @@ namespace Engine
 
 		void OnImGuiRender();
 
-		void SelectAsset(const fs::path& path) { SetDirectory(path.parent_path()); m_SelectedAsset = path; };
-		void SetDirectory(const fs::path& path) { m_CurrentDirectory = path; }
+		void SelectAsset(fs::path path);
+		void SetDirectory(const fs::path& path);
 
 	private:
 		void DrawDirectory(const fs::path& path);
@@ -25,8 +25,6 @@ namespace Engine
 
 		void FileDragSorce(const fs::path& path);
 		void FileDropTarget(const fs::path& path);
-
-		void OpenAsset(const fs::path& path);
 
 	private:
 		fs::path m_CurrentDirectory;

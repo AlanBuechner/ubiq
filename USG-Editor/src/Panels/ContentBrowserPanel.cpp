@@ -81,7 +81,7 @@ namespace Engine
 		while (dir.has_parent_path())
 			directorys.push_back(dir = dir.parent_path());
 
-		for (int i = directorys.size() - 1; i >= 0; i--)
+		for (int i = (int)directorys.size() - 1; i >= 0; i--)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0,0 });
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 2,2 });
@@ -165,7 +165,7 @@ namespace Engine
 					else if (path.extension().string() == ".ubiq")
 						EditorLayer::Get()->LoadScene(path.string());
 					else
-						OpenAsset(path);
+						Application::Get().GetAssetManager().OpenAsset(path);
 
 				}
 			}
@@ -220,6 +220,26 @@ namespace Engine
 		ImGui::End();
 	}
 
+	void ContentBrowserPanel::SelectAsset(fs::path path) 
+	{
+		if (fs::exists(path))
+		{
+			m_CurrentDirectory = path.parent_path(); 
+			m_SelectedAsset = path; 
+			while (path.has_parent_path())
+			{
+				path = path.parent_path();
+				m_OpenFolders[path] = true;
+			}
+		}
+	}
+
+	void ContentBrowserPanel::SetDirectory(const fs::path& path) 
+	{ 
+		if(fs::exists(path))
+			m_CurrentDirectory = path; 
+	}
+
 	void ContentBrowserPanel::DrawDirectory(const fs::path& dir)
 	{
 		for (auto& p : fs::directory_iterator(dir))
@@ -262,7 +282,7 @@ namespace Engine
 			else
 			{
 				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-					OpenAsset(path);
+					Application::Get().GetAssetManager().OpenAsset(path);
 			}
 
 			if (open)
@@ -287,7 +307,7 @@ namespace Engine
 			return EditorAssets::s_SceneFileIcon;
 
 		if (Texture2D::ValidExtention(ext))
-			return Application::Get().GetAssetManager().GetAsset<Texture2D>(file.path());//EditorAssets::s_ImageFileIcon;
+			return Application::Get().GetAssetManager().GetAsset<Texture2D>(file.path());
 
 		return EditorAssets::s_DefaultFileIcon;
 	}
@@ -316,11 +336,6 @@ namespace Engine
 			}
 			ImGui::EndDragDropTarget();
 		}
-	}
-
-	inline void ContentBrowserPanel::OpenAsset(const fs::path& path)
-	{
-		system(path.string().c_str());
 	}
 
 }

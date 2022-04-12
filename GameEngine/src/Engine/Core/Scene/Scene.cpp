@@ -172,12 +172,16 @@ namespace Engine
 		entity.AddComponent<IDComponent>(uuid);
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
-		entity.AddComponent<TransformComponent>();
+		auto& tc = entity.AddComponent<TransformComponent>();
+		tc.Owner = entity;
 		return entity;
 	}
 
 	void Scene::DestroyEntity(Entity entity)
 	{
+		for (auto& child : entity.GetTransform().GetChildren())
+			DestroyEntity(child);
+
 		m_Registry.destroy(entity);
 	}
 

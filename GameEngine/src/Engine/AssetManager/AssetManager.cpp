@@ -77,6 +77,18 @@ namespace Engine
 		return newPath;
 	}
 
+	void AssetManager::OpenAsset(UUID id)
+	{
+		OpenAsset(m_AssetPaths[id]);
+	}
+
+	void AssetManager::OpenAsset(const fs::path& path)
+	{
+#if defined(PLATFORM_WINDOWS)
+		system(path.string().c_str());
+#endif
+	}
+
 	void AssetManager::UpdateDirectory(const fs::path& dir)
 	{
 		if (!fs::exists(dir))

@@ -18,6 +18,8 @@ namespace Engine
 		void SelectEntity(Entity e);
 
 	private:
+		void CreateNewEntity(Entity parent = Entity());
+
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);
 	private:

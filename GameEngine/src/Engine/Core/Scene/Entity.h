@@ -1,10 +1,13 @@
 #pragma once
 #include "Scene.h"
 #include "entt.hpp"
-#include "Components.h"
 
 #include "Engine/Core/UUID.h"
 
+namespace Engine
+{
+	struct TransformComponent;
+}
 
 namespace Engine
 {
@@ -48,10 +51,14 @@ namespace Engine
 		operator entt::entity() const { return m_EntityID; }
 		operator uint32() const { return (uint32)m_EntityID; }
 
-		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
+		UUID GetUUID();
+		std::string GetTag();
+		TransformComponent& GetTransform();
 
 		bool operator == (const Entity& other) const { return m_EntityID == other.m_EntityID && m_Scene == other.m_Scene; }
 		bool operator != (const Entity& other) const { return !(*this == other); }
+
+		static Entity null;
 
 	private:
 		entt::entity m_EntityID = { entt::null };

@@ -19,6 +19,7 @@
 #include "Engine/Core/UUID.h"
 
 #include "Engine/Core/UUID.h"
+#include "Entity.h"
 
 namespace Engine
 {
@@ -49,26 +50,32 @@ namespace Engine
 
 	struct TransformComponent
 	{
+	public:
 		Math::Vector3 Position = { 0.0f, 0.0f, 0.0f };
 		Math::Vector3 Rotation = { 0.0f, 0.0f, 0.0f };
 		Math::Vector3 Scale = { 1.0f, 1.0f, 1.0f };
 
+	private:
+		Entity Owner;
 
+		Entity Parent;
+		std::vector<Entity> Children;
+
+	public:
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const Math::Vector3& position) :
-			Position(position)
-		{}
+		TransformComponent(const Math::Vector3& position);
 
-		Math::Mat4 GetTransform() const
-		{
-			Math::Mat4 rotation = glm::toMat4(Math::Quaternion(Rotation));
+		Math::Mat4 GetTransform() const;
 
-			return glm::translate(Math::Mat4(1.0f), Position) * 
-				rotation * 
-				glm::scale(Math::Mat4(1.0f), Scale);
-				
-		}
+		void AddChild(Entity child);
+		void RemoveChild(Entity child);
+		const std::vector<Entity>& GetChildren() const { return Children; }
+
+		Entity GetOwner() { return Owner; }
+		Entity GetParent() { return Parent; }
+
+		friend Scene;
 	};
 
 	struct SpriteRendererComponent
