@@ -339,7 +339,7 @@ namespace Engine
 			fs::path path = Application::Get().GetAssetManager().GetAssetPath(texture->GetAssetID());
 			if (ImGui::Button(path.string().c_str()))
 			{
-				EditorLayer::Get()->GetContantBrowser().SetDirectory(path.parent_path());
+				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
 			}
 		}
 		if (ImGui::Button("Clear"))
