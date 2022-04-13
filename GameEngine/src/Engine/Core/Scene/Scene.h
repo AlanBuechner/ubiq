@@ -30,6 +30,8 @@ namespace Engine
 		Entity CreateEntityWithUUID(const UUID uuid, const std::string& name = "");
 		void DestroyEntity(Entity entity);
 
+		Entity GetEntityWithUUID(UUID id);
+
 		Entity GetPrimaryCameraEntity();
 
 		static Ref<Scene> Copy(Ref<Scene> scene);

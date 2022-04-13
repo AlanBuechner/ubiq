@@ -289,7 +289,6 @@ namespace Engine
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
-
 		bool controlPressed = Input::GetKeyDown(KeyCode::CONTROL);
 		bool shiftPressed = Input::GetKeyDown(KeyCode::SHIFT);
 		bool rightClick = Input::GetMouseButtonDown(KeyCode::RIGHT_MOUSE);
@@ -320,7 +319,7 @@ namespace Engine
 			}
 			}
 
-			// imguizmo keybord shortcuts
+			// imguizmo keyboard shortcuts
 			switch (e.GetKeyCode())
 			{
 			case KeyCode::Q:

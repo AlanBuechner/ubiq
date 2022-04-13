@@ -55,6 +55,8 @@ namespace Engine
 		std::string GetTag();
 		TransformComponent& GetTransform();
 
+		Scene* GetScene() { return m_Scene; }
+
 		bool operator == (const Entity& other) const { return m_EntityID == other.m_EntityID && m_Scene == other.m_Scene; }
 		bool operator != (const Entity& other) const { return !(*this == other); }
 

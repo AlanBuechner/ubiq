@@ -31,7 +31,6 @@ namespace Engine
 		ImGui::Begin("Hierarchy");
 
 		m_Context->m_Registry.each([&](auto entityID) {
-
 			Entity entity{ entityID, m_Context.get() };
 
 			if(entity.GetTransform().GetParent() == Entity::null)
@@ -172,9 +171,8 @@ namespace Engine
 		if (ImGui::BeginPopupContextItem())
 		{
 			if (ImGui::MenuItem("Delete Entity"))
-			{
 				entityDeleted = true;
-			}
+			
 			if (ImGui::BeginMenu("Create"))
 			{
 				CreateNewEntity(entity);
@@ -199,7 +197,7 @@ namespace Engine
 		{
 			m_Context->DestroyEntity(entity);
 			if (m_Selected == entity)
-				m_Selected = {};
+				m_Selected = Entity::null;
 		}
 	}
 
@@ -208,7 +206,6 @@ namespace Engine
 	{
 		if (ent.HasComponent<T>())
 		{
-
 			ImVec2 contentRegion = ImGui::GetContentRegionAvail();
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});

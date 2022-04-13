@@ -76,6 +76,7 @@ namespace Engine
 		Entity GetParent() { return Parent; }
 
 		friend Scene;
+		friend SceneSerializer;
 	};
 
 	struct SpriteRendererComponent

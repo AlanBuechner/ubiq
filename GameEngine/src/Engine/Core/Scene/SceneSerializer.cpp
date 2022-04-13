@@ -139,11 +139,19 @@ namespace Engine
 			out << YAML::Key << "TransformComponent";
 			out << YAML::BeginMap;
 
-			auto& transrom = entity.GetComponent<TransformComponent>();
+			auto& transform = entity.GetComponent<TransformComponent>();
 			
-			out << YAML::Key << "Position" << YAML::Value << transrom.Position;
-			out << YAML::Key << "Rotation" << YAML::Value << transrom.Rotation;
-			out << YAML::Key << "Scale" << YAML::Value << transrom.Scale;
+			out << YAML::Key << "Position" << YAML::Value << transform.Position;
+			out << YAML::Key << "Rotation" << YAML::Value << transform.Rotation;
+			out << YAML::Key << "Scale" << YAML::Value << transform.Scale;
+
+			if (transform.GetChildren().size() > 0)
+			{
+				YAML::Node children;
+				for (auto c : transform.GetChildren())
+					children.push_back((uint64)c.GetUUID());
+				out << YAML::Key << "Children" << YAML::Value << children;
+			}
 
 			out << YAML::EndMap;
 		}
@@ -304,6 +312,9 @@ namespace Engine
 					tc.Position = transformComponent["Position"].as<Math::Vector3>();
 					tc.Rotation = transformComponent["Rotation"].as<Math::Vector3>();
 					tc.Scale = transformComponent["Scale"].as<Math::Vector3>();
+
+					tc.Owner = deserializedEntity;
+					tc.Parent = Entity::null;
 				}
 
 				auto cameraComponent = entity["CameraComponent"];
@@ -369,6 +380,25 @@ namespace Engine
 					bcc.Friction = circleCollider2DComponent["Friction"].as<float>();
 					bcc.Restitution = circleCollider2DComponent["Restitution"].as<float>();
 					bcc.RestitutionThreshold = circleCollider2DComponent["RestitutionThreshold"].as<float>();
+				}
+			}
+
+			// update entity and component refs
+			for (auto entity : entities)
+			{
+				Entity deserializedEntity = m_Scene->GetEntityWithUUID(entity["Entity"].as<uint64>());
+
+				auto transformComponent = entity["TransformComponent"];
+				if (transformComponent)
+				{
+					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
+
+					if (transformComponent["Children"])
+					{
+						YAML::Node chldren = transformComponent["Children"];
+						for (auto c : chldren)
+							tc.AddChild(m_Scene->GetEntityWithUUID(c.as<uint64>()));
+					}
 				}
 			}
 		}

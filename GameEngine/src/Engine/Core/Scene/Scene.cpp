@@ -188,6 +188,17 @@ namespace Engine
 		m_Registry.destroy(entity);
 	}
 
+	Entity Scene::GetEntityWithUUID(UUID id)
+	{
+		auto view = m_Registry.view<IDComponent>();
+		for (auto entity : view) {
+			auto idcomp = view.get<IDComponent>(entity);
+			if (idcomp.ID == id)
+				return Entity{ entity, this };
+		}
+		return Entity::null;
+	}
+
 	Entity Scene::GetPrimaryCameraEntity()
 	{
 		auto view = m_Registry.view<CameraComponent>();
@@ -196,7 +207,7 @@ namespace Engine
 			if (camera.Primary)
 				return Entity{ entity, this };
 		}
-		return {};
+		return Entity::null;
 	}
 
 	template<typename T>
