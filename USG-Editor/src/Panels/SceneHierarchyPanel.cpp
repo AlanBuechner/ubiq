@@ -30,12 +30,14 @@ namespace Engine
 	{
 		ImGui::Begin("Hierarchy");
 
+		std::vector<Entity> rootEntitys;
 		m_Context->m_Registry.each([&](auto entityID) {
 			Entity entity{ entityID, m_Context.get() };
-
-			if(entity.GetTransform().GetParent() == Entity::null)
-				DrawEntityNode(entity);
+			if (entity.GetTransform().GetParent() == Entity::null)
+				rootEntitys.push_back(entity);
 		});
+		for (uint32_t i = 0; i < rootEntitys.size(); i++)
+			DrawEntityNode(rootEntitys[i]);
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 		{
