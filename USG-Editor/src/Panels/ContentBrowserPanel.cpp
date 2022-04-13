@@ -17,6 +17,7 @@ namespace Engine
 	ContentBrowserPanel::ContentBrowserPanel() :
 		m_RootDirectory(s_AssetsDirectory), m_CurrentDirectory(s_AssetsDirectory)
 	{
+		m_OpenFolders[m_RootDirectory] = true;
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
@@ -52,13 +53,8 @@ namespace Engine
 		float dividLoc = m_DrawTreeView ? m_DivideLoc : 10;
 		ImGui::BeginChild("HierarchyView", { dividLoc, height });
 		if (dividLoc > 10 && m_DrawTreeView)
-		{
-			if (ImGui::TreeNodeEx(m_RootDirectory.filename().string().c_str(), ImGuiTreeNodeFlags_DefaultOpen, m_RootDirectory.filename().string().c_str()))
-			{
-				DrawDirectory(m_RootDirectory);
-				ImGui::TreePop();
-			}
-		}
+			DrawDirectory(m_RootDirectory);
+		
 		ImGui::EndChild();
 
 		ImGui::SameLine();
@@ -240,56 +236,53 @@ namespace Engine
 			m_CurrentDirectory = path; 
 	}
 
-	void ContentBrowserPanel::DrawDirectory(const fs::path& dir)
+	void ContentBrowserPanel::DrawDirectory(const fs::path& path)
 	{
-		for (auto& p : fs::directory_iterator(dir))
+		auto p = fs::directory_entry(path);
+		std::string filename = path.filename().string();
+
+		bool subPathOfCurrentDir = m_CurrentDirectory.string().rfind(path.string(), 0) == 0;
+
+		if (path.extension().string() == ".meta")
+			return;
+
+		ImGui::SetNextItemOpen(m_OpenFolders[path]);
+		if (!p.is_directory())
 		{
-			auto& path = p.path();
-			std::string filename = path.filename().string();
-
-			bool subPathOfCurrentDir = m_CurrentDirectory.string().rfind(path.string(), 0) == 0;
-
-			if (path.extension().string() == ".meta")
-				continue;
-
-			ImGui::PushID(path.string().c_str());
-			ImGui::SetNextItemOpen(m_OpenFolders[path]);
-			if (!p.is_directory())
-			{
-				ImGui::Image((ImTextureID)GetFileIcon(p)->GetRendererID(), { 20,20 }, { 0,1 }, { 1,0 });
-				ImGui::SameLine();
-			}
-			ImGuiTreeNodeFlags flags = (path == m_CurrentDirectory ? ImGuiTreeNodeFlags_Selected : 0) |
-				(p.is_directory() || subPathOfCurrentDir ? ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf) |
-				ImGuiTreeNodeFlags_SpanAvailWidth;
-			bool open = ImGui::TreeNodeEx(path.c_str(), flags, path.filename().string().c_str());
-			if (path == m_SelectedAsset)
-				ImGui::GetForegroundDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 0, 255), 0, 0, 3);
-
-			FileDragSorce(path);
-
-			if (p.is_directory())
-			{
-				FileDropTarget(path);
-
-				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-					m_CurrentDirectory = path;
-
-				m_OpenFolders[path] = open;
-				if(open)
-					DrawDirectory(path);
-			}
-			else
-			{
-				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-					Application::Get().GetAssetManager().OpenAsset(path);
-			}
-
-			if (open)
-				ImGui::TreePop();
-
-			ImGui::PopID();
+			ImGui::Image((ImTextureID)GetFileIcon(p)->GetRendererID(), { 20,20 }, { 0,1 }, { 1,0 });
+			ImGui::SameLine();
 		}
+		ImGuiTreeNodeFlags flags = (path == m_CurrentDirectory ? ImGuiTreeNodeFlags_Selected : 0) |
+			(p.is_directory() || subPathOfCurrentDir ? ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf) |
+			ImGuiTreeNodeFlags_SpanAvailWidth;
+		bool open = ImGui::TreeNodeEx(path.c_str(), flags, path.filename().string().c_str());
+		if (path == m_SelectedAsset)
+			ImGui::GetForegroundDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 0, 255), 0, 0, 3);
+
+		FileDragSorce(path);
+
+		if (p.is_directory())
+		{
+			FileDropTarget(path);
+
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+				m_CurrentDirectory = path;
+
+			m_OpenFolders[path] = open;
+			if (open)
+			{
+				for (auto& sub : fs::directory_iterator(path))
+					DrawDirectory(sub.path());
+			}
+		}
+		else
+		{
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+				Application::Get().GetAssetManager().OpenAsset(path);
+		}
+
+		if (open)
+			ImGui::TreePop();
 
 	}
 
@@ -328,6 +321,7 @@ namespace Engine
 	{
 		if (ImGui::BeginDragDropTarget())
 		{
+			CORE_INFO("DragDrop Target");
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
 				const auto droppath = (fs::path)(const wchar_t*)payload->Data;

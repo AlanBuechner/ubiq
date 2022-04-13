@@ -40,9 +40,7 @@ namespace Engine
 			DrawEntityNode(rootEntitys[i]);
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-		{
 			m_Selected = Entity::null;
-		}
 
 		// right click on blank space
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
@@ -50,8 +48,20 @@ namespace Engine
 			CreateNewEntity();
 			ImGui::EndPopup();
 		}
-		
+
+		ImRect windowRect = {ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax()};
+		if (ImGui::BeginDragDropTargetCustom(windowRect, ImGui::GetWindowDockID()))
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY"))
+			{
+				Entity dropedEntity = *(Entity*)payload->Data;
+				dropedEntity.GetTransform().SetParentToRoot();
+			}
+			ImGui::EndDragDropTarget();
+		}
+
 		ImGui::End();
+
 
 
 		ImGui::Begin("Properties");
@@ -150,23 +160,38 @@ namespace Engine
 		{
 			auto& tc = parent.GetTransform();
 			tc.AddChild(createdEntity);
-		
 		}
 		
 	}
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
-		auto children = entity.GetTransform().GetChildren();
+		auto& children = entity.GetTransform().GetChildren();
 		ImGuiTreeNodeFlags flags = ( m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
 			(children.size() == 0 ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow) |
 			ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		bool open = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity, flags, entity.GetTag().c_str());
+		bool open = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity, flags, entity.GetName().c_str());
 
 		if (ImGui::IsItemClicked())
-		{
 			m_Selected = entity;
+
+		if (ImGui::BeginDragDropSource())
+		{
+			ImGui::SetDragDropPayload("ENTITY", &entity, sizeof(Entity));
+			ImGui::Text(entity.GetName().c_str());
+			ImGui::EndDragDropSource();
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY"))
+			{
+				Entity dropedEntity = *(Entity*)payload->Data;
+				if (dropedEntity != entity)
+					entity.GetTransform().AddChild(dropedEntity);
+			}
+			ImGui::EndDragDropTarget();
 		}
 
 		bool entityDeleted = false;
@@ -182,8 +207,6 @@ namespace Engine
 			}
 			ImGui::EndPopup();
 		}
-
-		children = entity.GetTransform().GetChildren(); // update children array
 
 		if (open)
 		{
@@ -249,17 +272,15 @@ namespace Engine
 
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
-		if (entity.HasComponent<TagComponent>())
+		if (entity.HasComponent<EntityDataComponent>())
 		{
-			auto& tag = entity.GetComponent<TagComponent>().Tag;
+			auto& name = entity.GetComponent<EntityDataComponent>().Name;
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
-			strcpy_s(buffer, sizeof(buffer), tag.c_str());
-			if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
-			{
-				tag = std::string(buffer);
-			}
+			strcpy_s(buffer, sizeof(buffer), name.c_str());
+			if (ImGui::InputText("Name", buffer, sizeof(buffer)))
+				name = std::string(buffer);
 		}
 
 		DrawComponent<TransformComponent>(entity, "Transform", [&]() {
@@ -336,7 +357,6 @@ namespace Engine
 			ImGui::ColorEdit4("Color", glm::value_ptr(color));
 
 			PropertysPanel::DrawTextureControl("Texture", component.Texture);
-			
 		});
 
 		DrawComponent<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&]() {
@@ -370,11 +390,10 @@ namespace Engine
 			PropertysPanel::DrawVec2Control("Offset", component.Offset, 0.0f);
 			PropertysPanel::DrawVec2Control("Size", component.Size, 0.0f);
 
-			ImGui::DragFloat("Density", &component.Density, 0.1f);
-			ImGui::DragFloat("Friction", &component.Friction, 0.1f);
-			ImGui::DragFloat("Restitution", &component.Restitution, 0.1f);
-			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.1f);
-
+			PropertysPanel::DrawFloatControl("Density", component.Density, 1.0f);
+			PropertysPanel::DrawFloatControl("Friction", component.Friction, 0.5f);
+			PropertysPanel::DrawFloatControl("Restitution", component.Restitution, 0.0f);
+			PropertysPanel::DrawFloatControl("Restitution Threshold", component.RestitutionThreshold, 0.5f);
 		});
 
 		DrawComponent<CircleColliderComponent>(entity, "Circle Collider 2D", [&]() {
@@ -387,7 +406,6 @@ namespace Engine
 			PropertysPanel::DrawFloatControl("Friction", component.Friction, 0.5f);
 			PropertysPanel::DrawFloatControl("Restitution", component.Restitution, 0.0f);
 			PropertysPanel::DrawFloatControl("Restitution Threshold", component.RestitutionThreshold, 0.5f);
-
 		});
 
 	}

@@ -12,16 +12,26 @@ namespace Engine
 	{
 	}
 
-	UUID Entity::GetUUID() { return GetComponent<IDComponent>().ID; }
+	UUID Entity::GetUUID() { return GetComponent<EntityDataComponent>().GetID(); }
 
-	std::string Entity::GetTag()
+	std::string Entity::GetName()
 	{
-		return GetComponent<TagComponent>().Tag;
+		return GetComponent<EntityDataComponent>().Name;
 	}
 
 	TransformComponent& Entity::GetTransform()
 	{
 		return GetComponent<TransformComponent>();
+	}
+
+	Entity Entity::GetParent()
+	{
+		return GetTransform().GetParent();
+	}
+
+	const std::vector<Entity>& Entity::GetChildren()
+	{
+		return GetTransform().GetChildren();
 	}
 
 }

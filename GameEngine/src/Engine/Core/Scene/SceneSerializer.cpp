@@ -123,14 +123,14 @@ namespace Engine
 		out << YAML::BeginMap;
 		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
 
-		if (entity.HasComponent<TagComponent>())
+		if (entity.HasComponent<EntityDataComponent>())
 		{
-			out << YAML::Key << "TagComponent";
+			out << YAML::Key << "EntityDataComponent";
 			out << YAML::BeginMap;
 			
-			auto& tag = entity.GetComponent<TagComponent>().Tag;
+			auto& Name = entity.GetComponent<EntityDataComponent>().Name;
 
-			out << YAML::Key << "Tag" << YAML::Value << tag;
+			out << YAML::Key << "Name" << YAML::Value << Name;
 			out << YAML::EndMap;
 		}
 
@@ -296,12 +296,9 @@ namespace Engine
 				uint64 uuid = entity["Entity"].as<uint64>();
 
 				std::string name;
-				auto tagComponent = entity["TagComponent"];
-				if (tagComponent)
-				{
-					auto tag = tagComponent["Tag"];
-					name = tag.as<std::string>();
-				}
+				auto dataComponent = entity["EntityDataComponent"];
+				if (dataComponent)
+					name = dataComponent["Name"].as<std::string>();
 
 				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 

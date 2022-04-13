@@ -169,9 +169,7 @@ namespace Engine
 	Entity Scene::CreateEntityWithUUID(const UUID uuid, const std::string& name)
 	{
 		Entity entity{ m_Registry.create(), this };
-		entity.AddComponent<IDComponent>(uuid);
-		auto& tag = entity.AddComponent<TagComponent>();
-		tag.Tag = name.empty() ? "Entity" : name;
+		entity.AddComponent<EntityDataComponent>(name.empty() ? "Entity" : name, uuid);
 		auto& tc = entity.AddComponent<TransformComponent>();
 		tc.Owner = entity;
 		return entity;
@@ -190,10 +188,10 @@ namespace Engine
 
 	Entity Scene::GetEntityWithUUID(UUID id)
 	{
-		auto view = m_Registry.view<IDComponent>();
+		auto view = m_Registry.view<EntityDataComponent>();
 		for (auto entity : view) {
-			auto idcomp = view.get<IDComponent>(entity);
-			if (idcomp.ID == id)
+			auto idcomp = view.get<EntityDataComponent>(entity);
+			if (idcomp.GetID() == id)
 				return Entity{ entity, this };
 		}
 		return Entity::null;
@@ -216,7 +214,7 @@ namespace Engine
 		auto view = src.view<T>();
 		for (auto srcEntity : view)
 		{
-			entt::entity destEntity = map.at(src.get<IDComponent>(srcEntity).ID);
+			entt::entity destEntity = map.at(src.get<EntityDataComponent>(srcEntity).GetID());
 			auto& srcComponent = src.get<T>(srcEntity);
 			dest.emplace_or_replace<T>(destEntity, srcComponent);
 		}
@@ -233,11 +231,11 @@ namespace Engine
 
 		auto& srcSceneRegistry = scene->m_Registry;
 		auto& destSceneRegisry = newScene->m_Registry;
-		auto idView = srcSceneRegistry.view<IDComponent>();
+		auto idView = srcSceneRegistry.view<EntityDataComponent>();
 		for (auto e : idView)
 		{
-			auto uuid = srcSceneRegistry.get<IDComponent>(e).ID;
-			const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
+			auto uuid = srcSceneRegistry.get<EntityDataComponent>(e).GetID();
+			const auto& name = srcSceneRegistry.get<EntityDataComponent>(e).Name;
 			Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
 			enttMap[uuid] = newEntity;
 		}
@@ -256,18 +254,6 @@ namespace Engine
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
 		//static_assert(false);
-	}
-
-	template<>
-	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component)
-	{
-
-	}
-
-	template<>
-	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component)
-	{
-
 	}
 
 	template<>

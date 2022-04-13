@@ -28,24 +28,25 @@ namespace Engine
 
 namespace Engine
 {
-	struct IDComponent
+	struct EntityDataComponent
 	{
+	public:
+		std::string Name;
+
+	private:
 		UUID ID;
 
-		IDComponent() = default;
-		IDComponent(const IDComponent&) = default;
-	};
-
-
-	struct TagComponent
-	{
-		std::string Tag;
-
-		TagComponent() = default;
-		TagComponent(const TagComponent&) = default;
-		TagComponent(const std::string& tag) :
-			Tag(tag)
+	public:
+		EntityDataComponent() = default;
+		EntityDataComponent(const EntityDataComponent&) = default;
+		EntityDataComponent(const std::string& name) :
+			Name(name), ID(0)
 		{}
+		EntityDataComponent(const std::string& name, UUID id) :
+			Name(name), ID(id)
+		{}
+
+		UUID GetID() { return ID; }
 	};
 
 	struct TransformComponent
@@ -71,6 +72,7 @@ namespace Engine
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
 		const std::vector<Entity>& GetChildren() const { return Children; }
+		void SetParentToRoot();
 
 		Entity GetOwner() { return Owner; }
 		Entity GetParent() { return Parent; }

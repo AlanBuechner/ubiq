@@ -52,8 +52,11 @@ namespace Engine
 		operator uint32() const { return (uint32)m_EntityID; }
 
 		UUID GetUUID();
-		std::string GetTag();
+		std::string GetName();
 		TransformComponent& GetTransform();
+
+		Entity GetParent();
+		const std::vector<Entity>& GetChildren();
 
 		Scene* GetScene() { return m_Scene; }
 

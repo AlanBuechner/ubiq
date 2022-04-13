@@ -22,6 +22,9 @@ void Engine::TransformComponent::AddChild(Entity child)
 	TransformComponent& tc = child.GetComponent<TransformComponent>();
 	if (tc.Parent != Owner)
 	{
+		if (tc.Parent)
+			tc.Parent.GetTransform().RemoveChild(child);
+
 		tc.Parent = Owner;
 		Children.push_back(child);
 	}
@@ -36,5 +39,14 @@ void Engine::TransformComponent::RemoveChild(Entity child)
 			std::swap(Children[i], Children.back());
 			Children.pop_back();
 		}
+	}
+}
+
+void Engine::TransformComponent::SetParentToRoot()
+{
+	if (Parent)
+	{
+		Parent.GetTransform().RemoveChild(Owner);
+		Parent = Entity::null;
 	}
 }
