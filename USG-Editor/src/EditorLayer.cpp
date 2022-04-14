@@ -506,10 +506,12 @@ namespace Engine
 					Math::Vector3 position, rotation, scale;
 					Math::DecomposeTransform(transform, position, rotation, scale);
 
+					Math::Vector3 deltaPosition = position - tc.Position;
 					Math::Vector3 deltaRotation = rotation - tc.Rotation;
-					tc.Position = position;
+					Math::Vector3 deltaScale = scale - tc.Scale;
+					tc.Position += deltaPosition;
 					tc.Rotation += deltaRotation;
-					tc.Scale = scale;
+					tc.Scale += deltaScale;
 				}
 			}
 		}

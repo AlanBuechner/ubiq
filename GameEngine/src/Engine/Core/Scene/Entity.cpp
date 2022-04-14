@@ -29,9 +29,24 @@ namespace Engine
 		return GetTransform().GetParent();
 	}
 
+	void Entity::AddChild(Entity child)
+	{
+		GetTransform().AddChild(child);
+	}
+
+	void Entity::RemoveChild(Entity child)
+	{
+		GetTransform().RemoveChild(child);
+	}
+
 	const std::vector<Entity>& Entity::GetChildren()
 	{
 		return GetTransform().GetChildren();
+	}
+
+	void Entity::SetParentToRoot()
+	{
+		GetTransform().SetParentToRoot();
 	}
 
 }

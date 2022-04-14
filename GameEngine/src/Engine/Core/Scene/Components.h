@@ -62,12 +62,15 @@ namespace Engine
 		Entity Parent;
 		std::vector<Entity> Children;
 
+		Math::Mat4 ChashedGloableTransform = Math::Mat4(1.0f);
+
 	public:
 		TransformComponent() = default;
-		TransformComponent(const TransformComponent&) = default;
+		TransformComponent(const TransformComponent& parentTransform) = default;
 		TransformComponent(const Math::Vector3& position);
 
 		Math::Mat4 GetTransform() const;
+		Math::Mat4 GetGlobalTransform() const;
 
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
@@ -76,6 +79,9 @@ namespace Engine
 
 		Entity GetOwner() { return Owner; }
 		Entity GetParent() { return Parent; }
+
+	private:
+		void UpdateHierarchyGlobalTransform(Math::Mat4 parentTransform);
 
 		friend Scene;
 		friend SceneSerializer;

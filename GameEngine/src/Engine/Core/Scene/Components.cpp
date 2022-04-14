@@ -17,6 +17,11 @@ Math::Mat4 Engine::TransformComponent::GetTransform() const
 		glm::scale(Math::Mat4(1.0f), Scale);
 }
 
+Math::Mat4 Engine::TransformComponent::GetGlobalTransform() const
+{
+	return ChashedGloableTransform;
+}
+
 void Engine::TransformComponent::AddChild(Entity child)
 {
 	TransformComponent& tc = child.GetComponent<TransformComponent>();
@@ -49,4 +54,11 @@ void Engine::TransformComponent::SetParentToRoot()
 		Parent.GetTransform().RemoveChild(Owner);
 		Parent = Entity::null;
 	}
+}
+
+void Engine::TransformComponent::UpdateHierarchyGlobalTransform(Math::Mat4 parentTransform)
+{
+	ChashedGloableTransform = parentTransform * GetTransform();
+	for (auto& child : Children)
+		child.GetTransform().UpdateHierarchyGlobalTransform(ChashedGloableTransform);
 }

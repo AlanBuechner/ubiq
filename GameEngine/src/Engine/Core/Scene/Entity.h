@@ -56,7 +56,10 @@ namespace Engine
 		TransformComponent& GetTransform();
 
 		Entity GetParent();
+		void AddChild(Entity child);
+		void RemoveChild(Entity child);
 		const std::vector<Entity>& GetChildren();
+		void SetParentToRoot();
 
 		Scene* GetScene() { return m_Scene; }
 

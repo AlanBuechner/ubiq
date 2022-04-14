@@ -45,6 +45,11 @@ namespace Engine
 
 	void Scene::OnUpdateEditor(const EditorCamera& camera)
 	{
+		m_Registry.each([&](auto entityID) {
+			Entity entity{ entityID, this };
+			if (entity.GetTransform().GetParent() == Entity::null)
+				entity.GetTransform().UpdateHierarchyGlobalTransform(Math::Mat4(1.0f));
+		});
 
 		{
 			Renderer2D::BeginScene(camera);
@@ -56,7 +61,7 @@ namespace Engine
 			{
 				auto [transform, sprite] = spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
-				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+				Renderer2D::DrawSprite(transform.GetGlobalTransform(), sprite, (int)entity);
 			}
 
 			// render icons
@@ -84,7 +89,7 @@ namespace Engine
 			{
 				auto [mesh, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
 
-				Renderer::Submit(mesh.vao, mesh.mat, transform.GetTransform());
+				Renderer::Submit(mesh.vao, mesh.mat, transform.GetGlobalTransform());
 			}
 
 			Renderer::EndScene();
@@ -109,6 +114,12 @@ namespace Engine
 		// Physics
 		Physics2D::OnPysicsUpdate();
 
+		m_Registry.each([&](auto entityID) {
+			Entity entity{ entityID, this };
+			if (entity.GetTransform().GetParent() == Entity::null)
+				entity.GetTransform().UpdateHierarchyGlobalTransform(Math::Mat4(1.0f));
+		});
+
 		// get main camera
 		Camera* mainCamera = nullptr;
 		Math::Mat4 cameraTransform;
@@ -121,7 +132,7 @@ namespace Engine
 				if (camera.Primary)
 				{
 					mainCamera = &camera.Camera;
-					cameraTransform = transform.GetTransform();
+					cameraTransform = transform.GetGlobalTransform();
 					break;
 				}
 			}
@@ -138,7 +149,7 @@ namespace Engine
 			{
 				auto [transform, mesh] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
-				Renderer2D::DrawSprite(transform.GetTransform(), mesh, -1);
+				Renderer2D::DrawSprite(transform.GetGlobalTransform(), mesh, -1);
 			}
 
 			Renderer2D::EndScene();
