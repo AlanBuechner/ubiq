@@ -480,6 +480,7 @@ namespace Engine
 		Entity selected = m_HierarchyPanel.GetSelectedEntity();
 		if (m_SceneState != SceneState::Play && selected)
 		{
+			// TODO : Fix for child entity's
 			// Gizmo's
 			if (m_GizmoType != -1)
 			{
@@ -489,7 +490,9 @@ namespace Engine
 
 				// transform
 				auto& tc = selected.GetComponent<TransformComponent>(); // get the transform component
-				Math::Mat4 transform = tc.GetTransform(); // get the transform matrix
+				Math::Mat4 transform = tc.GetGlobalTransform(); // get the transform matrix
+				Math::Vector3 OldPosition, OldRotation, OldScale;
+				Math::DecomposeTransform(transform, OldPosition, OldRotation, OldScale);
 
 				ImGuizmo::SetOrthographic(false);
 				ImGuizmo::SetDrawlist();
@@ -506,12 +509,9 @@ namespace Engine
 					Math::Vector3 position, rotation, scale;
 					Math::DecomposeTransform(transform, position, rotation, scale);
 
-					Math::Vector3 deltaPosition = position - tc.Position;
-					Math::Vector3 deltaRotation = rotation - tc.Rotation;
-					Math::Vector3 deltaScale = scale - tc.Scale;
-					tc.Position += deltaPosition;
-					tc.Rotation += deltaRotation;
-					tc.Scale += deltaScale;
+					tc.Position += position - OldPosition;
+					tc.Rotation += rotation - OldRotation;
+					tc.Scale += scale - OldScale;
 				}
 			}
 		}
