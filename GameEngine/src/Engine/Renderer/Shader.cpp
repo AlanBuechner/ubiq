@@ -8,7 +8,7 @@
 namespace Engine
 {
 
-	Shader::ShaderSorce Shader::LoadShader(std::string file)
+	Shader::ShaderSorce Shader::LoadShader(const fs::path& file)
 	{
 		std::ifstream shaderFile;
 		shaderFile.open(file);
@@ -36,7 +36,7 @@ namespace Engine
 			{
 				if (line.find("vertex") != std::string::npos) 
 					mode = Type::VERTEX;
-				else if (line.find("pixle") != std::string::npos || line.find("fragment") != std::string::npos)
+				else if (line.find("pixel") != std::string::npos || line.find("fragment") != std::string::npos)
 					mode = Type::PIXLE;
 			}
 			else
@@ -56,7 +56,7 @@ namespace Engine
 		return sorce;
 	}
 
-	Shader::ShaderSorce Shader::LoadShader(std::string file, int type)
+	Shader::ShaderSorce Shader::LoadShader(const fs::path& file, int type)
 	{
 		ShaderSorce src = LoadShader(file);
 		ShaderSorce srcToReturn;

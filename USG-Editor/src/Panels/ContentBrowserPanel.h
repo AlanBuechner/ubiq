@@ -1,12 +1,9 @@
 #pragma once
-#include <filesystem>
 #include <Engine.h>
 
 #include <map>
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
-
-namespace fs = std::filesystem;
 
 namespace Engine
 {

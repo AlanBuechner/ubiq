@@ -10,7 +10,8 @@ project "GLAD"
 	{
 		"include/glad/glad.h",
 		"include/KHR/khrplatform.h",
-		"src/glad.c"
+		"src/glad.c",
+		"src/glad_wgl.c"
 	}
 
 	includedirs
@@ -28,4 +29,3 @@ project "GLAD"
 	filter "configurations:Release"
 		runtime "Release"
 		optimize "on"
-	

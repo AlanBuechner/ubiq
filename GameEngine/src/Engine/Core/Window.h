@@ -10,12 +10,12 @@ namespace Engine {
 		std::string Title;
 		uint32 Width;
 		uint32 Height;
-		bool FullScreen;
+		bool Maximized;
+		bool VSync;
 
-		WindowProps(const std::string& title = "Game Engine", uint32 width = 1280, uint32 height = 720, bool fullscreen = false)
-			: Title(title), Width(width), Height(height), FullScreen(fullscreen)
-		{
-		}
+		WindowProps(const std::string& title = "Game Engine", uint32 width = 1280, uint32 height = 720, bool maximized = false, bool vSync = true) :
+			Title(title), Width(width), Height(height), Maximized(maximized), VSync(vSync)
+		{}
 	};
 
 	// Interface representing a desktop system based Window
@@ -25,6 +25,7 @@ namespace Engine {
 		using EventCallbackFn = std::function<void(Event&)>;
 
 		virtual ~Window() {}
+		virtual void Shutdown() = 0;
 
 		virtual void OnUpdate() = 0; // updates the window
 
@@ -37,7 +38,12 @@ namespace Engine {
 		virtual bool IsVSync() const = 0;
 
 		virtual void SetViewport(float width, float height) = 0;
-		virtual void SetAspectRatio(float aspect) = 0;
+
+		virtual void SetTitle(const std::string& title) = 0;
+
+		virtual void ToggleMinimize() = 0;
+		virtual void ToggleMaximize() = 0;
+		virtual void ToggleFullScreen() = 0;
 
 		virtual void* GetNativeWindow() const = 0;
 

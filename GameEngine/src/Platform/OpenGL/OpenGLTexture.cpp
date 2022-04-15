@@ -7,7 +7,7 @@
 
 namespace Engine
 {
-	OpenGLTexture2D::OpenGLTexture2D(const std::string& path, Ref<TextureAttribute> attrib)
+	OpenGLTexture2D::OpenGLTexture2D(const fs::path& path, Ref<TextureAttribute> attrib)
 		: m_Attribute(attrib)
 	{
 		LoadFromFile(path);
@@ -98,13 +98,13 @@ namespace Engine
 		glBindTextureUnit(slot, m_RendererID);
 	}
 
-	void OpenGLTexture2D::LoadFromFile(const std::string& path)
+	void OpenGLTexture2D::LoadFromFile(const fs::path& path)
 	{
 		m_Path = path;
 
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(true);
-		stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+		stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 		CORE_ASSERT(data, "Failed to load image \"{0}\"", path);
 		m_Width = width;
 		m_Height = height;

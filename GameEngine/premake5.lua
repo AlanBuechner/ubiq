@@ -31,7 +31,6 @@ project "GameEngine"
 	{
 		"src",
 		"vendor/spdlog/include",
-		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
@@ -46,7 +45,6 @@ project "GameEngine"
 
 	links 
 	{ 
-		"GLFW",
 		"Glad",
 		"ImGui",
 		"Yaml",

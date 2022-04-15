@@ -4,8 +4,6 @@
 #include "Engine/Renderer/GraphicsContext.h"
 #include "Platform/OpenGL/OpenGLContext.h"
 
-#include <GLFW/glfw3.h>
-
 namespace Engine 
 {
 
@@ -26,26 +24,53 @@ namespace Engine
 		virtual bool IsVSync() const override; // returns wither or not v-sync is enabled
 
 		virtual void SetViewport(float width, float height) override;
-		virtual void SetAspectRatio(float aspect) override;
 
 		inline virtual void* GetNativeWindow() const;
+
+		virtual void SetTitle(const std::string& title) override;
+
+		virtual void ToggleMinimize() override;
+		virtual void ToggleMaximize() override;
+		virtual void ToggleFullScreen() override;
+
 	private:
 		virtual void Init(const WindowProps& props); // initialize the window
-		virtual void Shutdown(); // closes the window
+		virtual void Shutdown() override; // closes the window
+
+		static LRESULT WINAPI HandleEventSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam); // handles setting up events
+		static LRESULT WINAPI HandleEventThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam); // sends events to the corresponding window to be handled
+		LRESULT HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 	private:
-		GLFWwindow* m_Window;
+		HWND m_Window;
 		GraphicsContext* m_Context;
+
+		class WindowClass
+		{
+		public:
+			static const LPCWSTR GetName() noexcept { return wndClassName; }
+			static HINSTANCE GetInstance() noexcept { return wndClass.hInst; }
+
+		private:
+			WindowClass();
+			~WindowClass();
+			WindowClass(const WindowClass&) = delete;
+			static constexpr const LPCWSTR wndClassName = TEXT("Window");
+			static WindowClass wndClass;
+			HINSTANCE hInst;
+		};
 
 		struct WindowData
 		{
 			std::string Title; // window title
 			unsigned int Width, Height; // windows width and hight
-			bool FullScreen;
+			bool FullScreen, Maximized, Minimized;
 			bool VSync; // v-sync
 
 			EventCallbackFn EventCallback;
 		};
 
+		WINDOWPLACEMENT m_wpPrev = { sizeof(m_wpPrev) };
 		WindowData m_Data;
 	};
 

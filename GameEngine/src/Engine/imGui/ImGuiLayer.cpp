@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ImGuiLayer.h"
 #include "backends/imgui_impl_opengl3.h"
-#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_win32.h"
 
 #include "imgui.h"
 #include "Engine/Core/Application.h"
@@ -14,8 +14,9 @@
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Events/MouseEvent.h"
 
-// tmep
-#include <GLFW/glfw3.h>
+#include <Windows.h>
+
+// temp
 #include <glad/glad.h>
 
 #include <ImGuizmo.h>
@@ -53,7 +54,7 @@ namespace Engine
 
 		SetDarkThemeColors();
 
-		// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+		// When viewport's are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
 		ImGuiStyle& style = ImGui::GetStyle();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
@@ -62,17 +63,21 @@ namespace Engine
 		}
 
 		Application& app = Application::Get();
-		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
+		void* window = app.GetWindow().GetNativeWindow();
 
 		// Setup Platform/Renderer bindings
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
+#if defined(PLATFORM_WINDOWS)
+		ImGui_ImplWin32_Init(window);
+#endif
 		ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
 	void ImGuiLayer::OnDetach()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
+#if defined(PLATFORM_WINDOWS)
+		ImGui_ImplWin32_Shutdown();
+#endif
 		ImGui::DestroyContext();
 	}
 
@@ -96,7 +101,9 @@ namespace Engine
 	void ImGuiLayer::Begin()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
+#if defined(PLATFORM_WINDOWS)
+		ImGui_ImplWin32_NewFrame();
+#endif
 		ImGui::NewFrame();
 		ImGuizmo::BeginFrame();
 	}
@@ -113,10 +120,8 @@ namespace Engine
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
-			GLFWwindow* backup_current_context = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(backup_current_context);
 		}
 	}
 

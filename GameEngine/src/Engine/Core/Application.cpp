@@ -20,14 +20,13 @@ namespace Engine {
 
 	Application::Application(const std::string& name)
 	{
-
 		CREATE_PROFILE_FUNCTIONI();
 		auto timer = CREATE_PROFILEI();
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!");
 		s_Instance = this;
 
 		timer.Start("Create Window");
-		m_Window = std::unique_ptr<Window>(Window::Create({ name, 1280, 720, true })); // create a window
+		m_Window = std::unique_ptr<Window>(Window::Create({ name, 1280, 720, true, true })); // create a window
 		timer.End();
 		timer.Start("set event callback");
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
@@ -65,11 +64,12 @@ namespace Engine {
 		Engine::InstrumentationTimer timer = CREATE_PROFILEI();
 		CORE_INFO("Runing Application");
 		
-
 		while (m_Running)
 		{
 			CREATE_PROFILE_SCOPEI("Frame");
 			Time::UpdateDeltaTime();
+
+			CORE_INFO("{0}", Time::GetFPS());
 
 			timer.Start("Handle Input");
 			Input::UpdateKeyState(); // update the key stats
@@ -86,7 +86,7 @@ namespace Engine {
 			timer.End();
 
 			timer.Start("ImGui Render");
-			// render im gui layer
+			// render imgui layer
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
@@ -103,7 +103,6 @@ namespace Engine {
 		}
 
 		// destroy
-
 		m_AssetManager.Destroy();
 
 	}
@@ -117,7 +116,7 @@ namespace Engine {
 	{
 		if (m_InEditer)
 		{
-			// create im gui layer
+			// create imgui layer
 			m_ImGuiLayer = new ImGuiLayer();
 			PushOverlay(m_ImGuiLayer);
 		}
@@ -137,6 +136,7 @@ namespace Engine {
 			dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnKeyReleased, Input::s_Instance));
 			dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMousePressed, Input::s_Instance));
 			dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMouseReleased, Input::s_Instance));
+			dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMouseMoved, Input::s_Instance));
 		}
 
 		Input::GetUpdatedEventList(m_InputBuffer);

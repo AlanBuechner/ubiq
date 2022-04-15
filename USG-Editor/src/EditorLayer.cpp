@@ -194,7 +194,7 @@ namespace Engine
 			if (opt_fullscreen)
 				ImGui::PopStyleVar(2);
 
-			// Dockspace
+			// Dock space
 			ImGuiIO& io = ImGui::GetIO();
 			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 			{
@@ -206,7 +206,7 @@ namespace Engine
 			{
 				if (ImGui::BeginMenu("File"))
 				{
-					// Disabling fullscreen would allow the window to be moved to the front of other windows, 
+					// Disabling full screen would allow the window to be moved to the front of other windows, 
 					// which we can't undo at the moment without finer window depth/z control.
 					//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 

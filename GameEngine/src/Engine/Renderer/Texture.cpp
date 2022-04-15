@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	Ref<Texture2D> Texture2D::Create(const std::string& path, TextureAttribute& attribute)
+	Ref<Texture2D> Texture2D::Create(const fs::path& path, TextureAttribute& attribute)
 	{
 		CORE_ASSERT(path != "" ,"Path must be given");
 		
@@ -43,7 +43,7 @@ namespace Engine
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
-	bool Texture2D::ValidExtention(const std::string& ext)
+	bool Texture2D::ValidExtention(const fs::path& ext)
 	{
 		return (ext == ".png" || ext == ".jpg" || ext == "jpeg" || ext == ".bmp");
 	}

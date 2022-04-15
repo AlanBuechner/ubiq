@@ -73,7 +73,7 @@ namespace Engine
 		return uniforms;
 	}
 
-	uint32 OpenGLShader::GetUniformLocation(const std::string & name) const
+	uint32 OpenGLShader::GetUniformLocation(const std::string& name) const
 	{
 		if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
 			return m_UniformLocationCache[name];

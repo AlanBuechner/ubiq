@@ -7,7 +7,7 @@ namespace Engine
 	class OpenGLTexture2D : public Texture2D
 	{
 	public:
-		OpenGLTexture2D(const std::string& path, Ref<TextureAttribute> attrib);
+		OpenGLTexture2D(const fs::path& path, Ref<TextureAttribute> attrib);
 		OpenGLTexture2D(const uint32, const uint32 height, Ref<TextureAttribute> attrib);
 		virtual ~OpenGLTexture2D();
 
@@ -17,7 +17,7 @@ namespace Engine
 
 		virtual void SetData(void* data, uint32 size) override;
 		virtual void Bind(uint32 slot) const override;
-		virtual void LoadFromFile(const std::string& path);
+		virtual void LoadFromFile(const fs::path& path);
 		virtual Ref<TextureAttribute> GetAttributes() const override { return m_Attribute; }
 
 		virtual bool operator==(const Texture& other) const override
@@ -26,7 +26,7 @@ namespace Engine
 		}
 
 	private:
-		std::string m_Path;
+		fs::path m_Path;
 
 		uint32 m_Width, m_Height;
 		Ref<TextureAttribute> m_Attribute;

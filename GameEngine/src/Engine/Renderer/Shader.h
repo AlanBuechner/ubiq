@@ -26,9 +26,9 @@ namespace Engine
 		struct ShaderSorce
 		{
 		public:
-			std::string vertexPath;
+			fs::path vertexPath;
 			std::string vertexShader;
-			std::string pixlePath;
+			fs::path pixlePath;
 			std::string pixleShader;
 
 			void operator<<(const ShaderSorce& other)
@@ -71,8 +71,8 @@ namespace Engine
 
 		virtual void UploadPointLight(const std::string& name, uint32 i, const PointLight& light) = 0;
 
-		static ShaderSorce LoadShader(std::string file);
-		static ShaderSorce LoadShader(std::string file, int type);
+		static ShaderSorce LoadShader(const fs::path& file);
+		static ShaderSorce LoadShader(const fs::path& file, int type);
 		static void ReloadShader(ShaderSorce& shaders);
 
 		static Ref<Shader> Create(const std::string& name, Ref<Shader::ShaderSorce> src);

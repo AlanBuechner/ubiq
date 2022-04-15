@@ -1,13 +1,23 @@
 #include "pch.h"
 #include "Time.h"
-#include "Platform/OpenGL/OpenGLTime.h"
+#include <chrono>
+
+double Engine::Time::s_DeltaTime = 0.0f;
+double Engine::Time::s_LastFrameTime = Engine::Time::GetTime();
 
 namespace Engine
 {
-	Time* Time::s_Instance = Time::Create();
+	using namespace std::chrono;
 
-	Time* Time::Create()
+	double Time::GetTime()
 	{
-		return new OpenGLTime();
+		return duration<double>(high_resolution_clock::now().time_since_epoch()).count();
+	}
+
+	void Time::UpdateDeltaTime()
+	{
+		double time = GetTime();
+		s_DeltaTime = time - s_LastFrameTime;
+		s_LastFrameTime = time;
 	}
 }

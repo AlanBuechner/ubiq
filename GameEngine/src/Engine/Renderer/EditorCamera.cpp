@@ -5,8 +5,6 @@
 #include "Engine/Core/Input/KeyCodes.h"
 #include "Engine/Core/Time.h"
 
-#include <glfw/glfw3.h>
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 

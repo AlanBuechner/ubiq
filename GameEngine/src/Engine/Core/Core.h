@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <filesystem>
 
 #define ENABLE_ASSERTS
 
@@ -92,3 +93,5 @@ using int8 = int8_t;
 using int16 = int16_t;
 using int32 = int32_t;
 using int64 = int64_t;
+
+namespace fs = std::filesystem;

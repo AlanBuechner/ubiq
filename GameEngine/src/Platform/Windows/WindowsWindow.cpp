@@ -9,16 +9,15 @@
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Core/Input/Input.h"
 
+#include "Engine/Util/Utils.h"
+
+#include <imgui.h>
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+Engine::WindowsWindow::WindowClass Engine::WindowsWindow::WindowClass::wndClass;
+
 namespace Engine 
 {
-
-	static bool s_GLFWInitialized = false;
-
-	static void GLFWErrorCallback(int error, const char* description)
-	{
-		CORE_ERROR("GLFW Error ({0}): {1}", error, description);
-	}
-
 	Window* Window::Create(const WindowProps& props)
 	{
 		return new WindowsWindow(props);
@@ -41,152 +40,68 @@ namespace Engine
 		m_Data.Title = props.Title; // sets the window title
 		m_Data.Width = props.Width; // sets the width of the window
 		m_Data.Height = props.Height; // sets the hight of the window
-		m_Data.FullScreen = props.FullScreen;
+		m_Data.Maximized = props.Maximized;
+		m_Data.VSync = props.VSync;
 
-		CORE_INFO("Creating window {0} ({1}, {2}), {3}", props.Title, props.Width, props.Height, props.FullScreen);
+		CORE_INFO("Creating window {0} ({1}, {2}), {3}", props.Title, props.Width, props.Height, props.Maximized);
 
-		// handels if the window hasent be initalized
-		if (!s_GLFWInitialized)
+		RECT wr;
+		if (props.Maximized)
+			SystemParametersInfo(SPI_GETWORKAREA, 0, &wr, 0);
+		else
 		{
-			// TODO: glfwTerminate on system shutdown
-			int success = glfwInit(); // initalize the window
-			CORE_ASSERT(success, "Could not intialize GLFW!"); // checks if the window was seccessfuly initalized
-			glfwSetErrorCallback(GLFWErrorCallback); // sets the error callback
-			s_GLFWInitialized = true;
+			wr.left = 100;
+			wr.right = props.Width + wr.left;
+			wr.top = 100;
+			wr.bottom = props.Height + wr.top;
 		}
 
-		glfwWindowHint(GLFW_MAXIMIZED, props.FullScreen ? GLFW_TRUE : GLFW_FALSE);
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr); // creates the window
+		// adjust the window rect for the styles that it has
+		DWORD style = WS_OVERLAPPED | WS_THICKFRAME | WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+		CORE_ASSERT(AdjustWindowRect(&wr, style, FALSE) != 0, "Failed to adjust window rect");
+
+		// creat the window
+		const wchar_t* wtitle = GetWStr(props.Title.c_str());
+		m_Window = CreateWindow(
+			WindowClass::GetName(), wtitle, style,
+			CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
+			nullptr, nullptr, WindowClass::GetInstance(), this
+		);
+		delete[] wtitle;
+
+		// check if the windows was created successfully
+		CORE_ASSERT(m_Window != nullptr, "Failed to create window");
+
+		// show the window
+		ShowWindow(m_Window, props.Maximized ? SW_MAXIMIZE : SW_SHOW);
 
 		m_Context = new OpenGLContext(m_Window);
 		m_Context->Init();
-
-		glfwSetWindowUserPointer(m_Window, &m_Data);
-		SetVSync(true); // sets v-sync to true
-
-		// set GLFW callbacks
-		// set resize event
-		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
-		{
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
-			data.Width = width; // sets new width
-			data.Height = height; // sets new hight
-
-			WindowResizeEvent* event = new WindowResizeEvent(width, height); // creates new resize event
-			data.EventCallback(*event); //
-		});
-
-		// set close event
-		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
-		{
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
-			WindowCloseEvent* event = new WindowCloseEvent(); // creats new close event
-			data.EventCallback(*event);
-		});
-
-		// set key events
-		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-		{
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
-
-			key = KeyCode::OglToUbiq(key);
-
-			switch (action) // determens the type of key event
-			{
-			case GLFW_PRESS: // press event
-			{
-				KeyPressedEvent* event = new KeyPressedEvent(key); // creats new key pressed event
-				data.EventCallback(*event);
-				break;
-			}
-			case GLFW_RELEASE: // release event
-			{
-				KeyReleasedEvent* event = new KeyReleasedEvent(key); // creates new key release event
-				data.EventCallback(*event);
-				break;
-			}
-			case GLFW_REPEAT: // repeat event
-			{
-				KeyRepeatEvent* event = new KeyRepeatEvent(key, 1); // creates new key repeat event
-				data.EventCallback(*event);
-				break;
-			}
-			}
-		});
-
-		// set char event
-		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode)
-		{
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
-			keycode = KeyCode::OglToUbiq(keycode);
-			KeyTypedEvent* event = new KeyTypedEvent(keycode); // creates new key typed event
-			data.EventCallback(*event);
-		});
-
-		// set mouse button event
-		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
-		{
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
-
-			button = KeyCode::OglToUbiqMouse(button);
-
-			switch (action) // determens the type of mouse button event
-			{
-			case GLFW_PRESS: // press event
-			{
-				MouseButtonPressedEvent* event = new MouseButtonPressedEvent(button); // creates new mouse button pressed event
-				data.EventCallback(*event);
-				break;
-			}
-			case GLFW_RELEASE: // release event
-			{
-				MouseButtonReleasedEvent* event = new MouseButtonReleasedEvent(button); // creates new mouse button release event
-				data.EventCallback(*event);
-				break;
-			}
-			}
-		});
-
-		// set scroll event
-		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset)
-		{
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
-
-			MouseScrolledEvent* event = new MouseScrolledEvent(MOUSE_SCROLL_WHEEL, (float)xOffset, (float)yOffset); // creates new mouse scrolled event
-			data.EventCallback(*event);
-		});
-
-		// set mouse moved event
-		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
-		{
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window); // gets window data
-
-			MouseMovedEvent* cursorPositionEvent = new MouseMovedEvent(MOUSE_POSITON, (float)xPos, (float)yPos); // creates new mouse moved event
-			data.EventCallback(*cursorPositionEvent);
-
-			Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
-			MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)xPos - PrevMousePos.x , (float)yPos - PrevMousePos.y); // creates new mouse moved event
-			data.EventCallback(*deltaMousePostionEvent);
-		});
 	}
 
 	void WindowsWindow::Shutdown()
 	{
-		glfwDestroyWindow(m_Window); // destroys the window
+		if (m_Window)
+		{
+			DestroyWindow(m_Window);
+			m_Window = nullptr;
+		}
 	}
 
 	void WindowsWindow::OnUpdate()
 	{
+		MSG msg;
+		BOOL gResult = PeekMessage(&msg, m_Window, 0, 0, PM_REMOVE);
+		if (gResult != 0) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
 		m_Context->SwapBuffers(); // swap frame buffers
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
-		if (enabled)
-			glfwSwapInterval(1);
-		else
-			glfwSwapInterval(0);
-
 		m_Data.VSync = enabled;
 	}
 
@@ -197,17 +112,212 @@ namespace Engine
 
 	void WindowsWindow::SetViewport(float width, float height)
 	{
-		glfwSetWindowSize(m_Window, (int)width, (int)height);
-	}
-
-	void WindowsWindow::SetAspectRatio(float aspect)
-	{
-		glfwSetWindowAspectRatio(m_Window, (int)(aspect * 100.0f), 100);
+		if (m_Data.FullScreen || m_Data.Maximized || m_Data.Minimized) return;
+		SetWindowPos(m_Window, nullptr, 0, 0, (int)width, (int)height, 0);
 	}
 
 	inline void* WindowsWindow::GetNativeWindow() const
 	{
 		return m_Window;
+	}
+
+	void WindowsWindow::SetTitle(const std::string& title)
+	{
+		SetWindowTextA(m_Window, title.c_str());
+	}
+
+	void WindowsWindow::ToggleMinimize()
+	{
+		ShowWindow(m_Window, m_Data.Minimized ? (m_Data.Maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL) : SW_SHOWMINIMIZED);
+		m_Data.Minimized = !m_Data.Minimized;
+	}
+
+	void WindowsWindow::ToggleMaximize()
+	{
+		ShowWindow(m_Window, m_Data.Maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL);
+		m_Data.Maximized = !m_Data.Maximized;
+	}
+
+	void WindowsWindow::ToggleFullScreen()
+	{
+		DWORD dwStyle = GetWindowLong(m_Window, GWL_STYLE);
+		if (!m_Data.FullScreen)
+		{
+			MONITORINFO mi = { sizeof(mi) };
+			if (GetWindowPlacement(m_Window, &m_wpPrev) && GetMonitorInfo(MonitorFromWindow(m_Window, MONITOR_DEFAULTTOPRIMARY), &mi))
+			{
+				SetWindowLong(m_Window, GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW);
+				SetWindowPos(m_Window, HWND_TOP,
+					mi.rcMonitor.left, mi.rcMonitor.top,
+					mi.rcMonitor.right - mi.rcMonitor.left,
+					mi.rcMonitor.bottom - mi.rcMonitor.top,
+					SWP_NOOWNERZORDER | SWP_FRAMECHANGED
+				);
+
+				m_Data.FullScreen = true;
+				m_Data.Minimized = false;
+			}
+		}
+		else
+		{
+			SetWindowLong(m_Window, GWL_STYLE, dwStyle | WS_OVERLAPPEDWINDOW);
+			SetWindowPlacement(m_Window, &m_wpPrev);
+
+			ShowWindow(m_Window, m_Data.Minimized ? SW_SHOWMINIMIZED : (m_Data.Maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL));
+			m_Data.FullScreen = false;
+		}
+	}
+
+	LRESULT WINAPI WindowsWindow::HandleEventSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		if (msg == WM_NCCREATE)
+		{
+			// get the data the was sent from CreateWindow
+			const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCTW*>(lParam);
+			WindowsWindow* const pWnd = static_cast<WindowsWindow*>(pCreate->lpCreateParams); // get the window
+
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd)); // set user data on the window to contain the Window class
+			SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowsWindow::HandleEventThunk)); // change the event handler to handle event thunk
+
+			return pWnd->HandleEvent(hWnd, msg, wParam, lParam); // handle the event
+		}
+
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+
+	LRESULT WINAPI WindowsWindow::HandleEventThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		// get a pointer to the window
+		WindowsWindow* const pWnd = reinterpret_cast<WindowsWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		return pWnd->HandleEvent(hWnd, msg, wParam, lParam); // call handle event for that window
+	}
+
+	LRESULT WindowsWindow::HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+
+		switch (msg)
+		{
+			// keyboard events
+		case WM_SYSKEYDOWN:
+		case WM_KEYDOWN: // key down
+			if (m_Data.EventCallback == nullptr) break;
+				m_Data.EventCallback(*new KeyPressedEvent(static_cast<unsigned char>(wParam)));
+			break;
+		case WM_SYSKEYUP:
+		case WM_KEYUP: // key up
+			if (m_Data.EventCallback == nullptr) break;
+				m_Data.EventCallback(*new KeyReleasedEvent(static_cast<unsigned char>(wParam)));
+			break;
+		case WM_CHAR:
+			// TODO
+			break;
+
+			// mouse
+		case WM_MOUSEMOVE: // mouse move
+		{
+			if (m_Data.EventCallback == nullptr) break;
+			POINTS pt = MAKEPOINTS(lParam);
+			m_Data.EventCallback(*new MouseMovedEvent(MOUSE_POSITON, pt.x, pt.y));
+			Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
+			MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y); // creates new mouse moved event
+			m_Data.EventCallback(*deltaMousePostionEvent);
+			break;
+		}
+
+		case WM_LBUTTONDOWN: // left mouse down
+			if (m_Data.EventCallback == nullptr) break;
+				m_Data.EventCallback(*new MouseButtonPressedEvent(VK_LBUTTON));
+			break;
+		case WM_RBUTTONDOWN: // right mouse down
+			if (m_Data.EventCallback == nullptr) break;
+				m_Data.EventCallback(*new MouseButtonPressedEvent(VK_RBUTTON));
+			break;
+		case WM_MBUTTONDOWN: // middle mouse down
+			if (m_Data.EventCallback == nullptr) break;
+				m_Data.EventCallback(*new MouseButtonPressedEvent(VK_MBUTTON));
+			break;
+
+		case WM_LBUTTONUP: // left moues up
+			if (m_Data.EventCallback == nullptr) break;
+				m_Data.EventCallback(*new MouseButtonReleasedEvent(VK_LBUTTON));
+			break;
+		case WM_RBUTTONUP: // right mouse up
+			if (m_Data.EventCallback == nullptr) break;
+				m_Data.EventCallback(*new MouseButtonReleasedEvent(VK_RBUTTON));
+			break;
+		case WM_MBUTTONUP: // middle mouse up
+			if (m_Data.EventCallback == nullptr) break;
+				m_Data.EventCallback(*new MouseButtonReleasedEvent(VK_MBUTTON));
+			break;
+
+
+		// window events
+		case WM_SIZE: // windows resize event
+		{
+			// set the window min and max bools and let DefWindowProc change the window state
+			switch (wParam)
+			{
+			case SIZE_MAXIMIZED:
+				m_Data.Maximized = true;
+				m_Data.Minimized = false;
+				break;
+			case SIZE_MINIMIZED:
+				m_Data.Minimized = true;
+				break;
+			case SIZE_RESTORED:
+				m_Data.Minimized = false;
+				m_Data.Maximized = false;
+				break;
+
+			default:
+				break;
+			}
+
+			// set the width and hight
+			m_Data.Width = LOWORD(lParam);
+			m_Data.Height = HIWORD(lParam);
+			// resize swap chain
+
+			if (m_Data.EventCallback == nullptr) break;
+			m_Data.EventCallback(*new WindowResizeEvent(m_Data.Width, m_Data.Height));
+			break;
+		}
+		case WM_KILLFOCUS: // window remove focuses event
+			break;
+		case WM_CLOSE: // window close event
+			if (m_Data.EventCallback != nullptr)
+				m_Data.EventCallback(*new WindowCloseEvent());
+			return 0; // stop DefWindowProc from being called
+			break;
+		}
+
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+
+	WindowsWindow::WindowClass::WindowClass() :
+		hInst(GetModuleHandle(nullptr))
+	{
+		WNDCLASSEX wc = { 0 };
+		wc.cbSize = sizeof(wc);
+		wc.style = CS_OWNDC;
+		wc.lpfnWndProc = WindowsWindow::HandleEventSetup;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = GetInstance();
+		wc.hIcon = nullptr;
+		wc.hIconSm = nullptr;
+		wc.hbrBackground = nullptr;
+		wc.hCursor = nullptr;
+		wc.lpszMenuName = nullptr;
+		wc.lpszClassName = GetName();
+
+		RegisterClassEx(&wc);
+	}
+
+	WindowsWindow::WindowClass::~WindowClass()
+	{
+		UnregisterClass(wndClassName, GetInstance());
 	}
 
 }

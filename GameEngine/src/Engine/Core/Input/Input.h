@@ -252,14 +252,13 @@ namespace Engine
 		// mouse
 		inline KeyState GetMouseButtonStateImpl(int button) { return m_MouseStates[button]; }
 
-		virtual Math::Vector2 QueryMousePosition() = 0;
-
 		void SetKeyState(int key, KeyState state) { m_KeyStates[key] = state; }
 		void SetMouseButtonState(int button, KeyState state) { m_MouseStates[button] = state; }
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnKeyReleased(KeyReleasedEvent& e);
 		bool OnMousePressed(MouseButtonPressedEvent& e);
 		bool OnMouseReleased(MouseButtonReleasedEvent& e);
+		bool OnMouseMoved(MouseMovedEvent& e);
 		static void UpdateKeyState() { s_Instance->UpdateKeyStateImpl(); }
 		void UpdateKeyStateImpl();
 

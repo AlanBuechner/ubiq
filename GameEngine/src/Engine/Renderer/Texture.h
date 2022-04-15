@@ -19,7 +19,7 @@ namespace Engine
 
 		virtual void SetData(void* data, uint32 size) = 0;
 		virtual void Bind(uint32 slot) const = 0;
-		virtual void LoadFromFile(const std::string& path) = 0;
+		virtual void LoadFromFile(const fs::path& path) = 0;
 		virtual Ref<TextureAttribute> GetAttributes() const = 0;
 
 		virtual bool operator==(const Texture& other) const = 0;
@@ -28,10 +28,10 @@ namespace Engine
 	class Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> Create(const std::string& path = "", TextureAttribute& attribute = *TextureAttribute::Default);
+		static Ref<Texture2D> Create(const fs::path& path = "", TextureAttribute& attribute = *TextureAttribute::Default);
 		static Ref<Texture2D> Create(const uint32 width, const uint32 height, TextureAttribute& attribute = *TextureAttribute::Default);
 
-		static bool ValidExtention(const std::string& ext);
+		static bool ValidExtention(const fs::path& ext);
 
 	};
 }

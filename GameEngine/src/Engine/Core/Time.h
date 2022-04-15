@@ -10,26 +10,20 @@ namespace Engine
 	public:
 		Time() {}
 
-		static inline float GetDeltaTime() { return s_Instance->m_DeltaTime; }
-		static inline float GetDeltaSeconds() { return s_Instance->m_DeltaTime; }
-		static inline float GetDeltaMilliseconds() { return s_Instance->m_DeltaTime * 1000.0f; }
+		static inline float GetDeltaTime() { return (float)s_DeltaTime; }
+		static inline float GetDeltaSeconds() { return (float)s_DeltaTime; }
+		static inline float GetDeltaMilliseconds() { return (float)s_DeltaTime * 1000.0f; }
 
-		static inline double GetTime() { return s_Instance->GetTimeImpl(); }
+		static inline float GetFPS() { return (float)(1.0 / s_DeltaTime); }
+
+		static double GetTime();
 
 	private:
-		static void UpdateDeltaTime() { s_Instance->UpdateDeltaTimeImpl(); }
-		virtual void UpdateDeltaTimeImpl() {}
-
-		virtual double GetTimeImpl() = 0;
-
-		static Time* Create();
+		static void UpdateDeltaTime();
 
 	protected:
-		float m_DeltaTime = 0.0f;
-		float m_LastFrameTime = 0.0f;
-
-	private:
-		static Time* s_Instance;
+		static double s_DeltaTime;
+		static double s_LastFrameTime;
 	};
 }
 
