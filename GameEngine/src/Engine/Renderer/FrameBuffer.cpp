@@ -3,7 +3,7 @@
 
 #include "Engine/Renderer/Renderer.h"
 
-#include "Platform/OpenGL/OpenGLFrameBuffer.h"
+#include "Platform/DirectX12/DirectX12FrameBuffer.h"
 
 namespace Engine
 {
@@ -11,11 +11,11 @@ namespace Engine
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPI::None:
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGl:
-			return CreateRef<OpenGLFrameBuffer>(spec);
+		case RendererAPI::DirectX12:
+			return CreateRef<DirectX12FrameBuffer>(spec);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;

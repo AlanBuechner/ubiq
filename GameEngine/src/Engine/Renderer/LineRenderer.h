@@ -26,17 +26,15 @@ namespace Engine
 	{
 	public:
 		static void Init();
-		static void ShutDown();
+		static void Destroy();
 
 	public:
 
 		static void BeginScene(const Camera& camera, const Math::Mat4& transform);
 		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
-		static void Flush();
 
-	private:
-		static void BeginBatch();
+		static void Build();
 
 	public:
 

@@ -42,7 +42,7 @@ struct B2_API b2MotorJointDef : public b2JointDef
 	/// Initialize the bodies and offsets using the current transforms.
 	void Initialize(b2Body* bodyA, b2Body* bodyB);
 
-	/// Position of bodyB minus the position of bodyA, in bodyA's frame, in meters.
+	/// m_Position of bodyB minus the position of bodyA, in bodyA's frame, in meters.
 	b2Vec2 linearOffset;
 
 	/// The bodyB angle minus bodyA angle in radians.
@@ -54,7 +54,7 @@ struct B2_API b2MotorJointDef : public b2JointDef
 	/// The maximum motor torque in N-m.
 	float maxTorque;
 
-	/// Position correction factor in the range [0,1].
+	/// m_Position correction factor in the range [0,1].
 	float correctionFactor;
 };
 

@@ -97,8 +97,8 @@ namespace glm
 
 	/// Build a right handed look at view matrix.
 	///
-	/// @param eye Position of the camera
-	/// @param center Position where the camera is looking at
+	/// @param eye m_Position of the camera
+	/// @param center m_Position where the camera is looking at
 	/// @param up Normalized up vector, how the camera is oriented. Typically (0, 0, 1)
 	///
 	/// @tparam T A floating-point scalar type
@@ -111,8 +111,8 @@ namespace glm
 
 	/// Build a left handed look at view matrix.
 	///
-	/// @param eye Position of the camera
-	/// @param center Position where the camera is looking at
+	/// @param eye m_Position of the camera
+	/// @param center m_Position where the camera is looking at
 	/// @param up Normalized up vector, how the camera is oriented. Typically (0, 0, 1)
 	///
 	/// @tparam T A floating-point scalar type
@@ -125,8 +125,8 @@ namespace glm
 
 	/// Build a look at view matrix based on the default handedness.
 	///
-	/// @param eye Position of the camera
-	/// @param center Position where the camera is looking at
+	/// @param eye m_Position of the camera
+	/// @param center m_Position where the camera is looking at
 	/// @param up Normalized up vector, how the camera is oriented. Typically (0, 0, 1)
 	///
 	/// @tparam T A floating-point scalar type

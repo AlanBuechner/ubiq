@@ -47,8 +47,8 @@ namespace Engine
 
 			b2BodyDef bodyDef;
 			bodyDef.type = GetB2BodyType(rb2d.Type);
-			bodyDef.position.Set(transform.Position.x, transform.Position.y);
-			bodyDef.angle = transform.Rotation.z;
+			bodyDef.position.Set(transform.GetPosition().x, transform.GetPosition().y);
+			bodyDef.angle = transform.GetRotation().z;
 
 			b2Body* body = s_World->CreateBody(&bodyDef);
 			body->SetFixedRotation(rb2d.FixedRotation);
@@ -58,7 +58,7 @@ namespace Engine
 			{
 				auto& bc2d = entity.GetComponent<BoxCollider2DComponent>();
 				b2PolygonShape shape;
-				shape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
+				shape.SetAsBox(bc2d.Size.x * transform.GetScale().x, bc2d.Size.y * transform.GetScale().y);
 
 				b2FixtureDef fixtureDef;
 				fixtureDef.shape = &shape;
@@ -75,7 +75,7 @@ namespace Engine
 			{
 				auto& cc2d = entity.GetComponent<CircleColliderComponent>();
 				b2CircleShape shape;
-				shape.m_radius = cc2d.Size * glm::max(transform.Scale.x, transform.Scale.y);
+				shape.m_radius = cc2d.Size * glm::max(transform.GetScale().x, transform.GetScale().y);
 
 				b2FixtureDef fixtureDef;
 				fixtureDef.shape = &shape;
@@ -108,7 +108,7 @@ namespace Engine
 			auto& transform = entity.GetComponent<TransformComponent>();
 			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 			b2Body* body = (b2Body*)rb2d.RuntimeBody;
-			body->SetTransform({ transform.Position.x, transform.Position.y }, transform.Rotation.z);
+			body->SetTransform({ transform.GetPosition().x, transform.GetPosition().y}, transform.GetRotation().z);
 
 		}
 
@@ -125,9 +125,9 @@ namespace Engine
 
 			b2Body* body = (b2Body*)rb2d.RuntimeBody;
 			const auto& position = body->GetPosition();
-			transform.Position.x = position.x;
-			transform.Position.y = position.y;
-			transform.Rotation.z = body->GetAngle();
+			transform.SetPositionX(position.x);
+			transform.SetPositionY(position.y);
+			transform.SetRotationZ(body->GetAngle());
 		}
 	}
 

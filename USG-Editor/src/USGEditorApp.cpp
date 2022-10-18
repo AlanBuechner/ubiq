@@ -15,7 +15,7 @@ namespace Engine
 		{
 			auto timer = CREATE_PROFILEI();
 			timer.Start("EditorLayer");
-			m_InEditer = true; // tell the engine that we are in the editor
+			m_InEditer = true;
 			PushLayer(new EditorLayer()); // set the editor layer
 			GenLayerStack();
 			EditorAssets::Init();
@@ -25,7 +25,7 @@ namespace Engine
 
 		~USGEditor()
 		{
-
+			EditorAssets::Destroy();
 		}
 
 	};

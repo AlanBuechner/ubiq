@@ -2,7 +2,7 @@
 #include "Engine/AssetManager/AssetManager.h"
 #include "EditorAssets.h"
 #include "EditorLayer.h"
-#include <Engine/Core/UUID.h>
+#include "Engine/Core/UUID.h"
 
 #include "PropertiesPanel.h"
 
@@ -92,6 +92,15 @@ namespace Engine
 					if (ImGui::MenuItem("Sprite Renderer"))
 					{
 						m_Selected.AddComponent<SpriteRendererComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				if (!m_Selected.HasComponent<MeshRendererComponent>())
+				{
+					if (ImGui::MenuItem("Mesh Renderer"))
+					{
+						m_Selected.AddComponent<MeshRendererComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -285,11 +294,18 @@ namespace Engine
 
 		DrawComponent<TransformComponent>(entity, "Transform", [&]() {
 			auto& tc = entity.GetComponent<TransformComponent>();
-			PropertysPanel::DrawVec3Control("Position", tc.Position, 0.0f);
-			Math::Vector3 rotation = glm::degrees(tc.Rotation);
-			PropertysPanel::DrawVec3Control("Rotation", rotation, 0.0f);
-			tc.Rotation = glm::radians(rotation);
-			PropertysPanel::DrawVec3Control("Scale", tc.Scale, 1.0f);
+			Math::Vector3 posiiton = tc.GetPosition();
+			if (PropertysPanel::DrawVec3Control("m_Position", posiiton, 0.0f))
+				tc.SetPosition(posiiton);
+
+			Math::Vector3 rotation = glm::degrees(tc.GetRotation());
+			if (PropertysPanel::DrawVec3Control("Rotation", rotation, 0.0f))
+				tc.SetRotation(glm::radians(rotation));
+
+			Math::Vector3 scale = tc.GetScale();
+			if (PropertysPanel::DrawVec3Control("Scale", scale, 1.0f))
+				tc.SetScale(scale);
+
 		}, false);
 
 		DrawComponent<CameraComponent>(entity, "Camera", [&]() {
@@ -357,6 +373,19 @@ namespace Engine
 			ImGui::ColorEdit4("Color", glm::value_ptr(color));
 
 			PropertysPanel::DrawTextureControl("Texture", component.Texture);
+		});
+
+		DrawComponent<MeshRendererComponent>(entity, "Mesh Renderer", [&](){
+			auto& component = entity.GetComponent<MeshRendererComponent>();
+			
+			Ref<Mesh> mesh = component.GetMesh();
+			if (PropertysPanel::DrawMeshControl("Mesh", mesh))
+				component.SetMesh(mesh);
+
+
+			Ref<Material> mat = component.GetMaterial();
+			if (PropertysPanel::DrawMaterialControl("Material", mat))
+				component.SetMaterial(mat);
 		});
 
 		DrawComponent<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&]() {

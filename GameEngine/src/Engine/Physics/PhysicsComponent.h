@@ -1,9 +1,10 @@
 #pragma once
 #include "Engine/Math/Math.h"
+#include "Engine/Core/Scene/Components.h"
 
 namespace Engine
 {
-	struct Rigidbody2DComponent
+	struct Rigidbody2DComponent : public Component
 	{
 		enum class BodyType {
 			Static = 0,
@@ -23,7 +24,7 @@ namespace Engine
 
 	};
 
-	struct BoxCollider2DComponent
+	struct BoxCollider2DComponent : public Component
 	{
 		Math::Vector2 Offset = { 0.0f, 0.0f };
 		Math::Vector2 Size = { 0.5f, 0.5f };
@@ -39,7 +40,7 @@ namespace Engine
 		BoxCollider2DComponent(const BoxCollider2DComponent& other) = default;
 	};
 
-	struct CircleColliderComponent
+	struct CircleColliderComponent : public Component
 	{
 		Math::Vector2 Offset = { 0.0f, 0.0f };
 		float Size = 0.5f;

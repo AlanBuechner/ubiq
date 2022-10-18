@@ -18,12 +18,13 @@ namespace Engine
 	{
 	public:
 		static void Init();
-		static void Shutdown();
+		static void Destroy();
 
 		static void BeginScene(const Camera& camera, const Math::Mat4& transform);
 		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
-		static void Flush();
+
+		static void Build();
 
 		// draw colored quad
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, int entityID = -1);
@@ -76,9 +77,7 @@ namespace Engine
 
 	private:
 
-		static void DrawQuadImpl(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID = -1);
-		static void DrawQuadImpl(const Math::Mat4& transform, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2 textCoords[], int entityID = -1);
-
-		static void BeginBatch();
+		static void DrawQuadImpl(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2& uvSize, const Math::Vector2& uvPosition, int entityID = -1);
+		static void DrawQuadImpl(const Math::Mat4& transform, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2& uvSize, const Math::Vector2& uvPosition, int entityID = -1);
 	};
 }

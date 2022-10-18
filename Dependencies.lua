@@ -10,3 +10,8 @@ IncludeDir["ImGuizmo"] = "%{wks.location}/GameEngine/vendor/ImGuizmo"
 IncludeDir["Box2D"] = "%{wks.location}/GameEngine/vendor/Box2D"
 IncludeDir["Assimp"] = "%{wks.location}/GameEngine/vendor/Assimp"
 IncludeDir["json"] = "%{wks.location}/GameEngine/vendor/json"
+IncludeDir["dxc"] = "%{wks.location}/GameEngine/vendor/dxc"
+IncludeDir["pix"] = "%{wks.location}/GameEngine/vendor/pix"
+
+
+

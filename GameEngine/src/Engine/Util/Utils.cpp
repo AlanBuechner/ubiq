@@ -20,4 +20,14 @@ namespace Engine
 		return str;
 	}
 
+	std::wstring GetWStr(const std::string& str)
+	{
+		return {str.begin(), str.end()};
+	}
+
+	std::string GetStr(const std::wstring& wstr)
+	{
+		return {wstr.begin(), wstr.end()};
+	}
+
 }

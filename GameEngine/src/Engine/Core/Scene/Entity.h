@@ -36,7 +36,9 @@ namespace Engine
 		{
 			CORE_ASSERT(!HasComponent<T>(), "Entity alredy has component");
 			T& component = m_Scene->m_Registry.emplace<T>(m_EntityID, std::forward<Args>(args)...);
+			component.Owner = *this;
 			m_Scene->OnComponentAdded<T>(*this, component);
+			component.OnComponentAdded();
 			return component;
 		}
 
@@ -44,6 +46,7 @@ namespace Engine
 		void RemoveComponent()
 		{
 			CORE_ASSERT(HasComponent<T>(), "Entity does not have component");
+			GetComponent<T>().OnComponentRemoved();
 			m_Scene->m_Registry.remove<T>(m_EntityID);
 		}
 

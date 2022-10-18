@@ -4,6 +4,8 @@ bin/
 bin-int/
 Sandbox/*.json
 
+GameEngine/vendor/dxc
+
 *.sln
 *.vsxproj*
 *.vcxproj*

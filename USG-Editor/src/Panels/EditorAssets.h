@@ -7,6 +7,7 @@ namespace Engine
 	{
 	public:
 		static void Init();
+		static void Destroy();
 
 		static Ref<Texture2D> s_DefaultFileIcon;
 		static Ref<Texture2D> s_ShaderFileIcon;
@@ -16,6 +17,5 @@ namespace Engine
 		static Ref<Texture2D> s_BackIcon;
 		
 		static Ref<Texture2D> s_NoTextureIcon;
-
 	};
 }

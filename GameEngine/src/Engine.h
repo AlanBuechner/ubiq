@@ -14,21 +14,24 @@
 #include "Engine/Core/Input/InputControlerManeger.h"
 
 // --- Renderer ---------------------------
-#include "Engine/Renderer/RenderCommand.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/LineRenderer.h"
 
+#include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/ConstantBuffer.h"
+#include "Engine/Renderer/InstanceBuffer.h"
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/SubTexture.h"
 #include "Engine/Renderer/FrameBuffer.h"
-#include "Engine/Renderer/VertexArray.h"
+#include "Engine/Renderer/CommandList.h"
+#include "Engine/Renderer/CommandQueue.h"
+#include "Engine/Renderer/SwapChain.h"
+#include "Engine/Renderer/SceneRendererComponents.h"
 // Camera
 #include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/OrthographicCamera.h"
-#include "Engine/Renderer/PerspectiveCamera.h"
 // ----------------------------------------
 
 // ECS ------------------------------------
@@ -44,7 +47,7 @@
 // ----------------------------------------
 
 // Mesh -----------------------------------
-#include "Engine/Core/Mesh.h"
+#include "Engine/Core/MeshBuilder.h"
 #include "Engine/Core/MeshLoader.h"
 // ----------------------------------------
 

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ImGuiLayer.h"
-#include "backends/imgui_impl_opengl3.h"
+#include "backends/imgui_impl_dx12.h"
 #include "backends/imgui_impl_win32.h"
 
 #include "imgui.h"
@@ -14,7 +14,17 @@
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Events/MouseEvent.h"
 
-#include <Windows.h>
+#include "Engine/Renderer/Renderer.h"
+
+#ifdef PLATFORM_WINDOWS
+#include "Platform/Windows/Win.h"
+#include "Platform/Windows/WindowsWindow.h"
+#include "Platform/DirectX12/DirectX12SwapChain.h"
+#include "Platform/DirectX12/Directx12Context.h"
+#include "Platform/DirectX12/DirectX12Descriptors.h"
+#include "Platform/DirectX12/DirectX12ResourceManager.h"
+#endif // PLATFORM_WINDOWS
+
 
 // temp
 #include <glad/glad.h>
@@ -67,15 +77,28 @@ namespace Engine
 
 		// Setup Platform/Renderer bindings
 #if defined(PLATFORM_WINDOWS)
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+
+		// init windows
 		ImGui_ImplWin32_Init(window);
+
+		// init dx12
+		wrl::ComPtr<ID3D12DescriptorHeap> heap = DirectX12ResourceManager::s_SRVHeap->GetHeap();
+		Ref<DirectX12SwapChain> swapChain = std::dynamic_pointer_cast<DirectX12SwapChain>(Application::Get().GetWindow().GetSwapChain());
+		CORE_ASSERT(ImGui_ImplDX12_Init(context->GetDevice().Get(), 
+			swapChain->GetBufferCount(), DXGI_FORMAT_R8G8B8A8_UNORM,
+			heap.Get(),
+			heap->GetCPUDescriptorHandleForHeapStart(),
+			heap->GetGPUDescriptorHandleForHeapStart()),
+			"Faild to initalize imgui");
 #endif
-		ImGui_ImplOpenGL3_Init("#version 410");
+
 	}
 
 	void ImGuiLayer::OnDetach()
 	{
-		ImGui_ImplOpenGL3_Shutdown();
 #if defined(PLATFORM_WINDOWS)
+		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 #endif
 		ImGui::DestroyContext();
@@ -83,7 +106,7 @@ namespace Engine
 
 	void ImGuiLayer::OnImGuiRender()
 	{
-		static bool show = true;
+		static bool show = false;
 
 		//ImGui::ShowDemoWindow(&show);
 	}
@@ -100,8 +123,8 @@ namespace Engine
 
 	void ImGuiLayer::Begin()
 	{
-		ImGui_ImplOpenGL3_NewFrame();
 #if defined(PLATFORM_WINDOWS)
+		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 #endif
 		ImGui::NewFrame();
@@ -116,13 +139,24 @@ namespace Engine
 
 		// Rendering
 		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+#ifdef PLATFORM_WINDOWS
+		Ref<DirectX12SwapChain> swapChain = std::dynamic_pointer_cast<DirectX12SwapChain>(Application::Get().GetWindow().GetSwapChain());
+		Ref<DirectX12CommandList> commandList = Renderer::GetMainCommandList<DirectX12CommandList>();
+		commandList->SetRenderTarget(swapChain->GetCurrentFrameBuffer());
+		commandList->ClearRenderTarget(0, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+		wrl::ComPtr<ID3D12DescriptorHeap> heap = DirectX12ResourceManager::s_SRVHeap->GetHeap();
+		std::vector<ID3D12DescriptorHeap*> descheap{heap.Get()};
+		commandList->GetCommandList()->SetDescriptorHeaps((uint32)descheap.size(), descheap.data());
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList().Get());
+		commandList->Present();
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
+			ImGui::RenderPlatformWindowsDefault(nullptr, (void*)commandList->GetCommandList().Get());
 		}
+#endif // PLATFORM_WINDOWS
 	}
 
 	void ImGuiLayer::SetDarkThemeColors()

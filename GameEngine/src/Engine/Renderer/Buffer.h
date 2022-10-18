@@ -71,8 +71,13 @@ namespace Engine
 	{
 	public:
 		BufferLayout(){}
-		BufferLayout(const std::initializer_list<BufferElement>& elements)
-			: m_Elements(elements)
+		BufferLayout(const std::vector<BufferElement>& elements) :
+			m_Elements(elements)
+		{
+			CalculateOffsetsAndStride();
+		}
+		BufferLayout(const std::initializer_list<BufferElement>& elements) :
+			m_Elements(elements)
 		{
 			CalculateOffsetsAndStride();
 		}
@@ -106,16 +111,13 @@ namespace Engine
 	public:
 		virtual ~VertexBuffer() {}
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 		virtual BufferLayout& GetLayout() = 0;
 
 		virtual void SetData(const void* data, uint32 size) = 0;
 
-		static Ref<VertexBuffer> Create(uint32 size);
-		static Ref<VertexBuffer> Create(float* vertices, uint32 size);
+		static Ref<VertexBuffer> Create(uint32 count, uint32 stride);
+		static Ref<VertexBuffer> Create(const void* vertices, uint32 count, uint32 stride);
 	};
 
 	class IndexBuffer
@@ -125,12 +127,9 @@ namespace Engine
 
 		virtual uint32 GetCount() = 0;
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
 		virtual void SetData(const uint32* data, uint32 count) = 0;
 
 		static Ref<IndexBuffer> Create(uint32 count);
-		static Ref<IndexBuffer> Create(uint32* indices, uint32 count);
+		static Ref<IndexBuffer> Create(const uint32* indices, uint32 count);
 	};
 }

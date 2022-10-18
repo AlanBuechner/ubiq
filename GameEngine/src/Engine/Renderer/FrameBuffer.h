@@ -21,11 +21,21 @@ namespace Engine
 	struct FrameBufferTextureSpecification
 	{
 		FrameBufferTextureSpecification() = default;
-		FrameBufferTextureSpecification(FrameBufferTextureFormat format) :
-			TextureFormat(format) 
+		FrameBufferTextureSpecification(FrameBufferTextureFormat format, Math::Vector4 color) :
+			TextureFormat(format), ClearColor(color)
 		{}
 
 		FrameBufferTextureFormat TextureFormat = FrameBufferTextureFormat::None;
+		Math::Vector4 ClearColor;
+		inline bool IsDepthStencil() const
+		{
+			switch (TextureFormat)
+			{
+			case Engine::FrameBufferTextureFormat::DEPTH24STENCIL8:
+				return true;
+			}
+			return false;
+		}
 
 	};
 
@@ -54,17 +64,14 @@ namespace Engine
 
 		virtual ~FrameBuffer() = default;
 
-		virtual void Bind() = 0;
-		virtual void Unbind() = 0;
-
 		virtual void Resize(uint32 width, uint32 height) = 0;
 
-		virtual uint32 GetColorAttachmentRendererID(uint32 index = 0) const = 0;
+		virtual uint64 GetAttachmentRenderHandle(uint32 index = 0) const = 0;
+		virtual uint64 GetAttachmentShaderHandle(uint32 index = 0) const = 0;
 		virtual int ReadPixle(uint32 attachment, int x, int y) = 0;
 
-		virtual void ClearAttachment(uint32 attachmentIndex, int value) = 0;
-
 		virtual const FrameBufferSpecification& GetSpecification() const = 0;
+		virtual bool HasDepthAttachment() const = 0;
 
 		static Ref<FrameBuffer> Create(const FrameBufferSpecification& spec);
 	};

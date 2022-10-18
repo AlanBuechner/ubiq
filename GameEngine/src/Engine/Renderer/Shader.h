@@ -1,97 +1,106 @@
 #pragma once
 #include "Engine/Core/Core.h"
+#include "Engine/AssetManager/AssetManager.h"
+#include "Light.h"
+#include "FrameBuffer.h"
+#include "ShaderCompiler.h"
 #include <string>
 #include <Engine/Math/Math.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <unordered_map>
-#include "Light.h"
+#include <vector>
 
 namespace Engine
 {
-	class Shader
+	struct ShaderParameter;
+	struct ShaderSorce;
+
+	class ShaderPass
 	{
 	public:
 		struct Uniform
 		{
 			std::string name;
 			enum Type {
-				Float, Int,
-				Float2, Int2,
-				Float3, Int3,
-				Float4, Int4,
+				Float, Int, Uint,
+				Float2, Int2, Uint2,
+				Float3, Int3, Uint3,
+				Float4, Int4, Uint4,
 				Mat2, Mat3, Mat4
 			} type;
 		};
 
-		struct ShaderSorce
-		{
-		public:
-			fs::path vertexPath;
-			std::string vertexShader;
-			fs::path pixlePath;
-			std::string pixleShader;
-
-			void operator<<(const ShaderSorce& other)
-			{
-				if (this->vertexShader.empty())
-				{
-					this->vertexShader = other.vertexShader;
-					this->vertexPath = other.vertexPath;
-				};
-				if (this->pixleShader.empty())
-				{
-					this->pixleShader = other.pixleShader; 
-					this->pixlePath = other.pixlePath;
-				};
-			}
-		};
-
 		enum ShaderType
 		{
-			None = -1, Vertex = BIT(0), Pixle = BIT(1)
+			None = -1, Vertex = BIT(0), Pixel = BIT(1)
 		};
 
 	public:
-		virtual ~Shader() {};
+		virtual ~ShaderPass() {};
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
+		virtual std::vector<ShaderParameter> GetReflectionData() const = 0;
 
-		virtual const std::string& GetName() const = 0;
-
-		virtual void UploadUniformInt(const std::string& name, const int value) = 0;
-		virtual void UploadUniformIntArray(const std::string& name, const int* values, uint32 count) = 0;
-		virtual void UploadUniformFloat4(const std::string& name, const Math::Vector4& values) = 0;
-		virtual void UploadUniformFloat3(const std::string& name, const Math::Vector3& values) = 0;
-		virtual void UploadUniformFloat2(const std::string& name, const Math::Vector2& values) = 0;
-		virtual void UploadUniformFloat(const std::string& name, const float value) = 0;
-		virtual void UploadUniformMat4(const std::string& name, const Math::Mat4& matrix) = 0;
-		virtual void UploadUniformMat3(const std::string& name, const Math::Mat3& matrix) = 0;
-		virtual void UploadUniformMat2(const std::string& name, const Math::Mat2& matrix) = 0;
-
-		virtual void UploadPointLight(const std::string& name, uint32 i, const PointLight& light) = 0;
-
-		static ShaderSorce LoadShader(const fs::path& file);
-		static ShaderSorce LoadShader(const fs::path& file, int type);
-		static void ReloadShader(ShaderSorce& shaders);
-
-		static Ref<Shader> Create(const std::string& name, Ref<Shader::ShaderSorce> src);
+		static Ref<ShaderPass> Create(Ref<ShaderSorce> src, const std::string& passName);
 
 	private:
 		virtual uint32 GetUniformLocation(const std::string& name) const = 0;
 	};
 
-	class ShaderLibrary
+	class Shader : public Asset
 	{
 	public:
-		static void Init();
+		Shader(const fs::path& file);
 
-		void Add(const Ref<Shader>& shader);
-		Ref<Shader> Load(const std::string& name, const std::string& path);
-		Ref<Shader> Load(const std::string& name, Ref<Shader::ShaderSorce> src);
-		Ref<Shader> Get(const std::string& name);
+		Ref<ShaderPass> GetPass(const std::string& passName);
+
+		static Ref<Shader> Create(const fs::path& file);
 
 	private:
-		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
+		std::unordered_map<std::string, Ref<ShaderPass>> m_Passes;
+	};
+
+
+
+	struct ShaderInputElement
+	{
+		std::string semanticName;
+		uint32 semanticIndex;
+		ShaderPass::Uniform::Type format;
+	};
+
+	struct ShaderParameter
+	{
+		enum class PerameterType
+		{
+			Constants = 0,
+			Descriptor = 1,
+			DescriptorTable = 2,
+			StaticSampler = 4
+		};
+
+		enum class DescriptorType
+		{
+			CBV,
+			SRV,
+			UAV,
+			Sampler
+		};
+
+		ShaderPass::ShaderType shader; // witch shader is requesting the information
+		PerameterType type;
+		DescriptorType descType; // the type of descriptor
+		std::string name; // used for reflection queries
+		/*
+		* shader : Constants
+		*	- the number of constant values
+		* 
+		* shader : DescDescriptorTable
+		*	- the number of Descriptors in the table
+		*/
+		uint32 count;
+		uint32 reg;
+		uint32 space;
+
+		uint32 rootIndex = 0;
 	};
 }

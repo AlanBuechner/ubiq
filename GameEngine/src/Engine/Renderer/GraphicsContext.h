@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Engine/Core/Log.h"
+#include "ResourceManager.h"
 
 namespace Engine
 {
@@ -8,6 +9,8 @@ namespace Engine
 	{
 	public:
 		virtual void Init() = 0;
-		virtual void SwapBuffers() = 0;
+		virtual Ref<ResourceManager> GetResourceManager() = 0;
+
+		static Ref<GraphicsContext> Create();
 	};
 }

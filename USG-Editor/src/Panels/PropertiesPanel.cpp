@@ -158,7 +158,8 @@ namespace Engine
 		ImGui::PopStyleColor(3);
 
 		ImGui::SameLine();
-		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+		if (ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f"))
+			changed = true;
 		ImGui::PopItemWidth();
 
 		ImGui::PopStyleVar();
@@ -177,7 +178,7 @@ namespace Engine
 		ImGui::PushID(lable.c_str());
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, 100);
-		ImGui::Image((ImTextureID)(texture ? texture : EditorAssets::s_NoTextureIcon)->GetRendererID(), { 70,70 }, { 0,1 }, { 1,0 });
+		ImGui::Image((ImTextureID)(texture ? texture : EditorAssets::s_NoTextureIcon)->GetTextureHandle(), { 70,70 });
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -205,6 +206,70 @@ namespace Engine
 		}
 		ImGui::Columns(1);
 		ImGui::PopID();
+
+		return changed;
+	}
+
+	bool PropertysPanel::DrawMeshControl(const std::string& lable, Ref<Mesh>& mesh)
+	{
+		bool changed = false;
+
+		ImGui::Text(lable.c_str());
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				fs::path path = (const wchar_t*)payload->Data;
+				if (Mesh::ValidExtention(path.extension().string())) {
+					mesh = Application::Get().GetAssetManager().GetAsset<Mesh>(path);
+					changed = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+		if (mesh)
+		{
+			fs::path path = Application::Get().GetAssetManager().GetAssetPath(mesh->GetAssetID());
+			if (ImGui::Button(path.string().c_str()))
+				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Clear")) {
+			mesh = Ref<Mesh>();
+			changed = true;
+		}
+
+		return changed;
+	}
+
+	bool PropertysPanel::DrawMaterialControl(const std::string& lable, Ref<Material>& mat)
+	{
+		bool changed = false;
+
+		ImGui::Text(lable.c_str());
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				fs::path path = (const wchar_t*)payload->Data;
+				if (Material::ValidExtention(path.extension().string())) {
+					mat = Application::Get().GetAssetManager().GetAsset<Material>(path);
+					changed = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+		if (mat)
+		{
+			fs::path path = Application::Get().GetAssetManager().GetAssetPath(mat->GetAssetID());
+			if (ImGui::Button(path.string().c_str()))
+				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Clear")) {
+			mat = Ref<Material>();
+			changed = true;
+		}
 
 		return changed;
 	}

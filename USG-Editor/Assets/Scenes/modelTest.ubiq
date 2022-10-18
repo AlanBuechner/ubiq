@@ -1,0 +1,30 @@
+Scene: Name
+Entities:
+  - Entity: 11693751238415598823
+    EntityDataComponent:
+      Name: Camera
+    TransformComponent:
+      Position: [0, 0, 5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Primary: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00100000005
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 2276968180810840774
+    EntityDataComponent:
+      Name: Empty Entity
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Mesh: 5007949505076832925
+      Material: 14846736622411844726

@@ -9,14 +9,30 @@ Engine::Ref<Engine::Texture2D> Engine::EditorAssets::s_BackIcon;
 
 Engine::Ref<Engine::Texture2D> Engine::EditorAssets::s_NoTextureIcon;
 
-void Engine::EditorAssets::Init()
+namespace Engine
 {
-	s_DefaultFileIcon = Texture2D::Create("Resources/DefaultFileIcon.png");
-	s_ShaderFileIcon = Texture2D::Create("Resources/ShaderFileIcon.png");
-	s_SceneFileIcon = Texture2D::Create("Resources/SceneFileIcon.png");
-	s_ImageFileIcon = Texture2D::Create("Resources/ImageFileIcon.png");
-	s_FolderIcon = Texture2D::Create("Resources/FolderIcon.png");
-	s_BackIcon = Texture2D::Create("Resources/BackIcon.png");
+	void EditorAssets::Init()
+	{
+		s_DefaultFileIcon = Texture2D::Create("Resources/DefaultFileIcon.png");
+		s_ShaderFileIcon = Texture2D::Create("Resources/ShaderFileIcon.png");
+		s_SceneFileIcon = Texture2D::Create("Resources/SceneFileIcon.png");
+		s_ImageFileIcon = Texture2D::Create("Resources/ImageFileIcon.png");
+		s_FolderIcon = Texture2D::Create("Resources/FolderIcon.png");
+		s_BackIcon = Texture2D::Create("Resources/BackIcon.png");
 
-	s_NoTextureIcon = Texture2D::Create("Resources/NoTextureIcon.png");
+		s_NoTextureIcon = Texture2D::Create("Resources/NoTextureIcon.png");
+	}
+
+	void EditorAssets::Destroy()
+	{
+		s_DefaultFileIcon.reset();
+		s_ShaderFileIcon.reset();
+		s_SceneFileIcon.reset();
+		s_ImageFileIcon.reset();
+		s_FolderIcon.reset();
+		s_BackIcon.reset();
+
+		s_NoTextureIcon.reset();
+	}
+
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 #include <filesystem>
+#include "Engine/Util/Utils.h"
+#include "Engine/Math/Math.h"
 
 #define ENABLE_ASSERTS
 
@@ -48,6 +50,7 @@
 #ifdef ENABLE_ASSERTS
 	#define ASSERT(x, ...) {if(!(x)) {DEBUG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
 	#define CORE_ASSERT(x, ...) {if(!(x)) {CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
+	//#define CORE_ASSERT(x, msg, ...) {if(!(x)) {CORE_ERROR(std::string("Assertion Failed: ") + msg __VA_OPT__(,) __VA_ARGS__); __debugbreak();}}
 #else
 	#define ASSERT(x, ...)
 	#define CORE_ASSERT(x, ...)
@@ -57,6 +60,11 @@
 #define BIT(x) (1 << x)
 
 #define BIND_EVENT_FN(x) std::bind(x, this, std::placeholders::_1)
+#define BIND_EVENT_FN_EXTERN(x, p) std::bind(x, p, std::placeholders::_1)
+
+#define MEM_KiB(kib)	(kib * 1024)
+#define MEM_MiB(mib)	MEM_KiB(mib * 1024)
+#define MEM_GiB(gib)	MEM_MiB(gib * 1024)
 
 namespace Engine
 {

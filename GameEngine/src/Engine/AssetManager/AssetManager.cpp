@@ -3,9 +3,10 @@
 #include "Engine/Core/Application.h"
 #include "Engine/Util/Utils.h"
 #include "Engine/Core/Time.h"
+#include "Engine/Util/Performance.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
-#include <Windows.h>
+#include "Platform/Windows/Win.h"
 #include <shlobj_core.h>
 
 namespace Engine
@@ -26,6 +27,7 @@ namespace Engine
 	{
 		if (Time::GetTime() > m_NextCleanTime)
 		{
+			CREATE_PROFILE_SCOPEI("Cleaning Cashed Assets");
 			CORE_INFO("cleaning cashed assets");
 			std::vector<std::unordered_map<UUID, Ref<Asset>>::iterator> unusedAssets;
 

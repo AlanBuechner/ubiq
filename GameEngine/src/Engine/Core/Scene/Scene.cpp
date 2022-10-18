@@ -9,11 +9,11 @@
 #include "Engine/Physics/Physics2D.h"
 #include "Engine/Physics/PhysicsComponent.h"
 
-#include "Engine/Renderer/RenderCommand.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/LineRenderer.h"
 #include "Engine/Renderer/EditorCamera.h"
+#include "Engine/Renderer/SceneRendererComponents.h"
 
 #include "glm/glm.hpp"
 
@@ -27,10 +27,13 @@ namespace Engine
 	Scene::Scene()
 	{
 		m_CameraIcon = Texture2D::Create("Resources/CameraIcon.png");
+		m_SceneRenderer = SceneRenderer::Create();
 	}
 
 	Scene::~Scene()
 	{
+		m_Registry.clear();
+		m_SceneRenderer = nullptr;
 	}
 
 	void Scene::OnRuntimeStart()
@@ -45,12 +48,13 @@ namespace Engine
 
 	void Scene::OnUpdateEditor(const EditorCamera& camera)
 	{
+		// update transforms
 		m_Registry.each([&](auto entityID) {
 			Entity entity{ entityID, this };
-			if (entity.GetTransform().GetParent() == Entity::null)
-				entity.GetTransform().UpdateHierarchyGlobalTransform(Math::Mat4(1.0f));
+			entity.GetTransform().UpdateHierarchyGlobalTransform();
 		});
 
+		// render sprites
 		{
 			Renderer2D::BeginScene(camera);
 
@@ -70,8 +74,8 @@ namespace Engine
 			{
 				auto [cam, transform] = cameraView.get<CameraComponent, TransformComponent>(entity);
 				TransformComponent t = transform;
-				t.Rotation = { -camera.GetPitch(), -camera.GetYaw(), 0 };
-				t.Scale = { 1,1,1 };
+				t.SetRotation({ -camera.GetPitch(), -camera.GetYaw(), 0 });
+				t.SetScale({ 1,1,1 });
 
 				Renderer2D::DrawQuad(t.GetTransform(), m_CameraIcon, (int)entity);
 
@@ -80,19 +84,10 @@ namespace Engine
 			Renderer2D::EndScene();
 		}
 
+		// render 3d models
 		{
-			Renderer::BeginScene(camera);
-			Renderer::SubmitPointLight({ {1,1,0}, {1,1,1}, 5.0f, 1, 1, 0.5f });
-
-			auto view = m_Registry.view<MeshRendererComponent, TransformComponent>();
-			for (auto entity : view)
-			{
-				auto [mesh, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
-
-				Renderer::Submit(mesh.vao, mesh.mat, transform.GetGlobalTransform());
-			}
-
-			Renderer::EndScene();
+			m_SceneRenderer->BeginScene(camera);
+			m_SceneRenderer->Invalidate();
 		}
 	}
 
@@ -114,10 +109,10 @@ namespace Engine
 		// Physics
 		Physics2D::OnPysicsUpdate();
 
+		// update transforms
 		m_Registry.each([&](auto entityID) {
 			Entity entity{ entityID, this };
-			if (entity.GetTransform().GetParent() == Entity::null)
-				entity.GetTransform().UpdateHierarchyGlobalTransform(Math::Mat4(1.0f));
+			entity.GetTransform().UpdateHierarchyGlobalTransform();
 		});
 
 		// get main camera
@@ -182,7 +177,6 @@ namespace Engine
 		Entity entity{ m_Registry.create(), this };
 		entity.AddComponent<EntityDataComponent>(name.empty() ? "Entity" : name, uuid);
 		auto& tc = entity.AddComponent<TransformComponent>();
-		tc.Owner = entity;
 		return entity;
 	}
 
@@ -193,6 +187,7 @@ namespace Engine
 
 		for (auto& child : entity.GetTransform().GetChildren())
 			DestroyEntity(child);
+
 
 		m_Registry.destroy(entity);
 	}

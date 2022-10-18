@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
-#include "Mesh.h"
+#include "MeshBuilder.h"
+#include "Engine/Renderer/Mesh.h"
 #include <vector>
 #include <string>
 #include <cstdint>
@@ -106,6 +107,6 @@ namespace Engine
 	{
 	public:
 
-		static Ref<Mesh> LoadStaticMesh(std::string file, VertexLayout layout);
+		static Ref<Mesh> LoadStaticMesh(const fs::path& path, VertexLayout layout);
 	};
 }

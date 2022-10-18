@@ -13,7 +13,4 @@
 #include <unordered_set>
 
 #include "Engine/Core/Log.h"
-
-#ifdef PLATFORM_WINDOWS
-	#include <Windows.h>
-#endif
+//#include "Engine/Util/Performance.h"

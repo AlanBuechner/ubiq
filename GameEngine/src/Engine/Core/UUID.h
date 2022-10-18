@@ -1,10 +1,10 @@
 #pragma once
 #include <xhash>
 #include "Core.h"
+#include "Platform/Windows/Win.h"
 
 namespace Engine
 {
-
 	class UUID
 	{
 	public:
@@ -13,6 +13,9 @@ namespace Engine
 		UUID(const UUID&) = default;
 
 		operator uint64() const { return m_UUID; }
+#if defined(PLATFORM_WINDOWS)
+		operator LUID() const { return *(LUID*)(void*)&m_UUID; }
+#endif
 
 	private:
 		uint64 m_UUID;

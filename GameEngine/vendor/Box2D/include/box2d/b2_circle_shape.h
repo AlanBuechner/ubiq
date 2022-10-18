@@ -53,7 +53,7 @@ public:
 	/// @see b2Shape::ComputeMass
 	void ComputeMass(b2MassData* massData, float density) const override;
 
-	/// Position
+	/// m_Position
 	b2Vec2 m_p;
 };
 

@@ -60,12 +60,13 @@ namespace Engine
 
 	void EditorCamera::OnUpdate()
 	{
-		const float moveSpeed = 2.0f;
-		const float runSpeed = 4.0f;
+		const float moveSpeed = 4.0f;
+		const float runSpeed = 8.0f;
+		const float rotSpeed = 8.0f;
 		float speed = moveSpeed;
 
 		const Math::Vector2& mouse{ Input::GetMousePosition().x, Input::GetMousePosition().y };
-		Math::Vector2 delta = (mouse - m_InitialMousePosition) * 0.003f;
+		Math::Vector2 delta = (mouse - m_InitialMousePosition) * Time::GetDeltaTime() * rotSpeed;
 		m_InitialMousePosition = mouse;
 
 		bool alt = Input::GetKeyDown(KeyCode::ALT);
@@ -76,8 +77,8 @@ namespace Engine
 		bool mMouse = Input::GetMouseButtonDown(KeyCode::MIDDLE_MOUSE);
 
 		bool wKey = Input::GetKeyDown(KeyCode::W);
-		bool sKey = Input::GetKeyDown(KeyCode::S);
 		bool aKey = Input::GetKeyDown(KeyCode::A);
+		bool sKey = Input::GetKeyDown(KeyCode::S);
 		bool dKey = Input::GetKeyDown(KeyCode::D);
 
 		if (rMouse)

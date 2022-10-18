@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "Time.h"
 #include "Input/Input.h"
+#include "Cursor.h"
 
 #include "Engine/Events/Event.h"
 #include "Engine/Events/ApplicationEvent.h"
@@ -9,14 +10,15 @@
 #include "Engine/imGui/ImGuiLayer.h"
 
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/SwapChain.h"
+#include "Engine/Renderer/ResourceManager.h"
 
 #include "Engine/Util/Performance.h"
 
+Engine::Application* Engine::Application::s_Instance = nullptr;
+
 namespace Engine {
 
-#define BIND_EVENT_FN_EXTERN(x, p) std::bind(x, p, std::placeholders::_1)
-
-	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const std::string& name)
 	{
@@ -25,15 +27,14 @@ namespace Engine {
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!");
 		s_Instance = this;
 
+		Renderer::Init();
+
 		timer.Start("Create Window");
-		m_Window = std::unique_ptr<Window>(Window::Create({ name, 1280, 720, true, true })); // create a window
+		Window::Init();
+		m_Window = Window::Create({ name, 1280, 720, true, false }); // create a window
 		timer.End();
 		timer.Start("set event callback");
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
-		timer.End();
-
-		timer.Start("Renderer Init");
-		Renderer::Init();
 		timer.End();
 
 		m_AssetManager.Init("Assets");
@@ -41,6 +42,13 @@ namespace Engine {
 
 	Application::~Application()
 	{
+		m_LayerStack.RemoveAllLayers();
+		m_AssetManager.Destroy();
+		m_Window.reset();
+		WindowManager::Destroy();
+		Window::Shutdown();
+		
+		Renderer::Destroy();
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -61,50 +69,66 @@ namespace Engine {
 	void Application::Run()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		Engine::InstrumentationTimer timer = CREATE_PROFILEI();
+		InstrumentationTimer timer = CREATE_PROFILEI();
 		CORE_INFO("Runing Application");
+
+		// upload all resources from program startup
+		//ResourceManager::SignalCopy();
+		//ResourceManager::WaitForCopy();
 		
 		while (m_Running)
 		{
 			CREATE_PROFILE_SCOPEI("Frame");
 			Time::UpdateDeltaTime();
 
-			CORE_INFO("{0}", Time::GetFPS());
+			//Engine::Instrumentor::Get().RecordData(false);
 
-			timer.Start("Handle Input");
+			//CORE_INFO("{0}", Time::GetFPS());
+
+			Window::HandleEvents();
 			Input::UpdateKeyState(); // update the key stats
 			SendInputBuffer(); // sent the input buffer through the layer stack
+			Cursor::Update();
+
+			// update the layer stack
+			timer.Start("Update Layers");
+			for (Layer* layer : m_LayerStack)
+				layer->OnUpdate();
 			timer.End();
 
-			timer.Start("Update Layers");
-			// update the layer stack
+			// begin rendering
+			Renderer::BeginFrame();
+
 			if (!m_Minimized)
 			{
+				timer.Start("Render Layers");
 				for (Layer* layer : m_LayerStack)
-					layer->OnUpdate();
+					layer->OnRender();
+				timer.End();
 			}
-			timer.End();
 
-			timer.Start("ImGui Render");
-			// render imgui layer
-			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
-				layer->OnImGuiRender();
-			Performance::Render();
-			m_ImGuiLayer->End();
-			timer.End();
+			if (m_InEditer)
+			{
+				// render imgui layer
+				timer.Start("ImGui Render");
+				m_ImGuiLayer->Begin();
+				for (Layer* layer : m_LayerStack)
+					layer->OnImGuiRender();
+				Performance::Render();
+				m_ImGuiLayer->End();
+				timer.End();
+			}
 
-			m_AssetManager.Clean();
+			// end Rendering
+			Renderer::EndFrame();
+			WindowManager::UpdateSwapChainBackBufferIndex();
 
-			timer.Start("Update the Window");
-			// update the window
-			m_Window->OnUpdate();
-			timer.End();
+			// clean assets
+			//m_AssetManager.Clean();
+
+			//Engine::Instrumentor::Get().RecordData(true);
 		}
-
-		// destroy
-		m_AssetManager.Destroy();
-
+		Renderer::WaitForSwap(); // wait for last frame to finish
 	}
 
 	void Application::Close()
@@ -168,8 +192,6 @@ namespace Engine {
 			m_Minimized = true;
 		else
 			m_Minimized = false;
-
-		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;
 	}

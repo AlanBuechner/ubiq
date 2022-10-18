@@ -30,8 +30,8 @@ namespace Engine
 		int keycode = e.GetKeyCode();
 		SetKeyState(keycode, KeyReleased); 
 		m_ToUpdate.push_back(keycode);
-		std::vector<int>::const_iterator toRemove;
-		for (std::vector<int>::const_iterator it = m_KeysDown.begin(); it < m_KeysDown.end(); it++)
+		std::vector<int>::iterator toRemove = m_KeysDown.end();
+		for (std::vector<int>::iterator it = m_KeysDown.begin(); it < m_KeysDown.end(); it++)
 		{
 			if (*it == keycode)
 			{
@@ -39,7 +39,8 @@ namespace Engine
 				break;
 			}
 		}
-		m_KeysDown.erase(toRemove);
+		if(toRemove != m_KeysDown.end())
+			m_KeysDown.erase(toRemove);
 		return false; 
 	}
 

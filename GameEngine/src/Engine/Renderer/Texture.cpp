@@ -2,7 +2,7 @@
 #include "Texture.h"
 
 #include "Renderer.h"
-#include "Platform/OpenGL/OpenGLTexture.h"
+#include "Platform/DirectX12/DirectX12Texture.h"
 
 namespace Engine
 {
@@ -14,11 +14,11 @@ namespace Engine
 
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPI::None:
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGl:
-			return CreateRef<OpenGLTexture2D>(path, attrib);
+		case RendererAPI::DirectX12:
+			return CreateRef<DirectX12Texture2D>(path, attrib);
 		}
 		
 		CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -33,11 +33,11 @@ namespace Engine
 
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPI::None:
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGl:
-			return CreateRef<OpenGLTexture2D>(width, height, attrib);
+		case RendererAPI::DirectX12:
+			return CreateRef<DirectX12Texture2D>(width, height, attrib);
 		}
 
 		CORE_ASSERT(false, "Unknown RendererAPI!");

@@ -5,6 +5,8 @@
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Core/UUID.h"
 
+#include "Engine/Renderer/SceneRenderer.h"
+
 namespace Engine
 {
 	class Entity;
@@ -34,6 +36,8 @@ namespace Engine
 
 		Entity GetPrimaryCameraEntity();
 
+		Ref<SceneRenderer> GetSceneRenderer() { return m_SceneRenderer; }
+
 		static Ref<Scene> Copy(Ref<Scene> scene);
 
 	private:
@@ -45,6 +49,7 @@ namespace Engine
 		uint32 m_ViewportHeight = 0;
 
 		entt::registry m_Registry;
+		Ref<SceneRenderer> m_SceneRenderer;
 
 		Ref<Texture2D> m_CameraIcon;
 

@@ -41,6 +41,8 @@ namespace Engine
 
 		inline AssetManager& GetAssetManager() { return m_AssetManager; }
 
+		inline static bool IsRunning() { return s_Instance->m_Running; }
+
 	protected:
 		bool m_InEditer = false;
 		void GenLayerStack();
@@ -51,7 +53,7 @@ namespace Engine
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
-		Scope<Window> m_Window;
+		Ref<Window> m_Window;
 		std::vector<Event*> m_InputBuffer;
 		bool m_Running = true;
 		bool m_Minimized = false;

@@ -12,8 +12,14 @@ project "GameEngine"
 
 	files
 	{
-		"src/**.h",
-		"src/**.cpp",
+		"src/*.h",
+		"src/*.cpp",
+		"src/Engine/**.h",
+		"src/Engine/**.cpp",
+		"src/Platform/Windows/**.h",
+		"src/Platform/Windows/**.cpp",
+		"src/Platform/DirectX12/**.h",
+		"src/Platform/DirectX12/**.cpp",
 		"vendor/stb_image/**.h",
 		"vendor/stb_image/**.cpp",
 		"vendor/Glm/glm/**.hpp",
@@ -30,6 +36,7 @@ project "GameEngine"
 	includedirs
 	{
 		"src",
+		"vendor",
 		"vendor/spdlog/include",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
@@ -41,6 +48,8 @@ project "GameEngine"
 		"%{IncludeDir.Box2D}/Include",
 		"%{IncludeDir.Assimp}/include",
 		"%{IncludeDir.json}/single_include",
+		"%{IncludeDir.dxc}/inc",
+		"%{IncludeDir.pix}/include"
 	}
 
 	links 
@@ -50,7 +59,13 @@ project "GameEngine"
 		"Yaml",
 		"Box2D",
 		"%{IncludeDir.Assimp}/assimp-vc140-mt.lib",
-		"opengl32.lib"
+		"%{IncludeDir.dxc}/lib/x64/dxcompiler.lib",
+		"%{IncludeDir.pix}/bin/x64/WinPixEventRuntime.lib"
+	}
+
+	debugenvs
+	{
+		"PATH=%PATH%;%{IncludeDir.dxc}/bin/x64;%{IncludeDir.pix}/bin/x64"
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"

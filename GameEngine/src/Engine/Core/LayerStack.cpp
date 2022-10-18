@@ -10,8 +10,7 @@ namespace Engine {
 
 	LayerStack::~LayerStack()
 	{
-		for (Layer* layer : m_Layers)
-			delete layer;
+		RemoveAllLayers();
 	}
 
 	void LayerStack::PushLayer(Layer* layer)
@@ -47,4 +46,15 @@ namespace Engine {
 			m_Layers.erase(it);
 		}
 	}
+
+	void LayerStack::RemoveAllLayers()
+	{
+		for (Layer* layer : m_Layers)
+		{
+			layer->OnDetach();
+			delete layer;
+		}
+		m_Layers.clear();
+	}
+
 }

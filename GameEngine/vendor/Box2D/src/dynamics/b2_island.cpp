@@ -33,7 +33,7 @@
 #include "dynamics/b2_contact_solver.h"
 
 /*
-Position Correction Notes
+m_Position Correction Notes
 =========================
 I tried the several algorithms for position correction of the 2D revolute joint.
 I looked at these systems:
@@ -52,7 +52,7 @@ the velocity constraints are solved with pseudo velocities and a fraction
 of the position error is added to the pseudo velocity error. The pseudo
 velocities are initialized to zero and there is no warm-starting. After
 the position solver, the pseudo velocities are added to the positions.
-This is also called the First Order World method or the Position LCP method.
+This is also called the First Order World method or the m_Position LCP method.
 
 Modified Nonlinear Gauss-Seidel (NGS) - Like Pseudo Velocities except the
 position error is re-computed for each constraint and the positions are updated

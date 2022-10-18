@@ -1,17 +1,28 @@
 Scene: Name
 Entities:
-  - Entity: 1458793893167851688
-    TagComponent:
-      Tag: Entity
+  - Entity: 7279413424876760011
+    EntityDataComponent:
+      Name: Parent
     TransformComponent:
-      Position: [0, 0, 0]
+      Position: [-0.382162243, 1.41892803, -0.933284521]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
+      Children:
+        - 10084387321895164666
+        - 1458793893167851688
+  - Entity: 10084387321895164666
+    EntityDataComponent:
+      Name: Entity
+    TransformComponent:
+      Position: [-2.24890709, 0.539850473, -1.68532109]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+      Parent: 7279413424876760011
     SpriteRendererComponent:
-      Color: [0, 1, 0, 1]
+      Color: [1, 0, 0, 1]
   - Entity: 11693751238415598823
-    TagComponent:
-      Tag: Camera
+    EntityDataComponent:
+      Name: Entity
     TransformComponent:
       Position: [0, 0, 5]
       Rotation: [0, 0, 0]
@@ -27,12 +38,13 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
-  - Entity: 10084387321895164666
-    TagComponent:
-      Tag: Empty Entity
+  - Entity: 1458793893167851688
+    EntityDataComponent:
+      Name: Entity
     TransformComponent:
-      Position: [-2.24890709, 0.539850473, -1.68532109]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
+      Parent: 7279413424876760011
     SpriteRendererComponent:
-      Color: [1, 0, 0, 1]
+      Color: [0, 1, 0, 1]

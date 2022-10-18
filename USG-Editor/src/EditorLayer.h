@@ -7,6 +7,7 @@
 #include "Panels/ContentBrowserPanel.h"
 
 #include "Engine/Renderer/EditorCamera.h"
+#include "Engine/Renderer/SceneRenderer.h"
 
 namespace Engine
 {
@@ -31,6 +32,7 @@ namespace Engine
 		virtual void OnDetach() override;
 
 		virtual void OnUpdate() override;
+		virtual void OnRender() override;
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& event) override;
 

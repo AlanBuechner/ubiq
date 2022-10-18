@@ -2,17 +2,18 @@
 #include "OpenGLContext.h"
 #include "Engine/Core/Application.h"
 
-#include <Windows.h>
+#include "Platform/Windows/Win.h"
 #include <glad/glad.h>
 #include <glad/glad_wgl.h>
 
 namespace Engine
 {
-	OpenGLContext::OpenGLContext(void* windowHandle)
-		: m_WindowHandle(windowHandle)
+	OpenGLContext::OpenGLContext(void* windowHandle) :
+		m_WindowHandle(windowHandle)
 	{
-		CORE_ASSERT(m_WindowHandle, "handle is null")
+		CORE_ASSERT(m_WindowHandle, "handle is null");
 	}
+
 	void OpenGLContext::Init()
 	{
 #if defined(PLATFORM_WINDOWS)

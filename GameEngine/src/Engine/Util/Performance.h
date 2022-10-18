@@ -6,6 +6,7 @@
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Time.h"
 #include <string>
+#include <mutex>
 
 namespace Engine
 {
@@ -14,6 +15,7 @@ namespace Engine
 		const char* name;
 		long long start, end;
 		uint32 ThreadID;
+		uint32 ProccessID;
 	};
 
 	struct InstrumentationSession
@@ -28,6 +30,17 @@ namespace Engine
 		std::ofstream m_OutputStream;
 		int m_ProfileCount;
 		bool m_RecordData;
+		
+		std::mutex m_Mutex;
+
+		struct ThreadData
+		{
+			std::string name;
+			uint32 order;
+		};
+
+		std::unordered_map<uint32, ThreadData> m_RegisteredThreads;
+
 	public:
 		Instrumentor(bool record = false)
 			: m_CurrentSession(nullptr), m_ProfileCount(0), m_RecordData(record)
@@ -40,11 +53,16 @@ namespace Engine
 
 		void WriteProfile(const ProfileResult& result);
 
+		void InstantEvent(const std::string& name);
+
 		void WriteHeader();
 
 		void WriteFooter();
 
 		void RecordData(bool record);
+
+		void RegisterThread(const std::string& name, uint32 order);
+		void WriteThread(uint32 threadID, const std::string& name, uint32 order);
 
 		static Instrumentor& Get();
 	};
@@ -58,10 +76,11 @@ namespace Engine
 		{	
 		}
 
-		void Start(const std::string& name)
+		void Start(const std::string& name, uint32 pid = 0)
 		{
 			m_Name = name;
 			m_Start = Time::GetTime();
+			m_PID = pid;
 		}
 
 		void End()
@@ -72,7 +91,7 @@ namespace Engine
 			long long start = (long long)(m_Start * 1000000.0f);
 			long long end = (long long)(m_End * 1000000.0f);
 			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.c_str(), start, end, threadID };
+			ProfileResult result = { m_Name.c_str(), start, end, threadID, m_PID };
 			m_Func(result);
 		}
 
@@ -101,6 +120,8 @@ namespace Engine
 
 		double m_Elapsed;
 
+		uint32 m_PID;
+
 		std::string m_Name;
 
 		Fn m_Func;
@@ -114,10 +135,11 @@ namespace Engine
 
 		}
 
-		void Start(const std::string& name)
+		void Start(const std::string& name, uint32 pid = 0)
 		{
 			m_Name = name;
 			m_Start = Time::GetTime();
+			m_PID = pid;
 		}
 
 		void End()
@@ -128,7 +150,7 @@ namespace Engine
 			long long start = (long long)(m_Start * 1000000.0f);
 			long long end = (long long)(m_End * 1000000.0f);
 			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.c_str(), start, end, threadID };
+			ProfileResult result = { m_Name.c_str(), start, end, threadID, m_PID };
 
 			Instrumentor::Get().WriteProfile(result);
 		}
@@ -158,6 +180,8 @@ namespace Engine
 
 		double m_Elapsed;
 
+		uint32 m_PID;
+
 		std::string m_Name;
 	};
 
@@ -165,10 +189,11 @@ namespace Engine
 	class TimerScoped
 	{
 	public:
-		TimerScoped(const std::string& name, Fn&& func) :
+		TimerScoped(const std::string& name, Fn&& func, uint32 pid = 0) :
 			m_Func(func), m_Name(name)
 		{
 			m_Start = Time::GetTime();
+			m_PID = pid;
 		}
 
 		~TimerScoped()
@@ -179,7 +204,7 @@ namespace Engine
 			long long start = m_Start * 1000000.0f;
 			long long end = m_End * 1000000.0f;
 			uint32 threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.RawString(), start, end, threadID };
+			ProfileResult result = { m_Name.c_str(), start, end, threadID, m_PID };
 			m_Func(result);
 		}
 
@@ -193,7 +218,9 @@ namespace Engine
 
 		double m_Elapsed;
 
-		const std::string& m_Name;
+		uint32 m_PID;
+
+		const std::string m_Name;
 
 		Fn m_Func;
 	};
@@ -201,10 +228,11 @@ namespace Engine
 	class InstrumentationTimerScoped
 	{
 	public:
-		InstrumentationTimerScoped(const std::string& name) :
+		InstrumentationTimerScoped(const std::string& name, uint32 pid = 0) :
 			m_Name(name)
 		{
 			m_Start = Time::GetTime();
+			m_PID = pid;
 		}
 
 		~InstrumentationTimerScoped()
@@ -230,7 +258,9 @@ namespace Engine
 
 		double m_Elapsed;
 
-		const std::string& m_Name;
+		uint32 m_PID;
+
+		const std::string m_Name;
 	};
 
 	class Performance

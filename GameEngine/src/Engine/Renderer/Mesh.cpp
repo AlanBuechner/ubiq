@@ -1,0 +1,57 @@
+#include "pch.h"
+#include "Mesh.h"
+
+#include "Engine/Core/MeshLoader.h"
+
+namespace Engine
+{
+
+	Mesh::Mesh(uint32 vertexStride) :
+		m_VertexStride(vertexStride)
+	{}
+
+	void Mesh::SetVertices(const void* vertices, uint32 count)
+	{
+		if (m_VertexBuffer)
+			m_VertexBuffer->SetData(vertices, count);
+		else
+			m_VertexBuffer = VertexBuffer::Create(vertices, count, m_VertexStride);
+	}
+
+	void Mesh::SetIndices(const uint32* data, uint32 count)
+	{
+		if (m_IndexBuffer)
+			m_IndexBuffer->SetData(data, count);
+		else
+		m_IndexBuffer = IndexBuffer::Create(data, count);
+	}
+
+	Ref<Mesh> Mesh::Create(BufferLayout layout)
+	{
+		return CreateRef<Mesh>(layout.GetStride());
+	}
+
+	Ref<Mesh> Mesh::Create(uint32 vertexStride)
+	{
+		return CreateRef<Mesh>(vertexStride);
+	}
+
+	Ref<Mesh> Mesh::Create(const fs::path& path)
+	{
+		VertexLayout layout = {
+			{ VertexDataType::Position3 },
+			{ VertexDataType::UV },
+			{ VertexDataType::Normal },
+			{ VertexDataType::Tangent }
+		};
+
+
+		return MeshLoader::LoadStaticMesh(path, layout);
+	}
+
+	bool Mesh::ValidExtention(const fs::path& ext)
+	{
+		return (ext == ".obj");
+	}
+
+}

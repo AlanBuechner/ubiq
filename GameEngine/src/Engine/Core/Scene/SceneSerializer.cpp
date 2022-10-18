@@ -3,6 +3,7 @@
 #include "Components.h"
 #include "Entity.h"
 
+#include "Engine/Renderer/SceneRendererComponents.h"
 #include "Engine/Physics/PhysicsComponent.h"
 
 #include <fstream>
@@ -141,9 +142,11 @@ namespace Engine
 
 			auto& transform = entity.GetComponent<TransformComponent>();
 			
-			out << YAML::Key << "Position" << YAML::Value << transform.Position;
-			out << YAML::Key << "Rotation" << YAML::Value << transform.Rotation;
-			out << YAML::Key << "Scale" << YAML::Value << transform.Scale;
+			out << YAML::Key << "Position" << YAML::Value << transform.GetPosition();
+			out << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
+			out << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
+
+			out << YAML::Key << "Parent" << YAML::Value << (uint64)transform.GetParent().GetUUID();
 
 			if (transform.GetChildren().size() > 0)
 			{
@@ -189,6 +192,21 @@ namespace Engine
 			out << YAML::Key << "Color" << YAML::Value << spriteRenderer.Color;
 			if (spriteRenderer.Texture)
 				out << YAML::Key << "TextureID" << YAML::Value << spriteRenderer.Texture->GetAssetID();
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<MeshRendererComponent>())
+		{
+			out << YAML::Key << "MeshRendererComponent";
+			out << YAML::BeginMap;
+
+			auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
+			if(meshRenderer.GetMesh())
+				out << YAML::Key << "Mesh" << YAML::Value << meshRenderer.GetMesh()->GetAssetID();
+
+			if (meshRenderer.GetMaterial())
+				out << YAML::Key << "Material" << YAML::Value << meshRenderer.GetMaterial()->GetAssetID();
 
 			out << YAML::EndMap;
 		}
@@ -277,7 +295,6 @@ namespace Engine
 
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
-
 		std::ifstream stream(filepath);
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
@@ -306,12 +323,13 @@ namespace Engine
 				if (transformComponent)
 				{
 					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
-					tc.Position = transformComponent["Position"].as<Math::Vector3>();
-					tc.Rotation = transformComponent["Rotation"].as<Math::Vector3>();
-					tc.Scale = transformComponent["Scale"].as<Math::Vector3>();
 
 					tc.Owner = deserializedEntity;
 					tc.Parent = Entity::null;
+
+					tc.SetPosition(transformComponent["Position"].as<Math::Vector3>());
+					tc.SetRotation(transformComponent["Rotation"].as<Math::Vector3>());
+					tc.SetScale(transformComponent["Scale"].as<Math::Vector3>());
 				}
 
 				auto cameraComponent = entity["CameraComponent"];
@@ -340,6 +358,16 @@ namespace Engine
 					src.Color = spriteRendererComponent["Color"].as<Math::Vector4>();
 					if (spriteRendererComponent["TextureID"])
 						src.Texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(spriteRendererComponent["TextureID"].as<uint64>());
+				}
+
+				auto meshRendererComponent = entity["MeshRendererComponent"];
+				if (meshRendererComponent)
+				{
+					auto& mrc = deserializedEntity.AddComponent<MeshRendererComponent>();
+					if(meshRendererComponent["Mesh"])
+						mrc.SetMesh(Application::Get().GetAssetManager().GetAsset<Mesh>(meshRendererComponent["Mesh"].as<uint64>()));
+					if(meshRendererComponent["Material"])
+						mrc.SetMaterial(Application::Get().GetAssetManager().GetAsset<Material>(meshRendererComponent["Material"].as<uint64>()));
 				}
 
 				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];

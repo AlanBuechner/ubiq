@@ -17,8 +17,8 @@ project "Sandbox"
 	{
 		"src",
 		"%{wks.location}/GameEngine/vendor/spdlog/include",
-		"%{wks.location}/GameEngine/src",
 		"%{wks.location}/GameEngine/vendor",
+		"%{wks.location}/GameEngine/src",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}"
 	}

@@ -1,17 +1,15 @@
 ﻿#include "EditorLayer.h"
-#include <Engine/Util/Performance.h>
+
+#include "Engine/Core/Scene/SceneSerializer.h"
+#include "Engine/Renderer/SceneRendererComponents.h"
+#include "Engine/Math/Math.h"
+#include "Engine/Core/Cursor.h"
+#include "Engine/Util/Performance.h"
+#include "Engine/Util/PlatformUtils.h"
 
 #include <imgui/imgui.h>
-
-#include <Engine/Core/Scene/SceneSerializer.h>
-
-#include <Engine/Util/PlatformUtils.h>
-
-#include <memory>
-
 #include <ImGuizmo/ImGuizmo.h>
-
-#include "Engine/Math/Math.h"
+#include <memory>
 
 Engine::EditorLayer* Engine::EditorLayer::s_Instance = nullptr;
 
@@ -43,12 +41,15 @@ namespace Engine
 
 	void EditorLayer::OnAttach()
 	{
-
 		m_PlayButton = Texture2D::Create("Resources/PlayButton.png");
 		m_StopButton = Texture2D::Create("Resources/StopButton.png");
 
 		FrameBufferSpecification fbSpec;
-		fbSpec.Attachments = { FrameBufferTextureFormat::RGBA8, FrameBufferTextureFormat::RED_INTEGER, FrameBufferTextureFormat::Depth };
+		fbSpec.Attachments = {
+			{ FrameBufferTextureFormat::RGBA8, {0.1f,0.1f,0.1f,1} },
+			{ FrameBufferTextureFormat::RED_INTEGER, (Math::Vector4)-1 },
+			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
+		};
 		Window& window = Application::Get().GetWindow();
 		fbSpec.Width = window.GetWidth();
 		fbSpec.Height = window.GetHeight();
@@ -60,36 +61,13 @@ namespace Engine
 		m_EditorCamera = EditorCamera();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
-
-		Engine::VertexLayout layout = {
-			{Engine::VertexDataType::Position3},
-			{Engine::VertexDataType::UV},
-			{Engine::VertexDataType::Normal},
-			{Engine::VertexDataType::Tangent}
-		};
-
-		Ref<Mesh> mesh = Engine::MeshLoader::LoadStaticMesh("Assets/Models/ogre.obj", layout);
-
-		auto& meshComp = m_ActiveScene->CreateEntity().AddComponent<MeshRendererComponent>(mesh);
-		meshComp.mat->diffuse = Texture2D::Create("Assets/Images/ogre_diffuse.bmp");
-		meshComp.mat->normal = Texture2D::Create("Assets/Images/ogre_normal.bmp");
-		uint32 whiteTexureData = 0xffffffff;
-		meshComp.mat->speculur = Texture2D::Create(1, 1);
-		meshComp.mat->speculur->SetData(&whiteTexureData, sizeof(whiteTexureData));
-		meshComp.mat->shader = ShaderLibrary().Load("MeshShader", "Assets/Shaders/MeshShader.glsl");
-
-		/*for (auto& v : mesh->vertices)
-			std::cout << v.position.x << ", " << (0.5-v.position.y) << ", " << v.position.z << ", " << (1-v.uv.x) * 16 << ", " << (1-v.uv.y) * 16 << "," << std::endl;
-
-		for (auto& i : mesh->indices)
-			std::cout << i << ", ";*/
 		
 		Renderer::SetAmbientLight({ 0.5f, 0.5f, 0.5f });
 	}
 
 	void EditorLayer::OnDetach()
 	{
-
+		
 	}
 
 	void EditorLayer::OnUpdate()
@@ -108,8 +86,6 @@ namespace Engine
 			m_OpenScene = false;
 		}
 
-		InstrumentationTimer timer = CREATE_PROFILEI();
-
 		// resize
 		if (FrameBufferSpecification spec = m_FrameBuffer->GetSpecification();
 			m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
@@ -124,13 +100,7 @@ namespace Engine
 		m_EditorCamera.OnUpdate();
 
 		// setup renderer
-		timer.Start("Rendrer");
 		Renderer2D::ResetStats();
-		m_FrameBuffer->Bind();
-		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-		RenderCommand::Clear();
-
-		m_FrameBuffer->ClearAttachment(1, -1);
 
 		// update scene
 		if (m_SceneState == SceneState::Edit)
@@ -153,6 +123,24 @@ namespace Engine
 					m_HierarchyPanel.SelectEntity({ (entt::entity)entityID, m_ActiveScene.get() });
 			}
 		}
+
+	}
+
+	void EditorLayer::OnRender()
+	{
+		CREATE_PROFILE_FUNCTIONI();
+		InstrumentationTimer timer = CREATE_PROFILEI();
+		timer.Start("Recored Commands");
+
+		Ref<CommandList> commandList = Renderer::GetMainCommandList();
+
+		commandList->SetRenderTarget(m_FrameBuffer);
+		commandList->ClearRenderTarget(m_FrameBuffer);
+
+		Renderer::Build();
+		m_ActiveScene->GetSceneRenderer()->Build();
+
+		commandList->Present();
 
 		timer.End();
 	}
@@ -241,6 +229,7 @@ namespace Engine
 			
 			UI_Toolbar();
 			UI_Viewport();
+
 			// Console window
 
 			//ImGui::Begin("Console");
@@ -256,13 +245,8 @@ namespace Engine
 
 			ImGui::End();*/
 
-			static bool show = true;
-			//ImGui::ShowDemoWindow(&show);
-
 			ImGui::End();
 		}
-
-		m_FrameBuffer->Unbind();
 	}
 
 	void EditorLayer::OnEvent(Event& e)
@@ -347,6 +331,7 @@ namespace Engine
 	{
 
 		// draw grid lines
+		LineRenderer::BeginScene(m_EditorCamera);
 		{
 			Math::Vector3 camPos = m_EditorCamera.GetPosition();
 
@@ -354,10 +339,8 @@ namespace Engine
 			Math::Mat4 matx =	glm::translate(Math::Mat4(1.0f), { camPos.x - fmod(camPos.x, m_GridLineOffset), 0, camPos.z })
 								* glm::rotate(Math::Mat4(1.0f), glm::radians(90.0f), { 0,1,0 });
 
-			LineRenderer::BeginScene(m_EditorCamera);
 			LineRenderer::DrawLineMesh(m_GridMesh, matz);
 			LineRenderer::DrawLineMesh(m_GridMesh, matx);
-			LineRenderer::EndScene();
 		}
 
 		// draw camera frustum
@@ -366,8 +349,6 @@ namespace Engine
 		{
 			auto& tc = selected.GetComponent<TransformComponent>();
 			auto& cam = selected.GetComponent<CameraComponent>().Camera;
-
-			LineRenderer::BeginScene(m_EditorCamera);
 
 			const Math::Mat4& proj = glm::inverse(cam.GetProjectionMatrix());
 			const Math::Mat4& transform = tc.GetTransform();
@@ -402,10 +383,8 @@ namespace Engine
 			};
 
 			LineRenderer::DrawLineMesh(mesh, transform);
-
-			LineRenderer::EndScene();
-
 		}
+		LineRenderer::EndScene();
 	}
 
 	void EditorLayer::UI_Toolbar()
@@ -422,7 +401,7 @@ namespace Engine
 		float Size = ImGui::GetWindowHeight() - 4.0f;
 		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x*0.5f)-(Size*0.5f));
 		Ref<Texture2D> button = (m_SceneState == SceneState::Edit ? m_PlayButton : m_StopButton);
-		if (ImGui::ImageButton((ImTextureID)button->GetRendererID(), { Size, Size }, { 0,0 }, {1,1}, 0))
+		if (ImGui::ImageButton((ImTextureID)button->GetTextureHandle(), { Size, Size }, { 0,0 }, {1,1}, 0))
 		{
 			if (m_SceneState == SceneState::Edit)
 				OnScenePlay();
@@ -450,8 +429,8 @@ namespace Engine
 		{
 			m_ViewPortSize = { viewPortPanalSize.x, viewPortPanalSize.y };
 		}
-		uint32 textureID = m_FrameBuffer->GetColorAttachmentRendererID();
-		ImGui::Image((void*)textureID, viewPortPanalSize, ImVec2(0, 1), ImVec2(1, 0));
+
+		ImGui::Image((ImTextureID)m_FrameBuffer->GetAttachmentShaderHandle(0), viewPortPanalSize);
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -467,6 +446,17 @@ namespace Engine
 				}
 			}
 			ImGui::EndDragDropTarget();
+		}
+
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		{
+			Cursor::Visibility(false);
+			Cursor::Lock(true);
+		}
+		else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+		{
+			Cursor::Visibility(true);
+			Cursor::Lock(false);
 		}
 
 		ImVec2 minBound = ImGui::GetWindowPos();
@@ -509,9 +499,9 @@ namespace Engine
 					Math::Vector3 position, rotation, scale;
 					Math::DecomposeTransform(transform, position, rotation, scale);
 
-					tc.Position += position - OldPosition;
-					tc.Rotation += rotation - OldRotation;
-					tc.Scale += scale - OldScale;
+					tc.Translate(position - OldPosition);
+					tc.Rotate(rotation - OldRotation);
+					tc.Scale(scale - OldScale);
 				}
 			}
 		}
@@ -537,6 +527,9 @@ namespace Engine
 
 	int EditorLayer::GetEntityIDAtMousePosition(bool& inWindow)
 	{
+		inWindow = false;
+		return -1; // TODO
+
 		auto [mx, my] = ImGui::GetMousePos();
 		mx -= m_ViewportBounds[0].x;
 		my -= m_ViewportBounds[0].y;

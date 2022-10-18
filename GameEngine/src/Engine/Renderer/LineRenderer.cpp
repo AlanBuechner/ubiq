@@ -1,11 +1,12 @@
 #include "pch.h"
-#include "RenderCommand.h"
 #include "LineRenderer.h"
-#include "VertexArray.h"
+#include "Renderer.h"
 #include "Buffer.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "EditorCamera.h"
+#include "Mesh.h"
+#include "CommandList.h"
 
 namespace Engine
 {
@@ -17,150 +18,104 @@ namespace Engine
 		static const uint32 MaxVertices = MaxLines * LineVertexCount;
 		static const uint32 MaxIndices = MaxLines * 2;
 
-		Ref<VertexArray> LineVertexArray;
-		Ref<VertexBuffer> LineVertexBuffer;
-		Ref<IndexBuffer> LineIndexBuffer;
-		Ref<ShaderLibrary> Library;
+		Ref<Shader> LineShader;
 
-		uint32 VertexCount = 0;
-		uint32 IndexCount = 0;
+		std::vector<LineVertex> Vertices;
+		std::vector<uint32> Indices;
 
-		uint32* LineIndexBufferBase = nullptr;
-		uint32* LineIndexBufferPtr = nullptr;
-
-		LineVertex* LineVertexBufferBase = nullptr;
-		LineVertex* LineVertexBufferPtr = nullptr;
+		Ref<InstanceBuffer> Instances;
+		Ref<Mesh> m_Mesh;
+		Ref<ConstantBuffer> Camera;
 	};
 
-	static LineRendererData s_Data;
+	static LineRendererData s_LineData;
 
 	void LineRenderer::Init()
 	{
-		s_Data.LineVertexArray = Engine::VertexArray::Create();
+		s_LineData.LineShader = Shader::Create("Assets/Shaders/LineShader.hlsl");
 
-		s_Data.LineVertexBuffer = Engine::VertexBuffer::Create(s_Data.MaxVertices * sizeof(LineVertex));
+		s_LineData.Vertices.reserve(s_LineData.MaxVertices);
+		s_LineData.Indices.reserve(s_LineData.MaxIndices);
 
-		Engine::BufferLayout layout = {
-			{Engine::ShaderDataType::Float3, "a_Position"},
-			{Engine::ShaderDataType::Float4, "a_Color"}
-		};
+		s_LineData.m_Mesh = Mesh::Create(sizeof(LineVertex));
 
-		s_Data.LineVertexBuffer->SetLayout(layout);
-		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer);
+		s_LineData.Instances = InstanceBuffer::Create(sizeof(Math::Mat4), 1);
+		Math::Mat4 transform = Math::Mat4(1);
+		s_LineData.Instances->SetData(0, 1, &transform);
 
-		s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxVertices];
-
-		s_Data.LineIndexBufferBase = new uint32[s_Data.MaxIndices];
-
-		s_Data.LineIndexBuffer = Engine::IndexBuffer::Create(s_Data.MaxIndices);
-		s_Data.LineVertexArray->SetIndexBuffer(s_Data.LineIndexBuffer);
-
-		s_Data.Library = CreateRef<ShaderLibrary>();
-		Ref<Shader> TextureShader = s_Data.Library->Load("LineShader", "Assets/Shaders/LineShader.glsl");
+		s_LineData.Camera = ConstantBuffer::Create(sizeof(Math::Mat4));
 	}
 
-	void LineRenderer::ShutDown()
+	void LineRenderer::Destroy()
 	{
+		s_LineData.Camera.reset();
+		s_LineData.Instances.reset();
+		s_LineData.m_Mesh.reset();
+		s_LineData.LineShader.reset();
 	}
 
 	void LineRenderer::BeginScene(const Camera& camera, const Math::Mat4& transform)
 	{
-		Math::Mat4 viewProj = camera.GetProjectionMatrix() * glm::inverse(transform);
-
-		Ref<Shader> LineShader = s_Data.Library->Get("LineShader");
-		LineShader->Bind();
-		LineShader->UploadUniformMat4("u_ViewProjection", viewProj);
-		s_Data.LineVertexArray->Bind();
-
-		BeginBatch();
+		Math::Mat4 viewProj = camera.GetProjectionMatrix() * Math::Inverse(transform);
+		s_LineData.Camera->SetData(&viewProj);
 	}
 
 	void LineRenderer::BeginScene(const EditorCamera& camera)
 	{
 		Math::Mat4 viewProj = camera.GetViewProjection();
-
-		Ref<Shader> LineShader = s_Data.Library->Get("LineShader");
-		LineShader->Bind();
-		LineShader->UploadUniformMat4("u_ViewProjection", viewProj);
-		s_Data.LineVertexArray->Bind();
-
-		BeginBatch();
+		s_LineData.Camera->SetData(&viewProj);
 	}
 
 	void LineRenderer::EndScene()
 	{
-		s_Data.LineVertexBuffer->SetData(s_Data.LineVertexBufferBase, s_Data.VertexCount * sizeof(LineVertex));
-
-		s_Data.LineIndexBuffer->SetData(s_Data.LineIndexBufferBase, s_Data.IndexCount);
-
-		Flush();
+		s_LineData.m_Mesh->SetVertices(s_LineData.Vertices.data(), (uint32)s_LineData.Vertices.size());
+		s_LineData.m_Mesh->SetIndices(s_LineData.Indices.data(), (uint32)s_LineData.Indices.size());
 	}
 
-	void LineRenderer::Flush()
+	void LineRenderer::Build()
 	{
-		if (s_Data.IndexCount != 0)
-			RenderCommand::DrawLineIndexed(s_Data.LineVertexArray, s_Data.IndexCount);
-	}
+		if (!s_LineData.Vertices.empty())
+		{
+			Ref<CommandList> commandList = Renderer::GetMainCommandList();
 
-	void LineRenderer::BeginBatch()
-	{
-		s_Data.IndexCount = 0;
-		s_Data.VertexCount = 0;
-		s_Data.LineVertexBufferPtr = s_Data.LineVertexBufferBase;
-		s_Data.LineIndexBufferPtr = s_Data.LineIndexBufferBase;
+			commandList->SetShader(s_LineData.LineShader->GetPass("main"));
+			commandList->SetConstantBuffer(0, s_LineData.Camera);
+			commandList->DrawMesh(s_LineData.m_Mesh, s_LineData.Instances);
+		}
+
+		s_LineData.Vertices.clear();
+		s_LineData.Indices.clear();
 	}
 
 	void LineRenderer::DrawLine(Math::Vector3 p1, Math::Vector3 p2, const Math::Vector4 color, const Math::Mat4& transform)
 	{
-		if (s_Data.IndexCount + 2 > s_Data.MaxIndices || s_Data.VertexCount + 2 > s_Data.MaxVertices)
-		{
-			EndScene();
-			BeginBatch();
-		}
+		LineVertex vert;
+		vert.Color = color;
 
-		s_Data.LineVertexBufferPtr->Position = transform * Math::Vector4(p1, 1.0f);
-		s_Data.LineVertexBufferPtr->Color = color;
-		s_Data.LineVertexBufferPtr++;
+		uint32 baseVertexIndex = (uint32)s_LineData.Vertices.size();
+		s_LineData.Indices.push_back(baseVertexIndex);
+		s_LineData.Indices.push_back(baseVertexIndex+1);
 
-		*s_Data.LineIndexBufferPtr = s_Data.VertexCount + 0;
-		s_Data.LineIndexBufferPtr++;
-
-		s_Data.LineVertexBufferPtr->Position = transform * Math::Vector4(p2, 1.0f);
-		s_Data.LineVertexBufferPtr->Color = color;
-		s_Data.LineVertexBufferPtr++;
-
-		*s_Data.LineIndexBufferPtr = s_Data.VertexCount + 1;
-		s_Data.LineIndexBufferPtr++;
-
-		s_Data.IndexCount += 2;
-		s_Data.VertexCount += 2;
-
+		vert.Position = transform * Math::Vector4(p1, 1.0f);
+		s_LineData.Vertices.push_back(vert); 
+		vert.Position = transform * Math::Vector4(p2, 1.0f);
+		s_LineData.Vertices.push_back(vert);
 	}
 
 	void LineRenderer::DrawLineMesh(LineMesh& mesh, const Math::Mat4& transform)
 	{
-		if (s_Data.IndexCount + mesh.m_Indices.size() > s_Data.MaxIndices || s_Data.VertexCount + mesh.m_Vertices.size() > s_Data.MaxVertices)
-		{
-			EndScene();
-			BeginBatch();
-		}
 
+		uint32 baseVertexIndex = (uint32)s_LineData.Vertices.size();
 		for (uint32 i = 0; i < mesh.m_Vertices.size(); i++)
 		{
-			s_Data.LineVertexBufferPtr->Position = transform * Math::Vector4(mesh.m_Vertices[i].Position, 1.0f);
-			s_Data.LineVertexBufferPtr->Color = mesh.m_Vertices[i].Color;
-			s_Data.LineVertexBufferPtr++;
+			LineVertex vert = mesh.m_Vertices[i];
+			vert.Position = transform * Math::Vector4(vert.Position, 1.0f);
+			s_LineData.Vertices.push_back(vert);
 		}
 
 		for (uint32 i = 0; i < mesh.m_Indices.size(); i++)
-		{
-			*s_Data.LineIndexBufferPtr = s_Data.VertexCount + mesh.m_Indices[i];
-			s_Data.LineIndexBufferPtr++;
-		}
+			s_LineData.Indices.push_back(baseVertexIndex + mesh.m_Indices[i]);
 
-
-		s_Data.IndexCount += (uint32)mesh.m_Indices.size();
-		s_Data.VertexCount += (uint32)mesh.m_Vertices.size();
 	}
 
 }

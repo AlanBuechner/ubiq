@@ -1,8 +1,8 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "TextureAttribute.h"
-#include <Engine/Math/Math.h>
-#include <Engine/AssetManager/AssetManager.h>
+#include "Engine/Math/Math.h"
+#include "Engine/AssetManager/AssetManager.h"
 #include <string>
 
 namespace Engine
@@ -15,10 +15,11 @@ namespace Engine
 
 		virtual uint32 GetWidth() const = 0;
 		virtual uint32 GetHeight() const = 0;
-		virtual uint32 GetRendererID() const = 0;
+		virtual void* GetTextureHandle() const = 0;
+		virtual void* GetSamplerHandle() const = 0;
+		virtual uint32 GetDescriptorLocation() const = 0;
 
-		virtual void SetData(void* data, uint32 size) = 0;
-		virtual void Bind(uint32 slot) const = 0;
+		virtual void SetData(void* data) = 0;
 		virtual void LoadFromFile(const fs::path& path) = 0;
 		virtual Ref<TextureAttribute> GetAttributes() const = 0;
 
