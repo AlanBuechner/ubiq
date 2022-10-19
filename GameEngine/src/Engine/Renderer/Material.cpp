@@ -10,6 +10,15 @@ namespace Engine
 
 	void Material::Apply()
 	{
+		CBuffData data;
+		data.diffuseLoc = diffuse->GetDescriptorLocation();
+		if (normal) data.normalLoc = normal->GetDescriptorLocation();
+		else data.normalLoc = Renderer::GetBlueTexture()->GetDescriptorLocation();
+
+		if (specular) data.specularLoc = specular->GetDescriptorLocation();
+		else data.specularLoc = Renderer::GetBlackexture()->GetDescriptorLocation();
+
+		m_Buffer->SetData((const void*)&data);
 	}
 
 	Ref<Material> Material::Create(const fs::path& path)
@@ -36,6 +45,9 @@ namespace Engine
 			if (f.contains("specular"))
 				mat->specular = assetManager.GetAsset<Texture2D>(f["specular"]);
 		}
+
+		mat->m_Buffer = ConstantBuffer::Create(sizeof(CBuffData));
+		mat->Apply();
 
 		return mat;
 	}

@@ -189,6 +189,7 @@ namespace Engine
 			{
 				switch (p.descType)
 				{
+				case ShaderParameter::DescriptorType::CBV:
 				case ShaderParameter::DescriptorType::SRV:
 					m_CommandList->SetGraphicsRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
 					break;

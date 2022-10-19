@@ -13,13 +13,15 @@ namespace Engine
 	DirectX12ConstantBuffer::DirectX12ConstantBuffer(uint32 size) :
 		m_Size(size)
 	{
+		m_Size = m_Size + 256 - (m_Size % 256); // 256 byte aligned
+
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		// create resource
 		HRESULT hr = context->GetDevice()->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), // this heap will be used to upload the constant buffer data
 			D3D12_HEAP_FLAG_NONE, // no flags
-			&CD3DX12_RESOURCE_DESC::Buffer(size), // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
+			&CD3DX12_RESOURCE_DESC::Buffer(m_Size), // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
 			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, // will be data that is read from so we keep it in the generic read state
 			nullptr, // we do not have use an optimized clear value for constant buffers
 			IID_PPV_ARGS(m_Buffer.GetAddressOf())
@@ -28,6 +30,12 @@ namespace Engine
 
 		// create DescriptorHandle
 		m_Handle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+
+		D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
+		desc.BufferLocation = m_Buffer->GetGPUVirtualAddress();
+		desc.SizeInBytes = m_Size;
+
+		context->GetDevice()->CreateConstantBufferView(&desc, m_Handle.cpu);
 
 	}
 
@@ -40,7 +48,7 @@ namespace Engine
 		context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffer);
 	}
 
-	void DirectX12ConstantBuffer::SetData(void* data)
+	void DirectX12ConstantBuffer::SetData(const void* data)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		context->GetDX12ResourceManager()->UploadBuffer(m_Buffer, data, m_Size, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);

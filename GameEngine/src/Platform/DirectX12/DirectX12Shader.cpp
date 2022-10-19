@@ -138,13 +138,13 @@ namespace Engine
 			L"-T", profile.c_str(),
 			DXC_ARG_ALL_RESOURCES_BOUND,
 #ifdef DEBUG
-			DXC_ARG_DEBUG,
 			DXC_ARG_SKIP_OPTIMIZATIONS,
 #else
 			DXC_ARG_OPTIMIZATION_LEVEL3,
 #endif // DEBUG
-			L"-Qstrip_reflect", // strip reflection data to another blob
-			L"-Qstrip_debug", // strip debug data to another blob
+			//L"-Qstrip_reflect", // strip reflection data to another blob
+			DXC_ARG_DEBUG,
+			L"-Qembed_debug", // strip debug data to another blob
 		};
 
 		DxcBuffer buffer;

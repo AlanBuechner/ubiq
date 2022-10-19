@@ -146,7 +146,8 @@ namespace Engine
 			out << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
 			out << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
 
-			out << YAML::Key << "Parent" << YAML::Value << (uint64)transform.GetParent().GetUUID();
+			if(transform.GetParent())
+				out << YAML::Key << "Parent" << YAML::Value << (uint64)transform.GetParent().GetUUID();
 
 			if (transform.GetChildren().size() > 0)
 			{

@@ -12,7 +12,8 @@ namespace Engine
 		DirectX12ConstantBuffer(uint32 size);
 		~DirectX12ConstantBuffer();
 
-		virtual void SetData(void* data) override;
+		virtual void SetData(const void* data) override;
+		virtual uint32 GetDescriptorLocation() override { return m_Handle.GetIndex(); }
 
 		wrl::ComPtr<ID3D12Resource> GetBuffer() { return m_Buffer; }
 		DirectX12DescriptorHandle GetHandle() { return m_Handle; }

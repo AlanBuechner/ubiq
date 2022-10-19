@@ -20,6 +20,7 @@ struct VS_Input
 
 	// semantics starting with "I_" are per instance data
 	float4x4 transform : I_TRANSFORM;
+	uint materialID : I_MATID;
 };
 
 struct VS_Output
@@ -28,6 +29,7 @@ struct VS_Output
 	float2 uv : UV;
 	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
+	uint matID : MATID;
 };
 
 typedef VS_Output PS_Input;
@@ -51,15 +53,29 @@ VS_Output main(VS_Input input)
 	output.uv = input.uv;
 	output.normal = input.normal;
 	output.tangent = input.tangent;
+	output.matID = input.materialID;
 	return output;
 }
 
 #section pixel
 
+struct Material
+{
+	uint diffuse;
+	uint normal;
+	uint specular;
+};
+
+ConstantBuffer<Material> materials[];
+Texture2D<float4> textures[];
+sampler s;
+
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
 	
-	output.color = float4(1,1,1,1);
+	Material mat = materials[input.matID];
+
+	output.color = textures[mat.diffuse].Sample(s, input.uv);
 	return output;
 }

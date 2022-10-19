@@ -7,7 +7,8 @@ namespace Engine
 	{
 	public:
 		
-		virtual void SetData(void* data) = 0;
+		virtual void SetData(const void* data) = 0;
+		virtual uint32 GetDescriptorLocation() = 0;
 
 		static Ref<ConstantBuffer> Create(uint32 size);
 	};

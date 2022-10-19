@@ -137,8 +137,8 @@ namespace Engine
 		commandList->SetRenderTarget(m_FrameBuffer);
 		commandList->ClearRenderTarget(m_FrameBuffer);
 
-		Renderer::Build();
 		m_ActiveScene->GetSceneRenderer()->Build();
+		Renderer::Build();
 
 		commandList->Present();
 

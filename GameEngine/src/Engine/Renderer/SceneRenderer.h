@@ -48,7 +48,7 @@ namespace Engine
 
 			std::list<ObjectControlBlock> m_ControlBlocks;
 
-			ObjectControlBlockRef AddInstance(const Math::Mat4& transform);
+			ObjectControlBlockRef AddInstance(const Math::Mat4& transform, Ref<Material> mat);
 			void RemoveInstance(ObjectControlBlockRef controlBlock);
 			
 		};

@@ -148,6 +148,10 @@ namespace Engine
 			}
 
 			Renderer2D::EndScene();
+
+
+			m_SceneRenderer->BeginScene(*mainCamera, cameraTransform);
+			m_SceneRenderer->Invalidate();
 		}
 	}
 

@@ -3,6 +3,7 @@
 #include "Engine/AssetManager/AssetManager.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "ConstantBuffer.h"
 
 namespace Engine
 {
@@ -15,9 +16,19 @@ namespace Engine
 		Ref<Texture2D> specular;
 
 		void Apply();
+		Ref<ConstantBuffer> GetBuffer() { return m_Buffer; }
 
 		static Ref<Material> Create(const fs::path& path = "");
-
 		static bool ValidExtention(const fs::path& ext);
+
+	private:
+		struct CBuffData
+		{
+			uint32 diffuseLoc;
+			uint32 normalLoc;
+			uint32 specularLoc;
+		};
+
+		Ref<ConstantBuffer> m_Buffer;
 	};
 }

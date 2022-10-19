@@ -1,5 +1,15 @@
 Scene: Name
 Entities:
+  - Entity: 2276968180810840774
+    EntityDataComponent:
+      Name: Empty Entity
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Mesh: 15357381481408071768
+      Material: 14846736622411844726
   - Entity: 11693751238415598823
     EntityDataComponent:
       Name: Camera
@@ -18,13 +28,3 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
-  - Entity: 2276968180810840774
-    EntityDataComponent:
-      Name: Empty Entity
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    MeshRendererComponent:
-      Mesh: 5007949505076832925
-      Material: 14846736622411844726

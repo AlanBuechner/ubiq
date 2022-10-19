@@ -14,9 +14,9 @@ namespace Engine
 	}
 
 	// RenderObject
-	SceneRenderer::ObjectControlBlockRef SceneRenderer::RenderObject::AddInstance(const Math::Mat4& transform)
+	SceneRenderer::ObjectControlBlockRef SceneRenderer::RenderObject::AddInstance(const Math::Mat4& transform, Ref<Material> mat)
 	{
-		m_Instances.push_back({ transform, 0 }); // create new instance
+		m_Instances.push_back({ transform, mat->GetBuffer()->GetDescriptorLocation() }); // create new instance
 		m_ControlBlocks.push_front(ObjectControlBlock{*this, (uint32)m_Instances.size()-1}); // create new control block
 		return &m_ControlBlocks.front(); // return control block
 	}
@@ -54,7 +54,7 @@ namespace Engine
 		m_Objects.push_front({}); // create a new object
 		RenderObject& object = m_Objects.front(); // get new object
 		object.m_Mesh = mesh; // set mesh on object
-		return object.AddInstance(transform); // add and return new object
+		return object.AddInstance(transform, material); // add and return new object
 	}
 
 
@@ -108,7 +108,7 @@ namespace Engine
 				for (auto& renderObject : shaderDawSection)
 				{
 					if (renderObject.m_Mesh == mesh) // check if 
-						return renderObject.AddInstance(transform);
+						return renderObject.AddInstance(transform, material);
 				}
 
 				// cant find mesh
