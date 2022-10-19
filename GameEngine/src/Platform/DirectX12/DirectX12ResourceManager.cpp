@@ -179,6 +179,7 @@ namespace Engine
 
 	void DirectX12ResourceManager::RecordCommands(Ref<CommandList> commandList)
 	{
+		std::lock_guard g(m_UploadMutex);
 		struct CopyInfo
 		{
 			ID3D12Resource* dest;

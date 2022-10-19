@@ -61,8 +61,6 @@ namespace Engine
 		m_EditorCamera = EditorCamera();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
-		
-		Renderer::SetAmbientLight({ 0.5f, 0.5f, 0.5f });
 	}
 
 	void EditorLayer::OnDetach()
@@ -225,7 +223,6 @@ namespace Engine
 
 			m_HierarchyPanel.OnImGuiRender();
 			m_ContentPanel.OnImGuiRender();
-
 			
 			UI_Toolbar();
 			UI_Viewport();
@@ -389,7 +386,6 @@ namespace Engine
 
 	void EditorLayer::UI_Toolbar()
 	{
-
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0,2 });
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0,2 });
 		ImGui::PushStyleColor(ImGuiCol_Button, { 0,0,0,0 });

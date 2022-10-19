@@ -96,6 +96,19 @@ namespace Engine {
 				layer->OnUpdate();
 			timer.End();
 
+			// update gui
+			if (m_InEditer)
+			{
+				// render imgui layer
+				timer.Start("ImGui Render");
+				m_ImGuiLayer->Begin();
+				for (Layer* layer : m_LayerStack)
+					layer->OnImGuiRender();
+				Performance::Render();
+				m_ImGuiLayer->End();
+				timer.End();
+			}
+
 			// begin rendering
 			Renderer::BeginFrame();
 
@@ -108,16 +121,7 @@ namespace Engine {
 			}
 
 			if (m_InEditer)
-			{
-				// render imgui layer
-				timer.Start("ImGui Render");
-				m_ImGuiLayer->Begin();
-				for (Layer* layer : m_LayerStack)
-					layer->OnImGuiRender();
-				Performance::Render();
-				m_ImGuiLayer->End();
-				timer.End();
-			}
+				m_ImGuiLayer->Build();
 
 			// end Rendering
 			Renderer::EndFrame();

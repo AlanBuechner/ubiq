@@ -27,6 +27,7 @@ namespace Engine
 
 		void Begin();
 		void End();
+		void Build();
 
 		void SetBlockEvents(bool block) { m_BlockEvents = block; }
 

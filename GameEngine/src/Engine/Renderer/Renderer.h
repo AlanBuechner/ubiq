@@ -40,18 +40,11 @@ namespace Engine
 		static void WaitForRender();
 		static void WaitForSwap();
 
-		static void BeginScene(const Camera& camera, const Math::Mat4& transform);
-		static void BeginScene(const EditorCamera& camera);
-		static void EndScene();
-
 		static void Build();
 
 		static Ref<Texture2D> GetWhiteTexture() { return s_WhiteTexture; }
 		static Ref<Texture2D> GetBlackexture() { return s_BlackTexture; }
 		static Ref<Texture2D> GetBlueTexture() { return s_BlueTexture; }
-
-		static void SubmitPointLight(const PointLight& light);
-		static void SetAmbientLight(Math::Vector3 l) { m_SceneData->ambientLight = l; }
 
 		inline static RendererAPI GetAPI() { return s_Api; }
 		inline static Ref<GraphicsContext> GetContext() { return s_Context; }
@@ -67,25 +60,13 @@ namespace Engine
 		inline static Ref<T> GetMainCommandList() { return std::dynamic_pointer_cast<T>(s_MainCommandList); }
 
 	private:
-
-		static void WaitForRenderFlag();
-
 		static void Render();
 
 	private:
-		struct SceneData
-		{
-			Math::Mat4 ViewMatrix;
-			Math::Mat4 ProjectionMatrix;
-			std::vector<PointLight> PointLights;
-			Math::Vector3 ambientLight;
-		};
-
-		static SceneData* m_SceneData;
-
 		static Ref<GraphicsContext> s_Context;
 		static Ref<CommandQueue> s_MainCommandQueue;
 		static Ref<CommandList> s_MainCommandList;
+		static Ref<CommandQueue> s_MainCopyCommandQueue;
 		static Ref<CommandList> s_MainCopyCommandList;
 
 		static RendererAPI s_Api;
@@ -96,7 +77,7 @@ namespace Engine
 
 		static Flag s_RenderFlag;
 		static Flag s_SwapFlag;
-		static Flag s_RecordFlag;
+		static Flag s_CopyFlag;
 
 		static Ref<Texture2D> s_WhiteTexture;
 		static Ref<Texture2D> s_BlackTexture;
