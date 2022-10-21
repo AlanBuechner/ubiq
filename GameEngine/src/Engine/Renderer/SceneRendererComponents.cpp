@@ -4,6 +4,7 @@
 namespace Engine
 {
 
+	// mesh component
 	MeshRendererComponent::MeshRendererComponent(MeshRendererComponent&& other)
 	{
 		Owner = other.Owner;

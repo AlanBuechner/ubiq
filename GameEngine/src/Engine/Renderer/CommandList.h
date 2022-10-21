@@ -41,6 +41,7 @@ namespace Engine
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, int numInstances = -1) = 0;
 		virtual void Present() = 0;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) = 0;
+		virtual void SignalRecording() = 0;
 
 		virtual void Close() = 0;
 

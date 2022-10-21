@@ -16,9 +16,11 @@ namespace Engine
 		};
 
 		void AddCommandList(Ref<CommandList> commanList, std::vector<Ref<CommandList>> dependencys = {});
+		void RemoveCommandLIst(Ref<CommandList> commandList); // don't forget to remove all dependence 
 		inline void ClearCommandQueue() { m_Commands.clear(); }
 
 		virtual void Execute() = 0;
+		virtual void ExecuteImmediate(std::vector<Ref<CommandList>> commandLists) = 0;
 		virtual bool InExecution() = 0;
 
 		static Ref<CommandQueue> Create(Type type);

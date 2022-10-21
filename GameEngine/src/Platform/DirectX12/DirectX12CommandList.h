@@ -2,6 +2,7 @@
 #include "Engine/Renderer/CommandList.h"
 #include "DirectX12FrameBuffer.h"
 #include "DX.h"
+#include "Engine/Core/Flag.h"
 
 namespace Engine
 {
@@ -35,8 +36,10 @@ namespace Engine
 		virtual void Present() override;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
 		virtual void Close() override;
+		virtual void SignalRecording() override { m_RecordFlag.Signal(); }
 
 		wrl::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return m_CommandList; }
+
 
 	private:
 		wrl::ComPtr<ID3D12CommandAllocator> GetAllocator();
@@ -49,5 +52,7 @@ namespace Engine
 		std::vector<wrl::ComPtr<ID3D12CommandAllocator>> m_Allocators;
 
 		CommandListType m_Type;
+
+		Flag m_RecordFlag;
 	};
 }

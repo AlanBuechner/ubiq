@@ -62,15 +62,15 @@ namespace Engine
 	{
 		const float moveSpeed = 4.0f;
 		const float runSpeed = 8.0f;
-		const float rotSpeed = 8.0f;
+		const float rotSpeed = 0.3f;
 		float speed = moveSpeed;
 
 		const Math::Vector2& mouse{ Input::GetMousePosition().x, Input::GetMousePosition().y };
-		Math::Vector2 delta = (mouse - m_InitialMousePosition) * Time::GetDeltaTime() * rotSpeed;
+		Math::Vector2 delta = (mouse - m_InitialMousePosition) * rotSpeed;
 		m_InitialMousePosition = mouse;
 
 		bool alt = Input::GetKeyDown(KeyCode::ALT);
-		bool shift = Input::GetKeyDown(KeyCode::SHIFT);
+		bool shift = Input::GetKeyDown(KeyCode::LEFT_SHIFT) || Input::GetKeyDown(KeyCode::RIGHT_SHIFT);
 
 		bool rMouse = Input::GetMouseButtonDown(KeyCode::RIGHT_MOUSE);
 		bool lMouse = Input::GetMouseButtonDown(KeyCode::LEFT_MOUSE);

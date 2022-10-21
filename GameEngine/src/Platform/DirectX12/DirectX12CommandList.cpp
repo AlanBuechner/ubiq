@@ -58,10 +58,14 @@ namespace Engine
 			"Faild to Create Commnd List");
 		m_CommandList->SetName(L"Command List");
 		m_CommandList->Close();
+
+		m_RecordFlag.Signal();
 	}
 
 	void DirectX12CommandList::StartRecording(Ref<ShaderPass> startShader)
 	{
+		m_RecordFlag.Wait();
+		m_RecordFlag.Clear();
 		m_RenderTarget = nullptr;
 		wrl::ComPtr<ID3D12CommandAllocator> allocator = GetAllocator();
 		CORE_ASSERT_HRESULT(allocator->Reset(), "Failed to reset command allocator");

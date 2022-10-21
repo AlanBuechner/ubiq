@@ -71,10 +71,6 @@ namespace Engine {
 		CREATE_PROFILE_FUNCTIONI();
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		CORE_INFO("Runing Application");
-
-		// upload all resources from program startup
-		//ResourceManager::SignalCopy();
-		//ResourceManager::WaitForCopy();
 		
 		while (m_Running)
 		{
@@ -128,7 +124,7 @@ namespace Engine {
 			WindowManager::UpdateSwapChainBackBufferIndex();
 
 			// clean assets
-			//m_AssetManager.Clean();
+			m_AssetManager.Clean();
 
 			//Engine::Instrumentor::Get().RecordData(true);
 		}

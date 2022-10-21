@@ -37,7 +37,6 @@ namespace Engine
 		// graphics command queue
 		s_MainCommandQueue = CommandQueue::Create(CommandQueue::Type::Direct);
 		s_MainCommandList = CommandList::Create();
-		s_MainCommandQueue->AddCommandList(s_MainCommandList);
 
 		// copy command queue
 		s_MainCopyCommandQueue = CommandQueue::Create(CommandQueue::Type::Direct); // TODO : change to copy
@@ -114,7 +113,7 @@ namespace Engine
 
 	void Renderer::Render()
 	{
-		Instrumentor::Get().RegisterThread("Render", 2);
+		Instrumentor::Get().RegisterThread("Render", 1);
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		Ref<ResourceManager> resourceManager = s_Context->GetResourceManager();
 		Ref<ResourceDeletionPool> deletionPool = resourceManager->CreateNewDeletionPool();
@@ -131,7 +130,8 @@ namespace Engine
 			// rendering commands
 			s_RenderFlag.Wait();
 			timer.Start("Render");
-			GetMainCommandQueue()->Execute();
+			s_MainCommandQueue->Execute();
+			s_MainCommandQueue->ExecuteImmediate({s_MainCommandList});
 			s_RenderFlag.Clear();
 			timer.End();
 			

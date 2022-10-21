@@ -37,6 +37,21 @@ namespace Engine
 		m_Commands[dcount].push_back(commandList);
 	}
 
+	void CommandQueue::RemoveCommandLIst(Ref<CommandList> commandList)
+	{
+		for (uint32 i = 0; i < m_Commands.size(); i++)
+		{
+			for (uint32 j = 0; j < m_Commands[i].size(); j++)
+			{
+				if (m_Commands[i][j] == commandList)
+				{
+					m_Commands[i][j] = m_Commands[i].back();
+					m_Commands[i].pop_back();
+				}
+			}
+		}
+	}
+
 	Ref<CommandQueue> CommandQueue::Create(Type type)
 	{
 		CREATE_PROFILE_FUNCTIONI();

@@ -12,6 +12,7 @@ namespace Engine
 		DirectX12CommandQueue(Type type);
 
 		virtual void Execute() override;
+		virtual void ExecuteImmediate(std::vector<Ref<CommandList>> commandLists) override;
 		virtual bool InExecution() override;
 
 		inline wrl::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return m_CommandQueue; }
