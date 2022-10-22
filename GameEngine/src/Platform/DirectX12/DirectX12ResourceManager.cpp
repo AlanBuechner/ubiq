@@ -170,6 +170,19 @@ namespace Engine
 		m_UploadQueue.push(uploadData);
 	}
 
+	void DirectX12ResourceManager::CopyBuffer(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 size, D3D12_RESOURCE_STATES state)
+	{
+		UploadData uploadData;
+		uploadData.size = size;
+		uploadData.destOffset = 0;
+		uploadData.destResource = dest;
+		uploadData.srcOffset = 0;
+		uploadData.uploadResource = src;
+		uploadData.state = state;
+
+		m_UploadQueue.push(uploadData);
+	}
+
 	Ref<ResourceDeletionPool> DirectX12ResourceManager::CreateNewDeletionPool()
 	{
 		Ref<ResourceDeletionPool> pool = m_DeletionPool;

@@ -43,7 +43,7 @@ namespace Engine
 
 		struct RenderObject
 		{
-			std::vector<InstanceData> m_Instances;
+			Ref<InstanceBuffer> m_Instances = InstanceBuffer::Create(sizeof(InstanceData), 10); // default to capacity of 10
 			Ref<Mesh> m_Mesh;
 
 			std::list<ObjectControlBlock> m_ControlBlocks;

@@ -110,7 +110,7 @@ namespace Engine
 		if (s_Data.QuadInstanceBuffer->GetCount() != s_Data.Instances.capacity())
 			s_Data.QuadInstanceBuffer = InstanceBuffer::Create(sizeof(QuadInstance), (uint32)s_Data.Instances.capacity());
 		s_Data.QuadInstanceBuffer->SetData(0, (uint32)s_Data.Instances.size(), s_Data.Instances.data());
-
+		s_Data.QuadInstanceBuffer->Apply();
 	}
 
 	void Renderer2D::Build()

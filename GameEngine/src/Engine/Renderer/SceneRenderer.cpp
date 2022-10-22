@@ -10,14 +10,17 @@ namespace Engine
 	// ObjectControlBlock
 	void SceneRenderer::ObjectControlBlock::UpdateTransform(const Math::Mat4& transform)
 	{
-		m_Object.m_Instances[m_InstanceLocation].m_Transform = transform;
+		InstanceData data = m_Object.m_Instances->Get<InstanceData>(m_InstanceLocation);
+		data.m_Transform = transform;
+		m_Object.m_Instances->SetData(m_InstanceLocation, 1, &data);
 	}
 
 	// RenderObject
 	SceneRenderer::ObjectControlBlockRef SceneRenderer::RenderObject::AddInstance(const Math::Mat4& transform, Ref<Material> mat)
 	{
-		m_Instances.push_back({ transform, mat->GetBuffer()->GetDescriptorLocation() }); // create new instance
-		m_ControlBlocks.push_front(ObjectControlBlock{*this, (uint32)m_Instances.size()-1}); // create new control block
+		InstanceData data{ transform, mat->GetBuffer()->GetDescriptorLocation() };
+		m_Instances->PushBack(1, &data); // create new instance
+		m_ControlBlocks.push_front(ObjectControlBlock{*this, (uint32)m_Instances->GetCount()-1}); // create new control block
 		return &m_ControlBlocks.front(); // return control block
 	}
 
@@ -27,14 +30,15 @@ namespace Engine
 			return;
 
 		// find control block for last instance
-		uint32 swapIndex = (uint32)m_Instances.size() - 1; // last index in the instance buffer
+		uint32 swapIndex = (uint32)m_Instances->GetCount() - 1; // last index in the instance buffer
 		for (auto& block : m_ControlBlocks)
 		{
 			if (block.m_InstanceLocation == swapIndex)
 			{
 				// swap the buffer data
-				std::swap(m_Instances[controlBlock->m_InstanceLocation], m_Instances[block.m_InstanceLocation]);
-				m_Instances.pop_back(); // remove the last buffer
+				m_Instances->SetData(controlBlock->m_InstanceLocation, 1, &m_Instances->Get<InstanceData>(block.m_InstanceLocation));
+				//std::swap(m_Instances[controlBlock->m_InstanceLocation], m_Instances[block.m_InstanceLocation]);
+				m_Instances->PopBack(); // remove the last buffer
 
 				block.m_InstanceLocation = controlBlock->m_InstanceLocation; // swap the instance locations on the control blocks
 
@@ -84,13 +88,15 @@ namespace Engine
 			m_DrawCommands.reserve(shaderDawSection.m_Objects.size());
 			for (auto& renderObject : shaderDawSection)
 			{
-				if (!renderObject.m_Instances.empty())
+				if (!renderObject.m_Instances->Empty())
 				{
 					DrawCommand cmd;
 					cmd.m_Mesh = renderObject.m_Mesh;
 					cmd.m_Shader = shaderDawSection.m_Shader;
-					cmd.m_InstanceBuffer = InstanceBuffer::Create(sizeof(InstanceData), (uint32)renderObject.m_Instances.size());
-					cmd.m_InstanceBuffer->SetData(0, (uint32)renderObject.m_Instances.size(), renderObject.m_Instances.data());
+					cmd.m_InstanceBuffer = renderObject.m_Instances;
+					const InstanceData* instances = &renderObject.m_Instances->Get<InstanceData>(0);
+					cmd.m_InstanceBuffer->Apply();
+
 					m_DrawCommands.push_back(cmd);
 				}
 			}
