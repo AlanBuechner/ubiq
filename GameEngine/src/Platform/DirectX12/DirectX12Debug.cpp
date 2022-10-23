@@ -56,7 +56,7 @@ namespace Engine
 		//m_D3DInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
 
 		// DXGI info queue
-		if (SUCCEEDED(DXGIGetDebugInterface1(1, IID_PPV_ARGS(m_DXGIInfoQueue.GetAddressOf()))))
+		if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(m_DXGIInfoQueue.GetAddressOf()))))
 		{
 			m_DXGIInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_ERROR, true);
 			m_DXGIInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_CORRUPTION, true);

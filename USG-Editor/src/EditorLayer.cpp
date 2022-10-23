@@ -97,9 +97,6 @@ namespace Engine
 
 		m_EditorCamera.OnUpdate();
 
-		// setup renderer
-		Renderer2D::ResetStats();
-
 		// update scene
 		if (m_SceneState == SceneState::Edit)
 		{
@@ -130,15 +127,7 @@ namespace Engine
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		timer.Start("Recored Commands");
 
-		Ref<CommandList> commandList = Renderer::GetMainCommandList();
-
-		commandList->SetRenderTarget(m_FrameBuffer);
-		commandList->ClearRenderTarget(m_FrameBuffer);
-
-		m_ActiveScene->GetSceneRenderer()->Build();
-		Renderer::Build();
-
-		commandList->Present();
+		m_ActiveScene->GetSceneRenderer()->Build(m_FrameBuffer);
 
 		timer.End();
 	}
@@ -326,7 +315,6 @@ namespace Engine
 
 	void EditorLayer::DrawCustomGizmo()
 	{
-
 		// draw grid lines
 		LineRenderer::BeginScene(m_EditorCamera);
 		{

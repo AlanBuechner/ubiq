@@ -86,12 +86,6 @@ namespace Engine {
 			SendInputBuffer(); // sent the input buffer through the layer stack
 			Cursor::Update();
 
-			// update the layer stack
-			timer.Start("Update Layers");
-			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
-			timer.End();
-
 			// update gui
 			if (m_InEditer)
 			{
@@ -104,6 +98,12 @@ namespace Engine {
 				m_ImGuiLayer->End();
 				timer.End();
 			}
+
+			// update the layer stack
+			timer.Start("Update Layers");
+			for (Layer* layer : m_LayerStack)
+				layer->OnUpdate();
+			timer.End();
 
 			// begin rendering
 			Renderer::BeginFrame();

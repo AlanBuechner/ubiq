@@ -3,6 +3,7 @@
 #include <Engine/Math/Math.h>
 #include "Texture.h"
 #include "SubTexture.h"
+#include "CommandList.h"
 
 namespace Engine
 {
@@ -24,7 +25,7 @@ namespace Engine
 		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
 
-		static void Build();
+		static void Build(Ref<CommandList> commandList);
 
 		// draw colored quad
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, int entityID = -1);

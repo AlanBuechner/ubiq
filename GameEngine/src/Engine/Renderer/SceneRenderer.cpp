@@ -66,45 +66,43 @@ namespace Engine
 	SceneRenderer::SceneRenderer()
 	{
 		m_CameraBuffer = ConstantBuffer::Create(sizeof(Math::Mat4));
+
+		m_CommandList = CommandList::Create(CommandList::Direct);
+		Renderer::GetMainCommandQueue()->AddCommandList(m_CommandList);
 	}
 
-	void SceneRenderer::BeginScene(const Camera& camera, const Math::Mat4& transform)
+	void SceneRenderer::SetMainCamera(const Camera& camera, const Math::Mat4& transform)
 	{
 		m_ViewPorj = camera.GetProjectionMatrix() * Math::Inverse(transform);
 		m_CameraBuffer->SetData(&m_ViewPorj);
 	}
 
-	void SceneRenderer::BeginScene(const EditorCamera& camera)
+	void SceneRenderer::SetMainCamera(const EditorCamera& camera)
 	{
 		m_ViewPorj = camera.GetViewProjection();
 		m_CameraBuffer->SetData(&m_ViewPorj);
 	}
 
-	void SceneRenderer::Invalidate()
+	void SceneRenderer::UpdateBuffers()
 	{
-		m_DrawCommands.clear();
 		for (auto& shaderDawSection : m_ShaderDrawSection)
 		{
-			m_DrawCommands.reserve(shaderDawSection.m_Objects.size());
 			for (auto& renderObject : shaderDawSection)
 			{
-				if (!renderObject.m_Instances->Empty())
-				{
-					DrawCommand cmd;
-					cmd.m_Mesh = renderObject.m_Mesh;
-					cmd.m_Shader = shaderDawSection.m_Shader;
-					cmd.m_InstanceBuffer = renderObject.m_Instances;
-					const InstanceData* instances = &renderObject.m_Instances->Get<InstanceData>(0);
-					cmd.m_InstanceBuffer->Apply();
-
-					m_DrawCommands.push_back(cmd);
-				}
+				//if (!renderObject.m_Instances->Empty())
+					renderObject.m_Instances->Apply();
 			}
 		}
 	}
 
+	void SceneRenderer::Invalidate()
+	{
+		m_Invalid = true;
+	}
+
 	SceneRenderer::ObjectControlBlockRef SceneRenderer::Submit(Ref<Mesh> mesh, Ref<Material> material, const Math::Mat4& transform)
 	{
+		Invalidate();
 		// find the correct shader
 		for (auto& shaderDawSection : m_ShaderDrawSection)
 		{
@@ -132,18 +130,54 @@ namespace Engine
 
 	void SceneRenderer::RemoveObject(ObjectControlBlockRef controlBlock)
 	{
+		Invalidate();
 		if(controlBlock)
 			controlBlock->m_Object.RemoveInstance(controlBlock);
 	}
 
-	void SceneRenderer::Build()
+	void SceneRenderer::Build(Ref<FrameBuffer> frameBuffer)
 	{
-		Ref<CommandList> commandList = Renderer::GetMainCommandList();
-		for (DrawCommand& cmd : m_DrawCommands)
+		if (m_Invalid)
 		{
-			commandList->SetShader(cmd.m_Shader->GetPass("main"));
-			commandList->SetConstantBuffer(0, m_CameraBuffer);
-			commandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
+			CREATE_PROFILE_SCOPEI("Re Build command lists");
+			m_Invalid = false;
+
+			// compile commands
+			m_DrawCommands.clear();
+			for (auto& shaderDawSection : m_ShaderDrawSection)
+			{
+				m_DrawCommands.reserve(shaderDawSection.m_Objects.size());
+				for (auto& renderObject : shaderDawSection)
+				{
+					if (!renderObject.m_Instances->Empty())
+					{
+						DrawCommand cmd;
+						cmd.m_Mesh = renderObject.m_Mesh;
+						cmd.m_Shader = shaderDawSection.m_Shader;
+						cmd.m_InstanceBuffer = renderObject.m_Instances;
+
+						m_DrawCommands.push_back(cmd);
+					}
+				}
+			}
+
+			// record commands
+			m_CommandList->StartRecording();
+
+			m_CommandList->SetRenderTarget(frameBuffer);
+			m_CommandList->ClearRenderTarget(frameBuffer);
+
+			for (DrawCommand& cmd : m_DrawCommands)
+			{
+				m_CommandList->SetShader(cmd.m_Shader->GetPass("main"));
+				m_CommandList->SetConstantBuffer(0, m_CameraBuffer);
+				m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
+			}
+
+			Renderer::Build(m_CommandList);
+
+			m_CommandList->Present();
+			m_CommandList->Close();
 		}
 	}
 

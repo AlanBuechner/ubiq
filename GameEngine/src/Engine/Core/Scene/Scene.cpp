@@ -86,8 +86,8 @@ namespace Engine
 
 		// render 3d models
 		{
-			m_SceneRenderer->BeginScene(camera);
-			m_SceneRenderer->Invalidate();
+			m_SceneRenderer->SetMainCamera(camera);
+			m_SceneRenderer->UpdateBuffers();
 		}
 	}
 
@@ -150,8 +150,8 @@ namespace Engine
 			Renderer2D::EndScene();
 
 
-			m_SceneRenderer->BeginScene(*mainCamera, cameraTransform);
-			m_SceneRenderer->Invalidate();
+			m_SceneRenderer->SetMainCamera(*mainCamera, cameraTransform);
+			m_SceneRenderer->UpdateBuffers();
 		}
 	}
 

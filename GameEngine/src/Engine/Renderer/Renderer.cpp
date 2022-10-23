@@ -105,10 +105,10 @@ namespace Engine
 		s_SwapFlag.Wait();
 	}
 
-	void Renderer::Build()
+	void Renderer::Build(Ref<CommandList> commandList)
 	{
-		Renderer2D::Build();
-		LineRenderer::Build();
+		Renderer2D::Build(commandList);
+		LineRenderer::Build(commandList);
 	}
 
 	void Renderer::Render()

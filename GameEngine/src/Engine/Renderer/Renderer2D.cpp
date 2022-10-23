@@ -32,22 +32,19 @@ namespace Engine
 
 	struct Renderer2DData
 	{
-		static const uint32 MaxQuades = 1;
+		static const uint32 MaxQuades = 100;
 		Ref<InstanceBuffer> QuadInstanceBuffer;
-		std::vector<QuadInstance> Instances;
 
 		Ref<Mesh> QuadMesh;
 		Ref<Shader> SpriteShader;
-		Ref<Texture2D> WhiteTexture;
 
 		Ref<ConstantBuffer> Camera;
 
 		Renderer2D::Statistics Stats;
 
-		QuadInstance& GetInstanceLocation()
+		void AddInstance(const QuadInstance& instance)
 		{
-			Instances.push_back({});
-			return Instances.back();
+			QuadInstanceBuffer->PushBack(1, &instance);
 		}
 	};
 
@@ -76,11 +73,6 @@ namespace Engine
 
 		// create instance data
 		s_Data.QuadInstanceBuffer = InstanceBuffer::Create(sizeof(QuadInstance), s_Data.MaxQuades);
-		s_Data.Instances.reserve(s_Data.MaxQuades);
-
-		s_Data.WhiteTexture = Texture2D::Create(1, 1);
-		uint32 textureData = 0xffffffff;
-		s_Data.WhiteTexture->SetData(&textureData);
 
 		s_Data.Camera = ConstantBuffer::Create(sizeof(Math::Mat4));
 	}
@@ -88,7 +80,6 @@ namespace Engine
 	void Renderer2D::Destroy()
 	{
 		// destroy all gpu assets
-		s_Data.WhiteTexture.reset();
 		s_Data.QuadInstanceBuffer.reset();
 		s_Data.Camera.reset();
 	}
@@ -107,23 +98,18 @@ namespace Engine
 
 	void Renderer2D::EndScene()
 	{
-		if (s_Data.QuadInstanceBuffer->GetCount() != s_Data.Instances.capacity())
-			s_Data.QuadInstanceBuffer = InstanceBuffer::Create(sizeof(QuadInstance), (uint32)s_Data.Instances.capacity());
-		s_Data.QuadInstanceBuffer->SetData(0, (uint32)s_Data.Instances.size(), s_Data.Instances.data());
 		s_Data.QuadInstanceBuffer->Apply();
 	}
 
-	void Renderer2D::Build()
+	void Renderer2D::Build(Ref<CommandList> commandList)
 	{
-		if (!s_Data.Instances.empty())
+		/*if (!s_Data.QuadInstanceBuffer->Empty())
 		{
-			Ref<CommandList> commandList = Renderer::GetMainCommandList();
-
 			commandList->SetShader(s_Data.SpriteShader->GetPass("main"));
 			commandList->SetConstantBuffer(0, s_Data.Camera);
-			commandList->DrawMesh(s_Data.QuadMesh, s_Data.QuadInstanceBuffer, (uint32)s_Data.Instances.size());
-		}
-		s_Data.Instances.clear();
+			commandList->DrawMesh(s_Data.QuadMesh, s_Data.QuadInstanceBuffer, s_Data.QuadInstanceBuffer->GetCount());
+		}*/
+		s_Data.QuadInstanceBuffer->Clear();
 	}
 
 	void Renderer2D::ResetStats()
@@ -140,27 +126,27 @@ namespace Engine
 	// draw colored quad --------------------------------------
 	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, color, s_Data.WhiteTexture, { 1,1 }, { 0,0 }, entityID);
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, 0.0f, color, Renderer::GetWhiteTexture(), { 1,1 }, { 0,0 }, entityID);
 	}
 
 	void Renderer2D::DrawQuad(const Math::Vector2& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, int entityID)
 	{
-		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, s_Data.WhiteTexture, { 1,1 }, { 0,0 }, entityID);
+		DrawQuadImpl({ position.x, position.y, 0.0f }, size, rotation, color, Renderer::GetWhiteTexture(), { 1,1 }, { 0,0 }, entityID);
 	}
 
 	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, int entityID)
 	{
-		DrawQuadImpl(position, size, 0.0f, color, s_Data.WhiteTexture, { 1,1 }, { 0,0 }, entityID);
+		DrawQuadImpl(position, size, 0.0f, color, Renderer::GetWhiteTexture(), { 1,1 }, { 0,0 }, entityID);
 	}
 
 	void Renderer2D::DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, int entityID)
 	{
-		DrawQuadImpl(position, size, rotation, color, s_Data.WhiteTexture, { 1,1 }, { 0,0 }, entityID);
+		DrawQuadImpl(position, size, rotation, color, Renderer::GetWhiteTexture(), { 1,1 }, { 0,0 }, entityID);
 	}
 
 	void Renderer2D::DrawQuad(const Math::Mat4& transform, const Math::Vector4& color, int entityID)
 	{
-		DrawQuadImpl(transform, color, s_Data.WhiteTexture, { 1,1 }, { 0,0 }, entityID);
+		DrawQuadImpl(transform, color, Renderer::GetWhiteTexture(), { 1,1 }, { 0,0 }, entityID);
 	}
 
 
@@ -279,7 +265,7 @@ namespace Engine
 	// draw sprite component
 	void Renderer2D::DrawSprite(const Math::Mat4& transform, SpriteRendererComponent& src, int entityID)
 	{
-		DrawQuadImpl(transform, src.Color, (src.Texture ? src.Texture : s_Data.WhiteTexture), { 1,1 }, { 0,0 }, entityID);
+		DrawQuadImpl(transform, src.Color, (src.Texture ? src.Texture : Renderer::GetWhiteTexture()), { 1,1 }, { 0,0 }, entityID);
 	}
 
 
@@ -296,13 +282,14 @@ namespace Engine
 
 	void Renderer2D::DrawQuadImpl(const Math::Mat4& transform, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2& uvSize, const Math::Vector2& uvPosition, int entityID)
 	{
-		QuadInstance& i = s_Data.GetInstanceLocation();
+		QuadInstance i;
 		i.Transform = transform;
 		i.Color = color;
 		i.TextureID = texture->GetDescriptorLocation();
 		i.EntityID = entityID;
 		i.UVSize = uvSize;
 		i.UVPosition = uvPosition;
+		s_Data.AddInstance(i);
 	}
 
 }

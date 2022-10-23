@@ -13,6 +13,7 @@ namespace Engine
 		virtual void SetData(uint32 start, uint32 count, const void* data) override;
 		virtual void PushBack(uint32 count, const void* data) override;
 		virtual void PopBack() override { m_UploadCount--; }
+		virtual void Clear() override { m_UploadCount = 0; }
 		virtual void Apply() override;
 		virtual void* At(uint32 index) override;
 		virtual uint32 GetCount() override { return m_UploadCount; }

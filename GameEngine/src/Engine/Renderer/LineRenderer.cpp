@@ -73,16 +73,14 @@ namespace Engine
 		s_LineData.m_Mesh->SetIndices(s_LineData.Indices.data(), (uint32)s_LineData.Indices.size());
 	}
 
-	void LineRenderer::Build()
+	void LineRenderer::Build(Ref<CommandList> commandList)
 	{
-		if (!s_LineData.Vertices.empty())
+		/*if (!s_LineData.Vertices.empty())
 		{
-			Ref<CommandList> commandList = Renderer::GetMainCommandList();
-
 			commandList->SetShader(s_LineData.LineShader->GetPass("main"));
 			commandList->SetConstantBuffer(0, s_LineData.Camera);
 			commandList->DrawMesh(s_LineData.m_Mesh, s_LineData.Instances);
-		}
+		}*/
 
 		s_LineData.Vertices.clear();
 		s_LineData.Indices.clear();

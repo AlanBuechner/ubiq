@@ -1,5 +1,6 @@
 #pragma once
-#include "glm/glm.hpp"
+#include "Engine/Core/Core.h"
+#include "CommandList.h"
 
 namespace Engine
 {
@@ -34,7 +35,7 @@ namespace Engine
 		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
 
-		static void Build();
+		static void Build(Ref<CommandList> commandList);
 
 	public:
 

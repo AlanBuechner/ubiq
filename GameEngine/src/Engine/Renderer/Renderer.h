@@ -40,7 +40,7 @@ namespace Engine
 		static void WaitForRender();
 		static void WaitForSwap();
 
-		static void Build();
+		static void Build(Ref<CommandList> commandList);
 
 		static Ref<Texture2D> GetWhiteTexture() { return s_WhiteTexture; }
 		static Ref<Texture2D> GetBlackexture() { return s_BlackTexture; }

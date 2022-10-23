@@ -6,6 +6,8 @@
 #include "Camera.h"
 #include "EditorCamera.h"
 #include "ConstantBuffer.h"
+#include "CommandList.h"
+#include "FrameBuffer.h"
 #include <vector>
 #include <list>
 
@@ -71,14 +73,15 @@ namespace Engine
 	public:
 		SceneRenderer();
 
-		void BeginScene(const Camera& camera, const Math::Mat4& transform);
-		void BeginScene(const EditorCamera& camera);
+		void SetMainCamera(const Camera& camera, const Math::Mat4& transform);
+		void SetMainCamera(const EditorCamera& camera);
+		void UpdateBuffers();
 		void Invalidate();
 
 		ObjectControlBlockRef Submit(Ref<Mesh> mesh, Ref<Material> material, const Math::Mat4& transform);
 		void RemoveObject(ObjectControlBlockRef controlBlock);
 
-		void Build();
+		void Build(Ref<FrameBuffer> framBuffer);
 
 		static Ref<SceneRenderer> Create();
 
@@ -87,7 +90,10 @@ namespace Engine
 
 		std::vector<ShaderDrawSection> m_ShaderDrawSection;
 
+		Ref<CommandList> m_CommandList;
+
 		Math::Mat4 m_ViewPorj;
 		Ref<ConstantBuffer> m_CameraBuffer;
+		bool m_Invalid = true;
 	};
 }
