@@ -11,8 +11,12 @@ namespace Engine
 		m_OutputNode = CreateRef<OutputNode>(*this);
 		m_Nodes.push_back(m_OutputNode);
 
+		Ref<ShaderPassNode> depthPass = CreateRef<ShaderPassNode>(*this, "depth");
+		depthPass->SetRenderTarget({ m_OutputNode, m_OutputNode->m_Buffer });
+		m_Nodes.push_back(depthPass);
+
 		Ref<ShaderPassNode> mainPass = CreateRef<ShaderPassNode>(*this, "main");
-		mainPass->SetRenderTarget({ m_OutputNode, m_OutputNode->m_Buffer });
+		mainPass->SetRenderTarget({ depthPass, m_OutputNode->m_Buffer });
 		m_Nodes.push_back(mainPass);
 	}
 

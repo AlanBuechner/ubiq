@@ -116,6 +116,7 @@ namespace Engine
 
 		m_ActiveScene->GetSceneRenderer()->Build();
 		Renderer::Build(nullptr); // TODO : re make 2d and line renderers
+		Renderer::GetMainCommandList()->Present(m_ActiveScene->GetSceneRenderer()->GetRenderTarget()); // present the render target
 
 		timer.End();
 	}

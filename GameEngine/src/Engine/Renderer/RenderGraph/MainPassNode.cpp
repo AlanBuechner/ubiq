@@ -29,7 +29,8 @@ namespace Engine
 		
 		m_CommandList->StartRecording();
 		m_CommandList->SetRenderTarget(renderTarget);
-		m_CommandList->ClearRenderTarget();
+		if(!renderTarget->Cleared())
+			m_CommandList->ClearRenderTarget();
 
 		for (auto& cmd : scene.m_DrawCommands)
 		{
@@ -38,7 +39,6 @@ namespace Engine
 			m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
 		}
 
-		m_CommandList->Present();
 		m_CommandList->Close();
 	}
 }

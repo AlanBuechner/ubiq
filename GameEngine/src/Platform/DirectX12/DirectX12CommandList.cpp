@@ -111,7 +111,8 @@ namespace Engine
 				rendertargetHandles[i] = m_RenderTarget->GetAttachmentRenderHandle(i);
 			}
 		}
-		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
+		if(m_RenderTarget->GetState() == FrameBuffer::RenderTarget)
+			m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
 		m_CommandList->OMSetRenderTargets((uint32)rendertargetHandles.size(), (D3D12_CPU_DESCRIPTOR_HANDLE*)rendertargetHandles.data(), FALSE, depthHandle ? (D3D12_CPU_DESCRIPTOR_HANDLE*)&depthHandle : nullptr);
 		LONG width = (LONG)m_RenderTarget->GetSpecification().Width;
 		LONG height = (LONG)m_RenderTarget->GetSpecification().Height;
@@ -119,6 +120,8 @@ namespace Engine
 		m_CommandList->RSSetViewports(1, &viewport);
 		const D3D12_RECT r = { 0, 0, width, height };
 		m_CommandList->RSSetScissorRects(1, &r);
+
+		m_RenderTarget->SetState(FrameBuffer::RenderTarget);
 	}
 
 	void DirectX12CommandList::ClearRenderTarget()
@@ -162,6 +165,8 @@ namespace Engine
 			m_CommandList->ClearDepthStencilView(handle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, color.r, (uint8)color.g, 0, nullptr);
 		else
 			m_CommandList->ClearRenderTargetView(handle, (float*)&color, 0, nullptr);
+
+		std::dynamic_pointer_cast<DirectX12FrameBuffer>(frameBuffer)->Clear();
 	}
 
 
@@ -232,26 +237,29 @@ namespace Engine
 		m_CommandList->DrawIndexedInstanced(ib->GetCount(), numInstances, 0, 0, 0);
 	}
 
-	void DirectX12CommandList::Present()
+	void DirectX12CommandList::Present(Ref<FrameBuffer> fb)
 	{
-		if (m_RenderTarget)
+		if (fb)
 		{
-			bool swapChainTarget = m_RenderTarget->GetSpecification().SwapChainTarget;
-			std::vector<FrameBufferTextureSpecification> attachments = m_RenderTarget->GetSpecification().Attachments.Attachments;
+			Ref<DirectX12FrameBuffer> dxfb = std::dynamic_pointer_cast<DirectX12FrameBuffer>(fb);
+			bool swapChainTarget = dxfb->GetSpecification().SwapChainTarget;
+			std::vector<FrameBufferTextureSpecification> attachments = dxfb->GetSpecification().Attachments.Attachments;
 			std::vector<D3D12_RESOURCE_BARRIER> barriers(attachments.size());
 			for (uint32 i = 0; i < barriers.size(); i++)
 			{
 				if (attachments[i].IsDepthStencil())
-					barriers[i] = Transition(m_RenderTarget->GetBuffer(i).Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_DEPTH_READ);
+					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_DEPTH_READ);
 				else
 				{
 					D3D12_RESOURCE_STATES afterState = swapChainTarget ? D3D12_RESOURCE_STATE_PRESENT : D3D12_RESOURCE_STATE_COMMON;
-					barriers[i] = Transition(m_RenderTarget->GetBuffer(i).Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, afterState);
+					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, afterState);
 				}
 			}
 			m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
+			dxfb->SetState(FrameBuffer::Common);
 		}
-		m_RenderTarget = nullptr;
+		if(fb == m_RenderTarget)
+			m_RenderTarget = nullptr;
 	}
 
 	void DirectX12CommandList::ExecuteBundle(Ref<CommandList> commandList)

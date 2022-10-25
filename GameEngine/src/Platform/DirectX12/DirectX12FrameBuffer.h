@@ -27,10 +27,18 @@ namespace Engine
 		wrl::ComPtr<ID3D12Resource>& GetBuffer(uint32 i) { return m_Buffers[i]; }
 		void SetDescriptorHandle(uint32 i, DirectX12DescriptorHandle handle) { CORE_ASSERT(i < m_TargetHandles.size(), ""); m_TargetHandles[i] = handle; }
 
+		virtual State GetState() override { return m_State; }
+		virtual bool Cleared() override { return m_Cleared; }
+
+		void SetState(State state) { m_State = state; } // only gets called by command list
+		void Clear() { m_Cleared = true; } // only gets called by command list
 	private:
 		void CreateAttachment(uint32 i);
 
 	private:
+		State m_State;
+		bool m_Cleared = false;
+
 		std::vector<wrl::ComPtr<ID3D12Resource>> m_Buffers;
 		FrameBufferSpecification m_Spec;
 

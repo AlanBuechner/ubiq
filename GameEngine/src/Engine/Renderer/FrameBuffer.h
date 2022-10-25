@@ -62,6 +62,13 @@ namespace Engine
 	{
 	public:
 
+		enum State
+		{
+			RenderTarget,
+			SRV,
+			Common,
+		};
+
 		virtual ~FrameBuffer() = default;
 
 		virtual void Resize(uint32 width, uint32 height) = 0;
@@ -72,6 +79,9 @@ namespace Engine
 
 		virtual const FrameBufferSpecification& GetSpecification() const = 0;
 		virtual bool HasDepthAttachment() const = 0;
+
+		virtual State GetState() = 0;
+		virtual bool Cleared() = 0;
 
 		static Ref<FrameBuffer> Create(const FrameBufferSpecification& spec);
 	};

@@ -11,6 +11,26 @@ namespace Engine
 		m_Graph(graph)
 	{}
 
+	// frame buffer var
+	FrameBufferVar::FrameBufferVar(Ref<RenderGraphNode> input, Ref<FrameBuffer> var) :
+		m_Input(input), m_Var(var)
+	{}
+
+	Ref<FrameBuffer> FrameBufferVar::GetVar()
+	{
+		if (m_Input)
+			m_Input->Build();
+		return m_Var;
+	}
+
+	void RenderGraphNode::Build()
+	{
+		if (!m_Built)
+			BuildImpl();
+		m_Built = true;
+	}
+
+
 	// output node
 	OutputNode::OutputNode(RenderGraph& graph) :
 		RenderGraphNode(graph)
@@ -42,25 +62,6 @@ namespace Engine
 	void FrameBufferNode::OnViewportResize(uint32 width, uint32 height)
 	{
 		m_Buffer->Resize(width, height);
-	}
-
-	// frame buffer var
-	FrameBufferVar::FrameBufferVar(Ref<RenderGraphNode> input, Ref<FrameBuffer> var) :
-		m_Input(input), m_Var(var)
-	{}
-
-	Ref<FrameBuffer> FrameBufferVar::GetVar()
-	{
-		if(m_Input)
-			m_Input->Build();
-		return m_Var;
-	}
-
-	void RenderGraphNode::Build()
-	{
-		if(!m_Built)
-			BuildImpl();
-		m_Built = true;
 	}
 
 }

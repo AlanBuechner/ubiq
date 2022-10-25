@@ -33,7 +33,7 @@ namespace Engine
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
 		virtual void SetTexture(uint32 index, Ref<Texture> texture) override;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, int numInstances) override;
-		virtual void Present() override;
+		virtual void Present(Ref<FrameBuffer> fb = nullptr) override;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
 		virtual void Close() override;
 		virtual void SignalRecording() override { m_RecordFlag.Signal(); }

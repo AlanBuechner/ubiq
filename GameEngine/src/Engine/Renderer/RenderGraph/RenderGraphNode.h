@@ -9,6 +9,7 @@ namespace Engine
 {
 	class RenderGraph;
 
+	// base node
 	class RenderGraphNode
 	{
 	public:
@@ -29,26 +30,7 @@ namespace Engine
 		RenderGraph& m_Graph;
 	};
 
-	class OutputNode : public RenderGraphNode
-	{
-	public:
-		OutputNode(RenderGraph& graph);
-
-		virtual void OnViewportResize(uint32 width, uint32 height) override;
-
-		Ref<FrameBuffer> m_Buffer;
-	};
-
-	class FrameBufferNode : public RenderGraphNode
-	{
-	public:
-		FrameBufferNode(RenderGraph& graph);
-		
-		virtual void OnViewportResize(uint32 width, uint32 height) override;
-
-		Ref<FrameBuffer> m_Buffer;
-	};
-
+	// vars
 	class FrameBufferVar
 	{
 	public:
@@ -60,5 +42,28 @@ namespace Engine
 	private:
 		Ref<RenderGraphNode> m_Input;
 		Ref<FrameBuffer> m_Var;
+	};
+
+	// nodes
+	// output node
+	class OutputNode : public RenderGraphNode
+	{
+	public:
+		OutputNode(RenderGraph& graph);
+
+		virtual void OnViewportResize(uint32 width, uint32 height) override;
+
+		Ref<FrameBuffer> m_Buffer;
+	};
+
+	// frame buffer node
+	class FrameBufferNode : public RenderGraphNode
+	{
+	public:
+		FrameBufferNode(RenderGraph& graph);
+		
+		virtual void OnViewportResize(uint32 width, uint32 height) override;
+
+		Ref<FrameBuffer> m_Buffer;
 	};
 }

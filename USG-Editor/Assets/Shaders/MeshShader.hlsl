@@ -6,6 +6,10 @@ passes = {
 		VS = vertex;
 		PS = pixel; 
 	};
+	depth = {
+		VS = vertex;
+		PS = depth;
+	};
 };
 
 #section common
@@ -78,4 +82,22 @@ PS_Output main(PS_Input input)
 
 	output.color = textures[mat.diffuse].Sample(s, input.uv);
 	return output;
+}
+
+#section depth
+
+struct Material
+{
+	uint diffuse;
+	uint normal;
+	uint specular;
+};
+
+ConstantBuffer<Material> materials[];
+Texture2D<float4> textures[];
+sampler s;
+
+void main(PS_Input input)
+{
+
 }
