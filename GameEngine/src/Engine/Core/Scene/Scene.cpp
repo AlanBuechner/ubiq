@@ -169,6 +169,8 @@ namespace Engine
 				cameraComponent.Camera.SetViewportSize(width, height);
 			}
 		}
+
+		m_SceneRenderer->OnViewportResize(width, height);
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)

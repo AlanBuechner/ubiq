@@ -67,8 +67,13 @@ namespace Engine
 	{
 		m_CameraBuffer = ConstantBuffer::Create(sizeof(Math::Mat4));
 
-		m_CommandList = CommandList::Create(CommandList::Direct);
-		Renderer::GetMainCommandQueue()->AddCommandList(m_CommandList);
+		m_RenderGraph = CreateRef<RenderGraph>();
+		m_RenderGraph->AddToCommandQueue();
+	}
+
+	void SceneRenderer::OnViewportResize(uint32 width, uint32 height)
+	{
+		m_RenderGraph->OnViewportResize(width, height);
 	}
 
 	void SceneRenderer::SetMainCamera(const Camera& camera, const Math::Mat4& transform)
@@ -135,18 +140,21 @@ namespace Engine
 			controlBlock->m_Object.RemoveInstance(controlBlock);
 	}
 
-	void SceneRenderer::Build(Ref<FrameBuffer> frameBuffer)
+	void SceneRenderer::Build()
 	{
 		if (m_Invalid)
 		{
 			CREATE_PROFILE_SCOPEI("Re Build command lists");
 			m_Invalid = false;
 
+			SceneData& data = m_RenderGraph->GetScene();
+			data.m_MainCamera = m_CameraBuffer;
+
 			// compile commands
-			m_DrawCommands.clear();
+			data.m_DrawCommands.clear();
 			for (auto& shaderDawSection : m_ShaderDrawSection)
 			{
-				m_DrawCommands.reserve(shaderDawSection.m_Objects.size());
+				data.m_DrawCommands.reserve(shaderDawSection.m_Objects.size());
 				for (auto& renderObject : shaderDawSection)
 				{
 					if (!renderObject.m_Instances->Empty())
@@ -156,28 +164,12 @@ namespace Engine
 						cmd.m_Shader = shaderDawSection.m_Shader;
 						cmd.m_InstanceBuffer = renderObject.m_Instances;
 
-						m_DrawCommands.push_back(cmd);
+						data.m_DrawCommands.push_back(cmd);
 					}
 				}
 			}
 
-			// record commands
-			m_CommandList->StartRecording();
-
-			m_CommandList->SetRenderTarget(frameBuffer);
-			m_CommandList->ClearRenderTarget(frameBuffer);
-
-			for (DrawCommand& cmd : m_DrawCommands)
-			{
-				m_CommandList->SetShader(cmd.m_Shader->GetPass("main"));
-				m_CommandList->SetConstantBuffer(0, m_CameraBuffer);
-				m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
-			}
-
-			Renderer::Build(m_CommandList);
-
-			m_CommandList->Present();
-			m_CommandList->Close();
+			m_RenderGraph->Build();
 		}
 	}
 

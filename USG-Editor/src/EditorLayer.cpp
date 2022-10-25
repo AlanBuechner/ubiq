@@ -44,18 +44,6 @@ namespace Engine
 		m_PlayButton = Texture2D::Create("Resources/PlayButton.png");
 		m_StopButton = Texture2D::Create("Resources/StopButton.png");
 
-		FrameBufferSpecification fbSpec;
-		fbSpec.Attachments = {
-			{ FrameBufferTextureFormat::RGBA8, {0.1f,0.1f,0.1f,1} },
-			{ FrameBufferTextureFormat::RED_INTEGER, (Math::Vector4)-1 },
-			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
-		};
-		Window& window = Application::Get().GetWindow();
-		fbSpec.Width = window.GetWidth();
-		fbSpec.Height = window.GetHeight();
-
-		m_FrameBuffer = FrameBuffer::Create(fbSpec);
-
 		m_ActiveScene = CreateRef<Scene>();
 
 		m_EditorCamera = EditorCamera();
@@ -85,11 +73,10 @@ namespace Engine
 		}
 
 		// resize
-		if (FrameBufferSpecification spec = m_FrameBuffer->GetSpecification();
+		if (FrameBufferSpecification spec = m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetSpecification();
 			m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
 			(spec.Width != m_ViewPortSize.x || spec.Height != m_ViewPortSize.y))
 		{
-			m_FrameBuffer->Resize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 			m_EditorCamera.SetViewportSize(m_ViewPortSize.x, m_ViewPortSize.y);
 
 			m_ActiveScene->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
@@ -127,7 +114,8 @@ namespace Engine
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		timer.Start("Recored Commands");
 
-		m_ActiveScene->GetSceneRenderer()->Build(m_FrameBuffer);
+		m_ActiveScene->GetSceneRenderer()->Build();
+		Renderer::Build(nullptr); // TODO : re make 2d and line renderers
 
 		timer.End();
 	}
@@ -414,7 +402,7 @@ namespace Engine
 			m_ViewPortSize = { viewPortPanalSize.x, viewPortPanalSize.y };
 		}
 
-		ImGui::Image((ImTextureID)m_FrameBuffer->GetAttachmentShaderHandle(0), viewPortPanalSize);
+		ImGui::Image((ImTextureID)m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetAttachmentShaderHandle(0), viewPortPanalSize);
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -527,7 +515,7 @@ namespace Engine
 		if ((mousex >= 0 && mousex < (int)viewportSize.x) && (mousey >= 0 && mousey < (int)viewportSize.y))
 		{
 			inWindow = true;
-			return m_FrameBuffer->ReadPixle(1, mousex, mousey);
+			//return m_FrameBuffer->ReadPixle(1, mousex, mousey);
 		}
 
 		inWindow = false;

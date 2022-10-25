@@ -75,7 +75,6 @@ namespace Engine
 		Entity m_CameraEntity;
 
 		Math::Vector2 m_ViewPortSize;
-		Ref<FrameBuffer> m_FrameBuffer;
 
 		Math::Vector2 m_ViewportBounds[2];
 

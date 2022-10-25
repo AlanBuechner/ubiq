@@ -8,6 +8,7 @@
 #include "ConstantBuffer.h"
 #include "CommandList.h"
 #include "FrameBuffer.h"
+#include "RenderGraph/RenderGraph.h"
 #include <vector>
 #include <list>
 
@@ -34,13 +35,6 @@ namespace Engine
 		{
 			Math::Mat4 m_Transform;
 			uint32 m_MaterialIndex;
-		};
-
-		struct DrawCommand
-		{
-			Ref<Shader> m_Shader;
-			Ref<Mesh> m_Mesh;
-			Ref<InstanceBuffer> m_InstanceBuffer;
 		};
 
 		struct RenderObject
@@ -73,6 +67,8 @@ namespace Engine
 	public:
 		SceneRenderer();
 
+		Ref<FrameBuffer> GetRenderTarget() { return m_RenderGraph->GetRenderTarget(); }
+		void OnViewportResize(uint32 width, uint32 height);
 		void SetMainCamera(const Camera& camera, const Math::Mat4& transform);
 		void SetMainCamera(const EditorCamera& camera);
 		void UpdateBuffers();
@@ -81,19 +77,17 @@ namespace Engine
 		ObjectControlBlockRef Submit(Ref<Mesh> mesh, Ref<Material> material, const Math::Mat4& transform);
 		void RemoveObject(ObjectControlBlockRef controlBlock);
 
-		void Build(Ref<FrameBuffer> framBuffer);
+		void Build();
 
 		static Ref<SceneRenderer> Create();
 
 	private:
-		std::vector<DrawCommand> m_DrawCommands;
-
 		std::vector<ShaderDrawSection> m_ShaderDrawSection;
-
-		Ref<CommandList> m_CommandList;
 
 		Math::Mat4 m_ViewPorj;
 		Ref<ConstantBuffer> m_CameraBuffer;
 		bool m_Invalid = true;
+
+		Ref<RenderGraph> m_RenderGraph;
 	};
 }

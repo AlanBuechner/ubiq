@@ -1,0 +1,46 @@
+#include "pch.h"
+#include "RenderGraph.h"
+#include "MainPassNode.h"
+
+namespace Engine
+{
+
+	RenderGraph::RenderGraph()
+	{
+		// create outputNode
+		m_OutputNode = CreateRef<OutputNode>(*this);
+		m_Nodes.push_back(m_OutputNode);
+
+		Ref<ShaderPassNode> mainPass = CreateRef<ShaderPassNode>(*this, "main");
+		mainPass->SetRenderTarget({ m_OutputNode, m_OutputNode->m_Buffer });
+		m_Nodes.push_back(mainPass);
+	}
+
+	void RenderGraph::AddToCommandQueue()
+	{
+		for (auto& node : m_Nodes)
+			node->AddToCommandQueue();
+	}
+
+	void RenderGraph::OnViewportResize(uint32 width, uint32 height)
+	{
+		for (auto& node : m_Nodes)
+			node->OnViewportResize(width, height);
+	}
+
+	void RenderGraph::Build()
+	{
+		for (auto& node : m_Nodes)
+			node->Invalidate();
+
+		for (auto& node : m_Nodes)
+			node->Build();
+	}
+
+	Engine::Ref<Engine::FrameBuffer> RenderGraph::GetRenderTarget()
+	{
+		return m_OutputNode->m_Buffer;
+	}
+
+}
+
