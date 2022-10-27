@@ -26,7 +26,7 @@ namespace Engine
 	}
 
 	DirectX12FrameBuffer::DirectX12FrameBuffer(const FrameBufferSpecification& spec) :
-		m_Spec(spec)
+		m_Spec(spec), m_State(State::Common)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		for (auto format : m_Spec.Attachments.Attachments)
@@ -111,6 +111,47 @@ namespace Engine
 		return val;
 	}
 
+	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXState()
+	{
+		return GetDXState(m_State);
+	}
+
+
+	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXDepthState()
+	{
+		return GetDXDepthState(m_State);
+	}
+
+	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXState(State state)
+	{
+		switch (state)
+		{
+		case Engine::FrameBuffer::RenderTarget:
+			return D3D12_RESOURCE_STATE_RENDER_TARGET;
+		case Engine::FrameBuffer::SRV:
+			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		case Engine::FrameBuffer::Common:
+			return D3D12_RESOURCE_STATE_COMMON;
+		default:
+			break;
+		}
+	}
+
+	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXDepthState(State state)
+	{
+		switch (state)
+		{
+		case Engine::FrameBuffer::RenderTarget:
+			return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case Engine::FrameBuffer::SRV:
+			return D3D12_RESOURCE_STATE_DEPTH_READ | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		case Engine::FrameBuffer::Common:
+			return D3D12_RESOURCE_STATE_COMMON;
+		default:
+			break;
+		}
+	}
+
 	void DirectX12FrameBuffer::CreateAttachment(uint32 i)
 	{
 		CREATE_PROFILE_FUNCTIONI();
@@ -143,7 +184,7 @@ namespace Engine
 		clearVal.Format = format;
 		((Math::Vector4&)clearVal.Color) = color;
 
-		D3D12_RESOURCE_STATES state = m_Spec.Attachments.Attachments[i].IsDepthStencil() ? D3D12_RESOURCE_STATE_DEPTH_READ : D3D12_RESOURCE_STATE_COMMON;
+		D3D12_RESOURCE_STATES state = m_Spec.Attachments.Attachments[i].IsDepthStencil() ? GetDXDepthState() : GetDXState();
 		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommittedResource(
 			&props, D3D12_HEAP_FLAG_NONE, &rDesc,
 			state, &clearVal, IID_PPV_ARGS(m_Buffers[i].GetAddressOf())

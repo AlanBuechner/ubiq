@@ -102,16 +102,16 @@ namespace Engine
 			bool swapChainTarget = m_RenderTarget->GetSpecification().SwapChainTarget;
 			if (attachments[i].IsDepthStencil())
 			{
-				barriers[i] = Transition(m_RenderTarget->GetBuffer(i).Get(), D3D12_RESOURCE_STATE_DEPTH_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+				barriers[i] = Transition(m_RenderTarget->GetBuffer(i).Get(), m_RenderTarget->GetDXDepthState(), DirectX12FrameBuffer::GetDXDepthState(FrameBuffer::RenderTarget));
 				depthHandle = m_RenderTarget->GetAttachmentRenderHandle(i);
 			}
 			else
 			{
-				barriers[i] = Transition(m_RenderTarget->GetBuffer(i).Get(), ( swapChainTarget ? D3D12_RESOURCE_STATE_PRESENT : D3D12_RESOURCE_STATE_COMMON ), D3D12_RESOURCE_STATE_RENDER_TARGET);
+				barriers[i] = Transition(m_RenderTarget->GetBuffer(i).Get(), m_RenderTarget->GetDXState(), DirectX12FrameBuffer::GetDXState(FrameBuffer::RenderTarget));
 				rendertargetHandles[i] = m_RenderTarget->GetAttachmentRenderHandle(i);
 			}
 		}
-		if(m_RenderTarget->GetState() == FrameBuffer::RenderTarget)
+		if (m_RenderTarget->GetState() != FrameBuffer::RenderTarget)
 			m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
 		m_CommandList->OMSetRenderTargets((uint32)rendertargetHandles.size(), (D3D12_CPU_DESCRIPTOR_HANDLE*)rendertargetHandles.data(), FALSE, depthHandle ? (D3D12_CPU_DESCRIPTOR_HANDLE*)&depthHandle : nullptr);
 		LONG width = (LONG)m_RenderTarget->GetSpecification().Width;
@@ -248,17 +248,16 @@ namespace Engine
 			for (uint32 i = 0; i < barriers.size(); i++)
 			{
 				if (attachments[i].IsDepthStencil())
-					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_DEPTH_READ);
+					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), dxfb->GetDXDepthState(), DirectX12FrameBuffer::GetDXDepthState(FrameBuffer::Common));
 				else
 				{
-					D3D12_RESOURCE_STATES afterState = swapChainTarget ? D3D12_RESOURCE_STATE_PRESENT : D3D12_RESOURCE_STATE_COMMON;
-					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, afterState);
+					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), dxfb->GetDXState(), DirectX12FrameBuffer::GetDXState(FrameBuffer::Common));
 				}
 			}
 			m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
 			dxfb->SetState(FrameBuffer::Common);
 		}
-		if(fb == m_RenderTarget)
+		if (fb == m_RenderTarget)
 			m_RenderTarget = nullptr;
 	}
 

@@ -15,6 +15,7 @@ namespace Engine
 		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
 	{
 		UpdateView();
+		OnUpdate();
 	}
 
 	void EditorCamera::UpdateProjection()
@@ -25,7 +26,6 @@ namespace Engine
 
 	void EditorCamera::UpdateView()
 	{
-		// m_Yaw = m_Pitch = 0.0f; // Lock the camera's rotation
 		m_Position = CalculatePosition();
 
 		Math::Quaternion orientation = GetOrientation();

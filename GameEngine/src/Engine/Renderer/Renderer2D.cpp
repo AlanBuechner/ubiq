@@ -103,12 +103,12 @@ namespace Engine
 
 	void Renderer2D::Build(Ref<CommandList> commandList)
 	{
-		/*if (!s_Data.QuadInstanceBuffer->Empty())
+		if (!s_Data.QuadInstanceBuffer->Empty())
 		{
 			commandList->SetShader(s_Data.SpriteShader->GetPass("main"));
 			commandList->SetConstantBuffer(0, s_Data.Camera);
 			commandList->DrawMesh(s_Data.QuadMesh, s_Data.QuadInstanceBuffer, s_Data.QuadInstanceBuffer->GetCount());
-		}*/
+		}
 		s_Data.QuadInstanceBuffer->Clear();
 	}
 

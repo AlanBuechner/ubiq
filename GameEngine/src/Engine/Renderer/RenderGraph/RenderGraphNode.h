@@ -18,7 +18,7 @@ namespace Engine
 		void Build();
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
 		virtual void AddToCommandQueue() {}
-		void Invalidate() { m_Built = false; }
+		virtual void Invalidate() { m_Built = false; }
 
 		virtual std::vector<Ref<CommandList>> GetCommandLists() { return {}; }
 
@@ -52,6 +52,7 @@ namespace Engine
 		OutputNode(RenderGraph& graph);
 
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
+		virtual void Invalidate() { m_Buffer->ResetClear(); RenderGraphNode::Invalidate(); }
 
 		Ref<FrameBuffer> m_Buffer;
 	};

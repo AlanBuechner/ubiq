@@ -30,10 +30,10 @@ namespace Engine
 		const Math::Vector3& GetPosition() const { return m_Position; }
 		Math::Quaternion GetOrientation() const;
 
-		void SetPosition(Math::Vector3 pos) { m_Position = pos; }
-
 		float GetPitch() const { return m_Pitch; }
 		float GetYaw() const { return m_Yaw; }
+
+		void SetOrientation(Math::Vector2 orientation) { m_Pitch = orientation.x; m_Yaw = orientation.y; }
 	private:
 		void UpdateProjection();
 		void UpdateView();

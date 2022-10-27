@@ -47,6 +47,7 @@ namespace Engine
 		m_ActiveScene = CreateRef<Scene>();
 
 		m_EditorCamera = EditorCamera();
+		m_EditorCamera.SetOrientation({ Math::Radians(25), Math::Radians(25) });
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
@@ -114,9 +115,13 @@ namespace Engine
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		timer.Start("Recored Commands");
 
+		Ref<CommandList> commandList = Renderer::GetMainCommandList();
+
+		Ref<FrameBuffer> framBuffer = m_ActiveScene->GetSceneRenderer()->GetRenderTarget();
 		m_ActiveScene->GetSceneRenderer()->Build();
-		Renderer::Build(nullptr); // TODO : re make 2d and line renderers
-		Renderer::GetMainCommandList()->Present(m_ActiveScene->GetSceneRenderer()->GetRenderTarget()); // present the render target
+		commandList->SetRenderTarget(framBuffer);
+		Renderer::Build(commandList);
+		commandList->Present(framBuffer); // present the render target
 
 		timer.End();
 	}

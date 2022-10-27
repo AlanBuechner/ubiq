@@ -82,6 +82,7 @@ namespace Engine
 
 		virtual State GetState() = 0;
 		virtual bool Cleared() = 0;
+		virtual void ResetClear() = 0; // only called by render graph
 
 		static Ref<FrameBuffer> Create(const FrameBufferSpecification& spec);
 	};

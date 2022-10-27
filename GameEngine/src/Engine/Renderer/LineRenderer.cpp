@@ -75,12 +75,12 @@ namespace Engine
 
 	void LineRenderer::Build(Ref<CommandList> commandList)
 	{
-		/*if (!s_LineData.Vertices.empty())
+		if (!s_LineData.Vertices.empty())
 		{
 			commandList->SetShader(s_LineData.LineShader->GetPass("main"));
 			commandList->SetConstantBuffer(0, s_LineData.Camera);
 			commandList->DrawMesh(s_LineData.m_Mesh, s_LineData.Instances);
-		}*/
+		}
 
 		s_LineData.Vertices.clear();
 		s_LineData.Indices.clear();

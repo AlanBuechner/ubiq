@@ -20,6 +20,15 @@ namespace Engine
 		m_Nodes.push_back(mainPass);
 	}
 
+	RenderGraph::~RenderGraph()
+	{
+		for (Ref<RenderGraphNode> node : m_Nodes)
+		{
+			for (Ref<CommandList> cmdList : node->GetCommandLists())
+				Renderer::GetMainCommandQueue()->RemoveCommandLIst(cmdList);
+		}
+	}
+
 	void RenderGraph::AddToCommandQueue()
 	{
 		for (auto& node : m_Nodes)

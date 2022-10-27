@@ -28,6 +28,7 @@ namespace Engine
 	{
 	public:
 		RenderGraph();
+		~RenderGraph();
 
 		void AddToCommandQueue();
 		void OnViewportResize(uint32 width, uint32 height);
