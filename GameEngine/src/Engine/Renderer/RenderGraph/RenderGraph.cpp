@@ -43,6 +43,7 @@ namespace Engine
 
 	void RenderGraph::Build()
 	{
+		m_FrameBufferStates.clear();
 		for (auto& node : m_Nodes)
 			node->Invalidate();
 
@@ -53,6 +54,26 @@ namespace Engine
 	Engine::Ref<Engine::FrameBuffer> RenderGraph::GetRenderTarget()
 	{
 		return m_OutputNode->m_Buffer;
+	}
+
+	void RenderGraph::RecoardFrameBufferState(FrameBufferState state)
+	{
+		for (auto& fbState : m_FrameBufferStates)
+		{
+			if (fbState.buffer == state.buffer)
+			{
+				fbState.afterState = state.afterState;
+				return;
+			}
+		}
+
+		m_FrameBufferStates.push_back(state);
+	}
+
+	void RenderGraph::UpdateStates()
+	{
+		for (auto& fbState : m_FrameBufferStates)
+			fbState.buffer->SetState(fbState.afterState);
 	}
 
 }

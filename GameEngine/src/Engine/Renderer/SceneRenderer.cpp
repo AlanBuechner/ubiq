@@ -65,27 +65,22 @@ namespace Engine
 	// scene renderer
 	SceneRenderer::SceneRenderer()
 	{
-		m_CameraBuffer = ConstantBuffer::Create(sizeof(Math::Mat4));
-
 		m_RenderGraph = CreateRef<RenderGraph>();
 		m_RenderGraph->AddToCommandQueue();
+
+		m_CameraIndexBuffer = ConstantBuffer::Create(sizeof(uint32));
 	}
 
 	void SceneRenderer::OnViewportResize(uint32 width, uint32 height)
 	{
 		m_RenderGraph->OnViewportResize(width, height);
+		Invalidate();
 	}
 
-	void SceneRenderer::SetMainCamera(const Camera& camera, const Math::Mat4& transform)
+	void SceneRenderer::SetMainCamera(const Camera& camera)
 	{
-		m_ViewPorj = camera.GetProjectionMatrix() * Math::Inverse(transform);
-		m_CameraBuffer->SetData(&m_ViewPorj);
-	}
-
-	void SceneRenderer::SetMainCamera(const EditorCamera& camera)
-	{
-		m_ViewPorj = camera.GetViewProjection();
-		m_CameraBuffer->SetData(&m_ViewPorj);
+		uint32 bufferLoc = camera.GetCameraBuffer()->GetDescriptorLocation();
+		m_CameraIndexBuffer->SetData(&bufferLoc);
 	}
 
 	void SceneRenderer::UpdateBuffers()
@@ -148,7 +143,7 @@ namespace Engine
 			m_Invalid = false;
 
 			SceneData& data = m_RenderGraph->GetScene();
-			data.m_MainCamera = m_CameraBuffer;
+			data.m_MainCamera = m_CameraIndexBuffer;
 
 			// compile commands
 			data.m_DrawCommands.clear();
@@ -169,8 +164,11 @@ namespace Engine
 				}
 			}
 
+			//m_Invalid = true;
 			m_RenderGraph->Build();
 		}
+
+		m_RenderGraph->UpdateStates();
 	}
 
 	Ref<SceneRenderer> SceneRenderer::Create()

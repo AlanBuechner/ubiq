@@ -1,4 +1,5 @@
 #pragma once
+#include "ConstantBuffer.h"
 #include <Engine/Math/Math.h>
 #include <glm/gtc/quaternion.hpp>
 
@@ -6,20 +7,40 @@ namespace Engine
 {
 	class Camera
 	{
+
+	public:
+		struct CameraData
+		{
+			Math::Mat4 ViewMatrix = Math::Mat4(1.0f);
+			Math::Mat4 ProjectionMatrix = Math::Mat4(1.0f);
+			Math::Mat4 VPMatrix = Math::Mat4(1.0f);
+
+			Math::Vector3 Position;
+			Math::Vector3 Rotation;
+		};
+
 	protected:
 		typedef Engine::Camera Super;
 
 	public:
-		Camera() = default;
-		Camera(const Math::Mat4& projectionMatrix) :
-			m_ProjectionMatrix(projectionMatrix)
-		{}
+		Camera() {
+			m_CameraDataBuffer = ConstantBuffer::Create(sizeof(CameraData));
+		}
+		Camera(const Math::Mat4& projectionMatrix)
+		{
+			m_CameraData.ProjectionMatrix = projectionMatrix;
+			m_CameraDataBuffer = ConstantBuffer::Create(sizeof(CameraData));
+		}
 
 		virtual ~Camera() = default;
 
-		const Math::Mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
+		const Math::Mat4& GetProjectionMatrix() const { return m_CameraData.ProjectionMatrix; }
+		const Ref<ConstantBuffer> GetCameraBuffer() const { return m_CameraDataBuffer; }
+		void UpdateCameraBuffer() { m_CameraDataBuffer->SetData(&m_CameraData); }
 
 	protected:
-		Math::Mat4 m_ProjectionMatrix = Math::Mat4(1.0f);
+		CameraData m_CameraData;
+		Ref<ConstantBuffer> m_CameraDataBuffer;
+		
 	};
 }

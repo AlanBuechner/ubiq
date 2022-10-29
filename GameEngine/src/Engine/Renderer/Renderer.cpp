@@ -5,6 +5,7 @@
 #include "Renderer2D.h"
 #include "LineRenderer.h"
 #include "ResourceManager.h"
+#include "GPUProfiler.h"
 
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
 Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
@@ -82,7 +83,9 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		s_CopyFlag.Wait(false);
 		s_CopyFlag.Signal();
+		
 		Renderer::GetMainCommandList()->StartRecording();
+		GPUTimer::BeginEvent(s_MainCommandList, "MainCommandList");
 	}
 
 	void Renderer::EndFrame()
@@ -90,6 +93,7 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		WaitForRender();
 		WaitForSwap();
+		GPUTimer::EndEvent(s_MainCommandList);
 		GetMainCommandList()->Close();
 		s_RenderFlag.Signal();
 		s_SwapFlag.Clear();

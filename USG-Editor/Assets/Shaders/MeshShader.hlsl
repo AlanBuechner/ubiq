@@ -45,15 +45,29 @@ struct PS_Output
 
 #section vertex
 
-cbuffer Camera
+struct Camera
 {
+	float4x4 View;
+	float4x4 Porjection;
 	float4x4 ViewPorjection;
+
+	float3 Position;
+	float3 rotation;
 };
+
+cbuffer MainCameraIndex
+{
+	uint mainCameraIndex;
+};
+
+ConstantBuffer<Camera> cameras[];
+
 
 VS_Output main(VS_Input input)
 {
 	VS_Output output;
-	output.position = mul(ViewPorjection, mul(input.transform, float4(input.position, 1)));
+	Camera camera = cameras[mainCameraIndex];
+	output.position = mul(camera.ViewPorjection, mul(input.transform, float4(input.position, 1)));
 	output.uv = input.uv;
 	output.normal = input.normal;
 	output.tangent = input.tangent;

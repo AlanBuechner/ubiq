@@ -81,6 +81,7 @@ namespace Engine
 		virtual bool HasDepthAttachment() const = 0;
 
 		virtual State GetState() = 0;
+		virtual void SetState(State state) = 0;
 		virtual bool Cleared() = 0;
 		virtual void ResetClear() = 0; // only called by render graph
 

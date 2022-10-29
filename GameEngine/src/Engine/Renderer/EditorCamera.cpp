@@ -11,6 +11,10 @@
 namespace Engine
 {
 
+	EditorCamera::EditorCamera() :
+		Camera(glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip))
+	{}
+
 	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
 		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
 	{
@@ -21,7 +25,8 @@ namespace Engine
 	void EditorCamera::UpdateProjection()
 	{
 		m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
-		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
+		m_CameraData.ProjectionMatrix = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
+		m_CameraData.VPMatrix = m_CameraData.ProjectionMatrix * m_CameraData.ViewMatrix;
 	}
 
 	void EditorCamera::UpdateView()
@@ -29,8 +34,9 @@ namespace Engine
 		m_Position = CalculatePosition();
 
 		Math::Quaternion orientation = GetOrientation();
-		m_ViewMatrix = glm::translate(Math::Mat4(1.0f), m_Position) * glm::toMat4(orientation);
-		m_ViewMatrix = glm::inverse(m_ViewMatrix);
+		m_CameraData.ViewMatrix = glm::translate(Math::Mat4(1.0f), m_Position) * glm::toMat4(orientation);
+		m_CameraData.ViewMatrix = glm::inverse(m_CameraData.ViewMatrix);
+		m_CameraData.VPMatrix = m_CameraData.ProjectionMatrix * m_CameraData.ViewMatrix;
 	}
 
 	std::pair<float, float> EditorCamera::PanSpeed() const
@@ -108,6 +114,8 @@ namespace Engine
 
 
 		UpdateView();
+
+		UpdateCameraBuffer();
 	}
 
 	void EditorCamera::OnEvent(Event& e)

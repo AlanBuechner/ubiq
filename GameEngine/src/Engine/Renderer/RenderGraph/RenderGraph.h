@@ -26,6 +26,14 @@ namespace Engine
 
 	class RenderGraph
 	{
+
+	private:
+		struct FrameBufferState
+		{
+			FrameBuffer::State afterState;
+			Ref<FrameBuffer> buffer;
+		};
+
 	public:
 		RenderGraph();
 		~RenderGraph();
@@ -36,11 +44,18 @@ namespace Engine
 		SceneData& GetScene() { return m_Scene; }
 
 		Ref<FrameBuffer> GetRenderTarget();
+
+		void RecoardFrameBufferState(FrameBufferState state);
+		void UpdateStates();
+
+	private:
+
 	private:
 		std::vector<Ref<RenderGraphNode>> m_Nodes;
 		
 		Ref<OutputNode> m_OutputNode;
 
 		SceneData m_Scene;
+		std::vector<FrameBufferState> m_FrameBufferStates;
 	};
 }

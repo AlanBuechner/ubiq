@@ -4,6 +4,40 @@
 namespace Engine
 {
 
+
+	// camera component
+	void CameraComponent::ObjectMovecallback(const Math::Mat4& transform)
+	{
+		Camera.SetTransform(transform);
+	}
+
+	CameraComponent::CameraComponent(CameraComponent&& other)
+	{
+		Owner = other.Owner;
+		//Owner.GetTransform().AddMoveCallback(BIND_EVENT_FN_EXTERN(&CameraComponent::ObjectMovecallback, this));
+
+		other.Owner = Entity{};
+	}
+
+	CameraComponent& CameraComponent::operator=(CameraComponent&& other)
+	{
+		return *this;
+	}
+
+	CameraComponent::~CameraComponent()
+	{
+		if (Owner)
+		{
+			//Owner.GetTransform().RemoveMoveCallback(BIND_EVENT_FN_EXTERN(&CameraComponent::ObjectMovecallback, this));
+		}
+	}
+
+	void CameraComponent::OnComponentAdded()
+	{
+		Owner.GetTransform().AddMoveCallback(BIND_EVENT_FN_EXTERN(&CameraComponent::ObjectMovecallback, this));
+	}
+
+
 	// mesh component
 	MeshRendererComponent::MeshRendererComponent(MeshRendererComponent&& other)
 	{

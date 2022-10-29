@@ -239,7 +239,10 @@ namespace Engine
 
 	void DirectX12CommandList::Present(Ref<FrameBuffer> fb)
 	{
-		if (fb)
+		if (fb == nullptr)
+			fb = m_RenderTarget;
+
+		if (fb && fb->GetState() != FrameBuffer::State::Common)
 		{
 			Ref<DirectX12FrameBuffer> dxfb = std::dynamic_pointer_cast<DirectX12FrameBuffer>(fb);
 			bool swapChainTarget = dxfb->GetSpecification().SwapChainTarget;
@@ -250,9 +253,7 @@ namespace Engine
 				if (attachments[i].IsDepthStencil())
 					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), dxfb->GetDXDepthState(), DirectX12FrameBuffer::GetDXDepthState(FrameBuffer::Common));
 				else
-				{
 					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), dxfb->GetDXState(), DirectX12FrameBuffer::GetDXState(FrameBuffer::Common));
-				}
 			}
 			m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
 			dxfb->SetState(FrameBuffer::Common);

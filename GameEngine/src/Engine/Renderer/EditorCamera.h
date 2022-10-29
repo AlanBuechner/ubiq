@@ -10,7 +10,7 @@ namespace Engine
 	class EditorCamera : public Camera
 	{
 	public:
-		EditorCamera() = default;
+		EditorCamera();
 		EditorCamera(float fov, float aspectRatio, float nearClip, float farClip);
 
 		void OnUpdate();
@@ -21,8 +21,8 @@ namespace Engine
 
 		inline void SetViewportSize(float width, float height) { m_ViewportWidth = width; m_ViewportHeight = height; UpdateProjection(); }
 
-		const Math::Mat4& GetViewMatrix() const { return m_ViewMatrix; }
-		Math::Mat4 GetViewProjection() const { return m_ProjectionMatrix * m_ViewMatrix; }
+		const Math::Mat4& GetViewMatrix() const { return m_CameraData.ViewMatrix; }
+		Math::Mat4 GetViewProjection() const { return m_CameraData.VPMatrix; }
 
 		Math::Vector3 GetUpDirection() const;
 		Math::Vector3 GetRightDirection() const;
@@ -58,7 +58,6 @@ namespace Engine
 	private:
 		float m_FOV = 45.0f, m_AspectRatio = 1.778f, m_NearClip = 0.1f, m_FarClip = 10000.0f;
 
-		Math::Mat4 m_ViewMatrix;
 		Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
 		Math::Vector3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
 

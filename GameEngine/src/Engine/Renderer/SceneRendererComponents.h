@@ -7,6 +7,24 @@
 
 namespace Engine
 {
+	struct CameraComponent : public Component
+	{
+		Engine::SceneCamera Camera;
+		bool Primary = true;
+		bool FixedAspectRatio = false;
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent&) = default;
+		CameraComponent(CameraComponent&& other);
+		CameraComponent& CameraComponent::operator=(CameraComponent&& other);
+		~CameraComponent();
+
+		virtual void OnComponentAdded();
+
+	private:
+		void ObjectMovecallback(const Math::Mat4& transform);
+	};
+
 	class MeshRendererComponent : public Component
 	{
 	public:

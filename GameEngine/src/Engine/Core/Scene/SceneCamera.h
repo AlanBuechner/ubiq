@@ -36,6 +36,8 @@ namespace Engine
 
 		ProjectionType GetProjectionType() const { return m_ProjectionType; }
 		void SetProjectionType(ProjectionType type) { m_ProjectionType = type; RecalculateProjection(); }
+
+		void SetTransform(const Math::Mat4& transform);
 	private:
 		void RecalculateProjection();
 

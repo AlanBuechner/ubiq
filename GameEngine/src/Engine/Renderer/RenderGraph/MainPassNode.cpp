@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "MainPassNode.h"
+#include "Engine/Renderer/GPUProfiler.h"
 
 namespace Engine
 {
@@ -28,6 +29,7 @@ namespace Engine
 		const SceneData& scene = m_Graph.GetScene();
 		
 		m_CommandList->StartRecording();
+		GPUTimer::BeginEvent(m_CommandList, "Shader Pass");
 		m_CommandList->SetRenderTarget(renderTarget);
 		if(!renderTarget->Cleared())
 			m_CommandList->ClearRenderTarget();
@@ -39,7 +41,9 @@ namespace Engine
 			m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
 		}
 
+		GPUTimer::EndEvent(m_CommandList);
 		m_CommandList->Close();
+		m_Graph.RecoardFrameBufferState({ FrameBuffer::State::RenderTarget, renderTarget });
 	}
 }
 

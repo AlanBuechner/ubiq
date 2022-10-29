@@ -30,6 +30,7 @@
 #include "Engine/Renderer/CommandQueue.h"
 #include "Engine/Renderer/SwapChain.h"
 #include "Engine/Renderer/SceneRendererComponents.h"
+#include "Engine/Renderer/GPUProfiler.h"
 // Camera
 #include "Engine/Renderer/Camera.h"
 // ----------------------------------------

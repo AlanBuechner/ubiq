@@ -150,7 +150,7 @@ namespace Engine
 			Renderer2D::EndScene();
 
 
-			m_SceneRenderer->SetMainCamera(*mainCamera, cameraTransform);
+			m_SceneRenderer->SetMainCamera(*mainCamera);
 			m_SceneRenderer->UpdateBuffers();
 		}
 	}

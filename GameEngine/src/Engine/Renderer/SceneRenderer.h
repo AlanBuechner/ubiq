@@ -69,8 +69,7 @@ namespace Engine
 
 		Ref<FrameBuffer> GetRenderTarget() { return m_RenderGraph->GetRenderTarget(); }
 		void OnViewportResize(uint32 width, uint32 height);
-		void SetMainCamera(const Camera& camera, const Math::Mat4& transform);
-		void SetMainCamera(const EditorCamera& camera);
+		void SetMainCamera(const Camera& camera);
 		void UpdateBuffers();
 		void Invalidate();
 
@@ -82,10 +81,9 @@ namespace Engine
 		static Ref<SceneRenderer> Create();
 
 	private:
+		Ref<ConstantBuffer> m_CameraIndexBuffer;
 		std::vector<ShaderDrawSection> m_ShaderDrawSection;
 
-		Math::Mat4 m_ViewPorj;
-		Ref<ConstantBuffer> m_CameraBuffer;
 		bool m_Invalid = true;
 
 		Ref<RenderGraph> m_RenderGraph;

@@ -119,9 +119,12 @@ namespace Engine
 
 		Ref<FrameBuffer> framBuffer = m_ActiveScene->GetSceneRenderer()->GetRenderTarget();
 		m_ActiveScene->GetSceneRenderer()->Build();
+
+		Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
 		commandList->SetRenderTarget(framBuffer);
 		Renderer::Build(commandList);
 		commandList->Present(framBuffer); // present the render target
+		Engine::GPUTimer::EndEvent(commandList);
 
 		timer.End();
 	}

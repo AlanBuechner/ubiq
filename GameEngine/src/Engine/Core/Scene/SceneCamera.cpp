@@ -3,7 +3,8 @@
 
 namespace Engine
 {
-	SceneCamera::SceneCamera()
+	SceneCamera::SceneCamera() :
+		Camera()
 	{
 		RecalculateProjection();
 	}
@@ -30,6 +31,13 @@ namespace Engine
 		RecalculateProjection();
 	}
 
+	void SceneCamera::SetTransform(const Math::Mat4& transform)
+	{
+		m_CameraData.ViewMatrix = Math::Inverse(transform);
+		m_CameraData.VPMatrix = m_CameraData.ProjectionMatrix * m_CameraData.ViewMatrix;
+		UpdateCameraBuffer();
+	}
+
 	void SceneCamera::SetViewportSize(uint32 width, uint32 height)
 	{
 		m_AspectRatio = (float)width / (float)height;
@@ -40,7 +48,7 @@ namespace Engine
 	{
 		if (m_ProjectionType == ProjectionType::Perspective)
 		{
-			m_ProjectionMatrix = glm::perspective(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+			m_CameraData.ProjectionMatrix = glm::perspective(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 		}
 		else
 		{
@@ -49,7 +57,7 @@ namespace Engine
 			float orthBottom = -0.5f * m_OrthgraphicSize;
 			float orthTop = 0.5f * m_OrthgraphicSize;
 
-			m_ProjectionMatrix = glm::ortho(orthLeft, orthRight, orthBottom, orthTop, m_OrthgraphicNear, m_OrthgraphicFar);
+			m_CameraData.ProjectionMatrix = glm::ortho(orthLeft, orthRight, orthBottom, orthTop, m_OrthgraphicNear, m_OrthgraphicFar);
 		}
 	}
 
