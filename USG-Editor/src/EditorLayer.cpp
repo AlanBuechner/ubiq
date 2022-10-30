@@ -7,6 +7,9 @@
 #include "Engine/Util/Performance.h"
 #include "Engine/Util/PlatformUtils.h"
 
+// temp
+#include "Engine/Core/Scene/SceneRegistry.h"
+
 #include <imgui/imgui.h>
 #include <ImGuizmo/ImGuizmo.h>
 #include <memory>
@@ -50,6 +53,18 @@ namespace Engine
 		m_EditorCamera.SetOrientation({ Math::Radians(25), Math::Radians(25) });
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		// temp
+
+		SceneRegistry registry;
+		uint64 enttity = registry.CreateEntity();
+		TransformComponent& tc = registry.AddComponent<TransformComponent>(enttity);
+
+		registry.GetComponentPool<TransformComponent>();
+
+		registry.Each([&](EntityType entity) {
+			EntityData& data = registry.GetEntityData(entity);
+		});
 	}
 
 	void EditorLayer::OnDetach()

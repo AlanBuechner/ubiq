@@ -194,7 +194,6 @@ namespace Engine
 		for (auto& child : entity.GetTransform().GetChildren())
 			DestroyEntity(child);
 
-
 		m_Registry.destroy(entity);
 	}
 
