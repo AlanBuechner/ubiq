@@ -5,12 +5,6 @@ namespace Engine
 {
 
 
-	EntityData::~EntityData()
-	{
-		// TODO : delete components
-	}
-
-
 	void EntityData::RemoveComponentReferance(ComponentPool* pool)
 	{
 		std::vector<ComponentRef>::const_iterator i = std::find_if(m_Components.begin(), m_Components.end(), [pool](ComponentRef comp) {return comp.m_Pool == pool; });
@@ -25,22 +19,22 @@ namespace Engine
 
 	EntityType SceneRegistry::CreateEntity()
 	{
-		return CreateEntity(UUID());
+		return CreateEntity(UUID(), "");
 	}
 
-	EntityType SceneRegistry::CreateEntity(UUID id)
+	EntityType SceneRegistry::CreateEntity(UUID id, const std::string& name)
 	{
 		if (m_FreeEntitys.empty())
 		{
 			// no locations in the entity list is free
-			m_Entitys.push_back({ id, "" });
+			m_Entitys.push_back({ id, name });
 			m_UsedEntitys.push_back(m_Entitys.size()-1);
 			return m_Entitys.size() - 1;
 		}
 
 		EntityType entity = m_FreeEntitys.back(); // get the most recently deleted entity
 		m_FreeEntitys.pop_back();
-		m_Entitys[entity] = { id, "" };
+		m_Entitys[entity] = { id, name };
 		m_UsedEntitys.push_back(entity);
 		return entity;
 	}

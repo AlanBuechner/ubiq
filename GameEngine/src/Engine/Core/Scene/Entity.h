@@ -1,6 +1,6 @@
 #pragma once
 #include "Scene.h"
-#include "entt.hpp"
+#include "SceneRegistry.h"
 
 #include "Engine/Core/UUID.h"
 
@@ -15,20 +15,20 @@ namespace Engine
 	{
 	public:
 		Entity() = default;
-		Entity(entt::entity handle, Scene* scene);
+		Entity(EntityType handle, Scene* scene);
 		Entity(const Entity& other) = default;
 
 		template<typename T>
 		bool HasComponent()
 		{
-			return m_Scene->m_Registry.has<T>(m_EntityID);
+			return m_Scene->m_Registry.HasComponent<T>(m_EntityID);
 		}
 
 		template<typename T>
 		T& GetComponent()
 		{
 			CORE_ASSERT(HasComponent<T>(), "Entity does not have component");
-			return m_Scene->m_Registry.get<T>(m_EntityID);
+			return m_Scene->m_Registry.GetComponent<T>(m_EntityID);
 		}
 
 		template<typename T, typename... Args>
@@ -47,11 +47,11 @@ namespace Engine
 		{
 			CORE_ASSERT(HasComponent<T>(), "Entity does not have component");
 			GetComponent<T>().OnComponentRemoved();
-			m_Scene->m_Registry.remove<T>(m_EntityID);
+			m_Scene->m_Registry.RemoveComponent<T>(m_EntityID);
 		}
 
-		operator bool() const { return m_EntityID != entt::null && m_Scene != nullptr; }
-		operator entt::entity() const { return m_EntityID; }
+		operator bool() const { return m_EntityID != NullEntity && m_Scene != nullptr; }
+		operator EntityType() const { return m_EntityID; }
 		operator uint32() const { return (uint32)m_EntityID; }
 
 		UUID GetUUID();
@@ -72,7 +72,7 @@ namespace Engine
 		static Entity null;
 
 	private:
-		entt::entity m_EntityID = { entt::null };
+		EntityType m_EntityID = { NullEntity };
 		Scene* m_Scene = nullptr;
 	};
 }

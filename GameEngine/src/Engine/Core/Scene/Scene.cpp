@@ -32,7 +32,7 @@ namespace Engine
 
 	Scene::~Scene()
 	{
-		m_Registry.clear();
+
 		m_SceneRenderer = nullptr;
 	}
 
@@ -95,7 +95,7 @@ namespace Engine
 	{
 
 		// update scripts
-		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) 
+		m_Registry.GetComponentPool<NativeScriptComponent>()->Each([=](auto entity, auto& nsc) 
 		{
 			if (!nsc.Instance)
 			{
@@ -160,15 +160,11 @@ namespace Engine
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
 
-		auto view = m_Registry.view<CameraComponent>();
-		for (auto entity : view)
-		{
-			auto& cameraComponent = view.get<CameraComponent>(entity);
-			if (!cameraComponent.FixedAspectRatio)
-			{
-				cameraComponent.Camera.SetViewportSize(width, height);
-			}
-		}
+		m_Registry.GetComponentPool<CameraComponent>()->Each([&](void* comp) {
+			CameraComponent* camComp = (CameraComponent*)comp;
+			if (!camComp->FixedAspectRatio)
+				camComp->Camera.SetViewportSize(width, height);
+		});
 
 		m_SceneRenderer->OnViewportResize(width, height);
 	}
@@ -180,7 +176,7 @@ namespace Engine
 
 	Entity Scene::CreateEntityWithUUID(const UUID uuid, const std::string& name)
 	{
-		Entity entity{ m_Registry.create(), this };
+		Entity entity{ m_Registry.CreateEntity(uuid, name), this };
 		entity.AddComponent<EntityDataComponent>(name.empty() ? "Entity" : name, uuid);
 		auto& tc = entity.AddComponent<TransformComponent>();
 		return entity;
@@ -194,11 +190,12 @@ namespace Engine
 		for (auto& child : entity.GetTransform().GetChildren())
 			DestroyEntity(child);
 
-		m_Registry.destroy(entity);
+		m_Registry.DestroyEntity(entity);
 	}
 
 	Entity Scene::GetEntityWithUUID(UUID id)
 	{
+		// TODO : Create iterator
 		auto view = m_Registry.view<EntityDataComponent>();
 		for (auto entity : view) {
 			auto idcomp = view.get<EntityDataComponent>(entity);
@@ -210,6 +207,7 @@ namespace Engine
 
 	Entity Scene::GetPrimaryCameraEntity()
 	{
+		// TODO : Create iterator
 		auto view = m_Registry.view<CameraComponent>();
 		for (auto entity : view) {
 			auto camera = view.get<CameraComponent>(entity);
@@ -220,7 +218,7 @@ namespace Engine
 	}
 
 	template<typename T>
-	static void CopyComponent(entt::registry& dest, entt::registry& src, const std::unordered_map<UUID, entt::entity>& map)
+	static void CopyComponent(SceneRegistry& dest, SceneRegistry& src, const std::unordered_map<UUID, EntityType>& map)
 	{
 		auto view = src.view<T>();
 		for (auto srcEntity : view)
@@ -238,18 +236,16 @@ namespace Engine
 		newScene->m_ViewportWidth = scene->m_ViewportWidth;
 		newScene->m_ViewportHeight = scene->m_ViewportHeight;
 
-		std::unordered_map<UUID, entt::entity> enttMap;
+		std::unordered_map<UUID, EntityType> enttMap;
 
 		auto& srcSceneRegistry = scene->m_Registry;
 		auto& destSceneRegisry = newScene->m_Registry;
-		auto idView = srcSceneRegistry.view<EntityDataComponent>();
-		for (auto e : idView)
-		{
-			auto uuid = srcSceneRegistry.get<EntityDataComponent>(e).GetID();
-			const auto& name = srcSceneRegistry.get<EntityDataComponent>(e).Name;
-			Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
-			enttMap[uuid] = newEntity;
-		}
+
+		srcSceneRegistry.Each([&](EntityType entity) {
+			EntityData& data = srcSceneRegistry.GetEntityData(entity);
+			Entity newEntity = newScene->CreateEntityWithUUID(data.ID, data.name);
+			enttMap[data.ID] = newEntity;
+		});
 
 		CopyComponent<TransformComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<SpriteRendererComponent>(destSceneRegisry, srcSceneRegistry, enttMap);

@@ -1,11 +1,12 @@
 #pragma once
-#include "entt.hpp"
 #include "Engine/Core/Time.h"
 
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Core/UUID.h"
 
 #include "Engine/Renderer/SceneRenderer.h"
+#include "SceneRegistry.h"
+#include "ComponentPool.h"
 
 namespace Engine
 {
@@ -48,7 +49,7 @@ namespace Engine
 		uint32 m_ViewportWidth = 0;
 		uint32 m_ViewportHeight = 0;
 
-		entt::registry m_Registry;
+		SceneRegistry m_Registry;
 		Ref<SceneRenderer> m_SceneRenderer;
 
 		Ref<Texture2D> m_CameraIcon;

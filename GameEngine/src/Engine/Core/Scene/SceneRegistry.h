@@ -8,6 +8,8 @@
 namespace Engine
 {
 
+	inline constexpr auto NullEntity = UINT64_MAX;
+
 	struct EntityData
 	{
 		UUID ID;
@@ -18,8 +20,6 @@ namespace Engine
 			uint32 m_ComponentLoc;
 		};
 		std::vector<ComponentRef> m_Components;
-
-		~EntityData();
 
 		void RemoveComponentReferance(ComponentPool* pool);
 
@@ -34,7 +34,7 @@ namespace Engine
 		~SceneRegistry();
 
 		EntityType CreateEntity();
-		EntityType CreateEntity(UUID id);
+		EntityType CreateEntity(UUID id, const std::string& name);
 		void DestroyEntity(EntityType entity);
 
 		// EntityData Does not have referential integrity
@@ -77,6 +77,25 @@ namespace Engine
 		{
 			ComponentType typeID = typeid(T).hash_code();
 			return m_Pools[typeID];
+		}
+
+		template<class T>
+		T& GetComponent(EntityType entity)
+		{
+			return *(T*)GetComponentPool<T>()->GetComponentMemory(entity);
+		}
+
+		template<class T>
+		bool HasComponent(EntityType entity)
+		{
+			ComponentType componentID = typeid(t).hash_code();
+			EntityData& data = m_Entitys[entity];
+			for (auto& compRef : data.m_Components)
+			{
+				if (compRef.m_Pool->m_TypeID == componentID)
+					return true;
+			}
+			return false;
 		}
 
 		void Each(Func func);
