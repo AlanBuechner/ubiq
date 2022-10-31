@@ -55,16 +55,23 @@ namespace Engine
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
 		// temp
-
 		SceneRegistry registry;
-		uint64 enttity = registry.CreateEntity();
-		TransformComponent& tc = registry.AddComponent<TransformComponent>(enttity);
+		uint64 entity = registry.CreateEntity();
+		TransformComponent& tc = registry.AddComponent<TransformComponent>(entity);
 
-		registry.GetComponentPool<TransformComponent>();
+		ComponentPool* tcPool = registry.GetComponentPool<TransformComponent>();
+
+		tcPool->Each([&](void* component) {
+			Component* comp = (Component*)component;
+		});
 
 		registry.Each([&](EntityType entity) {
 			EntityData& data = registry.GetEntityData(entity);
 		});
+
+		registry.RemoveComponent<TransformComponent>(entity);
+
+		registry.DestroyEntity(entity);
 	}
 
 	void EditorLayer::OnDetach()

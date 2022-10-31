@@ -7,10 +7,21 @@ namespace Engine
 
 	EntityData::~EntityData()
 	{
-		for (auto& component : m_Components)
-			delete component.m_ComponentLoc;
+		// TODO : delete components
 	}
 
+
+	void EntityData::RemoveComponentReferance(ComponentPool* pool)
+	{
+		std::vector<ComponentRef>::const_iterator i = std::find_if(m_Components.begin(), m_Components.end(), [pool](ComponentRef comp) {return comp.m_Pool == pool; });
+		m_Components.erase(i);
+	}
+
+	SceneRegistry::~SceneRegistry()
+	{
+		for (auto& pool : m_Pools)
+			delete pool.second;
+	}
 
 	EntityType SceneRegistry::CreateEntity()
 	{
@@ -36,6 +47,12 @@ namespace Engine
 
 	void SceneRegistry::DestroyEntity(EntityType entity)
 	{
+		// remove components from entity
+		for (auto& compRef : m_Entitys[entity].m_Components)
+			compRef.m_Pool->Free(entity);
+		m_Entitys[entity].m_Components.clear();
+
+		// remove entity from used entity list
 		for (uint32 i = 0; i < m_UsedEntitys.size(); i++)
 		{
 			if (m_UsedEntitys[i] == entity)
@@ -45,6 +62,8 @@ namespace Engine
 				m_UsedEntitys.pop_back();
 			}
 		}
+
+		// add entity to free entity list
 		m_FreeEntitys.push_back(entity);
 	}
 
@@ -52,24 +71,6 @@ namespace Engine
 	{
 		for (EntityType entity : m_UsedEntitys)
 			func(entity);
-	}
-
-	void* SceneRegistry::AllocateComponent(ComponentType type, uint64 componentSize, EntityType entity)
-	{
-		for (uint32 i = 0; i < m_Pools.size(); i++)
-		{
-			if (m_Pools[i].GetTypeID() == type)
-			{
-				// allocate memory for component
-				return m_Pools[i].Allocate(entity);
-			}
-		}
-
-		// could not find the component pool
-		m_Pools.push_back(ComponentPool(type, componentSize)); // create new pool
-
-		// allocate memory for pool
-		return m_Pools.back().Allocate(entity);
 	}
 
 }
