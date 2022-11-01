@@ -38,7 +38,7 @@ namespace Engine
 
 		s_World = new b2World({ 0.0f, -9.81f });
 
-		auto view = s_Scene->m_Registry.view<Rigidbody2DComponent>();
+		/*auto view = s_Scene->m_Registry.view<Rigidbody2DComponent>();
 		for (auto e : view)
 		{
 			Entity entity = { e, s_Scene };
@@ -87,7 +87,7 @@ namespace Engine
 
 				cc2d.RuntimeFixture = body->CreateFixture(&fixtureDef);
 			}
-		}
+		}*/
 
 	}
 
@@ -99,7 +99,7 @@ namespace Engine
 
 	void Physics2D::OnPysicsUpdate()
 	{
-		auto view = s_Scene->m_Registry.view<Rigidbody2DComponent>();
+		/*auto view = s_Scene->m_Registry.view<Rigidbody2DComponent>();
 
 		for (auto e : view)
 		{
@@ -128,7 +128,7 @@ namespace Engine
 			transform.SetPositionX(position.x);
 			transform.SetPositionY(position.y);
 			transform.SetRotationZ(body->GetAngle());
-		}
+		}*/
 	}
 
 	Math::Vector2 Physics2D::GetGravity()
@@ -155,7 +155,7 @@ namespace Engine
 	bool Physics2D::RayCast(Math::Vector2 p1, Math::Vector2 p2, RayCastHit& outHit)
 	{
 
-		class Callback : public b2RayCastCallback
+		/*class Callback : public b2RayCastCallback
 		{
 		public:
 			Callback(Math::Vector2& p1, Math::Vector2& p2, RayCastHit& outHit) :
@@ -182,7 +182,8 @@ namespace Engine
 
 		s_World->RayCast(&callback, { p1.x, p1.y }, {p2.x, p2.y});
 
-		return callback.hit;
+		return callback.hit;*/
+		return false;
 	}
 
 }

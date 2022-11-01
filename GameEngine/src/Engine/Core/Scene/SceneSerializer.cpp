@@ -123,17 +123,7 @@ namespace Engine
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
-
-		if (entity.HasComponent<EntityDataComponent>())
-		{
-			out << YAML::Key << "EntityDataComponent";
-			out << YAML::BeginMap;
-			
-			auto& Name = entity.GetComponent<EntityDataComponent>().Name;
-
-			out << YAML::Key << "Name" << YAML::Value << Name;
-			out << YAML::EndMap;
-		}
+		out << YAML::Key << "Name" << YAML::Value << entity.GetName();
 
 		if (entity.HasComponent<TransformComponent>())
 		{
@@ -182,19 +172,6 @@ namespace Engine
 			out << YAML::EndMap; // end camera
 
 			out << YAML::EndMap; // end camera component
-		}
-
-		if (entity.HasComponent<SpriteRendererComponent>())
-		{
-			out << YAML::Key << "SpriteRendererComponent";
-			out << YAML::BeginMap;
-
-			auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
-			out << YAML::Key << "Color" << YAML::Value << spriteRenderer.Color;
-			if (spriteRenderer.Texture)
-				out << YAML::Key << "TextureID" << YAML::Value << spriteRenderer.Texture->GetAssetID();
-
-			out << YAML::EndMap;
 		}
 
 		if (entity.HasComponent<MeshRendererComponent>())
@@ -273,7 +250,7 @@ namespace Engine
 		out << YAML::Value << "Name";
 		out << YAML::Key << "Entities";
 		out << YAML::Value << YAML::BeginSeq;
-		m_Scene->m_Registry.each([&](auto entityID)
+		m_Scene->m_Registry.Each([&](auto entityID)
 			{
 				Entity entity = {entityID, m_Scene.get()};
 				if (!entity)
@@ -350,15 +327,6 @@ namespace Engine
 
 					cc.Primary = cameraComponent["Primary"].as<bool>();
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
-				}
-
-				auto spriteRendererComponent = entity["SpriteRendererComponent"];
-				if (spriteRendererComponent)
-				{
-					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
-					src.Color = spriteRendererComponent["Color"].as<Math::Vector4>();
-					if (spriteRendererComponent["TextureID"])
-						src.Texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(spriteRendererComponent["TextureID"].as<uint64>());
 				}
 
 				auto meshRendererComponent = entity["MeshRendererComponent"];

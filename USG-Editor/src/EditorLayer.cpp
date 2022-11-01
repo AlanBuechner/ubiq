@@ -125,7 +125,7 @@ namespace Engine
 				if (entityID == -1)
 					m_HierarchyPanel.SelectEntity({});
 				else
-					m_HierarchyPanel.SelectEntity({ (entt::entity)entityID, m_ActiveScene.get() });
+					m_HierarchyPanel.SelectEntity({ (EntityType)entityID, m_ActiveScene.get() });
 			}
 		}
 
@@ -436,18 +436,18 @@ namespace Engine
 		ImGui::Image((ImTextureID)m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetAttachmentShaderHandle(0), viewPortPanalSize);
 		if (ImGui::BeginDragDropTarget())
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			/*if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
 				bool inWindow;
 				int entityID = GetEntityIDAtMousePosition(inWindow);
 				if (entityID != -1)
 				{
-					Entity e = { (entt::entity)entityID, m_ActiveScene.get() };
+					Entity e = { (EntityType)entityID, m_ActiveScene.get() };
 					fs::path path = (const wchar_t*)payload->Data;
 					if (Texture2D::ValidExtention(path.extension().string()) && e.HasComponent<SpriteRendererComponent>())
 						e.GetComponent<SpriteRendererComponent>().Texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(path);
 				}
-			}
+			}*/
 			ImGui::EndDragDropTarget();
 		}
 

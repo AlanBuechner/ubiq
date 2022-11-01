@@ -2,7 +2,6 @@
 #include "Scene.h"
 
 #include "Components.h"
-#include "ScriptableEntity.h" 
 #include "Entity.h"
 #include "Engine/Core/UUID.h"
 
@@ -49,35 +48,25 @@ namespace Engine
 	void Scene::OnUpdateEditor(const EditorCamera& camera)
 	{
 		// update transforms
-		m_Registry.each([&](auto entityID) {
+		m_Registry.Each([&](EntityType entityID) {
 			Entity entity{ entityID, this };
-			entity.GetTransform().UpdateHierarchyGlobalTransform();
+			TransformComponent& tc = entity.GetTransform();
+			tc.UpdateHierarchyGlobalTransform();
 		});
 
 		// render sprites
 		{
 			Renderer2D::BeginScene(camera);
 
-			// render sprites
-			auto sprite = entt::get<SpriteRendererComponent>;
-			auto spriteGroup = m_Registry.group<TransformComponent>(sprite);
-			for (auto entity : spriteGroup)
-			{
-				auto [transform, sprite] = spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
-
-				Renderer2D::DrawSprite(transform.GetGlobalTransform(), sprite, (int)entity);
-			}
-
 			// render icons
-			auto cameraView = m_Registry.view<CameraComponent, TransformComponent>();
-			for (auto entity : cameraView)
+			auto cameraView = m_Registry.View<CameraComponent>();
+			for (auto& comp : cameraView)
 			{
-				auto [cam, transform] = cameraView.get<CameraComponent, TransformComponent>(entity);
-				TransformComponent t = transform;
-				t.SetRotation({ -camera.GetPitch(), -camera.GetYaw(), 0 });
-				t.SetScale({ 1,1,1 });
+				TransformComponent tc = comp.Owner.GetTransform(); // create copy of transform component to billboard 
+				tc.SetRotation({ -camera.GetPitch(), -camera.GetYaw(), 0 });
+				tc.SetScale({ 1,1,1 });
 
-				Renderer2D::DrawQuad(t.GetTransform(), m_CameraIcon, (int)entity);
+				Renderer2D::DrawQuad(tc.GetTransform(), m_CameraIcon, (int)(EntityType)comp.Owner);
 
 			}
 
@@ -93,63 +82,31 @@ namespace Engine
 
 	void Scene::OnUpdateRuntime()
 	{
+		// TODO : update components
 
-		// update scripts
-		m_Registry.GetComponentPool<NativeScriptComponent>()->Each([=](auto entity, auto& nsc) 
-		{
-			if (!nsc.Instance)
-			{
-				nsc.Instance = nsc.InstantiateScript();
-				nsc.Instance->m_Entity = {entity, this};
-				nsc.Instance->OnCreate();
-			}
-			nsc.Instance->OnUpdate();
-		});
 
 		// Physics
 		Physics2D::OnPysicsUpdate();
 
 		// update transforms
-		m_Registry.each([&](auto entityID) {
+		m_Registry.Each([&](EntityType entityID) {
 			Entity entity{ entityID, this };
-			entity.GetTransform().UpdateHierarchyGlobalTransform();
+			TransformComponent& tc = entity.GetTransform();
+			if (tc.IsDirty())
+			{
+				// iterate over all components on transform
+			}
 		});
 
 		// get main camera
+		Entity MainCameraEntity = GetPrimaryCameraEntity();
 		Camera* mainCamera = nullptr;
-		Math::Mat4 cameraTransform;
-		{
-			auto view = m_Registry.view<CameraComponent, TransformComponent>();
-			for (auto entity : view)
-			{
-				auto [camera, transform] = view.get<CameraComponent, TransformComponent>(entity);
 
-				if (camera.Primary)
-				{
-					mainCamera = &camera.Camera;
-					cameraTransform = transform.GetGlobalTransform();
-					break;
-				}
-			}
-		}
+		if (MainCameraEntity != Entity::null)
+			mainCamera = &MainCameraEntity.GetComponent<CameraComponent>().Camera;
 
 		if (mainCamera)
 		{
-			Renderer2D::BeginScene(*mainCamera, cameraTransform);
-
-			// render sprites
-			auto sprite = entt::get<SpriteRendererComponent>;
-			auto group = m_Registry.group<TransformComponent>(sprite);
-			for (auto entity : group)
-			{
-				auto [transform, mesh] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-
-				Renderer2D::DrawSprite(transform.GetGlobalTransform(), mesh, -1);
-			}
-
-			Renderer2D::EndScene();
-
-
 			m_SceneRenderer->SetMainCamera(*mainCamera);
 			m_SceneRenderer->UpdateBuffers();
 		}
@@ -177,7 +134,6 @@ namespace Engine
 	Entity Scene::CreateEntityWithUUID(const UUID uuid, const std::string& name)
 	{
 		Entity entity{ m_Registry.CreateEntity(uuid, name), this };
-		entity.AddComponent<EntityDataComponent>(name.empty() ? "Entity" : name, uuid);
 		auto& tc = entity.AddComponent<TransformComponent>();
 		return entity;
 	}
@@ -195,11 +151,10 @@ namespace Engine
 
 	Entity Scene::GetEntityWithUUID(UUID id)
 	{
-		// TODO : Create iterator
-		auto view = m_Registry.view<EntityDataComponent>();
-		for (auto entity : view) {
-			auto idcomp = view.get<EntityDataComponent>(entity);
-			if (idcomp.GetID() == id)
+		for (auto entity : m_Registry)
+		{
+			EntityData& data = m_Registry.GetEntityData(entity);
+			if (data.ID == id)
 				return Entity{ entity, this };
 		}
 		return Entity::null;
@@ -207,25 +162,25 @@ namespace Engine
 
 	Entity Scene::GetPrimaryCameraEntity()
 	{
-		// TODO : Create iterator
-		auto view = m_Registry.view<CameraComponent>();
-		for (auto entity : view) {
-			auto camera = view.get<CameraComponent>(entity);
-			if (camera.Primary)
-				return Entity{ entity, this };
+		
+		auto view = m_Registry.View<CameraComponent>();
+		for (auto comp : view)
+		{
+			if (comp.Primary)
+				return comp.Owner;
 		}
+
 		return Entity::null;
 	}
 
 	template<typename T>
 	static void CopyComponent(SceneRegistry& dest, SceneRegistry& src, const std::unordered_map<UUID, EntityType>& map)
 	{
-		auto view = src.view<T>();
-		for (auto srcEntity : view)
+		auto view = src.View<T>();
+		for (auto srcComponent : view)
 		{
-			entt::entity destEntity = map.at(src.get<EntityDataComponent>(srcEntity).GetID());
-			auto& srcComponent = src.get<T>(srcEntity);
-			dest.emplace_or_replace<T>(destEntity, srcComponent);
+			EntityType destEntity = map.at(src.GetEntityData(srcComponent.Owner).ID);
+			dest.AddComponent<T>(destEntity, srcComponent);
 		}
 	}
 
@@ -248,7 +203,6 @@ namespace Engine
 		});
 
 		CopyComponent<TransformComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
-		CopyComponent<SpriteRendererComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<CameraComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<Rigidbody2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<BoxCollider2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
@@ -276,19 +230,7 @@ namespace Engine
 	}
 
 	template<>
-	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
-	{
-
-	}
-
-	template<>
 	void Scene::OnComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent& component)
-	{
-
-	}
-
-	template<>
-	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
 	{
 
 	}
@@ -304,7 +246,7 @@ namespace Engine
 	{
 
 	}
-	
+
 	template<>
 	void Scene::OnComponentAdded<CircleColliderComponent>(Entity entity, CircleColliderComponent& component)
 	{

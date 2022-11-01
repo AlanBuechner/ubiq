@@ -2,6 +2,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Core/UUID.h"
 #include "ComponentPool.h"
+#include "ComponentView.h"
 #include <vector>
 #include <unordered_map>
 
@@ -33,6 +34,11 @@ namespace Engine
 
 		~SceneRegistry();
 
+		using iterator = std::vector<EntityType>::iterator;
+
+		iterator begin() { return m_UsedEntitys.begin(); }
+		iterator end() { return m_UsedEntitys.end(); }
+
 		EntityType CreateEntity();
 		EntityType CreateEntity(UUID id, const std::string& name);
 		void DestroyEntity(EntityType entity);
@@ -40,21 +46,20 @@ namespace Engine
 		// EntityData Does not have referential integrity
 		EntityData& GetEntityData(EntityType entity) { return m_Entitys[entity]; }
 
-		template<class T>
-		T& AddComponent(EntityType entity)
+		template<class T, typename... Args>
+		T& AddComponent(EntityType entity, Args&&... args)
 		{
 			uint64 componentID = typeid(T).hash_code(); // get component type id
 
 			// find the component pool
-			ComponentPool* pool = m_Pools[componentID];
-			if (pool == nullptr) pool = m_Pools[componentID] = new SizeComponentPool<sizeof(T)>(componentID);
+			ComponentPool* pool = GetOrCreateCompnentPool<T>();
 
 			// allocate memory for component
 			uint32 componentIndex = pool->Allocate(entity);
 			void* componentLocation = pool->GetComponentMemory(componentIndex);
 			CORE_ASSERT(componentLocation != nullptr, "faild to allocate memory for component"); // validate component was successfully created 
 
-			*new(componentLocation) T(); // create component in pre allocated memory
+			*new(componentLocation) T(std::forward<Args>(args)...); // create component in pre allocated memory
 			m_Entitys[entity].m_Components.push_back({ pool, componentIndex }); // add component to entity's list of components
 			return *(T*)componentLocation; // return component
 		}
@@ -75,30 +80,50 @@ namespace Engine
 		template<class T>
 		ComponentPool* GetComponentPool()
 		{
-			ComponentType typeID = typeid(T).hash_code();
-			return m_Pools[typeID];
+			return GetOrCreateCompnentPool<T>();;
 		}
 
 		template<class T>
 		T& GetComponent(EntityType entity)
 		{
-			return *(T*)GetComponentPool<T>()->GetComponentMemory(entity);
+			return *(T*)GetComponentPool<T>()->GetEntityComponentMemory(entity);
 		}
 
 		template<class T>
 		bool HasComponent(EntityType entity)
 		{
-			ComponentType componentID = typeid(t).hash_code();
+			if (m_Entitys.size() <= entity)
+				return false;
+
+			ComponentType componentID = typeid(T).hash_code();
 			EntityData& data = m_Entitys[entity];
 			for (auto& compRef : data.m_Components)
 			{
-				if (compRef.m_Pool->m_TypeID == componentID)
+				if (compRef.m_Pool->GetTypeID() == componentID)
 					return true;
 			}
 			return false;
 		}
 
 		void Each(Func func);
+
+		template<class T>
+		ComponentView<T> View()
+		{
+			uint64 componentID = typeid(T).hash_code();
+			ComponentPool* pool = GetOrCreateCompnentPool<T>();
+			return ComponentView<T>((SizeComponentPool<sizeof(T)>*)pool);
+		}
+
+		template<class T>
+		ComponentPool* GetOrCreateCompnentPool()
+		{
+			uint64 componentID = typeid(T).hash_code();
+			ComponentPool* pool = m_Pools[componentID];
+			if (pool == nullptr) 
+				pool = m_Pools[componentID] = new SizeComponentPool<sizeof(T)>(componentID);
+			return pool;
+		}
 
 	private:
 

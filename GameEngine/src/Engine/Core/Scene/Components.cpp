@@ -57,20 +57,6 @@ void Engine::TransformComponent::SetParentToRoot()
 	}
 }
 
-void Engine::TransformComponent::RemoveMoveCallback(Func func)
-{
-	for (uint32 i = 0; i < m_ChangeCallbacks.size(); i++)
-	{
-		using T = void(*)(const Math::Mat4&);
-		if (m_ChangeCallbacks[i].target<T>() == func.target<T>())
-		{
-			std::swap(m_ChangeCallbacks[i], m_ChangeCallbacks.back());
-			m_ChangeCallbacks.pop_back();
-			return;
-		}
-	}
-}
-
 void Engine::TransformComponent::Dirty()
 {
 	m_Dirty = true;
@@ -92,8 +78,10 @@ void Engine::TransformComponent::UpdateHierarchyGlobalTransform()
 		else
 			ChashedGloableTransform = GetTransform();
 
-		for (uint32 i = 0; i < m_ChangeCallbacks.size(); i++)
-			m_ChangeCallbacks[i](ChashedGloableTransform);
+		// iterate over all components on entity
+		std::vector<Component*> components = Owner.GetComponents();
+		for (Component* comp : components)
+			comp->OnTransformChange(ChashedGloableTransform);
 
 		m_Dirty = false;
 	}

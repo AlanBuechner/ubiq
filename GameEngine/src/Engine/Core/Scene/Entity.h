@@ -6,6 +6,7 @@
 
 namespace Engine
 {
+	struct Component;
 	struct TransformComponent;
 }
 
@@ -35,7 +36,7 @@ namespace Engine
 		T& AddComponent(Args&&... args)
 		{
 			CORE_ASSERT(!HasComponent<T>(), "Entity alredy has component");
-			T& component = m_Scene->m_Registry.emplace<T>(m_EntityID, std::forward<Args>(args)...);
+			T& component = m_Scene->m_Registry.AddComponent<T>(m_EntityID, std::forward<Args>(args)...);
 			component.Owner = *this;
 			m_Scene->OnComponentAdded<T>(*this, component);
 			component.OnComponentAdded();
@@ -63,6 +64,7 @@ namespace Engine
 		void RemoveChild(Entity child);
 		const std::vector<Entity>& GetChildren();
 		void SetParentToRoot();
+		std::vector<Component*> GetComponents();
 
 		Scene* GetScene() { return m_Scene; }
 

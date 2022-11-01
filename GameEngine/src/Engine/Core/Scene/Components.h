@@ -23,38 +23,14 @@
 
 namespace Engine
 {
-	class ScriptableEntity;
-}
-
-namespace Engine
-{
 	struct Component 
 	{
 		Entity Owner;
 
 		virtual void OnComponentAdded() {};
 		virtual void OnComponentRemoved() {};
-	};
 
-	struct EntityDataComponent : Component
-	{
-	public:
-		std::string Name;
-
-	private:
-		UUID ID;
-
-	public:
-		EntityDataComponent() = default;
-		EntityDataComponent(const EntityDataComponent&) = default;
-		EntityDataComponent(const std::string& name) :
-			Name(name), ID(0)
-		{}
-		EntityDataComponent(const std::string& name, UUID id) :
-			Name(name), ID(id)
-		{}
-
-		UUID GetID() { return ID; }
+		virtual void OnTransformChange(const Math::Mat4& transform) {};
 	};
 
 	struct TransformComponent : public Component
@@ -91,8 +67,7 @@ namespace Engine
 		Entity GetOwner() { return Owner; }
 		Entity GetParent() { return Parent; }
 
-		void AddMoveCallback(Func func) { m_ChangeCallbacks.push_back(func); }
-		void RemoveMoveCallback(Func func);
+		bool IsDirty() { return m_Dirty; }
 
 	private:
 		void Dirty();
@@ -109,37 +84,8 @@ namespace Engine
 		bool m_Dirty = true;
 		Math::Mat4 ChashedGloableTransform = Math::Mat4(1.0f);
 
-		std::vector<Func> m_ChangeCallbacks;
-
 		friend Scene;
 		friend SceneSerializer;
-	};
-
-	struct SpriteRendererComponent : public Component
-	{
-		Math::Vector4 Color{ 1.0f,1.0f, 1.0f, 1.0f };
-		Ref<Texture2D> Texture;
-
-		SpriteRendererComponent() = default;
-		SpriteRendererComponent(const SpriteRendererComponent&) = default;
-		SpriteRendererComponent(const Math::Vector4& color) :
-			Color(color)
-		{}
-	};
-
-	struct NativeScriptComponent : public Component
-	{
-		ScriptableEntity* Instance = nullptr;
-
-		ScriptableEntity*(*InstantiateScript)();
-		void(*DestroyScript)(NativeScriptComponent*);
-
-		template<typename T>
-		void Bind()
-		{
-			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
-			DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
-		}
 	};
 
 }

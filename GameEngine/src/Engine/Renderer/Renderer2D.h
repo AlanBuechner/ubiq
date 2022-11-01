@@ -9,8 +9,6 @@ namespace Engine
 {
 	class Camera;
 	class EditorCamera;
-
-	struct SpriteRendererComponent;
 }
 
 namespace Engine
@@ -61,9 +59,6 @@ namespace Engine
 		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
 		static void DrawQuad(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
 		static void DrawQuad(const Math::Mat4& transform, const Math::Vector4& color, const Ref<Texture2D>& texture, int entityID = -1);
-
-		// draw sprite component
-		static void DrawSprite(const Math::Mat4& transform, SpriteRendererComponent& src, int entityID);
 
 		struct Statistics
 		{

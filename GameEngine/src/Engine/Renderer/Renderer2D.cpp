@@ -262,14 +262,6 @@ namespace Engine
 
 
 
-	// draw sprite component
-	void Renderer2D::DrawSprite(const Math::Mat4& transform, SpriteRendererComponent& src, int entityID)
-	{
-		DrawQuadImpl(transform, src.Color, (src.Texture ? src.Texture : Renderer::GetWhiteTexture()), { 1,1 }, { 0,0 }, entityID);
-	}
-
-
-
 	// draw quad implementation
 	void Renderer2D::DrawQuadImpl(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2& uvSize, const Math::Vector2& uvPosition, int entityID)
 	{

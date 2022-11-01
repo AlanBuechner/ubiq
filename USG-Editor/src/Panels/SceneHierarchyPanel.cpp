@@ -31,11 +31,12 @@ namespace Engine
 		ImGui::Begin("Hierarchy");
 
 		std::vector<Entity> rootEntitys;
-		m_Context->m_Registry.each([&](auto entityID) {
+		m_Context->m_Registry.Each([&](auto entityID) {
 			Entity entity{ entityID, m_Context.get() };
 			if (entity.GetTransform().GetParent() == Entity::null)
 				rootEntitys.push_back(entity);
 		});
+
 		for (uint32_t i = 0; i < rootEntitys.size(); i++)
 			DrawEntityNode(rootEntitys[i]);
 
@@ -83,15 +84,6 @@ namespace Engine
 					if (ImGui::MenuItem("Camera"))
 					{
 						m_Selected.AddComponent<CameraComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-
-				if (!m_Selected.HasComponent<SpriteRendererComponent>())
-				{
-					if (ImGui::MenuItem("Sprite Renderer"))
-					{
-						m_Selected.AddComponent<SpriteRendererComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -150,12 +142,6 @@ namespace Engine
 		if (ImGui::MenuItem("Create Empty Entity"))
 		{
 			createdEntity = m_Context->CreateEntity("Empty Entity");
-			entityAdded = true;
-		}
-
-		if (ImGui::MenuItem("Create Sprite"))
-		{
-			(createdEntity = m_Context->CreateEntity("Sprite")).AddComponent<SpriteRendererComponent>();
 			entityAdded = true;
 		}
 
@@ -281,16 +267,15 @@ namespace Engine
 
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
-		if (entity.HasComponent<EntityDataComponent>())
-		{
-			auto& name = entity.GetComponent<EntityDataComponent>().Name;
 
-			char buffer[256];
-			memset(buffer, 0, sizeof(buffer));
-			strcpy_s(buffer, sizeof(buffer), name.c_str());
-			if (ImGui::InputText("Name", buffer, sizeof(buffer)))
-				name = std::string(buffer);
-		}
+		auto& name = entity.GetName();
+
+		char buffer[256];
+		memset(buffer, 0, sizeof(buffer));
+		strcpy_s(buffer, sizeof(buffer), name.c_str());
+		if (ImGui::InputText("Name", buffer, sizeof(buffer)))
+			name = std::string(buffer);
+		
 
 		DrawComponent<TransformComponent>(entity, "Transform", [&]() {
 			auto& tc = entity.GetComponent<TransformComponent>();
@@ -365,14 +350,6 @@ namespace Engine
 				if (PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
 					camera.SetOrthographicFarClip(farClip);
 			}
-		});
-
-		DrawComponent<SpriteRendererComponent>(entity, "Sprite Renderer", [&](){
-			auto& component = entity.GetComponent<SpriteRendererComponent>();
-			auto& color = component.Color;
-			ImGui::ColorEdit4("Color", glm::value_ptr(color));
-
-			PropertysPanel::DrawTextureControl("Texture", component.Texture);
 		});
 
 		DrawComponent<MeshRendererComponent>(entity, "Mesh Renderer", [&](){

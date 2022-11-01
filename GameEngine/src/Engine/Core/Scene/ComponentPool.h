@@ -7,6 +7,10 @@ namespace Engine
 {
 	using ComponentType = uint64;
 
+	template<uint64 TSize>
+	class SizeComponentPool;
+
+
 	class ComponentPool
 	{
 	public:
@@ -18,6 +22,7 @@ namespace Engine
 
 		ComponentType GetTypeID() { return m_TypeID; }
 		uint64 GetComponentSize() { return m_ComponentSize; }
+		virtual std::vector<uint32>& GetUsedSlots() = 0;
 
 		virtual void Each(Func func) = 0;
 
@@ -25,6 +30,7 @@ namespace Engine
 		virtual uint32 Allocate(uint64 entity) = 0;
 		virtual void Free(uint64 entity) = 0;
 		virtual void* GetComponentMemory(uint32 index) = 0;
+		virtual void* GetEntityComponentMemory(uint64 entity) = 0;
 
 	protected:
 		const ComponentType m_TypeID;
@@ -41,6 +47,11 @@ namespace Engine
 		SizeComponentPool(ComponentType typeID) :
 			ComponentPool(typeID, TSize)
 		{}
+
+		virtual std::vector<uint32>& GetUsedSlots() override
+		{
+			return m_UsedSlots;
+		}
 
 		virtual void Each(Func func) override
 		{
@@ -88,9 +99,16 @@ namespace Engine
 			}
 		}
 
-		virtual void* GetComponentMemory(uint32 index)
+
+
+		virtual void* GetComponentMemory(uint32 index) override
 		{
 			return &m_Components[index];
+		}
+
+		virtual void* GetEntityComponentMemory(uint64 entity) override
+		{
+			return GetComponentMemory(m_Entitys[entity]);
 		}
 
 	private:

@@ -13,28 +13,15 @@ namespace Engine
 		bool Primary = true;
 		bool FixedAspectRatio = false;
 
-		CameraComponent() = default;
-		CameraComponent(const CameraComponent&) = default;
-		CameraComponent(CameraComponent&& other);
-		CameraComponent& CameraComponent::operator=(CameraComponent&& other);
-		~CameraComponent();
-
-		virtual void OnComponentAdded();
-
-	private:
-		void ObjectMovecallback(const Math::Mat4& transform);
+		virtual void OnTransformChange(const Math::Mat4& transform) override;
 	};
 
 	class MeshRendererComponent : public Component
 	{
 	public:
-
-		MeshRendererComponent() = default;
-		MeshRendererComponent(MeshRendererComponent&& other);
-		MeshRendererComponent& MeshRendererComponent::operator=(MeshRendererComponent&& other);
 		~MeshRendererComponent();
 
-		virtual void OnComponentAdded() override;
+		virtual void OnTransformChange(const Math::Mat4& transform);
 
 		void SetMesh(Ref<Mesh> mesh) { m_Mesh = mesh; Invalidate(); }
 		Ref<Mesh> GetMesh() { return m_Mesh; }
@@ -43,9 +30,6 @@ namespace Engine
 		Ref<Material> GetMaterial() { return m_Mat; }
 
 		void Invalidate();
-
-	private:
-		void ObjectMovedCallback(const Math::Mat4& transform);
 
 	private:
 		Ref<Mesh> m_Mesh;
