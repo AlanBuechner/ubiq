@@ -33,4 +33,6 @@ namespace Math
 	Vector2 Lerp(const Vector2& v1, const Vector2& v2, float a);
 	Vector3 Lerp(const Vector3& v1, const Vector3& v2, float a);
 	Vector4 Lerp(const Vector4& v1, const Vector4& v2, float a);
+
+	Vector3 SphericalToCartesian(float t1, float t2);
 }

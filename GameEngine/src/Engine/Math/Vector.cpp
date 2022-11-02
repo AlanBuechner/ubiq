@@ -1,4 +1,5 @@
 #include <pch.h>
+#include "Math.h"
 #include "Vector.h"
 
 namespace Math
@@ -127,4 +128,15 @@ namespace Math
 	{
 		return (v1 * a) + v2 * (1.f - a);
 	}
+
+	Math::Vector3 SphericalToCartesian(float t1, float t2)
+	{
+		Vector3 pos;
+		pos.x = Sin(t2);
+		pos.z = Cos(t2);
+		pos *= Cos(t1);
+		pos.y = Sin(t1);
+		return pos;
+	}
+
 }

@@ -59,16 +59,24 @@ namespace Engine
 		props.VisibleNodeMask = 0;
 
 		wrl::ComPtr<ID3D12Resource> uploadBuffer;
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &rDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ, 0, IID_PPV_ARGS(uploadBuffer.GetAddressOf())),
-			"Failed To Create Upload Buffer");
+		CORE_ASSERT_HRESULT(
+			context->GetDevice()->CreateCommittedResource(
+				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 
+				D3D12_HEAP_FLAG_NONE, 
+				&rDesc,
+				D3D12_RESOURCE_STATE_GENERIC_READ, 0, IID_PPV_ARGS(uploadBuffer.GetAddressOf())
+			),"Failed To Create Upload Buffer"
+		);
 
 		// map the date to the upload buffer
 		void* mapped = nullptr;
 		D3D12_RANGE range = { 0, uploadSize };
 		CORE_ASSERT_HRESULT(uploadBuffer->Map(0, &range, &mapped), "Failed to map uplaod buffer");
 		for (uint32 y = 0; y < m_Height; y++)
-			memcpy((void*)((uintptr_t)mapped + y * uploadPitch), (stbi_uc*)data + y * m_Width * 4, m_Height * 4);
+		{
+			byte* pScan = (byte*)mapped + y * uploadPitch;
+			memcpy(pScan, (byte*)data + y * m_Width * 4, m_Width * 4);
+		}
 		//memcpy(mapped, data, m_Width * m_Height * 4);
 		uploadBuffer->Unmap(0, &range);
 
@@ -87,23 +95,13 @@ namespace Engine
 		dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
 		dstLocation.SubresourceIndex = 0;
 
-		D3D12_RESOURCE_BARRIER barrier = {};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = m_Buffer.Get();
-		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-
-		Ref<CommandQueue> commandQueue = CommandQueue::Create(CommandQueue::Type::Direct);
+		Ref<CommandQueue> commandQueue = Renderer::GetMainCommandQueue();
 		Ref<DirectX12CommandList> commandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create());
 		commandList->StartRecording();
 		commandList->GetCommandList()->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
-		commandList->GetCommandList()->ResourceBarrier(1, &barrier);
+		commandList->GetCommandList()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Buffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 		commandList->Close();
-
-		commandQueue->AddCommandList(commandList);
-		commandQueue->Execute();
+		commandQueue->ExecuteImmediate({ commandList });
 	}
 
 	void DirectX12Texture2D::LoadFromFile(const fs::path& path)

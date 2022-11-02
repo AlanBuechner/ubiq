@@ -226,15 +226,25 @@ namespace Engine
 	{
 		Ref<DirectX12VertexBuffer> vb = std::dynamic_pointer_cast<DirectX12VertexBuffer>(mesh->GetVertexBuffer());
 		Ref<DirectX12IndexBuffer> ib = std::dynamic_pointer_cast<DirectX12IndexBuffer>(mesh->GetIndexBuffer());
-		Ref<DirectX12InstanceBuffer> isb = std::dynamic_pointer_cast<DirectX12InstanceBuffer>(instanceBuffer);
 
-		if (numInstances < 0)
-			numInstances = isb->GetCount();
+		if (instanceBuffer)
+		{
+			Ref<DirectX12InstanceBuffer> isb = std::dynamic_pointer_cast<DirectX12InstanceBuffer>(instanceBuffer);
+			if (numInstances < 0)
+				numInstances = isb->GetCount();
 
-		D3D12_VERTEX_BUFFER_VIEW views[] = { vb->GetView(), isb->GetView() };
-		m_CommandList->IASetVertexBuffers(0, 2, views);
-		m_CommandList->IASetIndexBuffer(&ib->GetView());
-		m_CommandList->DrawIndexedInstanced(ib->GetCount(), numInstances, 0, 0, 0);
+			D3D12_VERTEX_BUFFER_VIEW views[] = { vb->GetView(), isb->GetView() };
+			m_CommandList->IASetVertexBuffers(0, 2, views);
+			m_CommandList->IASetIndexBuffer(&ib->GetView());
+			m_CommandList->DrawIndexedInstanced(ib->GetCount(), numInstances, 0, 0, 0);
+		}
+		else
+		{
+			D3D12_VERTEX_BUFFER_VIEW views[] = { vb->GetView() };
+			m_CommandList->IASetVertexBuffers(0, 1, views);
+			m_CommandList->IASetIndexBuffer(&ib->GetView());
+			m_CommandList->DrawIndexedInstanced(ib->GetCount(), 1, 0, 0, 0);
+		}
 	}
 
 	void DirectX12CommandList::Present(Ref<FrameBuffer> fb)

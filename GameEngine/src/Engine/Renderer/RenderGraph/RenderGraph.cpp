@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RenderGraph.h"
 #include "MainPassNode.h"
+#include "SkyboxNode.h"
 
 namespace Engine
 {
@@ -15,8 +16,12 @@ namespace Engine
 		depthPass->SetRenderTarget({ m_OutputNode, m_OutputNode->m_Buffer });
 		m_Nodes.push_back(depthPass);
 
+		Ref<SkyboxNode> skyboxPass = CreateRef<SkyboxNode>(*this, 10, 10);
+		skyboxPass->SetRenderTarget({ depthPass, m_OutputNode->m_Buffer });
+		m_Nodes.push_back(skyboxPass);
+
 		Ref<ShaderPassNode> mainPass = CreateRef<ShaderPassNode>(*this, "main");
-		mainPass->SetRenderTarget({ depthPass, m_OutputNode->m_Buffer });
+		mainPass->SetRenderTarget({ skyboxPass, m_OutputNode->m_Buffer });
 		m_Nodes.push_back(mainPass);
 	}
 

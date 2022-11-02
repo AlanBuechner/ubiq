@@ -8,6 +8,8 @@
 namespace Math
 {
 
+	constexpr float PI = 3.14592654f;
+
 	// trig
 	float Sin(float x);
 	float Cos(float x);
