@@ -189,6 +189,18 @@ namespace Engine
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<SkyboxComponent>())
+		{
+			out << YAML::Key << "SkyboxComponent";
+			out << YAML::BeginMap;
+
+			auto& skyboxComponent = entity.GetComponent<SkyboxComponent>();
+			if (skyboxComponent.GetSkyboxTexture())
+				out << YAML::Key << "Texture" << YAML::Value << skyboxComponent.GetSkyboxTexture()->GetAssetID();
+
+			out << YAML::EndMap;
+		}
+
 		if (entity.HasComponent<Rigidbody2DComponent>())
 		{
 			out << YAML::Key << "Rigidbody2DComponent";
@@ -291,9 +303,7 @@ namespace Engine
 				uint64 uuid = entity["Entity"].as<uint64>();
 
 				std::string name;
-				auto dataComponent = entity["EntityDataComponent"];
-				if (dataComponent)
-					name = dataComponent["Name"].as<std::string>();
+				name = entity["Name"].as<std::string>();
 
 				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 
@@ -337,6 +347,14 @@ namespace Engine
 						mrc.SetMesh(Application::Get().GetAssetManager().GetAsset<Mesh>(meshRendererComponent["Mesh"].as<uint64>()));
 					if(meshRendererComponent["Material"])
 						mrc.SetMaterial(Application::Get().GetAssetManager().GetAsset<Material>(meshRendererComponent["Material"].as<uint64>()));
+				}
+
+				auto skyboxComponent = entity["SkyboxComponent"];
+				if (skyboxComponent)
+				{
+					auto& sbc = deserializedEntity.AddComponent<SkyboxComponent>();
+					if (skyboxComponent["Texture"])
+						sbc.SetSkyboxTexture(Application::Get().GetAssetManager().GetAsset<Texture2D>(skyboxComponent["Texture"].as<uint64>()));
 				}
 
 				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];

@@ -37,4 +37,18 @@ namespace Engine
 		SceneRenderer::ObjectControlBlockRef m_Object = nullptr;
 		Ref<SceneRenderer> m_SceneRenderer;
 	};
+
+	class SkyboxComponent : public Component
+	{
+		static SkyboxComponent* s_Instance;
+
+	public:
+		virtual void OnComponentAdded();
+
+		Ref<Texture2D> GetSkyboxTexture() { return m_SkyboxTexture; }
+		void SetSkyboxTexture(Ref<Texture2D> texture);
+
+	private:
+		Ref<Texture2D> m_SkyboxTexture;
+	};
 }

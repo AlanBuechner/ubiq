@@ -121,11 +121,11 @@ namespace Engine
 		CREATE_PROFILE_SCOPEI("Swap Buffers");
 
 #ifdef DEBUG
-		static uint64 frame;
+		/*static uint64 frame;
 		OutputDebugStringA("Frame: ");
 		OutputDebugStringA(std::to_string(frame).c_str());
 		OutputDebugStringA("\n");
-		frame++;
+		frame++;*/
 #endif
 
 		CORE_ASSERT(m_SwapChain, "Invalid Swapchain! cannot swap buffers on null");

@@ -5,6 +5,7 @@
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/InstanceBuffer.h"
 #include "Engine/Renderer/ConstantBuffer.h"
+#include "Engine/Renderer/Texture.h"
 
 namespace Engine
 {
@@ -22,6 +23,7 @@ namespace Engine
 	{
 		std::vector<DrawCommand> m_DrawCommands;
 		Ref<ConstantBuffer> m_MainCamera;
+		Ref<Texture> m_Skybox;
 	};
 
 	class RenderGraph

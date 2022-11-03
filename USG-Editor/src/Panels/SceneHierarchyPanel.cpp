@@ -78,51 +78,18 @@ namespace Engine
 
 			if (ImGui::BeginPopup("AddComponent"))
 			{
+#define ADD_COMPONENT(name, component)\
+if(!m_Selected.HasComponent<component>()){\
+	if (ImGui::MenuItem(#name)){\
+		m_Selected.AddComponent<component>();\
+		ImGui::CloseCurrentPopup();\
+	}\
+}
+				ADD_COMPONENT(Camera, CameraComponent);
+				ADD_COMPONENT(Mesh Renderer, MeshRendererComponent);
+				ADD_COMPONENT(Skybox, SkyboxComponent);
 
-				if (!m_Selected.HasComponent<CameraComponent>())
-				{
-					if (ImGui::MenuItem("Camera"))
-					{
-						m_Selected.AddComponent<CameraComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-
-				if (!m_Selected.HasComponent<MeshRendererComponent>())
-				{
-					if (ImGui::MenuItem("Mesh Renderer"))
-					{
-						m_Selected.AddComponent<MeshRendererComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-
-				if (!m_Selected.HasComponent<Rigidbody2DComponent>())
-				{
-					if (ImGui::MenuItem("Rigidbody 2D"))
-					{
-						m_Selected.AddComponent<Rigidbody2DComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-
-				if (!m_Selected.HasComponent<BoxCollider2DComponent>())
-				{
-					if (ImGui::MenuItem("Box Collider 2D"))
-					{
-						m_Selected.AddComponent<BoxCollider2DComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				
-				if (!m_Selected.HasComponent<CircleColliderComponent>())
-				{
-					if (ImGui::MenuItem("Circle Collider 2D"))
-					{
-						m_Selected.AddComponent<CircleColliderComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
+#undef ADD_COMPONENT
 
 				ImGui::EndPopup();
 			}
@@ -363,6 +330,16 @@ namespace Engine
 			Ref<Material> mat = component.GetMaterial();
 			if (PropertysPanel::DrawMaterialControl("Material", mat))
 				component.SetMaterial(mat);
+		});
+
+		DrawComponent<SkyboxComponent>(entity, "Skybox", [&]() {
+			auto& component = entity.GetComponent<SkyboxComponent>();
+
+			Ref<Texture2D> texture = component.GetSkyboxTexture();
+			if (PropertysPanel::DrawTextureControl("Texture", texture))
+				component.SetSkyboxTexture(texture);
+
+
 		});
 
 		DrawComponent<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&]() {

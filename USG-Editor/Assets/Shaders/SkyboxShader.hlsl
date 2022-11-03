@@ -19,6 +19,7 @@ struct VS_Input
 struct VS_Output
 {
 	float4 position : SV_POSITION;
+	float2 uv : UV;
 	float3 worldPosition : WORLDPOSITION;
 };
 

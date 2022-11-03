@@ -38,5 +38,23 @@ namespace Engine
 		}
 	}
 
+	SkyboxComponent* SkyboxComponent::s_Instance;
+	void SkyboxComponent::OnComponentAdded()
+	{
+		if (s_Instance)
+		{
+			Owner.RemoveComponent<SkyboxComponent>();
+			return;
+		}
+
+		s_Instance = this;
+	}
+
+	void SkyboxComponent::SetSkyboxTexture(Ref<Texture2D> texture)
+	{
+		m_SkyboxTexture = texture;
+		Owner.GetScene()->GetSceneRenderer()->SetSkyBox(m_SkyboxTexture);
+	}
+
 }
 

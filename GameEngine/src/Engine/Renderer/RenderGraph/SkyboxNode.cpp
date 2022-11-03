@@ -14,9 +14,6 @@ namespace Engine
 
 		m_SkyboxShader = Application::Get().GetAssetManager().GetAsset<Shader>("Assets/Shaders/SkyboxShader.hlsl");
 
-		//m_SkyboxTexture = Application::Get().GetAssetManager().GetAsset<Texture2D>("Assets/Images/ogre_diffuse.bmp");
-		m_SkyboxTexture = Application::Get().GetAssetManager().GetAsset<Texture2D>("Assets/Images/alps_field_4k.jpg");
-
 		struct Vertex
 		{
 			Math::Vector4 position;
@@ -64,10 +61,13 @@ namespace Engine
 		if (!renderTarget->Cleared())
 			m_CommandList->ClearRenderTarget();
 
-		m_CommandList->SetShader(m_SkyboxShader->GetPass("main"));
-		m_CommandList->SetConstantBuffer(0, scene.m_MainCamera);
-		m_CommandList->SetTexture(2, m_SkyboxTexture);
-		m_CommandList->DrawMesh(m_SkyboxMesh);
+		if (scene.m_Skybox)
+		{
+			m_CommandList->SetShader(m_SkyboxShader->GetPass("main"));
+			m_CommandList->SetConstantBuffer(0, scene.m_MainCamera);
+			m_CommandList->SetTexture(2, scene.m_Skybox);
+			m_CommandList->DrawMesh(m_SkyboxMesh);
+		}
 
 		GPUTimer::EndEvent(m_CommandList);
 		m_CommandList->Close();

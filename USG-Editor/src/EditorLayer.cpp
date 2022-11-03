@@ -53,25 +53,6 @@ namespace Engine
 		m_EditorCamera.SetOrientation({ Math::Radians(25), Math::Radians(25) });
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
-
-		// temp
-		SceneRegistry registry;
-		uint64 entity = registry.CreateEntity();
-		TransformComponent& tc = registry.AddComponent<TransformComponent>(entity);
-
-		ComponentPool* tcPool = registry.GetComponentPool<TransformComponent>();
-
-		tcPool->Each([&](void* component) {
-			Component* comp = (Component*)component;
-		});
-
-		registry.Each([&](EntityType entity) {
-			EntityData& data = registry.GetEntityData(entity);
-		});
-
-		registry.RemoveComponent<TransformComponent>(entity);
-
-		registry.DestroyEntity(entity);
 	}
 
 	void EditorLayer::OnDetach()

@@ -83,6 +83,13 @@ namespace Engine
 		m_CameraIndexBuffer->SetData(&bufferLoc);
 	}
 
+	void SceneRenderer::SetSkyBox(Ref<Texture> texture)
+	{
+		SceneData& data = m_RenderGraph->GetScene();
+		data.m_Skybox = texture;
+		Invalidate();
+	}
+
 	void SceneRenderer::UpdateBuffers()
 	{
 		for (auto& shaderDawSection : m_ShaderDrawSection)

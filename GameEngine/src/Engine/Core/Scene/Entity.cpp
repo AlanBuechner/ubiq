@@ -14,7 +14,7 @@ namespace Engine
 
 	UUID Entity::GetUUID() { return m_Scene->m_Registry.GetEntityData(m_EntityID).ID; }
 
-	std::string Entity::GetName()
+	std::string& Entity::GetName()
 	{
 		return m_Scene->m_Registry.GetEntityData(m_EntityID).name;
 	}

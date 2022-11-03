@@ -23,8 +23,6 @@ namespace Engine
 		Ref<CommandList> m_CommandList;
 		FrameBufferVar m_RenderTarget;
 
-		Ref<Texture> m_SkyboxTexture;
-
 		Ref<Mesh> m_SkyboxMesh;
 		Ref<Shader> m_SkyboxShader;
 	};
