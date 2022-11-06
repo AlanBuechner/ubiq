@@ -115,6 +115,7 @@ namespace Engine
 
 		UpdateView();
 
+		m_CameraData.Position = m_Position;
 		UpdateCameraBuffer();
 	}
 

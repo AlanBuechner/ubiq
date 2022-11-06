@@ -159,7 +159,7 @@ namespace Engine
 			CORE_ASSERT(loc != nullptr, "Failed to upload data");
 		}
 
-		UploadData uploadData;
+		UploadBufferData uploadData;
 		uploadData.size = size;
 		uploadData.destOffset = offset;
 		uploadData.srcOffset = page->GetOffset(loc);
@@ -167,12 +167,12 @@ namespace Engine
 		uploadData.uploadResource = page->GetResource();
 		uploadData.state = state;
 
-		m_UploadQueue.push(uploadData);
+		m_BufferUploadQueue.push(uploadData);
 	}
 
 	void DirectX12ResourceManager::CopyBuffer(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 size, D3D12_RESOURCE_STATES state)
 	{
-		UploadData uploadData;
+		UploadBufferData uploadData;
 		uploadData.size = size;
 		uploadData.destOffset = 0;
 		uploadData.destResource = dest;
@@ -180,7 +180,20 @@ namespace Engine
 		uploadData.uploadResource = src;
 		uploadData.state = state;
 
-		m_UploadQueue.push(uploadData);
+		m_BufferUploadQueue.push(uploadData);
+	}
+
+	void DirectX12ResourceManager::UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, D3D12_RESOURCE_STATES state)
+	{
+		UploadTextureData uploadData;
+		uploadData.destResource = dest;
+		uploadData.uploadResource = src;
+		uploadData.width = width;
+		uploadData.height = height;
+		uploadData.pitch = pitch;
+		uploadData.state = state;
+
+		m_TextureUploadQueue.push(uploadData);
 	}
 
 	Ref<ResourceDeletionPool> DirectX12ResourceManager::CreateNewDeletionPool()
@@ -193,7 +206,7 @@ namespace Engine
 	void DirectX12ResourceManager::RecordCommands(Ref<CommandList> commandList)
 	{
 		std::lock_guard g(m_UploadMutex);
-		struct CopyInfo
+		struct BufferCopyInfo
 		{
 			ID3D12Resource* dest;
 			ID3D12Resource* src;
@@ -202,39 +215,86 @@ namespace Engine
 			uint64 size;
 		};
 
+		struct TextureCopyInfo
+		{
+			ID3D12Resource* dest;
+			ID3D12Resource* src;
+			uint64 width;
+			uint64 height;
+			uint64 pitch;
+		};
+
 		CREATE_PROFILE_FUNCTIONI();
-		uint32 numCopys = (uint32)m_UploadQueue.size();
+		uint32 numBufferCopys = (uint32)m_BufferUploadQueue.size();
+		uint32 numTextureCopys = (uint32)m_TextureUploadQueue.size();
 		std::vector<D3D12_RESOURCE_BARRIER> startb;
 		std::vector<D3D12_RESOURCE_BARRIER> endb;
-		std::vector<CopyInfo> copys;
+		std::vector<BufferCopyInfo> bufferCopys;
+		std::vector<TextureCopyInfo> textureCopys;
 
-		startb.reserve(numCopys);
-		endb.reserve(numCopys);
-		copys.reserve(numCopys);
+		startb.reserve(numBufferCopys);
+		endb.reserve(numBufferCopys);
+		bufferCopys.reserve(numBufferCopys);
+		textureCopys.reserve(numTextureCopys);
 
-		while (!m_UploadQueue.empty())
+		while (!m_BufferUploadQueue.empty())
 		{
-			UploadData& data = m_UploadQueue.front();
+			UploadBufferData& data = m_BufferUploadQueue.front();
 
 			startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST));
-			copys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.destOffset, data.srcOffset, data.size });
+			bufferCopys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.destOffset, data.srcOffset, data.size });
 			endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, data.state));
 
-			m_UploadQueue.pop();
+			m_BufferUploadQueue.pop();
 		}
 
+		while (!m_TextureUploadQueue.empty())
+		{
+			UploadTextureData& data = m_TextureUploadQueue.front();
+
+			startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST));
+			textureCopys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.width, data.height, data.pitch });
+			endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, data.state));
+
+			m_TextureUploadQueue.pop();
+		}
+
+		// get the command list
 		Ref<DirectX12CommandList> dxCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(commandList);
-		dxCommandList->StartRecording();
-		dxCommandList->GetCommandList()->ResourceBarrier(numCopys, startb.data());
-		for (uint32 i = 0; i < numCopys; i++)
-			dxCommandList->GetCommandList()->CopyBufferRegion(copys[i].dest, copys[i].destOffset, copys[i].src, copys[i].srcOffset, copys[i].size);
-		dxCommandList->GetCommandList()->ResourceBarrier(numCopys, endb.data());
+
+		dxCommandList->StartRecording(); // start recording 
+		dxCommandList->GetCommandList()->ResourceBarrier(startb.size(), startb.data()); // transition resources to copy
+
+		// copy buffers
+		for (uint32 i = 0; i < numBufferCopys; i++)
+			dxCommandList->GetCommandList()->CopyBufferRegion(bufferCopys[i].dest, bufferCopys[i].destOffset, bufferCopys[i].src, bufferCopys[i].srcOffset, bufferCopys[i].size);
+
+		// copy textures
+		for (uint32 i = 0; i < numTextureCopys; i++)
+		{
+			TextureCopyInfo& info = textureCopys[i];
+
+			D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+			srcLocation.pResource = info.src;
+			srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+			srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			srcLocation.PlacedFootprint.Footprint.Width = info.width;
+			srcLocation.PlacedFootprint.Footprint.Height = info.height;
+			srcLocation.PlacedFootprint.Footprint.Depth = 1;
+			srcLocation.PlacedFootprint.Footprint.RowPitch = info.pitch;
+
+			D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+			dstLocation.pResource = info.dest;
+			dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+			dstLocation.SubresourceIndex = 0;
+			dxCommandList->GetCommandList()->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
+		}
+
+		dxCommandList->GetCommandList()->ResourceBarrier(endb.size(), endb.data()); // transition resources back to original state
 		dxCommandList->Close();
 
 		for (uint32 i = 0; i < m_UploadPages.size(); i++)
-		{
 			m_UploadPages[i].Clear();
-		}
 
 	}
 }

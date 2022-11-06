@@ -63,7 +63,7 @@ namespace Engine
 
 				if (layout.HasElement(VertexDataType::Tangent))
 				{
-					meshBuilder->vertices[i].tangent = GetTangent(m, v);
+					meshBuilder->vertices[v].tangent = GetTangent(m, v);
 				}
 			}
 
@@ -102,10 +102,10 @@ namespace Engine
 			switch (l.type)
 			{
 			case VertexDataType::Position3:
-				elements.push_back({ ShaderDataType::Float3, "m_Position" });
+				elements.push_back({ ShaderDataType::Float3, "Position" });
 				break;
 			case VertexDataType::Position4:
-				elements.push_back({ ShaderDataType::Float4, "m_Position" });
+				elements.push_back({ ShaderDataType::Float4, "Position" });
 				break;
 			case VertexDataType::Normal:
 				elements.push_back({ ShaderDataType::Float3, "Normal" });

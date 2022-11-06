@@ -11,16 +11,62 @@ namespace Engine
 		Camera.SetTransform(transform);
 	}
 
-	// mesh component
-	MeshRendererComponent::~MeshRendererComponent()
+	// directional Light component
+	void DirectionalLightComponent::OnComponentAdded()
 	{
-		// remove callback
-		if (Owner)
+		if (s_Instance)
 		{
-			// remove object from the scene
-			if (Owner.GetScene() != nullptr)
-				Owner.GetScene()->GetSceneRenderer()->RemoveObject(m_Object);
+			Owner.RemoveComponent<DirectionalLightComponent>();
+			return;
 		}
+
+		s_Instance = this;
+
+		m_Light = { {0,-1,0}, {1,1,1}, 1 };
+		m_LightBuffer = ConstantBuffer::Create(sizeof(DirectionalLight));
+
+		Owner.GetScene()->GetSceneRenderer()->SetDirectionalLight(m_LightBuffer);
+	}
+
+	void DirectionalLightComponent::OnInvalid()
+	{
+		if (m_Dirty)
+		{
+			m_LightBuffer->SetData(&m_Light);
+			m_Dirty = false;
+		}
+	}
+
+	void DirectionalLightComponent::OnComponentRemoved()
+	{
+		if (this == s_Instance)
+			s_Instance = nullptr;
+	}
+
+	void DirectionalLightComponent::SetDirection(Math::Vector3 direction)
+	{
+		m_Light.direction = direction;
+		m_Dirty = true;
+	}
+
+	void DirectionalLightComponent::SetColor(Math::Vector3 color)
+	{
+		m_Light.color = color;
+		m_Dirty = true;
+	}
+
+	void DirectionalLightComponent::SetIntensity(float intensity)
+	{
+		m_Light.intensity = intensity;
+		m_Dirty = true;
+	}
+
+	// mesh component
+	void MeshRendererComponent::OnComponentRemoved()
+	{
+		// remove object from the scene
+		if (Owner.GetScene() != nullptr)
+			Owner.GetScene()->GetSceneRenderer()->RemoveObject(m_Object);
 	}
 
 	void MeshRendererComponent::OnTransformChange(const Math::Mat4& transform)
@@ -38,6 +84,7 @@ namespace Engine
 		}
 	}
 
+	// skybox component 
 	SkyboxComponent* SkyboxComponent::s_Instance;
 	void SkyboxComponent::OnComponentAdded()
 	{
@@ -48,6 +95,12 @@ namespace Engine
 		}
 
 		s_Instance = this;
+	}
+
+	void SkyboxComponent::OnComponentRemoved()
+	{
+		if (this == s_Instance)
+			s_Instance = nullptr;
 	}
 
 	void SkyboxComponent::SetSkyboxTexture(Ref<Texture2D> texture)

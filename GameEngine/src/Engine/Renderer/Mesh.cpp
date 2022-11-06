@@ -51,7 +51,7 @@ namespace Engine
 
 	bool Mesh::ValidExtention(const fs::path& ext)
 	{
-		return (ext == ".obj");
+		return (ext == ".obj" || ext == ".fbx" || ext == ".gltf");
 	}
 
 }

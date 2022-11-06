@@ -47,6 +47,7 @@ namespace Engine
 
 	void Scene::OnUpdateEditor(const EditorCamera& camera)
 	{
+		// updating
 		// update transforms
 		m_Registry.Each([&](EntityType entityID) {
 			Entity entity{ entityID, this };
@@ -54,6 +55,16 @@ namespace Engine
 			tc.UpdateHierarchyGlobalTransform();
 		});
 
+		
+		//update invalid components
+		m_Registry.Each([&](EntityType entityID) {
+			Entity entity{ entityID, this };
+			std::vector<Component*> components = entity.GetComponents();
+			for (Component* comp : components)
+				comp->OnInvalid();
+		});
+
+		// rendering
 		// render sprites
 		{
 			Renderer2D::BeginScene(camera);
@@ -82,8 +93,12 @@ namespace Engine
 
 	void Scene::OnUpdateRuntime()
 	{
-		// TODO : update components
-
+		// update transforms
+		m_Registry.Each([&](EntityType entityID) {
+			Entity entity{ entityID, this };
+			TransformComponent& tc = entity.GetTransform();
+			tc.UpdateHierarchyGlobalTransform();
+		});
 
 		// Physics
 		Physics2D::OnPysicsUpdate();
@@ -92,10 +107,7 @@ namespace Engine
 		m_Registry.Each([&](EntityType entityID) {
 			Entity entity{ entityID, this };
 			TransformComponent& tc = entity.GetTransform();
-			if (tc.IsDirty())
-			{
-				// iterate over all components on transform
-			}
+			tc.UpdateHierarchyGlobalTransform();
 		});
 
 		// get main camera
@@ -145,6 +157,13 @@ namespace Engine
 
 		for (auto& child : entity.GetTransform().GetChildren())
 			DestroyEntity(child);
+
+		m_Registry.Each([&](EntityType entityID) {
+			Entity entity{ entityID, this };
+			std::vector<Component*> components = entity.GetComponents();
+			for (Component* comp : components)
+				comp->OnComponentRemoved();
+		});
 
 		m_Registry.DestroyEntity(entity);
 	}
@@ -227,6 +246,12 @@ namespace Engine
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
 	{
 		component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+	}
+
+	template<>
+	void Scene::OnComponentAdded<DirectionalLightComponent>(Entity entity, DirectionalLightComponent& component)
+	{
+
 	}
 
 	template<>

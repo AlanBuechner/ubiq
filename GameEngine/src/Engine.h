@@ -22,6 +22,7 @@
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/ConstantBuffer.h"
+#include "Engine/Renderer/StructuredBuffer.h"
 #include "Engine/Renderer/InstanceBuffer.h"
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/SubTexture.h"

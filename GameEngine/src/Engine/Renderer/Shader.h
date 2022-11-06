@@ -42,7 +42,6 @@ namespace Engine
 
 		static Ref<ShaderPass> Create(Ref<ShaderSorce> src, const std::string& passName);
 
-	private:
 		virtual uint32 GetUniformLocation(const std::string& name) const = 0;
 	};
 

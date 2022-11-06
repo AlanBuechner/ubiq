@@ -70,6 +70,7 @@ namespace Engine
 		Ref<FrameBuffer> GetRenderTarget() { return m_RenderGraph->GetRenderTarget(); }
 		void OnViewportResize(uint32 width, uint32 height);
 		void SetMainCamera(const Camera& camera);
+		void SetDirectionalLight(Ref<ConstantBuffer> light);
 		void SetSkyBox(Ref<Texture> texture);
 		void UpdateBuffers();
 		void Invalidate();

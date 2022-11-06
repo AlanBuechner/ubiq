@@ -94,5 +94,7 @@ namespace Engine
 		bool m_SaveScene = false;
 
 		fs::path m_DropPath;
+
+		Ref<StructuredBuffer> m_SBuffer;
 	};
 }

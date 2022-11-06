@@ -84,6 +84,13 @@ struct Material
 	uint specular;
 };
 
+cbuffer DirectinalLight
+{
+	float3 direction;
+	float3 color;
+	float intensity;
+};
+
 ConstantBuffer<Material> materials[];
 Texture2D<float4> textures[];
 sampler s;

@@ -36,8 +36,10 @@ namespace Engine
 
 		for (auto& cmd : scene.m_DrawCommands)
 		{
-			m_CommandList->SetShader(cmd.m_Shader->GetPass(m_PassName));
-			m_CommandList->SetConstantBuffer(0, scene.m_MainCamera);
+			Ref<ShaderPass> pass = cmd.m_Shader->GetPass(m_PassName);
+			m_CommandList->SetShader(pass);
+			m_CommandList->SetConstantBuffer(pass->GetUniformLocation("MainCameraIndex"), scene.m_MainCamera);
+			m_CommandList->SetConstantBuffer(pass->GetUniformLocation("DirLight"), scene.m_DirectinalLight);
 			m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
 		}
 

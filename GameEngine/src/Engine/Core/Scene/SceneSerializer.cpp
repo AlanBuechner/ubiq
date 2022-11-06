@@ -174,6 +174,19 @@ namespace Engine
 			out << YAML::EndMap; // end camera component
 		}
 
+		if (entity.HasComponent<DirectionalLightComponent>())
+		{
+			out << YAML::Key << "DirectionalLightComponent";
+			out << YAML::BeginMap;
+
+			auto& dirLightComponent = entity.GetComponent<DirectionalLightComponent>();
+			out << YAML::Key << "Direction" << YAML::Value << dirLightComponent.GetDirectinalLight().direction;
+			out << YAML::Key << "Color" << YAML::Value << dirLightComponent.GetDirectinalLight().color;
+			out << YAML::Key << "Intensity" << YAML::Value << dirLightComponent.GetDirectinalLight().intensity;
+
+			out << YAML::EndMap;
+		}
+
 		if (entity.HasComponent<MeshRendererComponent>())
 		{
 			out << YAML::Key << "MeshRendererComponent";
@@ -337,6 +350,13 @@ namespace Engine
 
 					cc.Primary = cameraComponent["Primary"].as<bool>();
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+				}
+
+				auto dirLightComponent = entity["DirectionalLightComponent"];
+				if (dirLightComponent)
+				{
+					auto& dlc = deserializedEntity.AddComponent<DirectionalLightComponent>();
+					dlc.SetDirection(dirLightComponent["Direction"].as<Math::Vector3>());
 				}
 
 				auto meshRendererComponent = entity["MeshRendererComponent"];

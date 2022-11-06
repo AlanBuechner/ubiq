@@ -43,13 +43,23 @@ namespace Engine
 	class DirectX12ResourceManager : public ResourceManager
 	{
 	public:
-		struct UploadData
+		struct UploadBufferData
 		{
 			wrl::ComPtr<ID3D12Resource> destResource;
 			wrl::ComPtr<ID3D12Resource> uploadResource;
 			uint64 destOffset;
 			uint64 srcOffset;
 			uint32 size;
+			D3D12_RESOURCE_STATES state;
+		};
+
+		struct UploadTextureData
+		{
+			wrl::ComPtr<ID3D12Resource> destResource;
+			wrl::ComPtr<ID3D12Resource> uploadResource;
+			uint32 width;
+			uint32 height;
+			uint32 pitch;
 			D3D12_RESOURCE_STATES state;
 		};
 
@@ -72,13 +82,16 @@ namespace Engine
 		void UploadBufferRegion(wrl::ComPtr<ID3D12Resource> dest, uint64 offset, const void* data, uint32 size, D3D12_RESOURCE_STATES state);
 		void CopyBuffer(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 size, D3D12_RESOURCE_STATES state);
 
+		void UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, D3D12_RESOURCE_STATES state);
+
 		void ScheduleResourceDeletion(wrl::ComPtr<ID3D12Resource> resource) { m_DeletionPool->AddResource(resource); }
 
 	private:
 		virtual void RecordCommands(Ref<CommandList> commandList) override;
 
 	private:
-		std::queue<UploadData> m_UploadQueue;
+		std::queue<UploadBufferData> m_BufferUploadQueue;
+		std::queue<UploadTextureData> m_TextureUploadQueue;
 		std::vector<DirectX12UploadPage> m_UploadPages;
 
 		Ref<DirectX12ResourceDeletionPool> m_DeletionPool;

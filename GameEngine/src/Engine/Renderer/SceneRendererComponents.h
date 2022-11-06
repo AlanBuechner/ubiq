@@ -3,6 +3,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "SceneRenderer.h"
+#include "Light.h"
 #include "Engine/Core/Scene/Components.h"
 
 namespace Engine
@@ -16,10 +17,30 @@ namespace Engine
 		virtual void OnTransformChange(const Math::Mat4& transform) override;
 	};
 
+	class DirectionalLightComponent : public Component
+	{
+		DirectionalLightComponent* s_Instance;
+	public:
+		virtual void OnComponentAdded() override;
+		virtual void OnInvalid() override;
+		virtual void OnComponentRemoved() override;
+		
+		void SetDirection(Math::Vector3 direction);
+		void SetColor(Math::Vector3 color);
+		void SetIntensity(float intensity);
+		const DirectionalLight& GetDirectinalLight() { return m_Light; }
+
+	private:
+		DirectionalLight m_Light;
+		Ref<ConstantBuffer> m_LightBuffer;
+
+		bool m_Dirty = true;
+	};
+
 	class MeshRendererComponent : public Component
 	{
 	public:
-		~MeshRendererComponent();
+		virtual void OnComponentRemoved() override;
 
 		virtual void OnTransformChange(const Math::Mat4& transform);
 
@@ -43,7 +64,8 @@ namespace Engine
 		static SkyboxComponent* s_Instance;
 
 	public:
-		virtual void OnComponentAdded();
+		virtual void OnComponentAdded() override;
+		virtual void OnComponentRemoved() override;
 
 		Ref<Texture2D> GetSkyboxTexture() { return m_SkyboxTexture; }
 		void SetSkyboxTexture(Ref<Texture2D> texture);

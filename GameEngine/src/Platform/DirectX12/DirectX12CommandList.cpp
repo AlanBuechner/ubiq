@@ -212,12 +212,18 @@ namespace Engine
 
 	void DirectX12CommandList::SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer)
 	{
+		if (index == UINT32_MAX || buffer == nullptr)
+			return; // invalid bind slot
+
 		Ref<DirectX12ConstantBuffer> cb = std::dynamic_pointer_cast<DirectX12ConstantBuffer>(buffer);
 		m_CommandList->SetGraphicsRootConstantBufferView(index, cb->GetBuffer()->GetGPUVirtualAddress());
 	}
 
 	void DirectX12CommandList::SetTexture(uint32 index, Ref<Texture> texture)
 	{
+		if (index == UINT32_MAX)
+			return; // invalid bind slot
+
 		Ref<DirectX12Texture2D> d3dTexture = std::dynamic_pointer_cast<DirectX12Texture2D>(texture);
 		m_CommandList->SetGraphicsRootDescriptorTable(index, d3dTexture->GetHandle().gpu);
 	}

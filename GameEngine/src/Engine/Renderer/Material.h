@@ -13,7 +13,10 @@ namespace Engine
 		Ref<Shader> shader;
 		Ref<Texture2D> diffuse;
 		Ref<Texture2D> normal;
-		Ref<Texture2D> specular;
+		Ref<Texture2D> roughness;
+		Ref<Texture2D> ao;
+		Ref<Texture2D> metal;
+		Ref<Texture2D> disp;
 
 		void Apply();
 		Ref<ConstantBuffer> GetBuffer() { return m_Buffer; }
@@ -26,7 +29,10 @@ namespace Engine
 		{
 			uint32 diffuseLoc;
 			uint32 normalLoc;
-			uint32 specularLoc;
+			uint32 roughnessLoc;
+			uint32 aoLoc;
+			uint32 metalLoc;
+			uint32 dispLoc;
 		};
 
 		Ref<ConstantBuffer> m_Buffer;

@@ -12,11 +12,21 @@ namespace Engine
 	{
 		CBuffData data;
 		data.diffuseLoc = diffuse->GetDescriptorLocation();
+
 		if (normal) data.normalLoc = normal->GetDescriptorLocation();
 		else data.normalLoc = Renderer::GetBlueTexture()->GetDescriptorLocation();
 
-		if (specular) data.specularLoc = specular->GetDescriptorLocation();
-		else data.specularLoc = Renderer::GetBlackexture()->GetDescriptorLocation();
+		if (roughness) data.roughnessLoc = roughness->GetDescriptorLocation();
+		else data.roughnessLoc = Renderer::GetBlackexture()->GetDescriptorLocation();
+
+		if (ao) data.aoLoc = ao->GetDescriptorLocation();
+		else data.aoLoc = Renderer::GetWhiteTexture()->GetDescriptorLocation();
+
+		if (metal) data.metalLoc = metal->GetDescriptorLocation();
+		else Renderer::GetBlackexture()->GetDescriptorLocation();
+
+		if (disp) data.dispLoc = disp->GetDescriptorLocation();
+		else data.dispLoc = Renderer::GetBlackexture()->GetDescriptorLocation();
 
 		m_Buffer->SetData((const void*)&data);
 	}
@@ -36,14 +46,16 @@ namespace Engine
 			CORE_ASSERT(f.contains("shader"), "Material does not have a shader");
 			mat->shader = assetManager.GetAsset<Shader>(f["shader"].get<fs::path>());
 
-			if (f.contains("diffuse"))
-				mat->diffuse = assetManager.GetAsset<Texture2D>(f["diffuse"]);
+#define GET_TEXTURE_ATTRIB(name) if(f.contains(#name)) mat->name = assetManager.GetAsset<Texture2D>(f[#name]);
 
-			if (f.contains("normal"))
-				mat->normal = assetManager.GetAsset<Texture2D>(f["normal"]);
+			GET_TEXTURE_ATTRIB(diffuse);
+			GET_TEXTURE_ATTRIB(normal);
+			GET_TEXTURE_ATTRIB(roughness);
+			GET_TEXTURE_ATTRIB(ao);
+			GET_TEXTURE_ATTRIB(metal);
+			GET_TEXTURE_ATTRIB(disp);
 
-			if (f.contains("specular"))
-				mat->specular = assetManager.GetAsset<Texture2D>(f["specular"]);
+#undef GET_TEXTURE_ATTRIB
 		}
 
 		mat->m_Buffer = ConstantBuffer::Create(sizeof(CBuffData));

@@ -3,6 +3,7 @@
 #include "DX.h"
 #include <dxc/inc/dxcapi.h>
 #include <dxc/inc/d3d12shader.h>
+#include <unordered_map>
 
 namespace Engine
 {
@@ -21,8 +22,8 @@ namespace Engine
 
 		ShaderConfig::Topology GetTopologyType() { return m_Src->config.topology; }
 
-	private:
 		virtual uint32 GetUniformLocation(const std::string& name) const;
+	private:
 
 		struct ShaderBlobs
 		{
@@ -56,6 +57,8 @@ namespace Engine
 		ShaderConfig::RenderPass& m_PassConfig;
 
 		uint32 m_NumRootBindings = 0;
+
+		std::unordered_map<std::string, uint32> m_UniformLocations;
 
 		std::vector<ShaderInputElement> m_InputElements;
 		std::vector<ShaderParameter> m_ReflectionData;

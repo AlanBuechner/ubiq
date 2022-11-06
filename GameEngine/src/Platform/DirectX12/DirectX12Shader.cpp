@@ -87,7 +87,10 @@ namespace Engine
 
 	uint32 DirectX12Shader::GetUniformLocation(const std::string& name) const
 	{
-		return 0;
+		auto& location = m_UniformLocations.find(name);
+		if (location != m_UniformLocations.end())
+			return location->second;
+		return UINT32_MAX; // invalid location
 	}
 
 	void DirectX12Shader::Init()
@@ -332,6 +335,7 @@ namespace Engine
 			{
 				// populate root index
 				rd.rootIndex = (uint32)params.size();
+				m_UniformLocations[rd.name] = rd.rootIndex;
 
 				// root parameters
 				D3D12_ROOT_PARAMETER1 param;

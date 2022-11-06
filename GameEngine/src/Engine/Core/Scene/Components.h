@@ -31,6 +31,7 @@ namespace Engine
 		virtual void OnComponentRemoved() {};
 
 		virtual void OnTransformChange(const Math::Mat4& transform) {};
+		virtual void OnInvalid() {};
 	};
 
 	struct TransformComponent : public Component

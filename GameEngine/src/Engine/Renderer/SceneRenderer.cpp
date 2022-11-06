@@ -83,6 +83,13 @@ namespace Engine
 		m_CameraIndexBuffer->SetData(&bufferLoc);
 	}
 
+	void SceneRenderer::SetDirectionalLight(Ref<ConstantBuffer> light)
+	{
+		SceneData& data = m_RenderGraph->GetScene();
+		data.m_DirectinalLight = light;
+		Invalidate();
+	}
+
 	void SceneRenderer::SetSkyBox(Ref<Texture> texture)
 	{
 		SceneData& data = m_RenderGraph->GetScene();

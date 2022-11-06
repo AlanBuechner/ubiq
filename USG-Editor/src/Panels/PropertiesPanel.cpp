@@ -171,6 +171,30 @@ namespace Engine
 		return changed;
 	}
 
+	bool PropertysPanel::DrawColorControl(const std::string& label, Math::Vector3& values)
+	{
+
+		bool changed = false;
+
+		ImGui::PushID(label.c_str());
+		ImGui::Columns(2);
+
+		ImGui::SetColumnWidth(0, 100);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::SameLine();
+		if (ImGui::ColorEdit3("##color", (float*)&values))
+			changed = true;
+
+		ImGui::Columns(1);
+		ImGui::PopID();
+
+		ImGui::Spacing();
+
+		return changed;
+	}
+
 	bool PropertysPanel::DrawTextureControl(const std::string& lable, Ref<Texture2D>& texture)
 	{
 		bool changed = false;

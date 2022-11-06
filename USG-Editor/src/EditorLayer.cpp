@@ -53,6 +53,13 @@ namespace Engine
 		m_EditorCamera.SetOrientation({ Math::Radians(25), Math::Radians(25) });
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		struct D {
+			uint32 i = 12;
+		} d;
+
+		m_SBuffer = StructuredBuffer::Create(sizeof(D), 1);
+		m_SBuffer->SetData(&d);
 	}
 
 	void EditorLayer::OnDetach()

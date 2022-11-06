@@ -86,6 +86,7 @@ if(!m_Selected.HasComponent<component>()){\
 	}\
 }
 				ADD_COMPONENT(Camera, CameraComponent);
+				ADD_COMPONENT(Directiona lLight, DirectionalLightComponent);
 				ADD_COMPONENT(Mesh Renderer, MeshRendererComponent);
 				ADD_COMPONENT(Skybox, SkyboxComponent);
 
@@ -115,6 +116,24 @@ if(!m_Selected.HasComponent<component>()){\
 		if (ImGui::MenuItem("Create Camera"))
 		{
 			(createdEntity = m_Context->CreateEntity("Camera")).AddComponent<CameraComponent>();
+			entityAdded = true;
+		}
+
+		if (ImGui::MenuItem("Create Directional Light"))
+		{
+			(createdEntity = m_Context->CreateEntity("Directional Light")).AddComponent<DirectionalLightComponent>();
+			entityAdded = true;
+		}
+
+		if (ImGui::MenuItem("Create Mesh"))
+		{
+			(createdEntity = m_Context->CreateEntity("Mesh")).AddComponent<MeshRendererComponent>();
+			entityAdded = true;
+		}
+
+		if (ImGui::MenuItem("Create Skybox"))
+		{
+			(createdEntity = m_Context->CreateEntity("Skybox")).AddComponent<SkyboxComponent>();
 			entityAdded = true;
 		}
 
@@ -319,6 +338,20 @@ if(!m_Selected.HasComponent<component>()){\
 			}
 		});
 
+		DrawComponent<DirectionalLightComponent>(entity, "Directional Light", [&]() {
+			auto& component = entity.GetComponent<DirectionalLightComponent>();
+
+			DirectionalLight light = component.GetDirectinalLight();
+			if (PropertysPanel::DrawVec3Control("Direction", light.direction))
+				component.SetDirection(light.direction);
+
+			if (PropertysPanel::DrawColorControl("Color", light.color))
+				component.SetColor(light.color);
+
+			if (PropertysPanel::DrawFloatControl("Intensity", light.intensity))
+				component.SetIntensity(light.intensity);
+		});
+
 		DrawComponent<MeshRendererComponent>(entity, "Mesh Renderer", [&](){
 			auto& component = entity.GetComponent<MeshRendererComponent>();
 			
@@ -338,8 +371,6 @@ if(!m_Selected.HasComponent<component>()){\
 			Ref<Texture2D> texture = component.GetSkyboxTexture();
 			if (PropertysPanel::DrawTextureControl("Texture", texture))
 				component.SetSkyboxTexture(texture);
-
-
 		});
 
 		DrawComponent<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&]() {

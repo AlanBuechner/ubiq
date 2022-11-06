@@ -23,6 +23,7 @@ namespace Engine
 	{
 		std::vector<DrawCommand> m_DrawCommands;
 		Ref<ConstantBuffer> m_MainCamera;
+		Ref<ConstantBuffer> m_DirectinalLight;
 		Ref<Texture> m_Skybox;
 	};
 

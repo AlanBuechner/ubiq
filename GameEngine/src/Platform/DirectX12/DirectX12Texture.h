@@ -40,7 +40,6 @@ namespace Engine
 		Ref<TextureAttribute> m_Attribute;
 
 		wrl::ComPtr<ID3D12Resource> m_Buffer;
-		wrl::ComPtr<ID3D12Resource> m_UploadBuffer;
 		DirectX12DescriptorHandle m_Handle;
 		DirectX12DescriptorHandle m_SamplerHandle;
 

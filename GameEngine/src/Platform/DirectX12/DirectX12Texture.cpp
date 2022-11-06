@@ -80,38 +80,21 @@ namespace Engine
 		//memcpy(mapped, data, m_Width * m_Height * 4);
 		uploadBuffer->Unmap(0, &range);
 
-		// copy the upload buffer to the resource
-		D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
-		srcLocation.pResource = uploadBuffer.Get();
-		srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-		srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		srcLocation.PlacedFootprint.Footprint.Width = m_Width;
-		srcLocation.PlacedFootprint.Footprint.Height = m_Height;
-		srcLocation.PlacedFootprint.Footprint.Depth = 1;
-		srcLocation.PlacedFootprint.Footprint.RowPitch = uploadPitch;
+		context->GetDX12ResourceManager()->UploadTexture(m_Buffer, uploadBuffer, m_Width, m_Height, uploadPitch, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-		D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
-		dstLocation.pResource = m_Buffer.Get();
-		dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-		dstLocation.SubresourceIndex = 0;
-
-		Ref<CommandQueue> commandQueue = Renderer::GetMainCommandQueue();
-		Ref<DirectX12CommandList> commandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create());
-		commandList->StartRecording();
-		commandList->GetCommandList()->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
-		commandList->GetCommandList()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Buffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
-		commandList->Close();
-		commandQueue->ExecuteImmediate({ commandList });
+		context->GetDX12ResourceManager()->ScheduleResourceDeletion(uploadBuffer);
 	}
 
 	void DirectX12Texture2D::LoadFromFile(const fs::path& path)
 	{
+		InstrumentationTimer timer = CREATE_PROFILEI();
 		m_Path = path;
 
+		timer.Start("LoadImage");
 		int width, height, channels;
-		//stbi_set_flip_vertically_on_load(true);
 		stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &channels, 4);
 		CORE_ASSERT(data, "Failed to load image \"{0}\"", path);
+		timer.End();
 
 		CreateImage(width, height);
 		SetData(data);
@@ -148,7 +131,7 @@ namespace Engine
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
 			&rDesc,
-			D3D12_RESOURCE_STATE_COPY_DEST,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 			nullptr, 
 			IID_PPV_ARGS(m_Buffer.GetAddressOf())
 		);
