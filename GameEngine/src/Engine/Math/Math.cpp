@@ -55,7 +55,7 @@ namespace Math
 
 	float Atan2(float y, float x)
 	{
-		return glm::atan(y / x);
+		return glm::atan(y, x);
 	}
 
 	float Sinh(float x)

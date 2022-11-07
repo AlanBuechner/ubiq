@@ -219,9 +219,9 @@ namespace Engine
 		{
 			ID3D12Resource* dest;
 			ID3D12Resource* src;
-			uint64 width;
-			uint64 height;
-			uint64 pitch;
+			uint32 width;
+			uint32 height;
+			uint32 pitch;
 		};
 
 		CREATE_PROFILE_FUNCTIONI();
@@ -263,7 +263,7 @@ namespace Engine
 		Ref<DirectX12CommandList> dxCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(commandList);
 
 		dxCommandList->StartRecording(); // start recording 
-		dxCommandList->GetCommandList()->ResourceBarrier(startb.size(), startb.data()); // transition resources to copy
+		dxCommandList->GetCommandList()->ResourceBarrier((uint32)startb.size(), startb.data()); // transition resources to copy
 
 		// copy buffers
 		for (uint32 i = 0; i < numBufferCopys; i++)
@@ -290,7 +290,7 @@ namespace Engine
 			dxCommandList->GetCommandList()->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
 		}
 
-		dxCommandList->GetCommandList()->ResourceBarrier(endb.size(), endb.data()); // transition resources back to original state
+		dxCommandList->GetCommandList()->ResourceBarrier((uint32)endb.size(), endb.data()); // transition resources back to original state
 		dxCommandList->Close();
 
 		for (uint32 i = 0; i < m_UploadPages.size(); i++)

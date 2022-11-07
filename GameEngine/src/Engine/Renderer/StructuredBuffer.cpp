@@ -15,6 +15,7 @@ namespace Engine
 		default:
 			break;
 		}
+		return Ref<StructuredBuffer>();
 	}
 
 }

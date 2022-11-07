@@ -101,7 +101,7 @@ PS_Output main(PS_Input input)
 
 	float3 wp = input.worldPosition;
 
-	float lon = -atan2(wp.x, wp.z);
+	float lon = -atan2(wp.z, wp.x);
 	float lat = atan(wp.y/length(wp.xz));
 	float2 uv = float2((lon+PI)/(2*PI), 1-(lat+(PI/2))/PI);
 

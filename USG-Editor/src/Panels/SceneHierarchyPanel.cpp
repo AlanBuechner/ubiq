@@ -341,15 +341,23 @@ if(!m_Selected.HasComponent<component>()){\
 		DrawComponent<DirectionalLightComponent>(entity, "Directional Light", [&]() {
 			auto& component = entity.GetComponent<DirectionalLightComponent>();
 
-			DirectionalLight light = component.GetDirectinalLight();
-			if (PropertysPanel::DrawVec3Control("Direction", light.direction))
-				component.SetDirection(light.direction);
+			Math::Vector3 direction = component.GetDirectinalLight()->GetDirection();
+			Math::Vector2 rot = component.GetDirectinalLight()->GetAngles();
+			/*Math::Vector2 rot = {
+				Math::Degrees(-Math::Atan2(direction.z, direction.x)),
+				Math::Degrees(Math::Atan(direction.y/Math::Sqrt(direction.x * direction.x + direction.z * direction.z))),
+			};*/
 
-			if (PropertysPanel::DrawColorControl("Color", light.color))
-				component.SetColor(light.color);
+			if (PropertysPanel::DrawVec2Control("Direction", rot))
+				component.SetAngles(rot);
 
-			if (PropertysPanel::DrawFloatControl("Intensity", light.intensity))
-				component.SetIntensity(light.intensity);
+			Math::Vector3 color = component.GetDirectinalLight()->GetColor();
+			if (PropertysPanel::DrawColorControl("Color", color))
+				component.SetColor(color);
+
+			float intensity = component.GetDirectinalLight()->GetIntensity();
+			if (PropertysPanel::DrawFloatControl("Intensity", intensity))
+				component.SetIntensity(intensity);
 		});
 
 		DrawComponent<MeshRendererComponent>(entity, "Mesh Renderer", [&](){

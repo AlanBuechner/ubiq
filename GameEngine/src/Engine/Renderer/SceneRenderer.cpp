@@ -83,7 +83,7 @@ namespace Engine
 		m_CameraIndexBuffer->SetData(&bufferLoc);
 	}
 
-	void SceneRenderer::SetDirectionalLight(Ref<ConstantBuffer> light)
+	void SceneRenderer::SetDirectionalLight(Ref<DirectionalLight> light)
 	{
 		SceneData& data = m_RenderGraph->GetScene();
 		data.m_DirectinalLight = light;

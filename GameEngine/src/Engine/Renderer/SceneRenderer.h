@@ -9,6 +9,7 @@
 #include "CommandList.h"
 #include "FrameBuffer.h"
 #include "RenderGraph/RenderGraph.h"
+#include "Light.h"
 #include <vector>
 #include <list>
 
@@ -70,7 +71,7 @@ namespace Engine
 		Ref<FrameBuffer> GetRenderTarget() { return m_RenderGraph->GetRenderTarget(); }
 		void OnViewportResize(uint32 width, uint32 height);
 		void SetMainCamera(const Camera& camera);
-		void SetDirectionalLight(Ref<ConstantBuffer> light);
+		void SetDirectionalLight(Ref<DirectionalLight> light);
 		void SetSkyBox(Ref<Texture> texture);
 		void UpdateBuffers();
 		void Invalidate();

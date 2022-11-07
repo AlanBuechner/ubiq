@@ -11,9 +11,9 @@ Entities:
   - Entity: 11693751238415598823
     Name: Camera
     TransformComponent:
-      Position: [0, 0, 5]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Position: [3.19560456, 2.17798662, 5]
+      Rotation: [-0.242119506, 0.782615602, -1.8988132e-08]
+      Scale: [1, 1, 0.99999994]
     CameraComponent:
       Primary: true
       FixedAspectRatio: false
@@ -28,7 +28,7 @@ Entities:
   - Entity: 4289796849469945807
     Name: Mesh
     TransformComponent:
-      Position: [0, 0, 0]
+      Position: [0, 1.46089947, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshRendererComponent:
@@ -44,3 +44,12 @@ Entities:
       Direction: [0, -1, 0]
       Color: [1, 1, 1]
       Intensity: 1
+  - Entity: 1824081241608119135
+    Name: Floor
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [5, 5, 5]
+    MeshRendererComponent:
+      Mesh: 17720162746019331610
+      Material: 9193023617033958228

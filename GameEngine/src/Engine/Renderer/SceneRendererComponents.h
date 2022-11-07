@@ -25,14 +25,14 @@ namespace Engine
 		virtual void OnInvalid() override;
 		virtual void OnComponentRemoved() override;
 		
+		void SetAngles(Math::Vector2 rot);
 		void SetDirection(Math::Vector3 direction);
 		void SetColor(Math::Vector3 color);
 		void SetIntensity(float intensity);
-		const DirectionalLight& GetDirectinalLight() { return m_Light; }
+		const Ref<const DirectionalLight> GetDirectinalLight() { return m_Light; }
 
 	private:
-		DirectionalLight m_Light;
-		Ref<ConstantBuffer> m_LightBuffer;
+		Ref<DirectionalLight> m_Light;
 
 		bool m_Dirty = true;
 	};

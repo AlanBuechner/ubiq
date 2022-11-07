@@ -39,7 +39,7 @@ namespace Engine
 			Ref<ShaderPass> pass = cmd.m_Shader->GetPass(m_PassName);
 			m_CommandList->SetShader(pass);
 			m_CommandList->SetConstantBuffer(pass->GetUniformLocation("MainCameraIndex"), scene.m_MainCamera);
-			m_CommandList->SetConstantBuffer(pass->GetUniformLocation("DirLight"), scene.m_DirectinalLight);
+			m_CommandList->SetConstantBuffer(pass->GetUniformLocation("DirLight"), scene.m_DirectinalLight->GetBuffer());
 			m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
 		}
 

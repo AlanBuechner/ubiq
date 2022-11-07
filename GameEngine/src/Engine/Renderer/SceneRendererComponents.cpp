@@ -22,17 +22,16 @@ namespace Engine
 
 		s_Instance = this;
 
-		m_Light = { {0,-1,0}, {1,1,1}, 1 };
-		m_LightBuffer = ConstantBuffer::Create(sizeof(DirectionalLight));
+		m_Light = CreateRef<DirectionalLight>(Math::Vector3{ 0,-1,0 }, Math::Vector3{ 1,1,1 }, 1 );
 
-		Owner.GetScene()->GetSceneRenderer()->SetDirectionalLight(m_LightBuffer);
+		Owner.GetScene()->GetSceneRenderer()->SetDirectionalLight(m_Light);
 	}
 
 	void DirectionalLightComponent::OnInvalid()
 	{
 		if (m_Dirty)
 		{
-			m_LightBuffer->SetData(&m_Light);
+			m_Light->Apply();
 			m_Dirty = false;
 		}
 	}
@@ -43,21 +42,27 @@ namespace Engine
 			s_Instance = nullptr;
 	}
 
+	void DirectionalLightComponent::SetAngles(Math::Vector2 rot)
+	{
+		m_Light->SetAngles(rot);
+		m_Dirty = true;
+	}
+
 	void DirectionalLightComponent::SetDirection(Math::Vector3 direction)
 	{
-		m_Light.direction = direction;
+		m_Light->SetDirection(direction);
 		m_Dirty = true;
 	}
 
 	void DirectionalLightComponent::SetColor(Math::Vector3 color)
 	{
-		m_Light.color = color;
+		m_Light->SetColor(color);
 		m_Dirty = true;
 	}
 
 	void DirectionalLightComponent::SetIntensity(float intensity)
 	{
-		m_Light.intensity = intensity;
+		m_Light->SetIntensity(intensity);
 		m_Dirty = true;
 	}
 
