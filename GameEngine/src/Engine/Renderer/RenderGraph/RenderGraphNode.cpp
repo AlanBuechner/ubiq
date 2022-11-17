@@ -25,8 +25,13 @@ namespace Engine
 
 	void RenderGraphNode::Build()
 	{
+
 		if (!m_Built)
+		{
+			for (auto de : m_Dependincys)
+				de->Build();
 			BuildImpl();
+		}
 		m_Built = true;
 	}
 
@@ -34,12 +39,18 @@ namespace Engine
 	// output node
 	OutputNode::OutputNode(RenderGraph& graph) :
 		RenderGraphNode(graph)
+	{}
+
+	// frame buffer node
+	FrameBufferNode::FrameBufferNode(RenderGraph& graph) :
+		RenderGraphNode(graph)
 	{
 		FrameBufferSpecification fbSpec;
 		fbSpec.Attachments = {
 			{ FrameBufferTextureFormat::RGBA8, {0.1f,0.1f,0.1f,1} },
 			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
 		};
+		fbSpec.InitalState = FrameBufferState::Common;
 
 		Window& window = Application::Get().GetWindow();
 		fbSpec.Width = window.GetWidth();
@@ -47,16 +58,6 @@ namespace Engine
 
 		m_Buffer = FrameBuffer::Create(fbSpec);
 	}
-
-	void OutputNode::OnViewportResize(uint32 width, uint32 height)
-	{
-		m_Buffer->Resize(width, height);
-	}
-
-	// frame buffer node
-	FrameBufferNode::FrameBufferNode(RenderGraph& graph) :
-		RenderGraphNode(graph)
-	{}
 
 
 	void FrameBufferNode::OnViewportResize(uint32 width, uint32 height)

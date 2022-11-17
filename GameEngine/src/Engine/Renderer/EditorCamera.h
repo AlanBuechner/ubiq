@@ -33,7 +33,7 @@ namespace Engine
 		float GetPitch() const { return m_Pitch; }
 		float GetYaw() const { return m_Yaw; }
 
-		void SetOrientation(Math::Vector2 orientation) { m_Pitch = orientation.x; m_Yaw = orientation.y; }
+		void SetOrientation(Math::Vector2 orientation) { m_Pitch = orientation.y; m_Yaw = orientation.x; }
 	private:
 		void UpdateProjection();
 		void UpdateView();
@@ -64,7 +64,7 @@ namespace Engine
 		Math::Vector2 m_InitialMousePosition = { 0.0f, 0.0f };
 
 		float m_Distance = 10.0f;
-		float m_Pitch, m_Yaw;
+		float m_Pitch = 0, m_Yaw = 0;
 
 		float m_ViewportWidth = 1280, m_ViewportHeight = 720;
 	};

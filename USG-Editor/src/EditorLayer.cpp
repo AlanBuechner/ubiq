@@ -49,17 +49,10 @@ namespace Engine
 
 		m_ActiveScene = CreateRef<Scene>();
 
-		m_EditorCamera = EditorCamera();
-		m_EditorCamera.SetOrientation({ Math::Radians(25), Math::Radians(25) });
+		m_EditorCamera = CreateRef<EditorCamera>();
+		m_EditorCamera->SetOrientation({ Math::Radians(25), Math::Radians(25) });
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
-
-		struct D {
-			uint32 i = 12;
-		} d;
-
-		m_SBuffer = StructuredBuffer::Create(sizeof(D), 1);
-		m_SBuffer->SetData(&d);
 	}
 
 	void EditorLayer::OnDetach()
@@ -88,12 +81,12 @@ namespace Engine
 			m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
 			(spec.Width != m_ViewPortSize.x || spec.Height != m_ViewPortSize.y))
 		{
-			m_EditorCamera.SetViewportSize(m_ViewPortSize.x, m_ViewPortSize.y);
+			m_EditorCamera->SetViewportSize(m_ViewPortSize.x, m_ViewPortSize.y);
 
 			m_ActiveScene->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		}
 
-		m_EditorCamera.OnUpdate();
+		m_EditorCamera->OnUpdate();
 
 		// update scene
 		if (m_SceneState == SceneState::Edit)
@@ -133,7 +126,7 @@ namespace Engine
 		Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
 		commandList->SetRenderTarget(framBuffer);
 		Renderer::Build(commandList);
-		commandList->Present(framBuffer); // present the render target
+		commandList->Present(framBuffer, FrameBufferState::RenderTarget); // present the render target
 		Engine::GPUTimer::EndEvent(commandList);
 
 		timer.End();
@@ -223,6 +216,23 @@ namespace Engine
 			UI_Toolbar();
 			UI_Viewport();
 
+			/*ImGui::Begin("shadow map test");
+
+			auto dirLightView = m_ActiveScene->GetRegistry().View<DirectionalLightComponent>();
+			for (auto& comp : dirLightView)
+			{
+				Ref<const DirectionalLight> light = comp.GetDirectinalLight();
+				for (auto& cm : light->GetShadowMaps())
+				{
+					for (uint32 i = 0; i < light->s_NumShadowMaps; i++)
+					{
+						ImGui::Image((ImTextureID)cm.second.m_ShadowMaps[i]->GetAttachmentShaderHandle(0), { 500,500 });
+					}
+				}
+			}
+
+			ImGui::End();*/
+
 			// Console window
 
 			//ImGui::Begin("Console");
@@ -246,7 +256,7 @@ namespace Engine
 	{
 		Super::OnEvent(e);
 
-		m_EditorCamera.OnEvent(e);
+		m_EditorCamera->OnEvent(e);
 
 		EventDispatcher dispacher(e);
 		dispacher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(&EditorLayer::OnKeyPressed));
@@ -325,7 +335,7 @@ namespace Engine
 		// draw grid lines
 		LineRenderer::BeginScene(m_EditorCamera);
 		{
-			Math::Vector3 camPos = m_EditorCamera.GetPosition();
+			Math::Vector3 camPos = m_EditorCamera->GetPosition();
 
 			Math::Mat4 matz =	glm::translate(Math::Mat4(1.0f), { camPos.x, 0, camPos.z - fmod(camPos.z, m_GridLineOffset) });
 			Math::Mat4 matx =	glm::translate(Math::Mat4(1.0f), { camPos.x - fmod(camPos.x, m_GridLineOffset), 0, camPos.z })
@@ -342,7 +352,7 @@ namespace Engine
 			auto& tc = selected.GetComponent<TransformComponent>();
 			auto& cam = selected.GetComponent<CameraComponent>().Camera;
 
-			const Math::Mat4& proj = glm::inverse(cam.GetProjectionMatrix());
+			const Math::Mat4& proj = glm::inverse(cam->GetProjectionMatrix());
 			const Math::Mat4& transform = tc.GetTransform();
 			Math::Vector4 ltn = proj * Math::Vector4{ -1, 1, 0, 1 };
 			Math::Vector4 ltf = proj * Math::Vector4{ -1, 1, 1, 1 };
@@ -466,8 +476,8 @@ namespace Engine
 			if (m_GizmoType != -1)
 			{
 				// camera editor
-				const Math::Mat4& cameraProjection = m_EditorCamera.GetProjectionMatrix();
-				Math::Mat4 cameraView = m_EditorCamera.GetViewMatrix();
+				const Math::Mat4& cameraProjection = m_EditorCamera->GetProjectionMatrix();
+				Math::Mat4 cameraView = m_EditorCamera->GetViewMatrix();
 
 				// transform
 				auto& tc = selected.GetComponent<TransformComponent>(); // get the transform component

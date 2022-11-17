@@ -18,6 +18,13 @@ namespace Engine
 		Depth = DEPTH24STENCIL8
 	};
 
+	enum FrameBufferState
+	{
+		RenderTarget,
+		SRV,
+		Common,
+	};
+
 	struct FrameBufferTextureSpecification
 	{
 		FrameBufferTextureSpecification() = default;
@@ -54,6 +61,7 @@ namespace Engine
 		uint32 Width, Height;
 		FrameBufferAttachmentSpecification Attachments;
 		uint32 Samples = 1;
+		FrameBufferState InitalState = FrameBufferState::Common;
 
 		bool SwapChainTarget = false;
 	};
@@ -61,27 +69,18 @@ namespace Engine
 	class FrameBuffer
 	{
 	public:
-
-		enum State
-		{
-			RenderTarget,
-			SRV,
-			Common,
-		};
-
 		virtual ~FrameBuffer() = default;
 
 		virtual void Resize(uint32 width, uint32 height) = 0;
 
 		virtual uint64 GetAttachmentRenderHandle(uint32 index = 0) const = 0;
 		virtual uint64 GetAttachmentShaderHandle(uint32 index = 0) const = 0;
+		virtual uint32 GetAttachmentShaderDescriptoLocation(uint32 index = 0) const = 0;
 		virtual int ReadPixle(uint32 attachment, int x, int y) = 0;
 
 		virtual const FrameBufferSpecification& GetSpecification() const = 0;
 		virtual bool HasDepthAttachment() const = 0;
 
-		virtual State GetState() = 0;
-		virtual void SetState(State state) = 0;
 		virtual bool Cleared() = 0;
 		virtual void ResetClear() = 0; // only called by render graph
 

@@ -25,7 +25,7 @@ namespace Engine
 		void OnRuntimeStart();
 		void OnRuntimeStop();
 
-		void OnUpdateEditor(const EditorCamera& camera);
+		void OnUpdateEditor(Ref<EditorCamera> camera);
 		void OnUpdateRuntime();
 		void OnViewportResize(uint32 width, uint32 height);
 
@@ -38,6 +38,7 @@ namespace Engine
 		Entity GetPrimaryCameraEntity();
 
 		Ref<SceneRenderer> GetSceneRenderer() { return m_SceneRenderer; }
+		SceneRegistry& GetRegistry() { return m_Registry; }
 
 		static Ref<Scene> Copy(Ref<Scene> scene);
 
@@ -48,8 +49,8 @@ namespace Engine
 	private:
 		uint32 m_ViewportWidth = 0;
 		uint32 m_ViewportHeight = 0;
-
 		SceneRegistry m_Registry;
+
 		Ref<SceneRenderer> m_SceneRenderer;
 
 		Ref<Texture2D> m_CameraIcon;

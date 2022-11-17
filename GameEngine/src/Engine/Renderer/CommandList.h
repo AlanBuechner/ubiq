@@ -25,6 +25,16 @@ namespace Engine
 	public:
 
 		virtual void StartRecording(Ref<ShaderPass> startShader = nullptr) = 0;
+
+		// transitions
+		void ToRenderTarget(Ref<FrameBuffer> fb, FrameBufferState from) { Transition({ fb }, FrameBufferState::RenderTarget, from); }
+		void ToSRV(Ref<FrameBuffer> fb, FrameBufferState from) { Transition({ fb }, FrameBufferState::SRV, from); }
+		void Present(FrameBufferState from) { Present(nullptr, from); }
+		virtual void Present(Ref<FrameBuffer> fb, FrameBufferState from) = 0;
+
+		virtual void Transition(std::vector<Ref<FrameBuffer>> fbs, FrameBufferState to, FrameBufferState from) = 0;
+
+		// rendering
 		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) = 0;
 
 		virtual void ClearRenderTarget() = 0;
@@ -37,9 +47,9 @@ namespace Engine
 
 		virtual void SetShader(Ref<ShaderPass> shader) = 0;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) = 0;
+		virtual void SetRootConstant(uint32 index, uint32 data) = 0;
 		virtual void SetTexture(uint32 index, Ref<Texture> texture) = 0;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) = 0;
-		virtual void Present(Ref<FrameBuffer> fb = nullptr) = 0;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) = 0;
 		virtual void SignalRecording() = 0;
 

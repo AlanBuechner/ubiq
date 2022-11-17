@@ -7,8 +7,8 @@
 namespace Engine
 {
 	
-	SkyboxNode::SkyboxNode(RenderGraph& graph, uint32 uSeg, uint32 vSeg) :
-		RenderGraphNode(graph), m_USeg(uSeg), m_VSeg(vSeg)
+	SkyboxNode::SkyboxNode(RenderGraph& graph) :
+		RenderGraphNode(graph)
 	{
 		m_CommandList = CommandList::Create(CommandList::Direct);
 
@@ -56,22 +56,21 @@ namespace Engine
 		const SceneData& scene = m_Graph.GetScene();
 
 		m_CommandList->StartRecording();
+
 		GPUTimer::BeginEvent(m_CommandList, "Skybox Pass");
 		m_CommandList->SetRenderTarget(renderTarget);
-		if (!renderTarget->Cleared())
-			m_CommandList->ClearRenderTarget();
 
 		if (scene.m_Skybox)
 		{
-			m_CommandList->SetShader(m_SkyboxShader->GetPass("main"));
-			m_CommandList->SetConstantBuffer(0, scene.m_MainCamera);
-			m_CommandList->SetTexture(2, scene.m_Skybox);
+			Ref<ShaderPass> pass = m_SkyboxShader->GetPass("main");
+			m_CommandList->SetShader(pass);
+			m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), scene.m_MainCamera->GetCameraBuffer()->GetDescriptorLocation());
+			m_CommandList->SetTexture(pass->GetUniformLocation("texture"), scene.m_Skybox);
 			m_CommandList->DrawMesh(m_SkyboxMesh);
 		}
 
 		GPUTimer::EndEvent(m_CommandList);
 		m_CommandList->Close();
-		m_Graph.RecoardFrameBufferState({ FrameBuffer::State::RenderTarget, renderTarget });
 	}
 
 }

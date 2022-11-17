@@ -232,13 +232,19 @@ namespace Engine
 				if (bindDesc.Type == D3D_SIT_SAMPLER)
 					data.type = ShaderParameter::PerameterType::StaticSampler;
 				else
-					data.type = ShaderParameter::PerameterType::Descriptor;
+				{
+					if (data.name.rfind("RC_", 0) == 0)
+						data.type = ShaderParameter::PerameterType::Constants;
+					else
+						data.type = ShaderParameter::PerameterType::Descriptor;
+				}
 			}
 
 			switch (bindDesc.Type)
 			{
 			case D3D_SIT_CBUFFER:
 				data.descType = ShaderParameter::DescriptorType::CBV; break;
+			case D3D_SIT_STRUCTURED:
 			case D3D_SIT_TEXTURE:
 				data.descType = ShaderParameter::DescriptorType::SRV; break;
 			case D3D_SIT_SAMPLER:
@@ -400,7 +406,12 @@ namespace Engine
 				ssd.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 				ssd.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 				ssd.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-				ssd.Filter = D3D12_FILTER_ANISOTROPIC;
+				if(rd.name.rfind("A_", 0) == 0)
+					ssd.Filter = D3D12_FILTER_ANISOTROPIC;
+				else if(rd.name.rfind("P_", 0) == 0)
+					ssd.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+				else
+					ssd.Filter = D3D12_FILTER_ANISOTROPIC;
 				ssd.ShaderRegister = rd.reg;
 				ssd.RegisterSpace = rd.space;
 				samplers.push_back(ssd);

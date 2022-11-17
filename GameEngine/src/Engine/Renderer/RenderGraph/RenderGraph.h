@@ -23,20 +23,13 @@ namespace Engine
 	struct SceneData
 	{
 		std::vector<DrawCommand> m_DrawCommands;
-		Ref<ConstantBuffer> m_MainCamera;
+		Ref<Camera> m_MainCamera;
 		Ref<DirectionalLight> m_DirectinalLight;
 		Ref<Texture> m_Skybox;
 	};
 
 	class RenderGraph
 	{
-
-	private:
-		struct FrameBufferState
-		{
-			FrameBuffer::State afterState;
-			Ref<FrameBuffer> buffer;
-		};
 
 	public:
 		RenderGraph();
@@ -49,9 +42,6 @@ namespace Engine
 
 		Ref<FrameBuffer> GetRenderTarget();
 
-		void RecoardFrameBufferState(FrameBufferState state);
-		void UpdateStates();
-
 	private:
 
 	private:
@@ -60,6 +50,5 @@ namespace Engine
 		Ref<OutputNode> m_OutputNode;
 
 		SceneData m_Scene;
-		std::vector<FrameBufferState> m_FrameBufferStates;
 	};
 }

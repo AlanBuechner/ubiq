@@ -287,7 +287,7 @@ if(!m_Selected.HasComponent<component>()){\
 			ImGui::Checkbox("Fixed Aspect Ratio", &cameraComponent.FixedAspectRatio);
 
 			const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
-			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera->GetProjectionType()];
 			if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
 			{
 				for (int i = 0; i < 2; i++)
@@ -297,7 +297,7 @@ if(!m_Selected.HasComponent<component>()){\
 					if (ImGui::Selectable(projectionTypeStrings[i], isSelected))
 					{
 						currentProjectionTypeString = projectionTypeStrings[i];
-						camera.SetProjectionType((SceneCamera::ProjectionType)i);
+						camera->SetProjectionType((SceneCamera::ProjectionType)i);
 					}
 
 					if (isSelected)
@@ -307,34 +307,34 @@ if(!m_Selected.HasComponent<component>()){\
 				ImGui::EndCombo();
 			}
 
-			if (camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
+			if (camera->GetProjectionType() == SceneCamera::ProjectionType::Perspective)
 			{
-				float fov = glm::degrees(camera.GetPerspectiveVerticalFOV());
+				float fov = glm::degrees(camera->GetPerspectiveVerticalFOV());
 				if (PropertysPanel::DrawFloatControl("FOV", fov, 45.0f))
-					camera.SetPerspectiveVerticalFOV(glm::radians(fov));
+					camera->SetPerspectiveVerticalFOV(glm::radians(fov));
 
-				float nearClip = camera.GetPerspectiveNearClip();
+				float nearClip = camera->GetPerspectiveNearClip();
 				if (PropertysPanel::DrawFloatControl("Near Clip", nearClip, 0.01f))
-					camera.SetPerspectiveNearClip(nearClip);
+					camera->SetPerspectiveNearClip(nearClip);
 
-				float farClip = camera.GetPerspectiveFarClip();
+				float farClip = camera->GetPerspectiveFarClip();
 				if (PropertysPanel::DrawFloatControl("Far Clip", farClip, 1000.0f))
-					camera.SetPerspectiveFarClip(farClip);
+					camera->SetPerspectiveFarClip(farClip);
 			}
 
-			if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
+			if (camera->GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
 			{
-				float Size = camera.GetOrthographicSize();
+				float Size = camera->GetOrthographicSize();
 				if (PropertysPanel::DrawFloatControl("Size", Size, 10.0f))
-					camera.SetOrthographicSize(Size);
+					camera->SetOrthographicSize(Size);
 
-				float nearClip = camera.GetOrthographicNearClip();
+				float nearClip = camera->GetOrthographicNearClip();
 				if (PropertysPanel::DrawFloatControl("Near Clip", nearClip, -1.0f))
-					camera.SetOrthographicNearClip(nearClip);
+					camera->SetOrthographicNearClip(nearClip);
 
-				float farClip = camera.GetOrthographicFarClip();
+				float farClip = camera->GetOrthographicFarClip();
 				if (PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
-					camera.SetOrthographicFarClip(farClip);
+					camera->SetOrthographicFarClip(farClip);
 			}
 		});
 

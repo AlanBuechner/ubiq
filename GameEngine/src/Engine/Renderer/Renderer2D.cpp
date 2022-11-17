@@ -90,9 +90,9 @@ namespace Engine
 		s_Data.Camera->SetData(&viewProj);
 	}
 
-	void Renderer2D::BeginScene(const EditorCamera& camera)
+	void Renderer2D::BeginScene(Ref<EditorCamera> camera)
 	{
-		Math::Mat4 viewProj = camera.GetViewProjection();
+		Math::Mat4 viewProj = camera->GetViewProjection();
 		s_Data.Camera->SetData(&viewProj);
 	}
 

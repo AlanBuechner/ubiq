@@ -72,7 +72,7 @@ struct Camera
 	float3 rotation;
 };
 
-cbuffer MainCameraIndex
+cbuffer RC_MainCameraIndex
 {
 	uint mainCameraIndex;
 };

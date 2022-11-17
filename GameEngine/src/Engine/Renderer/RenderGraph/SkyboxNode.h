@@ -7,7 +7,7 @@ namespace Engine
 	class SkyboxNode : public RenderGraphNode
 	{
 	public:
-		SkyboxNode(RenderGraph& graph, uint32 uSeg, uint32 vSeg);
+		SkyboxNode(RenderGraph& graph);
 
 		void SetRenderTarget(FrameBufferVar var);
 
@@ -18,8 +18,6 @@ namespace Engine
 		virtual void BuildImpl() override;
 
 	private:
-		uint32 m_USeg, m_VSeg;
-
 		Ref<CommandList> m_CommandList;
 		FrameBufferVar m_RenderTarget;
 

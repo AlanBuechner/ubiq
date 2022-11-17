@@ -13,12 +13,21 @@ namespace Engine
 			m_Type(type)
 		{ Init(); }
 
+
+
 	private:
 		void Init();
 
 	public:
 		virtual void StartRecording(Ref<ShaderPass> startShader = nullptr) override;
 
+		// transitions
+		void Present(FrameBufferState from) { Present(nullptr, from); }
+		virtual void Present(Ref<FrameBuffer> fb, FrameBufferState from) override;
+
+		virtual void Transition(std::vector<Ref<FrameBuffer>> fbs, FrameBufferState to, FrameBufferState from) override;
+
+		// rendering
 		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) override;
 
 		virtual void ClearRenderTarget() override;
@@ -31,9 +40,9 @@ namespace Engine
 
 		virtual void SetShader(Ref<ShaderPass> shader) override;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
+		virtual void SetRootConstant(uint32 index, uint32 data) override;
 		virtual void SetTexture(uint32 index, Ref<Texture> texture) override;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, int numInstances) override;
-		virtual void Present(Ref<FrameBuffer> fb = nullptr) override;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
 		virtual void Close() override;
 		virtual void SignalRecording() override { m_RecordFlag.Signal(); }

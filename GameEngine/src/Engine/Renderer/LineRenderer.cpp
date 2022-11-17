@@ -61,9 +61,9 @@ namespace Engine
 		s_LineData.Camera->SetData(&viewProj);
 	}
 
-	void LineRenderer::BeginScene(const EditorCamera& camera)
+	void LineRenderer::BeginScene(Ref<EditorCamera> camera)
 	{
-		Math::Mat4 viewProj = camera.GetViewProjection();
+		Math::Mat4 viewProj = camera->GetViewProjection();
 		s_LineData.Camera->SetData(&viewProj);
 	}
 

@@ -61,7 +61,7 @@ void Sandbox2DLayer::OnRender()
 
 	//Engine::Renderer::Build();
 
-	commandList->Present();
+	commandList->Present(Engine::FrameBufferState::RenderTarget);
 
 	timer.End();
 }

@@ -55,5 +55,10 @@ namespace Engine
 		context->GetDX12ResourceManager()->UploadBufferRegion(m_Buffer, m_Stride * start, data, m_Stride * count, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	}
 
+	uint32 DirectX12StructuredBuffer::GetDescriptorLocation() const
+	{
+		return m_SRVhandle.GetIndex();
+	}
+
 }
 

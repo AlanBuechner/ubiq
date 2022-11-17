@@ -31,7 +31,7 @@ namespace Engine
 		}
 	}
 
-	Engine::Ref<Engine::ShaderPass> Shader::GetPass(const std::string& passName)
+	Ref<ShaderPass> Shader::GetPass(const std::string& passName)
 	{
 		return m_Passes[passName];
 	}

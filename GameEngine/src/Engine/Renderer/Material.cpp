@@ -28,6 +28,13 @@ namespace Engine
 		if (disp) data.dispLoc = disp->GetDescriptorLocation();
 		else data.dispLoc = Renderer::GetBlackexture()->GetDescriptorLocation();
 
+		if (parallax)
+		{
+			data.parallaxLoc = parallax->GetDescriptorLocation();
+			data.useParallax = TRUE;
+			data.invertParallax = invertParallax;
+		}
+
 		m_Buffer->SetData((const void*)&data);
 	}
 
@@ -47,6 +54,7 @@ namespace Engine
 			mat->shader = assetManager.GetAsset<Shader>(f["shader"].get<fs::path>());
 
 #define GET_TEXTURE_ATTRIB(name) if(f.contains(#name)) mat->name = assetManager.GetAsset<Texture2D>(f[#name]);
+#define GET_BOOL_ATTRIB(name) if(f.contains(#name) && f.is_boolean()) mat->name = (f[#name].get<bool>()); else mat->name = false;
 
 			GET_TEXTURE_ATTRIB(diffuse);
 			GET_TEXTURE_ATTRIB(normal);
@@ -54,8 +62,11 @@ namespace Engine
 			GET_TEXTURE_ATTRIB(ao);
 			GET_TEXTURE_ATTRIB(metal);
 			GET_TEXTURE_ATTRIB(disp);
+			GET_TEXTURE_ATTRIB(parallax);
+			GET_BOOL_ATTRIB(invertParallax);
 
 #undef GET_TEXTURE_ATTRIB
+#undef GET_BOOL_ATTRIB
 		}
 
 		mat->m_Buffer = ConstantBuffer::Create(sizeof(CBuffData));

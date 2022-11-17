@@ -19,6 +19,7 @@ namespace Engine
 
 		virtual uint64 GetAttachmentRenderHandle(uint32 index) const override;
 		virtual uint64 GetAttachmentShaderHandle(uint32 index) const override;
+		virtual uint32 GetAttachmentShaderDescriptoLocation(uint32 index) const override;
 		virtual int ReadPixle(uint32 index, int x, int y) override;
 
 		virtual const FrameBufferSpecification& GetSpecification() const { return m_Spec; }
@@ -27,23 +28,19 @@ namespace Engine
 		wrl::ComPtr<ID3D12Resource>& GetBuffer(uint32 i) { return m_Buffers[i]; }
 		void SetDescriptorHandle(uint32 i, DirectX12DescriptorHandle handle) { CORE_ASSERT(i < m_TargetHandles.size(), ""); m_TargetHandles[i] = handle; }
 
-		virtual State GetState() override { return m_State; }
-		virtual void SetState(State state) override { m_State = state; }
 		virtual bool Cleared() override { return m_Cleared; }
 		virtual void ResetClear() { m_Cleared = false; }
 
-		D3D12_RESOURCE_STATES GetDXState();
-		D3D12_RESOURCE_STATES GetDXDepthState();
-
-		static D3D12_RESOURCE_STATES GetDXState(State state);
-		static D3D12_RESOURCE_STATES GetDXDepthState(State state);
+		static D3D12_RESOURCE_STATES GetDXState(FrameBufferState state);
+		static D3D12_RESOURCE_STATES GetDXDepthState(FrameBufferState state);
 
 		void Clear() { m_Cleared = true; } // only gets called by command list
+
+
 	private:
 		void CreateAttachment(uint32 i);
 
 	private:
-		State m_State = State::Common;
 		bool m_Cleared = false;
 
 		std::vector<wrl::ComPtr<ID3D12Resource>> m_Buffers;

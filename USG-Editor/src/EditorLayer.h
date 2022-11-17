@@ -65,7 +65,7 @@ namespace Engine
 		const float m_GridLineOffset = m_GridExtent * 2 / m_GridLines;
 		LineMesh m_GridMesh;
 
-		EditorCamera m_EditorCamera;
+		Ref<EditorCamera> m_EditorCamera;
 
 		fs::path m_LoadedScene;
 
@@ -94,7 +94,5 @@ namespace Engine
 		bool m_SaveScene = false;
 
 		fs::path m_DropPath;
-
-		Ref<StructuredBuffer> m_SBuffer;
 	};
 }

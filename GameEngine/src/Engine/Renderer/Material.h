@@ -17,6 +17,8 @@ namespace Engine
 		Ref<Texture2D> ao;
 		Ref<Texture2D> metal;
 		Ref<Texture2D> disp;
+		Ref<Texture2D> parallax;
+		bool invertParallax;
 
 		void Apply();
 		Ref<ConstantBuffer> GetBuffer() { return m_Buffer; }
@@ -33,6 +35,9 @@ namespace Engine
 			uint32 aoLoc;
 			uint32 metalLoc;
 			uint32 dispLoc;
+			uint32 parallaxLoc;
+			BOOL useParallax = FALSE;
+			BOOL invertParallax = FALSE;
 		};
 
 		Ref<ConstantBuffer> m_Buffer;

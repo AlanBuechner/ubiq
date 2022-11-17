@@ -8,7 +8,7 @@ namespace Engine
 	// camera component
 	void CameraComponent::OnTransformChange(const Math::Mat4& transform)
 	{
-		Camera.SetTransform(transform);
+		Camera->SetTransform(transform);
 	}
 
 	// directional Light component
@@ -66,6 +66,11 @@ namespace Engine
 		m_Dirty = true;
 	}
 
+	void DirectionalLightComponent::UpdateShadowMaps()
+	{
+		m_Light->UpdateShadowMaps();
+	}
+
 	// mesh component
 	void MeshRendererComponent::OnComponentRemoved()
 	{
@@ -89,7 +94,7 @@ namespace Engine
 		}
 	}
 
-	// skybox component 
+	// skybox component
 	SkyboxComponent* SkyboxComponent::s_Instance;
 	void SkyboxComponent::OnComponentAdded()
 	{

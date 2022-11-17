@@ -22,12 +22,16 @@ namespace Engine
 
 		virtual std::vector<Ref<CommandList>> GetCommandLists() { return {}; }
 
+		void AddDependincy(Ref<RenderGraphNode> dependency) { m_Dependincys.push_back(dependency); }
+
 	protected:
 		virtual void BuildImpl() {};
 
 	protected:
 		bool m_Built = false;
 		RenderGraph& m_Graph;
+
+		std::vector<Ref<RenderGraphNode>> m_Dependincys;
 	};
 
 	// vars
@@ -51,7 +55,6 @@ namespace Engine
 	public:
 		OutputNode(RenderGraph& graph);
 
-		virtual void OnViewportResize(uint32 width, uint32 height) override;
 		virtual void Invalidate() { m_Buffer->ResetClear(); RenderGraphNode::Invalidate(); }
 
 		Ref<FrameBuffer> m_Buffer;

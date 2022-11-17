@@ -29,23 +29,22 @@ namespace Engine
 		const SceneData& scene = m_Graph.GetScene();
 		
 		m_CommandList->StartRecording();
+
 		GPUTimer::BeginEvent(m_CommandList, "Shader Pass");
 		m_CommandList->SetRenderTarget(renderTarget);
-		if(!renderTarget->Cleared())
-			m_CommandList->ClearRenderTarget();
 
 		for (auto& cmd : scene.m_DrawCommands)
 		{
 			Ref<ShaderPass> pass = cmd.m_Shader->GetPass(m_PassName);
 			m_CommandList->SetShader(pass);
-			m_CommandList->SetConstantBuffer(pass->GetUniformLocation("MainCameraIndex"), scene.m_MainCamera);
+			m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), scene.m_MainCamera->GetCameraBuffer()->GetDescriptorLocation());
 			m_CommandList->SetConstantBuffer(pass->GetUniformLocation("DirLight"), scene.m_DirectinalLight->GetBuffer());
+			m_CommandList->SetConstantBuffer(pass->GetUniformLocation("Cascades"), scene.m_DirectinalLight->GetShadowMaps()[scene.m_MainCamera].m_CameraIndeces);
 			m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
 		}
 
 		GPUTimer::EndEvent(m_CommandList);
 		m_CommandList->Close();
-		m_Graph.RecoardFrameBufferState({ FrameBuffer::State::RenderTarget, renderTarget });
 	}
 }
 

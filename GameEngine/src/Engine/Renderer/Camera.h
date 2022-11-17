@@ -37,8 +37,9 @@ namespace Engine
 		const Math::Mat4& GetProjectionMatrix() const { return m_CameraData.ProjectionMatrix; }
 		const Ref<ConstantBuffer> GetCameraBuffer() const { return m_CameraDataBuffer; }
 		void UpdateCameraBuffer() { m_CameraDataBuffer->SetData(&m_CameraData); }
+		const CameraData& GetCameraData() { return m_CameraData; }
 
-	protected:
+	public:
 		CameraData m_CameraData;
 		Ref<ConstantBuffer> m_CameraDataBuffer;
 		

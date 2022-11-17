@@ -15,7 +15,7 @@
 
 namespace Engine
 {
-	static inline D3D12_RESOURCE_BARRIER Transition(
+	static inline D3D12_RESOURCE_BARRIER TransitionResource(
 		_In_ ID3D12Resource* pResource,
 		D3D12_RESOURCE_STATES stateBefore,
 		D3D12_RESOURCE_STATES stateAfter,
@@ -85,43 +85,87 @@ namespace Engine
 		m_CommandList->SetDescriptorHeaps(2, heaps);
 	}
 
+
+	// transitions 
+
+	void DirectX12CommandList::Present(Ref<FrameBuffer> fb, FrameBufferState from)
+	{
+		if (fb == nullptr)
+			fb = m_RenderTarget;
+
+		Transition({ fb }, FrameBufferState::Common, from);
+
+		if (fb == m_RenderTarget)
+			m_RenderTarget = nullptr;
+	}
+
+	void DirectX12CommandList::Transition(std::vector<Ref<FrameBuffer>> fbs, FrameBufferState to, FrameBufferState from)
+	{
+		std::vector<D3D12_RESOURCE_BARRIER> barriers;
+		for (auto fb : fbs)
+		{
+			Ref<DirectX12FrameBuffer> dxfb = std::dynamic_pointer_cast<DirectX12FrameBuffer>(fb);
+
+			std::vector<FrameBufferTextureSpecification> attachments = dxfb->GetSpecification().Attachments.Attachments;
+			barriers.reserve(attachments.size());
+
+			for (uint32 i = 0; i < attachments.size(); i++)
+			{
+				bool swapChainTarget = dxfb->GetSpecification().SwapChainTarget;
+				if (attachments[i].IsDepthStencil())
+					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXDepthState(from), DirectX12FrameBuffer::GetDXDepthState(to)));
+				else
+					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXState(from), DirectX12FrameBuffer::GetDXState(to)));
+			}
+		}
+
+		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
+	}
+
+
+
+	// rendering
+
 	void DirectX12CommandList::SetRenderTarget(Ref<FrameBuffer> buffer)
 	{
+		// check if command list is a bundle
 		if (m_Type == CommandList::Bundle)
 		{
 			CORE_WARN("Command bundle can not set render targets. command will be ignored");
 			return;
 		}
+
+		// get directX 12 frame buffer
 		m_RenderTarget = std::dynamic_pointer_cast<DirectX12FrameBuffer>(buffer);
+
+		// get render target information
 		std::vector<FrameBufferTextureSpecification> attachments = m_RenderTarget->GetSpecification().Attachments.Attachments;
-		std::vector<D3D12_RESOURCE_BARRIER> barriers(attachments.size());
 		std::vector<uint64> rendertargetHandles(attachments.size() - (size_t)m_RenderTarget->HasDepthAttachment());
 		uint64 depthHandle = 0;
-		for (uint32 i = 0; i < barriers.size(); i++)
+		for (uint32 i = 0; i < attachments.size(); i++)
 		{
 			bool swapChainTarget = m_RenderTarget->GetSpecification().SwapChainTarget;
 			if (attachments[i].IsDepthStencil())
-			{
-				barriers[i] = Transition(m_RenderTarget->GetBuffer(i).Get(), m_RenderTarget->GetDXDepthState(), DirectX12FrameBuffer::GetDXDepthState(FrameBuffer::RenderTarget));
 				depthHandle = m_RenderTarget->GetAttachmentRenderHandle(i);
-			}
 			else
-			{
-				barriers[i] = Transition(m_RenderTarget->GetBuffer(i).Get(), m_RenderTarget->GetDXState(), DirectX12FrameBuffer::GetDXState(FrameBuffer::RenderTarget));
 				rendertargetHandles[i] = m_RenderTarget->GetAttachmentRenderHandle(i);
-			}
 		}
-		if (m_RenderTarget->GetState() != FrameBuffer::RenderTarget)
-			m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
-		m_CommandList->OMSetRenderTargets((uint32)rendertargetHandles.size(), (D3D12_CPU_DESCRIPTOR_HANDLE*)rendertargetHandles.data(), FALSE, depthHandle ? (D3D12_CPU_DESCRIPTOR_HANDLE*)&depthHandle : nullptr);
+
+		// set render target
+		m_CommandList->OMSetRenderTargets(
+			(uint32)rendertargetHandles.size(), 
+			(D3D12_CPU_DESCRIPTOR_HANDLE*)rendertargetHandles.data(), 
+			FALSE, 
+			depthHandle ? (D3D12_CPU_DESCRIPTOR_HANDLE*)&depthHandle : nullptr
+		);
+
+		// set scissor and viewport
 		LONG width = (LONG)m_RenderTarget->GetSpecification().Width;
 		LONG height = (LONG)m_RenderTarget->GetSpecification().Height;
 		const D3D12_VIEWPORT viewport = { 0, 0, (FLOAT)width, (FLOAT)height, 0, 1 };
 		m_CommandList->RSSetViewports(1, &viewport);
 		const D3D12_RECT r = { 0, 0, width, height };
 		m_CommandList->RSSetScissorRects(1, &r);
-
-		m_RenderTarget->SetState(FrameBuffer::RenderTarget);
 	}
 
 	void DirectX12CommandList::ClearRenderTarget()
@@ -219,6 +263,14 @@ namespace Engine
 		m_CommandList->SetGraphicsRootConstantBufferView(index, cb->GetBuffer()->GetGPUVirtualAddress());
 	}
 
+	void DirectX12CommandList::SetRootConstant(uint32 index, uint32 data)
+	{
+		if (index == UINT32_MAX)
+			return; // invalid bind slot
+
+		m_CommandList->SetGraphicsRoot32BitConstant(index, data, 0);
+	}
+
 	void DirectX12CommandList::SetTexture(uint32 index, Ref<Texture> texture)
 	{
 		if (index == UINT32_MAX)
@@ -251,31 +303,6 @@ namespace Engine
 			m_CommandList->IASetIndexBuffer(&ib->GetView());
 			m_CommandList->DrawIndexedInstanced(ib->GetCount(), 1, 0, 0, 0);
 		}
-	}
-
-	void DirectX12CommandList::Present(Ref<FrameBuffer> fb)
-	{
-		if (fb == nullptr)
-			fb = m_RenderTarget;
-
-		if (fb && fb->GetState() != FrameBuffer::State::Common)
-		{
-			Ref<DirectX12FrameBuffer> dxfb = std::dynamic_pointer_cast<DirectX12FrameBuffer>(fb);
-			bool swapChainTarget = dxfb->GetSpecification().SwapChainTarget;
-			std::vector<FrameBufferTextureSpecification> attachments = dxfb->GetSpecification().Attachments.Attachments;
-			std::vector<D3D12_RESOURCE_BARRIER> barriers(attachments.size());
-			for (uint32 i = 0; i < barriers.size(); i++)
-			{
-				if (attachments[i].IsDepthStencil())
-					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), dxfb->GetDXDepthState(), DirectX12FrameBuffer::GetDXDepthState(FrameBuffer::Common));
-				else
-					barriers[i] = Transition(dxfb->GetBuffer(i).Get(), dxfb->GetDXState(), DirectX12FrameBuffer::GetDXState(FrameBuffer::Common));
-			}
-			m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
-			dxfb->SetState(FrameBuffer::Common);
-		}
-		if (fb == m_RenderTarget)
-			m_RenderTarget = nullptr;
 	}
 
 	void DirectX12CommandList::ExecuteBundle(Ref<CommandList> commandList)

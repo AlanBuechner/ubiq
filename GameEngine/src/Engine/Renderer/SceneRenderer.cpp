@@ -67,8 +67,6 @@ namespace Engine
 	{
 		m_RenderGraph = CreateRef<RenderGraph>();
 		m_RenderGraph->AddToCommandQueue();
-
-		m_CameraIndexBuffer = ConstantBuffer::Create(sizeof(uint32));
 	}
 
 	void SceneRenderer::OnViewportResize(uint32 width, uint32 height)
@@ -77,10 +75,9 @@ namespace Engine
 		Invalidate();
 	}
 
-	void SceneRenderer::SetMainCamera(const Camera& camera)
+	void SceneRenderer::SetMainCamera(Ref<Camera> camera)
 	{
-		uint32 bufferLoc = camera.GetCameraBuffer()->GetDescriptorLocation();
-		m_CameraIndexBuffer->SetData(&bufferLoc);
+		m_MainCamera = camera;
 	}
 
 	void SceneRenderer::SetDirectionalLight(Ref<DirectionalLight> light)
@@ -157,7 +154,7 @@ namespace Engine
 			m_Invalid = false;
 
 			SceneData& data = m_RenderGraph->GetScene();
-			data.m_MainCamera = m_CameraIndexBuffer;
+			data.m_MainCamera = m_MainCamera;
 
 			// compile commands
 			data.m_DrawCommands.clear();
@@ -178,11 +175,8 @@ namespace Engine
 				}
 			}
 
-			//m_Invalid = true;
 			m_RenderGraph->Build();
 		}
-
-		m_RenderGraph->UpdateStates();
 	}
 
 	Ref<SceneRenderer> SceneRenderer::Create()

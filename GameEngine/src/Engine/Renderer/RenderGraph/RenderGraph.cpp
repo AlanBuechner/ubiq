@@ -1,28 +1,42 @@
 #include "pch.h"
 #include "RenderGraph.h"
+#include "GBufferPassNode.h"
 #include "MainPassNode.h"
 #include "SkyboxNode.h"
+#include "ShadowPassNode.h"
 
 namespace Engine
 {
 
 	RenderGraph::RenderGraph()
 	{
-		// create outputNode
-		m_OutputNode = CreateRef<OutputNode>(*this);
-		m_Nodes.push_back(m_OutputNode);
+		Ref<FrameBufferNode> renderTargetNode = CreateRef<FrameBufferNode>(*this);
+		m_Nodes.push_back(renderTargetNode);
 
-		Ref<ShaderPassNode> depthPass = CreateRef<ShaderPassNode>(*this, "depth");
-		depthPass->SetRenderTarget({ m_OutputNode, m_OutputNode->m_Buffer });
-		m_Nodes.push_back(depthPass);
+		// gbuffer pass
+		Ref<GBufferPassNode> gBufferPass = CreateRef<GBufferPassNode>(*this);
+		gBufferPass->SetRenderTarget({ renderTargetNode, renderTargetNode->m_Buffer });
+		m_Nodes.push_back(gBufferPass);
 
-		Ref<SkyboxNode> skyboxPass = CreateRef<SkyboxNode>(*this, 10, 10);
-		skyboxPass->SetRenderTarget({ depthPass, m_OutputNode->m_Buffer });
+		// shadow pass
+		Ref<ShadowPassNode> shadowPass = CreateRef<ShadowPassNode>(*this);
+		m_Nodes.push_back(shadowPass);
+
+		// skybox pass
+		Ref<SkyboxNode> skyboxPass = CreateRef<SkyboxNode>(*this);
+		skyboxPass->SetRenderTarget({ gBufferPass, renderTargetNode->m_Buffer });
 		m_Nodes.push_back(skyboxPass);
 
+		// main lit pass
 		Ref<ShaderPassNode> mainPass = CreateRef<ShaderPassNode>(*this, "main");
-		mainPass->SetRenderTarget({ skyboxPass, m_OutputNode->m_Buffer });
+		mainPass->SetRenderTarget({ skyboxPass, renderTargetNode->m_Buffer });
+		mainPass->AddDependincy(shadowPass);
 		m_Nodes.push_back(mainPass);
+
+		// create outputNode
+		m_OutputNode = CreateRef<OutputNode>(*this);
+		m_OutputNode->m_Buffer = renderTargetNode->m_Buffer;
+		m_Nodes.push_back(m_OutputNode);
 	}
 
 	RenderGraph::~RenderGraph()
@@ -48,7 +62,6 @@ namespace Engine
 
 	void RenderGraph::Build()
 	{
-		m_FrameBufferStates.clear();
 		for (auto& node : m_Nodes)
 			node->Invalidate();
 
@@ -59,26 +72,6 @@ namespace Engine
 	Engine::Ref<Engine::FrameBuffer> RenderGraph::GetRenderTarget()
 	{
 		return m_OutputNode->m_Buffer;
-	}
-
-	void RenderGraph::RecoardFrameBufferState(FrameBufferState state)
-	{
-		for (auto& fbState : m_FrameBufferStates)
-		{
-			if (fbState.buffer == state.buffer)
-			{
-				fbState.afterState = state.afterState;
-				return;
-			}
-		}
-
-		m_FrameBufferStates.push_back(state);
-	}
-
-	void RenderGraph::UpdateStates()
-	{
-		for (auto& fbState : m_FrameBufferStates)
-			fbState.buffer->SetState(fbState.afterState);
 	}
 
 }

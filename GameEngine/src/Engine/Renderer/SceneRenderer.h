@@ -70,7 +70,7 @@ namespace Engine
 
 		Ref<FrameBuffer> GetRenderTarget() { return m_RenderGraph->GetRenderTarget(); }
 		void OnViewportResize(uint32 width, uint32 height);
-		void SetMainCamera(const Camera& camera);
+		void SetMainCamera(Ref<Camera> camera);
 		void SetDirectionalLight(Ref<DirectionalLight> light);
 		void SetSkyBox(Ref<Texture> texture);
 		void UpdateBuffers();
@@ -84,7 +84,7 @@ namespace Engine
 		static Ref<SceneRenderer> Create();
 
 	private:
-		Ref<ConstantBuffer> m_CameraIndexBuffer;
+		Ref<Camera> m_MainCamera;
 		std::vector<ShaderDrawSection> m_ShaderDrawSection;
 
 		bool m_Invalid = true;

@@ -45,7 +45,7 @@ namespace Engine
 		Physics2D::OnPhysicsStop();
 	}
 
-	void Scene::OnUpdateEditor(const EditorCamera& camera)
+	void Scene::OnUpdateEditor(Ref<EditorCamera> camera)
 	{
 		// updating
 		// update transforms
@@ -65,6 +65,14 @@ namespace Engine
 		});
 
 		// rendering
+		auto dirLightView = m_Registry.View<DirectionalLightComponent>();
+		for (auto& comp : dirLightView)
+			comp.UpdateShadowMaps();
+		
+		// render 3d models
+		m_SceneRenderer->SetMainCamera(camera);
+		m_SceneRenderer->UpdateBuffers();
+
 		// render sprites
 		{
 			Renderer2D::BeginScene(camera);
@@ -74,7 +82,7 @@ namespace Engine
 			for (auto& comp : cameraView)
 			{
 				TransformComponent tc = comp.Owner.GetTransform(); // create copy of transform component to billboard 
-				tc.SetRotation({ -camera.GetPitch(), -camera.GetYaw(), 0 });
+				tc.SetRotation({ -camera->GetPitch(), -camera->GetYaw(), 0 });
 				tc.SetScale({ 1,1,1 });
 
 				Renderer2D::DrawQuad(tc.GetTransform(), m_CameraIcon, (int)(EntityType)comp.Owner);
@@ -82,12 +90,6 @@ namespace Engine
 			}
 
 			Renderer2D::EndScene();
-		}
-
-		// render 3d models
-		{
-			m_SceneRenderer->SetMainCamera(camera);
-			m_SceneRenderer->UpdateBuffers();
 		}
 	}
 
@@ -112,14 +114,14 @@ namespace Engine
 
 		// get main camera
 		Entity MainCameraEntity = GetPrimaryCameraEntity();
-		Camera* mainCamera = nullptr;
+		Ref<Camera> mainCamera = nullptr;
 
 		if (MainCameraEntity != Entity::null)
-			mainCamera = &MainCameraEntity.GetComponent<CameraComponent>().Camera;
+			mainCamera = MainCameraEntity.GetComponent<CameraComponent>().Camera;
 
 		if (mainCamera)
 		{
-			m_SceneRenderer->SetMainCamera(*mainCamera);
+			m_SceneRenderer->SetMainCamera(mainCamera);
 			m_SceneRenderer->UpdateBuffers();
 		}
 	}
@@ -132,7 +134,7 @@ namespace Engine
 		m_Registry.GetComponentPool<CameraComponent>()->Each([&](void* comp) {
 			CameraComponent* camComp = (CameraComponent*)comp;
 			if (!camComp->FixedAspectRatio)
-				camComp->Camera.SetViewportSize(width, height);
+				camComp->Camera->SetViewportSize(width, height);
 		});
 
 		m_SceneRenderer->OnViewportResize(width, height);
@@ -245,7 +247,7 @@ namespace Engine
 	template<>
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
 	{
-		component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		component.Camera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
 
 	template<>

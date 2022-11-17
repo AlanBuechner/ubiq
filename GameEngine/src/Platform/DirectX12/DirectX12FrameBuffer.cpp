@@ -26,7 +26,7 @@ namespace Engine
 	}
 
 	DirectX12FrameBuffer::DirectX12FrameBuffer(const FrameBufferSpecification& spec) :
-		m_Spec(spec), m_State(State::Common)
+		m_Spec(spec)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		for (auto format : m_Spec.Attachments.Attachments)
@@ -49,10 +49,9 @@ namespace Engine
 				if (m_AttachmentSpecs[i].IsDepthStencil())
 					m_TargetHandles[i] = DirectX12ResourceManager::s_DSVHeap->Allocate();
 				else
-				{
 					m_TargetHandles[i] = DirectX12ResourceManager::s_RTVHeap->Allocate();
-					m_SRVHandles[i] = DirectX12ResourceManager::s_SRVHeap->Allocate();
-				}
+
+				m_SRVHandles[i] = DirectX12ResourceManager::s_SRVHeap->Allocate();
 			}
 		}
 		Invalidate();
@@ -102,6 +101,12 @@ namespace Engine
 		return m_SRVHandles[index].gpu.ptr;
 	}
 
+	uint32 DirectX12FrameBuffer::GetAttachmentShaderDescriptoLocation(uint32 index) const
+	{
+		CORE_ASSERT(index < m_SRVHandles.size(), "");
+		return m_SRVHandles[index].GetIndex();
+	}
+
 	int DirectX12FrameBuffer::ReadPixle(uint32 index, int x, int y)
 	{
 		// TODO
@@ -111,41 +116,30 @@ namespace Engine
 		return val;
 	}
 
-	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXState()
-	{
-		return GetDXState(m_State);
-	}
-
-
-	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXDepthState()
-	{
-		return GetDXDepthState(m_State);
-	}
-
-	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXState(State state)
+	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXState(FrameBufferState state)
 	{
 		switch (state)
 		{
-		case Engine::FrameBuffer::RenderTarget:
+		case FrameBufferState::RenderTarget:
 			return D3D12_RESOURCE_STATE_RENDER_TARGET;
-		case Engine::FrameBuffer::SRV:
+		case FrameBufferState::SRV:
 			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-		case Engine::FrameBuffer::Common:
+		case FrameBufferState::Common:
 			return D3D12_RESOURCE_STATE_COMMON;
 		default:
 			break;
 		}
 	}
 
-	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXDepthState(State state)
+	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXDepthState(FrameBufferState state)
 	{
 		switch (state)
 		{
-		case Engine::FrameBuffer::RenderTarget:
+		case FrameBufferState::RenderTarget:
 			return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		case Engine::FrameBuffer::SRV:
+		case FrameBufferState::SRV:
 			return D3D12_RESOURCE_STATE_DEPTH_READ | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-		case Engine::FrameBuffer::Common:
+		case FrameBufferState::Common:
 			return D3D12_RESOURCE_STATE_COMMON;
 		default:
 			break;
@@ -184,28 +178,27 @@ namespace Engine
 		clearVal.Format = format;
 		((Math::Vector4&)clearVal.Color) = color;
 
-		D3D12_RESOURCE_STATES state = m_Spec.Attachments.Attachments[i].IsDepthStencil() ? GetDXDepthState() : GetDXState();
+		D3D12_RESOURCE_STATES state = m_Spec.Attachments.Attachments[i].IsDepthStencil() ? GetDXDepthState(m_Spec.InitalState) : GetDXState(m_Spec.InitalState);
 		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommittedResource(
 			&props, D3D12_HEAP_FLAG_NONE, &rDesc,
 			state, &clearVal, IID_PPV_ARGS(m_Buffers[i].GetAddressOf())
 		),"Failed To Create Resorce");
 
 		if (!m_Spec.Attachments.Attachments[i].IsDepthStencil())
-		{
 			context->GetDevice()->CreateRenderTargetView(m_Buffers[i].Get(), nullptr, m_TargetHandles[i].cpu);
-
-			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-			srvDesc.Format = format;
-			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-			srvDesc.Texture2D.MipLevels = rDesc.MipLevels;
-			srvDesc.Texture2D.MostDetailedMip = 0;
-			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			context->GetDevice()->CreateShaderResourceView(m_Buffers[i].Get(), &srvDesc, m_SRVHandles[i].cpu);
-		}
 		else
-		{
 			context->GetDevice()->CreateDepthStencilView(m_Buffers[i].Get(), nullptr, m_TargetHandles[i].cpu);
-		}
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		if (!m_Spec.Attachments.Attachments[i].IsDepthStencil())
+			srvDesc.Format = format;
+		else
+			srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = rDesc.MipLevels;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		context->GetDevice()->CreateShaderResourceView(m_Buffers[i].Get(), &srvDesc, m_SRVHandles[i].cpu);
 	}
 
 }

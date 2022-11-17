@@ -10,7 +10,11 @@ namespace Engine
 {
 	struct CameraComponent : public Component
 	{
-		Engine::SceneCamera Camera;
+		CameraComponent() {
+			Camera = CreateRef<SceneCamera>();
+		}
+
+		Ref<SceneCamera> Camera;
 		bool Primary = true;
 		bool FixedAspectRatio = false;
 
@@ -29,7 +33,9 @@ namespace Engine
 		void SetDirection(Math::Vector3 direction);
 		void SetColor(Math::Vector3 color);
 		void SetIntensity(float intensity);
-		const Ref<const DirectionalLight> GetDirectinalLight() { return m_Light; }
+		Ref<const DirectionalLight> GetDirectinalLight() { return m_Light; }
+
+		void UpdateShadowMaps();
 
 	private:
 		Ref<DirectionalLight> m_Light;

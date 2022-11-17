@@ -12,9 +12,11 @@ namespace Engine
 		DirectX12StructuredBuffer(uint32 stride, uint32 count);
 		~DirectX12StructuredBuffer();
 
-		void Resize(uint32 count) override;
+		virtual void Resize(uint32 count) override;
 
-		void SetData(void* data, uint32 count = 1, uint32 start = 0) override;
+		virtual void SetData(void* data, uint32 count = 1, uint32 start = 0) override;
+
+		virtual uint32 GetDescriptorLocation() const override;
 
 	private:
 		wrl::ComPtr<ID3D12Resource> m_Buffer;
