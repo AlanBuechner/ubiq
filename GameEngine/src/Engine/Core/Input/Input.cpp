@@ -19,9 +19,12 @@ namespace Engine
 	bool Input::OnKeyPressed(KeyPressedEvent& e)
 	{ 
 		int keycode = e.GetKeyCode();
-		SetKeyState(keycode, KeyPressed); 
-		m_ToUpdate.push_back(keycode);
-		m_KeysDown.push_back(keycode);
+		if (m_KeyStates[keycode] != Down)
+		{
+			SetKeyState(keycode, KeyPressed);
+			m_ToUpdate.push_back(keycode);
+			m_KeysDown.push_back(keycode);
+		}
 		return false; 
 	}
 
@@ -212,18 +215,18 @@ namespace Engine
 		KeyState r;
 		switch (keycode)
 		{
-		case KeyCode::ALT:
-			l = m_KeyStates[KeyCode::LEFT_ALT];
-			r = m_KeyStates[KeyCode::RIGHT_ALT];
-			break;
-		case KeyCode::CONTROL:
-			l = m_KeyStates[KeyCode::LEFT_CONTROL];
-			r = m_KeyStates[KeyCode::RIGHT_CONTROL];
-			break;
-		case KeyCode::SHIFT:
-			l = m_KeyStates[KeyCode::LEFT_SHIFT];
-			r = m_KeyStates[KeyCode::RIGHT_SHIFT];
-			break;
+			/*case KeyCode::ALT:
+				l = m_KeyStates[KeyCode::LEFT_ALT];
+				r = m_KeyStates[KeyCode::RIGHT_ALT];
+				break;
+			case KeyCode::CONTROL:
+				l = m_KeyStates[KeyCode::LEFT_CONTROL];
+				r = m_KeyStates[KeyCode::RIGHT_CONTROL];
+				break;
+			case KeyCode::SHIFT:
+				l = m_KeyStates[KeyCode::LEFT_SHIFT];
+				r = m_KeyStates[KeyCode::RIGHT_SHIFT];
+				break;*/
 		default:
 			return m_KeyStates[keycode];
 			break;

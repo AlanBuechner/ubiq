@@ -29,11 +29,18 @@ namespace Engine
 		{
 			m_Passes[pass.passName] = ShaderPass::Create(src, pass.passName);
 		}
+
+		m_Params = src->config.params;
 	}
 
 	Ref<ShaderPass> Shader::GetPass(const std::string& passName)
 	{
 		return m_Passes[passName];
+	}
+
+	std::vector<MaterialParameter>& Shader::GetParams()
+	{
+		return m_Params;
 	}
 
 	Ref<Shader> Shader::Create(const fs::path& file)

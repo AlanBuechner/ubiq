@@ -14,6 +14,7 @@ namespace Engine
 {
 	struct ShaderParameter;
 	struct ShaderSorce;
+	struct MaterialParameter;
 
 	class ShaderPass
 	{
@@ -51,11 +52,13 @@ namespace Engine
 		Shader(const fs::path& file);
 
 		Ref<ShaderPass> GetPass(const std::string& passName);
+		std::vector<MaterialParameter>& GetParams();
 
 		static Ref<Shader> Create(const fs::path& file);
 
 	private:
 		std::unordered_map<std::string, Ref<ShaderPass>> m_Passes;
+		std::vector<MaterialParameter> m_Params;
 	};
 
 
@@ -101,5 +104,20 @@ namespace Engine
 		uint32 space;
 
 		uint32 rootIndex = 0;
+	};
+
+	struct MaterialParameter
+	{
+		enum Type
+		{
+			TextureID,
+			Bool
+		};
+
+		std::string name;
+		Type type;
+		std::string defaultValue;
+
+		uint32 GetTypeSize();
 	};
 }

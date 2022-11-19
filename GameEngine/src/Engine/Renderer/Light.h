@@ -34,8 +34,11 @@ namespace Engine
 			{
 				uint32 camera;
 				uint32 frameBuffer;
+				uint32 tWidth;
+				uint32 tHeight;
 				float minDist;
 				float maxDist;
+				uint32 padding[2];
 			};
 
 			CascadedShadowMaps() = default;

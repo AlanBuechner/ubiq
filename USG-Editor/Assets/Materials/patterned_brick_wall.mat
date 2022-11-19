@@ -5,6 +5,7 @@
 	"roughness": "Assets/Images/patterned_brick_wall_4k/patterned_brick_wall_rough_4k.jpg",
 	"ao": "Assets/Images/patterned_brick_wall_4k/patterned_brick_wall_ao_4k.jpg",
 	"metal": "Assets/Images/patterned_brick_wall_4k/patterned_brick_wall_arm_4k.jpg",
-	"noparallax": "Assets/Images/patterned_brick_wall_4k/patterned_brick_wall_disp_4k.jpg",
-	"invertParallax" :  true
+	"parallax": "Assets/Images/patterned_brick_wall_4k/patterned_brick_wall_disp_4k.jpg",
+	"useParallax": false,
+	"invertParallax": true
 }

@@ -32,6 +32,7 @@ namespace Engine
 	void EditorCamera::UpdateView()
 	{
 		m_Position = CalculatePosition();
+		m_CameraData.Position = m_Position;
 
 		Math::Quaternion orientation = GetOrientation();
 		m_CameraData.ViewMatrix = glm::translate(Math::Mat4(1.0f), m_Position) * glm::toMat4(orientation);
@@ -52,7 +53,7 @@ namespace Engine
 
 	float EditorCamera::RotationSpeed() const
 	{
-		return 0.8f * 30;
+		return 0.3f * 30;
 	}
 
 	float EditorCamera::ZoomSpeed() const
@@ -76,7 +77,7 @@ namespace Engine
 		m_InitialMousePosition = mouse;
 
 		bool alt = Input::GetKeyDown(KeyCode::ALT);
-		bool shift = Input::GetKeyDown(KeyCode::LEFT_SHIFT) || Input::GetKeyDown(KeyCode::RIGHT_SHIFT);
+		bool shift = Input::GetKeyDown(KeyCode::SHIFT);
 
 		bool rMouse = Input::GetMouseButtonDown(KeyCode::RIGHT_MOUSE);
 		bool lMouse = Input::GetMouseButtonDown(KeyCode::LEFT_MOUSE);
@@ -88,10 +89,10 @@ namespace Engine
 		bool dKey = Input::GetKeyDown(KeyCode::D);
 
 		if (rMouse)
-			if (alt)
-				MouseRotateAboutFocal(delta);
-			else
-				MouseRotate(delta);
+		{
+			if (alt)	MouseRotateAboutFocal(delta);
+			else		MouseRotate(delta);
+		}
 		else if (mMouse)
 			MousePan(delta);
 		else if (lMouse && alt)
@@ -115,7 +116,6 @@ namespace Engine
 
 		UpdateView();
 
-		m_CameraData.Position = m_Position;
 		UpdateCameraBuffer();
 	}
 

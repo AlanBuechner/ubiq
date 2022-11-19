@@ -12,6 +12,18 @@ passes = {
 	};
 };
 
+material = {
+	diffuse = textureID(white);
+	normal = textureID(blue);
+	roughness = textureID(black);
+	ao = textureID(white);
+	metal = textureID(black);
+	disp = textureID(black);
+	parallax = textureID(black);
+	useParallax = bool(false);
+	invertParallax = bool(false);
+};
+
 #section common
 #pragma enable_d3d12_debug_symbols
 
@@ -47,20 +59,7 @@ struct PS_Output
 	float4 color : SV_TARGET0;
 };
 
-// common structions
-struct Material
-{
-	// texture indexes for the material properties
-	uint diffuse;
-	uint normal;
-	uint roughness;
-	uint ao;
-	uint metal;
-	uint disp;
-	uint parallax;
-	bool useParallax;
-	bool invertParallax;
-};
+// common structures
 
 struct DirectionalLight
 {
@@ -73,6 +72,8 @@ struct DirectionalLightCascade
 {
 	uint camera;
 	uint texture;
+	uint tWidth;
+	uint tHeight;
 	float minDist;
 	float maxDist;
 };
@@ -137,6 +138,7 @@ cbuffer Cascades
 }[];
 
 ConstantBuffer<Camera> cameras[] : register(space1);
+// Material struct is generated automaticly by the data defined in the config section
 ConstantBuffer<Material> materials[]: register(space2);
 
 Texture2D<float4> textures[] : register(space0);
@@ -145,39 +147,7 @@ sampler s;
 // P_ denotes sampler as having point filtering
 sampler P_s;
 
-static const float PI = 3.14159265f;
-
-// fresnel shlick function
-float3 F_Schlick(float3 f0, float HdotV) 
-{
-	return f0 + (float3(1, 1, 1) - f0) * pow(float3(1, 1, 1) - HdotV, 5.0);
-}
-
-// specular D
-float D(float a, float NdotH)
-{
-	float numerator = a * a;
-
-	float denominator = PI * pow(((NdotH * NdotH) * ((a * a) - 1)) + 1, 2);
-	denominator = max(denominator, 0.000001);
-
-	return numerator / denominator;
-}
-
-float G1(float a, float NdotX)
-{
-	float k = a / 2.0;
-
-	float denom = (NdotX * (1 - k)) + k;
-	denom = max(denom, 0.000001);
-
-	return NdotX / denom;
-}
-
-float G(float a, float NdotV, float NdotL)
-{
-	return G1(a, NdotV) * G1(a, NdotL);
-}
+#include "PBR.hlsli"
 
 float SampleParallax(uint textureID, bool invert, float2 uv)
 {
@@ -248,48 +218,38 @@ PS_Output main(PS_Input input)
 		//uint stride;
 		//cascades[cascadeIndex].GetDimensions(numCascades, stride);
 
-		uint ci = 0;
+		uint ci = numCascades;
 		for (uint i = 0; i < numCascades; i++)
 		{
 			DirectionalLightCascade c = cascades[i];
-			if (input.depth > c.minDist && input.depth <= c.maxDist)
+			float d = input.depth;
+			float min = c.minDist;
+			float max = c.maxDist;
+			if (d > min && d <= max)
 			{
 				ci = i;
 				break;
 			}
 		}
 
-		DirectionalLightCascade c = cascades[ci];
-		Camera shadowCamera = cameras[c.camera];
-
-		float4 pos = mul(shadowCamera.ViewPorjection, input.worldPosition);
-		pos.y = - pos.y; // flip v
-		pos = pos / pos.w;
-
-		float depthSample = textures[c.texture].Sample(P_s, pos.xy * 0.5 + 0.5).r;
-
-		if (!(depthSample+0.01 < pos.z))
+		bool inShadow = false;
+		if (ci < numCascades)
 		{
-			// lighting
-			float3 dir = normalize(-DirLight.direction);
+			DirectionalLightCascade c = cascades[ci];
+			Camera shadowCamera = cameras[c.camera];
 
-			float3 H = normalize(viewDirection + dir); // half way vector
+			float4 pos = mul(shadowCamera.ViewPorjection, input.worldPosition);
+			pos.y = -pos.y; // flip v
+			pos = pos / pos.w;
 
-			float NdotV = max(dot(normal, viewDirection), 0.000001);
-			float NdotL = max(dot(normal, dir), 0.000001);
-			float NdotH = max(dot(normal, H), 0.0);
-			float HdotV = max(dot(H, viewDirection), 0.0);
+			float depthSample = textures[c.texture].Sample(P_s, pos.xy * 0.5 + 0.5).r;
 
-			float3 ks = F_Schlick(baseReflectivity, HdotV); // how much energy is contributed to specular
-			float3 kd = (float3(1, 1, 1) - ks) * (1 - metallic); // how much energy is contribited to diffuse. the remaining amount of energy from after specular minus the energy ubsorbed by the metal
+			inShadow = !(depthSample + 0.01 < pos.z);
+		}
 
-			float3 ctn = D(roughness, NdotH) * G(roughness, NdotV, NdotL) * ks;
-			float ctd = 4.0 * NdotV * NdotL;
-			ctd = max(ctd, 0.000001);
-
-			float3 BRDF = (kd * diffuse.rgb / PI) + (ctn / ctd);
-
-			lo += BRDF * DirLight.color * 5 * NdotL;
+		if(inShadow)
+		{
+			lo += PBR(diffuse.rgb, DirLight.direction, DirLight.color, 5, viewDirection, normal, roughness, metallic, baseReflectivity);
 		}
 	}
 

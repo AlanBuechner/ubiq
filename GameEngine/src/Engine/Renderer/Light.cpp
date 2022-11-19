@@ -19,8 +19,8 @@ namespace Engine
 
 			FrameBufferSpecification fbSpec;
 			fbSpec.Attachments = { { FrameBufferTextureFormat::Depth, { 1,0,0,0 } } };
-			fbSpec.Width = 5000;
-			fbSpec.Height = 5000;
+			fbSpec.Width = 2500;
+			fbSpec.Height = 2500;
 			fbSpec.InitalState = FrameBufferState::SRV;
 			m_ShadowMaps[i] = FrameBuffer::Create(fbSpec);
 
@@ -28,6 +28,7 @@ namespace Engine
 				CascadeData{
 					m_Cameras[i]->GetCameraBuffer()->GetDescriptorLocation(),
 					m_ShadowMaps[i]->GetAttachmentShaderDescriptoLocation(),
+					fbSpec.Width, fbSpec.Height,
 					nearPlan, nearPlan + size
 				}
 			);

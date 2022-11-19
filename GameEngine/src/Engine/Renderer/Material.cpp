@@ -8,34 +8,29 @@
 namespace Engine
 {
 
-	void Material::Apply()
+	MaterialData::MaterialData(std::vector<MaterialParameter>& params) :
+		m_Params(params)
 	{
-		CBuffData data;
-		data.diffuseLoc = diffuse->GetDescriptorLocation();
+		// calculate size of buffer
+		for (auto& p : params)
+			m_Size += p.GetTypeSize();
 
-		if (normal) data.normalLoc = normal->GetDescriptorLocation();
-		else data.normalLoc = Renderer::GetBlueTexture()->GetDescriptorLocation();
+		// create buffer
+		m_Data = malloc(m_Size);
 
-		if (roughness) data.roughnessLoc = roughness->GetDescriptorLocation();
-		else data.roughnessLoc = Renderer::GetBlackexture()->GetDescriptorLocation();
-
-		if (ao) data.aoLoc = ao->GetDescriptorLocation();
-		else data.aoLoc = Renderer::GetWhiteTexture()->GetDescriptorLocation();
-
-		if (metal) data.metalLoc = metal->GetDescriptorLocation();
-		else Renderer::GetBlackexture()->GetDescriptorLocation();
-
-		if (disp) data.dispLoc = disp->GetDescriptorLocation();
-		else data.dispLoc = Renderer::GetBlackexture()->GetDescriptorLocation();
-
-		if (parallax)
+		uint64 offset = 0;
+		for (auto& p : params)
 		{
-			data.parallaxLoc = parallax->GetDescriptorLocation();
-			data.useParallax = TRUE;
-			data.invertParallax = invertParallax;
+			m_DataLocations[p.name] = (char*)m_Data + offset;
+			offset += p.GetTypeSize();
 		}
 
-		m_Buffer->SetData((const void*)&data);
+	}
+
+
+	void Material::Apply()
+	{
+		m_Buffer->SetData(m_Data->GetData());
 	}
 
 	Ref<Material> Material::Create(const fs::path& path)
@@ -52,24 +47,46 @@ namespace Engine
 
 			CORE_ASSERT(f.contains("shader"), "Material does not have a shader");
 			mat->shader = assetManager.GetAsset<Shader>(f["shader"].get<fs::path>());
+			mat->m_Data = CreateRef<MaterialData>(mat->shader->GetParams());
 
-#define GET_TEXTURE_ATTRIB(name) if(f.contains(#name)) mat->name = assetManager.GetAsset<Texture2D>(f[#name]);
-#define GET_BOOL_ATTRIB(name) if(f.contains(#name) && f.is_boolean()) mat->name = (f[#name].get<bool>()); else mat->name = false;
-
-			GET_TEXTURE_ATTRIB(diffuse);
-			GET_TEXTURE_ATTRIB(normal);
-			GET_TEXTURE_ATTRIB(roughness);
-			GET_TEXTURE_ATTRIB(ao);
-			GET_TEXTURE_ATTRIB(metal);
-			GET_TEXTURE_ATTRIB(disp);
-			GET_TEXTURE_ATTRIB(parallax);
-			GET_BOOL_ATTRIB(invertParallax);
-
-#undef GET_TEXTURE_ATTRIB
-#undef GET_BOOL_ATTRIB
+			for (auto& p : mat->shader->GetParams())
+			{
+				void* location = mat->m_Data->GetDatalocation(p.name);
+				if (f.contains(p.name))
+				{
+					if (p.type == MaterialParameter::TextureID)
+					{
+						mat->m_ReferensedTextures.push_back(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
+						*(uint32*)location = mat->m_ReferensedTextures.back()->GetDescriptorLocation(); // set asset value
+					}
+					else if (p.type == MaterialParameter::Bool)
+						*(BOOL*)location = f[p.name].get<bool>();
+				}
+				else
+				{
+					if (p.type == MaterialParameter::TextureID)
+					{
+						if (p.defaultValue == "white")
+							*(uint32*)location = Renderer::GetWhiteTexture()->GetDescriptorLocation();
+						else if (p.defaultValue == "black")
+							*(uint32*)location = Renderer::GetBlackTexture()->GetDescriptorLocation();
+						else if (p.defaultValue == "blue")
+							*(uint32*)location = Renderer::GetBlueTexture()->GetDescriptorLocation();
+						else
+							*(uint32*)location = Renderer::GetWhiteTexture()->GetDescriptorLocation();
+					}
+					else if (p.type == MaterialParameter::Bool)
+					{
+						if (p.defaultValue == "true")
+							*(BOOL*)location = TRUE;
+						else
+							*(BOOL*)location = FALSE;
+					}
+				}
+			}
 		}
 
-		mat->m_Buffer = ConstantBuffer::Create(sizeof(CBuffData));
+		mat->m_Buffer = ConstantBuffer::Create(mat->m_Data->GetSize());
 		mat->Apply();
 
 		return mat;

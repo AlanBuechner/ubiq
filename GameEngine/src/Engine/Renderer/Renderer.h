@@ -43,7 +43,7 @@ namespace Engine
 		static void Build(Ref<CommandList> commandList);
 
 		static Ref<Texture2D> GetWhiteTexture() { return s_WhiteTexture; }
-		static Ref<Texture2D> GetBlackexture() { return s_BlackTexture; }
+		static Ref<Texture2D> GetBlackTexture() { return s_BlackTexture; }
 		static Ref<Texture2D> GetBlueTexture() { return s_BlueTexture; }
 
 		inline static RendererAPI GetAPI() { return s_Api; }

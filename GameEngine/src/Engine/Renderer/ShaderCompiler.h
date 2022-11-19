@@ -7,6 +7,8 @@
 
 namespace Engine
 {
+	struct MaterialParameter;
+
 
 	struct ShaderConfig
 	{
@@ -28,6 +30,10 @@ namespace Engine
 
 		std::vector<RenderPass> passes;
 
+		std::vector<MaterialParameter> params;
+
+		std::unordered_map<std::string, void*> m_DataLocations;
+
 		RenderPass& FindPass(const std::string& passName);
 	};
 
@@ -44,8 +50,11 @@ namespace Engine
 	class ShaderCompiler
 	{
 	public:
+		static fs::path FindFilePath(const fs::path& file, const fs::path& parent);
 		static Ref<ShaderSorce> LoadFile(const fs::path& file);
+		static void PreProcess(std::string& str, const fs::path& path);
 		static ShaderConfig CompileConfig(const std::string& code);
+		static std::string GenerateMaterialStruct(std::vector<MaterialParameter>& params);
 
 	private:
 		static std::vector<std::string> Tokenize(const std::string& line);
@@ -65,8 +74,10 @@ namespace Engine
 		struct Value
 		{
 			bool isObject;
+			bool isString;
 
 			std::string string;
+			std::vector<std::string> paramters;
 			Ref<Object> object;
 
 			static Ref<Value> Build(std::queue<std::string>& tokenQueue);
