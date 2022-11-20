@@ -35,7 +35,10 @@ namespace Engine
 
 	Ref<ShaderPass> Shader::GetPass(const std::string& passName)
 	{
-		return m_Passes[passName];
+		auto pass = m_Passes.find(passName);
+		if (pass == m_Passes.end())
+			return nullptr;
+		return pass->second;
 	}
 
 	std::vector<MaterialParameter>& Shader::GetParams()

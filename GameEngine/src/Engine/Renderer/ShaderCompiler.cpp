@@ -75,7 +75,6 @@ namespace Engine
 		sorce->config = CompileConfig(configSection);
 		
 		std::string materialCode = GenerateMaterialStruct(sorce->config.params);
-		CORE_INFO(materialCode);
 
 		std::string commonSection = materialCode + ss["common"].str();
 		PreProcess(commonSection, file);

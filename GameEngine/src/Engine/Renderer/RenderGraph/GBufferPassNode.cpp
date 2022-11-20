@@ -41,9 +41,12 @@ namespace Engine
 		for (auto& cmd : scene.m_DrawCommands)
 		{
 			Ref<ShaderPass> pass = cmd.m_Shader->GetPass("depth");
-			m_CommandList->SetShader(pass);
-			m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), scene.m_MainCamera->GetCameraBuffer()->GetDescriptorLocation());
-			m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
+			if (pass)
+			{
+				m_CommandList->SetShader(pass);
+				m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), scene.m_MainCamera->GetCameraBuffer()->GetDescriptorLocation());
+				m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
+			}
 		}
 		GPUTimer::EndEvent(m_CommandList); // end depth pre pass
 
