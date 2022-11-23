@@ -5,6 +5,7 @@
 #include "DirectX12CommandList.h"
 #include "DirectX12Context.h"
 #include "DirectX12Shader.h"
+#include "DirectX12ComputeShader.h"
 #include "DirectX12Buffer.h"
 #include "DirectX12ConstantBuffer.h"
 #include "DirectX12Texture.h"
@@ -244,6 +245,7 @@ namespace Engine
 				{
 				case ShaderParameter::DescriptorType::CBV:
 				case ShaderParameter::DescriptorType::SRV:
+				case ShaderParameter::DescriptorType::UAV:
 					m_CommandList->SetGraphicsRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
 					break;
 				default:
@@ -312,6 +314,32 @@ namespace Engine
 			return;
 
 		m_CommandList->ExecuteBundle(dxCommandList->GetCommandList().Get());
+	}
+
+	void DirectX12CommandList::SetComputeShader(Ref<ComputeShader> shader)
+	{
+		Ref<DirectX12ComputeShader> dxShader = std::dynamic_pointer_cast<DirectX12ComputeShader>(shader);
+		m_CommandList->SetPipelineState(dxShader->GetPipelineState().Get());
+		m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature().Get());
+
+		std::vector<ShaderParameter> reflectionData = shader->GetReflectionData();
+		for (uint32 i = 0; i < reflectionData.size(); i++)
+		{
+			ShaderParameter& p = reflectionData[i];
+			if (p.type == ShaderParameter::PerameterType::DescriptorTable && p.count > 1)
+			{
+				switch (p.descType)
+				{
+				case ShaderParameter::DescriptorType::CBV:
+				case ShaderParameter::DescriptorType::SRV:
+				case ShaderParameter::DescriptorType::UAV:
+					m_CommandList->SetComputeRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
+					break;
+				default:
+					break;
+				}
+			}
+		}
 	}
 
 	void DirectX12CommandList::Close()

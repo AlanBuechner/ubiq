@@ -15,13 +15,15 @@ passes = {
 material = {
 	diffuse = textureID(white);
 	normal = textureID(blue);
-	roughness = textureID(black);
+	roughness = textureID(white);
 	ao = textureID(white);
 	metal = textureID(black);
 	disp = textureID(black);
 	parallax = textureID(black);
+	tiling = float(1);
 	useParallax = bool(false);
 	invertParallax = bool(false);
+	flipV = bool(false);
 };
 
 #section common
@@ -96,11 +98,15 @@ cbuffer RC_MainCameraIndex
 	uint mainCameraIndex;
 };
 
-ConstantBuffer<Camera> cameras[];
+ConstantBuffer<Camera> cameras[] : register(space0);
+// Material struct is generated automaticly by the data defined in the config section
+ConstantBuffer<Material> materials[]: register(space1);
 
 
 VS_Output main(VS_Input input)
 {
+	Material mat = materials[input.materialID];
+
 	Camera camera = cameras[mainCameraIndex];
 	float4x4 mvp = mul(camera.ViewPorjection, input.transform);
 	float4x4 mv = mul(camera.View, input.transform);
@@ -110,7 +116,7 @@ VS_Output main(VS_Input input)
 	output.worldPosition = mul(input.transform, float4(input.position, 1));
 	float4 cameraSpacePosition = mul(mv, float4(input.position, 1));
 	output.depth = -cameraSpacePosition.z;
-	output.uv = input.uv;
+	output.uv = input.uv * mat.tiling;
 
 	output.normal = normalize(mul((float3x3)input.transform, input.normal));
 	output.tangent = normalize(mul((float3x3)input.transform, input.tangent));
@@ -120,15 +126,13 @@ VS_Output main(VS_Input input)
 	output.CToP = camera.Position - output.position.xyz;
 
 	output.matID = input.materialID;
+
+	if (mat.flipV)
+		output.uv.y = 1 - output.uv.y;
 	return output;
 }
 
 #section pixel
-
-//cbuffer RC_CascadeIndex
-//{
-//	uint cascadeIndex;
-//};
 
 ConstantBuffer<DirectionalLight> DirLight;
 #define NUM_CASCADES 5
@@ -142,7 +146,7 @@ ConstantBuffer<Camera> cameras[] : register(space1);
 ConstantBuffer<Material> materials[]: register(space2);
 
 Texture2D<float4> textures[] : register(space0);
-sampler s;
+sampler A_s;
 
 // P_ denotes sampler as having point filtering
 sampler P_s;
@@ -151,8 +155,8 @@ sampler P_s;
 
 float SampleParallax(uint textureID, bool invert, float2 uv)
 {
-	if (invert) return 1.0 - textures[textureID].Sample(s, uv).r;
-	else return textures[textureID].Sample(s, uv).r;
+	if (invert) return 1.0 - textures[textureID].Sample(A_s, uv).r;
+	else return textures[textureID].Sample(A_s, uv).r;
 }
 
 PS_Output main(PS_Input input)
@@ -198,11 +202,11 @@ PS_Output main(PS_Input input)
 			//discard;
 	}
 
-	float4 diffuse = textures[mat.diffuse].Sample(s, uv);
-	float3 normal = normalize(textures[mat.normal].Sample(s, uv).xyz * 2 - 1);
-	float roughness = textures[mat.roughness].Sample(s, uv).r;
-	float metallic = textures[mat.metal].Sample(s, uv).b;
-	float ao = textures[mat.ao].Sample(s, uv).r;
+	float4 diffuse = textures[mat.diffuse].Sample(A_s, uv);
+	float3 normal = normalize(normalize(textures[mat.normal].Sample(A_s, uv).xyz) * 2 - 1);
+	float roughness = textures[mat.roughness].Sample(A_s, uv).r;
+	float metallic = textures[mat.metal].Sample(A_s, uv).b;
+	float ao = textures[mat.ao].Sample(A_s, uv).r;
 
 	float3x3 TBN = transpose(float3x3(normalize(input.tangent), normalize(input.bitangent), normalize(input.normal)));
 	normal = normalize(mul(TBN, normal));
@@ -244,12 +248,12 @@ PS_Output main(PS_Input input)
 
 			float depthSample = textures[c.texture].Sample(P_s, pos.xy * 0.5 + 0.5).r;
 
-			inShadow = !(depthSample + 0.01 < pos.z);
+			inShadow = depthSample + 0.01 < pos.z;
 		}
 
-		if(inShadow)
+		if(!inShadow)
 		{
-			lo += PBR(diffuse.rgb, DirLight.direction, DirLight.color, 5, viewDirection, normal, roughness, metallic, baseReflectivity);
+			lo += PBR(diffuse.rgb, DirLight.direction, DirLight.color, DirLight.intensity, viewDirection, normal, roughness, metallic, baseReflectivity);
 		}
 	}
 

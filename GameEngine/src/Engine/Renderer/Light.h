@@ -13,6 +13,7 @@ namespace Engine
 	public:
 		static constexpr uint32 s_NumShadowMaps = 5;
 	private:
+		#pragma pack 4
 		struct DirectionalLightData
 		{
 			DirectionalLightData() = default;
@@ -21,10 +22,9 @@ namespace Engine
 			{}
 
 			Math::Vector3 direction = { 0, -1, 0 };
-			float padding1;
+			float padding = 69;
 			Math::Vector3 color = { 1,1,1 };
-			float padding2;
-			float intensity = 1;
+			float intensity = 5;
 		};
 
 	public:

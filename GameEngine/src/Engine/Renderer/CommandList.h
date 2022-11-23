@@ -24,6 +24,7 @@ namespace Engine
 
 	public:
 
+		virtual void SignalRecording() = 0;
 		virtual void StartRecording(Ref<ShaderPass> startShader = nullptr) = 0;
 
 		// transitions
@@ -51,7 +52,9 @@ namespace Engine
 		virtual void SetTexture(uint32 index, Ref<Texture> texture) = 0;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) = 0;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) = 0;
-		virtual void SignalRecording() = 0;
+
+		// compute
+		virtual void SetComputeShader(Ref<ComputeShader> shader) = 0;
 
 		virtual void Close() = 0;
 

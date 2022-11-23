@@ -105,6 +105,6 @@ PS_Output main(PS_Input input)
 	float lat = atan(wp.y/length(wp.xz));
 	float2 uv = float2((lon+PI)/(2*PI), 1-(lat+(PI/2))/PI);
 
-	output.color = texture.Sample(s, uv);// *0 + float4(uv, 0, 1);
+	output.color = texture.SampleLevel(s, uv, 0);// *0 + float4(uv, 0, 1);
 	return output;
 }

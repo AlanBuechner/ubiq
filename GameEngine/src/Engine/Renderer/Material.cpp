@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Material.h"
 #include "Renderer.h"
+#include "ShaderCompiler.h"
 #include "Engine/Core/Application.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -59,6 +60,8 @@ namespace Engine
 						mat->m_ReferensedTextures.push_back(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
 						*(uint32*)location = mat->m_ReferensedTextures.back()->GetDescriptorLocation(); // set asset value
 					}
+					else if (p.type == MaterialParameter::Float)
+						*(float*)location = f[p.name].get<float>();
 					else if (p.type == MaterialParameter::Bool)
 						*(BOOL*)location = f[p.name].get<bool>();
 				}
@@ -74,6 +77,10 @@ namespace Engine
 							*(uint32*)location = Renderer::GetBlueTexture()->GetDescriptorLocation();
 						else
 							*(uint32*)location = Renderer::GetWhiteTexture()->GetDescriptorLocation();
+					}
+					else if (p.type == MaterialParameter::Float)
+					{
+						*(float*)location = std::stof(p.defaultValue);
 					}
 					else if (p.type == MaterialParameter::Bool)
 					{

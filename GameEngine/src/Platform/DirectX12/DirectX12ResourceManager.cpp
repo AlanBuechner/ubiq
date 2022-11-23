@@ -2,6 +2,7 @@
 #include "DirectX12ResourceManager.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Directx12Context.h"
+#include <algorithm>
 
 
 Engine::Ref<Engine::DirectX12DescriptorHeap> Engine::DirectX12ResourceManager::s_SRVHeap;
@@ -183,7 +184,7 @@ namespace Engine
 		m_BufferUploadQueue.push(uploadData);
 	}
 
-	void DirectX12ResourceManager::UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, D3D12_RESOURCE_STATES state)
+	void DirectX12ResourceManager::UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, bool genMipChain, D3D12_RESOURCE_STATES state)
 	{
 		UploadTextureData uploadData;
 		uploadData.destResource = dest;
@@ -192,6 +193,10 @@ namespace Engine
 		uploadData.height = height;
 		uploadData.pitch = pitch;
 		uploadData.state = state;
+
+		uploadData.genMipChain = genMipChain;
+		if (std::max(width, height) == 1)
+			uploadData.genMipChain = false;
 
 		m_TextureUploadQueue.push(uploadData);
 	}
@@ -206,6 +211,8 @@ namespace Engine
 	void DirectX12ResourceManager::RecordCommands(Ref<CommandList> commandList)
 	{
 		std::lock_guard g(m_UploadMutex);
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+
 		struct BufferCopyInfo
 		{
 			ID3D12Resource* dest;
@@ -224,6 +231,16 @@ namespace Engine
 			uint32 pitch;
 		};
 
+		struct TextureMipInfo
+		{
+			wrl::ComPtr<ID3D12Resource> texture;
+			wrl::ComPtr<ID3D12Resource> mipTexture;
+			uint32 width;
+			uint32 height;
+			uint32 numMips;
+			D3D12_RESOURCE_STATES state;
+		};
+
 		CREATE_PROFILE_FUNCTIONI();
 		uint32 numBufferCopys = (uint32)m_BufferUploadQueue.size();
 		uint32 numTextureCopys = (uint32)m_TextureUploadQueue.size();
@@ -231,6 +248,7 @@ namespace Engine
 		std::vector<D3D12_RESOURCE_BARRIER> endb;
 		std::vector<BufferCopyInfo> bufferCopys;
 		std::vector<TextureCopyInfo> textureCopys;
+		std::vector<TextureMipInfo> mipTextures;
 
 		startb.reserve(numBufferCopys);
 		endb.reserve(numBufferCopys);
@@ -252,9 +270,44 @@ namespace Engine
 		{
 			UploadTextureData& data = m_TextureUploadQueue.front();
 
-			startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST));
-			textureCopys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.width, data.height, data.pitch });
-			endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, data.state));
+			if (data.genMipChain)
+			{
+				// create temp texture to generate the mip levels
+				wrl::ComPtr<ID3D12Resource> mipTexture;
+
+				D3D12_RESOURCE_DESC rDesc;
+				rDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+				rDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				rDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+				rDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+				rDesc.MipLevels = (uint32)std::floor(std::log2(std::max(data.width, data.height))) + 1;
+				rDesc.Width = data.width;
+				rDesc.Height = data.height;
+				rDesc.Alignment = 0;
+				rDesc.DepthOrArraySize = 1;
+				rDesc.SampleDesc = { 1, 0 };
+
+				context->GetDevice()->CreateCommittedResource(
+					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+					D3D12_HEAP_FLAG_NONE,
+					&rDesc,
+					D3D12_RESOURCE_STATE_COPY_DEST,
+					nullptr,
+					IID_PPV_ARGS(mipTexture.GetAddressOf())
+				);
+				mipTexture->SetName(L"MipTexture");
+				mipTextures.push_back({ data.destResource, mipTexture, data.width, data.height, rDesc.MipLevels, data.state });
+
+				startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST)); // transition final texture to copy destination
+				textureCopys.push_back({ mipTexture.Get(), data.uploadResource.Get(), data.width, data.height, data.pitch });
+				endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(mipTexture.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
+			}
+			else
+			{
+				startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST));
+				textureCopys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.width, data.height, data.pitch });
+				endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, data.state));
+			}
 
 			m_TextureUploadQueue.pop();
 		}
@@ -291,10 +344,74 @@ namespace Engine
 		}
 
 		dxCommandList->GetCommandList()->ResourceBarrier((uint32)endb.size(), endb.data()); // transition resources back to original state
+
+
+		// generate mip maps
+		std::vector<D3D12_RESOURCE_BARRIER> mipBarrier;
+		std::vector<D3D12_RESOURCE_BARRIER> textureBarrier;
+		std::vector<TextureCopyInfo> mipCopys;
+
+		for (auto& mipTexture : mipTextures)
+		{
+			for (uint32 topMip = 0; topMip < mipTexture.numMips - 1; topMip++)
+			{
+				uint32_t srcWidth = std::max<uint32>(mipTexture.width >> (topMip), 1);
+				uint32_t srcHeight = std::max<uint32>(mipTexture.height >> (topMip), 1);
+
+				uint32_t dstWidth = std::max<uint32>(mipTexture.width >> (topMip + 1), 1);
+				uint32_t dstHeight = std::max<uint32>(mipTexture.height >> (topMip + 1), 1);
+
+				DirectX12DescriptorHandle lastMip;
+				DirectX12DescriptorHandle currMip;
+
+				// create SRV for last mip level
+				lastMip = s_SRVHeap->Allocate();
+				D3D12_UNORDERED_ACCESS_VIEW_DESC lastUavDesc = {};
+				lastUavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				lastUavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+				lastUavDesc.Texture2D.MipSlice = topMip;
+				context->GetDevice()->CreateUnorderedAccessView(mipTexture.mipTexture.Get(), nullptr, &lastUavDesc, lastMip.cpu);
+
+				// create UAV for current mip level
+				currMip = s_SRVHeap->Allocate();
+				D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+				uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+				uavDesc.Texture2D.MipSlice = topMip + 1;
+				context->GetDevice()->CreateUnorderedAccessView(mipTexture.mipTexture.Get(), nullptr, &uavDesc, currMip.cpu);
+
+				// blit the last mip level onto the current mip level
+				Ref<ComputeShader> blit = Renderer::GetBlitShader();
+				dxCommandList->SetComputeShader(blit);
+				dxCommandList->GetCommandList()->SetComputeRoot32BitConstant(blit->GetUniformLocation("RC_CBX"), *(uint32*)(void*)&srcWidth, 0);
+				dxCommandList->GetCommandList()->SetComputeRoot32BitConstant(blit->GetUniformLocation("RC_CBY"), *(uint32*)(void*)&srcHeight, 0);
+				dxCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("SrcTexture"), lastMip.gpu);
+				dxCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("DstTexture"), currMip.gpu);
+				dxCommandList->GetCommandList()->Dispatch(std::max(dstWidth / 8, 1u) + 1, std::max(dstHeight / 8, 1u) + 1, 1);
+
+				dxCommandList->GetCommandList()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::UAV(mipTexture.mipTexture.Get()));
+			}
+
+			// record barrier for texture and mip
+			mipBarrier.push_back(CD3DX12_RESOURCE_BARRIER::Transition(mipTexture.mipTexture.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE));
+			textureBarrier.push_back(CD3DX12_RESOURCE_BARRIER::Transition(mipTexture.texture.Get(), D3D12_RESOURCE_STATE_COPY_DEST, mipTexture.state));
+
+			// copy resource to final texture
+			mipCopys.push_back({ mipTexture.texture.Get(), mipTexture.mipTexture.Get(), 0,0,0 });
+
+			// schedule freeing of mip texture
+			ScheduleResourceDeletion(mipTexture.mipTexture);
+		}
+
+		dxCommandList->GetCommandList()->ResourceBarrier((uint32)mipBarrier.size(), mipBarrier.data()); // transition mips to copy src
+		for (uint32 i = 0; i < mipCopys.size(); i++)
+			dxCommandList->GetCommandList()->CopyResource(mipCopys[i].dest, mipCopys[i].src);
+		dxCommandList->GetCommandList()->ResourceBarrier((uint32)textureBarrier.size(), textureBarrier.data()); // transition resources back to original state
+
 		dxCommandList->Close();
 
+		// clear upload pages
 		for (uint32 i = 0; i < m_UploadPages.size(); i++)
 			m_UploadPages[i].Clear();
-
 	}
 }

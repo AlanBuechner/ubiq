@@ -31,14 +31,6 @@ namespace Engine
 	{
 	public:
 		Ref<Shader> shader;
-		Ref<Texture2D> diffuse;
-		Ref<Texture2D> normal;
-		Ref<Texture2D> roughness;
-		Ref<Texture2D> ao;
-		Ref<Texture2D> metal;
-		Ref<Texture2D> disp;
-		Ref<Texture2D> parallax;
-		bool invertParallax;
 
 		void Apply();
 		Ref<ConstantBuffer> GetBuffer() { return m_Buffer; }
@@ -47,19 +39,6 @@ namespace Engine
 		static bool ValidExtention(const fs::path& ext);
 
 	private:
-		struct CBuffData
-		{
-			uint32 diffuseLoc;
-			uint32 normalLoc;
-			uint32 roughnessLoc;
-			uint32 aoLoc;
-			uint32 metalLoc;
-			uint32 dispLoc;
-			uint32 parallaxLoc;
-			BOOL useParallax = FALSE;
-			BOOL invertParallax = FALSE;
-		};
-
 		std::vector<Ref<Texture>> m_ReferensedTextures;
 
 		Ref<MaterialData> m_Data;

@@ -7,7 +7,70 @@
 
 namespace Engine
 {
-	struct MaterialParameter;
+
+	struct ShaderInputElement
+	{
+		std::string semanticName;
+		uint32 semanticIndex;
+		ShaderPass::Uniform::Type format;
+	};
+
+	enum class ShaderType
+	{
+		None = -1, Vertex = BIT(0), Pixel = BIT(1), Compute = BIT(2)
+	};
+
+	struct ShaderParameter
+	{
+		enum class PerameterType
+		{
+			Constants = 0,
+			Descriptor = 1,
+			DescriptorTable = 2,
+			StaticSampler = 4
+		};
+
+		enum class DescriptorType
+		{
+			CBV,
+			SRV,
+			UAV,
+			Sampler
+		};
+
+		ShaderType shader; // witch shader is requesting the information
+		PerameterType type;
+		DescriptorType descType; // the type of descriptor
+		std::string name; // used for reflection queries
+		/*
+		* shader : Constants
+		*	- the number of constant values
+		*
+		* shader : DescDescriptorTable
+		*	- the number of Descriptors in the table
+		*/
+		uint32 count;
+		uint32 reg;
+		uint32 space;
+
+		uint32 rootIndex = 0;
+	};
+
+	struct MaterialParameter
+	{
+		enum Type
+		{
+			TextureID,
+			Float,
+			Bool
+		};
+
+		std::string name;
+		Type type;
+		std::string defaultValue;
+
+		uint32 GetTypeSize();
+	};
 
 
 	struct ShaderConfig

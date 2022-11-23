@@ -5,6 +5,7 @@
 #include "Renderer2D.h"
 #include "LineRenderer.h"
 #include "ResourceManager.h"
+#include "Engine/Core/MeshBuilder.h"
 #include "GPUProfiler.h"
 
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
@@ -18,6 +19,8 @@ Engine::InstrumentationTimer Engine::Renderer::s_Timer = CREATE_PROFILEI();
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_WhiteTexture;
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_BlackTexture;
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_BlueTexture;
+Engine::Ref<Engine::Mesh> Engine::Renderer::s_ScreenMesh;
+Engine::Ref<Engine::ComputeShader> Engine::Renderer::s_BlitShader;
 
 std::thread Engine::Renderer::s_RenderThread;
 
@@ -40,8 +43,8 @@ namespace Engine
 		s_MainCommandList = CommandList::Create();
 
 		// copy command queue
-		s_MainCopyCommandQueue = CommandQueue::Create(CommandQueue::Type::Direct); // TODO : change to copy
-		s_MainCopyCommandList = CommandList::Create(); // TODO : change to copy
+		s_MainCopyCommandQueue = CommandQueue::Create(CommandQueue::Type::Direct);
+		s_MainCopyCommandList = CommandList::Create();
 		s_MainCopyCommandQueue->AddCommandList(s_MainCopyCommandList);
 
 		Renderer2D::Init();
@@ -65,6 +68,29 @@ namespace Engine
 		s_BlueTexture = Texture2D::Create(1, 1);
 		textureData = 0x0000ffff; // 0,0,1,1
 		s_BlueTexture->SetData(&textureData);
+
+		struct Vertex
+		{
+			Math::Vector3 position;
+			Math::Vector2 UV;
+		};
+
+		TMeshBuilder<Vertex> meshBuilder;
+		meshBuilder.vertices.push_back({ { -1,-1,0 }, { 0, 1 } });
+		meshBuilder.vertices.push_back({ {  1,-1,0 }, { 1, 1 } });
+		meshBuilder.vertices.push_back({ { -1, 1,0 }, { 0, 0 } });
+		meshBuilder.vertices.push_back({ {  1, 1,0 }, { 1, 0 } });
+
+		meshBuilder.indices.push_back(0);
+		meshBuilder.indices.push_back(3);
+		meshBuilder.indices.push_back(1);
+		meshBuilder.indices.push_back(0);
+		meshBuilder.indices.push_back(2);
+		meshBuilder.indices.push_back(3);
+
+		s_ScreenMesh = meshBuilder.ToMesh();
+
+		s_BlitShader = ComputeShader::Create("Assets/Shaders/Blit.compute");
 	}
 
 	void Renderer::Destroy()
@@ -72,6 +98,7 @@ namespace Engine
 		s_WhiteTexture = nullptr;
 		s_BlackTexture = nullptr;
 		s_BlueTexture = nullptr;
+		s_ScreenMesh = nullptr;
 
 		s_RenderThread.join();
 		Renderer2D::Destroy();

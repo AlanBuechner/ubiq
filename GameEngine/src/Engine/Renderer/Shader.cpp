@@ -2,6 +2,7 @@
 #include "Shader.h"
 #include "Renderer.h"
 #include "Platform/DirectX12/DirectX12Shader.h"
+#include "Platform/DirectX12/DirectX12ComputeShader.h"
 
 #include <fstream>
 
@@ -49,6 +50,20 @@ namespace Engine
 	Ref<Shader> Shader::Create(const fs::path& file)
 	{
 		return CreateRef<Shader>(file);
+	}
+
+	Ref<ComputeShader> ComputeShader::Create(const fs::path& file)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None:
+			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::DirectX12:
+			return CreateRef<DirectX12ComputeShader>(file);
+		}
+		CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
 	}
 
 }

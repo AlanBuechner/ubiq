@@ -12,7 +12,9 @@ namespace Engine
 		case MaterialParameter::TextureID:
 			return sizeof(uint32);
 		case MaterialParameter::Bool:
-			return sizeof(int);
+			return sizeof(BOOL);
+		case MaterialParameter::Float:
+			return sizeof(float);
 		default:
 			return sizeof(uint32);
 		}
@@ -173,6 +175,8 @@ namespace Engine
 					MaterialParameter::Type type = MaterialParameter::TextureID;
 					if (param->value->string == "textureID")
 						type = MaterialParameter::TextureID;
+					else if (param->value->string == "float")
+						type = MaterialParameter::Float;
 					else if (param->value->string == "bool")
 						type = MaterialParameter::Bool;
 
@@ -203,6 +207,9 @@ namespace Engine
 			{
 			case MaterialParameter::TextureID:
 				ss << "uint ";
+				break;
+			case MaterialParameter::Float:
+				ss << "float ";
 				break;
 			case MaterialParameter::Bool:
 				ss << "bool ";

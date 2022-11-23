@@ -19,6 +19,7 @@ namespace Engine
 		void Init();
 
 	public:
+		virtual void SignalRecording() override { m_RecordFlag.Signal(); }
 		virtual void StartRecording(Ref<ShaderPass> startShader = nullptr) override;
 
 		// transitions
@@ -42,10 +43,12 @@ namespace Engine
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
 		virtual void SetRootConstant(uint32 index, uint32 data) override;
 		virtual void SetTexture(uint32 index, Ref<Texture> texture) override;
-		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, int numInstances) override;
+		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) override;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
+
+		virtual void SetComputeShader(Ref<ComputeShader> shader) override;
+
 		virtual void Close() override;
-		virtual void SignalRecording() override { m_RecordFlag.Signal(); }
 
 		wrl::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return m_CommandList; }
 

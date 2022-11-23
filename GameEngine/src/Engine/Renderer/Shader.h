@@ -3,7 +3,6 @@
 #include "Engine/AssetManager/AssetManager.h"
 #include "Light.h"
 #include "FrameBuffer.h"
-#include "ShaderCompiler.h"
 #include <string>
 #include <Engine/Math/Math.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -29,11 +28,6 @@ namespace Engine
 				Float4, Int4, Uint4,
 				Mat2, Mat3, Mat4
 			} type;
-		};
-
-		enum ShaderType
-		{
-			None = -1, Vertex = BIT(0), Pixel = BIT(1)
 		};
 
 	public:
@@ -62,62 +56,14 @@ namespace Engine
 	};
 
 
-
-	struct ShaderInputElement
+	class ComputeShader : public Asset
 	{
-		std::string semanticName;
-		uint32 semanticIndex;
-		ShaderPass::Uniform::Type format;
-	};
+	public:
 
-	struct ShaderParameter
-	{
-		enum class PerameterType
-		{
-			Constants = 0,
-			Descriptor = 1,
-			DescriptorTable = 2,
-			StaticSampler = 4
-		};
+		virtual std::vector<ShaderParameter> GetReflectionData() const = 0;
 
-		enum class DescriptorType
-		{
-			CBV,
-			SRV,
-			UAV,
-			Sampler
-		};
+		virtual uint32 GetUniformLocation(const std::string& name) const = 0;
 
-		ShaderPass::ShaderType shader; // witch shader is requesting the information
-		PerameterType type;
-		DescriptorType descType; // the type of descriptor
-		std::string name; // used for reflection queries
-		/*
-		* shader : Constants
-		*	- the number of constant values
-		* 
-		* shader : DescDescriptorTable
-		*	- the number of Descriptors in the table
-		*/
-		uint32 count;
-		uint32 reg;
-		uint32 space;
-
-		uint32 rootIndex = 0;
-	};
-
-	struct MaterialParameter
-	{
-		enum Type
-		{
-			TextureID,
-			Bool
-		};
-
-		std::string name;
-		Type type;
-		std::string defaultValue;
-
-		uint32 GetTypeSize();
+		static Ref<ComputeShader> Create(const fs::path& file);
 	};
 }
