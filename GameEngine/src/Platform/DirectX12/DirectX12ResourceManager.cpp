@@ -17,11 +17,20 @@ namespace Engine
 	void DirectX12ResourceDeletionPool::Clear()
 	{
 		m_Pool.clear();
+
+		for (DirectX12DescriptorHandle h : m_HandlePool)
+			h.Free();
+		m_HandlePool.clear();
 	}
 
 	void DirectX12ResourceDeletionPool::AddResource(wrl::ComPtr<ID3D12Resource> resource)
 	{
 		m_Pool.push_back(resource);
+	}
+
+	void DirectX12ResourceDeletionPool::AddHandle(DirectX12DescriptorHandle handle)
+	{
+		m_HandlePool.push_back(handle);
 	}
 
 	// upload page
@@ -390,6 +399,10 @@ namespace Engine
 				dxCommandList->GetCommandList()->Dispatch(std::max(dstWidth / 8, 1u) + 1, std::max(dstHeight / 8, 1u) + 1, 1);
 
 				dxCommandList->GetCommandList()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::UAV(mipTexture.mipTexture.Get()));
+
+				// delete handles
+				ScheduleHandelDeletion(lastMip);
+				ScheduleHandelDeletion(currMip);
 			}
 
 			// record barrier for texture and mip

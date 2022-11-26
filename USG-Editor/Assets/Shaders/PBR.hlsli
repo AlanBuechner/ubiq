@@ -3,7 +3,7 @@ static const float PI = 3.14159265f;
 // fresnel shlick function
 float3 F_Schlick(float3 f0, float HdotV)
 {
-	return f0 + (float3(1, 1, 1) - f0) * pow(float3(1, 1, 1) - HdotV, 5.0);
+	return f0 + ((float3(1, 1, 1) - f0) * pow(float3(1, 1, 1) - HdotV, 5.0));
 }
 
 // specular D

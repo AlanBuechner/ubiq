@@ -59,6 +59,7 @@ namespace Engine
 					{
 						mat->m_ReferensedTextures.push_back(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
 						*(uint32*)location = mat->m_ReferensedTextures.back()->GetDescriptorLocation(); // set asset value
+						CORE_INFO("texture: {0}, descriptor: {1}", p.name, mat->m_ReferensedTextures.back()->GetDescriptorLocation());
 					}
 					else if (p.type == MaterialParameter::Float)
 						*(float*)location = f[p.name].get<float>();
@@ -94,6 +95,7 @@ namespace Engine
 		}
 
 		mat->m_Buffer = ConstantBuffer::Create(mat->m_Data->GetSize());
+		CORE_INFO("{0}", mat->m_Buffer->GetDescriptorLocation());
 		mat->Apply();
 
 		return mat;

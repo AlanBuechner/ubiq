@@ -50,7 +50,7 @@ struct VS_Output
 	float3 normal : NORMAL; // world space normal
 	float3 tangent : TANGENT; // world space normal
 	float3 bitangent : BITANGENT; // world space normal
-	float3 CToP : CTOP; // direction from the camera to the point
+	float3 PToC : PTOC; // direction from the camera to the point
 	uint matID : MATID;
 };
 
@@ -123,7 +123,7 @@ VS_Output main(VS_Input input)
 
 	output.bitangent = normalize(cross(output.normal, output.tangent));
 
-	output.CToP = camera.Position - output.position.xyz;
+	output.PToC = camera.Position - output.worldPosition.xyz;
 
 	output.matID = input.materialID;
 
@@ -165,7 +165,7 @@ PS_Output main(PS_Input input)
 	
 	Material mat = materials[input.matID];
 
-	float3 viewDirection = normalize(input.CToP);
+	float3 viewDirection = normalize(input.PToC);
 	float2 uv = input.uv;
 
 	if (mat.useParallax)
