@@ -357,6 +357,8 @@ namespace Engine
 				{
 					auto& dlc = deserializedEntity.AddComponent<DirectionalLightComponent>();
 					dlc.SetDirection(dirLightComponent["Direction"].as<Math::Vector3>());
+					dlc.SetIntensity(dirLightComponent["Intensity"].as<float>());
+					dlc.SetColor(dirLightComponent["Color"].as<Math::Vector3>());
 				}
 
 				auto meshRendererComponent = entity["MeshRendererComponent"];

@@ -154,7 +154,7 @@ namespace Engine
 			Camera::CameraData& cd = m_Cameras[i]->m_CameraData;
 			cd.Position = center;
 			cd.ViewMatrix = viewMatrix;
-			cd.ProjectionMatrix = Math::Ortho(minx, maxx, miny, maxy, (minz-10)*3, maxz);
+			cd.ProjectionMatrix = Math::Ortho(minx, maxx, miny, maxy, (minz-15)*3, maxz+2);
 			cd.VPMatrix = cd.ProjectionMatrix * cd.ViewMatrix;
 			m_Cameras[i]->UpdateCameraBuffer();
 		}
