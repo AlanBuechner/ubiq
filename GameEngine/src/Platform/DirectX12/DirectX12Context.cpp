@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Directx12Context.h"
 #include "DirectX12ResourceManager.h"
+#include "DX.h"
 
 namespace Engine
 {
@@ -104,13 +105,13 @@ namespace Engine
 			D3D_FEATURE_LEVEL_11_1,
 			D3D_FEATURE_LEVEL_12_0,
 			D3D_FEATURE_LEVEL_12_1,
-			D3D_FEATURE_LEVEL(0xc200), // 12_2
+			//D3D_FEATURE_LEVEL(0xc200), // 12_2
 		};
 
 		D3D12_FEATURE_DATA_FEATURE_LEVELS flds{0};
 		flds.pFeatureLevelsRequested = reqArray;
 		flds.NumFeatureLevels = _countof(reqArray);
-		CORE_ASSERT_HRESULT(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &flds, sizeof(D3D12_FEATURE_DATA_FEATURE_LEVELS)), 
+		CORE_ASSERT_HRESULT(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &flds, sizeof(D3D12_FEATURE_DATA_FEATURE_LEVELS)),
 			"Failed to find feature level");
 
 		device.Reset();

@@ -10,11 +10,9 @@ Engine::TransformComponent::TransformComponent(const Math::Vector3& position) :
 
 Math::Mat4 Engine::TransformComponent::GetTransform() const
 {
-	Math::Mat4 rotation = glm::toMat4(Math::Quaternion(m_Rotation));
-
-	return glm::translate(Math::Mat4(1.0f), m_Position) *
-		rotation *
-		glm::scale(Math::Mat4(1.0f), m_Scale);
+	return Math::Translate(m_Position) *
+		Math::Mat4Cast(Math::Quaternion(m_Rotation)) *
+		Math::Scale(m_Scale);
 }
 
 Math::Mat4 Engine::TransformComponent::GetGlobalTransform() const

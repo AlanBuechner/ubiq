@@ -48,7 +48,7 @@ namespace Engine
 	{
 		if (m_ProjectionType == ProjectionType::Perspective)
 		{
-			m_CameraData.ProjectionMatrix = glm::perspective(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+			m_CameraData.ProjectionMatrix = Math::Perspective(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 		}
 		else
 		{
@@ -57,7 +57,7 @@ namespace Engine
 			float orthBottom = -0.5f * m_OrthgraphicSize;
 			float orthTop = 0.5f * m_OrthgraphicSize;
 
-			m_CameraData.ProjectionMatrix = glm::ortho(orthLeft, orthRight, orthBottom, orthTop, m_OrthgraphicNear, m_OrthgraphicFar);
+			m_CameraData.ProjectionMatrix = Math::Ortho(orthLeft, orthRight, orthBottom, orthTop, m_OrthgraphicNear, m_OrthgraphicFar);
 		}
 	}
 

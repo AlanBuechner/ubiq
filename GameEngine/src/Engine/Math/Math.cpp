@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "Math.h"
-
-#include <glm/gtc/noise.hpp>
-#include <Engine/Math/Math.h>
-#include <math.h>
+#include "GLMInclude.h"
 
 namespace Math
 {

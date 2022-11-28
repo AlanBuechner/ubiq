@@ -5,18 +5,17 @@
 #include "Engine/Core/Input/KeyCodes.h"
 #include "Engine/Core/Time.h"
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
+#include "Engine/Math/Math.h"
 
 namespace Engine
 {
 
 	EditorCamera::EditorCamera() :
-		Camera(glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip))
+		Camera(Math::Perspective(Math::Radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip))
 	{}
 
 	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
-		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
+		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), Camera(Math::Perspective(Math::Radians(fov), aspectRatio, nearClip, farClip))
 	{
 		UpdateView();
 		OnUpdate();
@@ -25,7 +24,7 @@ namespace Engine
 	void EditorCamera::UpdateProjection()
 	{
 		m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
-		m_CameraData.ProjectionMatrix = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
+		m_CameraData.ProjectionMatrix = Math::Perspective(Math::Radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
 		m_CameraData.VPMatrix = m_CameraData.ProjectionMatrix * m_CameraData.ViewMatrix;
 	}
 
@@ -35,8 +34,8 @@ namespace Engine
 		m_CameraData.Position = m_Position;
 
 		Math::Quaternion orientation = GetOrientation();
-		m_CameraData.ViewMatrix = glm::translate(Math::Mat4(1.0f), m_Position) * glm::toMat4(orientation);
-		m_CameraData.ViewMatrix = glm::inverse(m_CameraData.ViewMatrix);
+		m_CameraData.ViewMatrix = Math::Translate(m_Position) * Math::Mat4Cast(orientation);
+		m_CameraData.ViewMatrix = Math::Inverse(m_CameraData.ViewMatrix);
 		m_CameraData.VPMatrix = m_CameraData.ProjectionMatrix * m_CameraData.ViewMatrix;
 	}
 
@@ -177,17 +176,17 @@ namespace Engine
 
 	Math::Vector3 EditorCamera::GetUpDirection() const
 	{
-		return glm::rotate(GetOrientation(), Math::Vector3(0.0f, 1.0f, 0.0f));
+		return GetOrientation() * Math::Vector3(0.0f, 1.0f, 0.0f);
 	}
 
 	Math::Vector3 EditorCamera::GetRightDirection() const
 	{
-		return glm::rotate(GetOrientation(), Math::Vector3(1.0f, 0.0f, 0.0f));
+		return GetOrientation() * Math::Vector3(1.0f, 0.0f, 0.0f);
 	}
 
 	Math::Vector3 EditorCamera::GetForwardDirection() const
 	{
-		return glm::rotate(GetOrientation(), Math::Vector3(0.0f, 0.0f, -1.0f));
+		return GetOrientation() * Math::Vector3(0.0f, 0.0f, -1.0f);
 	}
 
 	Math::Vector3 EditorCamera::CalculatePosition() const

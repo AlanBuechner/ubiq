@@ -265,9 +265,9 @@ namespace Engine
 	// draw quad implementation
 	void Renderer2D::DrawQuadImpl(const Math::Vector3& position, const Math::Vector2& size, float rotation, const Math::Vector4& color, const Ref<Texture2D>& texture, const Math::Vector2& uvSize, const Math::Vector2& uvPosition, int entityID)
 	{
-		Math::Mat4 transform = glm::translate(Math::Mat4(1.0f), position) *
-			glm::rotate(Math::Mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f }) *
-			glm::scale(Math::Mat4(1.0f), { size.x, size.y, 1.0f });
+		Math::Mat4 transform = Math::Translate(position) *
+			Math::Rotate(rotation, { 0.0f, 0.0f, 1.0f }) *
+			Math::Scale({ size.x, size.y, 1.0f });
 
 		DrawQuadImpl(transform, color, texture, uvSize, uvPosition);
 	}

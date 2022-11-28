@@ -48,7 +48,7 @@ namespace Engine
 		float m_OrthgraphicNear = -1.0f;
 		float m_OrthgraphicFar = 1.0f;
 
-		float m_PerspectiveFOV = glm::radians(45.0f);
+		float m_PerspectiveFOV = Math::Radians(45.0f);
 		float m_PerspectiveNear = 0.001f;
 		float m_PerspectiveFar = 1000.0f;
 

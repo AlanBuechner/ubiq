@@ -1,8 +1,6 @@
-#include <pch.h>
+#include "pch.h"
 #include "Matrix.h"
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/matrix_decompose.hpp>
+#include "GLMInclude.h"
 
 namespace Math
 {
