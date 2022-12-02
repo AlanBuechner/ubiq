@@ -47,6 +47,7 @@ namespace Engine
 
 	DirectX12DescriptorHandle DirectX12DescriptorHeap::Allocate()
 	{
+		std::lock_guard g(m_Mutex);
 		CORE_ASSERT(!m_FreeSlots.empty(), "Not Enough Memory");
 
 		// get a free slot

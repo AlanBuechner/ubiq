@@ -10,13 +10,11 @@ namespace Engine
 		switch (type)
 		{
 		case MaterialParameter::TextureID:
-			return sizeof(uint32);
 		case MaterialParameter::Bool:
-			return sizeof(BOOL);
 		case MaterialParameter::Float:
-			return sizeof(float);
+			return 4;
 		default:
-			return sizeof(uint32);
+			return 4;
 		}
 	}
 

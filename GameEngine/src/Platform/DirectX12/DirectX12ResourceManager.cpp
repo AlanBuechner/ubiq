@@ -182,6 +182,7 @@ namespace Engine
 
 	void DirectX12ResourceManager::CopyBuffer(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 size, D3D12_RESOURCE_STATES state)
 	{
+		std::lock_guard g(m_UploadMutex);
 		UploadBufferData uploadData;
 		uploadData.size = size;
 		uploadData.destOffset = 0;
@@ -195,6 +196,7 @@ namespace Engine
 
 	void DirectX12ResourceManager::UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, bool genMipChain, D3D12_RESOURCE_STATES state)
 	{
+		std::lock_guard g(m_UploadMutex);
 		UploadTextureData uploadData;
 		uploadData.destResource = dest;
 		uploadData.uploadResource = src;

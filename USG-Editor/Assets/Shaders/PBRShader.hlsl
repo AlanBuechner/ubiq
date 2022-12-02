@@ -117,6 +117,8 @@ VS_Output main(VS_Input input)
 	float4 cameraSpacePosition = mul(mv, float4(input.position, 1));
 	output.depth = -cameraSpacePosition.z;
 	output.uv = input.uv * mat.tiling;
+	if (mat.flipV)
+		output.uv.y = 1 - output.uv.y;
 
 	output.normal = normalize(mul((float3x3)input.transform, input.normal));
 	output.tangent = normalize(mul((float3x3)input.transform, input.tangent));
@@ -127,8 +129,6 @@ VS_Output main(VS_Input input)
 
 	output.matID = input.materialID;
 
-	if (mat.flipV)
-		output.uv.y = 1 - output.uv.y;
 	return output;
 }
 

@@ -77,11 +77,9 @@ namespace Engine
 			byte* pScan = (byte*)mapped + y * uploadPitch;
 			memcpy(pScan, (byte*)data + y * m_Width * 4, m_Width * 4);
 		}
-		//memcpy(mapped, data, m_Width * m_Height * 4);
 		uploadBuffer->Unmap(0, &range);
 
-		context->GetDX12ResourceManager()->UploadTexture(m_Buffer, uploadBuffer, m_Width, m_Height, uploadPitch, true, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
+		context->GetDX12ResourceManager()->UploadTexture(m_Buffer, uploadBuffer, m_Width, m_Height, uploadPitch, m_UseMipMaps, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 		context->GetDX12ResourceManager()->ScheduleResourceDeletion(uploadBuffer);
 	}
 
@@ -120,7 +118,7 @@ namespace Engine
 		rDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		rDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 		rDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-		rDesc.MipLevels = (uint32)std::floor(std::log2(std::max(m_Width, m_Height))) + 1;
+		rDesc.MipLevels = m_UseMipMaps ? (uint32)std::floor(std::log2(std::max(m_Width, m_Height))) + 1 : 1;
 		rDesc.Width = width;
 		rDesc.Height = height;
 		rDesc.Alignment = 0;

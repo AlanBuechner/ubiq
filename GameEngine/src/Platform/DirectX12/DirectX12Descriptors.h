@@ -1,6 +1,7 @@
 #pragma once
 #include "DX.h"
 #include "Engine/Core/Core.h"
+#include <mutex>
 
 namespace Engine
 {
@@ -42,6 +43,7 @@ namespace Engine
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHeapStart() { return m_GPUHandle; }
 
 	private:
+		std::mutex m_Mutex;
 		D3D12_DESCRIPTOR_HEAP_TYPE m_Type;
 		wrl::ComPtr<ID3D12DescriptorHeap> m_Heap;
 		D3D12_CPU_DESCRIPTOR_HANDLE m_CPUHandle;

@@ -25,10 +25,10 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
-  - Entity: 4289796849469945807
+  - Entity: 14785401870932044183
     Name: Mesh
     TransformComponent:
-      Position: [0, 1.46089947, 0]
+      Position: [-1.36782742, 0.92923218, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshRendererComponent:
@@ -41,9 +41,9 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     DirectionalLightComponent:
-      Direction: [-4.37113883e-08, -1, -0]
+      Direction: [-0.781520426, -0.623879611, -0]
       Color: [1, 1, 1]
-      Intensity: 1
+      Intensity: 3
   - Entity: 1824081241608119135
     Name: Floor
     TransformComponent:

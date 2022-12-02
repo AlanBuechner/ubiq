@@ -43,5 +43,7 @@ namespace Engine
 		DirectX12DescriptorHandle m_Handle;
 		DirectX12DescriptorHandle m_SamplerHandle;
 
+		bool m_UseMipMaps = true;
+
 	};
 }

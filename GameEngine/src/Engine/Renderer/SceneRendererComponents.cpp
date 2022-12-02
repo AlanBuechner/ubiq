@@ -82,7 +82,10 @@ namespace Engine
 	void MeshRendererComponent::OnTransformChange(const Math::Mat4& transform)
 	{
 		if (m_Object)
+		{
 			m_Object->UpdateTransform(transform);
+			m_Mat->Apply(); // temp hack to get materials to work need to fix
+		}
 	}
 
 	void MeshRendererComponent::Invalidate()

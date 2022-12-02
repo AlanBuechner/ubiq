@@ -97,6 +97,9 @@ namespace Engine
 
 	void DirectX12IndexBuffer::CreateBuffer(uint32 count)
 	{
+		if (count == 0)
+			return;
+
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		if (m_Buffer)

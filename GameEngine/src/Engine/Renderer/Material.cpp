@@ -25,7 +25,6 @@ namespace Engine
 			m_DataLocations[p.name] = (char*)m_Data + offset;
 			offset += p.GetTypeSize();
 		}
-
 	}
 
 
@@ -37,6 +36,7 @@ namespace Engine
 	Ref<Material> Material::Create(const fs::path& path)
 	{
 		Ref<Material> mat = CreateRef<Material>();
+		CORE_INFO("{0}", path);
 
 		std::ifstream ifs(path.string());
 		if (ifs.is_open())
@@ -58,8 +58,9 @@ namespace Engine
 					if (p.type == MaterialParameter::TextureID)
 					{
 						mat->m_ReferensedTextures.push_back(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
-						*(uint32*)location = mat->m_ReferensedTextures.back()->GetDescriptorLocation(); // set asset value
-						CORE_INFO("texture: {0}, descriptor: {1}", p.name, mat->m_ReferensedTextures.back()->GetDescriptorLocation());
+						uint32 descLoc = mat->m_ReferensedTextures.back()->GetDescriptorLocation();
+						*(uint32*)location = descLoc; // set asset value
+						CORE_INFO("texture: {0}, descriptor: {1}", p.name, *(uint32*)location);
 					}
 					else if (p.type == MaterialParameter::Float)
 						*(float*)location = f[p.name].get<float>();

@@ -160,12 +160,9 @@ namespace Engine
 		for (auto& child : entity.GetTransform().GetChildren())
 			DestroyEntity(child);
 
-		m_Registry.Each([&](EntityType entityID) {
-			Entity entity{ entityID, this };
-			std::vector<Component*> components = entity.GetComponents();
-			for (Component* comp : components)
-				comp->OnComponentRemoved();
-		});
+		std::vector<Component*> components = entity.GetComponents();
+		for (Component* comp : components)
+			comp->OnComponentRemoved();
 
 		m_Registry.DestroyEntity(entity);
 	}

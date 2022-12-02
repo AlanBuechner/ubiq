@@ -32,6 +32,8 @@ namespace Engine
 	public:
 		Ref<Shader> shader;
 
+		inline void* GetData(const std::string& name) { return m_Data->GetDatalocation(name); }
+
 		void Apply();
 		Ref<ConstantBuffer> GetBuffer() { return m_Buffer; }
 
