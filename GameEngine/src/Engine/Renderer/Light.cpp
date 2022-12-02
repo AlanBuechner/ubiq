@@ -95,36 +95,8 @@ namespace Engine
 				verts[j] = verts[j] / verts[j].w;
 			}
 
-			// find the center of the vertices in world space
-			Math::Vector3 center = { 0,0,0 };
-			{
-				float minx = FLT_MAX;
-				float miny = FLT_MAX;
-				float minz = FLT_MAX;
-
-				float maxx = -FLT_MAX;
-				float maxy = -FLT_MAX;
-				float maxz = -FLT_MAX;
-
-				for (uint32 j = 0; j < 8; j++)
-				{
-					if (verts[j].x < minx) minx = verts[j].x;
-					if (verts[j].y < miny) miny = verts[j].y;
-					if (verts[j].z < minz) minz = verts[j].z;
-
-					if (verts[j].x > maxx) maxx = verts[j].x;
-					if (verts[j].y > maxy) maxy = verts[j].y;
-					if (verts[j].z > maxz) maxz = verts[j].z;
-				}
-
-				center.x = (minx + maxx) / 2.0f;
-				center.y = (miny + maxy) / 2.0f;
-				center.z = (minz + maxz) / 2.0f;
-			}
-
 			// calculate the view matrix
-			Math::Mat4 viewMatrix = Math::Inverse(Math::Translate(center) * TBN);
-			//Math::Mat4 viewMatrix = Math::LookAt(center, center + dir, upDir);
+			Math::Mat4 viewMatrix = Math::Inverse(TBN);
 
 			// transform from world space to light space
 			for (uint32 j = 0; j < 8; j++)
@@ -150,11 +122,27 @@ namespace Engine
 				if (verts[j].z > maxz) maxz = verts[j].z;
 			}
 
+			// find the center of the vertices in world space
+			Math::Vector3 center = { 
+				(minx + maxx),
+				(miny + maxy),
+				(minz + maxz) 
+			};
+			center /= 2;
+
+			minx -= center.x;
+			miny -= center.y;
+			minz -= center.z;
+
+			maxx -= center.x;
+			maxy -= center.y;
+			maxz -= center.z;
+
 			// set the camera data
 			Camera::CameraData& cd = m_Cameras[i]->m_CameraData;
 			cd.Position = center;
-			cd.ViewMatrix = viewMatrix;
-			cd.ProjectionMatrix = Math::Ortho(minx, maxx, miny, maxy, (minz-15)*3, maxz+2);
+			cd.ViewMatrix = Math::Inverse(TBN * Math::Translate(center));
+			cd.ProjectionMatrix = Math::Ortho(minx, maxx, miny, maxy, (minz - 15) * 3, maxz);
 			cd.VPMatrix = cd.ProjectionMatrix * cd.ViewMatrix;
 			m_Cameras[i]->UpdateCameraBuffer();
 		}

@@ -15,9 +15,9 @@ cbuffer RC_CBY
 void SampleTexture(uint2 pixel, inout float4 color)
 {
 	if (pixel.x >= TexelSizeX)
-		pixel.x -= 1;
+		pixel.x = TexelSizeX - 1;
 	if (pixel.y >= TexelSizeY)
-		pixel.y -= 1;
+		pixel.y = TexelSizeY - 1;
 
 	color += SrcTexture[pixel];
 }
@@ -25,14 +25,17 @@ void SampleTexture(uint2 pixel, inout float4 color)
 [numthreads(8, 8, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-	uint2 texcoords = 2 * DTid.xy;
+	if (DTid.x < TexelSizeX && DTid.y < TexelSizeY)
+	{
+		uint2 texcoords = 2 * DTid.xy;
 
-	float4 color = float4(0, 0, 0, 0);
-	SampleTexture(texcoords + uint2(0, 0), color);
-	SampleTexture(texcoords + uint2(1, 0), color);
-	SampleTexture(texcoords + uint2(0, 1), color);
-	SampleTexture(texcoords + uint2(1, 1), color);
+		float4 color = float4(0, 0, 0, 0);
+		SampleTexture(texcoords + uint2(0, 0), color);
+		SampleTexture(texcoords + uint2(1, 0), color);
+		SampleTexture(texcoords + uint2(0, 1), color);
+		SampleTexture(texcoords + uint2(1, 1), color);
 
-	//Write the final color into the destination texture.
-	DstTexture[DTid.xy] = color / 4.0;
+		//Write the final color into the destination texture.
+		DstTexture[DTid.xy] = color / 4.0;
+	}
 }
