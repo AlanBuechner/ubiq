@@ -183,6 +183,7 @@ namespace Engine
 			out << YAML::Key << "Direction" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetDirection();
 			out << YAML::Key << "Color" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetColor();
 			out << YAML::Key << "Intensity" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetIntensity();
+			out << YAML::Key << "Size" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetSize();
 
 			out << YAML::EndMap;
 		}
@@ -359,6 +360,7 @@ namespace Engine
 					dlc.SetDirection(dirLightComponent["Direction"].as<Math::Vector3>());
 					dlc.SetIntensity(dirLightComponent["Intensity"].as<float>());
 					dlc.SetColor(dirLightComponent["Color"].as<Math::Vector3>());
+					dlc.SetSize(dirLightComponent["Size"].as<float>());
 				}
 
 				auto meshRendererComponent = entity["MeshRendererComponent"];

@@ -68,6 +68,7 @@ struct DirectionalLight
 	float3 direction;
 	float3 color;
 	float intensity;
+	float size;
 };
 
 struct DirectionalLightCascade
@@ -84,6 +85,7 @@ struct Camera
 {
 	float4x4 View;
 	float4x4 Porjection;
+	float4x4 InvProjection;
 	float4x4 ViewPorjection;
 
 	float3 Position;
@@ -152,6 +154,7 @@ sampler A_s;
 sampler P_s;
 
 #include "PBR.hlsli"
+#include "Shadows.hlsli"
 
 float SampleParallax(uint textureID, bool invert, float2 uv)
 {
@@ -236,7 +239,7 @@ PS_Output main(PS_Input input)
 			}
 		}
 
-		bool inShadow = false;
+		float shadowAmount = 0;
 		if (ci < numCascades)
 		{
 			DirectionalLightCascade c = cascades[ci];
@@ -245,15 +248,16 @@ PS_Output main(PS_Input input)
 			float4 pos = mul(shadowCamera.ViewPorjection, input.worldPosition);
 			pos.y = -pos.y; // flip v
 			pos = pos / pos.w;
+			pos.xy = pos.xy * 0.5 + 0.5;
 
-			float depthSample = textures[c.texture].Sample(P_s, pos.xy * 0.5 + 0.5).r;
-
-			inShadow = depthSample + 0.01 < pos.z;
+			shadowAmount = PCSSDirectional(textures[c.texture], pos, shadowCamera.InvProjection, DirLight.size);
+			//shadowAmount = HardShadow(textures[c.texture], pos);
 		}
 
-		if(!inShadow)
+		if(shadowAmount != 0)
 		{
-			lo += PBR(diffuse.rgb, DirLight.direction, DirLight.color, DirLight.intensity, viewDirection, normal, roughness, metallic, baseReflectivity);
+			//lo += float3(shadowAmount, shadowAmount, shadowAmount);
+			lo += PBR(diffuse.rgb, DirLight.direction, DirLight.color, DirLight.intensity, viewDirection, normal, roughness, metallic, baseReflectivity) * shadowAmount;
 		}
 	}
 

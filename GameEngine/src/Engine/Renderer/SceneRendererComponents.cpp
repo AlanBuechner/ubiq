@@ -66,6 +66,12 @@ namespace Engine
 		m_Dirty = true;
 	}
 
+	void DirectionalLightComponent::SetSize(float size)
+	{
+		m_Light->SetSize(size);
+		m_Dirty = true;
+	}
+
 	void DirectionalLightComponent::UpdateShadowMaps()
 	{
 		m_Light->UpdateShadowMaps();
@@ -84,7 +90,9 @@ namespace Engine
 		if (m_Object)
 		{
 			m_Object->UpdateTransform(transform);
-			//m_Mat->Apply(); // temp hack to get materials to work need to fix
+#ifndef DEBUG
+			m_Mat->Apply(); // temp hack to get materials to work need to fix
+#endif
 		}
 	}
 

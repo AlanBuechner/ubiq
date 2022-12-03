@@ -66,6 +66,7 @@ struct Camera
 {
 	float4x4 View;
 	float4x4 Porjection;
+	float4x4 InvPorjection;
 	float4x4 ViewPorjection;
 
 	float3 Position;

@@ -25,6 +25,7 @@ namespace Engine
 			float padding = 69;
 			Math::Vector3 color = { 1,1,1 };
 			float intensity = 5;
+			float size = 2;
 		};
 
 	public:
@@ -65,11 +66,13 @@ namespace Engine
 		Math::Vector3 GetDirection() const { return m_Data.direction; }
 		Math::Vector3 GetColor() const { return m_Data.color; }
 		float GetIntensity() const { return m_Data.intensity; }
+		float GetSize() const { return m_Data.size; }
 
 		void SetAngles(Math::Vector2 rot);
 		void SetDirection(Math::Vector3 dir) { m_Data.direction = dir; }
 		void SetColor(Math::Vector3 color) { m_Data.color = color; }
 		void SetIntensity(float intensity) { m_Data.intensity = intensity; }
+		void SetSize(float size) { m_Data.size = size; }
 
 		void Apply() { m_Buffer->SetData(&m_Data); }
 

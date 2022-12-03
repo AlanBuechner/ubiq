@@ -44,6 +44,7 @@ Entities:
       Direction: [-4.37113883e-08, -1, -0]
       Color: [1, 1, 1]
       Intensity: 5
+      Size: 2
   - Entity: 1824081241608119135
     Name: Floor
     TransformComponent:

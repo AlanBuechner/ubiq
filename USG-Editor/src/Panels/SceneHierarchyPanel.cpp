@@ -343,10 +343,6 @@ if(!m_Selected.HasComponent<component>()){\
 
 			Math::Vector3 direction = component.GetDirectinalLight()->GetDirection();
 			Math::Vector2 rot = component.GetDirectinalLight()->GetAngles();
-			/*Math::Vector2 rot = {
-				Math::Degrees(-Math::Atan2(direction.z, direction.x)),
-				Math::Degrees(Math::Atan(direction.y/Math::Sqrt(direction.x * direction.x + direction.z * direction.z))),
-			};*/
 
 			if (PropertysPanel::DrawVec2Control("Direction", rot))
 				component.SetAngles(rot);
@@ -358,6 +354,10 @@ if(!m_Selected.HasComponent<component>()){\
 			float intensity = component.GetDirectinalLight()->GetIntensity();
 			if (PropertysPanel::DrawFloatControl("Intensity", intensity))
 				component.SetIntensity(intensity);
+
+			float size = component.GetDirectinalLight()->GetSize();
+			if (PropertysPanel::DrawFloatControl("Size", size))
+				component.SetSize(size);
 		});
 
 		DrawComponent<MeshRendererComponent>(entity, "Mesh Renderer", [&](){

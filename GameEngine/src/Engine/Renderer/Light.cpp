@@ -143,6 +143,7 @@ namespace Engine
 			cd.Position = center;
 			cd.ViewMatrix = Math::Inverse(TBN * Math::Translate(center));
 			cd.ProjectionMatrix = Math::Ortho(minx, maxx, miny, maxy, (minz - 15) * 3, maxz);
+			cd.InvProjection = Math::Inverse(cd.ProjectionMatrix);
 			cd.VPMatrix = cd.ProjectionMatrix * cd.ViewMatrix;
 			m_Cameras[i]->UpdateCameraBuffer();
 		}

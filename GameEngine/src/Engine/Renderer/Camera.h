@@ -13,6 +13,7 @@ namespace Engine
 		{
 			Math::Mat4 ViewMatrix = Math::Mat4(1.0f);
 			Math::Mat4 ProjectionMatrix = Math::Mat4(1.0f);
+			Math::Mat4 InvProjection = Math::Mat4(1.0f);
 			Math::Mat4 VPMatrix = Math::Mat4(1.0f);
 
 			Math::Vector3 Position;

@@ -176,7 +176,17 @@ namespace Engine
 		Math::Vector4 color = m_Spec.Attachments.Attachments[i].ClearColor;
 		D3D12_CLEAR_VALUE clearVal{};
 		clearVal.Format = format;
-		((Math::Vector4&)clearVal.Color) = color;
+		switch (m_Spec.Attachments.Attachments[i].TextureFormat)
+		{
+		case FrameBufferTextureFormat::DEPTH24STENCIL8:
+			{
+				clearVal.DepthStencil.Depth = color.r;
+				clearVal.DepthStencil.Stencil = color.g;
+			}
+		case FrameBufferTextureFormat::RGBA8:
+		case FrameBufferTextureFormat::RED_INTEGER:
+			((Math::Vector4&)clearVal.Color) = color;
+		}
 
 		D3D12_RESOURCE_STATES state = m_Spec.Attachments.Attachments[i].IsDepthStencil() ? GetDXDepthState(m_Spec.InitalState) : GetDXState(m_Spec.InitalState);
 		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommittedResource(

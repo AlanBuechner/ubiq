@@ -16,6 +16,7 @@ namespace Engine
 		DEPTH24STENCIL8,
 
 		Depth = DEPTH24STENCIL8
+
 	};
 
 	enum FrameBufferState

@@ -33,6 +33,7 @@ namespace Engine
 		void SetDirection(Math::Vector3 direction);
 		void SetColor(Math::Vector3 color);
 		void SetIntensity(float intensity);
+		void SetSize(float size);
 		Ref<const DirectionalLight> GetDirectinalLight() { return m_Light; }
 
 		void UpdateShadowMaps();
