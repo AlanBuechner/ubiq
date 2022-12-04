@@ -6,6 +6,8 @@ Entities:
       Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
+    SkyboxComponent:
+      Texture: 44308273739615182
   - Entity: 11693751238415598823
     Name: Camera
     TransformComponent:
@@ -42,7 +44,7 @@ Entities:
       Direction: [-0.781520426, -0.623879611, -0]
       Color: [1, 1, 1]
       Intensity: 3
-      Size: 2
+      Size: 0.5
   - Entity: 1824081241608119135
     Name: Floor
     TransformComponent:
