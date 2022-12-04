@@ -19,8 +19,8 @@ namespace Engine
 
 			FrameBufferSpecification fbSpec;
 			fbSpec.Attachments = { { FrameBufferTextureFormat::Depth, { 1,0,0,0 } } };
-			fbSpec.Width = 2500;
-			fbSpec.Height = 2500;
+			fbSpec.Width = 1000;
+			fbSpec.Height = 1000;
 			fbSpec.InitalState = FrameBufferState::SRV;
 			m_ShadowMaps[i] = FrameBuffer::Create(fbSpec);
 
