@@ -19,6 +19,7 @@ namespace Engine
 		ComponentPool(ComponentType typeID, uint64 componentSize) :
 			m_TypeID(typeID), m_ComponentSize(componentSize)
 		{}
+		virtual ~ComponentPool() {};
 
 		ComponentType GetTypeID() { return m_TypeID; }
 		uint64 GetComponentSize() { return m_ComponentSize; }

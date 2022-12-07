@@ -147,6 +147,9 @@ namespace Engine
 								if (s_Instance->m_SystemsNeedingAllRelesedEvents > 0) { send = true; break; }
 								key = ((MouseButtonReleasedEvent*)e)->GetMouseButton();
 								break;
+							case EventType::None:
+							default:
+								break;
 							}
 
 							if (send || key == *(i.Key))

@@ -39,10 +39,13 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
+		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
+
 		context->GetDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // this heap will be used to upload the constant buffer data
+			&props, // this heap will be used to upload the constant buffer data
 			D3D12_HEAP_FLAG_NONE, // no flags
-			&CD3DX12_RESOURCE_DESC::Buffer(size), // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
+			&resDesc, // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
 			D3D12_RESOURCE_STATE_GENERIC_READ, // will be data that is read from so we keep it in the generic read state
 			nullptr, // we do not have use an optimized clear value for constant buffers
 			IID_PPV_ARGS(&m_UploadBuffer)
@@ -109,11 +112,14 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
+		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height);
+
 		wrl::ComPtr<ID3D12Resource> constantBufferUploadHeap;
 		context->GetDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // this heap will be used to upload the constant buffer data
+			&props, // this heap will be used to upload the constant buffer data
 			D3D12_HEAP_FLAG_NONE, // no flags
-			&CD3DX12_RESOURCE_DESC::Tex2D(format, width, height), // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
+			&resDesc, // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
 			D3D12_RESOURCE_STATE_GENERIC_READ, // will be data that is read from so we keep it in the generic read state
 			nullptr, // we do not have use an optimized clear value for constant buffers
 			IID_PPV_ARGS(&constantBufferUploadHeap)
@@ -127,11 +133,14 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
+		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
+
 		wrl::ComPtr<ID3D12Resource> constantBufferUploadHeap;
 		context->GetDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // this heap will be used to upload the constant buffer data
+			&props, // this heap will be used to upload the constant buffer data
 			D3D12_HEAP_FLAG_NONE, // no flags
-			&CD3DX12_RESOURCE_DESC::Buffer(size), // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
+			&resDesc, // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
 			D3D12_RESOURCE_STATE_GENERIC_READ, // will be data that is read from so we keep it in the generic read state
 			nullptr, // we do not have use an optimized clear value for constant buffers
 			IID_PPV_ARGS(&constantBufferUploadHeap)
@@ -286,6 +295,8 @@ namespace Engine
 				// create temp texture to generate the mip levels
 				wrl::ComPtr<ID3D12Resource> mipTexture;
 
+				CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+
 				D3D12_RESOURCE_DESC rDesc;
 				rDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 				rDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -299,7 +310,7 @@ namespace Engine
 				rDesc.SampleDesc = { 1, 0 };
 
 				context->GetDevice()->CreateCommittedResource(
-					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+					&props,
 					D3D12_HEAP_FLAG_NONE,
 					&rDesc,
 					D3D12_RESOURCE_STATE_COPY_DEST,
@@ -366,11 +377,8 @@ namespace Engine
 		{
 			for (uint32 topMip = 0; topMip < mipTexture.numMips - 1; topMip++)
 			{
-				uint32_t srcWidth = std::max<uint32>(mipTexture.width >> (topMip), 1);
-				uint32_t srcHeight = std::max<uint32>(mipTexture.height >> (topMip), 1);
-
-				uint32_t dstWidth = std::max<uint32>(mipTexture.width >> (topMip + 1), 1);
-				uint32_t dstHeight = std::max<uint32>(mipTexture.height >> (topMip + 1), 1);
+				uint32 dstWidth = std::max<uint32>(mipTexture.width >> (topMip + 1), 1);
+				uint32 dstHeight = std::max<uint32>(mipTexture.height >> (topMip + 1), 1);
 
 				DirectX12DescriptorHandle lastMip;
 				DirectX12DescriptorHandle currMip;
@@ -394,13 +402,12 @@ namespace Engine
 				// blit the last mip level onto the current mip level
 				Ref<ComputeShader> blit = Renderer::GetBlitShader();
 				dxCommandList->SetComputeShader(blit);
-				dxCommandList->GetCommandList()->SetComputeRoot32BitConstant(blit->GetUniformLocation("RC_CBX"), *(uint32*)(void*)&srcWidth, 0);
-				dxCommandList->GetCommandList()->SetComputeRoot32BitConstant(blit->GetUniformLocation("RC_CBY"), *(uint32*)(void*)&srcHeight, 0);
 				dxCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("SrcTexture"), lastMip.gpu);
 				dxCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("DstTexture"), currMip.gpu);
 				dxCommandList->GetCommandList()->Dispatch(std::max(dstWidth / 8, 1u) + 1, std::max(dstHeight / 8, 1u) + 1, 1);
 
-				dxCommandList->GetCommandList()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::UAV(mipTexture.mipTexture.Get()));
+				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV(mipTexture.mipTexture.Get());
+				dxCommandList->GetCommandList()->ResourceBarrier(1, &barrier);
 
 				// delete handles
 				ScheduleHandelDeletion(lastMip);

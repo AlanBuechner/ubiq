@@ -11,6 +11,7 @@ namespace Engine
 {
 
 	EditorCamera::EditorCamera() :
+		m_FOV(45.0f), m_AspectRatio(1.778f), m_NearClip(0.1f), m_FarClip(10000.0f),
 		Camera(Math::Perspective(Math::Radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip))
 	{}
 

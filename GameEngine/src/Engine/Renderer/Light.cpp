@@ -19,8 +19,8 @@ namespace Engine
 
 			FrameBufferSpecification fbSpec;
 			fbSpec.Attachments = { { FrameBufferTextureFormat::Depth, { 1,0,0,0 } } };
-			fbSpec.Width = 1000;
-			fbSpec.Height = 1000;
+			fbSpec.Width = 2000;
+			fbSpec.Height = 2000;
 			fbSpec.InitalState = FrameBufferState::SRV;
 			m_ShadowMaps[i] = FrameBuffer::Create(fbSpec);
 
@@ -140,7 +140,7 @@ namespace Engine
 
 			// set the camera data
 			Camera::CameraData& cd = m_Cameras[i]->m_CameraData;
-			cd.Position = center;
+			//cd.Position = center;
 			cd.ViewMatrix = Math::Inverse(TBN * Math::Translate(center));
 			cd.ProjectionMatrix = Math::Ortho(minx, maxx, miny, maxy, (minz - 15) * 3, maxz);
 			cd.InvProjection = Math::Inverse(cd.ProjectionMatrix);

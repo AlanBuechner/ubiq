@@ -41,7 +41,7 @@ namespace Engine
 
 		virtual void SetData(const uint32* data, uint32 count) override;
 
-		D3D12_INDEX_BUFFER_VIEW GetView() { return m_View; }
+		const D3D12_INDEX_BUFFER_VIEW& GetView() { return m_View; }
 
 	private:
 		void CreateBuffer(uint32 count);

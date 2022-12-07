@@ -40,7 +40,7 @@ namespace Engine
 
 	uint32 DirectX12ComputeShader::GetUniformLocation(const std::string& name) const
 	{
-		auto& location = m_UniformLocations.find(name);
+		auto location = m_UniformLocations.find(name);
 		if (location != m_UniformLocations.end())
 			return location->second;
 		return UINT32_MAX; // invalid location

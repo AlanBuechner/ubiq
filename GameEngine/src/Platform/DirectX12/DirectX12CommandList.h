@@ -35,7 +35,7 @@ namespace Engine
 		virtual void ClearRenderTarget(uint32 attachment) override;
 		virtual void ClearRenderTarget(uint32 attachment, const Math::Vector4& color) override;
 
-		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer);
+		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer) override;
 		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment) override;
 		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment, const Math::Vector4& color) override;
 

@@ -19,9 +19,9 @@ namespace Engine
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		virtual void OnAttach();
-		virtual void OnDetach();
-		virtual void OnImGuiRender();
+		virtual void OnAttach() override;
+		virtual void OnDetach() override;
+		virtual void OnImGuiRender() override;
 
 		virtual void OnEvent(Event& e) override;
 

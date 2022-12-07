@@ -51,17 +51,12 @@ namespace Engine
 		rDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 		rDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-		D3D12_HEAP_PROPERTIES props;
-		props.Type = D3D12_HEAP_TYPE_UPLOAD;
-		props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		props.CreationNodeMask = 0;
-		props.VisibleNodeMask = 0;
+		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 
 		wrl::ComPtr<ID3D12Resource> uploadBuffer;
 		CORE_ASSERT_HRESULT(
 			context->GetDevice()->CreateCommittedResource(
-				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 
+				&props, 
 				D3D12_HEAP_FLAG_NONE, 
 				&rDesc,
 				D3D12_RESOURCE_STATE_GENERIC_READ, 0, IID_PPV_ARGS(uploadBuffer.GetAddressOf())
@@ -113,6 +108,8 @@ namespace Engine
 		m_Width = width;
 		m_Height = height;
 
+		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+
 		D3D12_RESOURCE_DESC rDesc;
 		rDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		rDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -126,7 +123,7 @@ namespace Engine
 		rDesc.SampleDesc = { 1, 0 };
 
 		context->GetDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			&props,
 			D3D12_HEAP_FLAG_NONE,
 			&rDesc,
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,

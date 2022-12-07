@@ -19,7 +19,8 @@ namespace Engine
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffer);
 		context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_UploadBuffer);
-		m_UploadBuffer->Unmap(0, &CD3DX12_RANGE(0, 0));
+		CD3DX12_RANGE range = CD3DX12_RANGE(0, 0);
+		m_UploadBuffer->Unmap(0, &range);
 		m_MapLoc = nullptr;
 	}
 
@@ -61,10 +62,13 @@ namespace Engine
 		if (m_Buffer)
 			context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffer);
 
+		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(count * m_Stride);
+
 		context->GetDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), // a default heap
+			&props, // a default heap
 			D3D12_HEAP_FLAG_NONE, // no flags
-			&CD3DX12_RESOURCE_DESC::Buffer(count * m_Stride), // resource description for a buffer
+			&resDesc, // resource description for a buffer
 			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, // start in the copy destination state
 			nullptr, // optimized clear value must be null for this type of resource
 			IID_PPV_ARGS(&m_Buffer)
@@ -94,7 +98,8 @@ namespace Engine
 			memcpy(m_MapLoc, oldMapLoc, 0);
 			
 			// clean up old buffer
-			oldUploadBuffer->Unmap(0, &CD3DX12_RANGE(0, 0));
+			CD3DX12_RANGE range = CD3DX12_RANGE(0, 0);
+			oldUploadBuffer->Unmap(0, &range);
 			context->GetDX12ResourceManager()->ScheduleResourceDeletion(oldUploadBuffer);
 		}
 

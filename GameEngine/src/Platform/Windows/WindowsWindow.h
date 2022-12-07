@@ -30,7 +30,7 @@ namespace Engine
 
 		virtual void SetViewport(float width, float height) override;
 
-		inline virtual void* GetNativeWindow() const;
+		inline virtual void* GetNativeWindow() const override;
 
 		virtual void SetTitle(const std::string& title) override;
 		virtual const std::string& GetTitle() const override;

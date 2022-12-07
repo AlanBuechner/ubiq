@@ -148,7 +148,7 @@ namespace Engine
 	Entity Scene::CreateEntityWithUUID(const UUID uuid, const std::string& name)
 	{
 		Entity entity{ m_Registry.CreateEntity(uuid, name), this };
-		auto& tc = entity.AddComponent<TransformComponent>();
+		entity.AddComponent<TransformComponent>();
 		return entity;
 	}
 

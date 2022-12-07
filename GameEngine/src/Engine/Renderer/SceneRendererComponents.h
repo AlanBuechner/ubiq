@@ -49,7 +49,7 @@ namespace Engine
 	public:
 		virtual void OnComponentRemoved() override;
 
-		virtual void OnTransformChange(const Math::Mat4& transform);
+		virtual void OnTransformChange(const Math::Mat4& transform) override;
 
 		void SetMesh(Ref<Mesh> mesh) { m_Mesh = mesh; Invalidate(); }
 		Ref<Mesh> GetMesh() { return m_Mesh; }

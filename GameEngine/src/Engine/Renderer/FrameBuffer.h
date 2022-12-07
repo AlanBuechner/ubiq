@@ -39,8 +39,13 @@ namespace Engine
 		{
 			switch (TextureFormat)
 			{
-			case Engine::FrameBufferTextureFormat::DEPTH24STENCIL8:
+			case FrameBufferTextureFormat::DEPTH24STENCIL8:
 				return true;
+
+			case FrameBufferTextureFormat::RGBA8:
+			case FrameBufferTextureFormat::RED_INTEGER:
+			case FrameBufferTextureFormat::None:
+				break;
 			}
 			return false;
 		}

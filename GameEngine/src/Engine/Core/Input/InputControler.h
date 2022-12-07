@@ -28,7 +28,7 @@ namespace Engine
 
 	struct ENGINE_API MouseMoveEventData
 	{
-		std::function<void(Math::Vector2& pos)> Function;
+		std::function<void(const Math::Vector2& pos)> Function;
 		int BindMode;
 	};
 
@@ -47,12 +47,12 @@ namespace Engine
 		~InputControler();
 
 		void RaiseEvent(int key, int state);
-		void RaiseMouseMoveEvent(MouseMoveBindMode bindMode, Math::Vector2& pos);
+		void RaiseMouseMoveEvent(MouseMoveBindMode bindMode, const Math::Vector2& pos);
 
 		EventData* BindEvent(int key, int state, std::function<void()> func);
 		void UnbindKey(EventData* event);
 
-		MouseMoveEventData* BindMouseMoveEvent(MouseMoveBindMode bindMode, std::function<void(Math::Vector2&)> func);
+		MouseMoveEventData* BindMouseMoveEvent(MouseMoveBindMode bindMode, std::function<void(const Math::Vector2&)> func);
 		void UnbindMouseEvent(MouseMoveEventData* event);
 
 	private:

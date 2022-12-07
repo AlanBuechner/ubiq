@@ -41,6 +41,8 @@ namespace Engine
 
 		if(fs::exists(fs::path("Assets") / file))
 			return fs::path("Assets") / file;
+
+		return fs::path("");
 	}
 
 	Ref<ShaderSorce> ShaderCompiler::LoadFile(const fs::path& file)

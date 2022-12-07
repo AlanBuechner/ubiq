@@ -210,12 +210,12 @@ namespace Engine
 		{
 			Up = 0,
 			Down = 1,
-			KeyPressed = EventType::KeyPressed,
-			KeyDown = EventType::KeyDown,
-			KeyReleased = EventType::KeyReleased,
-			MousePressed = EventType::MouseButtonPressed,
-			MouseReleased = EventType::MouseButtonReleased,
-			MouseDown = EventType::MouseButtonDown
+			KeyPressed = (uint32)EventType::KeyPressed,
+			KeyDown = (uint32)EventType::KeyDown,
+			KeyReleased = (uint32)EventType::KeyReleased,
+			MousePressed = (uint32)EventType::MouseButtonPressed,
+			MouseReleased = (uint32)EventType::MouseButtonReleased,
+			MouseDown = (uint32)EventType::MouseButtonDown
 		};
 
 		// keyboard

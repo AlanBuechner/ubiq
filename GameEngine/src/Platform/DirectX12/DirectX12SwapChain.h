@@ -23,7 +23,7 @@ namespace Engine
 		virtual void UpdateBackBufferIndex() override;
 		virtual void CleanUp() override;
 		
-		virtual uint32 GetBufferCount() { return (uint32)m_FrameBuffers.size(); }
+		virtual uint32 GetBufferCount() override { return (uint32)m_FrameBuffers.size(); }
 
 		wrl::ComPtr<ID3D12DescriptorHeap> GetDescriptorHeap() { return m_DescHeap; }
 

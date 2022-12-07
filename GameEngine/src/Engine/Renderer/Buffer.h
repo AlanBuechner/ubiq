@@ -28,6 +28,7 @@ namespace Engine
 		case Engine::ShaderDataType::Int3:		return 4 * 3;
 		case Engine::ShaderDataType::Int4:		return 4 * 4;
 		case Engine::ShaderDataType::Bool:		return 1;
+		default: break;
 		}
 		CORE_ASSERT(false, "Unknown ShaderDataType!");
 		return 0;
@@ -37,8 +38,8 @@ namespace Engine
 	{
 		std::string Name;
 		ShaderDataType Type;
-		uint32 Offset;
 		uint32 Size;
+		uint32 Offset;
 		bool Normalized;
 
 		BufferElement(){}
@@ -61,6 +62,7 @@ namespace Engine
 			case Engine::ShaderDataType::Int3:		return 3;
 			case Engine::ShaderDataType::Int4:		return 4;
 			case Engine::ShaderDataType::Bool:		return 1;
+			default: break;
 			}
 			CORE_ASSERT(false, "Unknown ShaderDataType!");
 			return 0;

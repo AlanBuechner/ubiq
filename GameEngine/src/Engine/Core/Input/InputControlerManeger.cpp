@@ -52,7 +52,7 @@ namespace Engine
 			return false;
 		for (auto i : m_Controlers)
 		{
-			i->RaiseMouseMoveEvent(e.GetMouseBindMode(), Math::Vector2({e.GetX(), e.GetY()}));
+			i->RaiseMouseMoveEvent(e.GetMouseBindMode(), Math::Vector2(e.GetX(), e.GetY()));
 		}
 		return false;
 	}

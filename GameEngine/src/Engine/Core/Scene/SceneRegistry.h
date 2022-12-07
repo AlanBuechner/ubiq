@@ -49,7 +49,7 @@ namespace Engine
 		template<class T, typename... Args>
 		T& AddComponent(EntityType entity, Args&&... args)
 		{
-			uint64 componentID = typeid(T).hash_code(); // get component type id
+			//uint64 componentID = typeid(T).hash_code(); // get component type id
 
 			// find the component pool
 			ComponentPool* pool = GetOrCreateCompnentPool<T>();
@@ -110,7 +110,7 @@ namespace Engine
 		template<class T>
 		ComponentView<T> View()
 		{
-			uint64 componentID = typeid(T).hash_code();
+			//uint64 componentID = typeid(T).hash_code();
 			ComponentPool* pool = GetOrCreateCompnentPool<T>();
 			return ComponentView<T>((SizeComponentPool<sizeof(T)>*)pool);
 		}

@@ -19,7 +19,7 @@ namespace Engine
 
 		ShaderConfig::Topology GetTopologyType() { return m_Src->config.topology; }
 
-		virtual uint32 GetUniformLocation(const std::string& name) const;
+		virtual uint32 GetUniformLocation(const std::string& name) const override;
 	private:
 
 		void Init();
@@ -43,8 +43,6 @@ namespace Engine
 		Ref<ShaderSorce> m_Src;
 		std::string m_PassName;
 		ShaderConfig::RenderPass& m_PassConfig;
-
-		uint32 m_NumRootBindings = 0;
 
 		std::unordered_map<std::string, uint32> m_UniformLocations;
 

@@ -112,7 +112,6 @@ namespace Engine
 
 			for (uint32 i = 0; i < attachments.size(); i++)
 			{
-				bool swapChainTarget = dxfb->GetSpecification().SwapChainTarget;
 				if (attachments[i].IsDepthStencil())
 					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXDepthState(from), DirectX12FrameBuffer::GetDXDepthState(to)));
 				else
@@ -145,7 +144,6 @@ namespace Engine
 		uint64 depthHandle = 0;
 		for (uint32 i = 0; i < attachments.size(); i++)
 		{
-			bool swapChainTarget = m_RenderTarget->GetSpecification().SwapChainTarget;
 			if (attachments[i].IsDepthStencil())
 				depthHandle = m_RenderTarget->GetAttachmentRenderHandle(i);
 			else

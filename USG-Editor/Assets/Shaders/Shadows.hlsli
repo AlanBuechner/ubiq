@@ -6,6 +6,7 @@ float HardShadow(Texture2D shadowMap, float4 coords)
 	return (depthSample < coords.z ? 0 : 1);
 }
 
+#define DITHER_OFFSETS 64
 #define BLOCKER_SEARCH_NUM_SAMPLES 32
 #define PCF_NUM_SAMPLES 32
 
@@ -42,6 +43,73 @@ static float2 poissonDisk[32] = {
   float2(0.853351, -0.455276),
   float2(-0.952834, -0.244641),
   float2(0.546395, 0.837528),
+};
+
+static float2 ditherOffsets[64] = {
+	float2(0.680375, -0.211234),
+	float2(0.566198, 0.596880),
+	float2(0.823295, -0.604897),
+	float2(-0.329554, 0.536459),
+	float2(-0.444451, 0.107940),
+	float2(-0.045206, 0.257742),
+	float2(-0.270431, 0.026802),
+	float2(0.904459, 0.832390),
+	float2(0.271423, 0.434594),
+	float2(-0.716795, 0.213938),
+	float2(-0.967399, -0.514226),
+	float2(-0.725537, 0.608353),
+	float2(-0.686642, -0.198111),
+	float2(-0.740419, -0.782382),
+	float2(0.997849, -0.563486),
+	float2(0.025865, 0.678224),
+	float2(0.225280, -0.407937),
+	float2(0.275105, 0.048574),
+	float2(-0.012834, 0.945550),
+	float2(-0.414966, 0.542715),
+	float2(0.053490, 0.539828),
+	float2(-0.199543, 0.783059),
+	float2(-0.433371, -0.295083),
+	float2(0.615449, 0.838053),
+	float2(-0.860489, 0.898654),
+	float2(0.051991, -0.827888),
+	float2(-0.615572, 0.326454),
+	float2(0.780465, -0.302214),
+	float2(-0.871657, -0.959954),
+	float2(-0.084597, -0.873808),
+	float2(-0.523440, 0.941268),
+	float2(0.804416, 0.701840),
+	float2(-0.466668, 0.079521),
+	float2(-0.249586, 0.520497),
+	float2(0.025071, 0.335448),
+	float2(0.063213, -0.921439),
+	float2(-0.124725, 0.863670),
+	float2(0.861620, 0.441905),
+	float2(-0.431413, 0.477069),
+	float2(0.279958, -0.291903),
+	float2(0.375723, -0.668052),
+	float2(-0.119791, 0.760150),
+	float2(0.658402, -0.339326),
+	float2(-0.542064, 0.786745),
+	float2(-0.299280, 0.373340),
+	float2(0.912936, 0.177280),
+	float2(0.314608, 0.717353),
+	float2(-0.120880, 0.847940),
+	float2(-0.203127, 0.629534),
+	float2(0.368437, 0.821944),
+	float2(-0.035019, -0.568350),
+	float2(0.900505, 0.840256),
+	float2(-0.704680, 0.762124),
+	float2(0.282161, -0.136093),
+	float2(0.239193, -0.437881),
+	float2(0.572004, -0.385084),
+	float2(-0.105933, -0.547787),
+	float2(-0.624934, -0.447531),
+	float2(0.112888, -0.166997),
+	float2(-0.660786, 0.813608),
+	float2(-0.793658, -0.747849),
+	float2(-0.009112, 0.520950),
+	float2(0.969503, 0.870008),
+	float2(0.368890, -0.233623),
 };
 
 //static float2 poissonDisk[16] = {
@@ -86,12 +154,21 @@ void FindBlocker(Texture2D shadowMap, out float avgBlockerDepth, out float numBl
 	avgBlockerDepth = blockerSum / numBlockers;
 }
 
+float hash12(float2 p)
+{
+	float3 p3 = frac(p.xyx * .1031);
+	p3 += dot(p3, p3.yzx + 33.33);
+	return frac((p3.x + p3.y) * p3.z);
+}
+
 float PCF_Filter(Texture2D shadowMap, float2 uv, float zReceiver, float2 filterRadiusUV)
 {
+	uint ditherIndex = hash12(uv) * DITHER_OFFSETS;
 	float sum = 0.0f;
 	for (int i = 0; i < PCF_NUM_SAMPLES; ++i)
 	{
 		float2 offset = poissonDisk[i] * filterRadiusUV;
+		//offset += ditherOffsets[(ditherIndex + i) % DITHER_OFFSETS] * (3.141592654 / (4 * PCF_NUM_SAMPLES)); // add dithering
 		float depthSample = shadowMap.Sample(P_s, uv + offset).r + DEPTH_BIAS;
 		sum += (depthSample < zReceiver ? 0 : 1);
 		//sum += shadowMap.SampleCmpLevelZero(P_s, uv + offset, zReceiver).r;

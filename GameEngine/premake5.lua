@@ -2,6 +2,7 @@ project "GameEngine"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
+	toolset "clang"
 	staticruntime "on"
 	openmp "On"
 

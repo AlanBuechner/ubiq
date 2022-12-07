@@ -4,7 +4,7 @@ topology = triangle;
 passes = { 
 	main = {
 		VS = vertex;
-		PS = pixel; 
+		PS = pixel;
 	};
 	depth = {
 		VS = vertex;
@@ -239,7 +239,7 @@ PS_Output main(PS_Input input)
 			}
 		}
 
-		float shadowAmount = 0;
+		float shadowAmount = 1;
 		if (ci < numCascades)
 		{
 			DirectionalLightCascade c = cascades[ci];

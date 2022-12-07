@@ -11,7 +11,7 @@ namespace Engine
 	{
 	public:
 		ComponentItorator(SizeComponentPool<sizeof(T)>* pool, uint32 index) :
-			m_Pool(pool), m_Index(index)
+			m_Index(index), m_Pool(pool)
 		{}
 
 		ComponentItorator& operator++()

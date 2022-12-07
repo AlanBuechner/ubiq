@@ -19,7 +19,7 @@ namespace Engine
 		virtual uint32 GetDescriptorLocation() const override { return m_Handle.GetIndex(); }
 
 		virtual void SetData(void* data) override;
-		virtual void LoadFromFile(const fs::path& path);
+		virtual void LoadFromFile(const fs::path& path) override;
 		virtual Ref<TextureAttribute> GetAttributes() const override { return m_Attribute; }
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_Handle; }
