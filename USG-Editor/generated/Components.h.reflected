@@ -1,0 +1,5 @@
+include<..\GameEngine\src\Engine/Core/Scene/Components.h>
+class<Engine::TransformComponent>reflect-class,GROUP = Component
+	prop<glm::vec;m_Position>reflect-property;
+	prop<glm::vec;m_Rotation>reflect-property;
+	prop<glm::vec;m_Scale>reflect-property;

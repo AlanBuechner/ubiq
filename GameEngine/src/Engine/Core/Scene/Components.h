@@ -21,10 +21,13 @@
 #include "Engine/Core/UUID.h"
 #include "Entity.h"
 
+#include <Reflection.h>
+
 namespace Engine
 {
-	struct Component 
+	class Component 
 	{
+	public:
 		Entity Owner;
 
 		virtual void OnComponentAdded() {};
@@ -33,8 +36,8 @@ namespace Engine
 		virtual void OnTransformChange(const Math::Mat4& transform) {};
 		virtual void OnInvalid() {};
 	};
-
-	struct TransformComponent : public Component
+	
+	CLASS(GROUP = Component) TransformComponent : public Component
 	{
 	public:
 		using Func = std::function<void(const Math::Mat4&)>;
@@ -75,9 +78,9 @@ namespace Engine
 		void UpdateHierarchyGlobalTransform();
 
 	private:
-		Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
-		Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
-		Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
+		PROPERTY() Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
+		PROPERTY() Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
+		PROPERTY() Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
 
 		Entity Parent;
 		std::vector<Entity> Children;
@@ -85,8 +88,8 @@ namespace Engine
 		bool m_Dirty = true;
 		Math::Mat4 ChashedGloableTransform = Math::Mat4(1.0f);
 
-		friend Scene;
-		friend SceneSerializer;
+		friend class Scene;
+		friend class SceneSerializer;
 	};
 
 }

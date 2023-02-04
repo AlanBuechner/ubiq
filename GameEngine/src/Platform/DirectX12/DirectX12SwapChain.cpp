@@ -22,7 +22,6 @@ namespace Engine
 	{
 		FrameBufferSpecification fbSpec;
 		fbSpec.Attachments = { {FrameBufferTextureFormat::RGBA8, {0,0,0,0}} };
-		Window& window = Application::Get().GetWindow();
 		fbSpec.Width = 0;
 		fbSpec.Height = 0;
 		fbSpec.SwapChainTarget = true;
@@ -33,7 +32,7 @@ namespace Engine
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		wrl::ComPtr<IDXGIFactory2> factory2;
-		CORE_ASSERT_HRESULT(context->GetFactory()->QueryInterface(IID_PPV_ARGS(factory2.GetAddressOf())), 
+		CORE_ASSERT_HRESULT(context->GetFactory()->QueryInterface(IID_PPV_ARGS(factory2.GetAddressOf())),
 			"Failed To Get Factory2");
 
 		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
@@ -46,7 +45,7 @@ namespace Engine
 		rtvHeapDesc.NodeMask = NULL;
 
 		// Create heap
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(m_DescHeap.GetAddressOf())), 
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(m_DescHeap.GetAddressOf())),
 			"ID3D12Device->CreateDescriptorHeap(...) for Heap type D3D12_DESCRIPTOR_HEAP_TYPE_RTV");
 		m_DescHeap->SetName(L"SwapChain RTV Heap");
 
@@ -101,7 +100,7 @@ namespace Engine
 			m_FrameBuffers[i]->GetBuffer(0).Reset();
 
 		// Resize swap chain
-		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_FrameBuffers.size(), width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH), 
+		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_FrameBuffers.size(), width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH),
 			"Faild to Resize the swapchain");
 
 		// Recreate buffer
@@ -150,7 +149,7 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		CORE_ASSERT(m_SwapChain, "Invalid Swapchain! can not get frame buffers from null");
-		for (unsigned int i = 0; i < m_FrameBuffers.size(); i++) 
+		for (unsigned int i = 0; i < m_FrameBuffers.size(); i++)
 		{
 			// Get buffer
 			m_FrameBuffers[i]->GetBuffer(0).Reset();

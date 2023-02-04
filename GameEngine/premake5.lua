@@ -14,6 +14,8 @@ project "GameEngine"
 
 	files
 	{
+		"Reflection.cpp",
+		"generated/generated.obj",
 		"src/*.h",
 		"src/*.cpp",
 		"src/Engine/**.h",
@@ -54,8 +56,13 @@ project "GameEngine"
 		"%{IncludeDir.pix}/include"
 	}
 
+	sysincludedirs 
+	{
+		"$(SolutionDir)vendor\\Compiler\\include"
+	}
+
 	links 
-	{ 
+	{
 		"Glad",
 		"ImGui",
 		"Yaml",
@@ -67,7 +74,12 @@ project "GameEngine"
 
 	debugenvs
 	{
-		"PATH=%PATH%;%{IncludeDir.dxc}/bin/x64;%{IncludeDir.pix}/bin/x64"
+		"PATH=%PATH%;%{IncludeDir.dxc}bin/x64;%{IncludeDir.pix}bin/x64"
+	}
+
+	prelinkcommands
+	{
+		--"%{wks.location}vendor\\Compiler\\bin\\Socrates.exe \"$(ProjectDir)\\\" \"$(IncludePath)\" \"$(IntermediateOutputPath)\\\""
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"
@@ -78,8 +90,6 @@ project "GameEngine"
 
 		defines
 		{
-			"BUILD_DLL",
-			"GLFW_INCLUDE_NONE"
 		}
 
 	filter "configurations:Debug"

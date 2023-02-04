@@ -11,6 +11,7 @@ extern Engine::Application* Engine::CreateApplication();
 int main(int argc, char** argv)
 {
 	Engine::Log::Init();
+
 	Engine::Instrumentor::Get().RecordData(true);
 	Engine::Instrumentor::Get().BeginSession("Startup", "startup.json");
 	Engine::Instrumentor::Get().RegisterThread("Main", 0);

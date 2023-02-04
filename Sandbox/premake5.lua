@@ -24,6 +24,11 @@ project "Sandbox"
 		"%{IncludeDir.entt}"
 	}
 
+	sysincludedirs 
+	{
+		"$(SolutionDir)vendor\\Compiler\\include"
+	}
+
 	links
 	{
 		"GameEngine"

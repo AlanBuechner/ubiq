@@ -3,9 +3,13 @@
 bin/
 bin-int/
 Sandbox/*.json
+GameEngine/generated
 
 GameEngine/vendor/dxc
+Directory.build.props
 
 *.sln
 *.vsxproj*
 *.vcxproj*
+USG-Editor/startup.json
+USG-Editor/runtime.json

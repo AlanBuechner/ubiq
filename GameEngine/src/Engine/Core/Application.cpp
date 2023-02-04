@@ -15,6 +15,9 @@
 
 #include "Engine/Util/Performance.h"
 
+#include <Reflection.h>
+//LINK_REFLECTION_DATA(GameEngine)
+
 Engine::Application* Engine::Application::s_Instance = nullptr;
 
 namespace Engine {
@@ -68,6 +71,10 @@ namespace Engine {
 
 	void Application::Run()
 	{
+		const Reflect::Class& c = Reflect::Registry::GetRegistry()->GetClass("Engine::TransformComponent");
+
+		CORE_INFO("{0}", c.GetName());
+
 		CREATE_PROFILE_FUNCTIONI();
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		CORE_INFO("Runing Application");

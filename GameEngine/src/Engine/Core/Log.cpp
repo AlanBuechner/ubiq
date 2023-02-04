@@ -16,5 +16,8 @@ namespace Engine
 
 		s_ClientLogger = spdlog::stdout_color_mt("APP");
 		s_ClientLogger->set_level(spdlog::level::trace);
+
+		Logger l("[%t] ENGINE: %m");
+		l.Log(Logger::Trace, "hello world, {0}", 1);
 	}
 }

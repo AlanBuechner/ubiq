@@ -88,8 +88,6 @@ namespace Engine
 
 		SceneState m_SceneState = SceneState::Edit;
 
-		bool m_TransformingEntity = false;
-
 		bool m_OpenScene = false;
 		bool m_SaveScene = false;
 

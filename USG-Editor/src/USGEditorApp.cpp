@@ -5,7 +5,6 @@
 
 namespace Engine
 {
-
 	class USGEditor : public Application
 	{
 	public:

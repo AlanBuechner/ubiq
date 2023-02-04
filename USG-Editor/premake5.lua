@@ -24,6 +24,11 @@ project "USG-Editor"
 		"%{IncludeDir.entt}"
 	}
 
+	sysincludedirs 
+	{
+		"$(SolutionDir)vendor\\Compiler\\include"
+	}
+
 	links
 	{
 		"GameEngine"

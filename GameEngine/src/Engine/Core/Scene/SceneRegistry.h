@@ -59,9 +59,9 @@ namespace Engine
 			void* componentLocation = pool->GetComponentMemory(componentIndex);
 			CORE_ASSERT(componentLocation != nullptr, "faild to allocate memory for component"); // validate component was successfully created 
 
-			*new(componentLocation) T(std::forward<Args>(args)...); // create component in pre allocated memory
+			T* comp = new(componentLocation) T(std::forward<Args>(args)...); // create component in pre allocated memory
 			m_Entitys[entity].m_Components.push_back({ pool, componentIndex }); // add component to entity's list of components
-			return *(T*)componentLocation; // return component
+			return *comp; // return component
 		}
 
 		template<class T>

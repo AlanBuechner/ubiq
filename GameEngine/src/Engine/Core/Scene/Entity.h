@@ -6,8 +6,8 @@
 
 namespace Engine
 {
-	struct Component;
-	struct TransformComponent;
+	class Component;
+	class TransformComponent;
 }
 
 namespace Engine

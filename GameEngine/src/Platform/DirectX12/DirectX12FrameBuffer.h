@@ -51,6 +51,5 @@ namespace Engine
 
 		std::vector<DirectX12DescriptorHandle>  m_TargetHandles;
 		std::vector<DirectX12DescriptorHandle>  m_SRVHandles;
-		uint32 m_DepthAttachment;
 	};
 }

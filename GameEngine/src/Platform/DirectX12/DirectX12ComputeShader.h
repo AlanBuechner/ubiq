@@ -6,6 +6,7 @@
 
 namespace Engine
 {
+
 	class DirectX12ComputeShader : public ComputeShader
 	{
 	public:
@@ -22,8 +23,6 @@ namespace Engine
 
 	private:
 		fs::path m_File;
-
-		uint32 m_NumRootBindings = 0;
 
 		std::unordered_map<std::string, uint32> m_UniformLocations;
 		std::vector<ShaderParameter> m_ReflectionData;
