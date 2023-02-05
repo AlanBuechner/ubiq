@@ -14,7 +14,6 @@ project "GameEngine"
 
 	files
 	{
-		"Reflection.cpp",
 		"generated/generated.obj",
 		"src/*.h",
 		"src/*.cpp",
@@ -58,7 +57,7 @@ project "GameEngine"
 
 	sysincludedirs 
 	{
-		"$(SolutionDir)vendor\\Compiler\\include"
+		"%{IncludeDir.Compiler}include"
 	}
 
 	links 
@@ -69,7 +68,8 @@ project "GameEngine"
 		"Box2D",
 		"%{IncludeDir.Assimp}/assimp-vc140-mt.lib",
 		"%{IncludeDir.dxc}/lib/x64/dxcompiler.lib",
-		"%{IncludeDir.pix}/bin/x64/WinPixEventRuntime.lib"
+		"%{IncludeDir.pix}/bin/x64/WinPixEventRuntime.lib",
+		"%{IncludeDir.Compiler}/lib/Reflection.lib"
 	}
 
 	debugenvs
