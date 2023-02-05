@@ -1,6 +1,5 @@
 $SaveFolder = $args[0]
-if ($args.count -lt 1)
-{
+if ($args.count -lt 1){
 	Write-Host "Missing save folder parameter"
 }
 
