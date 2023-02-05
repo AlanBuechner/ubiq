@@ -4,6 +4,8 @@ bin/
 bin-int/
 Sandbox/*.json
 GameEngine/generated
+Sandbox/generated
+USG-Editor/generated
 
 GameEngine/vendor/dxc
 Directory.build.props
