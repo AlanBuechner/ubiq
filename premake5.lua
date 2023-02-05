@@ -25,7 +25,6 @@ workspace "UbiqEngine"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
-	include "GameEngine/vendor/Glad"
 	include "GameEngine/vendor/imgui"
 	include "GameEngine/vendor/yaml-cpp"
 	include "GameEngine/vendor/Box2D"

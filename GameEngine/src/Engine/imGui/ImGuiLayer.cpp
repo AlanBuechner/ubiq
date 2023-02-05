@@ -27,9 +27,6 @@
 #endif // PLATFORM_WINDOWS
 
 
-// temp
-#include <glad/glad.h>
-
 #include <ImGuizmo.h>
 
 namespace Engine

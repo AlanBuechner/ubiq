@@ -41,11 +41,9 @@ project "GameEngine"
 		"src",
 		"vendor",
 		"vendor/spdlog/include",
-		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.Box2D}/Include",
@@ -57,12 +55,11 @@ project "GameEngine"
 
 	sysincludedirs 
 	{
-		"%{IncludeDir.Compiler}include"
+		"%{IncludeDir.Compiler}/include"
 	}
 
 	links 
 	{
-		"Glad",
 		"ImGui",
 		"Yaml",
 		"Box2D",

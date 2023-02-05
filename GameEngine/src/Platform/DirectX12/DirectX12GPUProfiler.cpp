@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DirectX12GPUProfiler.h"
 #include "DX.h"
-#include <pix/pix3.h>
+#include "WinPixEventRuntime/pix3.h"
 
 namespace Engine
 {
@@ -17,4 +17,3 @@ namespace Engine
 	}
 
 }
-

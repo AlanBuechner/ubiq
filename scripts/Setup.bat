@@ -1,5 +1,7 @@
 powershell -ExecutionPolicy Bypass -File GetDXC.ps1 ..\GameEngine\vendor\dxc
+powershell -ExecutionPolicy Bypass -File GetPix.ps1 ..\GameEngine\vendor\pix
 powershell -ExecutionPolicy Bypass -File GetCompiler.ps1 ..\vendor\Compiler
+
 
 (
 	echo ^<Project^>

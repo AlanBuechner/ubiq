@@ -8,6 +8,7 @@ Sandbox/generated
 USG-Editor/generated
 
 GameEngine/vendor/dxc
+GameEngine/vendor/pix
 Directory.build.props
 vendor/Compiler
 
