@@ -126,7 +126,6 @@ namespace Engine
 
 				m_AssetPaths[id] = asset;
 			}
-			CORE_INFO(asset.string());
 		}
 
 		// delete unused meta files

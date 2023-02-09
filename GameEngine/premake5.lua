@@ -65,8 +65,7 @@ project "GameEngine"
 		"Box2D",
 		"%{IncludeDir.Assimp}/assimp-vc140-mt.lib",
 		"%{IncludeDir.dxc}/lib/x64/dxcompiler.lib",
-		"%{IncludeDir.pix}/bin/x64/WinPixEventRuntime.lib",
-		"%{IncludeDir.Compiler}/lib/Reflection.lib"
+		"%{IncludeDir.pix}/bin/x64/WinPixEventRuntime.lib"
 	}
 
 	debugenvs
@@ -85,21 +84,32 @@ project "GameEngine"
 	filter "system:windows"
 		systemversion "latest"
 
-		defines
-		{
-		}
-
 	filter "configurations:Debug"
 		defines "DEBUG"
 		runtime "Debug"
 		symbols "on"
+
+		links
+		{
+			"%{IncludeDir.Compiler}/lib/ReflectionD.lib"
+		}
 
 	filter "configurations:Release"
 		defines "RELEASE"
 		runtime "Release"
 		optimize "on"
 
+		links
+		{
+			"%{IncludeDir.Compiler}/lib/Reflection.lib"
+		}
+
 	filter "configurations:Dist"
 		defines "DIST"
 		runtime "Release"
 		optimize "on"
+
+		links
+		{
+			"%{IncludeDir.Compiler}/lib/Reflection.lib"
+		}
