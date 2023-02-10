@@ -12,5 +12,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Engine/Core/Log.h"
+#include "Engine/Core/Logging/Log.h"
+
 //#include "Engine/Util/Performance.h"

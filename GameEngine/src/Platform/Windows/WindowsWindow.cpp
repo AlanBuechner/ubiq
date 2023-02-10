@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "WindowsWindow.h"
 #include "Engine/Core/Application.h"
-#include "Engine/Core/Log.h"
 #include "Engine/Util/Performance.h"
 
 #include "Engine/Core/Input/InputControler.h"

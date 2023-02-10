@@ -9,6 +9,7 @@
 #ifdef _WIN32
 	#ifdef _WIN64
 		#define PLATFORM_WINDOWS
+		#include "Platform/Windows/Win.h"
 	#else
 		#error "x86 Buillds are not sapported"
 	#endif // _WIN64

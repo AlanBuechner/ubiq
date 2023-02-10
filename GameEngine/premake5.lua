@@ -40,7 +40,6 @@ project "GameEngine"
 	{
 		"src",
 		"vendor",
-		"vendor/spdlog/include",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",

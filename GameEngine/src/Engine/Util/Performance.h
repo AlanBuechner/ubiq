@@ -3,7 +3,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include "Engine/Core/Log.h"
+#include "Engine/Core/Logging/Log.h"
 #include "Engine/Core/Time.h"
 #include <string>
 #include <mutex>

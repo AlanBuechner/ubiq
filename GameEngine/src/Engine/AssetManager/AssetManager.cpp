@@ -7,7 +7,6 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include "Platform/Windows/Win.h"
-#include <shlobj_core.h>
 
 namespace Engine
 {

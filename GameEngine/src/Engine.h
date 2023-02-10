@@ -8,7 +8,7 @@
 
 #include "Engine/Core/Application.h"
 #include "Engine/Core/Layer.h"
-#include "Engine/Core/Log.h"
+#include "Engine/Core/Logging/Log.h"
 #include "Engine/Core/Time.h"
 #include "Engine/Util/Utils.h"
 
