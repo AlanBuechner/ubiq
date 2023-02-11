@@ -33,7 +33,8 @@ namespace Engine
 		CORE_ASSERT_HRESULT(context->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(m_Heap.GetAddressOf())),
 			"Failed to create descriptor heap");
 		m_CPUHandle = m_Heap->GetCPUDescriptorHandleForHeapStart();
-		m_GPUHandle = m_Heap->GetGPUDescriptorHandleForHeapStart();
+		if(isShaderVisable)
+			m_GPUHandle = m_Heap->GetGPUDescriptorHandleForHeapStart();
 
 		for (uint32 i = 0; i < size; i++) m_FreeSlots.push_back(i);
 
