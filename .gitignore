@@ -12,6 +12,9 @@ GameEngine/vendor/pix
 Directory.build.props
 vendor/Compiler
 
+dxcompiler.dll
+dxil.dll
+
 *.sln
 *.vsxproj*
 *.vcxproj*

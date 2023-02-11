@@ -1,7 +1,13 @@
+@echo off
 powershell -ExecutionPolicy Bypass -File GetDXC.ps1 ..\GameEngine\vendor\dxc
 powershell -ExecutionPolicy Bypass -File GetPix.ps1 ..\GameEngine\vendor\pix
 powershell -ExecutionPolicy Bypass -File GetCompiler.ps1 ..\vendor\Compiler
 
+xcopy "..\GameEngine\vendor\dxc\bin\x64\dxcompiler.dll" "..\USG-Editor\dxcompiler.dll" /y
+xcopy "..\GameEngine\vendor\dxc\bin\x64\dxil.dll" "..\USG-Editor\dxil.dll" /y
+
+xcopy "..\GameEngine\vendor\dxc\bin\x64\dxcompiler.dll" "..\Sandbox\dxcompiler.dll" /y
+xcopy "..\GameEngine\vendor\dxc\bin\x64\dxil.dll" "..\Sandbox\dxil.dll" /y
 
 (
 	echo ^<Project^>
