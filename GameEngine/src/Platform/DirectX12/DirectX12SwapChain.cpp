@@ -75,15 +75,18 @@ namespace Engine
 		swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
 		// Create swap chain full screen mode descriptor
-		DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFDesc;
-		ZeroMemory(&swapChainFDesc, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
+		DXGI_SWAP_CHAIN_FULLSCREEN_DESC* swapChainFDesc = nullptr;
+		if (m_OwningWindow.GetFullScreen())
+		{
+			swapChainFDesc = new DXGI_SWAP_CHAIN_FULLSCREEN_DESC();
 
-		// Describe swap chain full screen mode
-		swapChainFDesc.Windowed = !(m_OwningWindow.GetMaximised() || m_OwningWindow.GetFullScreen());
+			// Describe swap chain full screen mode
+			swapChainFDesc->Windowed = true;
+		}
 
 		Ref<DirectX12CommandQueue> commandQueue = Renderer::GetMainCommandQueue<DirectX12CommandQueue>();
 		wrl::ComPtr<IDXGISwapChain1> swapChain;
-		CORE_ASSERT_HRESULT(factory2->CreateSwapChainForHwnd(commandQueue->GetCommandQueue().Get(), m_WindowHandle, &swapChainDesc, &swapChainFDesc, nullptr, swapChain.GetAddressOf()),
+		CORE_ASSERT_HRESULT(factory2->CreateSwapChainForHwnd(commandQueue->GetCommandQueue().Get(), m_WindowHandle, &swapChainDesc, swapChainFDesc, nullptr, swapChain.GetAddressOf()),
 			"Failed To Create Swapchain");
 		CORE_ASSERT_HRESULT(swapChain->QueryInterface(IID_PPV_ARGS(m_SwapChain.GetAddressOf())), "Failed to get swap chain");
 
@@ -92,6 +95,9 @@ namespace Engine
 
 		GetFrameBuffers();
 		m_CurrentBuffer = m_SwapChain->GetCurrentBackBufferIndex();
+
+		if (swapChainFDesc)
+			delete swapChainFDesc;
 	}
 
 	void DirectX12SwapChain::Resize(uint32 width, uint32 height)
