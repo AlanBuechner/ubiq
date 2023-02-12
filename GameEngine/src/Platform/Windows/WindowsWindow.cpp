@@ -80,6 +80,9 @@ namespace Engine
 		m_Data.Maximized = props.Maximized;
 		m_Data.VSync = props.VSync;
 
+		m_Data.FullScreen = false;
+		m_Data.Minimized = false;
+
 		CORE_INFO("Creating window {0} ({1}, {2}), {3}", props.Title, props.Width, props.Height, props.Maximized);
 
 		RECT wr;
