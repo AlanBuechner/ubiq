@@ -35,5 +35,41 @@ namespace Engine
 		}
 	}
 
+	void GPUProfiler::Init()
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			DirectX12GPUProfiler::Init();
+			break;
+		default:
+			break;
+		}
+	}
+
+	void GPUProfiler::SetTragetWindow(void* nativeWindow)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			DirectX12GPUProfiler::SetTargetWindow(nativeWindow);
+			break;
+		default:
+			break;
+		}
+	}
+
+	void GPUProfiler::TriggerGPUCapture()
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			DirectX12GPUProfiler::TriggerPixGPUCapture();
+			break;
+		default:
+			break;
+		}
+	}
+
 }
 

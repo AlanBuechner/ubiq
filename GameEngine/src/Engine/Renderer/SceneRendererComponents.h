@@ -25,6 +25,7 @@ namespace Engine
 	{
 		DirectionalLightComponent* s_Instance;
 	public:
+
 		virtual void OnComponentAdded() override;
 		virtual void OnInvalid() override;
 		virtual void OnComponentRemoved() override;

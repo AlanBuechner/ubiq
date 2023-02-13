@@ -13,7 +13,7 @@ namespace Engine
 	public:
 		static constexpr uint32 s_NumShadowMaps = 5;
 	private:
-		//#pragma pack 4
+		// data that gets uploaded to the gpu
 		struct DirectionalLightData
 		{
 			DirectionalLightData() = default;

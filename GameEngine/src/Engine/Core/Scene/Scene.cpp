@@ -31,7 +31,6 @@ namespace Engine
 
 	Scene::~Scene()
 	{
-
 		m_SceneRenderer = nullptr;
 	}
 

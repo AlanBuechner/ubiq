@@ -15,6 +15,8 @@
 
 #include "Engine/Util/Performance.h"
 
+#include "Engine/Renderer/GPUProfiler.h"
+
 #include <Reflection.h>
 //LINK_REFLECTION_DATA(GameEngine)
 
@@ -35,6 +37,7 @@ namespace Engine {
 		timer.Start("Create Window");
 		Window::Init();
 		m_Window = Window::Create({ name, 1280, 720, true, false }); // create a window
+		GPUProfiler::SetTragetWindow(m_Window->GetNativeWindow());
 		timer.End();
 		timer.Start("set event callback");
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back

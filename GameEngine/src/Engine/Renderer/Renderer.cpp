@@ -35,6 +35,9 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
+		// Init GPUProfiling
+		GPUProfiler::Init();
+
 		s_Context = GraphicsContext::Create();
 		s_Context->Init();
 		
@@ -103,6 +106,8 @@ namespace Engine
 		s_RenderThread.join();
 		Renderer2D::Destroy();
 		LineRenderer::Destroy();
+
+		s_Context.reset(); // destroy context before atexit
 	}
 
 	void Renderer::BeginFrame()

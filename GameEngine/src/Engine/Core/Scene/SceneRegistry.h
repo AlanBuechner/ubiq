@@ -116,12 +116,18 @@ namespace Engine
 		}
 
 		template<class T>
+		static void ComponentDestructorFunc(void* comp)
+		{
+			((T*)comp)->~T();
+		}
+
+		template<class T>
 		ComponentPool* GetOrCreateCompnentPool()
 		{
 			uint64 componentID = typeid(T).hash_code();
 			ComponentPool* pool = m_Pools[componentID];
 			if (pool == nullptr) 
-				pool = m_Pools[componentID] = new SizeComponentPool<sizeof(T)>(componentID);
+				pool = m_Pools[componentID] = new SizeComponentPool<sizeof(T)>(componentID, ComponentDestructorFunc<T>);
 			return pool;
 		}
 

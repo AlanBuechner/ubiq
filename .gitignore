@@ -20,3 +20,5 @@ dxil.dll
 *.vcxproj*
 USG-Editor/startup.json
 USG-Editor/runtime.json
+
+*.wpix

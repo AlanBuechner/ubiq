@@ -20,6 +20,7 @@ namespace Engine
 	void AssetManager::Destroy()
 	{
 		m_DirectoryWatchThread.detach();
+		m_CashedAssets.clear();
 	}
 
 	void AssetManager::Clean()

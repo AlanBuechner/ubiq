@@ -141,7 +141,7 @@ ConstantBuffer<DirectionalLight> DirLight;
 cbuffer Cascades
 {
 	DirectionalLightCascade cascades[NUM_CASCADES];
-}[];
+};
 
 ConstantBuffer<Camera> cameras[] : register(space1);
 // Material struct is generated automaticly by the data defined in the config section

@@ -10,4 +10,12 @@ namespace Engine
 		static void BeginEvent(Ref<CommandList> commandList, const std::string& eventName);
 		static void EndEvent(Ref<CommandList> commandList);
 	};
+
+	class GPUProfiler
+	{
+	public:
+		static void Init();
+		static void SetTragetWindow(void* nativeWindow);
+		static void TriggerGPUCapture();
+	};
 }

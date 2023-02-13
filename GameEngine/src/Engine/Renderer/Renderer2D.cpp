@@ -82,6 +82,8 @@ namespace Engine
 		// destroy all gpu assets
 		s_Data.QuadInstanceBuffer.reset();
 		s_Data.Camera.reset();
+		s_Data.QuadMesh.reset();
+		s_Data.SpriteShader.reset();
 	}
 
 	void Renderer2D::BeginScene(const Camera& camera, const Math::Mat4& transform)

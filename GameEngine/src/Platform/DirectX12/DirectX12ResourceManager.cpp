@@ -101,6 +101,8 @@ namespace Engine
 
 	DirectX12ResourceManager::~DirectX12ResourceManager()
 	{
+		m_DeletionPool.reset();
+
 		s_SRVHeap.reset();
 		s_RTVHeap.reset();
 		s_DSVHeap.reset();

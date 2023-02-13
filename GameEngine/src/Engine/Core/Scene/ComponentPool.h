@@ -15,9 +15,10 @@ namespace Engine
 	{
 	public:
 		using Func = std::function<void (void*)>;
+		using DestructorFunc = std::function<void (void*)>;
 
-		ComponentPool(ComponentType typeID, uint64 componentSize) :
-			m_TypeID(typeID), m_ComponentSize(componentSize)
+		ComponentPool(ComponentType typeID, uint64 componentSize, DestructorFunc dFunc) :
+			m_TypeID(typeID), m_ComponentSize(componentSize), m_DestructorFunc(dFunc)
 		{}
 		virtual ~ComponentPool() {};
 
@@ -36,6 +37,8 @@ namespace Engine
 	protected:
 		const ComponentType m_TypeID;
 		const uint64 m_ComponentSize;
+		const DestructorFunc m_DestructorFunc;
+
 	};
 
 	template<uint64 TSize>
@@ -45,9 +48,17 @@ namespace Engine
 		struct ComponentData
 		{byte data[TSize];};
 	public:
-		SizeComponentPool(ComponentType typeID) :
-			ComponentPool(typeID, TSize)
+		SizeComponentPool(ComponentType typeID, DestructorFunc dfunc) :
+			ComponentPool(typeID, TSize, dfunc)
 		{}
+
+		~SizeComponentPool()
+		{
+			for (auto& comp : m_UsedSlots)
+			{
+				m_DestructorFunc(GetComponentMemory(comp));
+			}
+		}
 
 		virtual std::vector<uint32>& GetUsedSlots() override
 		{
@@ -88,6 +99,8 @@ namespace Engine
 		{
 			uint32 componentIndex = m_Entitys[entity];
 			m_FreeSlots.push_back(componentIndex);
+
+			m_DestructorFunc(GetComponentMemory(componentIndex));
 
 			// remove entity from used list
 			for (uint32 i = 0; i < m_UsedSlots.size(); i++)
