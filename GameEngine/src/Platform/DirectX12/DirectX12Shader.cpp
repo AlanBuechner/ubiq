@@ -58,23 +58,25 @@ namespace Engine
 	{
 		ByteCodeBlobs blobs{};
 
-		const std::string& vsc = m_Src->m_Sections[m_PassConfig.vs];
+		ShaderSorce::SectionInfo vsi = m_Src->m_Sections[m_PassConfig.vs];
+		const std::string& vsc = vsi.m_SectionCode.str();
 		if (!vsc.empty())
 		{
 			ShaderBlobs vs = DirectX12ShaderCompiler::Get().Compile(vsc, m_Src->file, ShaderType::Vertex);
 			if (!vs.object) return;
 			blobs.vs = vs.object;
-			DirectX12ShaderCompiler::Get().GetShaderParameters(vs, m_ReflectionData, ShaderType::Vertex);
+			DirectX12ShaderCompiler::Get().GetShaderParameters(vs, vsi, m_ReflectionData, ShaderType::Vertex);
 			DirectX12ShaderCompiler::Get().GetInputLayout(vs, m_InputElements);
 		}
 
-		const std::string& psc = m_Src->m_Sections[m_PassConfig.ps];
+		ShaderSorce::SectionInfo psi = m_Src->m_Sections[m_PassConfig.ps];
+		const std::string& psc = psi.m_SectionCode.str();
 		if (!psc.empty())
 		{
 			ShaderBlobs ps = DirectX12ShaderCompiler::Get().Compile(psc, m_Src->file, ShaderType::Pixel);
 			if (!ps.object) return;
 			blobs.ps = ps.object;
-			DirectX12ShaderCompiler::Get().GetShaderParameters(ps, m_ReflectionData, ShaderType::Pixel);
+			DirectX12ShaderCompiler::Get().GetShaderParameters(ps, psi, m_ReflectionData, ShaderType::Pixel);
 			DirectX12ShaderCompiler::Get().GetOutputLayout(ps, m_RenderTargetFormates);
 		}
 

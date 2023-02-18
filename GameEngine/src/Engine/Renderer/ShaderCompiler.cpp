@@ -78,15 +78,17 @@ namespace Engine
 		
 		std::string materialCode = GenerateMaterialStruct(sorce->config.params);
 
-		std::string commonSection = materialCode + ss["common"].str();
-		PreProcess(commonSection, file);
-		for (auto& section : ss)
+		ShaderSorce::SectionInfo commonSection;
+		std::string commonSrc = materialCode + ss["common"].str();
+		PreProcess(commonSrc, commonSection, file);
+		for (auto& sectionSource : ss)
 		{
-			if (section.first != "config" && section.first != "common")
+			if (sectionSource.first != "config" && sectionSource.first != "common")
 			{
-				std::string code = section.second.str();
-				PreProcess(code, file);
-				sorce->m_Sections[section.first] = commonSection + "\n" + code;
+				ShaderSorce::SectionInfo section = commonSection;
+				std::string sectionSrc = sectionSource.second.str();
+				PreProcess(sectionSrc, section, file);
+				sorce->m_Sections[sectionSource.first] = section;
 			}
 		}
 
@@ -95,36 +97,80 @@ namespace Engine
 		return sorce;
 	}
 
-	void ShaderCompiler::PreProcess(std::string& str, const fs::path& path)
+	void ShaderCompiler::PreProcess(std::string& src, ShaderSorce::SectionInfo& section, const fs::path& fileLocation)
 	{
-		std::stringstream out;
-		std::stringstream ss(str);
+		std::stringstream ss(src);
 
 		std::string line;
 		while (getline(ss, line))
 		{
 			std::vector<std::string> tokens = Tokenize(line);
-			if (!tokens.empty() && tokens[0] == "#include")
+			if (!tokens.empty())
 			{
-				CORE_ASSERT( tokens.size() == 4 && tokens[1] == "\"" && tokens[3] == "\"", "failed to include header on Line \"{0}\"", line);
-				fs::path headerPath = FindFilePath(tokens[2], path);
 
-				// load header
-				std::ifstream ifs(headerPath);
-				std::string headerCode((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+				if (tokens[0] == "#include")
+				{
+					CORE_ASSERT(tokens.size() == 4 && tokens[1] == "\"" && tokens[3] == "\"", "failed to include header on line \"{0}\"", line);
+					fs::path headerPath = FindFilePath(tokens[2], fileLocation);
 
-				// process header
-				PreProcess(headerCode, headerPath);
+					// load header
+					std::ifstream ifs(headerPath);
+					std::string headerCode((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
-				out << headerCode << "\n";
-			}
-			else
-			{
-				out << line << "\n"; // append the line if there is no preprocessing needed
+					// process header
+					PreProcess(headerCode, section, headerPath);
+				}
+				else if (tokens[0] == "StaticSampler")
+				{
+					// 0			 1	  2 3			 4 5 6 7 8 9   10 11  12 13
+					// StaticSampler name = StaticSampler( U , V , Min ,  Mag )  ;
+
+					CORE_ASSERT(tokens.size() == 14, "error on line \"{0}\"", line);
+
+					std::string& name = tokens[1];
+					CORE_ASSERT(tokens[2] == "=", "expected \"=\"");
+					CORE_ASSERT(tokens[3] == "StaticSampler", "expected \"StaticSampler\"");
+					CORE_ASSERT(tokens[4] == "(", "expected \"(\"");
+					std::string& u = tokens[5];
+					CORE_ASSERT(tokens[6] == ",", "expected \",\"");
+					std::string& v = tokens[7];
+					CORE_ASSERT(tokens[8] == ",", "expected \",\"");
+					std::string& min = tokens[9];
+					CORE_ASSERT(tokens[10] == ",", "expected \",\"");
+					std::string& mag = tokens[11];
+					CORE_ASSERT(tokens[12] == ")", "expected \")\"");
+					CORE_ASSERT(tokens[13] == ";", "expected \";\"");
+
+					TextureAttribute attrib;
+					if (u == "repeat") attrib.U == TextureAttribute::WrapMode::Repeat;
+					else if (u == "repeatMiror") attrib.U == TextureAttribute::WrapMode::MirroredRepeat;
+					else if (u == "clamp") attrib.U == TextureAttribute::WrapMode::Clamp;
+
+					if (v == "repeat") attrib.U == TextureAttribute::WrapMode::Repeat;
+					else if (v == "repeatMiror") attrib.U == TextureAttribute::WrapMode::MirroredRepeat;
+					else if (v == "clamp") attrib.U == TextureAttribute::WrapMode::Clamp;
+
+					if (min == "point") attrib.Min = TextureAttribute::MinMagFilter::Point;
+					else if (min == "linear") attrib.Min = TextureAttribute::MinMagFilter::Linear;
+					else if (min == "anisotropic") attrib.Min = TextureAttribute::MinMagFilter::Anisotropic;
+
+					if (mag == "point") attrib.Mag = TextureAttribute::MinMagFilter::Point;
+					else if (mag == "linear") attrib.Mag = TextureAttribute::MinMagFilter::Linear;
+					else if (mag == "anisotropic") attrib.Mag = TextureAttribute::MinMagFilter::Anisotropic;
+
+					ShaderSorce::SectionInfo::SamplerInfo info;
+					info.m_SamplerConfig = attrib;
+
+					section.m_Samplers[name] = info;
+
+					section.m_SectionCode << "sampler " << name << ";";
+				}
+				else
+				{
+					section.m_SectionCode << line << "\n"; // append the line if there is no preprocessing needed
+				}
 			}
 		}
-
-		str = out.str();
 	}
 
 	ShaderConfig ShaderCompiler::CompileConfig(const std::string& code)

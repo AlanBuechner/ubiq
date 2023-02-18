@@ -148,18 +148,18 @@ ConstantBuffer<Camera> cameras[] : register(space1);
 ConstantBuffer<Material> materials[]: register(space2);
 
 Texture2D<float4> textures[] : register(space0);
-sampler A_s;
+StaticSampler textureSampler = StaticSampler(repeat, repeat, anisotropic, anisotropic);
 
 // P_ denotes sampler as having point filtering
-sampler P_s;
+StaticSampler shadowSampler = StaticSampler(clamp, clamp, point, point);
 
 #include "PBR.hlsli"
 #include "Shadows.hlsli"
 
 float SampleParallax(uint textureID, bool invert, float2 uv)
 {
-	if (invert) return 1.0 - textures[textureID].Sample(A_s, uv).r;
-	else return textures[textureID].Sample(A_s, uv).r;
+	if (invert) return 1.0 - textures[textureID].Sample(textureSampler, uv).r;
+	else return textures[textureID].Sample(textureSampler, uv).r;
 }
 
 PS_Output main(PS_Input input)
@@ -205,11 +205,11 @@ PS_Output main(PS_Input input)
 			//discard;
 	}
 
-	float4 diffuse = textures[mat.diffuse].Sample(A_s, uv);
-	float3 normal = normalize(normalize(textures[mat.normal].Sample(A_s, uv).xyz) * 2 - 1);
-	float roughness = textures[mat.roughness].Sample(A_s, uv).r;
-	float metallic = textures[mat.metal].Sample(A_s, uv).b;
-	float ao = textures[mat.ao].Sample(A_s, uv).r;
+	float4 diffuse = textures[mat.diffuse].Sample(textureSampler, uv);
+	float3 normal = normalize(normalize(textures[mat.normal].Sample(textureSampler, uv).xyz) * 2 - 1);
+	float roughness = textures[mat.roughness].Sample(textureSampler, uv).r;
+	float metallic = textures[mat.metal].Sample(textureSampler, uv).b;
+	float ao = textures[mat.ao].Sample(textureSampler, uv).r;
 
 	float3x3 TBN = transpose(float3x3(normalize(input.tangent), normalize(input.bitangent), normalize(input.normal)));
 	normal = normalize(mul(TBN, normal));

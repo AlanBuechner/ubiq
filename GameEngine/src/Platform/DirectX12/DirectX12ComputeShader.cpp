@@ -19,7 +19,8 @@ namespace Engine
 			ShaderBlobs cs = DirectX12ShaderCompiler::Get().Compile(code, file, ShaderType::Compute);
 			if (!cs.object) return;
 			blob = cs.object;
-			DirectX12ShaderCompiler::Get().GetShaderParameters(cs, m_ReflectionData, ShaderType::Compute);
+			ShaderSorce::SectionInfo info;
+			DirectX12ShaderCompiler::Get().GetShaderParameters(cs, info, m_ReflectionData, ShaderType::Compute);
 		}
 
 		if (blob != nullptr)

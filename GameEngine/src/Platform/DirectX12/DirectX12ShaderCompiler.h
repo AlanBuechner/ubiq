@@ -22,7 +22,7 @@ namespace Engine
 		static DirectX12ShaderCompiler& Get();
 
 		ShaderBlobs Compile(const std::string& code, const fs::path& file, ShaderType type);
-		void GetShaderParameters(ShaderBlobs& blobs, std::vector<ShaderParameter>& params, ShaderType type);
+		void GetShaderParameters(ShaderBlobs& blobs, ShaderSorce::SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type);
 		void GetInputLayout(ShaderBlobs& blobs, std::vector<ShaderInputElement>& inputElements);
 		void GetOutputLayout(ShaderBlobs& blobs, std::vector<FrameBufferTextureFormat>& outputElement);
 

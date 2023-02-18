@@ -52,6 +52,41 @@ D3D12_SHADER_VISIBILITY GetShaderVisibilityFlag(Engine::ShaderType type)
 	}
 }
 
+D3D12_TEXTURE_ADDRESS_MODE GetWrapMode(Engine::TextureAttribute::WrapMode mode)
+{
+	switch (mode)
+	{
+	case Engine::TextureAttribute::WrapMode::Repeat:
+		return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	case Engine::TextureAttribute::WrapMode::MirroredRepeat:
+		return D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
+	case Engine::TextureAttribute::WrapMode::Clamp:
+		return D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+	default:
+		break;
+	}
+}
+
+D3D12_FILTER GetFilter(Engine::TextureAttribute::MinMagFilter min, Engine::TextureAttribute::MinMagFilter mag)
+{
+	if (min == mag)
+	{
+		switch (min)
+		{
+		case Engine::TextureAttribute::MinMagFilter::Point:
+			return D3D12_FILTER_MIN_MAG_MIP_POINT;
+		case Engine::TextureAttribute::MinMagFilter::Linear:
+			return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		case Engine::TextureAttribute::MinMagFilter::Anisotropic:
+			return D3D12_FILTER_ANISOTROPIC;
+		default:
+			break;
+		}
+	}
+
+	CORE_ASSERT(false, "unknown sampler filter config");
+}
+
 namespace Engine
 {
 
@@ -133,7 +168,7 @@ namespace Engine
 		return blobs;
 	}
 
-	void DirectX12ShaderCompiler::GetShaderParameters(ShaderBlobs& blobs, std::vector<Engine::ShaderParameter>& params,  ShaderType type)
+	void DirectX12ShaderCompiler::GetShaderParameters(ShaderBlobs& blobs, ShaderSorce::SectionInfo& section, std::vector<Engine::ShaderParameter>& params,  ShaderType type)
 	{
 		if (!blobs.reflection)
 			return;
@@ -170,7 +205,33 @@ namespace Engine
 			else
 			{
 				if (bindDesc.Type == D3D_SIT_SAMPLER)
+				{
 					data.type = ShaderParameter::PerameterType::StaticSampler;
+
+					if(section.m_Samplers.find(data.name) != section.m_Samplers.end())
+						data.samplerAttribs = section.m_Samplers[data.name].m_SamplerConfig;
+					else
+					{
+						data.samplerAttribs.U = TextureAttribute::WrapMode::Repeat;
+						data.samplerAttribs.V = TextureAttribute::WrapMode::Repeat;
+						if (data.name.rfind("A_", 0) == 0)
+						{
+							data.samplerAttribs.Min = TextureAttribute::MinMagFilter::Anisotropic;
+							data.samplerAttribs.Mag = TextureAttribute::MinMagFilter::Anisotropic;
+						}
+						else if (data.name.rfind("P_", 0) == 0)
+						{
+							data.samplerAttribs.Min = TextureAttribute::MinMagFilter::Point;
+							data.samplerAttribs.Mag = TextureAttribute::MinMagFilter::Point;
+						}
+						else
+						{
+							data.samplerAttribs.Min = TextureAttribute::MinMagFilter::Anisotropic;
+							data.samplerAttribs.Mag = TextureAttribute::MinMagFilter::Anisotropic;
+
+						}
+					}
+				}
 				else
 				{
 					if (data.name.rfind("RC_", 0) == 0)
@@ -354,24 +415,17 @@ namespace Engine
 				// static samplers
 				D3D12_STATIC_SAMPLER_DESC ssd{};
 				ssd.ShaderVisibility = GetShaderVisibilityFlag(rd.shader);
-				ssd.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-				ssd.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-				ssd.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-				if (rd.name.rfind("A_", 0) == 0)
-				{
-					ssd.Filter = D3D12_FILTER_ANISOTROPIC;
-					ssd.MaxLOD = 10;
-					ssd.MinLOD = 0;
-				}
-				else if (rd.name.rfind("P_", 0) == 0)
-					ssd.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-				else
-				{
-					ssd.Filter = D3D12_FILTER_ANISOTROPIC;
-					ssd.MaxLOD = 10;
-					ssd.MinLOD = 0;
 
-				}
+				TextureAttribute& attrib = rd.samplerAttribs;
+				ssd.AddressU = GetWrapMode(attrib.U);
+				ssd.AddressV = GetWrapMode(attrib.V);
+				ssd.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+
+				ssd.Filter = GetFilter(attrib.Min, attrib.Mag);
+
+				ssd.MinLOD = 0;
+				ssd.MaxLOD = 10;
+
 				ssd.ShaderRegister = rd.reg;
 				ssd.RegisterSpace = rd.space;
 				samplers.push_back(ssd);

@@ -1,9 +1,10 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Shader.h"
+#include "TextureAttribute.h"
 
 #include <queue>
-
+#include <sstream>
 
 namespace Engine
 {
@@ -52,6 +53,8 @@ namespace Engine
 		uint32 count;
 		uint32 reg;
 		uint32 space;
+
+		TextureAttribute samplerAttribs; // used for static sampler
 
 		uint32 rootIndex = 0;
 	};
@@ -105,7 +108,34 @@ namespace Engine
 	public:
 		fs::path file;
 
-		std::unordered_map<std::string, std::string> m_Sections;
+		struct SectionInfo
+		{
+			struct SamplerInfo
+			{
+				TextureAttribute m_SamplerConfig;
+			};
+
+			std::stringstream m_SectionCode;
+			std::unordered_map<std::string, SamplerInfo> m_Samplers;
+
+			SectionInfo() = default;
+			SectionInfo(const SectionInfo& other)
+			{
+				*this = other;
+			}
+
+			SectionInfo& operator=(const SectionInfo& other)
+			{
+				if (this != &other)
+				{
+					m_SectionCode << other.m_SectionCode.str();
+					m_Samplers = other.m_Samplers;
+				}
+				return *this;
+			}
+		};
+
+		std::unordered_map<std::string, SectionInfo> m_Sections;
 
 		ShaderConfig config;
 	};
@@ -115,7 +145,7 @@ namespace Engine
 	public:
 		static fs::path FindFilePath(const fs::path& file, const fs::path& parent);
 		static Ref<ShaderSorce> LoadFile(const fs::path& file);
-		static void PreProcess(std::string& str, const fs::path& path);
+		static void PreProcess(std::string& src, ShaderSorce::SectionInfo& section, const fs::path& fileLocation);
 		static ShaderConfig CompileConfig(const std::string& code);
 		static std::string GenerateMaterialStruct(std::vector<MaterialParameter>& params);
 

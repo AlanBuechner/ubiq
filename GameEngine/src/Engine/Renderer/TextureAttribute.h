@@ -8,13 +8,14 @@ namespace Engine
 		{
 			Repeat,
 			MirroredRepeat,
-			ClampToEdge
+			Clamp
 		};
 
 		enum class MinMagFilter
 		{
-			Nearest,
-			Linear
+			Point,
+			Linear,
+			Anisotropic
 		};
 
 		WrapMode U = WrapMode::Repeat, V = WrapMode::Repeat;
