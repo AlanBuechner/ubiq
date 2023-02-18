@@ -1,8 +1,8 @@
 #define DEPTH_BIAS (0.0005)
 
-float HardShadow(Texture2D shadowMap, float4 coords)
+float HardShadow(Texture2D shadowMap, sampler s, float4 coords)
 {
-	float depthSample = shadowMap.Sample(shadowSampler, coords.xy).r + DEPTH_BIAS;
+	float depthSample = shadowMap.Sample(s, coords.xy).r + DEPTH_BIAS;
 	return (depthSample < coords.z ? 0 : 1);
 }
 
@@ -136,7 +136,7 @@ float PenumbraSize(float zReceiver, float zBlocker) //Parallel plane estimation
 	return (zReceiver - zBlocker) / zBlocker;
 }
 
-void FindBlocker(Texture2D shadowMap, out float avgBlockerDepth, out float numBlockers, float2 uv, float zReceiver, float2 searchSize)
+void FindBlocker(Texture2D shadowMap, sampler s, out float avgBlockerDepth, out float numBlockers, float2 uv, float zReceiver, float2 searchSize)
 {
 	//This uses similar triangles to compute what
 	float blockerSum = 0;
@@ -145,7 +145,7 @@ void FindBlocker(Texture2D shadowMap, out float avgBlockerDepth, out float numBl
 	for (int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; ++i)
 	{
 		float2 offset = poissonDisk[i] * searchSize;
-		float shadowMapDepth = shadowMap.SampleLevel(shadowSampler, uv + offset, 0).r + DEPTH_BIAS;
+		float shadowMapDepth = shadowMap.SampleLevel(s, uv + offset, 0).r + DEPTH_BIAS;
 		if (shadowMapDepth < zReceiver) {
 			blockerSum += shadowMapDepth;
 			numBlockers++;
@@ -161,7 +161,7 @@ float hash12(float2 p)
 	return frac((p3.x + p3.y) * p3.z);
 }
 
-float PCF_Filter(Texture2D shadowMap, float2 uv, float zReceiver, float2 filterRadiusUV)
+float PCF_Filter(Texture2D shadowMap, sampler s, float2 uv, float zReceiver, float2 filterRadiusUV)
 {
 	uint ditherIndex = hash12(uv) * DITHER_OFFSETS;
 	float sum = 0.0f;
@@ -169,14 +169,14 @@ float PCF_Filter(Texture2D shadowMap, float2 uv, float zReceiver, float2 filterR
 	{
 		float2 offset = poissonDisk[i] * filterRadiusUV;
 		//offset += ditherOffsets[(ditherIndex + i) % DITHER_OFFSETS] * (3.141592654 / (4 * PCF_NUM_SAMPLES)); // add dithering
-		float depthSample = shadowMap.Sample(shadowSampler, uv + offset).r + DEPTH_BIAS;
+		float depthSample = shadowMap.Sample(s, uv + offset).r + DEPTH_BIAS;
 		sum += (depthSample < zReceiver ? 0 : 1);
-		//sum += shadowMap.SampleCmpLevelZero(shadowSampler, uv + offset, zReceiver).r;
+		//sum += shadowMap.SampleCmpLevelZero(s, uv + offset, zReceiver).r;
 	}
 	return sum / PCF_NUM_SAMPLES;
 }
 
-float PCSSDirectional(Texture2D shadowMap, float4 coords, float4x4 ortho, float lightSize)
+float PCSSDirectional(Texture2D shadowMap, sampler s, float4 coords, float4x4 ortho, float lightSize)
 {
 	float4 p = mul(ortho, float4(1, 1, 1, 1));
 	float2 orthoSize = (p.xy / p.w) * 2;
@@ -188,7 +188,7 @@ float PCSSDirectional(Texture2D shadowMap, float4 coords, float4x4 ortho, float 
 	// STEP 1: blocker search
 	float avgBlockerDepth = 0;
 	float numBlockers = 0;
-	FindBlocker(shadowMap, avgBlockerDepth, numBlockers, uv, zReceiver, uvSearch); // we are scaling down the search area as a TEMP fix for the grainy shaodws
+	FindBlocker(shadowMap, s, avgBlockerDepth, numBlockers, uv, zReceiver, uvSearch); // we are scaling down the search area as a TEMP fix for the grainy shaodws
 	if (numBlockers < 1)
 		//There are no occluders so early out (this saves filtering)
 		return 1.0f;
@@ -198,5 +198,5 @@ float PCSSDirectional(Texture2D shadowMap, float4 coords, float4x4 ortho, float 
 	float2 filterRadiusUV = penumbraRatio * uvSearch;
 
 	// STEP 3: filtering
-	return PCF_Filter(shadowMap, uv, zReceiver, filterRadiusUV);
+	return PCF_Filter(shadowMap, s, uv, zReceiver, filterRadiusUV);
 }
