@@ -47,8 +47,8 @@ namespace Engine
 			for (uint32 i = 0; i < m_Commands[d].size(); i++)
 				cmdList[i] = std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[d][i])->GetCommandList().Get();
 
-			m_Fence->SetEventOnCompletion(d, eventHandle); // call event when fence val has been reached
-			WaitForSingleObject(eventHandle, INFINITE); // wait for event to be triggered
+			//m_Fence->SetEventOnCompletion(d, eventHandle); // call event when fence val has been reached
+			//WaitForSingleObject(eventHandle, INFINITE); // wait for event to be triggered
 
 			m_CommandQueue->ExecuteCommandLists((uint32)cmdList.size(), cmdList.data());
 			m_CommandQueue->Signal(m_Fence.Get(), d+1); // signal fence when execution has finished
