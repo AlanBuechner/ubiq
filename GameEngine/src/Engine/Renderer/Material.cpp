@@ -36,7 +36,6 @@ namespace Engine
 	Ref<Material> Material::Create(const fs::path& path)
 	{
 		Ref<Material> mat = CreateRef<Material>();
-		CORE_INFO("{0}", path);
 
 		std::ifstream ifs(path.string());
 		if (ifs.is_open())
@@ -60,7 +59,6 @@ namespace Engine
 						mat->m_ReferensedTextures.push_back(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
 						uint32 descLoc = mat->m_ReferensedTextures.back()->GetDescriptorLocation();
 						*(uint32*)location = descLoc; // set asset value
-						CORE_INFO("texture: {0}, descriptor: {1}", p.name, *(uint32*)location);
 					}
 					else if (p.type == MaterialParameter::Float)
 						*(float*)location = f[p.name].get<float>();
@@ -96,7 +94,6 @@ namespace Engine
 		}
 
 		mat->m_Buffer = ConstantBuffer::Create(mat->m_Data->GetSize());
-		CORE_INFO("{0}", mat->m_Buffer->GetDescriptorLocation());
 		mat->Apply();
 
 		return mat;

@@ -97,6 +97,13 @@ namespace Engine
 		s_SamplerHeap = std::make_shared<DirectX12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, true);
 
 		m_DeletionPool = CreateRef<DirectX12ResourceDeletionPool>();
+
+		m_CommandQueue = std::dynamic_pointer_cast<DirectX12CommandQueue>(CommandQueue::Create(CommandQueue::Type::Direct));
+		m_BufferCopyCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandList::Direct));
+		m_TextureCopyCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandList::Direct));
+
+		m_CommandQueue->AddCommandList(m_BufferCopyCommandList);
+		m_CommandQueue->AddCommandList(m_TextureCopyCommandList);
 	}
 
 	DirectX12ResourceManager::~DirectX12ResourceManager()
@@ -230,11 +237,31 @@ namespace Engine
 		return pool;
 	}
 
-	void DirectX12ResourceManager::RecordCommands(Ref<CommandList> commandList)
+	void DirectX12ResourceManager::UploadData()
 	{
+		CREATE_PROFILE_FUNCTIONI();
+
+		InstrumentationTimer timer = CREATE_PROFILEI();
 		std::lock_guard g(m_UploadMutex);
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
+		timer.Start("Record commands");
+		RecordBufferCommands(context);
+		RecordTextureCommands(context);
+		timer.End();
+
+		m_CommandQueue->Execute();
+		
+		// clear upload pages
+		for (uint32 i = 0; i < m_UploadPages.size(); i++)
+			m_UploadPages[i].Clear();
+	}
+
+	void DirectX12ResourceManager::RecordBufferCommands(Ref<DirectX12Context> context)
+	{
+		CREATE_PROFILE_FUNCTIONI();
+
+		// structs
 		struct BufferCopyInfo
 		{
 			ID3D12Resource* dest;
@@ -244,6 +271,55 @@ namespace Engine
 			uint64 size;
 		};
 
+
+		// data
+		std::vector<D3D12_RESOURCE_BARRIER> startb;
+		std::vector<D3D12_RESOURCE_BARRIER> endb;
+		std::vector<BufferCopyInfo> bufferCopys;
+
+		uint32 numBufferCopys = (uint32)m_BufferUploadQueue.size();
+		startb.reserve(numBufferCopys);
+		endb.reserve(numBufferCopys);
+		bufferCopys.reserve(numBufferCopys);
+
+		// collect data
+		while (!m_BufferUploadQueue.empty())
+		{
+			UploadBufferData& data = m_BufferUploadQueue.front();
+
+			startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST));
+			bufferCopys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.destOffset, data.srcOffset, data.size });
+			endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, data.state));
+
+			m_BufferUploadQueue.pop();
+		}
+
+		// record commands
+
+		m_BufferCopyCommandList->StartRecording(); // start recording 
+		m_BufferCopyCommandList->GetCommandList()->ResourceBarrier((uint32)startb.size(), startb.data()); // transition resources to copy dest
+
+		for (uint32 i = 0; i < numBufferCopys; i++)
+		{
+			m_BufferCopyCommandList->GetCommandList()->CopyBufferRegion(
+				bufferCopys[i].dest,
+				bufferCopys[i].destOffset,
+				bufferCopys[i].src,
+				bufferCopys[i].srcOffset,
+				bufferCopys[i].size
+			);
+		}
+
+		m_BufferCopyCommandList->GetCommandList()->ResourceBarrier((uint32)endb.size(), endb.data()); // transition resources back to original state
+
+		m_BufferCopyCommandList->Close();
+
+	}
+
+	void DirectX12ResourceManager::RecordTextureCommands(Ref<DirectX12Context> context)
+	{
+		CREATE_PROFILE_FUNCTIONI();
+		// structs
 		struct TextureCopyInfo
 		{
 			ID3D12Resource* dest;
@@ -263,31 +339,17 @@ namespace Engine
 			D3D12_RESOURCE_STATES state;
 		};
 
-		CREATE_PROFILE_FUNCTIONI();
-		uint32 numBufferCopys = (uint32)m_BufferUploadQueue.size();
+		// data
 		uint32 numTextureCopys = (uint32)m_TextureUploadQueue.size();
+
 		std::vector<D3D12_RESOURCE_BARRIER> startb;
 		std::vector<D3D12_RESOURCE_BARRIER> endb;
-		std::vector<BufferCopyInfo> bufferCopys;
 		std::vector<TextureCopyInfo> textureCopys;
 		std::vector<TextureMipInfo> mipTextures;
 
-		startb.reserve(numBufferCopys);
-		endb.reserve(numBufferCopys);
-		bufferCopys.reserve(numBufferCopys);
 		textureCopys.reserve(numTextureCopys);
 
-		while (!m_BufferUploadQueue.empty())
-		{
-			UploadBufferData& data = m_BufferUploadQueue.front();
-
-			startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST));
-			bufferCopys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.destOffset, data.srcOffset, data.size });
-			endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, data.state));
-
-			m_BufferUploadQueue.pop();
-		}
-
+		// collect data
 		while (!m_TextureUploadQueue.empty())
 		{
 			UploadTextureData& data = m_TextureUploadQueue.front();
@@ -336,15 +398,10 @@ namespace Engine
 			m_TextureUploadQueue.pop();
 		}
 
-		// get the command list
-		Ref<DirectX12CommandList> dxCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(commandList);
 
-		dxCommandList->StartRecording(); // start recording 
-		dxCommandList->GetCommandList()->ResourceBarrier((uint32)startb.size(), startb.data()); // transition resources to copy
-
-		// copy buffers
-		for (uint32 i = 0; i < numBufferCopys; i++)
-			dxCommandList->GetCommandList()->CopyBufferRegion(bufferCopys[i].dest, bufferCopys[i].destOffset, bufferCopys[i].src, bufferCopys[i].srcOffset, bufferCopys[i].size);
+		// start recording 
+		m_TextureCopyCommandList->StartRecording(); // start recording 
+		m_TextureCopyCommandList->GetCommandList()->ResourceBarrier((uint32)startb.size(), startb.data()); // transition resources to copy
 
 		// copy textures
 		for (uint32 i = 0; i < numTextureCopys; i++)
@@ -364,10 +421,10 @@ namespace Engine
 			dstLocation.pResource = info.dest;
 			dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
 			dstLocation.SubresourceIndex = 0;
-			dxCommandList->GetCommandList()->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
+			m_TextureCopyCommandList->GetCommandList()->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
 		}
 
-		dxCommandList->GetCommandList()->ResourceBarrier((uint32)endb.size(), endb.data()); // transition resources back to original state
+		m_TextureCopyCommandList->GetCommandList()->ResourceBarrier((uint32)endb.size(), endb.data()); // transition resources back to original state
 
 
 		// generate mip maps
@@ -403,18 +460,19 @@ namespace Engine
 
 				// blit the last mip level onto the current mip level
 				Ref<ComputeShader> blit = Renderer::GetBlitShader();
-				dxCommandList->SetComputeShader(blit);
-				dxCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("SrcTexture"), lastMip.gpu);
-				dxCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("DstTexture"), currMip.gpu);
-				dxCommandList->GetCommandList()->Dispatch(std::max(dstWidth / 8, 1u) + 1, std::max(dstHeight / 8, 1u) + 1, 1);
+				m_TextureCopyCommandList->SetComputeShader(blit);
+				m_TextureCopyCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("SrcTexture"), lastMip.gpu);
+				m_TextureCopyCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("DstTexture"), currMip.gpu);
+				m_TextureCopyCommandList->GetCommandList()->Dispatch(std::max(dstWidth / 8, 1u) + 1, std::max(dstHeight / 8, 1u) + 1, 1);
 
 				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV(mipTexture.mipTexture.Get());
-				dxCommandList->GetCommandList()->ResourceBarrier(1, &barrier);
+				m_TextureCopyCommandList->GetCommandList()->ResourceBarrier(1, &barrier);
 
 				// delete handles
 				ScheduleHandelDeletion(lastMip);
 				ScheduleHandelDeletion(currMip);
 			}
+
 
 			// record barrier for texture and mip
 			mipBarrier.push_back(CD3DX12_RESOURCE_BARRIER::Transition(mipTexture.mipTexture.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE));
@@ -427,15 +485,12 @@ namespace Engine
 			ScheduleResourceDeletion(mipTexture.mipTexture);
 		}
 
-		dxCommandList->GetCommandList()->ResourceBarrier((uint32)mipBarrier.size(), mipBarrier.data()); // transition mips to copy src
+		m_TextureCopyCommandList->GetCommandList()->ResourceBarrier((uint32)mipBarrier.size(), mipBarrier.data()); // transition mips to copy src
 		for (uint32 i = 0; i < mipCopys.size(); i++)
-			dxCommandList->GetCommandList()->CopyResource(mipCopys[i].dest, mipCopys[i].src);
-		dxCommandList->GetCommandList()->ResourceBarrier((uint32)textureBarrier.size(), textureBarrier.data()); // transition resources back to original state
+			m_TextureCopyCommandList->GetCommandList()->CopyResource(mipCopys[i].dest, mipCopys[i].src);
+		m_TextureCopyCommandList->GetCommandList()->ResourceBarrier((uint32)textureBarrier.size(), textureBarrier.data()); // transition resources back to original state
 
-		dxCommandList->Close();
-
-		// clear upload pages
-		for (uint32 i = 0; i < m_UploadPages.size(); i++)
-			m_UploadPages[i].Clear();
+		m_TextureCopyCommandList->Close();
 	}
+
 }

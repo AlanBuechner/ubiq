@@ -11,8 +11,6 @@
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
 Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
 Engine::Ref<Engine::CommandList> Engine::Renderer::s_MainCommandList;
-Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCopyCommandQueue;
-Engine::Ref<Engine::CommandList> Engine::Renderer::s_MainCopyCommandList;
 Engine::RendererAPI Engine::Renderer::s_Api = Engine::RendererAPI::DirectX12;
 Engine::InstrumentationTimer Engine::Renderer::s_Timer = CREATE_PROFILEI();
 
@@ -46,9 +44,6 @@ namespace Engine
 		s_MainCommandList = CommandList::Create();
 
 		// copy command queue
-		s_MainCopyCommandQueue = CommandQueue::Create(CommandQueue::Type::Direct);
-		s_MainCopyCommandList = CommandList::Create();
-		s_MainCopyCommandQueue->AddCommandList(s_MainCopyCommandList);
 
 		Renderer2D::Init();
 		LineRenderer::Init();
@@ -158,8 +153,8 @@ namespace Engine
 			// copy commands
 			s_CopyFlag.Wait();
 			timer.Start("Copy");
-			s_Context->GetResourceManager()->RecordCommands(s_MainCopyCommandList);
-			s_MainCopyCommandQueue->Execute();
+			GPUProfiler::StartFrame();
+			s_Context->GetResourceManager()->UploadData();
 			timer.End();
 			s_CopyFlag.Clear();
 
@@ -169,6 +164,7 @@ namespace Engine
 			s_MainCommandQueue->Execute();
 			s_MainCommandQueue->ExecuteImmediate({s_MainCommandList});
 			s_RenderFlag.Clear();
+			GPUProfiler::EndFrame();
 			timer.End();
 			
 			// swap buffers

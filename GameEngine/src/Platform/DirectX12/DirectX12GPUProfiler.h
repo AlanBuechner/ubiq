@@ -16,6 +16,12 @@ namespace Engine
 
 		static void TriggerPixGPUCapture();
 
+		static void BeginFrame();
+		static void EndFrame();
+
+	private:
+		static bool s_CaptureFrame;
+
 	};
 
 }

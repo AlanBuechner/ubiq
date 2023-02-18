@@ -5,6 +5,9 @@
 #include <queue>
 #include <mutex>
 
+#include "DirectX12CommandQueue.h"
+#include "DirectX12CommandList.h"
+
 namespace Engine
 {
 	class DirectX12Context;
@@ -91,9 +94,16 @@ namespace Engine
 		void ScheduleHandelDeletion(DirectX12DescriptorHandle handle) { m_DeletionPool->AddHandle(handle); }
 
 	private:
-		virtual void RecordCommands(Ref<CommandList> commandList) override;
+		virtual void UploadData() override;
+
+		void RecordBufferCommands(Ref<DirectX12Context> context);
+		void RecordTextureCommands(Ref<DirectX12Context> context);
 
 	private:
+		Ref<DirectX12CommandQueue> m_CommandQueue;
+		Ref<DirectX12CommandList> m_BufferCopyCommandList;
+		Ref<DirectX12CommandList> m_TextureCopyCommandList;
+
 		std::queue<UploadBufferData> m_BufferUploadQueue;
 		std::queue<UploadTextureData> m_TextureUploadQueue;
 		std::vector<DirectX12UploadPage> m_UploadPages;

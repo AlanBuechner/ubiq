@@ -71,5 +71,29 @@ namespace Engine
 		}
 	}
 
+	void GPUProfiler::StartFrame()
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			DirectX12GPUProfiler::BeginFrame();
+			break;
+		default:
+			break;
+		}
+	}
+
+	void GPUProfiler::EndFrame()
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			DirectX12GPUProfiler::EndFrame();
+			break;
+		default:
+			break;
+		}
+	}
+
 }
 

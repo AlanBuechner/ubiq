@@ -7,6 +7,8 @@
 #define USE_PIX
 #include "WinPixEventRuntime/pix3.h"
 
+bool Engine::DirectX12GPUProfiler::s_CaptureFrame = false;
+
 namespace Engine
 {
 
@@ -75,7 +77,28 @@ namespace Engine
 	void DirectX12GPUProfiler::TriggerPixGPUCapture()
 	{
 		CORE_INFO("starting gpu capture");
-		CORE_ASSERT_HRESULT(PIXGpuCaptureNextFrames(L"LoadScene.wpix", 2), "Faild to Capture Frames");
+		//CORE_ASSERT_HRESULT(PIXGpuCaptureNextFrames(L"LoadScene.wpix", 2), "Failed to Capture Frames");
+
+		s_CaptureFrame = true;
+	}
+
+	void DirectX12GPUProfiler::BeginFrame()
+	{
+		if (s_CaptureFrame)
+		{
+			PIXCaptureParameters params;
+			params.GpuCaptureParameters.FileName = L"Capture.wpix";
+			PIXBeginCapture(PIX_CAPTURE_GPU, &params);
+		}
+	}
+
+	void DirectX12GPUProfiler::EndFrame()
+	{
+		if (s_CaptureFrame)
+		{
+			PIXEndCapture(FALSE);
+			s_CaptureFrame = false;
+		}
 	}
 
 }

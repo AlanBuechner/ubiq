@@ -264,6 +264,7 @@ namespace Engine
 
 	void EditorLayer::LoadScene(const std::string& file)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		if (m_SceneState == SceneState::Play)
 			OnSceneStop();
 

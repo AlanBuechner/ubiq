@@ -17,5 +17,8 @@ namespace Engine
 		static void Init();
 		static void SetTragetWindow(void* nativeWindow);
 		static void TriggerGPUCapture();
+
+		static void StartFrame();
+		static void EndFrame();
 	};
 }

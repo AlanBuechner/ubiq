@@ -68,8 +68,6 @@ namespace Engine
 		static Ref<GraphicsContext> s_Context;
 		static Ref<CommandQueue> s_MainCommandQueue;
 		static Ref<CommandList> s_MainCommandList;
-		static Ref<CommandQueue> s_MainCopyCommandQueue;
-		static Ref<CommandList> s_MainCopyCommandList;
 
 		static RendererAPI s_Api;
 

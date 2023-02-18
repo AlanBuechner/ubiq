@@ -118,7 +118,10 @@ namespace Engine
 		template<class T>
 		static void ComponentDestructorFunc(void* comp)
 		{
-			((T*)comp)->~T();
+			if (comp)
+				((T*)comp)->~T();
+			else
+				CORE_WARN("Atempting to call component destuctor on nullptr");
 		}
 
 		template<class T>

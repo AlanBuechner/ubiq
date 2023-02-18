@@ -9,6 +9,8 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
+#include "Engine/Util/Performance.h"
+
 // temp
 #include "Engine/Renderer/GPUProfiler.h"
 
@@ -302,7 +304,7 @@ namespace Engine
 
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
-		GPUProfiler::TriggerGPUCapture();
+		CREATE_PROFILE_FUNCTIONI();
 		std::ifstream stream(filepath);
 		std::stringstream strStream;
 		strStream << stream.rdbuf();

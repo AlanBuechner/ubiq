@@ -90,9 +90,6 @@ namespace Engine
 		if (m_Object)
 		{
 			m_Object->UpdateTransform(transform);
-#ifndef DEBUG
-			m_Mat->Apply(); // temp hack to get materials to work need to fix
-#endif
 		}
 	}
 

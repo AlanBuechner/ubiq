@@ -21,7 +21,7 @@ namespace Engine
 
 		virtual Ref<ResourceDeletionPool> CreateNewDeletionPool() = 0;
 
-		virtual void RecordCommands(Ref<CommandList> commandList) = 0;
+		virtual void UploadData() = 0;
 	private:
 	};
 }
