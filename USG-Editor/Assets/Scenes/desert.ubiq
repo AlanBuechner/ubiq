@@ -42,8 +42,8 @@ Entities:
       Scale: [1, 1, 1]
     DirectionalLightComponent:
       Direction: [-0.781520426, -0.623879611, -0]
-      Color: [1, 1, 1]
-      Intensity: 3
+      Color: [0.815686285, 0.980484426, 1]
+      Intensity: 4
       Size: 0.5
   - Entity: 1824081241608119135
     Name: Floor

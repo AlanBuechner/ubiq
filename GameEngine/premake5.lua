@@ -15,20 +15,12 @@ project "GameEngine"
 	files
 	{
 		"generated/generated.obj",
-		"src/*.h",
-		"src/*.cpp",
-		"src/Engine/**.h",
-		"src/Engine/**.cpp",
-		"src/Platform/Windows/**.h",
-		"src/Platform/Windows/**.cpp",
-		"src/Platform/DirectX12/**.h",
-		"src/Platform/DirectX12/**.cpp",
-		"vendor/stb_image/**.h",
-		"vendor/stb_image/**.cpp",
-		"vendor/Glm/glm/**.hpp",
-		"vendor/Glm/glm/**.inl",
-		"vendor/ImGuizmo/ImGuizmo.h",
-		"vendor/ImGuizmo/ImGuizmo.cpp"
+		"src/**.h",
+		"src/**.cpp",
+		"%{IncludeDir.stb_image}/**.h",
+		"%{IncludeDir.stb_image}/**.cpp",
+		"%{IncludeDir.ImGuizmo}/ImGuizmo.h",
+		"%{IncludeDir.ImGuizmo}/ImGuizmo.cpp"
 	}
 
 	defines

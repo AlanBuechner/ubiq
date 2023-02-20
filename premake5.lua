@@ -25,12 +25,15 @@ workspace "UbiqEngine"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
-	include "GameEngine/vendor/imgui"
+	include "vendor/Walnut"
+	include "vendor/imgui"
+	include "vendor/GLFW"
 	include "GameEngine/vendor/yaml-cpp"
 	include "GameEngine/vendor/Box2D"
 group ""
 
-
 include "GameEngine"
 include "Sandbox"
 include "USG-Editor"
+include "Launcher"
+

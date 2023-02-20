@@ -17,7 +17,7 @@ project "USG-Editor"
 	includedirs
 	{
 		"src",
-		"%{wks.location}/GameEngine/vendor/spdlog/include",
+		"%{wks.location}/vendor",
 		"%{wks.location}/GameEngine/vendor",
 		"%{wks.location}/GameEngine/src",
 		"%{IncludeDir.glm}",
