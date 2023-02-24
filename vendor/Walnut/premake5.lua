@@ -3,7 +3,7 @@ project "Walnut"
    language "C++"
    cppdialect "C++17"
    targetdir "bin/%{cfg.buildcfg}"
-   staticruntime "off"
+   staticruntime "on"
 
    files { "src/**.h", "src/**.cpp" }
 
@@ -43,10 +43,8 @@ project "Walnut"
       defines { "WL_RELEASE" }
       runtime "Release"
       optimize "On"
-      symbols "On"
 
    filter "configurations:Dist"
       defines { "WL_DIST" }
       runtime "Release"
       optimize "On"
-      symbols "Off"

@@ -2,7 +2,7 @@
 	path = vendor/imgui
 	url = https://github.com/AlanBuechner/imgui.git
 [submodule "GameEngine/vendor/yaml-cpp"]
-	path = GameEngine/vendor/yaml-cpp
+	path = vendor/yaml-cpp
 	url = https://github.com/AlanBuechner/yaml-cpp.git
 [submodule "GameEngine/vendor/json"]
 	path = GameEngine/vendor/json

@@ -59,6 +59,12 @@ namespace Walnut {
 	private:
 		void Init();
 		void Shutdown();
+
+	public:
+		ImFont* m_HeaderFont;
+		ImFont* m_TabButtonFont;
+		ImFont* m_ProjectTitleFont;
+
 	private:
 		ApplicationSpecification m_Specification;
 		GLFWwindow* m_WindowHandle = nullptr;

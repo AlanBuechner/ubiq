@@ -1,50 +1,49 @@
 project "Launcher"
-   kind "ConsoleApp"
-   language "C++"
-   cppdialect "C++17"
-   staticruntime "off"
-   
-   targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+
+	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
-   files { "src/**.h", "src/**.cpp" }
+	files { "src/**.h", "src/**.cpp" }
 
-   includedirs
-   {
-      "src",
-      
-      "%{IncludeDir.ImGui}",
-      "%{IncludeDir.GLFW}/include",
-      "%{IncludeDir.glm}",
+	includedirs
+	{
+		"src",
 
-      "%{IncludeDir.Walnut}/src",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.GLFW}/include",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.ProjectManager}/src",
 
-      "%{IncludeDir.VulkanSDK}",
-   }
+		"%{IncludeDir.Walnut}/src",
 
-   links
-   {
-       "Walnut"
-   }
+		"%{IncludeDir.VulkanSDK}",
+	}
 
-   filter "system:windows"
-      systemversion "latest"
-      defines { "WL_PLATFORM_WINDOWS" }
+	links
+	{
+		"Walnut",
+		"ProjectManager"
+	}
 
-   filter "configurations:Debug"
-      defines { "WL_DEBUG" }
-      runtime "Debug"
-      symbols "On"
+	filter "system:windows"
+		systemversion "latest"
+		defines { "WL_PLATFORM_WINDOWS" }
 
-   filter "configurations:Release"
-      defines { "WL_RELEASE" }
-      runtime "Release"
-      optimize "On"
-      symbols "On"
+	filter "configurations:Debug"
+		defines "DEBUG"
+		runtime "Debug"
+		symbols "on"
 
-   filter "configurations:Dist"
-      kind "WindowedApp"
-      defines { "WL_DIST" }
-      runtime "Release"
-      optimize "On"
-      symbols "Off"
+	filter "configurations:Release"
+		defines "RELEASE"
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
+		defines "DIST"
+		runtime "Release"
+		optimize "on"
