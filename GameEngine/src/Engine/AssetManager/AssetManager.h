@@ -27,10 +27,10 @@ namespace Engine
 	class AssetManager
 	{
 	private:
-		fs::path m_RootDirectory;
-
 		std::unordered_map<UUID, Ref<Asset>> m_CashedAssets;
 		std::unordered_map<UUID, fs::path> m_AssetPaths;
+
+		std::vector<fs::path> m_AssetDirectories;
 
 		std::thread m_DirectoryWatchThread;
 
@@ -40,10 +40,13 @@ namespace Engine
 	public:
 		AssetManager() = default;
 
-		void Init(const fs::path& assetDirectory);
+		void Init();
 		void Destroy();
 
 		void Clean();
+
+		void AddAssetDirectory(const fs::path& directory);
+		inline const std::vector<fs::path>& GetAssetDirectories() { return m_AssetDirectories; }
 
 		void DeleteAsset(const fs::path& assetPath);
 		void RenameAsset(const fs::path& oldPath, const fs::path& newName);
@@ -87,6 +90,8 @@ namespace Engine
 
 		void OpenAsset(UUID id);
 		void OpenAsset(const fs::path& path);
+
+		fs::path FindAssetDirectory(const fs::path& assetPath);
 
 	private:
 		void UpdateDirectory(const fs::path& dir);

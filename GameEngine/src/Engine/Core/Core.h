@@ -50,8 +50,7 @@
 
 #ifdef ENABLE_ASSERTS
 	#define ASSERT(x, ...) {if(!(x)) {DEBUG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
-	#define CORE_ASSERT(x, ...) {if(!(x)) {CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
-	//#define CORE_ASSERT(x, msg, ...) {if(!(x)) {CORE_ERROR(std::string("Assertion Failed: ") + msg __VA_OPT__(,) __VA_ARGS__); __debugbreak();}}
+	#define CORE_ASSERT(x, msg, ...) {if(!(x)) {CORE_ERROR((std::string("Assertion Failed: ") + msg).c_str(), __VA_ARGS__); __debugbreak();}}
 #else
 	#define ASSERT(x, ...)
 	#define CORE_ASSERT(x, ...)

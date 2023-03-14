@@ -11,7 +11,8 @@ project "USG-Editor"
 	files
 	{
 		"src/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+		"embeded/**.rc",
 	}
 
 	includedirs
@@ -20,8 +21,9 @@ project "USG-Editor"
 		"%{wks.location}/vendor",
 		"%{wks.location}/GameEngine/vendor",
 		"%{wks.location}/GameEngine/src",
+		"%{wks.location}/GameEngine/embeded",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.ProjectManager}/src"
 	}
 
 	sysincludedirs 
@@ -31,7 +33,8 @@ project "USG-Editor"
 
 	links
 	{
-		"GameEngine"
+		"GameEngine",
+		"ProjectManager"
 	}
 
 	filter "system:windows"

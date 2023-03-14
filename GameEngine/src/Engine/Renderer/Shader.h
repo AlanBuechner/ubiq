@@ -43,12 +43,14 @@ namespace Engine
 	class Shader : public Asset
 	{
 	public:
-		Shader(const fs::path& file);
+		Shader(const std::string& src, const fs::path& file);
 
 		Ref<ShaderPass> GetPass(const std::string& passName);
 		std::vector<MaterialParameter>& GetParams();
 
 		static Ref<Shader> Create(const fs::path& file);
+		static Ref<Shader> CreateFromEmbeded(uint32 id, const fs::path& file);
+		static Ref<Shader> CreateFromSrc(const std::string& src, const fs::path& file = "");
 
 	private:
 		std::unordered_map<std::string, Ref<ShaderPass>> m_Passes;
@@ -65,5 +67,7 @@ namespace Engine
 		virtual uint32 GetUniformLocation(const std::string& name) const = 0;
 
 		static Ref<ComputeShader> Create(const fs::path& file);
+		static Ref<ComputeShader> CreateFromEmbeded(uint32 id, const fs::path& file);
+		static Ref<ComputeShader> CreateFromSrc(const std::string& src, const fs::path& file = "");
 	};
 }

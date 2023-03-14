@@ -1,4 +1,5 @@
 ﻿#include "EditorLayer.h"
+#include "EditorAssets.h"
 
 #include "Engine/Core/Scene/SceneSerializer.h"
 #include "Engine/Renderer/SceneRendererComponents.h"
@@ -40,13 +41,17 @@ namespace Engine
 			m_GridMesh.m_Indices.push_back((i * 3) + 2);
 		}
 
+		m_EditorDirectory = fs::current_path();
+		Application::Get().GetAssetManager().AddAssetDirectory(m_EditorDirectory / "Assets");
+
+		std::vector<std::string> args = GetCommandLineArguments();
+
+		if (args.size() > 1)
+			OpenProject(args[1]);
 	}
 
 	void EditorLayer::OnAttach()
 	{
-		m_PlayButton = Texture2D::Create("Resources/PlayButton.png");
-		m_StopButton = Texture2D::Create("Resources/StopButton.png");
-
 		m_ActiveScene = CreateRef<Scene>();
 
 		m_EditorCamera = CreateRef<EditorCamera>();
@@ -402,7 +407,7 @@ namespace Engine
 
 		float Size = ImGui::GetWindowHeight() - 4.0f;
 		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x*0.5f)-(Size*0.5f));
-		Ref<Texture2D> button = (m_SceneState == SceneState::Edit ? m_PlayButton : m_StopButton);
+		Ref<Texture2D> button = (m_SceneState == SceneState::Edit ? EditorAssets::s_PlayButton : EditorAssets::s_StopButton);
 		if (ImGui::ImageButton((ImTextureID)button->GetTextureHandle(), { Size, Size }, { 0,0 }, {1,1}, 0))
 		{
 			if (m_SceneState == SceneState::Edit)
@@ -550,6 +555,19 @@ namespace Engine
 
 		inWindow = false;
 		return -1;
+	}
+
+	void EditorLayer::OpenProject(const fs::path& projectFile)
+	{
+		CORE_INFO("opening project \"{0}\"", projectFile.string());
+		if (m_CurrentProject)
+		{
+			// TODO : unregister project
+		}
+
+		m_CurrentProject = CreateRef<ProjectManager::Project>(projectFile);
+		fs::current_path(m_CurrentProject->GetRootDirectory());
+		Application::Get().GetAssetManager().AddAssetDirectory(m_CurrentProject->GetAssetsDirectory());
 	}
 
 	void EditorLayer::NewScene()

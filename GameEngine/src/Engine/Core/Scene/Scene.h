@@ -53,8 +53,6 @@ namespace Engine
 
 		Ref<SceneRenderer> m_SceneRenderer;
 
-		Ref<Texture2D> m_CameraIcon;
-
 		friend class Entity;
 		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;

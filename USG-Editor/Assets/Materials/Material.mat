@@ -1,5 +1,0 @@
-{
-	"shader" : "Assets/Shaders/MeshShader.hlsl",
-	"diffuse" : "Assets/Images/ogre_diffuse.bmp",
-	"normal" : "Assets/Images/ogre_normal.bmp"
-}

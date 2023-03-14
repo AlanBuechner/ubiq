@@ -43,7 +43,7 @@ namespace Engine {
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
 		timer.End();
 
-		m_AssetManager.Init("Assets");
+		m_AssetManager.Init();
 	}
 
 	Application::~Application()

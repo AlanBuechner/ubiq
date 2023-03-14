@@ -25,7 +25,6 @@ namespace Engine
 {
 	Scene::Scene()
 	{
-		m_CameraIcon = Texture2D::Create("Resources/CameraIcon.png");
 		m_SceneRenderer = SceneRenderer::Create();
 	}
 
@@ -84,7 +83,7 @@ namespace Engine
 				tc.SetRotation({ -camera->GetPitch(), -camera->GetYaw(), 0 });
 				tc.SetScale({ 1,1,1 });
 
-				Renderer2D::DrawQuad(tc.GetTransform(), m_CameraIcon, (int)(EntityType)comp.Owner);
+				//Renderer2D::DrawQuad(tc.GetTransform(), m_CameraIcon, (int)(EntityType)comp.Owner);
 
 			}
 

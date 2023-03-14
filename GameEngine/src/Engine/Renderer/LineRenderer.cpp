@@ -8,6 +8,8 @@
 #include "Mesh.h"
 #include "CommandList.h"
 
+#include "EngineResource.h"
+
 namespace Engine
 {
 
@@ -32,7 +34,7 @@ namespace Engine
 
 	void LineRenderer::Init()
 	{
-		s_LineData.LineShader = Shader::Create("Assets/Shaders/LineShader.hlsl");
+		s_LineData.LineShader = Shader::CreateFromEmbeded(LINE, "LineShader.hlsl");
 
 		s_LineData.Vertices.reserve(s_LineData.MaxVertices);
 		s_LineData.Indices.reserve(s_LineData.MaxIndices);

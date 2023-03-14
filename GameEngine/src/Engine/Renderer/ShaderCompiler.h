@@ -144,7 +144,8 @@ namespace Engine
 	{
 	public:
 		static fs::path FindFilePath(const fs::path& file, const fs::path& parent);
-		static Ref<ShaderSorce> LoadFile(const fs::path& file);
+		static Ref<ShaderSorce> LoadFromFile(const fs::path& file);
+		static Ref<ShaderSorce> LoadFromSrc(std::istream& src, const fs::path& file = "");
 		static void PreProcess(std::string& src, ShaderSorce::SectionInfo& section, const fs::path& fileLocation);
 		static ShaderConfig CompileConfig(const std::string& code);
 		static std::string GenerateMaterialStruct(std::vector<MaterialParameter>& params);

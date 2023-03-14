@@ -45,23 +45,28 @@ namespace Engine
 		return fs::path("");
 	}
 
-	Ref<ShaderSorce> ShaderCompiler::LoadFile(const fs::path& file)
+	Ref<ShaderSorce> ShaderCompiler::LoadFromFile(const fs::path& file)
 	{
 		std::ifstream shaderFile;
 		shaderFile.open(file);
 		if (shaderFile.fail())
 		{
-			CORE_ERROR("Cant open file {0}", file);
+			CORE_ERROR("Cant open file {0}", file.string());
 			return CreateRef<ShaderSorce>();
 		}
 
+		return LoadFromSrc(shaderFile, file);
+	}
+
+	Ref<ShaderSorce> ShaderCompiler::LoadFromSrc(std::istream& src, const fs::path& file)
+	{
 		Ref<ShaderSorce> sorce = CreateRef<ShaderSorce>();
 
 		std::unordered_map<std::string, std::stringstream> ss;
 		std::stringstream* currSS = &ss["config"];
 
 		std::string line;
-		while (getline(shaderFile, line))
+		while (getline(src, line))
 		{
 			std::vector<std::string> tokens = Tokenize(line);
 
@@ -71,11 +76,9 @@ namespace Engine
 				*currSS << line << '\n';
 		}
 
-		shaderFile.close();
-
 		std::string configSection = ss["config"].str();
 		sorce->config = CompileConfig(configSection);
-		
+
 		std::string materialCode = GenerateMaterialStruct(sorce->config.params);
 
 		ShaderSorce::SectionInfo commonSection;
@@ -271,7 +274,7 @@ namespace Engine
 
 	std::vector<std::string> ShaderCompiler::Tokenize(const std::string& line)
 	{
-		const char delimiters[] = {' ', '	', '\n'};
+		const char delimiters[] = {' ', '	', '\r', '\n'};
 		const char reservedTokens[] = { "={};\"()," };
 
 		std::vector<std::string> tokens;

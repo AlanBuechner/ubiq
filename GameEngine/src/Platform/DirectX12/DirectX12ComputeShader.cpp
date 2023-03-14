@@ -7,11 +7,8 @@
 namespace Engine
 {
 
-	DirectX12ComputeShader::DirectX12ComputeShader(const fs::path& file)
+	DirectX12ComputeShader::DirectX12ComputeShader(const std::string& code, const fs::path& file)
 	{
-		std::ifstream ifs(file);
-		std::string code((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-
 		IDxcBlob* blob = nullptr;
 
 		if (!code.empty())

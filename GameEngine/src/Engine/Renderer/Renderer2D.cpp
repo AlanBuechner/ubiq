@@ -11,6 +11,8 @@
 
 #include "Engine/Util/Performance.h"
 
+#include "EngineResource.h"
+
 namespace Engine
 {
 	struct QuadVertex
@@ -69,7 +71,7 @@ namespace Engine
 		s_Data.QuadMesh->SetIndices(indices, _countof(indices));
 
 		// create shader
-		s_Data.SpriteShader = Shader::Create("Assets/Shaders/TextureShader.hlsl");
+		s_Data.SpriteShader = Shader::CreateFromEmbeded(TEXTURE, "TextureShader.hlsl");
 
 		// create instance data
 		s_Data.QuadInstanceBuffer = InstanceBuffer::Create(sizeof(QuadInstance), s_Data.MaxQuades);

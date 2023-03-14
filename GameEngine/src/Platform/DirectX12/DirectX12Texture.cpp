@@ -86,7 +86,7 @@ namespace Engine
 		timer.Start("LoadImage");
 		int width, height, channels;
 		stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &channels, 4);
-		CORE_ASSERT(data, "Failed to load image \"{0}\"", path);
+		CORE_ASSERT(data, "Failed to load image \"{0}\"", path.string());
 		timer.End();
 
 		CreateImage(width, height);

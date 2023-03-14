@@ -1,5 +1,5 @@
 #pragma once
-
+#include <vector>
 #include <string>
 
 namespace Engine
@@ -9,5 +9,11 @@ namespace Engine
 	public:
 		static std::string OpenFile(const char* filter);
 		static std::string SaveFile(const char* filter);
+
 	};
+
+	std::vector<std::string> GetCommandLineArguments();
+
+	bool GetEmbededResource(uint32 type, uint32 id, byte*& data, uint32& size);
+	void UnloadEmbededResource(uint32 type, uint32 id);
 }

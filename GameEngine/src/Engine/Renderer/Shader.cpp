@@ -4,6 +4,10 @@
 #include "Platform/DirectX12/DirectX12Shader.h"
 #include "Platform/DirectX12/DirectX12ComputeShader.h"
 
+#include "Engine/Util/PlatformUtils.h"
+#include "EngineResource.h"
+
+
 #include <fstream>
 
 namespace Engine
@@ -22,9 +26,10 @@ namespace Engine
 		return nullptr;
 	}
 
-	Shader::Shader(const fs::path& file)
+	Shader::Shader(const std::string& code, const fs::path& file)
 	{
-		Ref<ShaderSorce> src = ShaderCompiler::LoadFile(file);
+		std::stringstream is(code);
+		Ref<ShaderSorce> src = ShaderCompiler::LoadFromSrc(is, file);
 
 		for (const ShaderConfig::RenderPass& pass : src->config.passes)
 		{
@@ -49,18 +54,83 @@ namespace Engine
 
 	Ref<Shader> Shader::Create(const fs::path& file)
 	{
-		return CreateRef<Shader>(file);
+		std::ifstream ifs(file);
+		if (ifs.fail())
+		{
+			CORE_ERROR("Cant open file {0}", file.string());
+			return nullptr;
+		}
+
+		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+		return CreateFromSrc(str, file);
 	}
 
+	Ref<Shader> Shader::CreateFromEmbeded(uint32 id, const fs::path& file)
+	{
+		uint32 size = 0;
+		byte* data = nullptr;
+
+		if (GetEmbededResource(SHADER, id, data, size))
+		{
+			std::string src;
+			src.assign((char*)data, size);
+
+			return CreateFromSrc(src, file);
+		}
+		else
+		{
+			CORE_ERROR("Could not load shader from embeded: \"{0}\"", file.string());
+			return nullptr;
+		}
+	}
+
+	Ref<Shader> Shader::CreateFromSrc(const std::string& src, const fs::path& file /*= ""*/)
+	{
+		return CreateRef<Shader>(src, file);
+	}
+
+
+
+
+
+	// COMPUTE
 	Ref<ComputeShader> ComputeShader::Create(const fs::path& file)
 	{
+		std::ifstream ifs(file);
+		std::string code((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+		return CreateFromSrc(code, file);
+	}
+
+	Ref<ComputeShader> ComputeShader::CreateFromEmbeded(uint32 id, const fs::path& file)
+	{
+		uint32 size = 0;
+		byte* data = nullptr;
+
+		if (GetEmbededResource(SHADER, id, data, size))
+		{
+			std::string src;
+			src.assign((char*)data, size);
+
+			return CreateFromSrc(src, file);
+		}
+		else
+		{
+			CORE_ERROR("Could not load compute shader from embeded: \"{0}\"", file.string());
+			return nullptr;
+		}
+	}
+
+	Ref<ComputeShader> ComputeShader::CreateFromSrc(const std::string& src, const fs::path& file)
+	{
+		CORE_ASSERT(!src.empty(), "Compute shader soruce is empty: \"{0}\"", file.string());
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None:
 			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::DirectX12:
-			return CreateRef<DirectX12ComputeShader>(file);
+			return CreateRef<DirectX12ComputeShader>(src, file);
 		}
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;

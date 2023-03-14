@@ -1,7 +1,8 @@
 #include <Engine.h>
 #include "EditorLayer.h"
-#include "Panels/EditorAssets.h"
+#include "EditorAssets.h"
 #include <Engine/Core/EntryPoint.h>
+#include <Engine/Util/PlatformUtils.h>
 
 namespace Engine
 {
@@ -15,9 +16,9 @@ namespace Engine
 			auto timer = CREATE_PROFILEI();
 			timer.Start("EditorLayer");
 			m_InEditer = true;
+			EditorAssets::Init();
 			PushLayer(new EditorLayer()); // set the editor layer
 			GenLayerStack();
-			EditorAssets::Init();
 
 			timer.End();
 		}

@@ -8,6 +8,8 @@
 #include "Engine/Core/MeshBuilder.h"
 #include "GPUProfiler.h"
 
+#include "EngineResource.h"
+
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
 Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
 Engine::Ref<Engine::CommandList> Engine::Renderer::s_MainCommandList;
@@ -88,7 +90,7 @@ namespace Engine
 
 		s_ScreenMesh = meshBuilder.ToMesh();
 
-		s_BlitShader = ComputeShader::Create("Assets/Shaders/Blit.compute");
+		s_BlitShader = ComputeShader::CreateFromEmbeded(BLIT, "Blit.compute");
 	}
 
 	void Renderer::Destroy()

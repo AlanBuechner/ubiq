@@ -258,7 +258,7 @@ public:
 					si.cb = sizeof(si);
 					ZeroMemory(&pi, sizeof(pi));
 
-					std::wstring args = editorLocation.wstring() + L" " + project.GetProjectFile().wstring();
+					std::wstring args = editorLocation.wstring() + L" " + fs::absolute(project.GetProjectFile()).wstring();
 
 					// start the program up
 					CreateProcess(editorLocation.wstring().c_str(),   // the path
@@ -307,7 +307,7 @@ public:
 		if (ImGui::Button("Create Project"))
 		{
 			projectName.erase(remove(projectName.begin(), projectName.end(), ' '), projectName.end());
-			fs::path projectFile = fs::path(projectFolder) / (projectName + ".ubiqproj");
+			fs::path projectFile = fs::path(projectFolder) / projectName / (projectName + ".ubiqproj");
 
 			if (fs::exists(projectFile)) // TODO : give error
 				return;

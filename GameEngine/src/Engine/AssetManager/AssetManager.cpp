@@ -10,16 +10,16 @@
 
 namespace Engine
 {
-	void AssetManager::Init(const fs::path& assetDirectory)
+	void AssetManager::Init()
 	{
-		m_RootDirectory = assetDirectory;
+		/*m_RootDirectory = assetDirectory;
 		UpdateDirectory(m_RootDirectory);
-		m_DirectoryWatchThread = std::thread(WatchDirectory, this);
+		m_DirectoryWatchThread = std::thread(WatchDirectory, this);*/
 	}
 
 	void AssetManager::Destroy()
 	{
-		m_DirectoryWatchThread.detach();
+		//m_DirectoryWatchThread.detach();
 		m_CashedAssets.clear();
 	}
 
@@ -44,11 +44,18 @@ namespace Engine
 		}
 	}
 
+	void AssetManager::AddAssetDirectory(const fs::path& directory)
+	{
+		m_AssetDirectories.push_back(directory);
+		UpdateDirectory(directory);
+	}
+
 	void AssetManager::DeleteAsset(const fs::path& assetPath)
 	{
 		// check if is asset or directory
 		if (assetPath.extension().string() != "")
 		{
+			// asset
 			fs::remove(assetPath);
 			UUID id = GetAssetUUIDFromPath(assetPath);
 			fs::remove(assetPath.string() + ".meta");
@@ -56,9 +63,18 @@ namespace Engine
 		}
 		else
 		{
+			// directory
+			// find all assets int directory
+			std::vector<fs::path> foundAssets, foundMetas;
+			ProcessDirectory(assetPath, foundAssets, foundMetas);
+			// remove assets from list
+			for (const fs::path& asset : foundAssets)
+				m_AssetPaths.erase(GetAssetUUIDFromPath(asset));
+
+			// update asset directory
+			UpdateDirectory(FindAssetDirectory(assetPath));
+
 			fs::remove_all(assetPath);
-			m_AssetPaths.clear();
-			UpdateDirectory(m_RootDirectory);
 		}
 	}
 
@@ -91,18 +107,31 @@ namespace Engine
 #endif
 	}
 
+	fs::path AssetManager::FindAssetDirectory(const fs::path& assetPath)
+	{
+		for (auto dir : m_AssetDirectories)
+		{
+			fs::path rel = fs::relative(assetPath, dir);
+			if (!rel.empty() && rel.native()[0] != '.') // check if sub path
+				return dir;
+		}
+
+		return "";
+	}
+
 	void AssetManager::UpdateDirectory(const fs::path& dir)
 	{
-		if (!fs::exists(dir))
+		fs::path absDir = fs::absolute(dir);
+		if (!fs::exists(absDir))
 		{
-			fs::create_directory(dir);
+			fs::create_directory(absDir);
 			return;
 		}
 
 		CORE_INFO("starting directory update");
 		// get all assets in filesystem
 		std::vector<fs::path> foundAssets, foundMetas;
-		ProcessDirectory(dir, foundAssets, foundMetas);
+		ProcessDirectory(absDir, foundAssets, foundMetas);
 
 		// match files with meta files
 		for (auto asset : foundAssets)
@@ -193,7 +222,7 @@ namespace Engine
 		return;
 
 #if defined(PLATFORM_WINDOWS)
-		FILE_NOTIFY_INFORMATION strFileNotifyInfo[1024];
+		/*FILE_NOTIFY_INFORMATION strFileNotifyInfo[1024];
 		DWORD dwBytesReturned = 0;
 
 		HANDLE hDir = CreateFile(
@@ -230,7 +259,7 @@ namespace Engine
 					break;
 				}
 			}
-		}
+		}*/
 #endif
 	}
 

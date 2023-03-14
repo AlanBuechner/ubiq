@@ -9,6 +9,8 @@
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/SceneRenderer.h"
 
+#include "ProjectManager/Project.h"
+
 namespace Engine
 {
 
@@ -58,6 +60,8 @@ namespace Engine
 
 		int GetEntityIDAtMousePosition(bool& inWindow);
 
+		void OpenProject(const fs::path& projectFile);
+
 	private:
 		const Math::Vector4 m_GridColor = { 0.5f,0.5f,0.5f,1 };
 		const float m_GridExtent = 40.0f;
@@ -83,14 +87,15 @@ namespace Engine
 		SceneHierarchyPanel m_HierarchyPanel;
 		ContentBrowserPanel m_ContentPanel;
 
-		Ref<Texture2D> m_PlayButton;
-		Ref<Texture2D> m_StopButton;
-
 		SceneState m_SceneState = SceneState::Edit;
 
 		bool m_OpenScene = false;
 		bool m_SaveScene = false;
 
 		fs::path m_DropPath;
+
+		fs::path m_EditorDirectory;
+
+		Ref<ProjectManager::Project> m_CurrentProject;
 	};
 }

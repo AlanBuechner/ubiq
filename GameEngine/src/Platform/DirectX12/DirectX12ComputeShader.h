@@ -10,7 +10,7 @@ namespace Engine
 	class DirectX12ComputeShader : public ComputeShader
 	{
 	public:
-		DirectX12ComputeShader(const fs::path& file);
+		DirectX12ComputeShader(const std::string& code, const fs::path& file = "");
 
 		wrl::ComPtr<ID3D12RootSignature> GetRootSignature() { return m_Sig; }
 		wrl::ComPtr<ID3D12PipelineState> GetPipelineState() { return m_State; }
