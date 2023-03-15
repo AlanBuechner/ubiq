@@ -198,10 +198,16 @@ namespace Engine
 					if (ImGui::MenuItem("Open...", "Ctrl+O"))
 					{
 						OpenProjectDialog();
-
 					}
 
-					if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					ImGui::Separator();
+
+					if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+					{
+						SaveScene();
+					}
+
+					if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
 					{
 						SaveSceneAs();
 					}
