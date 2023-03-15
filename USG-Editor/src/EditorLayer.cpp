@@ -75,10 +75,10 @@ namespace Engine
 			m_SaveScene = false;
 		}
 
-		if (m_OpenScene)
+		if (m_OpenProject)
 		{
-			OpenScene();
-			m_OpenScene = false;
+			OpenProjectDialog();
+			m_OpenProject = false;
 		}
 
 		// resize
@@ -190,14 +190,14 @@ namespace Engine
 					// which we can't undo at the moment without finer window depth/z control.
 					//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-					if (ImGui::MenuItem("New", "Ctrl+N"))
+					/*if (ImGui::MenuItem("New", "Ctrl+N"))
 					{
 						NewScene();
-					}
+					}*/
 
 					if (ImGui::MenuItem("Open...", "Ctrl+O"))
 					{
-						OpenScene();
+						OpenProjectDialog();
 
 					}
 
@@ -307,7 +307,7 @@ namespace Engine
 			case KeyCode::O:
 			{
 				if (controlPressed)
-					m_OpenScene = true; // TODO : fix crash and move open scene call back
+					m_OpenProject = true; // TODO : fix crash and move open scene call back
 				break;
 			}
 			}
@@ -562,12 +562,21 @@ namespace Engine
 		CORE_INFO("opening project \"{0}\"", projectFile.string());
 		if (m_CurrentProject)
 		{
-			// TODO : unregister project
+			Application::Get().GetAssetManager().RemoveAssetDirectory(m_CurrentProject->GetAssetsDirectory());
 		}
 
 		m_CurrentProject = CreateRef<ProjectManager::Project>(projectFile);
 		fs::current_path(m_CurrentProject->GetRootDirectory());
 		Application::Get().GetAssetManager().AddAssetDirectory(m_CurrentProject->GetAssetsDirectory());
+	}
+
+	void EditorLayer::OpenProjectDialog()
+	{
+		std::string filepath = Engine::FileDialogs::OpenFile("Ubiq Project (*.ubiqproj)\0*.ubiqproj\0");
+		if (!filepath.empty())
+		{
+			OpenProject(filepath);
+		}
 	}
 
 	void EditorLayer::NewScene()
@@ -592,6 +601,7 @@ namespace Engine
 	{
 		if (!m_LoadedScene.empty())
 		{
+			CORE_INFO("Saving Scene: {0}", m_LoadedScene.string());
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(m_LoadedScene.string());
 		}
@@ -602,6 +612,7 @@ namespace Engine
 		std::string filepath = Engine::FileDialogs::SaveFile("Ubiq Scene (*.ubiq)\0*.ubiq\0");
 		if (!filepath.empty())
 		{
+			CORE_INFO("Saving Scene As: {0}", filepath);
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(filepath);
 		}

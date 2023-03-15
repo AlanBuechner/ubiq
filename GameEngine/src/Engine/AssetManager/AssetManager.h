@@ -46,6 +46,7 @@ namespace Engine
 		void Clean();
 
 		void AddAssetDirectory(const fs::path& directory);
+		void RemoveAssetDirectory(const fs::path& directory);
 		inline const std::vector<fs::path>& GetAssetDirectories() { return m_AssetDirectories; }
 
 		void DeleteAsset(const fs::path& assetPath);

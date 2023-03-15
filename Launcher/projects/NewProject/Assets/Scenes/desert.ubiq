@@ -6,6 +6,11 @@ Entities:
       Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Direction: [-0.556801677, -0.722967207, 0.409011483]
+      Color: [1, 0.982698977, 0.882352948]
+      Intensity: 4
+      Size: 0.5
     SkyboxComponent:
       Texture: 44308273739615182
   - Entity: 11693751238415598823
@@ -40,11 +45,6 @@ Entities:
       Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    DirectionalLightComponent:
-      Direction: [-0.781520426, -0.623879611, -0]
-      Color: [0.815686285, 0.980484426, 1]
-      Intensity: 4
-      Size: 0.5
   - Entity: 1824081241608119135
     Name: Floor
     TransformComponent:

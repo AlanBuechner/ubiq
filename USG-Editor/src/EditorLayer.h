@@ -61,6 +61,7 @@ namespace Engine
 		int GetEntityIDAtMousePosition(bool& inWindow);
 
 		void OpenProject(const fs::path& projectFile);
+		void OpenProjectDialog();
 
 	private:
 		const Math::Vector4 m_GridColor = { 0.5f,0.5f,0.5f,1 };
@@ -89,7 +90,7 @@ namespace Engine
 
 		SceneState m_SceneState = SceneState::Edit;
 
-		bool m_OpenScene = false;
+		bool m_OpenProject = false;
 		bool m_SaveScene = false;
 
 		fs::path m_DropPath;

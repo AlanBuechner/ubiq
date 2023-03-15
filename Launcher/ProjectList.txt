@@ -1,1 +1,2 @@
-C:\Users\abuechner\source\repos\ubiq\Launcher\projects\NewProject\NewProject.ubiqproj
+projects\NewProject\NewProject.ubiqproj
+projects\OtherNewPorject\OtherNewPorject.ubiqproj

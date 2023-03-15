@@ -50,6 +50,26 @@ namespace Engine
 		UpdateDirectory(directory);
 	}
 
+	void AssetManager::RemoveAssetDirectory(const fs::path& directory)
+	{
+		for (int index = 0;index < m_AssetDirectories.size(); index++)
+		{
+			if (directory == m_AssetDirectories[index])
+			{
+				m_AssetDirectories.erase(m_AssetDirectories.begin() + index);
+				for (auto& a : m_AssetPaths)
+				{
+					std::string rel = fs::relative(a.second, directory).string();
+					if (rel[0] != '.' && rel[1] != '.')
+					{
+						m_AssetPaths.erase(a.first);
+					}
+				}
+				break;
+			}
+		}
+	}
+
 	void AssetManager::DeleteAsset(const fs::path& assetPath)
 	{
 		// check if is asset or directory
