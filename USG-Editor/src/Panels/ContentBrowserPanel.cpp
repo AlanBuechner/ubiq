@@ -233,7 +233,7 @@ namespace Engine
 	void ContentBrowserPanel::SetDirectory(const fs::path& path) 
 	{ 
 		if(fs::exists(path))
-			m_CurrentDirectory = path; 
+			m_CurrentDirectory = fs::relative(path);
 	}
 
 	void ContentBrowserPanel::DrawDirectory(const fs::path& path)

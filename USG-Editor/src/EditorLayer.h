@@ -90,9 +90,6 @@ namespace Engine
 
 		SceneState m_SceneState = SceneState::Edit;
 
-		bool m_OpenProject = false;
-		bool m_SaveScene = false;
-
 		fs::path m_DropPath;
 
 		fs::path m_EditorDirectory;

@@ -299,7 +299,8 @@ namespace Engine
 			case KeyCode::S:
 			{
 				if (controlPressed && shiftPressed)
-					m_SaveScene = true; // TODO : fix crash and move save scene call back
+					SaveSceneAs();
+					//m_SaveScene = true; // TODO : fix crash and move save scene call back
 				else if (controlPressed)
 					SaveScene();
 				break;
@@ -313,7 +314,8 @@ namespace Engine
 			case KeyCode::O:
 			{
 				if (controlPressed)
-					m_OpenProject = true; // TODO : fix crash and move open scene call back
+					OpenProjectDialog();
+					//m_OpenProject = true; // TODO : fix crash and move open scene call back
 				break;
 			}
 			}
@@ -574,6 +576,10 @@ namespace Engine
 		m_CurrentProject = CreateRef<ProjectManager::Project>(projectFile);
 		fs::current_path(m_CurrentProject->GetRootDirectory());
 		Application::Get().GetAssetManager().AddAssetDirectory(m_CurrentProject->GetAssetsDirectory());
+
+		m_ContentPanel.SetDirectory(m_CurrentProject->GetAssetsDirectory());
+
+		NewScene();
 	}
 
 	void EditorLayer::OpenProjectDialog()

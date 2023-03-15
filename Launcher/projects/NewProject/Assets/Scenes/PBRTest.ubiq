@@ -41,7 +41,7 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     DirectionalLightComponent:
-      Direction: [-4.37113883e-08, -1, -0]
+      Direction: [-0.673012495, -0.739631116, -0]
       Color: [1, 1, 1]
       Intensity: 5
       Size: 2
