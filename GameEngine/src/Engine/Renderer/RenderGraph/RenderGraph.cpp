@@ -44,7 +44,7 @@ namespace Engine
 		for (Ref<RenderGraphNode> node : m_Nodes)
 		{
 			for (Ref<CommandList> cmdList : node->GetCommandLists())
-				Renderer::GetMainCommandQueue()->RemoveCommandLIst(cmdList);
+				Renderer::GetMainCommandQueue()->RemoveCommandList(cmdList);
 		}
 	}
 

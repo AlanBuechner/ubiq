@@ -70,7 +70,7 @@ namespace Engine
 		for (uint32 y = 0; y < m_Height; y++)
 		{
 			byte* pScan = (byte*)mapped + y * uploadPitch;
-			memcpy(pScan, (byte*)data + y * m_Width * 4, m_Width * 4);
+			memcpy(pScan, (byte*)data + y * m_Width  * 4, m_Width * 4);
 		}
 		uploadBuffer->Unmap(0, &range);
 

@@ -32,7 +32,8 @@ namespace Engine
 		
 		void SetAngles(Math::Vector2 rot);
 		void SetDirection(Math::Vector3 direction);
-		void SetColor(Math::Vector3 color);
+		void SetTint(Math::Vector3 color);
+		void SetTemperature(float temp);
 		void SetIntensity(float intensity);
 		void SetSize(float size);
 		Ref<const DirectionalLight> GetDirectinalLight() { return m_Light; }

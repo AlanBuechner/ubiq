@@ -54,9 +54,15 @@ namespace Engine
 		m_Dirty = true;
 	}
 
-	void DirectionalLightComponent::SetColor(Math::Vector3 color)
+	void DirectionalLightComponent::SetTint(Math::Vector3 color)
 	{
-		m_Light->SetColor(color);
+		m_Light->SetTint(color);
+		m_Dirty = true;
+	}
+
+	void DirectionalLightComponent::SetTemperature(float temp)
+	{
+		m_Light->SetCCT(temp);
 		m_Dirty = true;
 	}
 

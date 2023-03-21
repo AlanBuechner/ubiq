@@ -8,6 +8,8 @@
 namespace Engine
 {
 
+	Math::Vector3 CCTToRGB(float k);
+
 	class DirectionalLight
 	{
 	public:
@@ -65,12 +67,15 @@ namespace Engine
 		Math::Vector2 GetAngles() const { return m_Angles; }
 		Math::Vector3 GetDirection() const { return m_Data.direction; }
 		Math::Vector3 GetColor() const { return m_Data.color; }
+		Math::Vector3 GetTint() const { return m_Tint; }
+		float GetCCT() const { return m_CCT; }
 		float GetIntensity() const { return m_Data.intensity; }
 		float GetSize() const { return m_Data.size; }
 
 		void SetAngles(Math::Vector2 rot);
 		void SetDirection(Math::Vector3 dir) { m_Data.direction = dir; }
-		void SetColor(Math::Vector3 color) { m_Data.color = color; }
+		void SetTint(Math::Vector3 tint) { m_Tint = tint; m_Data.color = m_Tint * CCTToRGB(m_CCT); }
+		void SetCCT(float cct) { m_CCT = cct; m_Data.color = m_Tint * CCTToRGB(m_CCT); }
 		void SetIntensity(float intensity) { m_Data.intensity = intensity; }
 		void SetSize(float size) { m_Data.size = size; }
 
@@ -93,6 +98,9 @@ namespace Engine
 		std::unordered_map<Ref<Camera>, CascadedShadowMaps> m_ShadowMaps;
 
 		Math::Vector2 m_Angles = { 0,-90 };
+
+		float m_CCT = 6600;
+		Math::Vector3 m_Tint;
 	};
 
 	struct PointLight

@@ -33,7 +33,47 @@ namespace Engine
 		ImGui::PopStyleColor(3);
 
 		ImGui::SameLine();
-		if (ImGui::DragFloat("##X", &value, 0.01f, 0.0f, 0.0f, "%.2f"))
+		if (ImGui::DragFloat("##X", &value, 0.01f, 0, 0, "%.2f"))
+			changed = true;
+		ImGui::PopItemWidth();
+
+		ImGui::PopStyleVar();
+		ImGui::Columns(1);
+		ImGui::PopID();
+
+		ImGui::Spacing();
+
+		return changed;
+	}
+
+	bool PropertysPanel::DrawFloatSlider(const std::string& label, float& value, float min, float max, float resetValue /*= 0.0f*/, float columnWidth /*= 100.0f*/)
+	{
+		bool changed = false;
+
+		ImGui::PushID(label.c_str());
+		ImGui::Columns(2);
+
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.4f, 0.4f, 0.4f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.5f, 0.5f, 0.5f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.4f, 0.4f, 0.4f, 1.0f });
+		if (ImGui::Button("V", buttonSize)) {
+			value = resetValue;
+			changed = true;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		if (ImGui::SliderFloat("##X", &value, min, max, "%.2f"))
 			changed = true;
 		ImGui::PopItemWidth();
 
@@ -195,11 +235,11 @@ namespace Engine
 		return changed;
 	}
 
-	bool PropertysPanel::DrawTextureControl(const std::string& lable, Ref<Texture2D>& texture)
+	bool PropertysPanel::DrawTextureControl(const std::string& label, Ref<Texture2D>& texture)
 	{
 		bool changed = false;
 
-		ImGui::PushID(lable.c_str());
+		ImGui::PushID(label.c_str());
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, 100);
 		ImGui::Image((ImTextureID)(texture ? texture : EditorAssets::s_NoTextureIcon)->GetTextureHandle(), { 70,70 });
@@ -216,7 +256,7 @@ namespace Engine
 			ImGui::EndDragDropTarget();
 		}
 		ImGui::NextColumn();
-		ImGui::Text(lable.c_str());
+		ImGui::Text(label.c_str());
 		if (texture)
 		{
 			fs::path path = Application::Get().GetAssetManager().GetAssetPath(texture->GetAssetID());
@@ -234,11 +274,11 @@ namespace Engine
 		return changed;
 	}
 
-	bool PropertysPanel::DrawMeshControl(const std::string& lable, Ref<Mesh>& mesh)
+	bool PropertysPanel::DrawMeshControl(const std::string& label, Ref<Mesh>& mesh)
 	{
 		bool changed = false;
 
-		ImGui::Text(lable.c_str());
+		ImGui::Text(label.c_str());
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -266,11 +306,11 @@ namespace Engine
 		return changed;
 	}
 
-	bool PropertysPanel::DrawMaterialControl(const std::string& lable, Ref<Material>& mat)
+	bool PropertysPanel::DrawMaterialControl(const std::string& label, Ref<Material>& mat)
 	{
 		bool changed = false;
 
-		ImGui::Text(lable.c_str());
+		ImGui::Text(label.c_str());
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))

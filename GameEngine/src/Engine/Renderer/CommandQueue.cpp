@@ -37,7 +37,7 @@ namespace Engine
 		m_Commands[dcount].push_back(commandList);
 	}
 
-	void CommandQueue::RemoveCommandLIst(Ref<CommandList> commandList)
+	void CommandQueue::RemoveCommandList(Ref<CommandList> commandList)
 	{
 		for (uint32 i = 0; i < m_Commands.size(); i++)
 		{

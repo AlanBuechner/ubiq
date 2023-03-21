@@ -69,18 +69,6 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
-		if (m_SaveScene)
-		{
-			SaveSceneAs();
-			m_SaveScene = false;
-		}
-
-		if (m_OpenProject)
-		{
-			OpenProjectDialog();
-			m_OpenProject = false;
-		}
-
 		// resize
 		if (FrameBufferSpecification spec = m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetSpecification();
 			m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
@@ -300,7 +288,6 @@ namespace Engine
 			{
 				if (controlPressed && shiftPressed)
 					SaveSceneAs();
-					//m_SaveScene = true; // TODO : fix crash and move save scene call back
 				else if (controlPressed)
 					SaveScene();
 				break;
@@ -315,7 +302,6 @@ namespace Engine
 			{
 				if (controlPressed)
 					OpenProjectDialog();
-					//m_OpenProject = true; // TODO : fix crash and move open scene call back
 				break;
 			}
 			}

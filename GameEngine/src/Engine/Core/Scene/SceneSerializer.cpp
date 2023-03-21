@@ -186,7 +186,8 @@ namespace Engine
 
 			auto& dirLightComponent = entity.GetComponent<DirectionalLightComponent>();
 			out << YAML::Key << "Direction" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetDirection();
-			out << YAML::Key << "Color" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetColor();
+			out << YAML::Key << "Temperature" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetCCT();
+			out << YAML::Key << "Color" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetTint();
 			out << YAML::Key << "Intensity" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetIntensity();
 			out << YAML::Key << "Size" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetSize();
 
@@ -365,7 +366,8 @@ namespace Engine
 					auto& dlc = deserializedEntity.AddComponent<DirectionalLightComponent>();
 					dlc.SetDirection(dirLightComponent["Direction"].as<Math::Vector3>());
 					dlc.SetIntensity(dirLightComponent["Intensity"].as<float>());
-					dlc.SetColor(dirLightComponent["Color"].as<Math::Vector3>());
+					dlc.SetTemperature(dirLightComponent["Temperature"].as<float>());
+					dlc.SetTint(dirLightComponent["Color"].as<Math::Vector3>());
 					dlc.SetSize(dirLightComponent["Size"].as<float>());
 				}
 

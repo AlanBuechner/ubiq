@@ -86,7 +86,7 @@ if(!m_Selected.HasComponent<component>()){\
 	}\
 }
 				ADD_COMPONENT(Camera, CameraComponent);
-				ADD_COMPONENT(Directiona lLight, DirectionalLightComponent);
+				ADD_COMPONENT(Directional Light, DirectionalLightComponent);
 				ADD_COMPONENT(Mesh Renderer, MeshRendererComponent);
 				ADD_COMPONENT(Skybox, SkyboxComponent);
 
@@ -347,9 +347,13 @@ if(!m_Selected.HasComponent<component>()){\
 			if (PropertysPanel::DrawVec2Control("Direction", rot))
 				component.SetAngles(rot);
 
-			Math::Vector3 color = component.GetDirectinalLight()->GetColor();
+			float temp = component.GetDirectinalLight()->GetCCT();
+			if (PropertysPanel::DrawFloatSlider("Temperature", temp, 1700, 20000, 6600))
+				component.SetTemperature(temp);
+
+			Math::Vector3 color = component.GetDirectinalLight()->GetTint();
 			if (PropertysPanel::DrawColorControl("Color", color))
-				component.SetColor(color);
+				component.SetTint(color);
 
 			float intensity = component.GetDirectinalLight()->GetIntensity();
 			if (PropertysPanel::DrawFloatControl("Intensity", intensity))

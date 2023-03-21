@@ -213,7 +213,6 @@ PS_Output main(PS_Input input)
 
 	float3x3 TBN = transpose(float3x3(normalize(input.tangent), normalize(input.bitangent), normalize(input.normal)));
 	normal = normalize(mul(TBN, normal));
-	float3 baseReflectivity = lerp(float3(0,0,0), diffuse.rgb, metallic);
 
 	float3 lo = float3(0,0,0);
 
@@ -257,7 +256,7 @@ PS_Output main(PS_Input input)
 		if(shadowAmount != 0)
 		{
 			//lo += float3(shadowAmount, shadowAmount, shadowAmount);
-			lo += PBR(diffuse.rgb, DirLight.direction, DirLight.color, DirLight.intensity, viewDirection, normal, roughness, metallic, baseReflectivity) * shadowAmount;
+			lo += PBR(diffuse.rgb, DirLight.direction, DirLight.color, DirLight.intensity, viewDirection, normal, roughness, metallic) * shadowAmount;
 		}
 	}
 
