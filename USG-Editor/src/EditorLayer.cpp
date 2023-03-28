@@ -115,6 +115,7 @@ namespace Engine
 
 		Ref<FrameBuffer> framBuffer = m_ActiveScene->GetSceneRenderer()->GetRenderTarget();
 		m_ActiveScene->GetSceneRenderer()->Build();
+		m_ActiveScene->GetSceneRenderer()->Render(Renderer::GetMainCommandQueue());
 
 		Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
 		commandList->SetRenderTarget(framBuffer);
@@ -349,8 +350,8 @@ namespace Engine
 		Entity selected = m_HierarchyPanel.GetSelectedEntity();
 		if (selected && selected.HasComponent<CameraComponent>())
 		{
-			auto& tc = selected.GetComponent<TransformComponent>();
-			auto& cam = selected.GetComponent<CameraComponent>().Camera;
+			auto& tc = selected.GetTransform();
+			auto& cam = selected.GetComponent<CameraComponent>()->Camera;
 
 			const Math::Mat4& proj = glm::inverse(cam->GetProjectionMatrix());
 			const Math::Mat4& transform = tc.GetTransform();
@@ -480,7 +481,7 @@ namespace Engine
 				Math::Mat4 cameraView = m_EditorCamera->GetViewMatrix();
 
 				// transform
-				auto& tc = selected.GetComponent<TransformComponent>(); // get the transform component
+				auto& tc = selected.GetTransform(); // get the transform component
 				Math::Mat4 transform = tc.GetGlobalTransform(); // get the transform matrix
 				Math::Vector3 OldPosition, OldRotation, OldScale;
 				Math::DecomposeTransform(transform, OldPosition, OldRotation, OldScale);

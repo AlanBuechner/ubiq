@@ -66,7 +66,6 @@ namespace Engine
 	SceneRenderer::SceneRenderer()
 	{
 		m_RenderGraph = CreateRef<RenderGraph>();
-		m_RenderGraph->AddToCommandQueue();
 	}
 
 	void SceneRenderer::OnViewportResize(uint32 width, uint32 height)
@@ -177,6 +176,11 @@ namespace Engine
 
 			m_RenderGraph->Build();
 		}
+	}
+
+	void SceneRenderer::Render(Ref<CommandQueue> queue)
+	{
+		m_RenderGraph->Submit(queue);
 	}
 
 	Ref<SceneRenderer> SceneRenderer::Create()

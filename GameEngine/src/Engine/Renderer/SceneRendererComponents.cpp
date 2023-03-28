@@ -14,14 +14,6 @@ namespace Engine
 	// directional Light component
 	void DirectionalLightComponent::OnComponentAdded()
 	{
-		if (s_Instance)
-		{
-			Owner.RemoveComponent<DirectionalLightComponent>();
-			return;
-		}
-
-		s_Instance = this;
-
 		m_Light = CreateRef<DirectionalLight>(Math::Vector3{ 0,-1,0 }, Math::Vector3{ 1,1,1 }, 1 );
 
 		Owner.GetScene()->GetSceneRenderer()->SetDirectionalLight(m_Light);
@@ -38,8 +30,6 @@ namespace Engine
 
 	void DirectionalLightComponent::OnComponentRemoved()
 	{
-		if (this == s_Instance)
-			s_Instance = nullptr;
 	}
 
 	void DirectionalLightComponent::SetAngles(Math::Vector2 rot)
@@ -86,9 +76,7 @@ namespace Engine
 	// mesh component
 	void MeshRendererComponent::OnComponentRemoved()
 	{
-		// remove object from the scene
-		if (Owner.GetScene() != nullptr)
-			Owner.GetScene()->GetSceneRenderer()->RemoveObject(m_Object);
+
 	}
 
 	void MeshRendererComponent::OnTransformChange(const Math::Mat4& transform)
@@ -109,22 +97,14 @@ namespace Engine
 	}
 
 	// skybox component
-	SkyboxComponent* SkyboxComponent::s_Instance;
 	void SkyboxComponent::OnComponentAdded()
 	{
-		if (s_Instance)
-		{
-			Owner.RemoveComponent<SkyboxComponent>();
-			return;
-		}
 
-		s_Instance = this;
 	}
 
 	void SkyboxComponent::OnComponentRemoved()
 	{
-		if (this == s_Instance)
-			s_Instance = nullptr;
+
 	}
 
 	void SkyboxComponent::SetSkyboxTexture(Ref<Texture2D> texture)

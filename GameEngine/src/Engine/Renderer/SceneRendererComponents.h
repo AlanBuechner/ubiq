@@ -21,9 +21,8 @@ namespace Engine
 		virtual void OnTransformChange(const Math::Mat4& transform) override;
 	};
 
-	class DirectionalLightComponent : public Component
+	class DirectionalLightComponent : public Component, SceneStatic
 	{
-		DirectionalLightComponent* s_Instance;
 	public:
 
 		virtual void OnComponentAdded() override;
@@ -68,10 +67,8 @@ namespace Engine
 		Ref<SceneRenderer> m_SceneRenderer;
 	};
 
-	class SkyboxComponent : public Component
+	class SkyboxComponent : public Component, SceneStatic
 	{
-		static SkyboxComponent* s_Instance;
-
 	public:
 		virtual void OnComponentAdded() override;
 		virtual void OnComponentRemoved() override;

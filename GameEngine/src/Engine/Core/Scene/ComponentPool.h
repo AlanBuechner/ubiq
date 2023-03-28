@@ -17,8 +17,8 @@ namespace Engine
 		using Func = std::function<void (void*)>;
 		using DestructorFunc = std::function<void (void*)>;
 
-		ComponentPool(ComponentType typeID, uint64 componentSize, DestructorFunc dFunc) :
-			m_TypeID(typeID), m_ComponentSize(componentSize), m_DestructorFunc(dFunc)
+		ComponentPool(ComponentType typeID, uint64 componentSize, DestructorFunc dFunc, bool sceneStatic) :
+			m_TypeID(typeID), m_ComponentSize(componentSize), m_DestructorFunc(dFunc), m_SceneStatic(sceneStatic)
 		{}
 		virtual ~ComponentPool() {};
 
@@ -38,7 +38,7 @@ namespace Engine
 		const ComponentType m_TypeID;
 		const uint64 m_ComponentSize;
 		const DestructorFunc m_DestructorFunc;
-
+		const bool m_SceneStatic;
 	};
 
 	template<uint64 TSize>
@@ -48,8 +48,8 @@ namespace Engine
 		struct ComponentData
 		{byte data[TSize];};
 	public:
-		SizeComponentPool(ComponentType typeID, DestructorFunc dfunc) :
-			ComponentPool(typeID, TSize, dfunc)
+		SizeComponentPool(ComponentType typeID, DestructorFunc dfunc, bool sceneStatic) :
+			ComponentPool(typeID, TSize, dfunc, sceneStatic)
 		{}
 
 		~SizeComponentPool()
@@ -76,6 +76,9 @@ namespace Engine
 		virtual uint32 Allocate(uint64 entity) override
 		{
 			// allocate more room for the entity's list
+			if (m_SceneStatic && m_Entitys.size() >= 1)
+				return UINT32_MAX;
+
 			if (m_Entitys.size() <= entity)
 				m_Entitys.resize(entity+1);
 

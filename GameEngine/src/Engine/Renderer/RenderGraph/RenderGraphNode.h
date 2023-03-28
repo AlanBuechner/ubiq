@@ -17,7 +17,7 @@ namespace Engine
 
 		void Build();
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
-		virtual void AddToCommandQueue() {}
+		virtual void AddToCommandQueue(Ref<ExecutionOrder> order) {}
 		virtual void Invalidate() { m_Built = false; }
 
 		virtual std::vector<Ref<CommandList>> GetCommandLists() { return {}; }

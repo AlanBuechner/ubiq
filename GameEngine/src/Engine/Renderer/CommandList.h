@@ -20,9 +20,6 @@ namespace Engine
 		};
 
 	public:
-		uint32 m_DependencyCount = 0;
-
-	public:
 
 		virtual void SignalRecording() = 0;
 		virtual void StartRecording(Ref<ShaderPass> startShader = nullptr) = 0;

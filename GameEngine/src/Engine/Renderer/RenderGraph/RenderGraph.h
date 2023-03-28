@@ -13,6 +13,9 @@ namespace Engine
 	class RenderGraphNode;
 	class OutputNode;
 
+	class ExecutionOrder;
+	class CommandQueue;
+
 	struct DrawCommand
 	{
 		Ref<Shader> m_Shader;
@@ -35,7 +38,7 @@ namespace Engine
 		RenderGraph();
 		~RenderGraph();
 
-		void AddToCommandQueue();
+		void Submit(Ref<CommandQueue> queue);
 		void OnViewportResize(uint32 width, uint32 height);
 		void Build();
 		SceneData& GetScene() { return m_Scene; }
@@ -48,6 +51,8 @@ namespace Engine
 		std::vector<Ref<RenderGraphNode>> m_Nodes;
 		
 		Ref<OutputNode> m_OutputNode;
+
+		Ref<ExecutionOrder> m_Order;
 
 		SceneData m_Scene;
 	};

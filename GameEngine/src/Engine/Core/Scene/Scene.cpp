@@ -115,7 +115,7 @@ namespace Engine
 		Ref<Camera> mainCamera = nullptr;
 
 		if (MainCameraEntity != Entity::null)
-			mainCamera = MainCameraEntity.GetComponent<CameraComponent>().Camera;
+			mainCamera = MainCameraEntity.GetComponent<CameraComponent>()->Camera;
 
 		if (mainCamera)
 		{

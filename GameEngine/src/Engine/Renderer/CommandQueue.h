@@ -5,6 +5,22 @@
 
 namespace Engine
 {
+
+	class ExecutionOrder
+	{
+	public:
+		void Add(Ref<CommandList> commandList, std::vector<Ref<CommandList>> dependencys = {});
+		void Remove(Ref<CommandList> commandList); // don't forget to remove all dependence 
+		void Clear() { m_Commands.clear(); }
+
+		std::vector<std::vector<Ref<CommandList>>>& GetCommandLists() { return m_Commands; }
+
+		static Ref<ExecutionOrder> Create() { return CreateRef<ExecutionOrder>(); }
+
+	private:
+		std::vector<std::vector<Ref<CommandList>>> m_Commands;
+	};
+
 	class CommandQueue
 	{
 	public:
@@ -15,9 +31,8 @@ namespace Engine
 			Compute = 2,
 		};
 
-		void AddCommandList(Ref<CommandList> commanList, std::vector<Ref<CommandList>> dependencys = {});
-		void RemoveCommandList(Ref<CommandList> commandList); // don't forget to remove all dependence 
-		inline void ClearCommandQueue() { m_Commands.clear(); }
+		void Submit(Ref<CommandList> commandList, uint32 dcount = 0);
+		void Submit(Ref<ExecutionOrder> order, uint32 dcount = 0);
 
 		virtual void Execute() = 0;
 		virtual void ExecuteImmediate(std::vector<Ref<CommandList>> commandLists) = 0;

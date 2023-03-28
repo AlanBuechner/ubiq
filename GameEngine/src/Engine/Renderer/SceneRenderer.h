@@ -80,6 +80,7 @@ namespace Engine
 		void RemoveObject(ObjectControlBlockRef controlBlock);
 
 		void Build();
+		void Render(Ref<CommandQueue> queue);
 
 		static Ref<SceneRenderer> Create();
 

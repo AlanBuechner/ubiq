@@ -37,6 +37,12 @@ namespace Engine
 
 		Entity GetPrimaryCameraEntity();
 
+		template<class T>
+		T* GetSceneStatic()
+		{
+			return m_Registry.GetSceneStatic<T>();
+		}
+
 		Ref<SceneRenderer> GetSceneRenderer() { return m_SceneRenderer; }
 		SceneRegistry& GetRegistry() { return m_Registry; }
 

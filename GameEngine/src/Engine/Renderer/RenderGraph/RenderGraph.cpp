@@ -37,21 +37,20 @@ namespace Engine
 		m_OutputNode = CreateRef<OutputNode>(*this);
 		m_OutputNode->m_Buffer = renderTargetNode->m_Buffer;
 		m_Nodes.push_back(m_OutputNode);
+
+
+		m_Order = ExecutionOrder::Create();
+		for (auto& node : m_Nodes)
+			node->AddToCommandQueue(m_Order);
 	}
 
 	RenderGraph::~RenderGraph()
 	{
-		for (Ref<RenderGraphNode> node : m_Nodes)
-		{
-			for (Ref<CommandList> cmdList : node->GetCommandLists())
-				Renderer::GetMainCommandQueue()->RemoveCommandList(cmdList);
-		}
 	}
 
-	void RenderGraph::AddToCommandQueue()
+	void RenderGraph::Submit(Ref<CommandQueue> queue)
 	{
-		for (auto& node : m_Nodes)
-			node->AddToCommandQueue();
+		queue->Submit(m_Order);
 	}
 
 	void RenderGraph::OnViewportResize(uint32 width, uint32 height)

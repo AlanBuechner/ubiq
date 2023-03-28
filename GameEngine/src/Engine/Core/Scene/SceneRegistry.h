@@ -5,6 +5,7 @@
 #include "ComponentView.h"
 #include <vector>
 #include <unordered_map>
+#include <type_traits>
 
 namespace Engine
 {
@@ -27,6 +28,8 @@ namespace Engine
 	};
 	using EntityType = uint64;
 
+	class SceneStatic {};
+
 	class SceneRegistry
 	{
 	public:
@@ -47,7 +50,7 @@ namespace Engine
 		EntityData& GetEntityData(EntityType entity) { return m_Entitys[entity]; }
 
 		template<class T, typename... Args>
-		T& AddComponent(EntityType entity, Args&&... args)
+		T* AddComponent(EntityType entity, Args&&... args)
 		{
 			//uint64 componentID = typeid(T).hash_code(); // get component type id
 
@@ -56,12 +59,15 @@ namespace Engine
 
 			// allocate memory for component
 			uint32 componentIndex = pool->Allocate(entity);
+			if (componentIndex == UINT32_MAX)
+				return nullptr;
+
 			void* componentLocation = pool->GetComponentMemory(componentIndex);
 			CORE_ASSERT(componentLocation != nullptr, "faild to allocate memory for component"); // validate component was successfully created 
 
 			T* comp = new(componentLocation) T(std::forward<Args>(args)...); // create component in pre allocated memory
 			m_Entitys[entity].m_Components.push_back({ pool, componentIndex }); // add component to entity's list of components
-			return *comp; // return component
+			return comp; // return component
 		}
 
 		template<class T>
@@ -78,15 +84,28 @@ namespace Engine
 		}
 
 		template<class T>
+		T* GetSceneStatic()
+		{
+			uint64 componentID = typeid(T).hash_code(); // get component type id
+
+			ComponentPool* pool = m_Pools[componentID];
+			if (pool == nullptr) return;
+
+			return (T*)pool->GetComponentMemory(0);
+		}
+
+		template<class T>
 		ComponentPool* GetComponentPool()
 		{
 			return GetOrCreateCompnentPool<T>();;
 		}
 
 		template<class T>
-		T& GetComponent(EntityType entity)
+		T* GetComponent(EntityType entity)
 		{
-			return *(T*)GetComponentPool<T>()->GetEntityComponentMemory(entity);
+			if(HasComponent<T>(entity))
+				return (T*)GetComponentPool<T>()->GetEntityComponentMemory(entity);
+			return nullptr;
 		}
 
 		template<class T>
@@ -129,24 +148,9 @@ namespace Engine
 		{
 			uint64 componentID = typeid(T).hash_code();
 			ComponentPool* pool = m_Pools[componentID];
-			if (pool == nullptr) 
-				pool = m_Pools[componentID] = new SizeComponentPool<sizeof(T)>(componentID, ComponentDestructorFunc<T>);
-			return pool;
-		}
-
-	private:
-
-		template<uint64 TSize>
-		void* AllocateComponent(ComponentType type, EntityType entity, uint32& index)
-		{
-			ComponentPool* pool = m_Pools[type];
-
 			if (pool == nullptr)
-				pool = m_Pools[type] = new SizeComponentPool<TSize>(type);
-
-			// allocate memory for pool
-			index = pool->Allocate(entity);
-			return pool->GetComponentMemory(index);
+				pool = m_Pools[componentID] = new SizeComponentPool<sizeof(T)>(componentID, ComponentDestructorFunc<T>, std::is_base_of_v<SceneStatic, T>);
+			return pool;
 		}
 
 	private:

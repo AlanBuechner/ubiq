@@ -15,12 +15,12 @@ namespace Engine
 		m_RenderTarget = var;
 	}
 
-	void ShaderPassNode::AddToCommandQueue()
+	void ShaderPassNode::AddToCommandQueue(Ref<ExecutionOrder> order)
 	{
 		std::vector<Ref<CommandList>> dependencies;
 		for (auto& cmdList : m_RenderTarget.GetInput()->GetCommandLists())
 			dependencies.push_back(cmdList);
-		Renderer::GetMainCommandQueue()->AddCommandList(m_CommandList, dependencies);
+		order->Add(m_CommandList, dependencies);
 	}
 
 	void ShaderPassNode::BuildImpl()

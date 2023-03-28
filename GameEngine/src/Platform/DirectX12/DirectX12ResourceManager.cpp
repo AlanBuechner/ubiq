@@ -101,9 +101,6 @@ namespace Engine
 		m_CommandQueue = std::dynamic_pointer_cast<DirectX12CommandQueue>(CommandQueue::Create(CommandQueue::Type::Direct));
 		m_BufferCopyCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandList::Direct));
 		m_TextureCopyCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandList::Direct));
-
-		m_CommandQueue->AddCommandList(m_BufferCopyCommandList);
-		m_CommandQueue->AddCommandList(m_TextureCopyCommandList);
 	}
 
 	DirectX12ResourceManager::~DirectX12ResourceManager()
@@ -250,6 +247,8 @@ namespace Engine
 		RecordTextureCommands(context);
 		timer.End();
 
+		m_CommandQueue->Submit(m_BufferCopyCommandList);
+		m_CommandQueue->Submit(m_TextureCopyCommandList);
 		m_CommandQueue->Execute();
 		
 		// clear upload pages

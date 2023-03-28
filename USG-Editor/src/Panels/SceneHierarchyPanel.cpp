@@ -264,7 +264,7 @@ if(!m_Selected.HasComponent<component>()){\
 		
 
 		DrawComponent<TransformComponent>(entity, "Transform", [&]() {
-			auto& tc = entity.GetComponent<TransformComponent>();
+			auto& tc = *entity.GetComponent<TransformComponent>();
 			Math::Vector3 posiiton = tc.GetPosition();
 			if (PropertysPanel::DrawVec3Control("m_Position", posiiton, 0.0f))
 				tc.SetPosition(posiiton);
@@ -280,7 +280,7 @@ if(!m_Selected.HasComponent<component>()){\
 		}, false);
 
 		DrawComponent<CameraComponent>(entity, "Camera", [&]() {
-			auto& cameraComponent = entity.GetComponent<CameraComponent>();
+			auto& cameraComponent = *entity.GetComponent<CameraComponent>();
 			auto& camera = cameraComponent.Camera;
 
 			ImGui::Checkbox("Primary", &cameraComponent.Primary);
@@ -339,7 +339,7 @@ if(!m_Selected.HasComponent<component>()){\
 		});
 
 		DrawComponent<DirectionalLightComponent>(entity, "Directional Light", [&]() {
-			auto& component = entity.GetComponent<DirectionalLightComponent>();
+			auto& component = *entity.GetComponent<DirectionalLightComponent>();
 
 			Math::Vector3 direction = component.GetDirectinalLight()->GetDirection();
 			Math::Vector2 rot = component.GetDirectinalLight()->GetAngles();
@@ -365,7 +365,7 @@ if(!m_Selected.HasComponent<component>()){\
 		});
 
 		DrawComponent<MeshRendererComponent>(entity, "Mesh Renderer", [&](){
-			auto& component = entity.GetComponent<MeshRendererComponent>();
+			auto& component = *entity.GetComponent<MeshRendererComponent>();
 			
 			Ref<Mesh> mesh = component.GetMesh();
 			if (PropertysPanel::DrawMeshControl("Mesh", mesh))
@@ -378,7 +378,7 @@ if(!m_Selected.HasComponent<component>()){\
 		});
 
 		DrawComponent<SkyboxComponent>(entity, "Skybox", [&]() {
-			auto& component = entity.GetComponent<SkyboxComponent>();
+			auto& component = *entity.GetComponent<SkyboxComponent>();
 
 			Ref<Texture2D> texture = component.GetSkyboxTexture();
 			if (PropertysPanel::DrawTextureControl("Texture", texture))
@@ -386,7 +386,7 @@ if(!m_Selected.HasComponent<component>()){\
 		});
 
 		DrawComponent<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&]() {
-			auto& component = entity.GetComponent<Rigidbody2DComponent>();
+			auto& component = *entity.GetComponent<Rigidbody2DComponent>();
 
 			const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
 			const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
@@ -411,7 +411,7 @@ if(!m_Selected.HasComponent<component>()){\
 		});
 
 		DrawComponent<BoxCollider2DComponent>(entity, "Box Collider 2D", [&]() {
-			auto& component = entity.GetComponent<BoxCollider2DComponent>();
+			auto& component = *entity.GetComponent<BoxCollider2DComponent>();
 
 			PropertysPanel::DrawVec2Control("Offset", component.Offset, 0.0f);
 			PropertysPanel::DrawVec2Control("Size", component.Size, 0.0f);
@@ -423,7 +423,7 @@ if(!m_Selected.HasComponent<component>()){\
 		});
 
 		DrawComponent<CircleColliderComponent>(entity, "Circle Collider 2D", [&]() {
-			auto& component = entity.GetComponent<CircleColliderComponent>();
+			auto& component = *entity.GetComponent<CircleColliderComponent>();
 
 			PropertysPanel::DrawVec2Control("Offset", component.Offset, 0.0f);
 

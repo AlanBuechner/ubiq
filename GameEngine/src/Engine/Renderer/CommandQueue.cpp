@@ -10,10 +10,10 @@
 namespace Engine
 {
 
-	void CommandQueue::AddCommandList(Ref<CommandList> commandList, std::vector<Ref<CommandList>> dependencys)
+	void ExecutionOrder::Add(Ref<CommandList> commandList, std::vector<Ref<CommandList>> dependencys /*= {}*/)
 	{
 		// find the command list's dependency count
-		uint32 dcount = 0;
+		int dcount = -1;
 		for (uint32 i = 0; i < m_Commands.size(); i++)
 		{
 			for (uint32 j = 0; j < m_Commands[i].size(); j++)
@@ -22,22 +22,22 @@ namespace Engine
 				{
 					if (m_Commands[i][j] == dependencys[k])
 					{
-						dcount = (uint32)Math::Max((float)m_Commands[i][j]->m_DependencyCount+1, (float)dcount); // TODO: make an int version of max
+						dcount = (uint32)Math::Max((float)i, (float)dcount); // TODO: make an int version of max
 					}
 				}
 			}
 		}
 
+		dcount++;
+
 		// add new dependency list
 		if (dcount >= m_Commands.size())
 			m_Commands.push_back(std::vector<Ref<CommandList>>());
 
-		commandList->m_DependencyCount = dcount;
-
 		m_Commands[dcount].push_back(commandList);
 	}
 
-	void CommandQueue::RemoveCommandList(Ref<CommandList> commandList)
+	void ExecutionOrder::Remove(Ref<CommandList> commandList)
 	{
 		for (uint32 i = 0; i < m_Commands.size(); i++)
 		{
@@ -49,6 +49,26 @@ namespace Engine
 					m_Commands[i].pop_back();
 				}
 			}
+		}
+	}
+
+	void CommandQueue::Submit(Ref<CommandList> commandList, uint32 dcount)
+	{
+		// add new dependency list
+		if (dcount >= m_Commands.size())
+			m_Commands.resize(dcount + 1);
+
+		m_Commands[dcount].push_back(commandList);
+	}
+
+	void CommandQueue::Submit(Ref<ExecutionOrder> order, uint32 dcount /*= 0*/)
+	{
+		auto& commands = order->GetCommandLists();
+		for (uint32 i = 0; i < commands.size(); i++)
+		{
+			std::vector<Ref<CommandList>>& list = commands[i];
+			for (auto& command : list)
+				Submit(command, dcount + i);
 		}
 	}
 

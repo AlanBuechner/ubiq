@@ -135,7 +135,7 @@ namespace Engine
 			out << YAML::Key << "TransformComponent";
 			out << YAML::BeginMap;
 
-			auto& transform = entity.GetComponent<TransformComponent>();
+			auto& transform = entity.GetTransform();
 			
 			out << YAML::Key << "Position" << YAML::Value << transform.GetPosition();
 			out << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
@@ -160,7 +160,7 @@ namespace Engine
 			out << YAML::Key << "CameraComponent";
 			out << YAML::BeginMap;
 
-			auto& cameraComponent = entity.GetComponent<CameraComponent>();
+			auto& cameraComponent = *entity.GetComponent<CameraComponent>();
 			auto& camera = cameraComponent.Camera;
 
 			out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
@@ -184,7 +184,7 @@ namespace Engine
 			out << YAML::Key << "DirectionalLightComponent";
 			out << YAML::BeginMap;
 
-			auto& dirLightComponent = entity.GetComponent<DirectionalLightComponent>();
+			auto& dirLightComponent = *entity.GetComponent<DirectionalLightComponent>();
 			out << YAML::Key << "Direction" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetDirection();
 			out << YAML::Key << "Temperature" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetCCT();
 			out << YAML::Key << "Color" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetTint();
@@ -199,7 +199,7 @@ namespace Engine
 			out << YAML::Key << "MeshRendererComponent";
 			out << YAML::BeginMap;
 
-			auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
+			auto& meshRenderer = *entity.GetComponent<MeshRendererComponent>();
 			if(meshRenderer.GetMesh())
 				out << YAML::Key << "Mesh" << YAML::Value << meshRenderer.GetMesh()->GetAssetID();
 
@@ -214,7 +214,7 @@ namespace Engine
 			out << YAML::Key << "SkyboxComponent";
 			out << YAML::BeginMap;
 
-			auto& skyboxComponent = entity.GetComponent<SkyboxComponent>();
+			auto& skyboxComponent = *entity.GetComponent<SkyboxComponent>();
 			if (skyboxComponent.GetSkyboxTexture())
 				out << YAML::Key << "Texture" << YAML::Value << skyboxComponent.GetSkyboxTexture()->GetAssetID();
 
@@ -226,7 +226,7 @@ namespace Engine
 			out << YAML::Key << "Rigidbody2DComponent";
 			out << YAML::BeginMap;
 
-			auto& component = entity.GetComponent<Rigidbody2DComponent>();
+			auto& component = *entity.GetComponent<Rigidbody2DComponent>();
 			out << YAML::Key << "Type";
 			switch (component.Type)
 			{
@@ -244,7 +244,7 @@ namespace Engine
 			out << YAML::Key << "BoxCollider2DComponent";
 			out << YAML::BeginMap;
 
-			auto& component = entity.GetComponent<BoxCollider2DComponent>();
+			auto& component = *entity.GetComponent<BoxCollider2DComponent>();
 			out << YAML::Key << "Offset" << YAML::Value << component.Offset;
 			out << YAML::Key << "Size" << YAML::Value << component.Size;
 			out << YAML::Key << "Density" << YAML::Value << component.Density;
@@ -260,7 +260,7 @@ namespace Engine
 			out << YAML::Key << "CircleColiderComponent";
 			out << YAML::BeginMap;
 
-			auto& component = entity.GetComponent<CircleColliderComponent>();
+			auto& component = *entity.GetComponent<CircleColliderComponent>();
 			out << YAML::Key << "Offset" << YAML::Value << component.Offset;
 			out << YAML::Key << "Size" << YAML::Value << component.Size;
 			out << YAML::Key << "Density" << YAML::Value << component.Density;
@@ -331,7 +331,7 @@ namespace Engine
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)
 				{
-					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
+					auto& tc = *deserializedEntity.GetComponent<TransformComponent>();
 
 					tc.Owner = deserializedEntity;
 					tc.Parent = Entity::null;
@@ -344,7 +344,7 @@ namespace Engine
 				auto cameraComponent = entity["CameraComponent"];
 				if (cameraComponent)
 				{
-					auto& cc = deserializedEntity.AddComponent<CameraComponent>();
+					auto& cc = *deserializedEntity.AddComponent<CameraComponent>();
 
 					auto camera = cameraComponent["Camera"];
 					cc.Camera->SetProjectionType((SceneCamera::ProjectionType)camera["ProjectionType"].as<int>());
@@ -363,7 +363,7 @@ namespace Engine
 				auto dirLightComponent = entity["DirectionalLightComponent"];
 				if (dirLightComponent)
 				{
-					auto& dlc = deserializedEntity.AddComponent<DirectionalLightComponent>();
+					auto& dlc = *deserializedEntity.AddComponent<DirectionalLightComponent>();
 					dlc.SetDirection(dirLightComponent["Direction"].as<Math::Vector3>());
 					dlc.SetIntensity(dirLightComponent["Intensity"].as<float>());
 					dlc.SetTemperature(dirLightComponent["Temperature"].as<float>());
@@ -374,7 +374,7 @@ namespace Engine
 				auto meshRendererComponent = entity["MeshRendererComponent"];
 				if (meshRendererComponent)
 				{
-					auto& mrc = deserializedEntity.AddComponent<MeshRendererComponent>();
+					auto& mrc = *deserializedEntity.AddComponent<MeshRendererComponent>();
 					if(meshRendererComponent["Mesh"])
 						mrc.SetMesh(Application::Get().GetAssetManager().GetAsset<Mesh>(meshRendererComponent["Mesh"].as<uint64>()));
 					if(meshRendererComponent["Material"])
@@ -384,7 +384,7 @@ namespace Engine
 				auto skyboxComponent = entity["SkyboxComponent"];
 				if (skyboxComponent)
 				{
-					auto& sbc = deserializedEntity.AddComponent<SkyboxComponent>();
+					auto& sbc = *deserializedEntity.AddComponent<SkyboxComponent>();
 					if (skyboxComponent["Texture"])
 						sbc.SetSkyboxTexture(Application::Get().GetAssetManager().GetAsset<Texture2D>(skyboxComponent["Texture"].as<uint64>()));
 				}
@@ -392,7 +392,7 @@ namespace Engine
 				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];
 				if (rigidbody2DComponent)
 				{
-					auto& rbc = deserializedEntity.AddComponent<Rigidbody2DComponent>();
+					auto& rbc = *deserializedEntity.AddComponent<Rigidbody2DComponent>();
 
 					std::string type = rigidbody2DComponent["Type"].as<std::string>();
 					if (type == "Static") rbc.Type = Rigidbody2DComponent::BodyType::Static;
@@ -405,7 +405,7 @@ namespace Engine
 				auto boxCollider2DComponent = entity["BoxCollider2DComponent"];
 				if (boxCollider2DComponent)
 				{
-					auto& bcc = deserializedEntity.AddComponent<BoxCollider2DComponent>();
+					auto& bcc = *deserializedEntity.AddComponent<BoxCollider2DComponent>();
 					bcc.Offset = boxCollider2DComponent["Offset"].as<Math::Vector2>();
 					bcc.Size = boxCollider2DComponent["Size"].as<Math::Vector2>();
 					bcc.Density = boxCollider2DComponent["Density"].as<float>();
@@ -417,7 +417,7 @@ namespace Engine
 				auto circleCollider2DComponent = entity["CircleColiderComponent"];
 				if (circleCollider2DComponent)
 				{
-					auto& bcc = deserializedEntity.AddComponent<CircleColliderComponent>();
+					auto& bcc = *deserializedEntity.AddComponent<CircleColliderComponent>();
 					bcc.Offset = circleCollider2DComponent["Offset"].as<Math::Vector2>();
 					bcc.Size = circleCollider2DComponent["Size"].as<float>();
 					bcc.Density = circleCollider2DComponent["Density"].as<float>();
@@ -435,7 +435,7 @@ namespace Engine
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)
 				{
-					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
+					auto& tc = *deserializedEntity.GetComponent<TransformComponent>();
 
 					if (transformComponent["Children"])
 					{

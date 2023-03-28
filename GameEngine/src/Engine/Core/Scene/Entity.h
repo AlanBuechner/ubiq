@@ -26,29 +26,34 @@ namespace Engine
 		}
 
 		template<typename T>
-		T& GetComponent()
+		T* GetComponent()
 		{
-			CORE_ASSERT(HasComponent<T>(), "Entity does not have component");
 			return m_Scene->m_Registry.GetComponent<T>(m_EntityID);
 		}
 
 		template<typename T, typename... Args>
-		T& AddComponent(Args&&... args)
+		T* AddComponent(Args&&... args)
 		{
 			CORE_ASSERT(!HasComponent<T>(), "Entity alredy has component");
-			T& component = m_Scene->m_Registry.AddComponent<T>(m_EntityID, std::forward<Args>(args)...);
-			component.Owner = *this;
-			m_Scene->OnComponentAdded<T>(*this, component);
-			component.OnComponentAdded();
+			T* component = m_Scene->m_Registry.AddComponent<T>(m_EntityID, std::forward<Args>(args)...);
+			if (component != nullptr)
+			{
+				component->Owner = *this;
+				m_Scene->OnComponentAdded<T>(*this, *component);
+				component->OnComponentAdded();
+			}
 			return component;
 		}
 
 		template<typename T>
 		void RemoveComponent()
 		{
-			CORE_ASSERT(HasComponent<T>(), "Entity does not have component");
-			GetComponent<T>().OnComponentRemoved();
-			m_Scene->m_Registry.RemoveComponent<T>(m_EntityID);
+			T* comp = GetComponent<T>();
+			if (comp != nullptr)
+			{
+				comp->OnComponentRemoved();
+				m_Scene->m_Registry.RemoveComponent<T>(m_EntityID);
+			}
 		}
 
 		operator bool() const { return m_EntityID != NullEntity && m_Scene != nullptr; }

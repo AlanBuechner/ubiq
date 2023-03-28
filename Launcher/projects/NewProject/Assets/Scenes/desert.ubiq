@@ -34,7 +34,7 @@ Entities:
   - Entity: 14785401870932044183
     Name: Mesh
     TransformComponent:
-      Position: [-1.36782742, 0.92923218, 0]
+      Position: [0, 1.46000004, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshRendererComponent:

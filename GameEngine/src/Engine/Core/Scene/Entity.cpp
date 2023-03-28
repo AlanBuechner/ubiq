@@ -21,7 +21,9 @@ namespace Engine
 
 	TransformComponent& Entity::GetTransform()
 	{
-		return GetComponent<TransformComponent>();
+		TransformComponent* comp = GetComponent<TransformComponent>();
+		CORE_ASSERT(comp != nullptr, "entety does not have transform");
+		return *comp;
 	}
 
 	Entity Entity::GetParent()

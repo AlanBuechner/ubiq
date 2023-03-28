@@ -11,7 +11,7 @@ namespace Engine
 
 		void SetRenderTarget(FrameBufferVar var);
 
-		virtual void AddToCommandQueue() override;
+		virtual void AddToCommandQueue(Ref<ExecutionOrder> order) override;
 		virtual std::vector<Ref<CommandList>> GetCommandLists() override { return { m_CommandList }; }
 
 	protected:

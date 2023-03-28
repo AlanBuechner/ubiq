@@ -11,9 +11,9 @@ namespace Engine
 		m_CommandList = CommandList::Create();
 	}
 
-	void ShadowPassNode::AddToCommandQueue()
+	void ShadowPassNode::AddToCommandQueue(Ref<ExecutionOrder> order)
 	{
-		Renderer::GetMainCommandQueue()->AddCommandList(m_CommandList);
+		order->Add(m_CommandList);
 	}
 
 	void ShadowPassNode::BuildImpl()

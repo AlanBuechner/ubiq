@@ -43,6 +43,9 @@ namespace Engine
 		m_Fence->Signal(0);
 		for (uint32 d = 0; d < m_Commands.size(); d++)
 		{
+			if(m_Commands[d].empty())
+				continue;
+
 			std::vector<ID3D12CommandList*> cmdList(m_Commands[d].size());
 			for (uint32 i = 0; i < m_Commands[d].size(); i++)
 				cmdList[i] = std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[d][i])->GetCommandList().Get();
@@ -59,7 +62,8 @@ namespace Engine
 
 		m_Fence->SetEventOnCompletion(m_Commands.size(), eventHandle); // call event when fence val has been reached
 		WaitForSingleObject(eventHandle, INFINITE); // wait for event to be triggered
-
+		
+		m_Commands.clear();
 	}
 
 	void DirectX12CommandQueue::ExecuteImmediate(std::vector<Ref<CommandList>> commandLists)
