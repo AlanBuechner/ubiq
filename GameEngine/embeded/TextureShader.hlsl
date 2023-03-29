@@ -31,7 +31,6 @@ struct VS_Output
 	float4 color : COLOR;
 	float2 uv : UV;
 	uint textureID: TEXTUREID;
-	int entityID : ENTITYID;
 };
 
 typedef VS_Output PS_Input;
@@ -39,7 +38,6 @@ typedef VS_Output PS_Input;
 struct PS_Output
 {
 	float4 color : SV_TARGET0;
-	int id : SV_TARGET1;
 };
 
 #section vertex
@@ -56,7 +54,6 @@ VS_Output main(VS_Input input)
 	output.color = input.color;
 	output.uv = (input.uv * input.uvSize) + input.uvPosition;
 	output.textureID = input.textureID;
-	output.entityID = input.entityID;
 	return output;
 }
 
@@ -72,7 +69,6 @@ PS_Output main(PS_Input input)
 	if (color.a == 0.0)
 		discard;
 	output.color = color;
-	output.id = input.entityID;
 	
 	return output;
 }

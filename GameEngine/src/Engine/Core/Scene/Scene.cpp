@@ -223,6 +223,9 @@ namespace Engine
 		CopyComponent<Rigidbody2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<BoxCollider2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<CircleColliderComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+		CopyComponent<DirectionalLightComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+		CopyComponent<SkyboxComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+		CopyComponent<MeshRendererComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 
 		return newScene;
 	}
