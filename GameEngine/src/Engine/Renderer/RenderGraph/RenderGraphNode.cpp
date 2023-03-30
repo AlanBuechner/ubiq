@@ -47,7 +47,7 @@ namespace Engine
 	{
 		FrameBufferSpecification fbSpec;
 		fbSpec.Attachments = {
-			{ FrameBufferTextureFormat::RGBA8, {0.1f,0.1f,0.1f,1} },
+			{ FrameBufferTextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
 			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
 		};
 		fbSpec.InitalState = FrameBufferState::Common;

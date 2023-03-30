@@ -89,6 +89,8 @@ namespace Engine
 
 		inline fs::path GetAssetPath(UUID id) { return m_AssetPaths[id]; }
 
+		fs::path GetRelitiveAssetPath(UUID id);
+
 		void OpenAsset(UUID id);
 		void OpenAsset(const fs::path& path);
 

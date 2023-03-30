@@ -220,7 +220,7 @@ namespace Engine
 	{
 		if (fs::exists(path))
 		{
-			m_CurrentDirectory = path.parent_path(); 
+			m_CurrentDirectory = fs::relative(path.parent_path());
 			m_SelectedAsset = path; 
 			while (path.has_parent_path())
 			{

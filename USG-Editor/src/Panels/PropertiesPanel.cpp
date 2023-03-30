@@ -259,7 +259,7 @@ namespace Engine
 		ImGui::Text(label.c_str());
 		if (texture)
 		{
-			fs::path path = Application::Get().GetAssetManager().GetAssetPath(texture->GetAssetID());
+			fs::path path = Application::Get().GetAssetManager().GetRelitiveAssetPath(texture->GetAssetID());
 			if (ImGui::Button(path.string().c_str()))
 				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
 			
@@ -293,7 +293,7 @@ namespace Engine
 		}
 		if (mesh)
 		{
-			fs::path path = Application::Get().GetAssetManager().GetAssetPath(mesh->GetAssetID());
+			fs::path path = Application::Get().GetAssetManager().GetRelitiveAssetPath(mesh->GetAssetID());
 			if (ImGui::Button(path.string().c_str()))
 				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
 		}
@@ -325,7 +325,7 @@ namespace Engine
 		}
 		if (mat)
 		{
-			fs::path path = Application::Get().GetAssetManager().GetAssetPath(mat->GetAssetID());
+			fs::path path = Application::Get().GetAssetManager().GetRelitiveAssetPath(mat->GetAssetID());
 			if (ImGui::Button(path.string().c_str()))
 				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
 		}

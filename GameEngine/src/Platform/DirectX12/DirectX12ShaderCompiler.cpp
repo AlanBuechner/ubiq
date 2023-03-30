@@ -316,7 +316,7 @@ namespace Engine
 			switch (outputParam.ComponentType)
 			{
 			case D3D_REGISTER_COMPONENT_FLOAT32:
-				outputElement.push_back(FrameBufferTextureFormat::RGBA8);
+				outputElement.push_back(FrameBufferTextureFormat::RGBA16);
 				break;
 			case D3D_REGISTER_COMPONENT_UINT32:
 				break;

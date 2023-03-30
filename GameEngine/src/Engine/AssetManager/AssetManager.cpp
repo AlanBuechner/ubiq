@@ -115,6 +115,13 @@ namespace Engine
 		return newPath;
 	}
 
+	fs::path AssetManager::GetRelitiveAssetPath(UUID id)
+	{
+		fs::path absPath = GetAssetPath(id);
+
+		return fs::relative(absPath);
+	}
+
 	void AssetManager::OpenAsset(UUID id)
 	{
 		OpenAsset(m_AssetPaths[id]);
