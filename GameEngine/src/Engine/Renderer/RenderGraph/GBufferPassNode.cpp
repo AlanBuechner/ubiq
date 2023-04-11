@@ -10,31 +10,15 @@ namespace Engine
 		m_CommandList = CommandList::Create(CommandList::Direct);
 	}
 
-	void GBufferPassNode::SetRenderTarget(FrameBufferVar var)
-	{
-		m_RenderTarget = var;
-	}
-
-	void GBufferPassNode::AddToCommandQueue(Ref<ExecutionOrder> order)
-	{
-		std::vector<Ref<CommandList>> dependencies;
-		for (auto& cmdList : m_RenderTarget.GetInput()->GetCommandLists())
-			dependencies.push_back(cmdList);
-		order->Add(m_CommandList, dependencies);
-	}
-
 	void GBufferPassNode::BuildImpl()
 	{
-		Ref<FrameBuffer> renderTarget = m_RenderTarget.GetVarAndBuild();
 		const SceneData& scene = m_Graph.GetScene();
-
-		m_CommandList->StartRecording();
 
 		// depth pre pass
 		GPUTimer::BeginEvent(m_CommandList, "Depth pre pass");
 		// set up render target
-		m_CommandList->ToRenderTarget(renderTarget, FrameBufferState::Common);
-		m_CommandList->SetRenderTarget(renderTarget);
+		m_CommandList->ToRenderTarget(m_RenderTarget, FrameBufferState::Common);
+		m_CommandList->SetRenderTarget(m_RenderTarget);
 		m_CommandList->ClearRenderTarget();
 
 		// render all objects
@@ -53,8 +37,6 @@ namespace Engine
 		// begin gbuffer pass
 		GPUTimer::BeginEvent(m_CommandList, "GBuffer pass");
 		GPUTimer::EndEvent(m_CommandList); // end gbuffer pass
-
-		m_CommandList->Close();
 	}
 }
 

@@ -10,33 +10,12 @@ namespace Engine
 		m_CommandList = CommandList::Create(CommandList::Direct);
 	}
 
-	void ShaderPassNode::SetRenderTarget(FrameBufferVar var)
-	{
-		m_RenderTarget = var;
-	}
-
-	void ShaderPassNode::AddToCommandQueue(Ref<ExecutionOrder> order)
-	{
-		std::vector<Ref<CommandList>> dependencies;
-		for (auto& cmdList : m_RenderTarget.GetInput()->GetCommandLists())
-			dependencies.push_back(cmdList);
-		for (auto& node : m_Dependincys)
-		{
-			for(auto& cmdList : node->GetCommandLists())
-				dependencies.push_back(cmdList);
-		}
-		order->Add(m_CommandList, dependencies);
-	}
-
 	void ShaderPassNode::BuildImpl()
 	{
-		Ref<FrameBuffer> renderTarget = m_RenderTarget.GetVarAndBuild();
 		const SceneData& scene = m_Graph.GetScene();
-		
-		m_CommandList->StartRecording();
 
 		GPUTimer::BeginEvent(m_CommandList, "Shader Pass");
-		m_CommandList->SetRenderTarget(renderTarget);
+		m_CommandList->SetRenderTarget(m_RenderTarget);
 
 		for (auto& cmd : scene.m_DrawCommands)
 		{
@@ -52,7 +31,6 @@ namespace Engine
 		}
 
 		GPUTimer::EndEvent(m_CommandList);
-		m_CommandList->Close();
 	}
 }
 

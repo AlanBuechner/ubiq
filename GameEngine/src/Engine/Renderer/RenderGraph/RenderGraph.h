@@ -7,6 +7,7 @@
 #include "Engine/Renderer/ConstantBuffer.h"
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/Light.h"
+#include "Engine/Renderer/CommandList.h"
 
 namespace Engine
 {
@@ -52,6 +53,7 @@ namespace Engine
 		
 		Ref<OutputNode> m_OutputNode;
 
+		std::vector<Ref<CommandList>> m_CommandLists;
 		Ref<ExecutionOrder> m_Order;
 
 		SceneData m_Scene;

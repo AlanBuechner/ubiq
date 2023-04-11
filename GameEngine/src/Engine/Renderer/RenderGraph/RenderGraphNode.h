@@ -17,10 +17,10 @@ namespace Engine
 
 		void Build();
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
-		virtual void AddToCommandQueue(Ref<ExecutionOrder> order) {}
 		virtual void Invalidate() { m_Built = false; }
 
-		virtual std::vector<Ref<CommandList>> GetCommandLists() { return {}; }
+		void SetCommandList(Ref<CommandList> commandList) { m_CommandList = commandList; }
+		Ref<CommandList> GetCommandList() { return m_CommandList; }
 
 		void AddDependincy(Ref<RenderGraphNode> dependency) { m_Dependincys.push_back(dependency); }
 
@@ -32,21 +32,7 @@ namespace Engine
 		RenderGraph& m_Graph;
 
 		std::vector<Ref<RenderGraphNode>> m_Dependincys;
-	};
-
-	// vars
-	class FrameBufferVar
-	{
-	public:
-		FrameBufferVar() = default;
-		FrameBufferVar(Ref<RenderGraphNode> input, Ref<FrameBuffer> var);
-		Ref<FrameBuffer> GetVarAndBuild();
-		Ref<FrameBuffer> GetVar();
-		Ref<RenderGraphNode> GetInput() { return m_Input; }
-
-	private:
-		Ref<RenderGraphNode> m_Input;
-		Ref<FrameBuffer> m_Var;
+		Ref<CommandList> m_CommandList;
 	};
 
 	// nodes

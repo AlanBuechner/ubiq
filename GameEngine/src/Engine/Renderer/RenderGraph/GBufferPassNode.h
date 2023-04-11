@@ -9,16 +9,12 @@ namespace Engine
 	public:
 		GBufferPassNode(RenderGraph& graph);
 
-		void SetRenderTarget(FrameBufferVar var);
-
-		virtual void AddToCommandQueue(Ref<ExecutionOrder> order) override;
-		virtual std::vector<Ref<CommandList>> GetCommandLists() override { return { m_CommandList }; }
+		void SetRenderTarget(Ref<FrameBuffer> fb) { m_RenderTarget = fb; }
 
 	protected:
 		virtual void BuildImpl() override;
 
 	private:
-		Ref<CommandList> m_CommandList;
-		FrameBufferVar m_RenderTarget;
+		Ref<FrameBuffer> m_RenderTarget;
 	};
 }

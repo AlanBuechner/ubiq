@@ -14,29 +14,48 @@ namespace Engine
 		Ref<FrameBufferNode> renderTargetNode = CreateRef<FrameBufferNode>(*this);
 		m_Nodes.push_back(renderTargetNode);
 
+		Ref<CommandList> commandList = CommandList::Create(CommandList::Direct);
+		m_CommandLists.push_back(commandList);
+
 		// gbuffer pass
 		Ref<GBufferPassNode> gBufferPass = CreateRef<GBufferPassNode>(*this);
-		gBufferPass->SetRenderTarget({ renderTargetNode, renderTargetNode->m_Buffer });
+		gBufferPass->SetCommandList(commandList);
+		gBufferPass->SetRenderTarget(renderTargetNode->m_Buffer);
 		m_Nodes.push_back(gBufferPass);
 
 		// shadow pass
 		Ref<ShadowPassNode> shadowPass = CreateRef<ShadowPassNode>(*this);
+		shadowPass->SetCommandList(commandList);
 		m_Nodes.push_back(shadowPass);
 
 		// skybox pass
 		Ref<SkyboxNode> skyboxPass = CreateRef<SkyboxNode>(*this);
-		skyboxPass->SetRenderTarget({ gBufferPass, renderTargetNode->m_Buffer });
+		skyboxPass->SetCommandList(commandList);
+		skyboxPass->SetRenderTarget(renderTargetNode->m_Buffer);
+		skyboxPass->AddDependincy(gBufferPass);
 		m_Nodes.push_back(skyboxPass);
 
 		// main lit pass
 		Ref<ShaderPassNode> mainPass = CreateRef<ShaderPassNode>(*this, "lit");
-		mainPass->SetRenderTarget({ skyboxPass, renderTargetNode->m_Buffer });
+		mainPass->SetCommandList(commandList);
+		mainPass->SetRenderTarget(renderTargetNode->m_Buffer);
 		mainPass->AddDependincy(shadowPass);
+		mainPass->AddDependincy(skyboxPass);
 		m_Nodes.push_back(mainPass);
 
 		// post processing
+		Ref<FrameBufferNode> postRenderTargetNode = CreateRef<FrameBufferNode>(*this);
+		m_Nodes.push_back(renderTargetNode);
+
+		PostProcessInput input;
+		input.m_TextureHandles["Color Buffer"] = renderTargetNode->m_Buffer->GetAttachmentShaderHandle(0);
+		input.m_TextureHandles["Depth Buffer"] = renderTargetNode->m_Buffer->GetAttachmentShaderHandle(1);
+
 		Ref<PostProcessNode> postPass = CreateRef<PostProcessNode>(*this);
-		postPass->SetRenderTarget({ mainPass, renderTargetNode->m_Buffer });
+		postPass->SetCommandList(commandList);
+		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer );
+		postPass->SetInput(input);
+		postPass->AddDependincy(mainPass);
 		m_Nodes.push_back(postPass);
 
 		// create outputNode
@@ -45,8 +64,7 @@ namespace Engine
 		m_Nodes.push_back(m_OutputNode);
 
 		m_Order = ExecutionOrder::Create();
-		for (auto& node : m_Nodes)
-			node->AddToCommandQueue(m_Order);
+		m_Order->Add(commandList);
 	}
 
 	RenderGraph::~RenderGraph()
@@ -66,11 +84,17 @@ namespace Engine
 
 	void RenderGraph::Build()
 	{
+		for (Ref<CommandList> list : m_CommandLists)
+			list->StartRecording();
+
 		for (auto& node : m_Nodes)
 			node->Invalidate();
 
 		for (auto& node : m_Nodes)
 			node->Build();
+
+		for (Ref<CommandList> list : m_CommandLists)
+			list->Close();
 	}
 
 	Engine::Ref<Engine::FrameBuffer> RenderGraph::GetRenderTarget()

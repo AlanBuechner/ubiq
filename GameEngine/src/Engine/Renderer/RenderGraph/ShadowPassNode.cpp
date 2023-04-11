@@ -11,16 +11,10 @@ namespace Engine
 		m_CommandList = CommandList::Create();
 	}
 
-	void ShadowPassNode::AddToCommandQueue(Ref<ExecutionOrder> order)
-	{
-		order->Add(m_CommandList);
-	}
-
 	void ShadowPassNode::BuildImpl()
 	{
 		const SceneData& scene = m_Graph.GetScene();
 
-		m_CommandList->StartRecording();
 		GPUTimer::BeginEvent(m_CommandList, "Shadow Pass");
 
 		// convert all frame buffers to render targets
@@ -92,8 +86,6 @@ namespace Engine
 		m_CommandList->Transition(fbs, FrameBufferState::SRV, FrameBufferState::RenderTarget);
 
 		GPUTimer::EndEvent(m_CommandList);
-
-		m_CommandList->Close();
 	}
 
 }

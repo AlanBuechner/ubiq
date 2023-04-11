@@ -37,29 +37,12 @@ namespace Engine
 
 	}
 
-	void SkyboxNode::SetRenderTarget(FrameBufferVar var)
-	{
-		m_RenderTarget = var;
-	}
-
-	void SkyboxNode::AddToCommandQueue(Ref<ExecutionOrder> order)
-	{
-		std::vector<Ref<CommandList>> dependencies;
-		for (auto& cmdList : m_RenderTarget.GetInput()->GetCommandLists())
-			dependencies.push_back(cmdList);
-		order->Add(
-			m_CommandList, dependencies);
-	}
-
 	void SkyboxNode::BuildImpl()
 	{
-		Ref<FrameBuffer> renderTarget = m_RenderTarget.GetVarAndBuild();
 		const SceneData& scene = m_Graph.GetScene();
 
-		m_CommandList->StartRecording();
-
 		GPUTimer::BeginEvent(m_CommandList, "Skybox Pass");
-		m_CommandList->SetRenderTarget(renderTarget);
+		m_CommandList->SetRenderTarget(m_RenderTarget);
 
 		if (scene.m_Skybox)
 		{
@@ -71,7 +54,6 @@ namespace Engine
 		}
 
 		GPUTimer::EndEvent(m_CommandList);
-		m_CommandList->Close();
 	}
 
 }

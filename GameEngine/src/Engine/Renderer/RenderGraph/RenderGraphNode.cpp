@@ -11,23 +11,6 @@ namespace Engine
 		m_Graph(graph)
 	{}
 
-	// frame buffer var
-	FrameBufferVar::FrameBufferVar(Ref<RenderGraphNode> input, Ref<FrameBuffer> var) :
-		m_Input(input), m_Var(var)
-	{}
-
-	Ref<FrameBuffer> FrameBufferVar::GetVarAndBuild()
-	{
-		if (m_Input)
-			m_Input->Build();
-		return m_Var;
-	}
-
-	Ref<FrameBuffer> FrameBufferVar::GetVar()
-	{
-		return m_Var;
-	}
-
 	void RenderGraphNode::Build()
 	{
 
