@@ -96,6 +96,7 @@ sampler s;
 
 static const float PI = 3.14159265f;
 
+[earlydepthstencil]
 PS_Output main(PS_Input input)
 {
 	PS_Output output;

@@ -16,10 +16,15 @@ namespace Engine
 		m_Input(input), m_Var(var)
 	{}
 
-	Ref<FrameBuffer> FrameBufferVar::GetVar()
+	Ref<FrameBuffer> FrameBufferVar::GetVarAndBuild()
 	{
 		if (m_Input)
 			m_Input->Build();
+		return m_Var;
+	}
+
+	Ref<FrameBuffer> FrameBufferVar::GetVar()
+	{
 		return m_Var;
 	}
 

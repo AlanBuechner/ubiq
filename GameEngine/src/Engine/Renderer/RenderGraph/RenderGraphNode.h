@@ -40,6 +40,7 @@ namespace Engine
 	public:
 		FrameBufferVar() = default;
 		FrameBufferVar(Ref<RenderGraphNode> input, Ref<FrameBuffer> var);
+		Ref<FrameBuffer> GetVarAndBuild();
 		Ref<FrameBuffer> GetVar();
 		Ref<RenderGraphNode> GetInput() { return m_Input; }
 

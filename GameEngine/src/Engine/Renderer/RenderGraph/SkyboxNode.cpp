@@ -53,7 +53,7 @@ namespace Engine
 
 	void SkyboxNode::BuildImpl()
 	{
-		Ref<FrameBuffer> renderTarget = m_RenderTarget.GetVar();
+		Ref<FrameBuffer> renderTarget = m_RenderTarget.GetVarAndBuild();
 		const SceneData& scene = m_Graph.GetScene();
 
 		m_CommandList->StartRecording();

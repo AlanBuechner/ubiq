@@ -4,6 +4,7 @@
 #include "MainPassNode.h"
 #include "SkyboxNode.h"
 #include "ShadowPassNode.h"
+#include "PostProcessNode.h"
 
 namespace Engine
 {
@@ -28,16 +29,20 @@ namespace Engine
 		m_Nodes.push_back(skyboxPass);
 
 		// main lit pass
-		Ref<ShaderPassNode> mainPass = CreateRef<ShaderPassNode>(*this, "main");
+		Ref<ShaderPassNode> mainPass = CreateRef<ShaderPassNode>(*this, "lit");
 		mainPass->SetRenderTarget({ skyboxPass, renderTargetNode->m_Buffer });
 		mainPass->AddDependincy(shadowPass);
 		m_Nodes.push_back(mainPass);
+
+		// post processing
+		Ref<PostProcessNode> postPass = CreateRef<PostProcessNode>(*this);
+		postPass->SetRenderTarget({ mainPass, renderTargetNode->m_Buffer });
+		m_Nodes.push_back(postPass);
 
 		// create outputNode
 		m_OutputNode = CreateRef<OutputNode>(*this);
 		m_OutputNode->m_Buffer = renderTargetNode->m_Buffer;
 		m_Nodes.push_back(m_OutputNode);
-
 
 		m_Order = ExecutionOrder::Create();
 		for (auto& node : m_Nodes)

@@ -239,14 +239,18 @@ namespace Engine
 
 			//ImGui::End();
 
-			/*ImGui::Begin("Statistics");
+			ImGui::Begin("Statistics");
 
-			ImGui::Text("Renderer2D Statis:");
+			/*ImGui::Text("Renderer2D Statis:");
 			Renderer2D::Statistics stats = Renderer2D::GetStats();
 			ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-			ImGui::Text("Quads: %d", stats.QuadCount);
+			ImGui::Text("Quads: %d", stats.QuadCount);*/
 
-			ImGui::End();*/
+			static float deltaTime = Time::GetDeltaMilliseconds();
+			deltaTime = (0.99f * deltaTime) + ( 0.01f * Time::GetDeltaMilliseconds());
+			ImGui::Text("%f m/s %f (fps)", deltaTime, Time::GetFPS());
+
+			ImGui::End();
 
 			ImGui::End();
 		}

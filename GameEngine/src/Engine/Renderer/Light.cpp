@@ -191,7 +191,7 @@ namespace Engine
 			Camera::CameraData& cd = m_Cameras[i]->m_CameraData;
 			//cd.Position = center;
 			cd.ViewMatrix = Math::Inverse(TBN * Math::Translate(center));
-			cd.ProjectionMatrix = Math::Ortho(minx, maxx, miny, maxy, (minz - 15) * 3, maxz);
+			cd.ProjectionMatrix = Math::Ortho(minx, maxx, miny, maxy, (minz - 100) * 3, maxz);
 			cd.InvProjection = Math::Inverse(cd.ProjectionMatrix);
 			cd.VPMatrix = cd.ProjectionMatrix * cd.ViewMatrix;
 			m_Cameras[i]->UpdateCameraBuffer();

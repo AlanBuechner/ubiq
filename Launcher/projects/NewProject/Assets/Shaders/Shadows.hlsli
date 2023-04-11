@@ -6,7 +6,7 @@ float HardShadow(Texture2D shadowMap, sampler s, float4 coords)
 	return (depthSample < coords.z ? 0 : 1);
 }
 
-#define DITHER_OFFSETS 64
+#define DITHER_OFFSETS 32
 #define BLOCKER_SEARCH_NUM_SAMPLES 32
 #define PCF_NUM_SAMPLES 32
 
@@ -45,7 +45,7 @@ static float2 poissonDisk[32] = {
   float2(0.546395, 0.837528),
 };
 
-static float2 ditherOffsets[64] = {
+static float2 ditherOffsets[DITHER_OFFSETS] = {
 	float2(0.680375, -0.211234),
 	float2(0.566198, 0.596880),
 	float2(0.823295, -0.604897),
@@ -78,7 +78,7 @@ static float2 ditherOffsets[64] = {
 	float2(-0.084597, -0.873808),
 	float2(-0.523440, 0.941268),
 	float2(0.804416, 0.701840),
-	float2(-0.466668, 0.079521),
+	/*float2(-0.466668, 0.079521),
 	float2(-0.249586, 0.520497),
 	float2(0.025071, 0.335448),
 	float2(0.063213, -0.921439),
@@ -109,7 +109,7 @@ static float2 ditherOffsets[64] = {
 	float2(-0.793658, -0.747849),
 	float2(-0.009112, 0.520950),
 	float2(0.969503, 0.870008),
-	float2(0.368890, -0.233623),
+	float2(0.368890, -0.233623),*/
 };
 
 float PenumbraSize(float zReceiver, float zBlocker) //Parallel plane estimation
@@ -135,29 +135,29 @@ void FindBlocker(Texture2D shadowMap, sampler s, out float avgBlockerDepth, out 
 	avgBlockerDepth = blockerSum / numBlockers;
 }
 
-float hash12(float2 p)
+float PCF_Filter(Texture2D shadowMap, sampler s, float2 uv, float zReceiver, float2 filterRadiusUV, int ditherIndex)
 {
-	float3 p3 = frac(p.xyx * .1031);
-	p3 += dot(p3, p3.yzx + 33.33);
-	return frac((p3.x + p3.y) * p3.z);
-}
-
-float PCF_Filter(Texture2D shadowMap, sampler s, float2 uv, float zReceiver, float2 filterRadiusUV)
-{
-	uint ditherIndex = hash12(uv) * DITHER_OFFSETS;
 	float sum = 0.0f;
 	for (int i = 0; i < PCF_NUM_SAMPLES; ++i)
 	{
-		float2 offset = poissonDisk[i] * filterRadiusUV;
-		//offset += ditherOffsets[(ditherIndex + i) % DITHER_OFFSETS] * (3.141592654 / (4 * PCF_NUM_SAMPLES)); // add dithering
+		float2 ditherOffset = ditherOffsets[(ditherIndex + i) % DITHER_OFFSETS] * (3.141592654 / PCF_NUM_SAMPLES); // add dithering
+		//float2 ditherOffset = ditherOffsets[(ditherIndex + i) % DITHER_OFFSETS]; // add dithering
+		float2 offset = (poissonDisk[i] + ditherOffset) * filterRadiusUV;
 		float depthSample = shadowMap.Sample(s, uv + offset).r + DEPTH_BIAS;
 		sum += (depthSample < zReceiver ? 0 : 1);
-		//sum += shadowMap.SampleCmpLevelZero(s, uv + offset, zReceiver).r;
 	}
 	return sum / PCF_NUM_SAMPLES;
 }
 
-float PCSSDirectional(Texture2D shadowMap, sampler s, float4 coords, float4x4 ortho, float lightSize)
+float hash1(uint n)
+{
+	// integer hash copied from Hugo Elias
+	n = (n << 13U) ^ n;
+	n = n * (n * n * 15731U + 789221U) + 1376312589U;
+	return float(n & uint(0x7fffffffU)) / float(0x7fffffff);
+}
+
+float PCSSDirectional(Texture2D shadowMap, sampler s, float4 coords, float4x4 ortho, float lightSize, float3 pixelLocation)
 {
 	float4 p = mul(ortho, float4(1, 1, 1, 1));
 	float2 orthoSize = (p.xy / p.w) * 2;
@@ -179,5 +179,6 @@ float PCSSDirectional(Texture2D shadowMap, sampler s, float4 coords, float4x4 or
 	float2 filterRadiusUV = penumbraRatio * uvSearch;
 
 	// STEP 3: filtering
-	return PCF_Filter(shadowMap, s, uv, zReceiver, filterRadiusUV);
+	int ditherIndex = hash1(pixelLocation.x * 1750.8743 + pixelLocation.y* 9753.2198 + pixelLocation.z* 4930.9434) * DITHER_OFFSETS;
+	return PCF_Filter(shadowMap, s, uv, zReceiver, filterRadiusUV, ditherIndex);
 }

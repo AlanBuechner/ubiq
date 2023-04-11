@@ -44,6 +44,7 @@ namespace Engine
 				return true;
 
 			case FrameBufferTextureFormat::RGBA8:
+			case FrameBufferTextureFormat::RGBA16:
 			case FrameBufferTextureFormat::RED_INTEGER:
 			case FrameBufferTextureFormat::None:
 				break;

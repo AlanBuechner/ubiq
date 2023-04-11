@@ -143,16 +143,48 @@ namespace Engine
 
 		desc.BlendState.AlphaToCoverageEnable = FALSE;
 		desc.BlendState.IndependentBlendEnable = FALSE;
-		desc.BlendState.RenderTarget[0].BlendEnable = TRUE;
-		desc.BlendState.RenderTarget[0].LogicOpEnable = FALSE;
-		desc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-		desc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-		desc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		desc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-		desc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
-		desc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-		desc.BlendState.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
-		desc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+		desc.NumRenderTargets = (uint32)m_RenderTargetFormates.size();
+		for (uint32 i = 0; i < m_RenderTargetFormates.size(); i++)
+		{
+			desc.RTVFormats[i] = UbiqToDXGI(m_RenderTargetFormates[i]);
+
+			switch (m_RenderTargetFormates[i])
+			{
+			case FrameBufferTextureFormat::RGBA8:
+			case FrameBufferTextureFormat::RGBA16:
+			{
+				desc.BlendState.RenderTarget[i].BlendEnable = TRUE;
+				desc.BlendState.RenderTarget[i].LogicOpEnable = FALSE;
+				desc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+				desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+				desc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
+				desc.BlendState.RenderTarget[i].SrcBlendAlpha = D3D12_BLEND_ONE;
+				desc.BlendState.RenderTarget[i].DestBlendAlpha = D3D12_BLEND_ONE;
+				desc.BlendState.RenderTarget[i].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+				desc.BlendState.RenderTarget[i].LogicOp = D3D12_LOGIC_OP_NOOP;
+				desc.BlendState.RenderTarget[i].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+				break;
+			}
+			case FrameBufferTextureFormat::RED_INTEGER:
+			{
+				desc.BlendState.RenderTarget[i].BlendEnable = FALSE;
+				desc.BlendState.RenderTarget[i].LogicOpEnable = FALSE;
+				desc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+				desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+				desc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
+				desc.BlendState.RenderTarget[i].SrcBlendAlpha = D3D12_BLEND_ONE;
+				desc.BlendState.RenderTarget[i].DestBlendAlpha = D3D12_BLEND_ONE;
+				desc.BlendState.RenderTarget[i].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+				desc.BlendState.RenderTarget[i].LogicOp = D3D12_LOGIC_OP_NOOP;
+				desc.BlendState.RenderTarget[i].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+				break;
+			}
+			default:
+				break;
+			}
+
+		}
 
 		desc.DepthStencilState.DepthEnable = TRUE;
 		desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
@@ -165,9 +197,6 @@ namespace Engine
 		desc.DepthStencilState.FrontFace = defaultStencilOp;
 		desc.DepthStencilState.BackFace = defaultStencilOp;
 
-		desc.NumRenderTargets = (uint32)m_RenderTargetFormates.size();
-		for(uint32 i = 0; i < m_RenderTargetFormates.size(); i++)
-			desc.RTVFormats[i] = UbiqToDXGI(m_RenderTargetFormates[i]);
 		desc.SampleMask = UINT_MAX;
 		desc.SampleDesc.Count = 1;
 

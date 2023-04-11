@@ -20,12 +20,17 @@ namespace Engine
 		std::vector<Ref<CommandList>> dependencies;
 		for (auto& cmdList : m_RenderTarget.GetInput()->GetCommandLists())
 			dependencies.push_back(cmdList);
+		for (auto& node : m_Dependincys)
+		{
+			for(auto& cmdList : node->GetCommandLists())
+				dependencies.push_back(cmdList);
+		}
 		order->Add(m_CommandList, dependencies);
 	}
 
 	void ShaderPassNode::BuildImpl()
 	{
-		Ref<FrameBuffer> renderTarget = m_RenderTarget.GetVar();
+		Ref<FrameBuffer> renderTarget = m_RenderTarget.GetVarAndBuild();
 		const SceneData& scene = m_Graph.GetScene();
 		
 		m_CommandList->StartRecording();

@@ -1,0 +1,51 @@
+Scene: Name
+Entities:
+  - Entity: 12554925818194114016
+    Name: Skybox
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Direction: [-0.556801677, -0.722967207, 0.409011483]
+      Temperature: 6300.00977
+      Color: [1, 1, 1]
+      Intensity: 4
+      Size: 0.5
+    SkyboxComponent:
+      Texture: 44308273739615182
+  - Entity: 11693751238415598823
+    Name: Camera
+    TransformComponent:
+      Position: [3.19560456, 2.17798662, 5]
+      Rotation: [-0.242119506, 0.782615602, -1.8988132e-08]
+      Scale: [1, 1, 0.99999994]
+    CameraComponent:
+      Primary: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00100000005
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 14785401870932044183
+    Name: Mesh
+    TransformComponent:
+      Position: [59.8362312, 7.00051117, -40.8272934]
+      Rotation: [0, 0, 0]
+      Scale: [1, 5693.47412, 1]
+    MeshRendererComponent:
+      Mesh: 7711650371006191785
+      Material: 9193023617033958228
+  - Entity: 1824081241608119135
+    Name: Floor
+    TransformComponent:
+      Position: [-19.2683067, -7.1497879, 8.20482922]
+      Rotation: [0, 0, 0]
+      Scale: [5, 5, 5]
+    MeshRendererComponent:
+      Mesh: 15383826060822133857
+      Material: 11419106162513771918

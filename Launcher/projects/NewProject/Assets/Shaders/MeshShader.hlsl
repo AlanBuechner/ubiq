@@ -2,7 +2,7 @@
 topology = triangle;
 
 passes = { 
-	main = {
+	lit = {
 		VS = vertex;
 		PS = pixel; 
 	};

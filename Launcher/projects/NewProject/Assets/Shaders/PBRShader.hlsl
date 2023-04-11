@@ -2,7 +2,7 @@
 topology = triangle;
 
 passes = { 
-	main = {
+	lit = {
 		VS = vertex;
 		PS = pixel;
 	};
@@ -162,6 +162,7 @@ float SampleParallax(uint textureID, bool invert, float2 uv)
 	else return textures[textureID].Sample(textureSampler, uv).r;
 }
 
+[earlydepthstencil]
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
@@ -249,8 +250,8 @@ PS_Output main(PS_Input input)
 			pos = pos / pos.w;
 			pos.xy = pos.xy * 0.5 + 0.5;
 
-			shadowAmount = PCSSDirectional(textures[c.texture], shadowSampler, pos, shadowCamera.InvProjection, DirLight.size);
-			//shadowAmount = HardShadow(textures[c.texture], sampler, pos);
+			shadowAmount = PCSSDirectional(textures[c.texture], shadowSampler, pos, shadowCamera.InvProjection, DirLight.size, (float3)input.worldPosition);
+			//shadowAmount = HardShadow(textures[c.texture], shadowSampler, pos);
 		}
 
 		if(shadowAmount != 0)
@@ -260,7 +261,7 @@ PS_Output main(PS_Input input)
 		}
 	}
 
-	float3 ambiant = float3(0.3, 0.3, 0.3) * diffuse.rgb;
+	float3 ambiant = float3(0.5, 0.5, 0.5) * diffuse.rgb;
 
 	output.color = float4((ambiant + lo) * ao, diffuse.a);
 	return output;
