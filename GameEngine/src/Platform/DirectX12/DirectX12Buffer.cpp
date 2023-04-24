@@ -120,6 +120,8 @@ namespace Engine
 			IID_PPV_ARGS(&m_Buffer)
 		);
 
+		CORE_ASSERT(m_Buffer.Get() != nullptr, "faild to create index buffer")
+
 		m_View.BufferLocation = m_Buffer->GetGPUVirtualAddress();
 		m_View.SizeInBytes = count * sizeof(uint32);
 		m_View.Format = DXGI_FORMAT_R32_UINT;

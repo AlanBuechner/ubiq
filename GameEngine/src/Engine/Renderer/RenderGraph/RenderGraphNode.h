@@ -51,10 +51,24 @@ namespace Engine
 	class FrameBufferNode : public RenderGraphNode
 	{
 	public:
-		FrameBufferNode(RenderGraph& graph);
+		FrameBufferNode(RenderGraph& graph, FrameBufferSpecification fbSpec);
 		
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 
 		Ref<FrameBuffer> m_Buffer;
+	};
+
+	// transition Node
+	class TransitionNode : public RenderGraphNode
+	{
+	public:
+		TransitionNode(RenderGraph& graph);
+
+		void AddBuffer(CommandList::FBTransitionObject transition) { m_Transitions.push_back(transition); }
+
+		virtual void BuildImpl() override;
+
+	private:
+		std::vector<CommandList::FBTransitionObject> m_Transitions;
 	};
 }

@@ -7,9 +7,7 @@ namespace Engine
 
 	ShadowPassNode::ShadowPassNode(RenderGraph& graph) :
 		RenderGraphNode(graph)
-	{
-		m_CommandList = CommandList::Create();
-	}
+	{}
 
 	void ShadowPassNode::BuildImpl()
 	{

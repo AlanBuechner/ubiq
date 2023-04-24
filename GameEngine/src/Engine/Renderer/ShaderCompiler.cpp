@@ -18,6 +18,28 @@ namespace Engine
 		}
 	}
 
+	TextureAttribute::WrapMode GetWrapMode(const std::string& str)
+	{
+		if (str == "repeat")
+			return TextureAttribute::WrapMode::Repeat;
+		else if (str == "repeatMiror")
+			return TextureAttribute::WrapMode::MirroredRepeat;
+		else if (str == "clamp")
+			return TextureAttribute::WrapMode::Clamp;
+		return TextureAttribute::WrapMode::Clamp;
+	}
+
+	TextureAttribute::MinMagFilter GetFilter(const std::string& str)
+	{
+		if (str == "point") 
+			return TextureAttribute::MinMagFilter::Point;
+		else if (str == "linear") 
+			return TextureAttribute::MinMagFilter::Linear;
+		else if (str == "anisotropic") 
+			return TextureAttribute::MinMagFilter::Anisotropic;
+		return TextureAttribute::MinMagFilter::Linear;
+	}
+
 
 	ShaderConfig::RenderPass& ShaderConfig::FindPass(const std::string& passName)
 	{
@@ -145,21 +167,11 @@ namespace Engine
 					CORE_ASSERT(tokens[13] == ";", "expected \";\"");
 
 					TextureAttribute attrib;
-					if (u == "repeat") attrib.U == TextureAttribute::WrapMode::Repeat;
-					else if (u == "repeatMiror") attrib.U == TextureAttribute::WrapMode::MirroredRepeat;
-					else if (u == "clamp") attrib.U == TextureAttribute::WrapMode::Clamp;
+					attrib.U = GetWrapMode(u);
+					attrib.V = GetWrapMode(v);
 
-					if (v == "repeat") attrib.U == TextureAttribute::WrapMode::Repeat;
-					else if (v == "repeatMiror") attrib.U == TextureAttribute::WrapMode::MirroredRepeat;
-					else if (v == "clamp") attrib.U == TextureAttribute::WrapMode::Clamp;
-
-					if (min == "point") attrib.Min = TextureAttribute::MinMagFilter::Point;
-					else if (min == "linear") attrib.Min = TextureAttribute::MinMagFilter::Linear;
-					else if (min == "anisotropic") attrib.Min = TextureAttribute::MinMagFilter::Anisotropic;
-
-					if (mag == "point") attrib.Mag = TextureAttribute::MinMagFilter::Point;
-					else if (mag == "linear") attrib.Mag = TextureAttribute::MinMagFilter::Linear;
-					else if (mag == "anisotropic") attrib.Mag = TextureAttribute::MinMagFilter::Anisotropic;
+					attrib.Min = GetFilter(min);
+					attrib.Mag = GetFilter(mag);
 
 					ShaderSorce::SectionInfo::SamplerInfo info;
 					info.m_SamplerConfig = attrib;
@@ -213,6 +225,13 @@ namespace Engine
 							rpass.vs = var->value->string;
 						else if (var->name == "PS")
 							rpass.ps = var->value->string;
+						else if (var->name == "blendMode")
+						{
+							if (var->value->string == "blend")
+								rpass.blendMode = ShaderConfig::RenderPass::Blend;
+							else if (var->value->string == "add")
+								rpass.blendMode = ShaderConfig::RenderPass::Add;
+						}
 					}
 					config.passes.push_back(rpass);
 				}

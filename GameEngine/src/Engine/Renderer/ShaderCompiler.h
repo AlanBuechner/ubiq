@@ -87,9 +87,16 @@ namespace Engine
 
 		struct RenderPass
 		{
+			enum BlendMode {
+				Blend,
+				Add
+			};
+
 			std::string passName;
 			std::string vs;
 			std::string ps;
+			BlendMode blendMode = Blend;
+
 		};
 
 		Topology topology;

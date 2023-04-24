@@ -30,20 +30,9 @@ namespace Engine
 	{}
 
 	// frame buffer node
-	FrameBufferNode::FrameBufferNode(RenderGraph& graph) :
+	FrameBufferNode::FrameBufferNode(RenderGraph& graph, FrameBufferSpecification fbSpec) :
 		RenderGraphNode(graph)
 	{
-		FrameBufferSpecification fbSpec;
-		fbSpec.Attachments = {
-			{ FrameBufferTextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
-			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
-		};
-		fbSpec.InitalState = FrameBufferState::Common;
-
-		Window& window = Application::Get().GetWindow();
-		fbSpec.Width = window.GetWidth();
-		fbSpec.Height = window.GetHeight();
-
 		m_Buffer = FrameBuffer::Create(fbSpec);
 	}
 
@@ -51,6 +40,15 @@ namespace Engine
 	void FrameBufferNode::OnViewportResize(uint32 width, uint32 height)
 	{
 		m_Buffer->Resize(width, height);
+	}
+
+	TransitionNode::TransitionNode(RenderGraph& graph) :
+		RenderGraphNode(graph)
+	{}
+
+	void TransitionNode::BuildImpl()
+	{
+		m_CommandList->Transition(m_Transitions);
 	}
 
 }

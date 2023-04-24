@@ -162,6 +162,14 @@ namespace Engine
 
 	void DirectX12ResourceManager::UploadBufferRegion(wrl::ComPtr<ID3D12Resource> dest, uint64 offset, const void* data, uint32 size, D3D12_RESOURCE_STATES state)
 	{
+
+		if (dest.Get() == nullptr)
+		{
+			CORE_ERROR("atempting to upload data with null resource");
+			__debugbreak();
+			return;
+		}
+
 		std::lock_guard g(m_UploadMutex);
 
 		DirectX12UploadPage* page;
@@ -197,6 +205,13 @@ namespace Engine
 
 	void DirectX12ResourceManager::CopyBuffer(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 size, D3D12_RESOURCE_STATES state)
 	{
+		if (dest.Get() == nullptr || src.Get() == nullptr)
+		{
+			CORE_ERROR("atempting to upload data with null resource");
+			__debugbreak();
+			return;
+		}
+
 		std::lock_guard g(m_UploadMutex);
 		UploadBufferData uploadData;
 		uploadData.size = size;
@@ -211,6 +226,14 @@ namespace Engine
 
 	void DirectX12ResourceManager::UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, bool genMipChain, D3D12_RESOURCE_STATES state)
 	{
+
+		if (dest.Get() == nullptr || src.Get() == nullptr)
+		{
+			CORE_ERROR("atempting to upload data with null resource");
+			__debugbreak();
+			return;
+		}
+
 		std::lock_guard g(m_UploadMutex);
 		UploadTextureData uploadData;
 		uploadData.destResource = dest;

@@ -157,7 +157,10 @@ namespace Engine
 				desc.BlendState.RenderTarget[i].BlendEnable = TRUE;
 				desc.BlendState.RenderTarget[i].LogicOpEnable = FALSE;
 				desc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-				desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+				if(m_PassConfig.blendMode == ShaderConfig::RenderPass::Blend)
+					desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+				else if(m_PassConfig.blendMode = ShaderConfig::RenderPass::Add)
+					desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_SRC_ALPHA;
 				desc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
 				desc.BlendState.RenderTarget[i].SrcBlendAlpha = D3D12_BLEND_ONE;
 				desc.BlendState.RenderTarget[i].DestBlendAlpha = D3D12_BLEND_ONE;

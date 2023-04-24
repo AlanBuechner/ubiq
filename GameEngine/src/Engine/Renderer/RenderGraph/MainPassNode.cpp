@@ -6,9 +6,7 @@ namespace Engine
 {
 	ShaderPassNode::ShaderPassNode(RenderGraph& graph, const std::string& passName) :
 		RenderGraphNode(graph), m_PassName(passName)
-	{
-		m_CommandList = CommandList::Create(CommandList::Direct);
-	}
+	{}
 
 	void ShaderPassNode::BuildImpl()
 	{

@@ -17,3 +17,5 @@
 #define BLIT 254
 #define LINE 253
 #define TEXTURE 252
+#define DEPTHFOG 251
+#define BLOOM 250

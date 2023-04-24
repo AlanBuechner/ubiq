@@ -27,6 +27,7 @@ namespace Engine
 		virtual void Present(Ref<FrameBuffer> fb, FrameBufferState from) override;
 
 		virtual void Transition(std::vector<Ref<FrameBuffer>> fbs, FrameBufferState to, FrameBufferState from) override;
+		virtual void Transition(std::vector<FBTransitionObject> transitions) override;
 
 		// rendering
 		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) override;
@@ -43,6 +44,7 @@ namespace Engine
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
 		virtual void SetRootConstant(uint32 index, uint32 data) override;
 		virtual void SetTexture(uint32 index, Ref<Texture> texture) override;
+		virtual void SetFrameBuffer(uint32 index, Ref<FrameBuffer> buffer, uint32 attatchment) override;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) override;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
 

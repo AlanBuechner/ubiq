@@ -419,7 +419,7 @@ namespace Engine
 				TextureAttribute& attrib = rd.samplerAttribs;
 				ssd.AddressU = GetWrapMode(attrib.U);
 				ssd.AddressV = GetWrapMode(attrib.V);
-				ssd.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+				ssd.AddressW = GetWrapMode(TextureAttribute::WrapMode::Clamp);
 
 				ssd.Filter = GetFilter(attrib.Min, attrib.Mag);
 

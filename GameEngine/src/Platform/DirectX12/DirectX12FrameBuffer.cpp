@@ -152,6 +152,9 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		// delete buffer
+		if (m_Buffers[i])
+			context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffers[i]);
 
 		D3D12_HEAP_PROPERTIES props
 		{
@@ -194,7 +197,7 @@ namespace Engine
 		D3D12_RESOURCE_STATES state = m_Spec.Attachments.Attachments[i].IsDepthStencil() ? GetDXDepthState(m_Spec.InitalState) : GetDXState(m_Spec.InitalState);
 		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommittedResource(
 			&props, D3D12_HEAP_FLAG_NONE, &rDesc,
-			state, &clearVal, IID_PPV_ARGS(m_Buffers[i].GetAddressOf())
+			state, &clearVal, IID_PPV_ARGS(m_Buffers[i].ReleaseAndGetAddressOf())
 		),"Failed To Create Resorce");
 
 		if (!m_Spec.Attachments.Attachments[i].IsDepthStencil())

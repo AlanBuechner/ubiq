@@ -10,8 +10,6 @@ namespace Engine
 	SkyboxNode::SkyboxNode(RenderGraph& graph) :
 		RenderGraphNode(graph)
 	{
-		m_CommandList = CommandList::Create(CommandList::Direct);
-
 		m_SkyboxShader = Application::Get().GetAssetManager().GetAsset<Shader>("Assets/Shaders/SkyboxShader.hlsl");
 
 		struct Vertex

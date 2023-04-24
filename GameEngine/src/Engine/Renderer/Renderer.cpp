@@ -43,7 +43,7 @@ namespace Engine
 		
 		// graphics command queue
 		s_MainCommandQueue = CommandQueue::Create(CommandQueue::Type::Direct);
-		s_MainCommandList = CommandList::Create();
+		s_MainCommandList = CommandList::Create(CommandList::Direct);
 
 		// copy command queue
 

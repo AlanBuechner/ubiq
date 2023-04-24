@@ -6,9 +6,7 @@ namespace Engine
 {
 	GBufferPassNode::GBufferPassNode(RenderGraph& graph) :
 		RenderGraphNode(graph)
-	{
-		m_CommandList = CommandList::Create(CommandList::Direct);
-	}
+	{}
 
 	void GBufferPassNode::BuildImpl()
 	{
@@ -17,7 +15,6 @@ namespace Engine
 		// depth pre pass
 		GPUTimer::BeginEvent(m_CommandList, "Depth pre pass");
 		// set up render target
-		m_CommandList->ToRenderTarget(m_RenderTarget, FrameBufferState::Common);
 		m_CommandList->SetRenderTarget(m_RenderTarget);
 		m_CommandList->ClearRenderTarget();
 

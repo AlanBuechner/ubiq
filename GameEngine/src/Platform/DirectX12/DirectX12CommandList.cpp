@@ -122,6 +122,27 @@ namespace Engine
 		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
 	}
 
+	void DirectX12CommandList::Transition(std::vector<FBTransitionObject> transitions)
+	{
+		std::vector<D3D12_RESOURCE_BARRIER> barriers;
+		for (auto transition : transitions)
+		{
+			Ref<DirectX12FrameBuffer> dxfb = std::dynamic_pointer_cast<DirectX12FrameBuffer>(transition.fb);
+			std::vector<FrameBufferTextureSpecification> attachments = dxfb->GetSpecification().Attachments.Attachments;
+			barriers.reserve(attachments.size());
+
+			for (uint32 i = 0; i < attachments.size(); i++)
+			{
+				if (attachments[i].IsDepthStencil())
+					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXDepthState(transition.from), DirectX12FrameBuffer::GetDXDepthState(transition.to)));
+				else
+					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXState(transition.from), DirectX12FrameBuffer::GetDXState(transition.to)));
+			}
+		}
+
+		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
+	}
+
 
 
 	// rendering
@@ -278,6 +299,17 @@ namespace Engine
 
 		Ref<DirectX12Texture2D> d3dTexture = std::dynamic_pointer_cast<DirectX12Texture2D>(texture);
 		m_CommandList->SetGraphicsRootDescriptorTable(index, d3dTexture->GetHandle().gpu);
+	}
+
+	void DirectX12CommandList::SetFrameBuffer(uint32 index, Ref<FrameBuffer> buffer, uint32 attatchment)
+	{
+		if (index == UINT32_MAX)
+			return; // invalid bind slot
+
+		Ref<DirectX12FrameBuffer> d3dTexture = std::dynamic_pointer_cast<DirectX12FrameBuffer>(buffer);
+		D3D12_GPU_DESCRIPTOR_HANDLE handle;
+		handle.ptr = d3dTexture->GetAttachmentShaderHandle(attatchment);
+		m_CommandList->SetGraphicsRootDescriptorTable(index, handle);
 	}
 
 	void DirectX12CommandList::DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, int numInstances)

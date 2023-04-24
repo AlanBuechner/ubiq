@@ -19,6 +19,12 @@ namespace Engine
 			Bundle
 		};
 
+		struct FBTransitionObject
+		{
+			Ref<FrameBuffer> fb;
+			FrameBufferState to, from;
+		};
+
 	public:
 
 		virtual void SignalRecording() = 0;
@@ -31,6 +37,7 @@ namespace Engine
 		virtual void Present(Ref<FrameBuffer> fb, FrameBufferState from) = 0;
 
 		virtual void Transition(std::vector<Ref<FrameBuffer>> fbs, FrameBufferState to, FrameBufferState from) = 0;
+		virtual void Transition(std::vector<FBTransitionObject> transitions) = 0;
 
 		// rendering
 		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) = 0;
@@ -47,6 +54,7 @@ namespace Engine
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) = 0;
 		virtual void SetRootConstant(uint32 index, uint32 data) = 0;
 		virtual void SetTexture(uint32 index, Ref<Texture> texture) = 0;
+		virtual void SetFrameBuffer(uint32 index, Ref<FrameBuffer> buffer, uint32 attatchment) = 0;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) = 0;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) = 0;
 
