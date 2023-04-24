@@ -27,13 +27,16 @@ namespace Engine
 		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(m_Stride * count);
 
+		if (m_Buffer)
+			context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffer);
+
 		context->GetDevice()->CreateCommittedResource(
 			&props,
 			D3D12_HEAP_FLAG_NONE,
 			&resDesc,
 			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 			nullptr,
-			IID_PPV_ARGS(m_Buffer.GetAddressOf())
+			IID_PPV_ARGS(m_Buffer.ReleaseAndGetAddressOf())
 		);
 
 		m_Buffer->SetName(L"Structured Buffer");

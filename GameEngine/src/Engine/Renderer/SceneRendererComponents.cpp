@@ -104,7 +104,7 @@ namespace Engine
 
 	void SkyboxComponent::OnComponentRemoved()
 	{
-
+		Owner.GetScene()->GetSceneRenderer()->SetSkyBox(nullptr);
 	}
 
 	void SkyboxComponent::SetSkyboxTexture(Ref<Texture2D> texture)

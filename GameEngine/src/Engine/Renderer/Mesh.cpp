@@ -23,7 +23,7 @@ namespace Engine
 		if (m_IndexBuffer)
 			m_IndexBuffer->SetData(data, count);
 		else
-		m_IndexBuffer = IndexBuffer::Create(data, count);
+			m_IndexBuffer = IndexBuffer::Create(data, count);
 	}
 
 	Ref<Mesh> Mesh::Create(BufferLayout layout)

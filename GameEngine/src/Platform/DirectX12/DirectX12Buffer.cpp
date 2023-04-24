@@ -52,7 +52,7 @@ namespace Engine
 			&resDesc, // resource description for a buffer
 			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, // start in the copy destination state
 			nullptr, // optimized clear value must be null for this type of resource
-			IID_PPV_ARGS(&m_Buffer)
+			IID_PPV_ARGS(m_Buffer.ReleaseAndGetAddressOf())
 		);
 
 		m_View.BufferLocation = m_Buffer->GetGPUVirtualAddress();
@@ -117,7 +117,7 @@ namespace Engine
 			&resDesc, // resource description for a buffer
 			D3D12_RESOURCE_STATE_INDEX_BUFFER, // start in the copy destination state
 			nullptr, // optimized clear value must be null for this type of resource
-			IID_PPV_ARGS(&m_Buffer)
+			IID_PPV_ARGS(m_Buffer.ReleaseAndGetAddressOf())
 		);
 
 		CORE_ASSERT(m_Buffer.Get() != nullptr, "faild to create index buffer")

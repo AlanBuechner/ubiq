@@ -50,6 +50,6 @@ namespace Engine
 		wrl::ComPtr<ID3D12Resource> m_Buffer;
 		D3D12_INDEX_BUFFER_VIEW m_View;
 
-		uint32 m_Count;
+		uint32 m_Count = 0;
 	};
 }
