@@ -11,12 +11,12 @@ namespace Engine
 {
 
 	EditorCamera::EditorCamera() :
-		m_FOV(45.0f), m_AspectRatio(1.778f), m_NearClip(0.1f), m_FarClip(10000.0f),
-		Camera(Math::Perspective(Math::Radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip))
+		EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f)
 	{}
 
-	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
-		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), Camera(Math::Perspective(Math::Radians(fov), aspectRatio, nearClip, farClip))
+	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip):
+		m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), 
+		Camera(Math::Perspective(Math::Radians(fov), aspectRatio, nearClip, farClip))
 	{
 		UpdateView();
 		OnUpdate();
