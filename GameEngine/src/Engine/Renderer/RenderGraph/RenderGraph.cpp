@@ -10,6 +10,7 @@
 
 // post process
 #include "Engine/Renderer/PostProcessing/Bloom.h"
+#include "Engine/Renderer/PostProcessing/DepthOfField.h"
 
 namespace Engine
 {
@@ -98,6 +99,7 @@ namespace Engine
 		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer );
 		postPass->SetInput(input);
 		postPass->AddPostProcess(CreateRef<Bloom>());
+		postPass->AddPostProcess(CreateRef<DepthOfField>());
 		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachmentShaderDescriptoLocation(0));
 		postPass->InitPostProcessStack();
 		postPass->AddDependincy(t2);

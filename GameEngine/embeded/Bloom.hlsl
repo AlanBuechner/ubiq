@@ -87,12 +87,12 @@ float max3(float a, float b, float c)
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
+	Texture2D<float4> src = textures[srcLoc];
 
 	uint2 srcTexelSize;
-	textures[srcLoc].GetDimensions(srcTexelSize.x, srcTexelSize.y);
+	src.GetDimensions(srcTexelSize.x, srcTexelSize.y);
 	float2 srcPixelUVSize = 1.0 / srcTexelSize;
 
-	Texture2D<float4> src = textures[srcLoc];
 
 	/*
 	

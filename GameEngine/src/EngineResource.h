@@ -19,3 +19,4 @@
 #define TEXTURE 252
 #define DEPTHFOG 251
 #define BLOOM 250
+#define DEPTHOFFIELD 249

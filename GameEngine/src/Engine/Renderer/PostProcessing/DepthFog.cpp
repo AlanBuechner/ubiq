@@ -33,7 +33,7 @@ namespace Engine
 		commandList->SetShader(depthFogPass);
 		commandList->SetConstantBuffer(depthFogPass->GetUniformLocation("texInput"), m_Params);
 		commandList->SetConstantBuffer(depthFogPass->GetUniformLocation("camera"), m_Scene->m_MainCamera->GetCameraBuffer());
-		commandList->SetRootConstant(depthFogPass->GetUniformLocation("RC_SrcLoc"), srcDescriptorLocation);
+		commandList->SetRootConstant(depthFogPass->GetUniformLocation("RC_SrcLoc"), (uint32)srcDescriptorLocation);
 
 		commandList->DrawMesh(screenMesh);
 	}

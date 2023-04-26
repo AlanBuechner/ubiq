@@ -13,6 +13,7 @@ namespace Engine
 	struct PostProcessInput
 	{
 		std::unordered_map<std::string, uint64> m_TextureHandles;
+		std::unordered_map<std::string, uint64> m_CBHandles;
 	};
 
 	class PostProcess

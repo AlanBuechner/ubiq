@@ -57,7 +57,7 @@ namespace Engine
 			commandList->SetShader(downSample);
 			commandList->SetRootConstant(downSample->GetUniformLocation("RC_SrcLoc"), srcLoc);
 			float threshold = i == 0 ? 1 : 0;
-			commandList->SetRootConstant(downSample->GetUniformLocation("RC_Threshold"), *(uint32*)(float*)&threshold);
+			commandList->SetRootConstant(downSample->GetUniformLocation("RC_Threshold"), threshold);
 			commandList->DrawMesh(screenMesh);
 			commandList->Transition({ m_GaussianSumBuffers[i] }, FrameBufferState::SRV, FrameBufferState::RenderTarget);
 		}
@@ -83,7 +83,7 @@ namespace Engine
 		commandList->SetRenderTarget(renderTarget);
 		commandList->ClearRenderTarget(renderTarget);
 		commandList->SetShader(composit);
-		commandList->SetRootConstant(composit->GetUniformLocation("RC_SrcLoc"), srcDescriptorLocation);
+		commandList->SetRootConstant(composit->GetUniformLocation("RC_SrcLoc"), (uint32)srcDescriptorLocation);
 		commandList->SetRootConstant(composit->GetUniformLocation("RC_Bloom"), m_GaussianSumBuffers[0]->GetAttachmentShaderDescriptoLocation(0));
 		commandList->DrawMesh(screenMesh);
 
