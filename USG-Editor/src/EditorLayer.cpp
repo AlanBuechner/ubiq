@@ -337,6 +337,8 @@ namespace Engine
 
 	void EditorLayer::DrawCustomGizmo()
 	{
+		return;
+
 		// draw grid lines
 		LineRenderer::BeginScene(m_EditorCamera);
 		{

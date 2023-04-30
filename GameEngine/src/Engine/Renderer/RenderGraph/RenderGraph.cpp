@@ -11,6 +11,7 @@
 // post process
 #include "Engine/Renderer/PostProcessing/Bloom.h"
 #include "Engine/Renderer/PostProcessing/DepthOfField.h"
+#include "Engine/Renderer/PostProcessing/ToneMapping.h"
 
 namespace Engine
 {
@@ -19,9 +20,11 @@ namespace Engine
 	{
 		Window& window = Application::Get().GetWindow();
 
+
+		float clearval = pow(0.2f, 2.2);
 		FrameBufferSpecification fbSpec1;
 		fbSpec1.Attachments = {
-			{ FrameBufferTextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
+			{ FrameBufferTextureFormat::RGBA16, {clearval,clearval,clearval,1} },
 			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
 		};
 		fbSpec1.InitalState = FrameBufferState::Common;
@@ -71,7 +74,7 @@ namespace Engine
 		// create post processing render target
 		FrameBufferSpecification fbSpec2;
 		fbSpec2.Attachments = {
-			{ FrameBufferTextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
+			{ FrameBufferTextureFormat::RGBA16, {0,0,0,1} },
 			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
 		};
 		fbSpec2.InitalState = FrameBufferState::Common;
@@ -98,8 +101,9 @@ namespace Engine
 		postPass->SetCommandList(commandList);
 		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer );
 		postPass->SetInput(input);
-		postPass->AddPostProcess(CreateRef<Bloom>());
 		postPass->AddPostProcess(CreateRef<DepthOfField>());
+		postPass->AddPostProcess(CreateRef<Bloom>());
+		postPass->AddPostProcess(CreateRef<ToneMapping>());
 		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachmentShaderDescriptoLocation(0));
 		postPass->InitPostProcessStack();
 		postPass->AddDependincy(t2);

@@ -14,13 +14,13 @@ passes = {
 		VS = vertex;
 		PS = blurCoC;
 	};
-	nearBlur = {
+	bokehBlur = {
 		VS = vertex;
 		PS = bokehBlur;
 	};
-	farBlur = {
+	farBokehBlur = {
 		VS = vertex;
-		PS = bokehBlur;
+		PS = farBokehBlur;
 	};
 	composit = {
 		VS = vertex;
@@ -275,18 +275,64 @@ PS_Output main(PS_Input input)
 	return output;
 }
 
-#section nearBlur
-
-cbuffer RC_COCLoc{
-	uint cocLoc;
-};
+#section bokehBlur
 
 cbuffer RC_SrcLoc{
 	uint srcLoc;
 };
 
+cbuffer RC_Strength {
+	float strength;
+};
+
+cbuffer RC_COC {
+	uint cocLoc;
+};
+
 Texture2D<float4> textures[];
 StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
+
+PS_Output main(PS_Input input)
+{
+	PS_Output output;
+
+	Texture2D<float4> src = textures[srcLoc];
+
+	uint2 srcTexelCount;
+	src.GetDimensions(srcTexelCount.x, srcTexelCount.y);
+	float2 srcPixelUVSize = 1.0 / srcTexelCount;
+
+	float4 sum = src.Sample(textureSampler, input.uv);
+	for (uint i = 0; i < 48; i++)
+	{
+		float2 offset = offsets[i] * strength * srcPixelUVSize;
+		sum += src.Sample(textureSampler, input.uv + offset);
+	}
+
+	output.color = sum/49.0;
+
+	output.color.a = 1;
+	return output;
+}
+
+
+#section farBokehBlur
+
+cbuffer RC_SrcLoc {
+	uint srcLoc;
+};
+
+cbuffer RC_Strength {
+	float strength;
+};
+
+cbuffer RC_COC {
+	uint cocLoc;
+};
+
+Texture2D<float4> textures[];
+StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
+StaticSampler pointSampler = StaticSampler(clamp, clamp, point, point);
 
 
 PS_Output main(PS_Input input)
@@ -296,28 +342,71 @@ PS_Output main(PS_Input input)
 	Texture2D<float4> src = textures[srcLoc];
 	Texture2D<float4> coc = textures[cocLoc];
 
-	output.color = float4(1, 1, 1, 1);
+	uint2 srcTexelCount;
+	src.GetDimensions(srcTexelCount.x, srcTexelCount.y);
+	float2 srcPixelUVSize = 1.0 / srcTexelCount;
+
+	float c = coc.Sample(pointSampler, input.uv).g;
+
+	float cocSum = c;
+	for (uint i = 0; i < 48; i++)
+	{
+		float2 offset = offsets[i] * strength * srcPixelUVSize * c;
+		float farcoc = coc.Sample(pointSampler, input.uv + offset).g;
+		cocSum += farcoc;
+	}
+
+	cocSum = max(cocSum / 49.0, 0.00001);
+
+	float4 sum = src.Sample(textureSampler, input.uv);
+	for (uint j = 0; j < 48; j++)
+	{
+		float2 offset = offsets[j] * strength * srcPixelUVSize * c;
+		float farcoc = coc.Sample(pointSampler, input.uv + offset).g;
+		sum += src.Sample(textureSampler, input.uv + offset) * (farcoc / cocSum);
+	}
+
+	output.color = sum / 49.0;
+
+	output.color.a = 1;
 	return output;
 }
 
 #section composit
 
-cbuffer RC_SrcLoc
-{
+cbuffer RC_SrcLoc{
 	uint srcLoc;
 };
 
+cbuffer RC_NearLoc {
+	uint nearLoc;
+};
+
+cbuffer RC_FarLoc {
+	uint farLoc;
+};
+
+cbuffer RC_COC {
+	uint cocLoc;
+};
+
 Texture2D<float4> textures[];
-StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
+StaticSampler textureSampler = StaticSampler(clamp, clamp, point, point);
 
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
 
-	Texture2D<float4> src = textures[srcLoc];
-	float4 color = src.Sample(textureSampler, input.uv);
+	float4 src = textures[srcLoc].Sample(textureSampler, input.uv);
+	float4 near = textures[nearLoc].Sample(textureSampler, input.uv);
+	float4 far = textures[farLoc].Sample(textureSampler, input.uv);
+	float2 coc = textures[cocLoc].Sample(textureSampler, input.uv).rg;
 
-	output.color = color;
+	//float4 background = lerp(src, far, coc.g);
+	float4 background = lerp(src, far, sqrt(coc.g));
+	//float4 background = lerp(src, far/max(coc.g, 0.00001), coc.g);
+
+	output.color = lerp(background, near, coc.r);
 	output.color.a = 1;
 	return output;
 }

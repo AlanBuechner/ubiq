@@ -8,7 +8,7 @@ Entities:
       Scale: [1, 1, 1]
     DirectionalLightComponent:
       Direction: [-0.556801677, -0.722967207, 0.409011483]
-      Temperature: 6300.00977
+      Temperature: 3185.11011
       Color: [1, 1, 1]
       Intensity: 4
       Size: 0.5
@@ -34,7 +34,7 @@ Entities:
   - Entity: 14785401870932044183
     Name: Mesh
     TransformComponent:
-      Position: [0, 1.46000004, 0]
+      Position: [14.9394608, 0.89301759, -9.45795631]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshRendererComponent:
@@ -49,3 +49,12 @@ Entities:
     MeshRendererComponent:
       Mesh: 15383826060822133857
       Material: 11419106162513771918
+  - Entity: 10453396793969881703
+    Name: Mesh
+    TransformComponent:
+      Position: [-4.025177, 0, -0.0164539814]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Mesh: 7711650371006191785
+      Material: 9193023617033958228

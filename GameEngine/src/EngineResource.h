@@ -20,3 +20,4 @@
 #define DEPTHFOG 251
 #define BLOOM 250
 #define DEPTHOFFIELD 249
+#define TONEMAPPING 248
