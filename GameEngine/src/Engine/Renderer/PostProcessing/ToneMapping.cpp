@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ToneMapping.h"
 #include "EngineResource.h"
+#include "Engine/Renderer/GPUProfiler.h"
 
 namespace Engine
 {
@@ -15,12 +16,15 @@ namespace Engine
 		Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("HillACES");
 		//Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("NarkowiczACES");
 
+		GPUTimer::BeginEvent(commandList, "ToneMapping");
+
 		commandList->SetRenderTarget(renderTarget);
 		commandList->ClearRenderTarget(renderTarget);
 		commandList->SetShader(pass);
 		commandList->SetRootConstant(pass->GetUniformLocation("RC_SrcLoc"), (uint32)srcDescriptorLocation);
 		commandList->DrawMesh(screenMesh);
 
+		GPUTimer::EndEvent(commandList);
 	}
 
 }

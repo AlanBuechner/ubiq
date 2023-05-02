@@ -36,7 +36,6 @@ namespace Engine
 	{
 		m_RenderTarget = fb;
 		FrameBufferSpecification spec = m_RenderTarget->GetSpecification();
-		spec.InitalState = FrameBufferState::RenderTarget;
 		m_BackBuffer = FrameBuffer::Create(spec);
 	}
 
@@ -65,6 +64,12 @@ namespace Engine
 			if (i == 0) srcLoc = m_SrcDescriptorLocation;
 
 			post->RecordCommands(m_CommandList, curr, srcLoc, m_Input, m_ScreenMesh);
+
+			m_CommandList->Transition({ 
+				{curr, m_RenderTarget->GetSpecification().InitalState, FrameBufferState::RenderTarget },
+				{lastPass, FrameBufferState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
+			});
+
 			curr = (curr == m_BackBuffer) ? m_RenderTarget : m_BackBuffer; // swap buffers
 		}
 

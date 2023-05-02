@@ -76,7 +76,7 @@ namespace Engine
 	// mesh component
 	void MeshRendererComponent::OnComponentRemoved()
 	{
-
+		Owner.GetScene()->GetSceneRenderer()->RemoveObject(m_Object); // remove the object if it exists
 	}
 
 	void MeshRendererComponent::OnTransformChange(const Math::Mat4& transform)

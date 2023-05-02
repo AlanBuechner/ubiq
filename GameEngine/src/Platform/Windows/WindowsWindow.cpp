@@ -120,6 +120,16 @@ namespace Engine
 		ShowWindow(m_Window, props.Maximized ? SW_MAXIMIZE : SW_SHOW);
 		UpdateWindow(m_Window);
 
+		// Register raw input
+
+		RAWINPUTDEVICE rid;
+		rid.usUsagePage = 0x01;
+		rid.usUsage = 0x02;
+		rid.dwFlags = 0;
+		rid.hwndTarget = m_Window;
+		RegisterRawInputDevices(&rid, 1, sizeof(rid));
+
+		// set up swap chain
 		m_SwapChain = SwapChain::Create(*this);
 		m_SwapChain->Init(3);
 		m_SwapChain->SetVSync(m_Data.VSync);
@@ -292,9 +302,9 @@ namespace Engine
 			if (m_Data.EventCallback == nullptr) break;
 			POINTS pt = MAKEPOINTS(lParam);
 			m_Data.EventCallback(*new MouseMovedEvent(MOUSE_POSITON, pt.x, pt.y));
-			Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
-			MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y); // creates new mouse moved event
-			m_Data.EventCallback(*deltaMousePostionEvent);
+			//Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
+			//MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y); // creates new mouse moved event
+			//m_Data.EventCallback(*deltaMousePostionEvent);
 			break;
 		}
 
@@ -323,6 +333,22 @@ namespace Engine
 			if (m_Data.EventCallback == nullptr) break;
 			m_Data.EventCallback(*new MouseButtonReleasedEvent(VK_MBUTTON));
 			break;
+		case WM_INPUT: {
+			unsigned size = 0;
+			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER));
+			CORE_INFO("{0}", size);
+			static RAWINPUT* raw = new RAWINPUT[size];
+			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, raw, &size, sizeof(RAWINPUTHEADER));
+
+			if (raw[0].header.dwType == RIM_TYPEMOUSE && (raw[0].data.mouse.lLastX != 0 || raw[0].data.mouse.lLastY != 0)) {
+				CORE_INFO("{0}, {1}", raw[0].data.mouse.lLastX, raw[0].data.mouse.lLastY);
+				MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)raw[0].data.mouse.lLastX, (float)raw[0].data.mouse.lLastY); // creates new mouse moved event
+				m_Data.EventCallback(*deltaMousePostionEvent);
+			}
+			//delete[] raw;
+			CORE_INFO("hello");
+			break;
+		}
 
 
 			// window events

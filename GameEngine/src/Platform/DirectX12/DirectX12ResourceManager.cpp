@@ -304,14 +304,20 @@ namespace Engine
 		endb.reserve(numBufferCopys);
 		bufferCopys.reserve(numBufferCopys);
 
+		std::unordered_set<ID3D12Resource*> m_SeenUploads;
+
 		// collect data
 		while (!m_BufferUploadQueue.empty())
 		{
 			UploadBufferData& data = m_BufferUploadQueue.front();
 
-			startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST));
+			if (m_SeenUploads.find(data.destResource.Get()) == m_SeenUploads.end())
+			{
+				startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST));
+				endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, data.state));
+				m_SeenUploads.insert(data.destResource.Get());
+			}
 			bufferCopys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.destOffset, data.srcOffset, data.size });
-			endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, data.state));
 
 			m_BufferUploadQueue.pop();
 		}

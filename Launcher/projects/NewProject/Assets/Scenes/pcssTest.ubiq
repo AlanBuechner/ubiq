@@ -8,7 +8,7 @@ Entities:
       Scale: [1, 1, 1]
     DirectionalLightComponent:
       Direction: [-0.556801677, -0.722967207, 0.409011483]
-      Temperature: 6300.00977
+      Temperature: 3185.11011
       Color: [1, 1, 1]
       Intensity: 4
       Size: 0.5
