@@ -337,7 +337,7 @@ namespace Engine
 			unsigned size = 0;
 			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER));
 			CORE_INFO("{0}", size);
-			static RAWINPUT* raw = new RAWINPUT[size];
+			RAWINPUT* raw = new RAWINPUT[size];
 			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, raw, &size, sizeof(RAWINPUTHEADER));
 
 			if (raw[0].header.dwType == RIM_TYPEMOUSE && (raw[0].data.mouse.lLastX != 0 || raw[0].data.mouse.lLastY != 0)) {
@@ -345,7 +345,7 @@ namespace Engine
 				MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)raw[0].data.mouse.lLastX, (float)raw[0].data.mouse.lLastY); // creates new mouse moved event
 				m_Data.EventCallback(*deltaMousePostionEvent);
 			}
-			//delete[] raw;
+			delete[] raw;
 			CORE_INFO("hello");
 			break;
 		}
