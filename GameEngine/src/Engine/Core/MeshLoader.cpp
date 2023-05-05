@@ -25,11 +25,11 @@ namespace Engine
 		return { mesh->mTangents[index].x, mesh->mTangents[index].y, mesh->mTangents[index].z };
 	}
 
-	Math::Vector2 GetUVCoords(aiMesh* mesh, uint32 index)
+	Math::Vector2 GetUVCoords(aiMesh* mesh, uint32 index, uint32 uvSet = 0)
 	{
-		if (mesh->mTextureCoords[0] == nullptr)
+		if (mesh->mTextureCoords[uvSet] == nullptr)
 			return { 0.0f, 0.0f };
-		const auto coords = mesh->mTextureCoords[0][index];
+		const auto coords = mesh->mTextureCoords[uvSet][index];
 		return { coords.x, coords.y };
 	}
 

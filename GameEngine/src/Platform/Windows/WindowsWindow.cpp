@@ -336,15 +336,13 @@ namespace Engine
 		case WM_INPUT: {
 			unsigned size = 0;
 			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER));
-			RAWINPUT* raw = new RAWINPUT[size];
-			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, raw, &size, sizeof(RAWINPUTHEADER));
+			RAWINPUT raw{0};
+			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, &raw, &size, sizeof(RAWINPUTHEADER));
 
-			if (raw[0].header.dwType == RIM_TYPEMOUSE && (raw[0].data.mouse.lLastX != 0 || raw[0].data.mouse.lLastY != 0)) {
-				MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)raw[0].data.mouse.lLastX, (float)raw[0].data.mouse.lLastY); // creates new mouse moved event
+			if (raw.header.dwType == RIM_TYPEMOUSE && (raw.data.mouse.lLastX != 0 || raw.data.mouse.lLastY != 0)) {
+				MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)raw.data.mouse.lLastX, (float)raw.data.mouse.lLastY); // creates new mouse moved event
 				m_Data.EventCallback(*deltaMousePostionEvent);
 			}
-			delete[] raw;
-			CORE_INFO("hello");
 			break;
 		}
 

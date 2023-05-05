@@ -372,6 +372,7 @@ if(!m_Selected.HasComponent<component>()){\
 				component.SetMesh(mesh);
 
 
+
 			Ref<Material> mat = component.GetMaterial();
 			if (PropertysPanel::DrawMaterialControl("Material", mat))
 				component.SetMaterial(mat);
