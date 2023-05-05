@@ -1,9 +1,15 @@
 #pragma once
 
 #include "RenderGraph.h"
-#include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/CommandQueue.h"
+//#include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/CommandList.h"
+
+namespace Engine
+{
+	class CommandList;
+
+	struct FrameBufferSpecification;
+}
 
 namespace Engine
 {
@@ -42,7 +48,7 @@ namespace Engine
 	public:
 		OutputNode(RenderGraph& graph);
 
-		virtual void Invalidate() { m_Buffer->ResetClear(); RenderGraphNode::Invalidate(); }
+		virtual void Invalidate();
 
 		Ref<FrameBuffer> m_Buffer;
 	};
@@ -51,7 +57,7 @@ namespace Engine
 	class FrameBufferNode : public RenderGraphNode
 	{
 	public:
-		FrameBufferNode(RenderGraph& graph, FrameBufferSpecification fbSpec);
+		FrameBufferNode(RenderGraph& graph, const FrameBufferSpecification& fbSpec);
 		
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 
@@ -64,7 +70,7 @@ namespace Engine
 	public:
 		TransitionNode(RenderGraph& graph);
 
-		void AddBuffer(CommandList::FBTransitionObject transition) { m_Transitions.push_back(transition); }
+		void AddBuffer(const CommandList::FBTransitionObject& transition);
 
 		virtual void BuildImpl() override;
 

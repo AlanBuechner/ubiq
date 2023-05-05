@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/Resources/Texture.h"
 #include "DirectX12Descriptors.h"
 #include "DX.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Renderer/FrameBuffer.h"
+#include "Engine/Renderer/Resources/FrameBuffer.h"
 #include "DirectX12Descriptors.h"
 #include "DX.h"
 

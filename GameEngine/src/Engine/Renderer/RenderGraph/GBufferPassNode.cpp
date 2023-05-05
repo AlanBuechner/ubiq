@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GBufferPassNode.h"
 #include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Camera.h"
 
 namespace Engine
 {

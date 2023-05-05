@@ -1,7 +1,11 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "CommandList.h"
 #include <vector>
+
+namespace Engine
+{
+	class CommandList;
+}
 
 namespace Engine
 {

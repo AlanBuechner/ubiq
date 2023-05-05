@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "Light.h"
-#include "LineRenderer.h"
+
+#include "Resources/ConstantBuffer.h"
+#include "Camera.h"
+#include "Resources/FrameBuffer.h"
+#include "Resources/StructuredBuffer.h"
 
 namespace Engine
 {
@@ -198,6 +202,12 @@ namespace Engine
 		}
 	}
 
+	DirectionalLight::DirectionalLight(Math::Vector3 dir, Math::Vector3 color, float intensity) :
+		m_Data(dir, color, intensity)
+	{
+		m_Buffer = ConstantBuffer::Create(sizeof(DirectionalLightData));
+	}
+
 	void DirectionalLight::SetAngles(Math::Vector2 rot)
 	{
 		m_Angles = rot;
@@ -208,6 +218,11 @@ namespace Engine
 			Math::Sin(rot.x) * Math::Cos(rot.y),
 		};
 		SetDirection(dir);
+	}
+
+	void DirectionalLight::Apply()
+	{
+		m_Buffer->SetData(&m_Data);
 	}
 
 	void DirectionalLight::AddCamera(Ref<Camera> camera)

@@ -1,6 +1,20 @@
 #include "pch.h"
 #include "RenderGraph.h"
 
+#include "Engine/Core/Window.h"
+#include "Engine/Core/Application.h"
+
+#include "Engine/Renderer/Resources/FrameBuffer.h"
+#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Mesh.h"
+#include "Engine/Renderer/Resources/InstanceBuffer.h"
+#include "Engine/Renderer/Resources/ConstantBuffer.h"
+#include "Engine/Renderer/Resources/Texture.h"
+#include "Engine/Renderer/Light.h"
+#include "Engine/Renderer/CommandList.h"
+#include "Engine/Renderer/CommandQueue.h"
+#include "Engine/Renderer/Camera.h"
+
 // nodes
 #include "GBufferPassNode.h"
 #include "MainPassNode.h"

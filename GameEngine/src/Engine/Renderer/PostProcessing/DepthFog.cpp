@@ -1,6 +1,7 @@
 #include <pch.h>
 #include "DepthFog.h"
 #include "EngineResource.h"
+#include "Engine/Renderer/Camera.h"
 #include <unordered_map>
 
 namespace Engine

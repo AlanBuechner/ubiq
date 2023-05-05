@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Shader.h"
-#include "TextureAttribute.h"
+#include "Resources/TextureAttribute.h"
 
 #include <queue>
 #include <sstream>

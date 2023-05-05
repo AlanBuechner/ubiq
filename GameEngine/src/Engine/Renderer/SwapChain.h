@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Engine/Core/Window.h"
-#include "Engine/Renderer/FrameBuffer.h"
+#include "Engine/Renderer/Resources/FrameBuffer.h"
 
 namespace Engine
 {

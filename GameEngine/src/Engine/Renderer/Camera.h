@@ -1,7 +1,6 @@
 #pragma once
-#include "ConstantBuffer.h"
+#include "Resources/ConstantBuffer.h"
 #include <Engine/Math/Math.h>
-#include <glm/gtc/quaternion.hpp>
 
 namespace Engine
 {

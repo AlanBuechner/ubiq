@@ -2,7 +2,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/AssetManager/AssetManager.h"
 #include "Light.h"
-#include "FrameBuffer.h"
+#include "Resources/FrameBuffer.h"
 #include <string>
 #include <Engine/Math/Math.h>
 #include <glm/gtc/type_ptr.hpp>

@@ -2,7 +2,7 @@
 
 #include "Engine/Core/Core.h"
 #include "Engine/Renderer/CommandList.h"
-#include "Engine/Renderer/FrameBuffer.h"
+#include "Engine/Renderer/Resources/FrameBuffer.h"
 #include "Engine/Renderer/RenderGraph/RenderGraph.h"
 
 #include <unordered_map>

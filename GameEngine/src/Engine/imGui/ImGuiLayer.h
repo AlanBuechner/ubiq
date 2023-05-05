@@ -36,7 +36,6 @@ namespace Engine
 
 	private:
 		bool m_BlockEvents = true;
-		float m_time = 0.0f;
 		Scope<Window> m_Window;
 	};
 }

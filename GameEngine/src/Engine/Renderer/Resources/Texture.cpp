@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Texture.h"
 
-#include "Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 #include "Platform/DirectX12/DirectX12Texture.h"
 
 namespace Engine
@@ -45,6 +45,6 @@ namespace Engine
 	}
 	bool Texture2D::ValidExtention(const fs::path& ext)
 	{
-		return (ext == ".png" || ext == ".jpg" || ext == "jpeg" || ext == ".bmp");
+		return (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".bmp");
 	}
 }

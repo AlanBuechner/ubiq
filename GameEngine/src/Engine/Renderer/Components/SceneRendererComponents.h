@@ -1,9 +1,9 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "SceneRenderer.h"
-#include "Light.h"
+#include "Engine/Renderer/Material.h"
+#include "Engine/Renderer/Mesh.h"
+#include "Engine/Renderer/SceneRenderer.h"
+#include "Engine/Renderer/Light.h"
 #include "Engine/Core/Scene/Components.h"
 
 namespace Engine

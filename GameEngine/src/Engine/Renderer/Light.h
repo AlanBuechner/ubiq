@@ -1,9 +1,16 @@
 #pragma once
 #include <Engine/Math/Math.h>
-#include "ConstantBuffer.h"
-#include "Camera.h"
-#include "FrameBuffer.h"
-#include "StructuredBuffer.h"
+//#include "Resources/ConstantBuffer.h"
+//#include "Camera.h"
+//#include "Resources/FrameBuffer.h"
+//#include "Resources/StructuredBuffer.h"
+
+namespace Engine
+{
+	class Camera;
+	class FrameBuffer;
+	class ConstantBuffer;
+}
 
 namespace Engine
 {
@@ -60,9 +67,7 @@ namespace Engine
 		};
 
 	public:
-		DirectionalLight(Math::Vector3 dir, Math::Vector3 color, float intensity) :
-			m_Data(dir, color, intensity)
-		{ m_Buffer = ConstantBuffer::Create(sizeof(DirectionalLightData)); }
+		DirectionalLight(Math::Vector3 dir, Math::Vector3 color, float intensity);
 
 		Math::Vector2 GetAngles() const { return m_Angles; }
 		Math::Vector3 GetDirection() const { return m_Data.direction; }
@@ -79,7 +84,7 @@ namespace Engine
 		void SetIntensity(float intensity) { m_Data.intensity = intensity; }
 		void SetSize(float size) { m_Data.size = size; }
 
-		void Apply() { m_Buffer->SetData(&m_Data); }
+		void Apply();
 
 		Ref<ConstantBuffer> GetBuffer() { return m_Buffer; }
 

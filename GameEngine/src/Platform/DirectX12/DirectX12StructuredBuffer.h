@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Engine/Renderer/StructuredBuffer.h"
+#include "Engine/Renderer/Resources/StructuredBuffer.h"
 #include "DirectX12ResourceManager.h"
 #include "DX.h"
 

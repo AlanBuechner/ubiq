@@ -9,8 +9,8 @@
 #include "SceneCamera.h"
 
 #include "Engine/Renderer/Mesh.h"
-#include "Engine/Renderer/Texture.h"
-#include "Engine/Renderer/Buffer.h"
+#include "Engine/Renderer/Resources/Texture.h"
+#include "Engine/Renderer/Resources/Buffer.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/Material.h"
 

@@ -3,7 +3,6 @@
 #include "TextureAttribute.h"
 #include "Engine/Math/Math.h"
 #include "Engine/AssetManager/AssetManager.h"
-#include <string>
 
 namespace Engine
 {

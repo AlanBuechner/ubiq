@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GPUProfiler.h"
 #include "Renderer.h"
+#include "CommandList.h"
 #include <memory>
 
 #if defined(PLATFORM_WINDOWS)

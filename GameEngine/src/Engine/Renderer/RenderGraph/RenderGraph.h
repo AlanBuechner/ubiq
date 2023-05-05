@@ -1,13 +1,18 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Engine/Renderer/FrameBuffer.h"
-#include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/Mesh.h"
-#include "Engine/Renderer/InstanceBuffer.h"
-#include "Engine/Renderer/ConstantBuffer.h"
-#include "Engine/Renderer/Texture.h"
-#include "Engine/Renderer/Light.h"
-#include "Engine/Renderer/CommandList.h"
+
+namespace Engine
+{
+	class CommandList;
+	class DirectionalLight;
+	class Texture;
+	class ConstantBuffer;
+	class InstanceBuffer;
+	class Mesh;
+	class Shader;
+	class FrameBuffer;
+	class Camera;
+}
 
 namespace Engine
 {

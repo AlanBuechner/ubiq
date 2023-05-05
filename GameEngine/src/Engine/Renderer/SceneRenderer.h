@@ -1,17 +1,24 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Mesh.h"
-#include "Material.h"
-#include "InstanceBuffer.h"
-#include "Camera.h"
-#include "EditorCamera.h"
-#include "ConstantBuffer.h"
-#include "CommandList.h"
-#include "FrameBuffer.h"
-#include "RenderGraph/RenderGraph.h"
-#include "Light.h"
 #include <vector>
 #include <list>
+
+namespace Engine
+{
+	class CommandList;
+	class CommandQueue;
+	class Mesh;
+	class Material;
+	class InstanceBuffer;
+	class Camera;
+	class EditorCamera;
+	class ConstantBuffer;
+	class FrameBuffer;
+	class RenderGraph;
+	class DirectionalLight;
+	class Shader;
+	class Texture;
+}
 
 namespace Engine
 {
@@ -40,7 +47,8 @@ namespace Engine
 
 		struct RenderObject
 		{
-			Ref<InstanceBuffer> m_Instances = InstanceBuffer::Create(sizeof(InstanceData), 10); // default to capacity of 10
+			RenderObject();
+			Ref<InstanceBuffer> m_Instances;
 			Ref<Mesh> m_Mesh;
 
 			std::list<ObjectControlBlock> m_ControlBlocks;
@@ -68,7 +76,7 @@ namespace Engine
 	public:
 		SceneRenderer();
 
-		Ref<FrameBuffer> GetRenderTarget() { return m_RenderGraph->GetRenderTarget(); }
+		Ref<FrameBuffer> GetRenderTarget();
 		void OnViewportResize(uint32 width, uint32 height);
 		void SetMainCamera(Ref<Camera> camera);
 		void SetDirectionalLight(Ref<DirectionalLight> light);

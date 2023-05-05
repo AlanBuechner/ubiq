@@ -3,7 +3,7 @@
 #include "Components.h"
 #include "Entity.h"
 
-#include "Engine/Renderer/SceneRendererComponents.h"
+#include "Engine/Renderer/Components/SceneRendererComponents.h"
 #include "Engine/Physics/PhysicsComponent.h"
 
 #include <fstream>

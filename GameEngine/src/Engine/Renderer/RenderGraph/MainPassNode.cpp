@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "MainPassNode.h"
+#include "Engine/Renderer/Camera.h"
+
 #include "Engine/Renderer/GPUProfiler.h"
 
 namespace Engine

@@ -1,6 +1,10 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "ResourceManager.h"
+
+namespace Engine
+{
+	class ResourceManager;
+}
 
 namespace Engine
 {

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Engine/Math/Math.h"
-#include "Texture.h"
-#include "SubTexture.h"
+#include "Resources/Texture.h"
+#include "Resources/SubTexture.h"
 #include "CommandList.h"
 
 namespace Engine

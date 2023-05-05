@@ -2,7 +2,16 @@
 #include "SceneRenderer.h"
 #include "Renderer.h"
 
-#include "Platform/DirectX12/DirectX12ResourceManager.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "Resources/InstanceBuffer.h"
+#include "Camera.h"
+#include "EditorCamera.h"
+#include "Resources/ConstantBuffer.h"
+#include "CommandList.h"
+#include "Resources/FrameBuffer.h"
+#include "RenderGraph/RenderGraph.h"
+#include "Light.h"
 
 namespace Engine
 {
@@ -13,6 +22,11 @@ namespace Engine
 		InstanceData data = m_Object.m_Instances->Get<InstanceData>(m_InstanceLocation);
 		data.m_Transform = transform;
 		m_Object.m_Instances->SetData(m_InstanceLocation, 1, &data);
+	}
+
+	SceneRenderer::RenderObject::RenderObject()
+	{
+		m_Instances = InstanceBuffer::Create(sizeof(InstanceData), 10); // default to capacity of 10
 	}
 
 	// RenderObject
@@ -66,6 +80,11 @@ namespace Engine
 	SceneRenderer::SceneRenderer()
 	{
 		m_RenderGraph = CreateRef<RenderGraph>();
+	}
+
+	Ref<FrameBuffer> SceneRenderer::GetRenderTarget()
+	{
+		return m_RenderGraph->GetRenderTarget();
 	}
 
 	void SceneRenderer::OnViewportResize(uint32 width, uint32 height)

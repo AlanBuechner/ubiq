@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Renderer/ConstantBuffer.h"
+#include "Engine/Renderer/Resources/ConstantBuffer.h"
 #include "DirectX12Descriptors.h"
 #include "DX.h"
 

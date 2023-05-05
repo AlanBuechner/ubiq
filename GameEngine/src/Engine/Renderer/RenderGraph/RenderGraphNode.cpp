@@ -3,10 +3,11 @@
 #include "Engine/Core/Application.h"
 #include "Engine/Core/Window.h"
 
+#include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/CommandList.h"
+
 namespace Engine
 {
-
-
 	RenderGraphNode::RenderGraphNode(RenderGraph& graph) :
 		m_Graph(graph)
 	{}
@@ -29,8 +30,13 @@ namespace Engine
 		RenderGraphNode(graph)
 	{}
 
+	void OutputNode::Invalidate()
+	{
+		m_Buffer->ResetClear(); RenderGraphNode::Invalidate();
+	}
+
 	// frame buffer node
-	FrameBufferNode::FrameBufferNode(RenderGraph& graph, FrameBufferSpecification fbSpec) :
+	FrameBufferNode::FrameBufferNode(RenderGraph& graph, const FrameBufferSpecification& fbSpec) :
 		RenderGraphNode(graph)
 	{
 		m_Buffer = FrameBuffer::Create(fbSpec);
@@ -45,6 +51,11 @@ namespace Engine
 	TransitionNode::TransitionNode(RenderGraph& graph) :
 		RenderGraphNode(graph)
 	{}
+
+	void TransitionNode::AddBuffer(const CommandList::FBTransitionObject& transition)
+	{
+		m_Transitions.push_back(transition);
+	}
 
 	void TransitionNode::BuildImpl()
 	{

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Renderer/InstanceBuffer.h"
+#include "Engine/Renderer/Resources/InstanceBuffer.h"
 #include "DX.h"
 
 namespace Engine

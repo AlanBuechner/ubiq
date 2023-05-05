@@ -2,7 +2,7 @@
 #include "Engine/Core/Core.h"
 #include "PostProcess.h"
 #include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/ConstantBuffer.h"
+#include "Engine/Renderer/Resources/ConstantBuffer.h"
 
 namespace Engine
 {

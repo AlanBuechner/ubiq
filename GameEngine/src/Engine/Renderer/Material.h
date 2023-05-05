@@ -2,8 +2,8 @@
 #include "Engine/Core/Core.h"
 #include "Engine/AssetManager/AssetManager.h"
 #include "Shader.h"
-#include "Texture.h"
-#include "ConstantBuffer.h"
+#include "Resources/Texture.h"
+#include "Resources/ConstantBuffer.h"
 #include <unordered_map>
 
 namespace Engine

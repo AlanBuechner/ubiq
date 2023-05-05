@@ -2,7 +2,7 @@
 #include "EditorAssets.h"
 
 #include "Engine/Core/Scene/SceneSerializer.h"
-#include "Engine/Renderer/SceneRendererComponents.h"
+#include "Engine/Renderer/Components/SceneRendererComponents.h"
 #include "Engine/Math/Math.h"
 #include "Engine/Core/Cursor.h"
 #include "Engine/Util/Performance.h"

@@ -1,9 +1,13 @@
 #pragma once
 
 #include "Camera.h"
-#include "Engine/Events/Event.h"
-#include "Engine/Events/MouseEvent.h"
 #include "Engine/Math/Math.h"
+
+namespace Engine
+{
+	class Event;
+	class MouseScrolledEvent;
+}
 
 namespace Engine
 {

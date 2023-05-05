@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "LineRenderer.h"
 #include "Renderer.h"
-#include "Buffer.h"
+#include "Resources/Buffer.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "EditorCamera.h"

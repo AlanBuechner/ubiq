@@ -12,7 +12,7 @@
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/LineRenderer.h"
 #include "Engine/Renderer/EditorCamera.h"
-#include "Engine/Renderer/SceneRendererComponents.h"
+#include "Engine/Renderer/Components/SceneRendererComponents.h"
 
 #include "glm/glm.hpp"
 
