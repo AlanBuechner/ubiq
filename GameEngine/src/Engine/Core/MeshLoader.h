@@ -2,6 +2,7 @@
 #include "Core.h"
 #include "MeshBuilder.h"
 #include "Engine/Renderer/Mesh.h"
+#include "Engine/Renderer/Model.h"
 #include <vector>
 #include <string>
 #include <cstdint>
@@ -71,7 +72,7 @@ namespace Engine
 		inline std::vector<VertexElement>::const_iterator begin() const { return m_Elements.begin(); }
 		inline std::vector<VertexElement>::const_iterator end() const { return m_Elements.end(); }
 
-		inline VertexElement FindElement(VertexDataType type)
+		inline VertexElement FindElement(VertexDataType type) const
 		{
 			for (auto e : m_Elements)
 				if (e.type == type)
@@ -80,7 +81,7 @@ namespace Engine
 			return VertexDataType();
 		}
 
-		inline bool HasElement(VertexDataType type)
+		inline bool HasElement(VertexDataType type) const
 		{
 			return FindElement(type).type != VertexDataType::None;
 		}
@@ -107,6 +108,6 @@ namespace Engine
 	{
 	public:
 
-		static Ref<Mesh> LoadStaticMesh(const fs::path& path, VertexLayout layout);
+		static Ref<Model> LoadModel(const fs::path& path, VertexLayout layout);
 	};
 }

@@ -4,6 +4,7 @@
 #include "Entity.h"
 
 #include "Engine/Renderer/Components/SceneRendererComponents.h"
+#include "Engine/Renderer/Components/StaticModelRendererComponent.h"
 #include "Engine/Physics/PhysicsComponent.h"
 
 #include <fstream>
@@ -194,17 +195,28 @@ namespace Engine
 			out << YAML::EndMap;
 		}
 
-		if (entity.HasComponent<MeshRendererComponent>())
+		if (entity.HasComponent<StaticModelRendererComponent>())
 		{
-			out << YAML::Key << "MeshRendererComponent";
+			out << YAML::Key << "StaticModelRendererComponent";
 			out << YAML::BeginMap;
 
-			auto& meshRenderer = *entity.GetComponent<MeshRendererComponent>();
-			if(meshRenderer.GetMesh())
-				out << YAML::Key << "Mesh" << YAML::Value << meshRenderer.GetMesh()->GetAssetID();
+			auto& meshRenderer = *entity.GetComponent<StaticModelRendererComponent>();
+			if(meshRenderer.GetModel())
+				out << YAML::Key << "Model" << YAML::Value << meshRenderer.GetModel()->GetAssetID();
 
-			if (meshRenderer.GetMaterial())
-				out << YAML::Key << "Material" << YAML::Value << meshRenderer.GetMaterial()->GetAssetID();
+			if (!meshRenderer.GetMeshes().empty())
+			{
+				YAML::Node materials;
+				for (auto& entry : meshRenderer.GetMeshes())
+				{
+					if (entry.m_Material)
+						materials.push_back((uint64)entry.m_Material->GetAssetID());
+					else
+						materials.push_back(0);
+
+				}
+				out << YAML::Key << "Materials" << YAML::Value << materials;
+			}
 
 			out << YAML::EndMap;
 		}
@@ -371,14 +383,21 @@ namespace Engine
 					dlc.SetSize(dirLightComponent["Size"].as<float>());
 				}
 
-				auto meshRendererComponent = entity["MeshRendererComponent"];
-				if (meshRendererComponent)
+				auto staticModelRendererComponent = entity["StaticModelRendererComponent"];
+				if (staticModelRendererComponent)
 				{
-					auto& mrc = *deserializedEntity.AddComponent<MeshRendererComponent>();
-					if(meshRendererComponent["Mesh"])
-						mrc.SetMesh(Application::Get().GetAssetManager().GetAsset<Mesh>(meshRendererComponent["Mesh"].as<uint64>()));
-					if(meshRendererComponent["Material"])
-						mrc.SetMaterial(Application::Get().GetAssetManager().GetAsset<Material>(meshRendererComponent["Material"].as<uint64>()));
+					auto& mrc = *deserializedEntity.AddComponent<StaticModelRendererComponent>();
+					if(staticModelRendererComponent["Model"])
+						mrc.SetModel(Application::Get().GetAssetManager().GetAsset<Model>(staticModelRendererComponent["Model"].as<uint64>()));
+
+					if (staticModelRendererComponent["Materials"])
+					{
+						YAML::Node materials = staticModelRendererComponent["Materials"];
+						uint32 i = 0;
+						for (auto mat : materials)
+							mrc.GetMeshes()[i++].m_Material = Application::Get().GetAssetManager().GetAsset<Material>(mat.as<uint64>());
+					}
+					mrc.Invalidate();
 				}
 
 				auto skyboxComponent = entity["SkyboxComponent"];

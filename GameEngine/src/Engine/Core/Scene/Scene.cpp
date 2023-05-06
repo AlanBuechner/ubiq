@@ -13,6 +13,7 @@
 #include "Engine/Renderer/LineRenderer.h"
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Components/SceneRendererComponents.h"
+#include "Engine/Renderer/Components/StaticModelRendererComponent.h"
 
 #include "glm/glm.hpp"
 
@@ -225,7 +226,7 @@ namespace Engine
 		CopyComponent<CircleColliderComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<DirectionalLightComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<SkyboxComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
-		CopyComponent<MeshRendererComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
+		CopyComponent<StaticModelRendererComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 
 		return newScene;
 	}
@@ -255,7 +256,7 @@ namespace Engine
 	}
 
 	template<>
-	void Scene::OnComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent& component)
+	void Scene::OnComponentAdded<StaticModelRendererComponent>(Entity entity, StaticModelRendererComponent& component)
 	{
 
 	}

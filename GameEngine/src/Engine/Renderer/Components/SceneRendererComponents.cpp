@@ -73,29 +73,6 @@ namespace Engine
 		m_Light->UpdateShadowMaps();
 	}
 
-	// mesh component
-	void MeshRendererComponent::OnComponentRemoved()
-	{
-		Owner.GetScene()->GetSceneRenderer()->RemoveObject(m_Object); // remove the object if it exists
-	}
-
-	void MeshRendererComponent::OnTransformChange(const Math::Mat4& transform)
-	{
-		if (m_Object)
-		{
-			m_Object->UpdateTransform(transform);
-		}
-	}
-
-	void MeshRendererComponent::Invalidate()
-	{
-		if (m_Mesh && m_Mat)
-		{
-			Owner.GetScene()->GetSceneRenderer()->RemoveObject(m_Object); // remove the object if it exists
-			m_Object = Owner.GetScene()->GetSceneRenderer()->Submit(m_Mesh, m_Mat, Owner.GetTransform().GetTransform()); // re add it with the new shader and mesh
-		}
-	}
-
 	// skybox component
 	void SkyboxComponent::OnComponentAdded()
 	{

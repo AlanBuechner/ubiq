@@ -34,58 +34,68 @@ namespace Engine
 	}
 
 
-	void ProcessNode(aiNode* node, const aiScene* scene, Ref<MeshBuilder> meshBuilder, VertexLayout layout)
+	void ProcessNode(const aiScene* scene, aiNode* node, Ref<Model> model, const VertexLayout& vertLayout, const BufferLayout& bufferLayout)
 	{
 		for (uint32 i = 0; i < node->mNumMeshes; i++)
 		{
-			uint32 vertexOffset = (uint32)meshBuilder->vertices.size();
+			MeshBuilder meshBuilder;
+			uint32 vertexOffset = (uint32)meshBuilder.vertices.size();
 			aiMesh* m = scene->mMeshes[node->mMeshes[i]];
 
-			meshBuilder->vertices.resize((size_t)vertexOffset + m->mNumVertices);
+			meshBuilder.vertices.resize((size_t)vertexOffset + m->mNumVertices);
 
 			// vertices
 			for (uint32 v = 0; v < m->mNumVertices; v++)
 			{
-				if (layout.HasElement(VertexDataType::Position3))
+				if (vertLayout.HasElement(VertexDataType::Position3))
 				{
-					meshBuilder->vertices[v].position = GetPosition(m ,v);
+					meshBuilder.vertices[v].position = GetPosition(m ,v);
 				}
 
-				if (layout.HasElement(VertexDataType::UV))
+				if (vertLayout.HasElement(VertexDataType::UV))
 				{
-					meshBuilder->vertices[v].uv = GetUVCoords(m, v);
+					meshBuilder.vertices[v].uv = GetUVCoords(m, v);
 				}
 
-				if (layout.HasElement(VertexDataType::Normal))
+				if (vertLayout.HasElement(VertexDataType::Normal))
 				{
-					meshBuilder->vertices[v].normal = GetNormal(m, v);
+					meshBuilder.vertices[v].normal = GetNormal(m, v);
 				}
 
-				if (layout.HasElement(VertexDataType::Tangent))
+				if (vertLayout.HasElement(VertexDataType::Tangent))
 				{
-					meshBuilder->vertices[v].tangent = GetTangent(m, v);
+					meshBuilder.vertices[v].tangent = GetTangent(m, v);
 				}
 			}
 
 			// indices
-			meshBuilder->indices.reserve((size_t)m->mNumFaces*3);
+			meshBuilder.indices.reserve((size_t)m->mNumFaces*3);
 			for (uint32 j = 0; j < m->mNumFaces; j++)
 			{
 				for (uint32 k = 0; k < 3; k++)
-					meshBuilder->indices.push_back(m->mFaces[j].mIndices[k]);
+					meshBuilder.indices.push_back(m->mFaces[j].mIndices[k]);
 			}
 
+			Ref<Mesh> mesh = Mesh::Create(bufferLayout);
+			mesh->SetVertices(meshBuilder.vertices.data(), (uint32)meshBuilder.vertices.size());
+			mesh->SetIndices(meshBuilder.indices.data(), (uint32)meshBuilder.indices.size());
+
+			model->AddMesh(mesh);
 		}
 
 		for (uint32 i = 0; i < node->mNumChildren; i++)
-			ProcessNode(node->mChildren[i], scene, meshBuilder, layout);
+		{
+			Ref<Model> child = CreateRef<Model>();
+			ProcessNode(scene, node->mChildren[i], child, vertLayout, bufferLayout);
+			model->AddChild(child);
+		}
 	}
 
 
-	Ref<Mesh> MeshLoader::LoadStaticMesh(const fs::path& path, VertexLayout layout)
+	Ref<Model> MeshLoader::LoadModel(const fs::path& path, VertexLayout layout)
 	{
 		Assimp::Importer imp;
-		auto model = imp.ReadFile(path.string(),
+		auto scene = imp.ReadFile(path.string(),
 			aiProcess_Triangulate |
 			aiProcess_JoinIdenticalVertices |
 			(layout.HasElement(VertexDataType::Normal) ? aiProcess_GenNormals : 0) |
@@ -93,8 +103,6 @@ namespace Engine
 			aiProcess_FlipWindingOrder
 		);
 
-		Ref<MeshBuilder> meshBuilder = CreateRef<MeshBuilder>();
-		ProcessNode(model->mRootNode, model, meshBuilder, layout);
 
 		std::vector<BufferElement> elements;
 		for (auto l : layout)
@@ -121,12 +129,11 @@ namespace Engine
 			}
 		}
 
-		BufferLayout meshLayout(elements);
+		BufferLayout bufferLayout(elements);
 
-		Ref<Mesh> mesh = Mesh::Create(meshLayout);
-		mesh->SetVertices(meshBuilder->vertices.data(), (uint32)meshBuilder->vertices.size());
-		mesh->SetIndices(meshBuilder->indices.data(), (uint32)meshBuilder->indices.size());
+		Ref<Model> model = CreateRef<Model>();
+		ProcessNode(scene, scene->mRootNode, model, layout, bufferLayout);
 
-		return mesh;
+		return model;
 	}
 }

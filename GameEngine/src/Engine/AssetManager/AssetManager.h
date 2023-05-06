@@ -6,8 +6,6 @@
 #include <unordered_map>
 #include <thread>
 
-namespace fs = std::filesystem;
-
 namespace Engine
 {
 	class Asset;

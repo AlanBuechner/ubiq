@@ -36,22 +36,4 @@ namespace Engine
 		return CreateRef<Mesh>(vertexStride);
 	}
 
-	Ref<Mesh> Mesh::Create(const fs::path& path)
-	{
-		VertexLayout layout = {
-			{ VertexDataType::Position3 },
-			{ VertexDataType::UV },
-			{ VertexDataType::Normal },
-			{ VertexDataType::Tangent }
-		};
-
-
-		return MeshLoader::LoadStaticMesh(path, layout);
-	}
-
-	bool Mesh::ValidExtention(const fs::path& ext)
-	{
-		return (ext == ".obj" || ext == ".fbx" || ext == ".gltf" || ext == ".glb");
-	}
-
 }

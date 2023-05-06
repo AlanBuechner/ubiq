@@ -4,6 +4,11 @@
 #include "EditorLayer.h"
 #include "Engine/Core/UUID.h"
 
+#include "Engine/Renderer/Model.h"
+
+#include "Engine/Renderer/Components/SceneRendererComponents.h"
+#include "Engine/Renderer/Components/StaticModelRendererComponent.h"
+
 #include "PropertiesPanel.h"
 
 #include <imgui/imgui.h>
@@ -87,7 +92,7 @@ if(!m_Selected.HasComponent<component>()){\
 }
 				ADD_COMPONENT(Camera, CameraComponent);
 				ADD_COMPONENT(Directional Light, DirectionalLightComponent);
-				ADD_COMPONENT(Mesh Renderer, MeshRendererComponent);
+				ADD_COMPONENT(Static Model Renderer, StaticModelRendererComponent);
 				ADD_COMPONENT(Skybox, SkyboxComponent);
 
 #undef ADD_COMPONENT
@@ -127,7 +132,7 @@ if(!m_Selected.HasComponent<component>()){\
 
 		if (ImGui::MenuItem("Create Mesh"))
 		{
-			(createdEntity = m_Context->CreateEntity("Mesh")).AddComponent<MeshRendererComponent>();
+			(createdEntity = m_Context->CreateEntity("Mesh")).AddComponent<StaticModelRendererComponent>();
 			entityAdded = true;
 		}
 
@@ -364,18 +369,19 @@ if(!m_Selected.HasComponent<component>()){\
 				component.SetSize(size);
 		});
 
-		DrawComponent<MeshRendererComponent>(entity, "Mesh Renderer", [&](){
-			auto& component = *entity.GetComponent<MeshRendererComponent>();
+		DrawComponent<StaticModelRendererComponent>(entity, "Static Model Renderer", [&](){
+			auto& component = *entity.GetComponent<StaticModelRendererComponent>();
 			
-			Ref<Mesh> mesh = component.GetMesh();
-			if (PropertysPanel::DrawMeshControl("Mesh", mesh))
-				component.SetMesh(mesh);
+			Ref<Model> model = component.GetModel();
+			if (PropertysPanel::DrawModelControl("Model", model))
+				component.SetModel(model);
 
-
-
-			Ref<Material> mat = component.GetMaterial();
-			if (PropertysPanel::DrawMaterialControl("Material", mat))
-				component.SetMaterial(mat);
+			for (auto& entry : component.GetMeshes())
+			{
+				entry.m_Material;
+				if (PropertysPanel::DrawMaterialControl("Material", entry.m_Material))
+					component.Invalidate();
+			}
 		});
 
 		DrawComponent<SkyboxComponent>(entity, "Skybox", [&]() {

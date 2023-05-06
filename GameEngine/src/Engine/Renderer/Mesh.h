@@ -1,10 +1,9 @@
 #pragma once
 #include "Resources/Buffer.h"
-#include "Engine/AssetManager/AssetManager.h"
 
 namespace Engine
 {
-	class Mesh : public Asset
+	class Mesh
 	{
 	public:
 		Mesh(uint32 vertexStride);
@@ -17,9 +16,6 @@ namespace Engine
 
 		static Ref<Mesh> Create(BufferLayout layout);
 		static Ref<Mesh> Create(uint32 vertexStride);
-		static Ref<Mesh> Create(const fs::path& path);
-
-		static bool ValidExtention(const fs::path& ext);
 
 	private:
 		uint32 m_VertexStride;

@@ -248,7 +248,7 @@ namespace Engine
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
 				fs::path path = (const wchar_t*)payload->Data;
-				if (Texture2D::ValidExtention(path.extension().string())) {
+				if (Texture2D::ValidExtension(path.extension().string())) {
 					texture = Application::Get().GetAssetManager().GetAsset<Texture2D>(path);
 					changed = true;
 				}
@@ -274,7 +274,7 @@ namespace Engine
 		return changed;
 	}
 
-	bool PropertysPanel::DrawMeshControl(const std::string& label, Ref<Mesh>& mesh)
+	bool PropertysPanel::DrawModelControl(const std::string& label, Ref<Model>& mesh)
 	{
 		bool changed = false;
 
@@ -284,8 +284,8 @@ namespace Engine
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
 				fs::path path = (const wchar_t*)payload->Data;
-				if (Mesh::ValidExtention(path.extension().string())) {
-					mesh = Application::Get().GetAssetManager().GetAsset<Mesh>(path);
+				if (Model::ValidExtension(path.extension().string())) {
+					mesh = Application::Get().GetAssetManager().GetAsset<Model>(path);
 					changed = true;
 				}
 			}
@@ -299,7 +299,7 @@ namespace Engine
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Clear")) {
-			mesh = Ref<Mesh>();
+			mesh = Ref<Model>();
 			changed = true;
 		}
 

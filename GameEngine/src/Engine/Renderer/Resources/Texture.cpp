@@ -43,7 +43,7 @@ namespace Engine
 		CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
-	bool Texture2D::ValidExtention(const fs::path& ext)
+	bool Texture2D::ValidExtension(const fs::path& ext)
 	{
 		return (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".bmp");
 	}

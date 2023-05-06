@@ -299,7 +299,7 @@ namespace Engine
 		if (ext == ".ubiq")
 			return EditorAssets::s_SceneFileIcon;
 
-		if (Texture2D::ValidExtention(ext))
+		if (Texture2D::ValidExtension(ext))
 			return Application::Get().GetAssetManager().GetAsset<Texture2D>(file.path());
 
 		return EditorAssets::s_DefaultFileIcon;
