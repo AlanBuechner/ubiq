@@ -3,6 +3,7 @@
 
 #include "Engine/Core/Core.h"
 #include "Renderer.h"
+#include "Engine/Renderer/Resources/InstanceBuffer.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "EditorCamera.h"

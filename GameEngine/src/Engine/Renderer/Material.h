@@ -2,9 +2,14 @@
 #include "Engine/Core/Core.h"
 #include "Engine/AssetManager/AssetManager.h"
 #include "Shader.h"
-#include "Resources/Texture.h"
-#include "Resources/ConstantBuffer.h"
 #include <unordered_map>
+
+namespace Engine
+{
+	class Shader;
+	class Texture;
+	class ConstantBuffer;
+}
 
 namespace Engine
 {

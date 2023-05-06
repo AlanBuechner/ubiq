@@ -1,11 +1,17 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Resources/FrameBuffer.h"
-#include "Mesh.h"
-#include "Shader.h"
-#include "Resources/ConstantBuffer.h"
-#include "Resources/Texture.h"
-#include "Resources/InstanceBuffer.h"
+
+namespace Engine
+{
+	class Mesh;
+	class Shader;
+	class ShaderPass;
+	class ComputeShader;
+	class ConstantBuffer;
+	class Texture;
+	class InstanceBuffer;
+}
 
 namespace Engine
 {

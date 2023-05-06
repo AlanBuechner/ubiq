@@ -1,11 +1,11 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "CommandList.h"
 
 namespace Engine
 {
 	class Camera;
 	class EditorCamera;
+	class CommandList;
 }
 
 namespace Engine

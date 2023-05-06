@@ -13,12 +13,11 @@
 #include "Engine/Core/Flag.h"
 #include <thread>
 
-#define MAX_LIGHTS 12
-
 namespace Engine
 {
 	class Camera;
 	class ShaderPass;
+	class Texture2D;
 }
 
 namespace Engine

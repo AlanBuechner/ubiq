@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "MainPassNode.h"
 #include "Engine/Renderer/Camera.h"
+#include "Engine/Renderer/Light.h"
+#include "Engine/Renderer/Shader.h"
 
 #include "Engine/Renderer/GPUProfiler.h"
 

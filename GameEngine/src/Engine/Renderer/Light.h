@@ -1,9 +1,5 @@
 #pragma once
 #include <Engine/Math/Math.h>
-//#include "Resources/ConstantBuffer.h"
-//#include "Camera.h"
-//#include "Resources/FrameBuffer.h"
-//#include "Resources/StructuredBuffer.h"
 
 namespace Engine
 {

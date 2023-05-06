@@ -2,6 +2,8 @@
 #include "Material.h"
 #include "Renderer.h"
 #include "ShaderCompiler.h"
+#include "Resources/Texture.h"
+#include "Resources/ConstantBuffer.h"
 #include "Engine/Core/Application.h"
 #include <nlohmann/json.hpp>
 #include <fstream>

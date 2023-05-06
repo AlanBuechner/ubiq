@@ -1,7 +1,6 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Engine/AssetManager/AssetManager.h"
-#include "Light.h"
 #include "Resources/FrameBuffer.h"
 #include <string>
 #include <Engine/Math/Math.h>
@@ -14,6 +13,10 @@ namespace Engine
 	struct ShaderParameter;
 	struct ShaderSorce;
 	struct MaterialParameter;
+}
+
+namespace Engine
+{
 
 	class ShaderPass
 	{

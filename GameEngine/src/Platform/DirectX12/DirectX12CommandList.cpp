@@ -13,6 +13,7 @@
 #include "DirectX12ResourceManager.h"
 
 #include "Engine/Util/Performance.h"
+#include "Engine/Renderer/Mesh.h"
 
 namespace Engine
 {
