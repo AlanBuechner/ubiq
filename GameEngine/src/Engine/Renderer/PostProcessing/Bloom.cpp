@@ -21,35 +21,9 @@ namespace Engine
 		Ref<ShaderPass> upSample = m_BloomShader->GetPass("upSample");
 		Ref<ShaderPass> composit = m_BloomShader->GetPass("composit");
 
-		uint32 numDownSamples = 6;
+		
 
-		if (m_GaussianSumBuffers.size() != numDownSamples)
-		{
-			m_GaussianSumBuffers.resize(numDownSamples);
-			for (uint32 i = 0; i < numDownSamples; i++)
-			{
-				uint32 w = renderTarget->GetSpecification().Width;
-				uint32 h = renderTarget->GetSpecification().Height;
-				uint32 fac = Math::Pow(2, i+1);
-
-				if(m_GaussianSumBuffers[i])
-					m_GaussianSumBuffers[i]->Resize(w / fac, h / fac);
-				else
-				{
-					FrameBufferSpecification spec;
-					spec.Attachments = {
-						{ FrameBufferTextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
-						{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
-					};
-					spec.InitalState = FrameBufferState::RenderTarget;
-					spec.Width = w / fac;
-					spec.Height = h / fac;
-					m_GaussianSumBuffers[i] = FrameBuffer::Create(spec);
-				}
-			}
-		}
-
-		for (uint32 i = 0; i < numDownSamples; i++)
+		for (uint32 i = 0; i < m_NumberDownSamples; i++)
 		{
 			uint32 srcLoc = (i==0) ? srcDescriptorLocation : m_GaussianSumBuffers[i - 1]->GetAttachmentShaderDescriptoLocation(0);
 			commandList->SetRenderTarget(m_GaussianSumBuffers[i]);
@@ -70,7 +44,7 @@ namespace Engine
 		}
 
 
-		for (int i = numDownSamples-2; i >= 0; i--)
+		for (int i = m_NumberDownSamples -2; i >= 0; i--)
 		{
 			uint32 srcLoc = m_GaussianSumBuffers[i + 1]->GetAttachmentShaderDescriptoLocation(0);
 			commandList->SetRenderTarget(m_GaussianSumBuffers[i]);
@@ -96,6 +70,36 @@ namespace Engine
 
 		GPUTimer::EndEvent(commandList);
 
+	}
+
+	void Bloom::OnViewportResize(uint32 width, uint32 height)
+	{
+
+		if (m_GaussianSumBuffers.size() != m_NumberDownSamples)
+		{
+			m_GaussianSumBuffers.resize(m_NumberDownSamples);
+			for (uint32 i = 0; i < m_NumberDownSamples; i++)
+			{
+				uint32 w = width;
+				uint32 h = height;
+				uint32 fac = Math::Pow(2, i + 1);
+
+				if (m_GaussianSumBuffers[i])
+					m_GaussianSumBuffers[i]->Resize(w / fac, h / fac);
+				else
+				{
+					FrameBufferSpecification spec;
+					spec.Attachments = {
+						{ FrameBufferTextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
+						{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
+					};
+					spec.InitalState = FrameBufferState::RenderTarget;
+					spec.Width = w / fac;
+					spec.Height = h / fac;
+					m_GaussianSumBuffers[i] = FrameBuffer::Create(spec);
+				}
+			}
+		}
 	}
 
 }

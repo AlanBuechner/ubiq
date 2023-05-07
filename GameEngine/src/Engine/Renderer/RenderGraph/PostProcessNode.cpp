@@ -48,6 +48,12 @@ namespace Engine
 	void PostProcessNode::OnViewportResize(uint32 width, uint32 height)
 	{
 		m_BackBuffer->Resize(width, height);
+
+		for (uint32 i = 0; i < m_PostProcessStack.size(); i++)
+		{
+			Ref<PostProcess> post = m_PostProcessStack[i];
+			post->OnViewportResize(width, height);
+		}
 	}
 
 	void PostProcessNode::BuildImpl()
@@ -55,6 +61,10 @@ namespace Engine
 		Ref<FrameBuffer> curr = m_PostProcessStack.size() % 2 == 0 ? m_BackBuffer : m_RenderTarget;
 
 		GPUTimer::BeginEvent(m_CommandList, "Post Processing");
+
+		m_CommandList->Transition({
+			{curr, FrameBufferState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
+		});
 
 		for (uint32 i = 0; i < m_PostProcessStack.size(); i++)
 		{
@@ -65,10 +75,18 @@ namespace Engine
 
 			post->RecordCommands(m_CommandList, curr, srcLoc, m_Input, m_ScreenMesh);
 
-			m_CommandList->Transition({ 
-				{curr, m_RenderTarget->GetSpecification().InitalState, FrameBufferState::RenderTarget },
-				{lastPass, FrameBufferState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
-			});
+			std::vector<CommandList::FBTransitionObject> transitions;
+			transitions.reserve(2);
+
+			if (i + 1 < m_PostProcessStack.size())
+			{
+				m_CommandList->Transition({
+					{ lastPass, FrameBufferState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
+					{ curr, m_RenderTarget->GetSpecification().InitalState, FrameBufferState::RenderTarget },
+				});
+			}
+
+
 
 			curr = (curr == m_BackBuffer) ? m_RenderTarget : m_BackBuffer; // swap buffers
 		}

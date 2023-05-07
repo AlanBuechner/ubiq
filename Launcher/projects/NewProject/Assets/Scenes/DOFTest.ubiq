@@ -18,6 +18,7 @@ Entities:
       Position: [0, 0, 0]
       Rotation: [0, -0.436332315, 0]
       Scale: [1, 1, 100]
-    MeshRendererComponent:
-      Mesh: 630034325824791667
-      Material: 9193023617033958228
+    StaticModelRendererComponent:
+      Model: 630034325824791667
+      Materials:
+        - 14846736622411844726

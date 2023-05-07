@@ -31,14 +31,6 @@ namespace Engine
 
 	void DepthOfField::RecordCommands(Ref<CommandList> commandList, Ref<FrameBuffer> renderTarget, uint64 srcDescriptorLocation, const PostProcessInput& input, Ref<Mesh> screenMesh)
 	{
-		if (m_COCTexture->GetSpecification().Height != renderTarget->GetSpecification().Height || m_COCTexture->GetSpecification().Width != renderTarget->GetSpecification().Width)
-		{
-			m_COCTexture->Resize(renderTarget->GetSpecification().Width, renderTarget->GetSpecification().Height);
-			m_TempTexture->Resize(renderTarget->GetSpecification().Width, renderTarget->GetSpecification().Height);
-			m_NearBlur->Resize(renderTarget->GetSpecification().Width, renderTarget->GetSpecification().Height);
-			m_FarBlur->Resize(renderTarget->GetSpecification().Width, renderTarget->GetSpecification().Height);
-		}
-
 		GPUTimer::BeginEvent(commandList, "Depth Of Field");
 
 		Ref<ShaderPass> coc = m_DepthOfFieldShader->GetPass("CoC");
@@ -164,6 +156,14 @@ namespace Engine
 
 
 		GPUTimer::EndEvent(commandList);
+	}
+
+	void DepthOfField::OnViewportResize(uint32 width, uint32 height)
+	{
+		m_COCTexture->Resize(width, height);
+		m_TempTexture->Resize(width, height);
+		m_NearBlur->Resize(width, height);
+		m_FarBlur->Resize(width, height);
 	}
 
 }

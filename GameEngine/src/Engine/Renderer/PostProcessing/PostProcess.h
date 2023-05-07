@@ -22,6 +22,8 @@ namespace Engine
 		virtual void Init(const PostProcessInput& input, SceneData& scene) = 0;
 		virtual void RecordCommands(Ref<CommandList> commandList, Ref<FrameBuffer> renderTarget, uint64 srcDescriptorLocation, const PostProcessInput& input, Ref<Mesh> screenMesh) = 0;
 
+		virtual void OnViewportResize(uint32 width, uint32 height) {}
+
 	protected:
 		SceneData* m_Scene;
 	};

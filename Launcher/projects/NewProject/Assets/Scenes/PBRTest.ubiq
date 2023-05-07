@@ -31,9 +31,10 @@ Entities:
       Position: [0, 1.46089947, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    MeshRendererComponent:
-      Mesh: 7711650371006191785
-      Material: 9193023617033958228
+    StaticModelRendererComponent:
+      Model: 7711650371006191785
+      Materials:
+        - 9193023617033958228
   - Entity: 10863390703189385925
     Name: Directional Light
     TransformComponent:
@@ -52,6 +53,7 @@ Entities:
       Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [5, 5, 5]
-    MeshRendererComponent:
-      Mesh: 17720162746019331610
-      Material: 9193023617033958228
+    StaticModelRendererComponent:
+      Model: 17720162746019331610
+      Materials:
+        - 9193023617033958228

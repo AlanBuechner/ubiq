@@ -102,7 +102,6 @@ namespace Engine
 		Ref<TransitionNode> t2 = CreateRef<TransitionNode>(*this);
 		t2->SetCommandList(commandList);
 		t2->AddBuffer({ renderTargetNode->m_Buffer, FrameBufferState::Common, FrameBufferState::RenderTarget });
-		t2->AddBuffer({ postRenderTargetNode->m_Buffer, FrameBufferState::RenderTarget, FrameBufferState::Common });
 		t2->AddDependincy(mainPass);
 		m_Nodes.push_back(t2);
 
@@ -115,7 +114,7 @@ namespace Engine
 		postPass->SetCommandList(commandList);
 		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer );
 		postPass->SetInput(input);
-		postPass->AddPostProcess(CreateRef<DepthOfField>());
+		//postPass->AddPostProcess(CreateRef<DepthOfField>());
 		postPass->AddPostProcess(CreateRef<Bloom>());
 		postPass->AddPostProcess(CreateRef<ToneMapping>());
 		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachmentShaderDescriptoLocation(0));
