@@ -2,6 +2,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/AssetManager/AssetManager.h"
 #include "Engine/Math/Math.h"
+#include "Engine/Core/MeshBuilder.h"
 
 namespace Engine
 {
@@ -14,15 +15,22 @@ namespace Engine
 	class Model : public Asset
 	{
 	public:
+		struct Node
+		{
+			std::vector<MeshBuilder> m_MeshBuilders;
+			std::vector<std::string> m_Names;
+			std::vector<Node> m_Children;
+			Math::Mat4 m_Transform;
+		};
+
+	public:
 		Model() = default;
 
-		void AddMesh(Ref<Mesh> mesh) { m_Meshes.push_back(mesh); }
-		void AddChild(Ref<Model> child) { m_Children.push_back(child); }
-		void SetTransform(Math::Mat4 transform) { m_Transform = transform; }
+		void BakeMesh();
 
-		std::vector<Ref<Mesh>>& GetMeshes() { return m_Meshes; }
-		std::vector<Ref<Model>>& GetChildren() { return m_Children; }
-		Math::Mat4 GetTransform() { return m_Transform; }
+		Node& GetRoot() { return m_Root; }
+		std::vector<Ref<Mesh>>& GetBakedMeshes() { return m_BakedMeshes; }
+		std::vector<std::string>& GetNames() { return m_Names; }
 
 		static Ref<Model> Create(const fs::path& path);
 
@@ -30,9 +38,14 @@ namespace Engine
 
 	private:
 
-		std::vector<Ref<Mesh>> m_Meshes;
-		std::vector<Ref<Model>> m_Children;
-		Math::Mat4 m_Transform = Math::Mat4(1.0f);
+		void CollapseNode(Node& node, Math::Mat4 parentTransform);
+
+	private:
+
+		Node m_Root;
+
+		std::vector<Ref<Mesh>> m_BakedMeshes;
+		std::vector<std::string> m_Names;
 	};
 
 }

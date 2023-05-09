@@ -18,27 +18,12 @@ namespace Engine
 
 	void StaticModelRendererComponent::OnTransformChange(const Math::Mat4& transform)
 	{
-
 		for (uint32 i = 0; i < m_CollapsedModelTree.size(); i++)
 		{
 			MeshEntry& entry = m_CollapsedModelTree[i];
-			entry.m_Object->UpdateTransform(transform);
+			if(entry.m_Object)
+				entry.m_Object->UpdateTransform(transform);
 		}
-	}
-
-	void CollapseModel(Ref<Model> model, std::vector<StaticModelRendererComponent::MeshEntry>& collapsedTree)
-	{
-
-		for (Ref<Mesh> mesh : model->GetMeshes())
-		{
-			StaticModelRendererComponent::MeshEntry entry;
-			entry.m_Mesh = mesh;
-			collapsedTree.push_back(entry);
-		}
-
-		for (Ref<Model> child : model->GetChildren())
-			CollapseModel(child, collapsedTree);
-
 	}
 
 	void StaticModelRendererComponent::SetModel(Ref<Model> model)
@@ -50,10 +35,16 @@ namespace Engine
 			Owner.GetScene()->GetSceneRenderer()->RemoveObject(m_CollapsedModelTree[i].m_Object);
 		m_CollapsedModelTree.clear();
 
-		if(model)
-			CollapseModel(model, m_CollapsedModelTree);
-		
-		Invalidate();
+		if (model)
+		{
+			for (uint32 i = 0; i < model->GetBakedMeshes().size(); i++)
+			{
+				m_CollapsedModelTree.push_back({
+					model->GetNames()[i],
+					model->GetBakedMeshes()[i],
+				});
+			}
+		}
 	}
 
 	void StaticModelRendererComponent::Invalidate()

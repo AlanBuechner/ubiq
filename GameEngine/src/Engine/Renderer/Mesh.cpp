@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "Mesh.h"
 
-#include "Engine/Core/MeshLoader.h"
-
 namespace Engine
 {
 

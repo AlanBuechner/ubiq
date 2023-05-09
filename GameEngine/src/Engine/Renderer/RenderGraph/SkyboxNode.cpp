@@ -34,7 +34,9 @@ namespace Engine
 		meshBuilder.indices.push_back(2);
 		meshBuilder.indices.push_back(1);
 
-		m_SkyboxMesh = meshBuilder.ToMesh();
+		meshBuilder.Apply();
+
+		m_SkyboxMesh = meshBuilder.mesh;
 
 	}
 

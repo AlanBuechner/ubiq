@@ -40,7 +40,7 @@ Entities:
     StaticModelRendererComponent:
       Model: 7711650371006191785
       Materials:
-        - 9193023617033958228
+        sphere_gltf_Sphere.001: 9193023617033958228
   - Entity: 1824081241608119135
     Name: Floor
     TransformComponent:
@@ -50,4 +50,4 @@ Entities:
     StaticModelRendererComponent:
       Model: 15383826060822133857
       Materials:
-        - 11419106162513771918
+        Cube: 11419106162513771918

@@ -206,16 +206,19 @@ namespace Engine
 
 			if (!meshRenderer.GetMeshes().empty())
 			{
-				YAML::Node materials;
+				out << YAML::Key << "Materials";
+				out << YAML::BeginMap;
+
 				for (auto& entry : meshRenderer.GetMeshes())
 				{
+					uint64 matID = 0;
 					if (entry.m_Material)
-						materials.push_back((uint64)entry.m_Material->GetAssetID());
-					else
-						materials.push_back(0);
+						matID = (uint64)entry.m_Material->GetAssetID();
 
+					out << YAML::Key << entry.m_Name << YAML::Value << matID;
 				}
-				out << YAML::Key << "Materials" << YAML::Value << materials;
+
+				out << YAML::EndMap;
 			}
 
 			out << YAML::EndMap;
@@ -393,9 +396,14 @@ namespace Engine
 					if (staticModelRendererComponent["Materials"])
 					{
 						YAML::Node materials = staticModelRendererComponent["Materials"];
-						uint32 i = 0;
-						for (auto mat : materials)
-							mrc.GetMeshes()[i++].m_Material = Application::Get().GetAssetManager().GetAsset<Material>(mat.as<uint64>());
+
+						for (auto& entry : mrc.GetMeshes())
+						{
+							UUID matID = 0;
+							if(materials[entry.m_Name])
+								matID = materials[entry.m_Name].as<uint64>();
+							entry.m_Material = Application::Get().GetAssetManager().GetAsset<Material>(matID);
+						}
 					}
 					mrc.Invalidate();
 				}

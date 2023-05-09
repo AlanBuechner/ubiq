@@ -24,6 +24,8 @@
 #include "Platform/DirectX12/Directx12Context.h"
 #include "Platform/DirectX12/DirectX12Descriptors.h"
 #include "Platform/DirectX12/DirectX12ResourceManager.h"
+#include "Platform/DirectX12/DirectX12CommandList.h"
+#include "Platform/DirectX12/DX.h"
 #endif // PLATFORM_WINDOWS
 
 

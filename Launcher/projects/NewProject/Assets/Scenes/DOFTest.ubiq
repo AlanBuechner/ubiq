@@ -21,4 +21,4 @@ Entities:
     StaticModelRendererComponent:
       Model: 630034325824791667
       Materials:
-        - 14846736622411844726
+        cube: 14846736622411844726

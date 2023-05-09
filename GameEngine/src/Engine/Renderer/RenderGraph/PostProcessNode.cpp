@@ -28,8 +28,9 @@ namespace Engine
 		meshBuilder.indices.push_back(0);
 		meshBuilder.indices.push_back(2);
 		meshBuilder.indices.push_back(1);
+		meshBuilder.Apply();
 
-		m_ScreenMesh = meshBuilder.ToMesh();
+		m_ScreenMesh = meshBuilder.mesh;
 	}
 
 	void PostProcessNode::SetRenderTarget(Ref<FrameBuffer> fb)

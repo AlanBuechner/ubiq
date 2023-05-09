@@ -15,8 +15,13 @@ namespace Engine
 
 		struct MeshEntry
 		{
-			Ref<Mesh> m_Mesh;
-			Ref<Material> m_Material;
+			MeshEntry(std::string name, Ref<Mesh> mesh) :
+				m_Name(name), m_Mesh(mesh)
+			{}
+
+			std::string m_Name;
+			Ref<Mesh> m_Mesh = nullptr;
+			Ref<Material> m_Material = nullptr;
 			SceneRenderer::ObjectControlBlockRef m_Object = nullptr;
 		};
 

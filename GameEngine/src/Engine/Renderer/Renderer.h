@@ -18,6 +18,7 @@ namespace Engine
 	class Camera;
 	class ShaderPass;
 	class Texture2D;
+	class Mesh;
 }
 
 namespace Engine

@@ -376,10 +376,10 @@ if(!m_Selected.HasComponent<component>()){\
 			if (PropertysPanel::DrawModelControl("Model", model))
 				component.SetModel(model);
 
-			for (auto& entry : component.GetMeshes())
+			for (uint32_t i = 0; i < component.GetMeshes().size(); i++)
 			{
-				entry.m_Material;
-				if (PropertysPanel::DrawMaterialControl("Material", entry.m_Material))
+				auto& entry = component.GetMeshes()[i];
+				if (PropertysPanel::DrawMaterialControl(entry.m_Name, entry.m_Material))
 					component.Invalidate();
 			}
 		});

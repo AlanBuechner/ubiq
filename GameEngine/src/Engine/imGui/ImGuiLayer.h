@@ -5,11 +5,6 @@
 #include "Engine/Events/MouseEvent.h"
 #include "Engine/Events/KeyEvent.h"
 
-#if defined(PLATFORM_WINDOWS)
-#include "Platform/DirectX12/DirectX12CommandList.h"
-#include "Platform/DirectX12/DX.h"
-#endif
-
 namespace Engine
 {
 	class Window;

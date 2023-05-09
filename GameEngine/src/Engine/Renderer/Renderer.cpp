@@ -88,7 +88,9 @@ namespace Engine
 		meshBuilder.indices.push_back(2);
 		meshBuilder.indices.push_back(3);
 
-		s_ScreenMesh = meshBuilder.ToMesh();
+		meshBuilder.Apply();
+
+		s_ScreenMesh = meshBuilder.mesh;
 
 		s_BlitShader = ComputeShader::CreateFromEmbeded(BLIT, "Blit.compute");
 	}
