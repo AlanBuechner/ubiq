@@ -207,13 +207,21 @@ PS_Output main(PS_Input input)
 	}
 
 	float4 diffuse = textures[mat.diffuse].Sample(textureSampler, uv);
-	float3 normal = normalize(normalize(textures[mat.normal].Sample(textureSampler, uv).xyz) * 2 - 1);
+	float3 normal = normalize(normalize(textures[mat.normal].Sample(textureSampler, uv).rgb) * 2 - 1);
 	float roughness = textures[mat.roughness].Sample(textureSampler, uv).r;
 	float metallic = textures[mat.metal].Sample(textureSampler, uv).b;
 	float ao = textures[mat.ao].Sample(textureSampler, uv).r;
 
-	float3x3 TBN = transpose(float3x3(normalize(input.tangent), normalize(input.bitangent), normalize(input.normal)));
-	normal = normalize(mul(TBN, normal));
+	bool3 nan = isnan(input.tangent);
+	if (nan.x || nan.y || nan.z)
+	{
+		normal = input.normal;
+	}
+	else
+	{
+		float3x3 TBN = transpose(float3x3(normalize(input.tangent), normalize(input.bitangent), normalize(input.normal)));
+		normal = normalize(mul(TBN, normal));
+	}
 
 	float3 lo = float3(0,0,0);
 

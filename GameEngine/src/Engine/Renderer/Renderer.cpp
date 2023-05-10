@@ -64,11 +64,11 @@ namespace Engine
 		s_WhiteTexture->SetData(&textureData);
 
 		s_BlackTexture = Texture2D::Create(1, 1);
-		textureData = 0x000000ff; // 0,0,0,1
+		textureData = 0xff0000ff; // 1,0,0,1
 		s_BlackTexture->SetData(&textureData);
 
 		s_BlueTexture = Texture2D::Create(1, 1);
-		textureData = 0x0000ffff; // 0,0,1,1
+		textureData = 0xffff0000; // 0,0,1,1
 		s_BlueTexture->SetData(&textureData);
 
 		struct Vertex
