@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "StaticModelRendererComponent.h"
-
+#include "Engine/Renderer/Renderer.h"
 
 
 namespace Engine
@@ -52,11 +52,13 @@ namespace Engine
 		for (uint32 i = 0; i < m_CollapsedModelTree.size(); i++)
 		{
 			MeshEntry& entry = m_CollapsedModelTree[i];
+			Ref<Material> mat = Renderer::GetDefultMaterial();
+			if (entry.m_Material) mat = entry.m_Material;
 
-			if (entry.m_Material)
+			if (mat)
 			{
 				Owner.GetScene()->GetSceneRenderer()->RemoveObject(entry.m_Object);
-				entry.m_Object = Owner.GetScene()->GetSceneRenderer()->Submit(entry.m_Mesh, entry.m_Material, Owner.GetTransform().GetTransform());
+				entry.m_Object = Owner.GetScene()->GetSceneRenderer()->Submit(entry.m_Mesh, mat, Owner.GetTransform().GetTransform());
 			}
 		}
 	}

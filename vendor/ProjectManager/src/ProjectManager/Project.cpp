@@ -60,6 +60,9 @@ namespace ProjectManager
 		YAML::Node data = YAML::Load(ss);
 		m_Version = data["Version"].as<Version>();
 
+		if (data["DefultMaterialID"])
+			m_DefultMaterialID = data["DefultMaterialID"].as<uint64_t>();
+
 		ifs.close();
 		return true;
 	}
@@ -72,6 +75,7 @@ namespace ProjectManager
 
 		out << YAML::BeginMap;
 		out << YAML::Key << "Version" << YAML::Value << m_Version;
+		out << YAML::Key << "DefultMaterialID" << YAML::Value << m_DefultMaterialID;
 
 		out << YAML::EndMap;
 

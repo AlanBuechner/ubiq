@@ -38,6 +38,8 @@ namespace ProjectManager
 		inline fs::path GetScriptsDirectory() { return GetRootDirectory() / "Scripts"; }
 		inline fs::path GetModulesDirectory() { return GetRootDirectory() / "Modules"; }
 
+		inline uint64_t GetDefultMaterialID() { return m_DefultMaterialID; }
+
 		inline Version GetVersion() { return m_Version; }
 		inline void SetVersion(Version version) { m_Version = version; }
 
@@ -45,6 +47,8 @@ namespace ProjectManager
 		fs::path m_ProjectFile;
 
 		Version m_Version;
+
+		uint64_t m_DefultMaterialID = 0;
 	};
 }
 

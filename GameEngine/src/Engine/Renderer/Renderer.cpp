@@ -22,6 +22,8 @@ Engine::Ref<Engine::Texture2D> Engine::Renderer::s_BlueTexture;
 Engine::Ref<Engine::Mesh> Engine::Renderer::s_ScreenMesh;
 Engine::Ref<Engine::ComputeShader> Engine::Renderer::s_BlitShader;
 
+Engine::Ref<Engine::Material> Engine::Renderer::s_DefultMaterial;
+
 std::thread Engine::Renderer::s_RenderThread;
 
 Engine::Flag Engine::Renderer::s_RenderFlag;
@@ -101,6 +103,7 @@ namespace Engine
 		s_BlackTexture = nullptr;
 		s_BlueTexture = nullptr;
 		s_ScreenMesh = nullptr;
+		s_DefultMaterial = nullptr;
 
 		s_RenderThread.join();
 		Renderer2D::Destroy();

@@ -569,6 +569,7 @@ namespace Engine
 		m_CurrentProject = CreateRef<ProjectManager::Project>(projectFile);
 		fs::current_path(m_CurrentProject->GetRootDirectory());
 		Application::Get().GetAssetManager().AddAssetDirectory(m_CurrentProject->GetAssetsDirectory());
+		Renderer::SetDefultMaterial(Application::Get().GetAssetManager().GetAsset<Material>(m_CurrentProject->GetDefultMaterialID()));
 
 		m_ContentPanel.SetDirectory(m_CurrentProject->GetAssetsDirectory());
 

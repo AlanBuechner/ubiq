@@ -374,7 +374,10 @@ if(!m_Selected.HasComponent<component>()){\
 			
 			Ref<Model> model = component.GetModel();
 			if (PropertysPanel::DrawModelControl("Model", model))
+			{
 				component.SetModel(model);
+				component.Invalidate();
+			}
 
 			for (uint32_t i = 0; i < component.GetMeshes().size(); i++)
 			{

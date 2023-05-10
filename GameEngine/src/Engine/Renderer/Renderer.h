@@ -42,11 +42,14 @@ namespace Engine
 
 		static void Build(Ref<CommandList> commandList);
 
+		static void SetDefultMaterial(Ref<Material> mat) { s_DefultMaterial = mat; }
+
 		static Ref<Texture2D> GetWhiteTexture() { return s_WhiteTexture; }
 		static Ref<Texture2D> GetBlackTexture() { return s_BlackTexture; }
 		static Ref<Texture2D> GetBlueTexture() { return s_BlueTexture; }
 		static Ref<Mesh> GetScreenMesh() { return s_ScreenMesh; }
 		static Ref<ComputeShader> GetBlitShader() { return s_BlitShader; }
+		static Ref<Material> GetDefultMaterial() { return s_DefultMaterial; }
 
 		inline static RendererAPI GetAPI() { return s_Api; }
 		inline static Ref<GraphicsContext> GetContext() { return s_Context; }
@@ -84,5 +87,7 @@ namespace Engine
 		static Ref<Texture2D> s_BlueTexture;
 		static Ref<Mesh> s_ScreenMesh;
 		static Ref<ComputeShader> s_BlitShader;
+
+		static Ref<Material> s_DefultMaterial;
 	};
 }
