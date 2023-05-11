@@ -67,3 +67,13 @@ Entities:
       Model: 7711650371006191785
       Materials:
         sphere_gltf_Sphere.001: 9193023617033958228
+  - Entity: 10063963099091963717
+    Name: box
+    TransformComponent:
+      Position: [4.39184475, -2.5049305, 2.61999989]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    StaticModelRendererComponent:
+      Model: 630034325824791667
+      Materials:
+        cube: 0

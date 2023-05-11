@@ -258,7 +258,7 @@ PS_Output main(PS_Input input)
 			pos = pos / pos.w;
 			pos.xy = pos.xy * 0.5 + 0.5;
 
-			shadowAmount = PCSSDirectional(textures[c.texture], shadowSampler, pos, shadowCamera.InvProjection, DirLight.size, (float3)input.worldPosition);
+			shadowAmount = PCSSDirectional(textures[c.texture], shadowSampler, pos, shadowCamera.InvProjection, DirLight.size, (float3)input.worldPosition, DEPTH_BIAS * (ci+1));
 			//shadowAmount = HardShadow(textures[c.texture], shadowSampler, pos);
 		}
 
