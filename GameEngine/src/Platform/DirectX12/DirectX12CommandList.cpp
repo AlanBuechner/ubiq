@@ -64,24 +64,14 @@ namespace Engine
 		m_RecordFlag.Signal();
 	}
 
-	void DirectX12CommandList::StartRecording(Ref<ShaderPass> startShader)
+	void DirectX12CommandList::StartRecording()
 	{
 		m_RecordFlag.Wait();
 		m_RecordFlag.Clear();
 		m_RenderTarget = nullptr;
 		wrl::ComPtr<ID3D12CommandAllocator> allocator = GetAllocator();
 		CORE_ASSERT_HRESULT(allocator->Reset(), "Failed to reset command allocator");
-		ID3D12PipelineState* startPipeline = nullptr;
-		Ref<DirectX12Shader> dxShader = std::dynamic_pointer_cast<DirectX12Shader>(startShader);
-		if (startShader)
-			startPipeline = dxShader->GetPipelineState().Get();
-		CORE_ASSERT_HRESULT(m_CommandList->Reset(allocator.Get(), startPipeline), "Failed to reset command list");
-
-		if (startShader)
-		{
-			m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature().Get());
-			m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		}
+		CORE_ASSERT_HRESULT(m_CommandList->Reset(allocator.Get(), nullptr), "Failed to reset command list");
 
 		ID3D12DescriptorHeap* heaps[]{ DirectX12ResourceManager::s_SRVHeap->GetHeap().Get(), DirectX12ResourceManager::s_SamplerHeap->GetHeap().Get() };
 		m_CommandList->SetDescriptorHeaps(2, heaps);
@@ -238,8 +228,14 @@ namespace Engine
 
 	void DirectX12CommandList::SetShader(Ref<ShaderPass> shader)
 	{
+		if (!m_RenderTarget)
+		{
+			CORE_ERROR("Can not set shader without rendertarget");
+			return;
+		}
+
 		Ref<DirectX12Shader> dxShader = std::dynamic_pointer_cast<DirectX12Shader>(shader);
-		m_CommandList->SetPipelineState(dxShader->GetPipelineState().Get());
+		m_CommandList->SetPipelineState(dxShader->GetPipelineState(m_RenderTarget).Get());
 		m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature().Get());
 
 		D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;

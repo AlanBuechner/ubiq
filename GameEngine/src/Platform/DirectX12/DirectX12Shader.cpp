@@ -46,6 +46,22 @@ namespace Engine
 		return m_ReflectionData;
 	}
 
+	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::GetPipelineState(Ref<FrameBuffer> target)
+	{
+		std::vector<FrameBufferTextureFormat> formates;
+		for (auto& attachment : target->GetSpecification().Attachments.Attachments)
+		{
+			if(!attachment.IsDepthStencil())
+				formates.push_back(attachment.TextureFormat);
+		}
+
+		auto state = m_PiplineStates.find(formates);
+		if (state == m_PiplineStates.end())
+			return CreatePiplineState(formates);
+
+		return state->second;
+	}
+
 	uint32 DirectX12Shader::GetUniformLocation(const std::string& name) const
 	{
 		auto location = m_UniformLocations.find(name);
@@ -56,15 +72,13 @@ namespace Engine
 
 	void DirectX12Shader::Init()
 	{
-		ByteCodeBlobs blobs{};
-
 		ShaderSorce::SectionInfo vsi = m_Src->m_Sections[m_PassConfig.vs];
 		const std::string& vsc = vsi.m_SectionCode.str();
 		if (!vsc.empty())
 		{
 			ShaderBlobs vs = DirectX12ShaderCompiler::Get().Compile(vsc, m_Src->file, ShaderType::Vertex);
 			if (!vs.object) return;
-			blobs.vs = vs.object;
+			m_Blobs.vs = vs.object;
 			DirectX12ShaderCompiler::Get().GetShaderParameters(vs, vsi, m_ReflectionData, ShaderType::Vertex);
 			DirectX12ShaderCompiler::Get().GetInputLayout(vs, m_InputElements);
 		}
@@ -75,12 +89,12 @@ namespace Engine
 		{
 			ShaderBlobs ps = DirectX12ShaderCompiler::Get().Compile(psc, m_Src->file, ShaderType::Pixel);
 			if (!ps.object) return;
-			blobs.ps = ps.object;
+			m_Blobs.ps = ps.object;
 			DirectX12ShaderCompiler::Get().GetShaderParameters(ps, psi, m_ReflectionData, ShaderType::Pixel);
 			DirectX12ShaderCompiler::Get().GetOutputLayout(ps, m_RenderTargetFormates);
 		}
 
-		if (blobs)
+		if (m_Blobs)
 		{
 			// create root signature
 			m_Sig = DirectX12ShaderCompiler::Get().GenRootSignature(m_ReflectionData);
@@ -88,11 +102,11 @@ namespace Engine
 				m_UniformLocations[param.name] = param.rootIndex;
 
 			// create pipeline state object
-			CreatePiplineState(blobs);
+			//CreatePiplineState();
 		}
 	}
 
-	void DirectX12Shader::CreatePiplineState(ByteCodeBlobs blobs)
+	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::CreatePiplineState(const std::vector<FrameBufferTextureFormat>& formates)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -125,8 +139,8 @@ namespace Engine
 		case ShaderConfig::Point:
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT; break;
 		}
-		desc.VS = { blobs.vs->GetBufferPointer(), blobs.vs->GetBufferSize() };
-		desc.PS = { blobs.ps->GetBufferPointer(), blobs.ps->GetBufferSize() };
+		desc.VS = { m_Blobs.vs->GetBufferPointer(), m_Blobs.vs->GetBufferSize() };
+		desc.PS = { m_Blobs.ps->GetBufferPointer(), m_Blobs.ps->GetBufferSize() };
 		desc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 		desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
@@ -144,12 +158,12 @@ namespace Engine
 		desc.BlendState.AlphaToCoverageEnable = FALSE;
 		desc.BlendState.IndependentBlendEnable = FALSE;
 
-		desc.NumRenderTargets = (uint32)m_RenderTargetFormates.size();
-		for (uint32 i = 0; i < m_RenderTargetFormates.size(); i++)
+		desc.NumRenderTargets = (uint32)formates.size();
+		for (uint32 i = 0; i < formates.size(); i++)
 		{
-			desc.RTVFormats[i] = UbiqToDXGI(m_RenderTargetFormates[i]);
+			desc.RTVFormats[i] = UbiqToDXGI(formates[i]);
 
-			switch (m_RenderTargetFormates[i])
+			switch (formates[i])
 			{
 			case FrameBufferTextureFormat::RGBA8:
 			case FrameBufferTextureFormat::RGBA16:
@@ -203,7 +217,10 @@ namespace Engine
 		desc.SampleMask = UINT_MAX;
 		desc.SampleDesc.Count = 1;
 
-		context->GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(m_State.GetAddressOf()));
+		wrl::ComPtr<ID3D12PipelineState> state;
+		context->GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(state.GetAddressOf()));
+		m_PiplineStates[formates] = state;
+		return state;
 	}
 
 }

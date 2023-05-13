@@ -6,6 +6,11 @@
 
 namespace Engine
 {
+	class FrameBuffer;
+}
+
+namespace Engine
+{
 	class ENGINE_API DirectX12Shader : public ShaderPass
 	{
 	public:
@@ -15,7 +20,7 @@ namespace Engine
 		virtual std::vector<ShaderParameter> GetReflectionData() const override;
 
 		wrl::ComPtr<ID3D12RootSignature> GetRootSignature() { return m_Sig; }
-		wrl::ComPtr<ID3D12PipelineState> GetPipelineState() { return m_State; }
+		wrl::ComPtr<ID3D12PipelineState> GetPipelineState(Ref<FrameBuffer> target);
 
 		ShaderConfig::Topology GetTopologyType() { return m_Src->config.topology; }
 
@@ -35,8 +40,8 @@ namespace Engine
 				if (ps == nullptr) return false;
 				return true;
 			}
-		};
-		void CreatePiplineState(ByteCodeBlobs blobs);
+		} m_Blobs;
+		wrl::ComPtr<ID3D12PipelineState> CreatePiplineState(const std::vector<FrameBufferTextureFormat>& formates);
 
 
 	private:
@@ -44,6 +49,19 @@ namespace Engine
 		std::string m_PassName;
 		ShaderConfig::RenderPass& m_PassConfig;
 
+		struct FBVectorHash {
+			std::size_t operator()(const std::vector<FrameBufferTextureFormat>& c) const {
+				std::hash<uint32> hasher;
+				size_t seed = 0;
+				for (FrameBufferTextureFormat i : c) {
+					seed ^= hasher((uint32)i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+				}
+				return seed;
+			}
+		};
+
+
+		std::unordered_map<std::vector<FrameBufferTextureFormat>, wrl::ComPtr<ID3D12PipelineState>, FBVectorHash> m_PiplineStates;
 		std::unordered_map<std::string, uint32> m_UniformLocations;
 
 		std::vector<ShaderInputElement> m_InputElements;
@@ -51,6 +69,5 @@ namespace Engine
 		std::vector<FrameBufferTextureFormat> m_RenderTargetFormates;
 
 		wrl::ComPtr<ID3D12RootSignature> m_Sig;
-		wrl::ComPtr<ID3D12PipelineState> m_State;
 	};
 }

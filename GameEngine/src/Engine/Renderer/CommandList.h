@@ -34,7 +34,7 @@ namespace Engine
 	public:
 
 		virtual void SignalRecording() = 0;
-		virtual void StartRecording(Ref<ShaderPass> startShader = nullptr) = 0;
+		virtual void StartRecording() = 0;
 
 		// transitions
 		void ToRenderTarget(Ref<FrameBuffer> fb, FrameBufferState from) { Transition({ fb }, FrameBufferState::RenderTarget, from); }

@@ -20,7 +20,7 @@ namespace Engine
 
 	public:
 		virtual void SignalRecording() override { m_RecordFlag.Signal(); }
-		virtual void StartRecording(Ref<ShaderPass> startShader = nullptr) override;
+		virtual void StartRecording() override;
 
 		// transitions
 		void Present(FrameBufferState from) { Present(nullptr, from); }
