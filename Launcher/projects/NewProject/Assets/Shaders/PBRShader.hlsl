@@ -14,7 +14,7 @@ passes = {
 
 material = {
 	diffuse = textureID(white);
-	normal = textureID(blue);
+	normal = textureID(normal);
 	roughness = textureID(white);
 	ao = textureID(white);
 	metal = textureID(black);

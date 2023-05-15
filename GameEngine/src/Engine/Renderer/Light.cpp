@@ -71,7 +71,10 @@ namespace Engine
 			m_Cameras[i] = CreateRef<Camera>();
 
 			FrameBufferSpecification fbSpec;
-			fbSpec.Attachments = { { FrameBufferTextureFormat::Depth, { 1,0,0,0 } } };
+			fbSpec.Attachments = { 
+				{ FrameBufferTextureFormat::RG16, {FLT_MAX,0,0,0} },
+				{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } },
+			};
 			fbSpec.Width = 4000 - (i*500);
 			fbSpec.Height = 4000 - (i*500);
 			fbSpec.InitalState = FrameBufferState::SRV;
@@ -80,7 +83,7 @@ namespace Engine
 			cascadeData.push_back(
 				CascadeData{
 					m_Cameras[i]->GetCameraBuffer()->GetDescriptorLocation(),
-					m_ShadowMaps[i]->GetAttachmentShaderDescriptoLocation(),
+					m_ShadowMaps[i]->GetAttachmentShaderDescriptoLocation(1),
 					fbSpec.Width, fbSpec.Height,
 					nearPlan, nearPlan + size
 				}

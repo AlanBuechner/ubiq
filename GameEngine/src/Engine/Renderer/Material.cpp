@@ -75,8 +75,8 @@ namespace Engine
 							*(uint32*)location = Renderer::GetWhiteTexture()->GetDescriptorLocation();
 						else if (p.defaultValue == "black")
 							*(uint32*)location = Renderer::GetBlackTexture()->GetDescriptorLocation();
-						else if (p.defaultValue == "blue")
-							*(uint32*)location = Renderer::GetBlueTexture()->GetDescriptorLocation();
+						else if (p.defaultValue == "normal")
+							*(uint32*)location = Renderer::GetNormalTexture()->GetDescriptorLocation();
 						else
 							*(uint32*)location = Renderer::GetWhiteTexture()->GetDescriptorLocation();
 					}

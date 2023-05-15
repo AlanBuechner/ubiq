@@ -167,6 +167,7 @@ namespace Engine
 			{
 			case FrameBufferTextureFormat::RGBA8:
 			case FrameBufferTextureFormat::RGBA16:
+			case FrameBufferTextureFormat::RGBA32:
 			{
 				desc.BlendState.RenderTarget[i].BlendEnable = TRUE;
 				desc.BlendState.RenderTarget[i].LogicOpEnable = FALSE;

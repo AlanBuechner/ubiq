@@ -18,7 +18,7 @@ Engine::InstrumentationTimer Engine::Renderer::s_Timer = CREATE_PROFILEI();
 
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_WhiteTexture;
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_BlackTexture;
-Engine::Ref<Engine::Texture2D> Engine::Renderer::s_BlueTexture;
+Engine::Ref<Engine::Texture2D> Engine::Renderer::s_NormalTexture;
 Engine::Ref<Engine::Mesh> Engine::Renderer::s_ScreenMesh;
 Engine::Ref<Engine::ComputeShader> Engine::Renderer::s_BlitShader;
 
@@ -67,9 +67,9 @@ namespace Engine
 		textureData = 0xff0000ff; // 1,0,0,1
 		s_BlackTexture->SetData(&textureData);
 
-		s_BlueTexture = Texture2D::Create(1, 1);
-		textureData = 0xffff0000; // 0,0,1,1
-		s_BlueTexture->SetData(&textureData);
+		s_NormalTexture = Texture2D::Create(1, 1);
+		textureData = 0xffff8080; // 0,0,1,1
+		s_NormalTexture->SetData(&textureData);
 
 		struct Vertex
 		{
@@ -101,7 +101,7 @@ namespace Engine
 	{
 		s_WhiteTexture = nullptr;
 		s_BlackTexture = nullptr;
-		s_BlueTexture = nullptr;
+		s_NormalTexture = nullptr;
 		s_ScreenMesh = nullptr;
 		s_DefultMaterial = nullptr;
 

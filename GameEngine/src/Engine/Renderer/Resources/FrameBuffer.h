@@ -9,8 +9,16 @@ namespace Engine
 		None = 0,
 
 		// Color
+		// 4 component float
 		RGBA8,
 		RGBA16,
+		RGBA32,
+
+		// 2 component float
+		RG16,
+		RG32,
+
+		// 1 component int
 		RED_INTEGER,
 
 		// Depth/Stencil
@@ -42,11 +50,7 @@ namespace Engine
 			{
 			case FrameBufferTextureFormat::DEPTH24STENCIL8:
 				return true;
-
-			case FrameBufferTextureFormat::RGBA8:
-			case FrameBufferTextureFormat::RGBA16:
-			case FrameBufferTextureFormat::RED_INTEGER:
-			case FrameBufferTextureFormat::None:
+			default:
 				break;
 			}
 			return false;

@@ -12,11 +12,18 @@ namespace Engine
 	{
 		switch (format)
 		{
-
 		case Engine::FrameBufferTextureFormat::RGBA8:
 			return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case Engine::FrameBufferTextureFormat::RGBA16:
 			return DXGI_FORMAT_R16G16B16A16_FLOAT;
+		case Engine::FrameBufferTextureFormat::RGBA32:
+			return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+		case Engine::FrameBufferTextureFormat::RG16:
+			return DXGI_FORMAT_R16G16_FLOAT;
+		case Engine::FrameBufferTextureFormat::RG32:
+			return DXGI_FORMAT_R32G32_FLOAT;
+
 		case Engine::FrameBufferTextureFormat::RED_INTEGER:
 			return DXGI_FORMAT_R32_SINT;
 		case Engine::FrameBufferTextureFormat::DEPTH24STENCIL8:
@@ -190,6 +197,9 @@ namespace Engine
 			}
 		case FrameBufferTextureFormat::RGBA8:
 		case FrameBufferTextureFormat::RGBA16:
+		case FrameBufferTextureFormat::RGBA32:
+		case FrameBufferTextureFormat::RG16:
+		case FrameBufferTextureFormat::RG32:
 		case FrameBufferTextureFormat::RED_INTEGER:
 			((Math::Vector4&)clearVal.Color) = color;
 		}
