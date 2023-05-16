@@ -49,11 +49,15 @@ namespace Engine
 	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::GetPipelineState(Ref<FrameBuffer> target)
 	{
 		std::vector<FrameBufferTextureFormat> formates;
+		FrameBufferTextureFormat depthFormat = FrameBufferTextureFormat::None;
 		for (auto& attachment : target->GetSpecification().Attachments.Attachments)
 		{
-			if(!attachment.IsDepthStencil())
+			if (!attachment.IsDepthStencil())
 				formates.push_back(attachment.TextureFormat);
+			else
+				depthFormat = attachment.TextureFormat;
 		}
+		formates.push_back(depthFormat);
 
 		auto state = m_PiplineStates.find(formates);
 		if (state == m_PiplineStates.end())
@@ -106,7 +110,7 @@ namespace Engine
 		}
 	}
 
-	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::CreatePiplineState(const std::vector<FrameBufferTextureFormat>& formates)
+	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::CreatePiplineState(const std::vector<FrameBufferTextureFormat>& formats)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -141,10 +145,14 @@ namespace Engine
 		}
 		desc.VS = { m_Blobs.vs->GetBufferPointer(), m_Blobs.vs->GetBufferSize() };
 		desc.PS = { m_Blobs.ps->GetBufferPointer(), m_Blobs.ps->GetBufferSize() };
-		desc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 		desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
-		desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+		if(m_PassConfig.cullMode == ShaderConfig::RenderPass::Back)
+			desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+		else if (m_PassConfig.cullMode == ShaderConfig::RenderPass::Front)
+			desc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
+		else if (m_PassConfig.cullMode == ShaderConfig::RenderPass::None)
+			desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 		desc.RasterizerState.FrontCounterClockwise = FALSE;
 		desc.RasterizerState.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 		desc.RasterizerState.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
@@ -158,12 +166,12 @@ namespace Engine
 		desc.BlendState.AlphaToCoverageEnable = FALSE;
 		desc.BlendState.IndependentBlendEnable = FALSE;
 
-		desc.NumRenderTargets = (uint32)formates.size();
-		for (uint32 i = 0; i < formates.size(); i++)
+		desc.NumRenderTargets = (uint32)formats.size();
+		for (uint32 i = 0; i < formats.size(); i++)
 		{
-			desc.RTVFormats[i] = UbiqToDXGI(formates[i]);
+			desc.RTVFormats[i] = UbiqToDXGI(formats[i]);
 
-			switch (formates[i])
+			switch (formats[i])
 			{
 			case FrameBufferTextureFormat::RGBA8:
 			case FrameBufferTextureFormat::RGBA16:
@@ -201,26 +209,36 @@ namespace Engine
 			default:
 				break;
 			}
-
 		}
 
-		desc.DepthStencilState.DepthEnable = TRUE;
-		desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-		desc.DepthStencilState.StencilEnable = TRUE;
-		desc.DepthStencilState.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
-		desc.DepthStencilState.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
-		const D3D12_DEPTH_STENCILOP_DESC defaultStencilOp =
-		{ D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
-		desc.DepthStencilState.FrontFace = defaultStencilOp;
-		desc.DepthStencilState.BackFace = defaultStencilOp;
+		if (formats.back() != FrameBufferTextureFormat::None)
+		{
+			desc.DepthStencilState.DepthEnable = TRUE;
+			desc.DSVFormat = UbiqToDXGI(formats.back());
+			desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+			if(m_PassConfig.depthTest == ShaderConfig::RenderPass::Less)
+				desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+			else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::LessOrEqual)
+				desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+			else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::Greater)
+				desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+			else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::GreaterOrEqual)
+				desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+			desc.DepthStencilState.StencilEnable = TRUE;
+			desc.DepthStencilState.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+			desc.DepthStencilState.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+			const D3D12_DEPTH_STENCILOP_DESC defaultStencilOp =
+			{ D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
+			desc.DepthStencilState.FrontFace = defaultStencilOp;
+			desc.DepthStencilState.BackFace = defaultStencilOp;
+		}
 
 		desc.SampleMask = UINT_MAX;
 		desc.SampleDesc.Count = 1;
 
 		wrl::ComPtr<ID3D12PipelineState> state;
 		context->GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(state.GetAddressOf()));
-		m_PiplineStates[formates] = state;
+		m_PiplineStates[formats] = state;
 		return state;
 	}
 

@@ -56,11 +56,6 @@ struct VS_Output
 
 typedef VS_Output PS_Input;
 
-struct PS_Output
-{
-	float4 color : SV_TARGET0;
-};
-
 // common structures
 
 struct DirectionalLight
@@ -135,6 +130,11 @@ VS_Output main(VS_Input input)
 }
 
 #section pixel
+
+struct PS_Output
+{
+	float4 color : SV_TARGET0;
+};
 
 ConstantBuffer<DirectionalLight> DirLight;
 #define NUM_CASCADES 5

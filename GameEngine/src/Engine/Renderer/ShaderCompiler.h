@@ -92,10 +92,25 @@ namespace Engine
 				Add
 			};
 
+			enum CullMode {
+				Back,
+				Front,
+				None
+			};
+			
+			enum DepthTest {
+				Less,
+				LessOrEqual,
+				Greater,
+				GreaterOrEqual
+			};
+
 			std::string passName;
 			std::string vs;
 			std::string ps;
 			BlendMode blendMode = Blend;
+			CullMode cullMode = Back;
+			DepthTest depthTest = LessOrEqual;
 
 		};
 

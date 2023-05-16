@@ -41,7 +41,7 @@ namespace Engine
 				return true;
 			}
 		} m_Blobs;
-		wrl::ComPtr<ID3D12PipelineState> CreatePiplineState(const std::vector<FrameBufferTextureFormat>& formates);
+		wrl::ComPtr<ID3D12PipelineState> CreatePiplineState(const std::vector<FrameBufferTextureFormat>& formats);
 
 
 	private:

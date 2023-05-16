@@ -232,6 +232,26 @@ namespace Engine
 							else if (var->value->string == "add")
 								rpass.blendMode = ShaderConfig::RenderPass::Add;
 						}
+						else if (var->name == "cullMode")
+						{
+							if (var->value->string == "back")
+								rpass.cullMode = ShaderConfig::RenderPass::Back;
+							else if (var->value->string == "front")
+								rpass.cullMode = ShaderConfig::RenderPass::Front;
+							else if (var->value->string == "none")
+								rpass.cullMode = ShaderConfig::RenderPass::None;
+						}
+						else if (var->name == "depthTest")
+						{
+							if (var->value->string == "less")
+								rpass.depthTest = ShaderConfig::RenderPass::Less;
+							else if (var->value->string == "lessOrEqual")
+								rpass.depthTest = ShaderConfig::RenderPass::LessOrEqual;
+							else if (var->value->string == "greater")
+								rpass.depthTest = ShaderConfig::RenderPass::Greater;
+							else if (var->value->string == "greaterOrEqual")
+								rpass.depthTest = ShaderConfig::RenderPass::GreaterOrEqual;
+						}
 					}
 					config.passes.push_back(rpass);
 				}
