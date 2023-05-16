@@ -15,5 +15,5 @@ $ZIPPath = Join-Path -Path $SaveFolder -ChildPath "pix.zip"
 Invoke-WebRequest -UseBasicParsing -Uri $DownloadURL -OutFile $ZIPPath
 Expand-Archive -Path $ZIPPath -DestinationPath $SaveFolder -Force
 Remove-Item -Path $ZIPPath
-Write-Host "Sucessfully downloaded Socrates"
+Write-Host "Sucessfully downloaded pix"
 exit 0
