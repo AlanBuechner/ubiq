@@ -278,7 +278,16 @@ namespace Engine
 			return; // invalid bind slot
 
 		Ref<DirectX12ConstantBuffer> cb = std::dynamic_pointer_cast<DirectX12ConstantBuffer>(buffer);
-		m_CommandList->SetGraphicsRootConstantBufferView(index, cb->GetBuffer()->GetGPUVirtualAddress());
+		m_CommandList->SetGraphicsRootConstantBufferView(index, cb->GetDXResource()->GetBuffer()->GetGPUVirtualAddress());
+	}
+
+	void DirectX12CommandList::SetConstantBuffer(uint32 index, Ref<RWConstantBuffer> buffer)
+	{
+		if (index == UINT32_MAX || buffer == nullptr)
+			return; // invalid bind slot
+
+		Ref<DirectX12RWConstantBuffer> cb = std::dynamic_pointer_cast<DirectX12RWConstantBuffer>(buffer);
+		m_CommandList->SetGraphicsRootUnorderedAccessView(index, cb->GetDXResource()->GetBuffer()->GetGPUVirtualAddress());
 	}
 
 	void DirectX12CommandList::SetRootConstant(uint32 index, uint32 data)

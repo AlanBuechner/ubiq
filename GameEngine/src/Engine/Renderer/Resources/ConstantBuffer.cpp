@@ -6,7 +6,10 @@
 
 namespace Engine
 {
-	Ref<ConstantBuffer> Engine::ConstantBuffer::Create(uint32 size)
+
+	ConstantBufferResource::~ConstantBufferResource() {}
+
+	Ref<ConstantBuffer> ConstantBuffer::Create(uint32 size)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -16,6 +19,44 @@ namespace Engine
 			break;
 		}
 		return Ref<ConstantBuffer>();
+	}
+
+	Ref<ConstantBuffer> ConstantBuffer::Create(Ref<ConstantBufferResource> resource)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			return std::make_shared<DirectX12ConstantBuffer>(resource);
+		default:
+			break;
+		}
+		return Ref<ConstantBuffer>();
+	}
+
+
+	// -------------- RWConstantBuffer -------------- //
+	Ref<RWConstantBuffer> RWConstantBuffer::Create(uint32 size)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			return std::make_shared<DirectX12RWConstantBuffer>(size);
+		default:
+			break;
+		}
+		return Ref<RWConstantBuffer>();
+	}
+
+	Ref<RWConstantBuffer> RWConstantBuffer::Create(Ref<ConstantBufferResource> resource)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			return std::make_shared<DirectX12RWConstantBuffer>(resource);
+		default:
+			break;
+		}
+		return Ref<RWConstantBuffer>();
 	}
 
 }

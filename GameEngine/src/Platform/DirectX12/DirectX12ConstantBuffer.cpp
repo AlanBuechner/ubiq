@@ -10,15 +10,16 @@
 
 namespace Engine
 {
-	DirectX12ConstantBuffer::DirectX12ConstantBuffer(uint32 size) :
-		m_Size(size)
+
+	DirectX12ConstantBufferResource::DirectX12ConstantBufferResource(uint32 size)
 	{
-		m_Size = m_Size + 256 - (m_Size % 256); // 256 byte aligned
+		size = size + 256 - (size % 256); // 256 byte aligned
+		m_Size = size;
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(m_Size);
+		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
 
 		// create resource
 		HRESULT hr = context->GetDevice()->CreateCommittedResource(
@@ -30,31 +31,91 @@ namespace Engine
 			IID_PPV_ARGS(m_Buffer.GetAddressOf())
 		);
 		CORE_ASSERT_HRESULT(hr, "Failed to create constant buffer resource");
-
-		// create DescriptorHandle
-		m_Handle = DirectX12ResourceManager::s_SRVHeap->Allocate();
-
-		D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
-		desc.BufferLocation = m_Buffer->GetGPUVirtualAddress();
-		desc.SizeInBytes = m_Size;
-
-		context->GetDevice()->CreateConstantBufferView(&desc, m_Handle.cpu);
-
 	}
 
-	DirectX12ConstantBuffer::~DirectX12ConstantBuffer()
+	DirectX12ConstantBufferResource::~DirectX12ConstantBufferResource()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		if (m_Handle)
-			m_Handle.Free();
+		if (m_SRVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_SRVHandle);
+		if (m_UAVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_UAVHandle);
 
 		context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffer);
 	}
 
-	void DirectX12ConstantBuffer::SetData(const void* data)
+	void DirectX12ConstantBufferResource::SetData(const void* data)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		context->GetDX12ResourceManager()->UploadBuffer(m_Buffer, data, m_Size, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+
+	void DirectX12ConstantBufferResource::CreateSRVHandle()
+	{
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		if (!m_SRVHandle)
+		{
+			m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+
+			D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
+			desc.BufferLocation = m_Buffer->GetGPUVirtualAddress();
+			desc.SizeInBytes = m_Size;
+			context->GetDevice()->CreateConstantBufferView(&desc, m_SRVHandle.cpu);
+		}
+	}
+
+
+	void DirectX12ConstantBufferResource::CreateUAVHandle()
+	{
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		if (!m_UAVHandle)
+		{
+			m_UAVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+			D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+			uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+			uavDesc.Buffer.CounterOffsetInBytes = 0;
+			uavDesc.Buffer.FirstElement = 0;
+			uavDesc.Buffer.NumElements = 1;
+			uavDesc.Buffer.StructureByteStride = m_Size;
+			context->GetDevice()->CreateUnorderedAccessView(m_Buffer.Get(), nullptr, &uavDesc, m_UAVHandle.cpu);
+		}
+	}
+
+	// Constant Buffer
+	DirectX12ConstantBuffer::DirectX12ConstantBuffer(uint32 size)
+	{
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		m_Resource = CreateRef<DirectX12ConstantBufferResource>(size);
+		m_Resource->CreateSRVHandle();
+	}
+
+	DirectX12ConstantBuffer::DirectX12ConstantBuffer(Ref<ConstantBufferResource> resource)
+	{
+		m_Resource = std::dynamic_pointer_cast<DirectX12ConstantBufferResource>(resource);
+		m_Resource->CreateSRVHandle();
+	}
+
+	void DirectX12ConstantBuffer::SetData(const void* data)
+	{
+		m_Resource->SetData(data);
+	}
+
+
+	// RW Constant Buffer
+	DirectX12RWConstantBuffer::DirectX12RWConstantBuffer(uint32 size)
+	{
+		m_Resource = CreateRef<DirectX12ConstantBufferResource>(size);
+		m_Resource->CreateUAVHandle();
+	}
+
+	DirectX12RWConstantBuffer::DirectX12RWConstantBuffer(Ref<ConstantBufferResource> resource)
+	{
+		m_Resource = std::dynamic_pointer_cast<DirectX12ConstantBufferResource>(resource);
+		m_Resource->CreateUAVHandle();
+	}
+
+	void DirectX12RWConstantBuffer::SetData(const void* data)
+	{
+		m_Resource->SetData(data);
 	}
 
 }

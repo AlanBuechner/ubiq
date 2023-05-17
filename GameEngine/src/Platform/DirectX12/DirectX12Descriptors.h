@@ -10,8 +10,8 @@ namespace Engine
 	struct DirectX12DescriptorHandle
 	{
 	public:
-		D3D12_CPU_DESCRIPTOR_HANDLE cpu;
-		D3D12_GPU_DESCRIPTOR_HANDLE gpu;
+		D3D12_CPU_DESCRIPTOR_HANDLE cpu{0};
+		D3D12_GPU_DESCRIPTOR_HANDLE gpu{0};
 
 		operator bool() const { return cpu.ptr != 0; }
 		bool IsShaderVisible() const { return gpu.ptr != 0; }
@@ -20,9 +20,10 @@ namespace Engine
 		void Free();
 
 	private:
-		friend DirectX12DescriptorHeap;
 		DirectX12DescriptorHeap* m_Container = nullptr;
-		uint32 m_Index = 0;
+		uint32 m_Index = UINT32_MAX;
+
+		friend DirectX12DescriptorHeap;
 	};
 
 	class DirectX12DescriptorHeap
