@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-	struct ConstantBufferResource
+	class ConstantBufferResource
 	{
 	public:
 		virtual ~ConstantBufferResource() = 0;
@@ -11,7 +11,7 @@ namespace Engine
 		uint32 GetSize() { return m_Size; }
 
 	protected:
-		uint32 m_Size;
+		uint32 m_Size = 0;
 	};
 	
 

@@ -6,12 +6,26 @@
 namespace Engine
 {
 
+	StructuredBufferResource::~StructuredBufferResource() {}
+
 	Ref<StructuredBuffer> StructuredBuffer::Create(uint32 stride, uint32 count)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
 			return CreateRef<DirectX12StructuredBuffer>(stride, count);
+		default:
+			break;
+		}
+		return Ref<StructuredBuffer>();
+	}
+
+	Ref<StructuredBuffer> StructuredBuffer::Create(Ref<StructuredBufferResource> resource)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			return CreateRef<DirectX12StructuredBuffer>(resource);
 		default:
 			break;
 		}

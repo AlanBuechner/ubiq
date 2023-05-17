@@ -6,6 +6,7 @@ namespace Engine
 	class Camera;
 	class FrameBuffer;
 	class ConstantBuffer;
+	class StructuredBuffer;
 }
 
 namespace Engine
@@ -44,7 +45,6 @@ namespace Engine
 				uint32 tHeight;
 				float minDist;
 				float maxDist;
-				uint32 padding[2];
 			};
 
 			CascadedShadowMaps() = default;
@@ -59,7 +59,7 @@ namespace Engine
 			Ref<FrameBuffer> m_ShadowMaps[s_NumShadowMaps];
 			Ref<Camera> m_Cameras[s_NumShadowMaps];
 
-			Ref<ConstantBuffer> m_CameraIndeces;
+			Ref<StructuredBuffer> m_CameraIndeces;
 		};
 
 	public:

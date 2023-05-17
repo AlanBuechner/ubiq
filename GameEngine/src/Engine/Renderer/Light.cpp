@@ -2,6 +2,7 @@
 #include "Light.h"
 
 #include "Resources/ConstantBuffer.h"
+#include "Resources/StructuredBuffer.h"
 #include "Camera.h"
 #include "Resources/FrameBuffer.h"
 #include "Resources/StructuredBuffer.h"
@@ -92,8 +93,8 @@ namespace Engine
 			size *= 2;
 		}
 
-		m_CameraIndeces = ConstantBuffer::Create(sizeof(CascadeData) * s_NumShadowMaps);
-		m_CameraIndeces->SetData(cascadeData.data());
+		m_CameraIndeces = StructuredBuffer::Create(sizeof(CascadeData), s_NumShadowMaps);
+		m_CameraIndeces->SetData(cascadeData.data(), s_NumShadowMaps);
 	}
 
 	void DirectionalLight::CascadedShadowMaps::UpdateMaps(Math::Vector3 dir)

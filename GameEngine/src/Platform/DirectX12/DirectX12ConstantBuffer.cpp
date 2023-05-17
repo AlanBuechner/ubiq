@@ -36,7 +36,7 @@ namespace Engine
 	DirectX12ConstantBufferResource::~DirectX12ConstantBufferResource()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		if (m_SRVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_SRVHandle);
+		if (m_CBVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_CBVHandle);
 		if (m_UAVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_UAVHandle);
 
 		context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffer);
@@ -48,17 +48,17 @@ namespace Engine
 		context->GetDX12ResourceManager()->UploadBuffer(m_Buffer, data, m_Size, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 	}
 
-	void DirectX12ConstantBufferResource::CreateSRVHandle()
+	void DirectX12ConstantBufferResource::CreateCBVHandle()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		if (!m_SRVHandle)
+		if (!m_CBVHandle)
 		{
-			m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+			m_CBVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 
 			D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
 			desc.BufferLocation = m_Buffer->GetGPUVirtualAddress();
 			desc.SizeInBytes = m_Size;
-			context->GetDevice()->CreateConstantBufferView(&desc, m_SRVHandle.cpu);
+			context->GetDevice()->CreateConstantBufferView(&desc, m_CBVHandle.cpu);
 		}
 	}
 
@@ -85,20 +85,14 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		m_Resource = CreateRef<DirectX12ConstantBufferResource>(size);
-		m_Resource->CreateSRVHandle();
+		m_Resource->CreateCBVHandle();
 	}
 
 	DirectX12ConstantBuffer::DirectX12ConstantBuffer(Ref<ConstantBufferResource> resource)
 	{
 		m_Resource = std::dynamic_pointer_cast<DirectX12ConstantBufferResource>(resource);
-		m_Resource->CreateSRVHandle();
+		m_Resource->CreateCBVHandle();
 	}
-
-	void DirectX12ConstantBuffer::SetData(const void* data)
-	{
-		m_Resource->SetData(data);
-	}
-
 
 	// RW Constant Buffer
 	DirectX12RWConstantBuffer::DirectX12RWConstantBuffer(uint32 size)
@@ -111,11 +105,6 @@ namespace Engine
 	{
 		m_Resource = std::dynamic_pointer_cast<DirectX12ConstantBufferResource>(resource);
 		m_Resource->CreateUAVHandle();
-	}
-
-	void DirectX12RWConstantBuffer::SetData(const void* data)
-	{
-		m_Resource->SetData(data);
 	}
 
 }

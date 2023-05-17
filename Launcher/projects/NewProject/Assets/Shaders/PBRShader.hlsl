@@ -137,11 +137,7 @@ struct PS_Output
 };
 
 ConstantBuffer<DirectionalLight> DirLight;
-#define NUM_CASCADES 5
-cbuffer Cascades
-{
-	DirectionalLightCascade cascades[NUM_CASCADES];
-};
+StructuredBuffer<DirectionalLightCascade> Cascades;
 
 ConstantBuffer<Camera> cameras[] : register(space1);
 // Material struct is generated automaticly by the data defined in the config section
@@ -229,14 +225,15 @@ PS_Output main(PS_Input input)
 	if(true) 
 	{
 		// depth testing
-		uint numCascades = NUM_CASCADES;
-		//uint stride;
-		//cascades[cascadeIndex].GetDimensions(numCascades, stride);
+		//uint numCascades = NUM_CASCADES;
+		uint numCascades;
+		uint stride;
+		Cascades.GetDimensions(numCascades, stride);
 
 		uint ci = numCascades;
 		for (uint i = 0; i < numCascades; i++)
 		{
-			DirectionalLightCascade c = cascades[i];
+			DirectionalLightCascade c = Cascades[i];
 			float d = input.depth;
 			float min = c.minDist;
 			float max = c.maxDist;
@@ -250,7 +247,7 @@ PS_Output main(PS_Input input)
 		float shadowAmount = 1;
 		if (ci < numCascades)
 		{
-			DirectionalLightCascade c = cascades[ci];
+			DirectionalLightCascade c = Cascades[ci];
 			Camera shadowCamera = cameras[c.camera];
 
 			float4 pos = mul(shadowCamera.ViewPorjection, input.worldPosition);

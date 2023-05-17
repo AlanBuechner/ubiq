@@ -6,19 +6,22 @@
 namespace Engine
 {
 
-	DirectX12StructuredBuffer::DirectX12StructuredBuffer(uint32 stride, uint32 count) :
-		m_Stride(stride), m_Count(count)
+	DirectX12StructuredBufferResource::DirectX12StructuredBufferResource(uint32 stride, uint32 count)
 	{
+		m_Stride = stride;
 		Resize(count);
-
 	}
 
-	DirectX12StructuredBuffer::~DirectX12StructuredBuffer()
+	DirectX12StructuredBufferResource::~DirectX12StructuredBufferResource()
 	{
-		DirectX12ResourceManager::s_SRVHeap->Free(m_SRVhandle);
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		if (m_SRVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_SRVHandle);
+		if (m_UAVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_UAVHandle);
+
+		context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffer);
 	}
 
-	void DirectX12StructuredBuffer::Resize(uint32 count)
+	void DirectX12StructuredBufferResource::Resize(uint32 count)
 	{
 		m_Count = count;
 
@@ -40,30 +43,58 @@ namespace Engine
 		);
 
 		m_Buffer->SetName(L"Structured Buffer");
-
-		m_SRVhandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
-
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-		srvDesc.Buffer.FirstElement = 0;
-		srvDesc.Buffer.NumElements = count;
-		srvDesc.Buffer.StructureByteStride = m_Stride;
-		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-
-		context->GetDevice()->CreateShaderResourceView(m_Buffer.Get(), &srvDesc, m_SRVhandle.cpu);
 	}
 
-	void DirectX12StructuredBuffer::SetData(void* data, uint32 count /*= 1*/, uint32 start /*= 0*/)
+	void DirectX12StructuredBufferResource::SetData(void* data, uint32 count /*= 1*/, uint32 start /*= 0*/)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		context->GetDX12ResourceManager()->UploadBufferRegion(m_Buffer, m_Stride * start, data, m_Stride * count, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		context->GetDX12ResourceManager()->UploadBufferRegion(m_Buffer, m_Stride * start, data, m_Stride * count, 
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	}
 
-	uint32 DirectX12StructuredBuffer::GetDescriptorLocation() const
+	void DirectX12StructuredBufferResource::CreateSRVHandle()
 	{
-		return m_SRVhandle.GetIndex();
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+
+		if (!m_SRVHandle)
+		{
+			m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+			srvDesc.Buffer.FirstElement = 0;
+			srvDesc.Buffer.NumElements = m_Count;
+			srvDesc.Buffer.StructureByteStride = m_Stride;
+			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+
+			context->GetDevice()->CreateShaderResourceView(m_Buffer.Get(), &srvDesc, m_SRVHandle.cpu);
+		}
+	}
+
+	void DirectX12StructuredBufferResource::CreateUAVHandle()
+	{
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+
+		if (m_UAVHandle)
+		{
+			m_UAVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+		}
+	}
+
+
+
+	DirectX12StructuredBuffer::DirectX12StructuredBuffer(uint32 stride, uint32 count)
+	{
+		m_Resource = CreateRef<DirectX12StructuredBufferResource>(stride, count);
+		m_Resource->CreateSRVHandle();
+	}
+
+	DirectX12StructuredBuffer::DirectX12StructuredBuffer(Ref<StructuredBufferResource> resource)
+	{
+		m_Resource = std::dynamic_pointer_cast<DirectX12StructuredBufferResource>(resource);
+		m_Resource->CreateSRVHandle();
 	}
 
 }

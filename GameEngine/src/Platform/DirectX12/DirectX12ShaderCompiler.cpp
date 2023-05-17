@@ -200,7 +200,7 @@ namespace Engine
 			if (data.count == 0)
 				data.count = -1;
 
-			if (bindDesc.BindCount > 1 || bindDesc.Type == D3D_SIT_TEXTURE || bindDesc.Type == D3D_SIT_UAV_RWTYPED)
+			if (bindDesc.BindCount > 1 || bindDesc.Type == D3D_SIT_TEXTURE || bindDesc.Type == D3D_SIT_UAV_RWTYPED || bindDesc.Type == D3D_SIT_STRUCTURED)
 				data.type = ShaderParameter::PerameterType::DescriptorTable;
 			else
 			{

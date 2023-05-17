@@ -8,6 +8,7 @@
 #include "DirectX12ComputeShader.h"
 #include "DirectX12Buffer.h"
 #include "DirectX12ConstantBuffer.h"
+#include "DirectX12StructuredBuffer.h"
 #include "DirectX12Texture.h"
 #include "DirectX12InstanceBuffer.h"
 #include "DirectX12ResourceManager.h"
@@ -288,6 +289,15 @@ namespace Engine
 
 		Ref<DirectX12RWConstantBuffer> cb = std::dynamic_pointer_cast<DirectX12RWConstantBuffer>(buffer);
 		m_CommandList->SetGraphicsRootUnorderedAccessView(index, cb->GetDXResource()->GetBuffer()->GetGPUVirtualAddress());
+	}
+
+	void DirectX12CommandList::SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer)
+	{
+		if (index == UINT32_MAX || buffer == nullptr)
+			return;
+
+		Ref<DirectX12StructuredBuffer> sb = std::dynamic_pointer_cast<DirectX12StructuredBuffer>(buffer);
+		m_CommandList->SetGraphicsRootDescriptorTable(index, sb->GetDXResource()->GetSRVHandle().gpu);
 	}
 
 	void DirectX12CommandList::SetRootConstant(uint32 index, uint32 data)

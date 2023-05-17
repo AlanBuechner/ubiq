@@ -10,6 +10,7 @@ namespace Engine
 	class ComputeShader;
 	class ConstantBuffer;
 	class RWConstantBuffer;
+	class StructuredBuffer;
 	class Texture;
 	class InstanceBuffer;
 }
@@ -60,6 +61,7 @@ namespace Engine
 		virtual void SetShader(Ref<ShaderPass> shader) = 0;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) = 0;
 		virtual void SetConstantBuffer(uint32 index, Ref<RWConstantBuffer> buffer) = 0;
+		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) = 0;
 		virtual void SetRootConstant(uint32 index, uint32 data) = 0;
 		void SetRootConstant(uint32 index, float data) { SetRootConstant(index, *(uint32*)&data); }
 		virtual void SetTexture(uint32 index, Ref<Texture> texture) = 0;
