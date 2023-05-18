@@ -38,9 +38,10 @@ namespace Engine
 
 
 
-	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips)
+	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format)
 	{
 		m_NumMips = numMips == 0 ? (uint32)std::floor(std::log2(std::max(width, height))) + 1 : numMips;
+		m_Format = format;
 		Resize(width, height);
 	}
 
@@ -94,7 +95,8 @@ namespace Engine
 
 		// create upload buffer
 		D3D12_RESOURCE_DESC rDesc;
-		UINT uploadPitch = (m_Width * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
+		UINT stride = GetStride();
+		UINT uploadPitch = (m_Width * stride + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
 		UINT uploadSize = m_Height * uploadPitch;
 		rDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 		rDesc.Alignment = 0;
@@ -131,32 +133,63 @@ namespace Engine
 		}
 		uploadBuffer->Unmap(0, &range);
 
-		context->GetDX12ResourceManager()->UploadTexture(m_Buffer, uploadBuffer, m_Width, m_Height, uploadPitch, true, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		context->GetDX12ResourceManager()->UploadTexture(m_Buffer, uploadBuffer, m_Width, m_Height, uploadPitch, m_NumMips, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, GetDXGIFormat());
 		context->GetDX12ResourceManager()->ScheduleResourceDeletion(uploadBuffer);
+
+		if (m_SRVHandle) CreateSRVHandle();
+		if (m_UAVHandles.size() != 0) CreateUAVHandle();
 	}
 
 	void DirectX12Texture2DResource::CreateSRVHandle()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		if (m_SRVHandle) context->GetDX12ResourceManager()->ScheduleHandleDeletion(m_SRVHandle);
 
-		if (!m_SRVHandle)
-		{
-			m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
-			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-			srvDesc.Format = GetDXGIFormat();
-			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-			srvDesc.Texture2D.MipLevels = m_NumMips;
-			srvDesc.Texture2D.MostDetailedMip = 0;
-			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = GetDXGIFormat();
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = m_NumMips;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-			context->GetDevice()->CreateShaderResourceView(m_Buffer.Get(), &srvDesc, m_SRVHandle.cpu);
-		}
+		context->GetDevice()->CreateShaderResourceView(m_Buffer.Get(), &srvDesc, m_SRVHandle.cpu);
+	}
+
+	void DirectX12Texture2DResource::CreateRTVDSVHandle()
+	{
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		if (m_RTVDSVHandle) context->GetDX12ResourceManager()->ScheduleHandleDeletion(m_RTVDSVHandle);
+
+		m_RTVDSVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+
+		if (IsDepthStencil(m_Format))
+			context->GetDevice()->CreateDepthStencilView(m_Buffer.Get(), nullptr, m_RTVDSVHandle.cpu);
+		else
+			context->GetDevice()->CreateRenderTargetView(m_Buffer.Get(), nullptr, m_RTVDSVHandle.cpu);
+
 	}
 
 	void DirectX12Texture2DResource::CreateUAVHandle()
 	{
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
+		for(uint32 i = 0; i < m_UAVHandles.size(); i++)
+			if (m_UAVHandles[i]) context->GetDX12ResourceManager()->ScheduleHandleDeletion(m_UAVHandles[i]);
+
+		m_UAVHandles.resize(m_NumMips);
+		for (uint32 i = 0; i < m_NumMips; i++)
+		{
+			m_UAVHandles[i] = DirectX12ResourceManager::s_SRVHeap->Allocate();
+
+			D3D12_UNORDERED_ACCESS_VIEW_DESC lastUavDesc = {};
+			lastUavDesc.Format = GetDXGIFormat();
+			lastUavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+			lastUavDesc.Texture2D.MipSlice = i;
+			context->GetDevice()->CreateUnorderedAccessView(m_Buffer.Get(), nullptr, &lastUavDesc, m_UAVHandles[i].cpu);
+		}
 	}
+
 
 
 
@@ -167,19 +200,19 @@ namespace Engine
 	DirectX12Texture2D::DirectX12Texture2D(const fs::path& path)
 	{
 		LoadFromFile(path);
-		m_Resource->CreateSRVHandle();
+		if(!m_Resource->m_SRVHandle) m_Resource->CreateSRVHandle();
 	}
 
-	DirectX12Texture2D::DirectX12Texture2D(const uint32 width, const uint32 height)
+	DirectX12Texture2D::DirectX12Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format)
 	{
-		m_Resource = CreateRef<DirectX12Texture2DResource>(width, height, 0);
-		m_Resource->CreateSRVHandle();
+		m_Resource = CreateRef<DirectX12Texture2DResource>(width, height, mips, format);
+		if (!m_Resource->m_SRVHandle) m_Resource->CreateSRVHandle();
 	}
 
 	DirectX12Texture2D::DirectX12Texture2D(Ref<Texture2DResource> resource)
 	{
 		m_Resource = std::dynamic_pointer_cast<DirectX12Texture2DResource>(resource);
-		m_Resource->CreateSRVHandle();
+		if (!m_Resource->m_SRVHandle) m_Resource->CreateSRVHandle();
 	}
 
 	void DirectX12Texture2D::LoadFromFile(const fs::path& path)
@@ -187,18 +220,50 @@ namespace Engine
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		m_Path = path;
 
-		timer.Start("LoadImage");
-		int width, height, channels;
-		stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &channels, 4);
-		CORE_ASSERT(data, "Failed to load image \"{0}\"", path.string());
-		timer.End();
+		if (path.extension() == ".hdr")
+		{
+			timer.Start("LoadImage");
+			int width, height, channels;
+			stbi_us* data = stbi_load_16(path.string().c_str(), &width, &height, &channels, STBI_rgb_alpha);
+			CORE_ASSERT(data, "Failed to load image \"{0}\"", path.string());
+			timer.End();
 
-		if (m_Resource)
-			m_Resource->Resize(width, height);
+			if (m_Resource)
+				m_Resource->Resize(width, height);
+			else
+				m_Resource = CreateRef<DirectX12Texture2DResource>(width, height, 0, TextureFormat::RGBA16);
+			m_Resource->SetData(data);
+
+			stbi_image_free(data);
+		}
 		else
-			m_Resource = CreateRef<DirectX12Texture2DResource>(width, height, 0);
-		m_Resource->SetData(data);
+		{
+			timer.Start("LoadImage");
+			int width, height, channels;
+			stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &channels, STBI_rgb_alpha);
+			CORE_ASSERT(data, "Failed to load image \"{0}\"", path.string());
+			timer.End();
 
-		stbi_image_free(data);
+			if (m_Resource)
+				m_Resource->Resize(width, height);
+			else
+				m_Resource = CreateRef<DirectX12Texture2DResource>(width, height, 0, TextureFormat::RGBA8);
+			m_Resource->SetData(data);
+
+			stbi_image_free(data);
+		}
 	}
+
+	DirectX12RenderTarget2D::DirectX12RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format)
+	{
+		m_Resource = CreateRef<DirectX12Texture2DResource>(width, height, mips, format);
+		if (!m_Resource->m_RTVDSVHandle) m_Resource->CreateRTVDSVHandle();
+	}
+
+	DirectX12RenderTarget2D::DirectX12RenderTarget2D(Ref<Texture2DResource> resource)
+	{
+		m_Resource = std::dynamic_pointer_cast<DirectX12Texture2DResource>(resource);
+		if (!m_Resource->m_RTVDSVHandle) m_Resource->CreateRTVDSVHandle();
+	}
+
 }

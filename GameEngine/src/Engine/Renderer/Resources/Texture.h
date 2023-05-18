@@ -28,6 +28,7 @@ namespace Engine
 
 		Depth = DEPTH24STENCIL8
 	};
+	bool IsDepthStencil(TextureFormat format);
 
 	class Texture2DResource
 	{
@@ -37,6 +38,8 @@ namespace Engine
 		uint32 GetWidth() { return m_Width; }
 		uint32 GetHeight() { return m_Height; }
 		TextureFormat GetFormat() { return m_Format; }
+
+		uint32 GetStride();
 
 	protected:
 		uint32 m_Width = 1;
@@ -51,7 +54,7 @@ namespace Engine
 	public:
 		virtual uint32 GetWidth() const = 0;
 		virtual uint32 GetHeight() const = 0;
-		virtual void* GetTextureHandle() const = 0;
+		virtual uint64 GetSRVHandle() const = 0;
 		virtual uint32 GetDescriptorLocation() const = 0;
 
 		virtual void SetData(void* data) = 0;
@@ -62,10 +65,23 @@ namespace Engine
 		virtual bool operator==(const Texture2D& other) const = 0;
 
 		static Ref<Texture2D> Create(const fs::path& path = "");
-		static Ref<Texture2D> Create(const uint32 width, const uint32 height);
+		static Ref<Texture2D> Create(uint32 width, uint32 height);
+		static Ref<Texture2D> Create(uint32 width, uint32 height, uint32 mips);
+		static Ref<Texture2D> Create(uint32 width, uint32 height, TextureFormat format);
+		static Ref<Texture2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
 		static Ref<Texture2D> Create(Ref<Texture2DResource> resource);
 
 		static bool ValidExtension(const fs::path& ext);
+	};
+
+	class RenderTarget2D
+	{
+		virtual void Resize(uint32 width, uint32 height) = 0;
+		
+		virtual Ref<Texture2DResource> GetResource() = 0;
+
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
+		static Ref<RenderTarget2D> Create(Ref<Texture2DResource> resource);
 
 	};
 }

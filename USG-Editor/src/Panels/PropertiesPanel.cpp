@@ -242,7 +242,7 @@ namespace Engine
 		ImGui::PushID(label.c_str());
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, 100);
-		ImGui::Image((ImTextureID)(texture ? texture : EditorAssets::s_NoTextureIcon)->GetTextureHandle(), { 70,70 });
+		ImGui::Image((ImTextureID)(texture ? texture : EditorAssets::s_NoTextureIcon)->GetSRVHandle(), { 70,70 });
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))

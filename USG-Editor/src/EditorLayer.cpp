@@ -409,7 +409,7 @@ namespace Engine
 		float Size = ImGui::GetWindowHeight() - 4.0f;
 		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x*0.5f)-(Size*0.5f));
 		Ref<Texture2D> button = (m_SceneState == SceneState::Edit ? EditorAssets::s_PlayButton : EditorAssets::s_StopButton);
-		if (ImGui::ImageButton((ImTextureID)button->GetTextureHandle(), { Size, Size }, { 0,0 }, {1,1}, 0))
+		if (ImGui::ImageButton((ImTextureID)button->GetSRVHandle(), { Size, Size }, { 0,0 }, {1,1}, 0))
 		{
 			if (m_SceneState == SceneState::Edit)
 				OnScenePlay();

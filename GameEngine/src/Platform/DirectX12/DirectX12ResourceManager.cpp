@@ -224,7 +224,7 @@ namespace Engine
 		m_BufferUploadQueue.push(uploadData);
 	}
 
-	void DirectX12ResourceManager::UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, bool genMipChain, D3D12_RESOURCE_STATES state)
+	void DirectX12ResourceManager::UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, uint32 numMips, D3D12_RESOURCE_STATES state, DXGI_FORMAT format)
 	{
 
 		if (dest.Get() == nullptr || src.Get() == nullptr)
@@ -241,11 +241,9 @@ namespace Engine
 		uploadData.width = width;
 		uploadData.height = height;
 		uploadData.pitch = pitch;
+		uploadData.numMips = numMips;
 		uploadData.state = state;
-
-		uploadData.genMipChain = genMipChain;
-		if (std::max(width, height) == 1)
-			uploadData.genMipChain = false;
+		uploadData.format = format;
 
 		m_TextureUploadQueue.push(uploadData);
 	}
@@ -355,6 +353,7 @@ namespace Engine
 			uint32 width;
 			uint32 height;
 			uint32 pitch;
+			DXGI_FORMAT format;
 		};
 
 		struct TextureMipInfo
@@ -365,6 +364,7 @@ namespace Engine
 			uint32 height;
 			uint32 numMips;
 			D3D12_RESOURCE_STATES state;
+			DXGI_FORMAT format;
 		};
 
 		// data
@@ -382,7 +382,7 @@ namespace Engine
 		{
 			UploadTextureData& data = m_TextureUploadQueue.front();
 
-			if (data.genMipChain)
+			if (data.numMips > 1)
 			{
 				// create temp texture to generate the mip levels
 				wrl::ComPtr<ID3D12Resource> mipTexture;
@@ -391,10 +391,10 @@ namespace Engine
 
 				D3D12_RESOURCE_DESC rDesc;
 				rDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-				rDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				rDesc.Format = data.format;
 				rDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 				rDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-				rDesc.MipLevels = (uint32)std::floor(std::log2(std::max(data.width, data.height))) + 1;
+				rDesc.MipLevels = data.numMips;
 				rDesc.Width = data.width;
 				rDesc.Height = data.height;
 				rDesc.Alignment = 0;
@@ -410,16 +410,16 @@ namespace Engine
 					IID_PPV_ARGS(mipTexture.GetAddressOf())
 				);
 				mipTexture->SetName(L"MipTexture");
-				mipTextures.push_back({ data.destResource, mipTexture, data.width, data.height, rDesc.MipLevels, data.state });
+				mipTextures.push_back({ data.destResource, mipTexture, data.width, data.height, rDesc.MipLevels, data.state, data.format });
 
 				startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST)); // transition final texture to copy destination
-				textureCopys.push_back({ mipTexture.Get(), data.uploadResource.Get(), data.width, data.height, data.pitch });
+				textureCopys.push_back({ mipTexture.Get(), data.uploadResource.Get(), data.width, data.height, data.pitch, data.format });
 				endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(mipTexture.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 			}
 			else
 			{
 				startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST));
-				textureCopys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.width, data.height, data.pitch });
+				textureCopys.push_back({ data.destResource.Get(), data.uploadResource.Get(), data.width, data.height, data.pitch, data.format});
 				endb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, data.state));
 			}
 
@@ -432,14 +432,15 @@ namespace Engine
 		m_TextureCopyCommandList->GetCommandList()->ResourceBarrier((uint32)startb.size(), startb.data()); // transition resources to copy
 
 		// copy textures
-		for (uint32 i = 0; i < numTextureCopys; i++)
+		for (uint32 i = 0; i < textureCopys.size(); i++)
 		{
 			TextureCopyInfo& info = textureCopys[i];
 
 			D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
 			srcLocation.pResource = info.src;
 			srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-			srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			srcLocation.PlacedFootprint.Offset = 0;
+			srcLocation.PlacedFootprint.Footprint.Format = info.format;
 			srcLocation.PlacedFootprint.Footprint.Width = info.width;
 			srcLocation.PlacedFootprint.Footprint.Height = info.height;
 			srcLocation.PlacedFootprint.Footprint.Depth = 1;
@@ -473,7 +474,7 @@ namespace Engine
 				// create SRV for last mip level
 				lastMip = s_SRVHeap->Allocate();
 				D3D12_UNORDERED_ACCESS_VIEW_DESC lastUavDesc = {};
-				lastUavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				lastUavDesc.Format = mipTexture.format;
 				lastUavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 				lastUavDesc.Texture2D.MipSlice = topMip;
 				context->GetDevice()->CreateUnorderedAccessView(mipTexture.mipTexture.Get(), nullptr, &lastUavDesc, lastMip.cpu);
@@ -481,7 +482,7 @@ namespace Engine
 				// create UAV for current mip level
 				currMip = s_SRVHeap->Allocate();
 				D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-				uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				uavDesc.Format = mipTexture.format;
 				uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 				uavDesc.Texture2D.MipSlice = topMip + 1;
 				context->GetDevice()->CreateUnorderedAccessView(mipTexture.mipTexture.Get(), nullptr, &uavDesc, currMip.cpu);

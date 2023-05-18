@@ -51,33 +51,27 @@ namespace Engine
 	void DirectX12ConstantBufferResource::CreateCBVHandle()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		if (!m_CBVHandle)
-		{
-			m_CBVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+		m_CBVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 
-			D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
-			desc.BufferLocation = m_Buffer->GetGPUVirtualAddress();
-			desc.SizeInBytes = m_Size;
-			context->GetDevice()->CreateConstantBufferView(&desc, m_CBVHandle.cpu);
-		}
+		D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
+		desc.BufferLocation = m_Buffer->GetGPUVirtualAddress();
+		desc.SizeInBytes = m_Size;
+		context->GetDevice()->CreateConstantBufferView(&desc, m_CBVHandle.cpu);
 	}
 
 
 	void DirectX12ConstantBufferResource::CreateUAVHandle()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		if (!m_UAVHandle)
-		{
-			m_UAVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
-			D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-			uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-			uavDesc.Buffer.CounterOffsetInBytes = 0;
-			uavDesc.Buffer.FirstElement = 0;
-			uavDesc.Buffer.NumElements = 1;
-			uavDesc.Buffer.StructureByteStride = m_Size;
-			context->GetDevice()->CreateUnorderedAccessView(m_Buffer.Get(), nullptr, &uavDesc, m_UAVHandle.cpu);
-		}
+		m_UAVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+		uavDesc.Buffer.CounterOffsetInBytes = 0;
+		uavDesc.Buffer.FirstElement = 0;
+		uavDesc.Buffer.NumElements = 1;
+		uavDesc.Buffer.StructureByteStride = m_Size;
+		context->GetDevice()->CreateUnorderedAccessView(m_Buffer.Get(), nullptr, &uavDesc, m_UAVHandle.cpu);
 	}
 
 	// Constant Buffer
@@ -85,26 +79,26 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		m_Resource = CreateRef<DirectX12ConstantBufferResource>(size);
-		m_Resource->CreateCBVHandle();
+		if(!m_Resource->m_CBVHandle) m_Resource->CreateCBVHandle();
 	}
 
 	DirectX12ConstantBuffer::DirectX12ConstantBuffer(Ref<ConstantBufferResource> resource)
 	{
 		m_Resource = std::dynamic_pointer_cast<DirectX12ConstantBufferResource>(resource);
-		m_Resource->CreateCBVHandle();
+		if (!m_Resource->m_CBVHandle) m_Resource->CreateCBVHandle();
 	}
 
 	// RW Constant Buffer
 	DirectX12RWConstantBuffer::DirectX12RWConstantBuffer(uint32 size)
 	{
 		m_Resource = CreateRef<DirectX12ConstantBufferResource>(size);
-		m_Resource->CreateUAVHandle();
+		if(!m_Resource->m_UAVHandle) m_Resource->CreateUAVHandle();
 	}
 
 	DirectX12RWConstantBuffer::DirectX12RWConstantBuffer(Ref<ConstantBufferResource> resource)
 	{
 		m_Resource = std::dynamic_pointer_cast<DirectX12ConstantBufferResource>(resource);
-		m_Resource->CreateUAVHandle();
+		if (!m_Resource->m_UAVHandle) m_Resource->CreateUAVHandle();
 	}
 
 }
