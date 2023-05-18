@@ -7,7 +7,7 @@
 namespace Engine
 {
 	class Shader;
-	class Texture;
+	class Texture2D;
 	class ConstantBuffer;
 }
 
@@ -46,7 +46,7 @@ namespace Engine
 		static bool ValidExtention(const fs::path& ext);
 
 	private:
-		std::vector<Ref<Texture>> m_ReferensedTextures;
+		std::vector<Ref<Texture2D>> m_ReferensedTextures;
 
 		Ref<MaterialData> m_Data;
 

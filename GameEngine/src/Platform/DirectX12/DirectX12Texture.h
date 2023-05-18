@@ -5,45 +5,67 @@
 
 namespace Engine
 {
+	DXGI_FORMAT GetDXGITextureFormat(TextureFormat format);
+
+	class DirectX12Texture2DResource : public Texture2DResource
+	{
+	public:
+		DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips);
+		~DirectX12Texture2DResource();
+
+		wrl::ComPtr<ID3D12Resource> GetBuffer() { return m_Buffer; }
+		DirectX12DescriptorHandle& GetSRVHandle() { return m_SRVHandle; }
+		DirectX12DescriptorHandle& GetUAVHandle(uint32 i) { return m_UAVHandles[i]; }
+
+		DXGI_FORMAT GetDXGIFormat() { return GetDXGITextureFormat(m_Format); }
+
+	private:
+
+		void Resize(uint32 width, uint32 height);
+		void SetData(void* data);
+		
+		void CreateSRVHandle();
+		void CreateUAVHandle();
+
+	private:
+		wrl::ComPtr<ID3D12Resource> m_Buffer;
+		DirectX12DescriptorHandle m_SRVHandle;
+		std::vector<DirectX12DescriptorHandle> m_UAVHandles;
+
+		uint32 m_NumMips = 0;
+
+		friend class DirectX12Texture2D;
+	};
+
+
 	class DirectX12Texture2D : public Texture2D
 	{
 	public:
-		DirectX12Texture2D(const fs::path& path, Ref<TextureAttribute> attrib);
-		DirectX12Texture2D(const uint32, const uint32 height, Ref<TextureAttribute> attrib);
-		virtual ~DirectX12Texture2D();
+		DirectX12Texture2D(const fs::path& path);
+		DirectX12Texture2D(const uint32, const uint32 height);
+		DirectX12Texture2D(Ref<Texture2DResource> resource);
 
-		virtual uint32 GetWidth() const override { return m_Width; }
-		virtual uint32 GetHeight() const override { return m_Height; }
-		virtual void* GetTextureHandle() const override { return (void*)m_Handle.gpu.ptr; }
-		virtual void* GetSamplerHandle() const override { return (void*)m_SamplerHandle.gpu.ptr; }
-		virtual uint32 GetDescriptorLocation() const override { return m_Handle.GetIndex(); }
+		virtual uint32 GetWidth() const override { return m_Resource->m_Width; }
+		virtual uint32 GetHeight() const override { return m_Resource->m_Height; }
+		virtual void* GetTextureHandle() const override { return (void*)m_Resource->m_SRVHandle.gpu.ptr; }
+		virtual uint32 GetDescriptorLocation() const override { return m_Resource->m_SRVHandle.GetIndex(); }
 
-		virtual void SetData(void* data) override;
+		virtual Ref<Texture2DResource> GetResource() override { return m_Resource; }
+
+		Ref<DirectX12Texture2DResource> GetDXResource() { return m_Resource; }
+
+		virtual void SetData(void* data) override { m_Resource->SetData(data); }
 		virtual void LoadFromFile(const fs::path& path) override;
-		virtual Ref<TextureAttribute> GetAttributes() const override { return m_Attribute; }
 
-		const DirectX12DescriptorHandle& GetHandle() { return m_Handle; }
-
-		virtual bool operator==(const Texture& other) const override
+		virtual bool operator==(const Texture2D& other) const override
 		{
-			return m_Handle.cpu.ptr == ((DirectX12Texture2D&)other).m_Handle.cpu.ptr;
+			return m_Resource->m_SRVHandle.cpu.ptr == ((DirectX12Texture2D&)other).m_Resource->m_SRVHandle.cpu.ptr;
 		}
-
-	private:
-		void CreateImage(uint32 width, uint32 height);
-		void CreateSampler();
 
 	private:
 		fs::path m_Path;
 
-		uint32 m_Width, m_Height;
-		Ref<TextureAttribute> m_Attribute;
-
-		wrl::ComPtr<ID3D12Resource> m_Buffer;
-		DirectX12DescriptorHandle m_Handle;
-		DirectX12DescriptorHandle m_SamplerHandle;
-
-		bool m_UseMipMaps = true;
+		Ref<DirectX12Texture2DResource> m_Resource;
 
 	};
 }

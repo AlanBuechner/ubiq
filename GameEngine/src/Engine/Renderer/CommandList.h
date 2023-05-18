@@ -12,7 +12,7 @@ namespace Engine
 	class RWConstantBuffer;
 	class StructuredBuffer;
 	class RWStructuredBuffer;
-	class Texture;
+	class Texture2D;
 	class InstanceBuffer;
 }
 
@@ -66,7 +66,7 @@ namespace Engine
 		virtual void SetStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer) = 0;
 		virtual void SetRootConstant(uint32 index, uint32 data) = 0;
 		void SetRootConstant(uint32 index, float data) { SetRootConstant(index, *(uint32*)&data); }
-		virtual void SetTexture(uint32 index, Ref<Texture> texture) = 0;
+		virtual void SetTexture(uint32 index, Ref<Texture2D> texture) = 0;
 		virtual void SetFrameBuffer(uint32 index, Ref<FrameBuffer> buffer, uint32 attatchment) = 0;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) = 0;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) = 0;

@@ -497,8 +497,8 @@ namespace Engine
 				m_TextureCopyCommandList->GetCommandList()->ResourceBarrier(1, &barrier);
 
 				// delete handles
-				ScheduleHandelDeletion(lastMip);
-				ScheduleHandelDeletion(currMip);
+				ScheduleHandleDeletion(lastMip);
+				ScheduleHandleDeletion(currMip);
 			}
 
 

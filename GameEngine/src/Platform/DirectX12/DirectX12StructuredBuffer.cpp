@@ -15,8 +15,8 @@ namespace Engine
 	DirectX12StructuredBufferResource::~DirectX12StructuredBufferResource()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		if (m_SRVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_SRVHandle);
-		if (m_UAVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_UAVHandle);
+		if (m_SRVHandle) context->GetDX12ResourceManager()->ScheduleHandleDeletion(m_SRVHandle);
+		if (m_UAVHandle) context->GetDX12ResourceManager()->ScheduleHandleDeletion(m_UAVHandle);
 
 		context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffer);
 	}

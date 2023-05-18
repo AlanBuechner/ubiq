@@ -105,7 +105,7 @@ namespace Engine
 		Invalidate();
 	}
 
-	void SceneRenderer::SetSkyBox(Ref<Texture> texture)
+	void SceneRenderer::SetSkyBox(Ref<Texture2D> texture)
 	{
 		SceneData& data = m_RenderGraph->GetScene();
 		data.m_Skybox = texture;

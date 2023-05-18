@@ -317,13 +317,13 @@ namespace Engine
 		m_CommandList->SetGraphicsRoot32BitConstant(index, data, 0);
 	}
 
-	void DirectX12CommandList::SetTexture(uint32 index, Ref<Texture> texture)
+	void DirectX12CommandList::SetTexture(uint32 index, Ref<Texture2D> texture)
 	{
 		if (index == UINT32_MAX)
 			return; // invalid bind slot
 
 		Ref<DirectX12Texture2D> d3dTexture = std::dynamic_pointer_cast<DirectX12Texture2D>(texture);
-		m_CommandList->SetGraphicsRootDescriptorTable(index, d3dTexture->GetHandle().gpu);
+		m_CommandList->SetGraphicsRootDescriptorTable(index, d3dTexture->GetDXResource()->GetSRVHandle().gpu);
 	}
 
 	void DirectX12CommandList::SetFrameBuffer(uint32 index, Ref<FrameBuffer> buffer, uint32 attatchment)

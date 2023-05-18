@@ -5,7 +5,7 @@ namespace Engine
 {
 	class CommandList;
 	class DirectionalLight;
-	class Texture;
+	class Texture2D;
 	class ConstantBuffer;
 	class InstanceBuffer;
 	class Mesh;
@@ -34,7 +34,7 @@ namespace Engine
 		std::vector<DrawCommand> m_DrawCommands;
 		Ref<Camera> m_MainCamera;
 		Ref<DirectionalLight> m_DirectinalLight;
-		Ref<Texture> m_Skybox;
+		Ref<Texture2D> m_Skybox;
 	};
 
 	class RenderGraph

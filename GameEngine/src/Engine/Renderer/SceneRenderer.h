@@ -17,7 +17,7 @@ namespace Engine
 	class RenderGraph;
 	class DirectionalLight;
 	class Shader;
-	class Texture;
+	class Texture2D;
 }
 
 namespace Engine
@@ -80,7 +80,7 @@ namespace Engine
 		void OnViewportResize(uint32 width, uint32 height);
 		void SetMainCamera(Ref<Camera> camera);
 		void SetDirectionalLight(Ref<DirectionalLight> light);
-		void SetSkyBox(Ref<Texture> texture);
+		void SetSkyBox(Ref<Texture2D> texture);
 		void UpdateBuffers();
 		void Invalidate();
 

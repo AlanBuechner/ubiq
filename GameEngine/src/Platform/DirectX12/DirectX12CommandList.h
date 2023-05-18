@@ -46,7 +46,7 @@ namespace Engine
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) override;
 		virtual void SetStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer) override;
 		virtual void SetRootConstant(uint32 index, uint32 data) override;
-		virtual void SetTexture(uint32 index, Ref<Texture> texture) override;
+		virtual void SetTexture(uint32 index, Ref<Texture2D> texture) override;
 		virtual void SetFrameBuffer(uint32 index, Ref<FrameBuffer> buffer, uint32 attatchment) override;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) override;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;

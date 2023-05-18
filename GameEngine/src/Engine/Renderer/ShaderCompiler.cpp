@@ -18,26 +18,26 @@ namespace Engine
 		}
 	}
 
-	TextureAttribute::WrapMode GetWrapMode(const std::string& str)
+	SamplerInfo::WrapMode GetWrapMode(const std::string& str)
 	{
 		if (str == "repeat")
-			return TextureAttribute::WrapMode::Repeat;
+			return SamplerInfo::WrapMode::Repeat;
 		else if (str == "repeatMiror")
-			return TextureAttribute::WrapMode::MirroredRepeat;
+			return SamplerInfo::WrapMode::MirroredRepeat;
 		else if (str == "clamp")
-			return TextureAttribute::WrapMode::Clamp;
-		return TextureAttribute::WrapMode::Clamp;
+			return SamplerInfo::WrapMode::Clamp;
+		return SamplerInfo::WrapMode::Clamp;
 	}
 
-	TextureAttribute::MinMagFilter GetFilter(const std::string& str)
+	SamplerInfo::MinMagFilter GetFilter(const std::string& str)
 	{
 		if (str == "point") 
-			return TextureAttribute::MinMagFilter::Point;
+			return SamplerInfo::MinMagFilter::Point;
 		else if (str == "linear") 
-			return TextureAttribute::MinMagFilter::Linear;
+			return SamplerInfo::MinMagFilter::Linear;
 		else if (str == "anisotropic") 
-			return TextureAttribute::MinMagFilter::Anisotropic;
-		return TextureAttribute::MinMagFilter::Linear;
+			return SamplerInfo::MinMagFilter::Anisotropic;
+		return SamplerInfo::MinMagFilter::Linear;
 	}
 
 
@@ -166,15 +166,12 @@ namespace Engine
 					CORE_ASSERT(tokens[12] == ")", "expected \")\"");
 					CORE_ASSERT(tokens[13] == ";", "expected \";\"");
 
-					TextureAttribute attrib;
-					attrib.U = GetWrapMode(u);
-					attrib.V = GetWrapMode(v);
+					SamplerInfo info;
+					info.U = GetWrapMode(u);
+					info.V = GetWrapMode(v);
 
-					attrib.Min = GetFilter(min);
-					attrib.Mag = GetFilter(mag);
-
-					ShaderSorce::SectionInfo::SamplerInfo info;
-					info.m_SamplerConfig = attrib;
+					info.Min = GetFilter(min);
+					info.Mag = GetFilter(mag);
 
 					section.m_Samplers[name] = info;
 

@@ -1,13 +1,32 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Shader.h"
-#include "Resources/TextureAttribute.h"
-
 #include <queue>
 #include <sstream>
 
 namespace Engine
 {
+
+	struct SamplerInfo
+	{
+		enum class WrapMode
+		{
+			Repeat,
+			MirroredRepeat,
+			Clamp
+		};
+
+		enum class MinMagFilter
+		{
+			Point,
+			Linear,
+			Anisotropic
+		};
+
+		WrapMode U = WrapMode::Repeat, V = WrapMode::Repeat;
+
+		MinMagFilter Min = MinMagFilter::Linear, Mag = MinMagFilter::Linear;
+	};
 
 	struct ShaderInputElement
 	{
@@ -54,7 +73,7 @@ namespace Engine
 		uint32 reg;
 		uint32 space;
 
-		TextureAttribute samplerAttribs; // used for static sampler
+		SamplerInfo samplerAttribs;
 
 		uint32 rootIndex = 0;
 	};
@@ -132,11 +151,6 @@ namespace Engine
 
 		struct SectionInfo
 		{
-			struct SamplerInfo
-			{
-				TextureAttribute m_SamplerConfig;
-			};
-
 			std::stringstream m_SectionCode;
 			std::unordered_map<std::string, SamplerInfo> m_Samplers;
 

@@ -36,8 +36,8 @@ namespace Engine
 	DirectX12ConstantBufferResource::~DirectX12ConstantBufferResource()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		if (m_CBVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_CBVHandle);
-		if (m_UAVHandle) context->GetDX12ResourceManager()->ScheduleHandelDeletion(m_UAVHandle);
+		if (m_CBVHandle) context->GetDX12ResourceManager()->ScheduleHandleDeletion(m_CBVHandle);
+		if (m_UAVHandle) context->GetDX12ResourceManager()->ScheduleHandleDeletion(m_UAVHandle);
 
 		context->GetDX12ResourceManager()->ScheduleResourceDeletion(m_Buffer);
 	}

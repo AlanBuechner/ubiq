@@ -91,7 +91,7 @@ namespace Engine
 		void UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, bool genMipChain, D3D12_RESOURCE_STATES state);
 
 		void ScheduleResourceDeletion(wrl::ComPtr<ID3D12Resource> resource) { m_DeletionPool->AddResource(resource); }
-		void ScheduleHandelDeletion(DirectX12DescriptorHandle handle) { m_DeletionPool->AddHandle(handle); }
+		void ScheduleHandleDeletion(DirectX12DescriptorHandle handle) { m_DeletionPool->AddHandle(handle); }
 
 	private:
 		virtual void UploadData() override;
