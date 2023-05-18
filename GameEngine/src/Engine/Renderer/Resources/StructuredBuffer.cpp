@@ -32,5 +32,30 @@ namespace Engine
 		return Ref<StructuredBuffer>();
 	}
 
+
+	Ref<RWStructuredBuffer> RWStructuredBuffer::Create(uint32 stride, uint32 count)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			return CreateRef<DirectX12RWStructuredBuffer>(stride, count);
+		default:
+			break;
+		}
+		return Ref<RWStructuredBuffer>();
+	}
+
+	Ref<RWStructuredBuffer> RWStructuredBuffer::Create(Ref<StructuredBufferResource> resource)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			return CreateRef<DirectX12RWStructuredBuffer>(resource);
+		default:
+			break;
+		}
+		return Ref<RWStructuredBuffer>();
+	}
+
 }
 

@@ -45,7 +45,7 @@ namespace Engine
 		m_Buffer->SetName(L"Structured Buffer");
 	}
 
-	void DirectX12StructuredBufferResource::SetData(void* data, uint32 count /*= 1*/, uint32 start /*= 0*/)
+	void DirectX12StructuredBufferResource::SetData(const void* data, uint32 count /*= 1*/, uint32 start /*= 0*/)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		context->GetDX12ResourceManager()->UploadBufferRegion(m_Buffer, m_Stride * start, data, m_Stride * count, 
@@ -95,6 +95,21 @@ namespace Engine
 	{
 		m_Resource = std::dynamic_pointer_cast<DirectX12StructuredBufferResource>(resource);
 		m_Resource->CreateSRVHandle();
+	}
+
+
+
+
+	DirectX12RWStructuredBuffer::DirectX12RWStructuredBuffer(uint32 stride, uint32 count)
+	{
+		m_Resource = CreateRef<DirectX12StructuredBufferResource>(stride, count);
+		m_Resource->CreateUAVHandle();
+	}
+
+	DirectX12RWStructuredBuffer::DirectX12RWStructuredBuffer(Ref<StructuredBufferResource> resource)
+	{
+		m_Resource = std::dynamic_pointer_cast<DirectX12StructuredBufferResource>(resource);
+		m_Resource->CreateUAVHandle();
 	}
 
 }

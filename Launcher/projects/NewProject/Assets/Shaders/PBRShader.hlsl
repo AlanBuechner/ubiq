@@ -146,7 +146,6 @@ ConstantBuffer<Material> materials[]: register(space2);
 Texture2D<float4> textures[] : register(space0);
 StaticSampler textureSampler = StaticSampler(repeat, repeat, anisotropic, anisotropic);
 
-// P_ denotes sampler as having point filtering
 StaticSampler shadowSampler = StaticSampler(clamp, clamp, point, point);
 
 #include "PBR.hlsli"
@@ -224,8 +223,6 @@ PS_Output main(PS_Input input)
 	// directinal light
 	if(true) 
 	{
-		// depth testing
-		//uint numCascades = NUM_CASCADES;
 		uint numCascades;
 		uint stride;
 		Cascades.GetDimensions(numCascades, stride);

@@ -21,7 +21,7 @@ namespace Engine
 	{
 	public:
 		virtual void Resize(uint32 count) = 0;
-		virtual void SetData(void* data, uint32 count = 1, uint32 start = 0) = 0;
+		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) = 0;
 
 		virtual uint32 GetDescriptorLocation() const = 0;
 
@@ -29,5 +29,19 @@ namespace Engine
 
 		static Ref<StructuredBuffer> Create(uint32 stride, uint32 count);
 		static Ref<StructuredBuffer> Create(Ref<StructuredBufferResource> resource);
+	};
+
+	class RWStructuredBuffer
+	{
+	public:
+		virtual void Resize(uint32 count) = 0;
+		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) = 0;
+
+		virtual uint32 GetDescriptorLocation() const = 0;
+
+		virtual Ref<StructuredBufferResource> GetResource() = 0;
+
+		static Ref<RWStructuredBuffer> Create(uint32 stride, uint32 count);
+		static Ref<RWStructuredBuffer> Create(Ref<StructuredBufferResource> resource);
 	};
 }

@@ -19,7 +19,7 @@ namespace Engine
 
 	private:
 		void Resize(uint32 count);
-		void SetData(void* data, uint32 count = 1, uint32 start = 0);
+		void SetData(const void* data, uint32 count = 1, uint32 start = 0);
 
 		void CreateSRVHandle();
 		void CreateUAVHandle();
@@ -30,6 +30,7 @@ namespace Engine
 		DirectX12DescriptorHandle m_UAVHandle;
 
 		friend class DirectX12StructuredBuffer;
+		friend class DirectX12RWStructuredBuffer;
 	};
 
 
@@ -41,7 +42,7 @@ namespace Engine
 
 		virtual void Resize(uint32 count) override { m_Resource->Resize(count); }
 
-		virtual void SetData(void* data, uint32 count = 1, uint32 start = 0) { m_Resource->SetData(data, count, start); }
+		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) { m_Resource->SetData(data, count, start); }
 
 		virtual uint32 GetDescriptorLocation() const override { return m_Resource->m_SRVHandle.GetIndex(); }
 
@@ -52,4 +53,31 @@ namespace Engine
 		Ref<DirectX12StructuredBufferResource> m_Resource;
 
 	};
+
+
+
+
+	class DirectX12RWStructuredBuffer : public RWStructuredBuffer
+	{
+	public:
+		DirectX12RWStructuredBuffer(uint32 stride, uint32 count);
+		DirectX12RWStructuredBuffer(Ref<StructuredBufferResource> resource);
+
+		virtual void Resize(uint32 count) override { m_Resource->Resize(count); }
+
+		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) { m_Resource->SetData(data, count, start); }
+
+		virtual uint32 GetDescriptorLocation() const override { return m_Resource->m_SRVHandle.GetIndex(); }
+
+		virtual Ref<StructuredBufferResource> GetResource() { return m_Resource; }
+		virtual Ref<DirectX12StructuredBufferResource> GetDXResource() { return m_Resource; }
+
+	private:
+		Ref<DirectX12StructuredBufferResource> m_Resource;
+
+	};
+
+
+
+
 }

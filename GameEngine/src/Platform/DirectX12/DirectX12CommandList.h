@@ -44,6 +44,7 @@ namespace Engine
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
 		virtual void SetConstantBuffer(uint32 index, Ref<RWConstantBuffer> buffer) override;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) override;
+		virtual void SetStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer) override;
 		virtual void SetRootConstant(uint32 index, uint32 data) override;
 		virtual void SetTexture(uint32 index, Ref<Texture> texture) override;
 		virtual void SetFrameBuffer(uint32 index, Ref<FrameBuffer> buffer, uint32 attatchment) override;

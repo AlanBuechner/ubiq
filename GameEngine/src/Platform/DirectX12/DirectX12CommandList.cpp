@@ -300,6 +300,15 @@ namespace Engine
 		m_CommandList->SetGraphicsRootDescriptorTable(index, sb->GetDXResource()->GetSRVHandle().gpu);
 	}
 
+	void DirectX12CommandList::SetStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer)
+	{
+		if (index == UINT32_MAX || buffer == nullptr)
+			return;
+
+		Ref<DirectX12StructuredBuffer> sb = std::dynamic_pointer_cast<DirectX12StructuredBuffer>(buffer);
+		m_CommandList->SetGraphicsRootDescriptorTable(index, sb->GetDXResource()->GetUAVHandle().gpu);
+	}
+
 	void DirectX12CommandList::SetRootConstant(uint32 index, uint32 data)
 	{
 		if (index == UINT32_MAX)
