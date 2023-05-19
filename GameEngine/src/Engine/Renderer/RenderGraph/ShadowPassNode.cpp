@@ -39,7 +39,7 @@ namespace Engine
 			}
 		}
 
-		m_CommandList->Transition(fbs, FrameBufferState::RenderTarget, FrameBufferState::SRV);
+		m_CommandList->Transition(fbs, ResourceState::RenderTarget, ResourceState::ShaderResource);
 
 
 		// directional light
@@ -85,7 +85,7 @@ namespace Engine
 		
 		
 		// convert all render target to srv
-		m_CommandList->Transition(fbs, FrameBufferState::SRV, FrameBufferState::RenderTarget);
+		m_CommandList->Transition(fbs, ResourceState::ShaderResource, ResourceState::RenderTarget);
 
 		GPUTimer::EndEvent(m_CommandList);
 	}

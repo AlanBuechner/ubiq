@@ -82,6 +82,23 @@ namespace Engine
 		m_UAVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
+	void* DirectX12StructuredBufferResource::GetGPUResourcePointer()
+	{
+		return (void*)m_Buffer.Get();
+	}
+
+	uint32 DirectX12StructuredBufferResource::GetState(ResourceState state)
+	{
+		switch (state)
+		{
+		case ResourceState::ShaderResource:
+			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		case ResourceState::UnorderedResource:
+			return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		}
+	}
+
+
 
 
 	DirectX12StructuredBuffer::DirectX12StructuredBuffer(uint32 stride, uint32 count)

@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Resources/FrameBuffer.h"
+#include "Resources/ResourceState.h"
 
 namespace Engine
 {
@@ -31,7 +32,7 @@ namespace Engine
 		struct FBTransitionObject
 		{
 			Ref<FrameBuffer> fb;
-			FrameBufferState to, from;
+			ResourceState to, from;
 		};
 
 	public:
@@ -40,13 +41,15 @@ namespace Engine
 		virtual void StartRecording() = 0;
 
 		// transitions
-		void ToRenderTarget(Ref<FrameBuffer> fb, FrameBufferState from) { Transition({ fb }, FrameBufferState::RenderTarget, from); }
-		void ToSRV(Ref<FrameBuffer> fb, FrameBufferState from) { Transition({ fb }, FrameBufferState::SRV, from); }
-		void Present(FrameBufferState from) { Present(nullptr, from); }
-		virtual void Present(Ref<FrameBuffer> fb, FrameBufferState from) = 0;
+		void ToRenderTarget(Ref<FrameBuffer> fb, ResourceState from) { Transition({ fb }, ResourceState::RenderTarget, from); }
+		void ToSRV(Ref<FrameBuffer> fb, ResourceState from) { Transition({ fb }, ResourceState::ShaderResource, from); }
+		void Present(ResourceState from) { Present(nullptr, from); }
+		virtual void Present(Ref<FrameBuffer> fb, ResourceState from) = 0;
 
-		virtual void Transition(std::vector<Ref<FrameBuffer>> fbs, FrameBufferState to, FrameBufferState from) = 0;
+		virtual void Transition(std::vector<Ref<FrameBuffer>> fbs, ResourceState to, ResourceState from) = 0;
 		virtual void Transition(std::vector<FBTransitionObject> transitions) = 0;
+
+		virtual void Transition(std::vector<ResourceTransitionObject> transitions) = 0;
 
 		// rendering
 		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) = 0;

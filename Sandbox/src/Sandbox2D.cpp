@@ -15,9 +15,9 @@ void Sandbox2DLayer::OnAttach()
 
 	Engine::FrameBufferSpecification specs;
 	specs.Attachments = {
-		{ Engine::FrameBufferTextureFormat::RGBA8, {1,0,0,1} },
-		{ Engine::FrameBufferTextureFormat::RED_INTEGER, (Math::Vector4)-1 },
-		{ Engine::FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
+		{ Engine::TextureFormat::RGBA8, {1,0,0,1} },
+		{ Engine::TextureFormat::RED_INTEGER, (Math::Vector4)-1 },
+		{ Engine::TextureFormat::Depth, { 1,0,0,0 } }
 	};
 	Engine::Window& window = Engine::Application::Get().GetWindow();
 	specs.Width = window.GetWidth();
@@ -61,7 +61,7 @@ void Sandbox2DLayer::OnRender()
 
 	//Engine::Renderer::Build();
 
-	commandList->Present(Engine::FrameBufferState::RenderTarget);
+	commandList->Present(Engine::ResourceState::RenderTarget);
 
 	timer.End();
 }

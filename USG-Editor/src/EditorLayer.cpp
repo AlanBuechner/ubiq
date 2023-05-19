@@ -120,7 +120,7 @@ namespace Engine
 		Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
 		commandList->SetRenderTarget(framBuffer);
 		Renderer::Build(commandList);
-		commandList->Present(framBuffer, FrameBufferState::RenderTarget); // present the render target
+		commandList->Present(framBuffer, ResourceState::RenderTarget); // present the render target
 		Engine::GPUTimer::EndEvent(commandList);
 
 		timer.End();

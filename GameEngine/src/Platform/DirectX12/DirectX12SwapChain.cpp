@@ -21,7 +21,7 @@ namespace Engine
 	void DirectX12SwapChain::Init(uint32 numBuffers)
 	{
 		FrameBufferSpecification fbSpec;
-		fbSpec.Attachments = { {FrameBufferTextureFormat::RGBA8, {0,0,0,0}} };
+		fbSpec.Attachments = { {TextureFormat::RGBA8, {0,0,0,0}} };
 		fbSpec.Width = 0;
 		fbSpec.Height = 0;
 		fbSpec.SwapChainTarget = true;

@@ -33,13 +33,13 @@ namespace Engine
 			float threshold = i == 0 ? 1 : 0;
 			commandList->SetRootConstant(downSample->GetUniformLocation("RC_Threshold"), threshold);
 			commandList->DrawMesh(screenMesh);
-			commandList->Transition({ m_GaussianSumBuffers[i] }, FrameBufferState::SRV, FrameBufferState::RenderTarget);
+			commandList->Transition({ m_GaussianSumBuffers[i] }, ResourceState::ShaderResource, ResourceState::RenderTarget);
 		}
 
 		{
 			std::vector<CommandList::FBTransitionObject> transitions(m_GaussianSumBuffers.size() - 1);
 			for (uint32 i = 0; i < m_GaussianSumBuffers.size() - 1; i++) // dont change the last frame buffer
-				transitions[i] = { m_GaussianSumBuffers[i], FrameBufferState::RenderTarget, FrameBufferState::SRV };
+				transitions[i] = { m_GaussianSumBuffers[i], ResourceState::RenderTarget, ResourceState::ShaderResource };
 			commandList->Transition(transitions);
 		}
 
@@ -51,7 +51,7 @@ namespace Engine
 			commandList->SetShader(upSample);
 			commandList->SetRootConstant(upSample->GetUniformLocation("RC_SrcLoc"), srcLoc);
 			commandList->DrawMesh(screenMesh);
-			commandList->Transition({ m_GaussianSumBuffers[i] }, FrameBufferState::SRV, FrameBufferState::RenderTarget);
+			commandList->Transition({ m_GaussianSumBuffers[i] }, ResourceState::ShaderResource, ResourceState::RenderTarget);
 		}
 
 		commandList->SetRenderTarget(renderTarget);
@@ -64,7 +64,7 @@ namespace Engine
 		{
 			std::vector<CommandList::FBTransitionObject> transitions(m_GaussianSumBuffers.size());
 			for (uint32 i = 0; i < m_GaussianSumBuffers.size(); i++)
-				transitions[i] = { m_GaussianSumBuffers[i], FrameBufferState::RenderTarget, FrameBufferState::SRV };
+				transitions[i] = { m_GaussianSumBuffers[i], ResourceState::RenderTarget, ResourceState::ShaderResource };
 			commandList->Transition(transitions);
 		}
 
@@ -90,10 +90,10 @@ namespace Engine
 				{
 					FrameBufferSpecification spec;
 					spec.Attachments = {
-						{ FrameBufferTextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
-						{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
+						{ TextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
+						{ TextureFormat::Depth, { 1,0,0,0 } }
 					};
-					spec.InitalState = FrameBufferState::RenderTarget;
+					spec.InitalState = ResourceState::RenderTarget;
 					spec.Width = w / fac;
 					spec.Height = h / fac;
 					m_GaussianSumBuffers[i] = FrameBuffer::Create(spec);

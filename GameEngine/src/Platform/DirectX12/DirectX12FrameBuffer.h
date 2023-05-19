@@ -5,7 +5,7 @@
 
 namespace Engine
 {
-	DXGI_FORMAT UbiqToDXGI(FrameBufferTextureFormat format);
+	DXGI_FORMAT UbiqToDXGI(TextureFormat format);
 
 	class DirectX12FrameBuffer : public FrameBuffer
 	{
@@ -23,31 +23,24 @@ namespace Engine
 		virtual int ReadPixle(uint32 index, int x, int y) override;
 
 		virtual const FrameBufferSpecification& GetSpecification() const override { return m_Spec; }
-		virtual bool HasDepthAttachment() const override { return m_DepthAttachmentSpec.TextureFormat != FrameBufferTextureFormat::None; };
+		virtual bool HasDepthAttachment() const override { return m_DepthAttachmentSpec.textureFormat != TextureFormat::None; };
 
 		wrl::ComPtr<ID3D12Resource>& GetBuffer(uint32 i) { return m_Buffers[i]; }
 		void SetDescriptorHandle(uint32 i, DirectX12DescriptorHandle handle) { CORE_ASSERT(i < m_TargetHandles.size(), ""); m_TargetHandles[i] = handle; }
 
-		virtual bool Cleared() override { return m_Cleared; }
-		virtual void ResetClear() override { m_Cleared = false; }
-
-		static D3D12_RESOURCE_STATES GetDXState(FrameBufferState state);
-		static D3D12_RESOURCE_STATES GetDXDepthState(FrameBufferState state);
-
-		void Clear() { m_Cleared = true; } // only gets called by command list
-
+		static D3D12_RESOURCE_STATES GetDXState(ResourceState state);
+		static D3D12_RESOURCE_STATES GetDXDepthState(ResourceState state);
 
 	private:
 		void CreateAttachment(uint32 i);
 
 	private:
-		bool m_Cleared = false;
 
 		std::vector<wrl::ComPtr<ID3D12Resource>> m_Buffers;
 		FrameBufferSpecification m_Spec;
 
 		std::vector<FrameBufferTextureSpecification> m_AttachmentSpecs;
-		FrameBufferTextureSpecification m_DepthAttachmentSpec = { FrameBufferTextureFormat::None, {0,0,0,0} };
+		FrameBufferTextureSpecification m_DepthAttachmentSpec = { TextureFormat::None, {0,0,0,0} };
 
 		std::vector<DirectX12DescriptorHandle>  m_TargetHandles;
 		std::vector<DirectX12DescriptorHandle>  m_SRVHandles;

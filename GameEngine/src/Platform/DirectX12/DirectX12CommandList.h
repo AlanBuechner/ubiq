@@ -23,11 +23,13 @@ namespace Engine
 		virtual void StartRecording() override;
 
 		// transitions
-		void Present(FrameBufferState from) { Present(nullptr, from); }
-		virtual void Present(Ref<FrameBuffer> fb, FrameBufferState from) override;
+		void Present(ResourceState from) { Present(nullptr, from); }
+		virtual void Present(Ref<FrameBuffer> fb, ResourceState from) override;
 
-		virtual void Transition(std::vector<Ref<FrameBuffer>> fbs, FrameBufferState to, FrameBufferState from) override;
+		virtual void Transition(std::vector<Ref<FrameBuffer>> fbs, ResourceState to, ResourceState from) override;
 		virtual void Transition(std::vector<FBTransitionObject> transitions) override;
+
+		virtual void Transition(std::vector<ResourceTransitionObject> transitions) override;
 
 		// rendering
 		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) override;

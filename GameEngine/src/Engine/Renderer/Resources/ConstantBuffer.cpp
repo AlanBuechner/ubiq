@@ -9,6 +9,19 @@ namespace Engine
 
 	ConstantBufferResource::~ConstantBufferResource() {}
 
+	bool ConstantBufferResource::SupportState(ResourceState state)
+	{
+		switch (state)
+		{
+		case Engine::ShaderResource:
+		case Engine::UnorderedResource:
+			return true;
+		case Engine::Common:
+		case Engine::RenderTarget:
+			return false;
+		}
+	}
+
 	Ref<ConstantBuffer> ConstantBuffer::Create(uint32 size)
 	{
 		switch (Renderer::GetAPI())

@@ -38,10 +38,10 @@ namespace Engine
 		float clearval = pow(0.2f, 2.2);
 		FrameBufferSpecification fbSpec1;
 		fbSpec1.Attachments = {
-			{ FrameBufferTextureFormat::RGBA16, {clearval,clearval,clearval,1} },
-			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
+			{ TextureFormat::RGBA16, {clearval,clearval,clearval,1} },
+			{ TextureFormat::Depth, { 1,0,0,0 } }
 		};
-		fbSpec1.InitalState = FrameBufferState::Common;
+		fbSpec1.InitalState = ResourceState::Common;
 
 		fbSpec1.Width = window.GetWidth();
 		fbSpec1.Height = window.GetHeight();
@@ -55,7 +55,7 @@ namespace Engine
 		// set frame buffer to render target
 		Ref<TransitionNode> t1 = CreateRef<TransitionNode>(*this);
 		t1->SetCommandList(commandList);
-		t1->AddBuffer({ renderTargetNode->m_Buffer, FrameBufferState::RenderTarget, FrameBufferState::Common });
+		t1->AddBuffer({ renderTargetNode->m_Buffer, ResourceState::RenderTarget, ResourceState::Common });
 		m_Nodes.push_back(t1);
 
 		// shadow pass
@@ -88,10 +88,10 @@ namespace Engine
 		// create post processing render target
 		FrameBufferSpecification fbSpec2;
 		fbSpec2.Attachments = {
-			{ FrameBufferTextureFormat::RGBA16, {0,0,0,1} },
-			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
+			{ TextureFormat::RGBA16, {0,0,0,1} },
+			{ TextureFormat::Depth, { 1,0,0,0 } }
 		};
-		fbSpec2.InitalState = FrameBufferState::Common;
+		fbSpec2.InitalState = ResourceState::Common;
 		fbSpec2.Width = window.GetWidth();
 		fbSpec2.Height = window.GetHeight();
 
@@ -101,7 +101,7 @@ namespace Engine
 		// set frame buffer to srv for use in post processing
 		Ref<TransitionNode> t2 = CreateRef<TransitionNode>(*this);
 		t2->SetCommandList(commandList);
-		t2->AddBuffer({ renderTargetNode->m_Buffer, FrameBufferState::Common, FrameBufferState::RenderTarget });
+		t2->AddBuffer({ renderTargetNode->m_Buffer, ResourceState::Common, ResourceState::RenderTarget });
 		t2->AddDependincy(mainPass);
 		m_Nodes.push_back(t2);
 

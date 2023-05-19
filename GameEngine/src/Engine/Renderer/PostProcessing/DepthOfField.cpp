@@ -16,10 +16,10 @@ namespace Engine
 
 		FrameBufferSpecification spec;
 		spec.Attachments = {
-			{ FrameBufferTextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
-			{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } }
+			{ TextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
+			{ TextureFormat::Depth, { 1,0,0,0 } }
 		};
-		spec.InitalState = FrameBufferState::RenderTarget;
+		spec.InitalState = ResourceState::RenderTarget;
 		spec.Width = 100;
 		spec.Height = 100;
 
@@ -56,7 +56,7 @@ namespace Engine
 
 		GPUTimer::BeginEvent(commandList, "expand COC");
 
-		commandList->Transition({ m_COCTexture }, FrameBufferState::SRV, FrameBufferState::RenderTarget);
+		commandList->Transition({ m_COCTexture }, ResourceState::ShaderResource, ResourceState::RenderTarget);
 
 		commandList->SetRenderTarget(m_TempTexture);
 		commandList->ClearRenderTarget(m_TempTexture);
@@ -67,8 +67,8 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->Transition({
-			{m_COCTexture, FrameBufferState::RenderTarget, FrameBufferState::SRV},
-			{m_TempTexture, FrameBufferState::SRV, FrameBufferState::RenderTarget},
+			{m_COCTexture, ResourceState::RenderTarget, ResourceState::ShaderResource},
+			{m_TempTexture, ResourceState::ShaderResource, ResourceState::RenderTarget},
 		});
 
 		commandList->SetRenderTarget(m_COCTexture);
@@ -80,8 +80,8 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->Transition({
-			{m_COCTexture, FrameBufferState::SRV, FrameBufferState::RenderTarget},
-			{m_TempTexture, FrameBufferState::RenderTarget, FrameBufferState::SRV},
+			{m_COCTexture, ResourceState::ShaderResource, ResourceState::RenderTarget},
+			{m_TempTexture, ResourceState::RenderTarget, ResourceState::ShaderResource},
 		});
 
 		GPUTimer::EndEvent(commandList); // end expand coc
@@ -97,8 +97,8 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->Transition({
-			{m_COCTexture, FrameBufferState::RenderTarget, FrameBufferState::SRV},
-			{m_TempTexture, FrameBufferState::SRV, FrameBufferState::RenderTarget},
+			{m_COCTexture, ResourceState::RenderTarget, ResourceState::ShaderResource},
+			{m_TempTexture, ResourceState::ShaderResource, ResourceState::RenderTarget},
 		});
 
 		commandList->SetRenderTarget(m_COCTexture);
@@ -109,7 +109,7 @@ namespace Engine
 		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_TempTexture->GetAttachmentShaderDescriptoLocation(0));
 		commandList->DrawMesh(screenMesh);
 
-		commandList->Transition({ m_TempTexture }, FrameBufferState::RenderTarget, FrameBufferState::SRV);
+		commandList->Transition({ m_TempTexture }, ResourceState::RenderTarget, ResourceState::ShaderResource);
 
 		GPUTimer::EndEvent(commandList); // end blur coc
 
@@ -134,8 +134,8 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->Transition({
-			{m_NearBlur, FrameBufferState::SRV, FrameBufferState::RenderTarget},
-			{m_FarBlur, FrameBufferState::SRV, FrameBufferState::RenderTarget},
+			{m_NearBlur, ResourceState::ShaderResource, ResourceState::RenderTarget},
+			{m_FarBlur, ResourceState::ShaderResource, ResourceState::RenderTarget},
 		});
 
 		GPUTimer::EndEvent(commandList); // end bokeh blur
@@ -150,8 +150,8 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->Transition({
-			{m_NearBlur, FrameBufferState::RenderTarget, FrameBufferState::SRV},
-			{m_FarBlur, FrameBufferState::RenderTarget, FrameBufferState::SRV},
+			{m_NearBlur, ResourceState::RenderTarget, ResourceState::ShaderResource},
+			{m_FarBlur, ResourceState::RenderTarget, ResourceState::ShaderResource},
 		});
 
 

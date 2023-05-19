@@ -8,25 +8,25 @@
 namespace Engine
 {
 
-	DXGI_FORMAT UbiqToDXGI(FrameBufferTextureFormat format)
+	DXGI_FORMAT UbiqToDXGI(TextureFormat format)
 	{
 		switch (format)
 		{
-		case Engine::FrameBufferTextureFormat::RGBA8:
+		case Engine::TextureFormat::RGBA8:
 			return DXGI_FORMAT_R8G8B8A8_UNORM;
-		case Engine::FrameBufferTextureFormat::RGBA16:
+		case Engine::TextureFormat::RGBA16:
 			return DXGI_FORMAT_R16G16B16A16_FLOAT;
-		case Engine::FrameBufferTextureFormat::RGBA32:
+		case Engine::TextureFormat::RGBA32:
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
 
-		case Engine::FrameBufferTextureFormat::RG16:
+		case Engine::TextureFormat::RG16:
 			return DXGI_FORMAT_R16G16_FLOAT;
-		case Engine::FrameBufferTextureFormat::RG32:
+		case Engine::TextureFormat::RG32:
 			return DXGI_FORMAT_R32G32_FLOAT;
 
-		case Engine::FrameBufferTextureFormat::RED_INTEGER:
+		case Engine::TextureFormat::RED_INTEGER:
 			return DXGI_FORMAT_R32_SINT;
-		case Engine::FrameBufferTextureFormat::DEPTH24STENCIL8:
+		case Engine::TextureFormat::DEPTH24STENCIL8:
 			return DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
 			break;
@@ -40,7 +40,7 @@ namespace Engine
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		for (auto format : m_Spec.Attachments.Attachments)
 		{
-			if (format.IsDepthStencil())
+			if (IsDepthStencil(format.textureFormat))
 			{
 				CORE_ASSERT(!HasDepthAttachment(), "can not have more than one depth attachment on a frame buffer");
 				m_DepthAttachmentSpec = format;
@@ -55,7 +55,7 @@ namespace Engine
 		{
 			for (uint32 i = 0; i < m_AttachmentSpecs.size(); i++)
 			{
-				if (m_AttachmentSpecs[i].IsDepthStencil())
+				if (IsDepthStencil(m_AttachmentSpecs[i].textureFormat))
 					m_TargetHandles[i] = DirectX12ResourceManager::s_DSVHeap->Allocate();
 				else
 					m_TargetHandles[i] = DirectX12ResourceManager::s_RTVHeap->Allocate();
@@ -125,30 +125,30 @@ namespace Engine
 		return val;
 	}
 
-	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXState(FrameBufferState state)
+	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXState(ResourceState state)
 	{
 		switch (state)
 		{
-		case FrameBufferState::RenderTarget:
+		case ResourceState::RenderTarget:
 			return D3D12_RESOURCE_STATE_RENDER_TARGET;
-		case FrameBufferState::SRV:
+		case ResourceState::ShaderResource:
 			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-		case FrameBufferState::Common:
+		case ResourceState::Common:
 			return D3D12_RESOURCE_STATE_COMMON;
 		default:
 			break;
 		}
 	}
 
-	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXDepthState(FrameBufferState state)
+	D3D12_RESOURCE_STATES DirectX12FrameBuffer::GetDXDepthState(ResourceState state)
 	{
 		switch (state)
 		{
-		case FrameBufferState::RenderTarget:
+		case ResourceState::RenderTarget:
 			return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		case FrameBufferState::SRV:
+		case ResourceState::ShaderResource:
 			return D3D12_RESOURCE_STATE_DEPTH_READ | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-		case FrameBufferState::Common:
+		case ResourceState::Common:
 			return D3D12_RESOURCE_STATE_COMMON;
 		default:
 			break;
@@ -171,13 +171,13 @@ namespace Engine
 			0, 0
 		};
 
-		DXGI_FORMAT format = UbiqToDXGI(m_Spec.Attachments.Attachments[i].TextureFormat);
+		DXGI_FORMAT format = UbiqToDXGI(m_Spec.Attachments.Attachments[i].textureFormat);
 
 		D3D12_RESOURCE_DESC rDesc;
 		rDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		rDesc.Format = format;
 		rDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		rDesc.Flags = m_Spec.Attachments.Attachments[i].IsDepthStencil() ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+		rDesc.Flags = IsDepthStencil(m_Spec.Attachments.Attachments[i].textureFormat) ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 		rDesc.MipLevels = 1;
 		rDesc.Width = m_Spec.Width;
 		rDesc.Height = m_Spec.Height;
@@ -185,38 +185,38 @@ namespace Engine
 		rDesc.DepthOrArraySize = 1;
 		rDesc.SampleDesc = { 1, 0 };
 
-		Math::Vector4 color = m_Spec.Attachments.Attachments[i].ClearColor;
+		Math::Vector4 color = m_Spec.Attachments.Attachments[i].clearColor;
 		D3D12_CLEAR_VALUE clearVal{};
 		clearVal.Format = format;
-		switch (m_Spec.Attachments.Attachments[i].TextureFormat)
+		switch (m_Spec.Attachments.Attachments[i].textureFormat)
 		{
-		case FrameBufferTextureFormat::DEPTH24STENCIL8:
+		case TextureFormat::DEPTH24STENCIL8:
 			{
 				clearVal.DepthStencil.Depth = color.r;
 				clearVal.DepthStencil.Stencil = color.g;
 			}
-		case FrameBufferTextureFormat::RGBA8:
-		case FrameBufferTextureFormat::RGBA16:
-		case FrameBufferTextureFormat::RGBA32:
-		case FrameBufferTextureFormat::RG16:
-		case FrameBufferTextureFormat::RG32:
-		case FrameBufferTextureFormat::RED_INTEGER:
+		case TextureFormat::RGBA8:
+		case TextureFormat::RGBA16:
+		case TextureFormat::RGBA32:
+		case TextureFormat::RG16:
+		case TextureFormat::RG32:
+		case TextureFormat::RED_INTEGER:
 			((Math::Vector4&)clearVal.Color) = color;
 		}
 
-		D3D12_RESOURCE_STATES state = m_Spec.Attachments.Attachments[i].IsDepthStencil() ? GetDXDepthState(m_Spec.InitalState) : GetDXState(m_Spec.InitalState);
+		D3D12_RESOURCE_STATES state = IsDepthStencil(m_Spec.Attachments.Attachments[i].textureFormat) ? GetDXDepthState(m_Spec.InitalState) : GetDXState(m_Spec.InitalState);
 		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommittedResource(
 			&props, D3D12_HEAP_FLAG_NONE, &rDesc,
 			state, &clearVal, IID_PPV_ARGS(m_Buffers[i].ReleaseAndGetAddressOf())
 		),"Failed To Create Resorce");
 
-		if (!m_Spec.Attachments.Attachments[i].IsDepthStencil())
+		if (!IsDepthStencil(m_Spec.Attachments.Attachments[i].textureFormat))
 			context->GetDevice()->CreateRenderTargetView(m_Buffers[i].Get(), nullptr, m_TargetHandles[i].cpu);
 		else
 			context->GetDevice()->CreateDepthStencilView(m_Buffers[i].Get(), nullptr, m_TargetHandles[i].cpu);
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		if (!m_Spec.Attachments.Attachments[i].IsDepthStencil())
+		if (!IsDepthStencil(m_Spec.Attachments.Attachments[i].textureFormat))
 			srvDesc.Format = format;
 		else
 			srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;

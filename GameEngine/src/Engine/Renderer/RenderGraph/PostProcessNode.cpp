@@ -64,7 +64,7 @@ namespace Engine
 		GPUTimer::BeginEvent(m_CommandList, "Post Processing");
 
 		m_CommandList->Transition({
-			{curr, FrameBufferState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
+			{curr, ResourceState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
 		});
 
 		for (uint32 i = 0; i < m_PostProcessStack.size(); i++)
@@ -82,8 +82,8 @@ namespace Engine
 			if (i + 1 < m_PostProcessStack.size())
 			{
 				m_CommandList->Transition({
-					{ lastPass, FrameBufferState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
-					{ curr, m_RenderTarget->GetSpecification().InitalState, FrameBufferState::RenderTarget },
+					{ lastPass, ResourceState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
+					{ curr, m_RenderTarget->GetSpecification().InitalState, ResourceState::RenderTarget },
 				});
 			}
 

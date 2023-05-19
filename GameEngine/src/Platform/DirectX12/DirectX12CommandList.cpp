@@ -81,18 +81,18 @@ namespace Engine
 
 	// transitions 
 
-	void DirectX12CommandList::Present(Ref<FrameBuffer> fb, FrameBufferState from)
+	void DirectX12CommandList::Present(Ref<FrameBuffer> fb, ResourceState from)
 	{
 		if (fb == nullptr)
 			fb = m_RenderTarget;
 
-		Transition({ fb }, FrameBufferState::Common, from);
+		Transition({ fb }, ResourceState::Common, from);
 
 		if (fb == m_RenderTarget)
 			m_RenderTarget = nullptr;
 	}
 
-	void DirectX12CommandList::Transition(std::vector<Ref<FrameBuffer>> fbs, FrameBufferState to, FrameBufferState from)
+	void DirectX12CommandList::Transition(std::vector<Ref<FrameBuffer>> fbs, ResourceState to, ResourceState from)
 	{
 		std::vector<D3D12_RESOURCE_BARRIER> barriers;
 		for (auto fb : fbs)
@@ -104,7 +104,7 @@ namespace Engine
 
 			for (uint32 i = 0; i < attachments.size(); i++)
 			{
-				if (attachments[i].IsDepthStencil())
+				if (IsDepthStencil(attachments[i].textureFormat))
 					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXDepthState(from), DirectX12FrameBuffer::GetDXDepthState(to)));
 				else
 					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXState(from), DirectX12FrameBuffer::GetDXState(to)));
@@ -125,7 +125,7 @@ namespace Engine
 
 			for (uint32 i = 0; i < attachments.size(); i++)
 			{
-				if (attachments[i].IsDepthStencil())
+				if (IsDepthStencil(attachments[i].textureFormat))
 					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXDepthState(transition.from), DirectX12FrameBuffer::GetDXDepthState(transition.to)));
 				else
 					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXState(transition.from), DirectX12FrameBuffer::GetDXState(transition.to)));
@@ -136,6 +136,23 @@ namespace Engine
 	}
 
 
+
+	void DirectX12CommandList::Transition(std::vector<ResourceTransitionObject> transitions)
+	{
+		std::vector<D3D12_RESOURCE_BARRIER> barriers;
+		barriers.resize(transitions.size());
+		for (uint32 i = 0; i < transitions.size(); i++)
+		{
+			ResourceState to = transitions[i].to;
+			ResourceState from = transitions[i].from;
+			Ref<GPUResource> resource = transitions[i].resource;
+			CORE_ASSERT(resource->SupportState(to), "resouce does not support state");
+			barriers[i] = TransitionResource((ID3D12Resource*)resource->GetGPUResourcePointer(), 
+				(D3D12_RESOURCE_STATES)resource->GetState(from), (D3D12_RESOURCE_STATES)resource->GetState(to));
+		}
+
+		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
+	}
 
 	// rendering
 
@@ -157,7 +174,7 @@ namespace Engine
 		uint64 depthHandle = 0;
 		for (uint32 i = 0; i < attachments.size(); i++)
 		{
-			if (attachments[i].IsDepthStencil())
+			if (IsDepthStencil(attachments[i].textureFormat))
 				depthHandle = m_RenderTarget->GetAttachmentRenderHandle(i);
 			else
 				rendertargetHandles[i] = m_RenderTarget->GetAttachmentRenderHandle(i);
@@ -203,7 +220,7 @@ namespace Engine
 
 	void DirectX12CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment)
 	{
-		Math::Vector4 color = frameBuffer->GetSpecification().Attachments.Attachments[attachment].ClearColor;
+		Math::Vector4 color = frameBuffer->GetSpecification().Attachments.Attachments[attachment].clearColor;
 		ClearRenderTarget(frameBuffer, attachment, color);
 	}
 
@@ -217,12 +234,10 @@ namespace Engine
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle;
 		handle.ptr = frameBuffer->GetAttachmentRenderHandle(attachment);
-		if (frameBuffer->GetSpecification().Attachments.Attachments[attachment].IsDepthStencil())
+		if (IsDepthStencil(frameBuffer->GetSpecification().Attachments.Attachments[attachment].textureFormat))
 			m_CommandList->ClearDepthStencilView(handle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, color.r, (uint8)color.g, 0, nullptr);
 		else
 			m_CommandList->ClearRenderTargetView(handle, (float*)&color, 0, nullptr);
-
-		std::dynamic_pointer_cast<DirectX12FrameBuffer>(frameBuffer)->Clear();
 	}
 
 

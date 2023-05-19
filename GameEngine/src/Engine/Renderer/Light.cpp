@@ -73,12 +73,12 @@ namespace Engine
 
 			FrameBufferSpecification fbSpec;
 			fbSpec.Attachments = { 
-				{ FrameBufferTextureFormat::RG16, {FLT_MAX,0,0,0} },
-				{ FrameBufferTextureFormat::Depth, { 1,0,0,0 } },
+				{ TextureFormat::RG16, {FLT_MAX,0,0,0} },
+				{ TextureFormat::Depth, { 1,0,0,0 } },
 			};
 			fbSpec.Width = 4000 - (i*500);
 			fbSpec.Height = 4000 - (i*500);
-			fbSpec.InitalState = FrameBufferState::SRV;
+			fbSpec.InitalState = ResourceState::ShaderResource;
 			m_ShadowMaps[i] = FrameBuffer::Create(fbSpec);
 
 			cascadeData.push_back(

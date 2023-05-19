@@ -291,7 +291,7 @@ namespace Engine
 
 	}
 
-	void DirectX12ShaderCompiler::GetOutputLayout(ShaderBlobs& blobs, std::vector<FrameBufferTextureFormat>& outputElement)
+	void DirectX12ShaderCompiler::GetOutputLayout(ShaderBlobs& blobs, std::vector<TextureFormat>& outputElement)
 	{
 		if (!blobs.reflection)
 			return;
@@ -316,12 +316,12 @@ namespace Engine
 			switch (outputParam.ComponentType)
 			{
 			case D3D_REGISTER_COMPONENT_FLOAT32:
-				outputElement.push_back(FrameBufferTextureFormat::RGBA16);
+				outputElement.push_back(TextureFormat::RGBA16);
 				break;
 			case D3D_REGISTER_COMPONENT_UINT32:
 				break;
 			case D3D_REGISTER_COMPONENT_SINT32:
-				outputElement.push_back(FrameBufferTextureFormat::RED_INTEGER);
+				outputElement.push_back(TextureFormat::RED_INTEGER);
 				break;
 			default:
 				break;

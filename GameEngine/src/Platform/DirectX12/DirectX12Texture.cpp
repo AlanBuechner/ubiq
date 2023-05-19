@@ -190,6 +190,28 @@ namespace Engine
 		}
 	}
 
+	void* DirectX12Texture2DResource::GetGPUResourcePointer()
+	{
+		return (void*)m_Buffer.Get();
+	}
+
+	uint32 DirectX12Texture2DResource::GetState(ResourceState state)
+	{
+		switch (state)
+		{
+		case ResourceState::Common:
+			return D3D12_RESOURCE_STATE_COMMON;
+		case ResourceState::ShaderResource:
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | (IsDepthStencil(m_Format) ? D3D12_RESOURCE_STATE_DEPTH_READ : 0);
+		case ResourceState::UnorderedResource:
+			return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		case ResourceState::RenderTarget:
+			return IsDepthStencil(m_Format) ? D3D12_RESOURCE_STATE_DEPTH_WRITE : D3D12_RESOURCE_STATE_RENDER_TARGET;
+		default:
+			break;
+		}
+	}
+
 
 
 

@@ -74,6 +74,25 @@ namespace Engine
 		context->GetDevice()->CreateUnorderedAccessView(m_Buffer.Get(), nullptr, &uavDesc, m_UAVHandle.cpu);
 	}
 
+	void* DirectX12ConstantBufferResource::GetGPUResourcePointer()
+	{
+		return (void*)m_Buffer.Get();
+	}
+
+	uint32 DirectX12ConstantBufferResource::GetState(ResourceState state)
+	{
+		switch (state)
+		{
+		case ResourceState::ShaderResource:
+			return D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		case ResourceState::UnorderedResource:
+			return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		}
+	}
+
+
+
+
 	// Constant Buffer
 	DirectX12ConstantBuffer::DirectX12ConstantBuffer(uint32 size)
 	{

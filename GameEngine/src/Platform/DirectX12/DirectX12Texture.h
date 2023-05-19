@@ -29,6 +29,9 @@ namespace Engine
 		void CreateRTVDSVHandle();
 		void CreateUAVHandle();
 
+		void* GetGPUResourcePointer() override;
+		uint32 GetState(ResourceState state) override;
+
 	private:
 		wrl::ComPtr<ID3D12Resource> m_Buffer;
 		DirectX12DescriptorHandle m_SRVHandle;
@@ -39,6 +42,8 @@ namespace Engine
 
 		friend class DirectX12Texture2D;
 		friend class DirectX12RenderTarget2D;
+	protected:
+
 	};
 
 
@@ -87,8 +92,6 @@ namespace Engine
 
 	private:
 		Ref<DirectX12Texture2DResource> m_Resource;
-
-
 	};
 
 }

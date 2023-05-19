@@ -23,6 +23,8 @@ namespace Engine
 
 		void CreateCBVHandle();
 		void CreateUAVHandle();
+		void* GetGPUResourcePointer() override;
+		uint32 GetState(ResourceState state) override;
 
 	private:
 		wrl::ComPtr<ID3D12Resource> m_Buffer;
@@ -31,6 +33,7 @@ namespace Engine
 
 		friend class DirectX12ConstantBuffer;
 		friend class DirectX12RWConstantBuffer;
+
 	};
 
 

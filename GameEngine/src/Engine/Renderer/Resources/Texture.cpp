@@ -24,24 +24,36 @@ namespace Engine
 	{
 		switch (m_Format)
 		{
-		case Engine::TextureFormat::RGBA8:
+		case TextureFormat::RGBA8:
 			return 4*1;
-		case Engine::TextureFormat::RGBA16:
+		case TextureFormat::RGBA16:
 			return 4*2;
-		case Engine::TextureFormat::RGBA32:
+		case TextureFormat::RGBA32:
 			return 4*4;
-		case Engine::TextureFormat::RG16:
+		case TextureFormat::RG16:
 			return 2*2;
-		case Engine::TextureFormat::RG32:
+		case TextureFormat::RG32:
 			return 2*4;
-		case Engine::TextureFormat::RED_INTEGER:
+		case TextureFormat::RED_INTEGER:
 			return 4*1;
-		case Engine::TextureFormat::DEPTH24STENCIL8:
+		case TextureFormat::DEPTH24STENCIL8:
 			return 24+8;
 		default:
 			break;
 		}
 		return 0;
+	}
+
+	bool Texture2DResource::SupportState(ResourceState state)
+	{
+		switch (state)
+		{
+		case ResourceState::Common:
+		case ResourceState::ShaderResource:
+		case ResourceState::UnorderedResource:
+		case ResourceState::RenderTarget:
+			return true;
+		}
 	}
 
 	Ref<Texture2D> Texture2D::Create(const fs::path& path)

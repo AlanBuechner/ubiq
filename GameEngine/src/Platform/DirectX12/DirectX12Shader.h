@@ -41,7 +41,7 @@ namespace Engine
 				return true;
 			}
 		} m_Blobs;
-		wrl::ComPtr<ID3D12PipelineState> CreatePiplineState(const std::vector<FrameBufferTextureFormat>& formats);
+		wrl::ComPtr<ID3D12PipelineState> CreatePiplineState(const std::vector<TextureFormat>& formats);
 
 
 	private:
@@ -50,10 +50,10 @@ namespace Engine
 		ShaderConfig::RenderPass& m_PassConfig;
 
 		struct FBVectorHash {
-			std::size_t operator()(const std::vector<FrameBufferTextureFormat>& c) const {
+			std::size_t operator()(const std::vector<TextureFormat>& c) const {
 				std::hash<uint32> hasher;
 				size_t seed = 0;
-				for (FrameBufferTextureFormat i : c) {
+				for (TextureFormat i : c) {
 					seed ^= hasher((uint32)i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 				}
 				return seed;
@@ -61,12 +61,12 @@ namespace Engine
 		};
 
 
-		std::unordered_map<std::vector<FrameBufferTextureFormat>, wrl::ComPtr<ID3D12PipelineState>, FBVectorHash> m_PiplineStates;
+		std::unordered_map<std::vector<TextureFormat>, wrl::ComPtr<ID3D12PipelineState>, FBVectorHash> m_PiplineStates;
 		std::unordered_map<std::string, uint32> m_UniformLocations;
 
 		std::vector<ShaderInputElement> m_InputElements;
 		std::vector<ShaderParameter> m_ReflectionData;
-		std::vector<FrameBufferTextureFormat> m_RenderTargetFormates;
+		std::vector<TextureFormat> m_RenderTargetFormates;
 
 		wrl::ComPtr<ID3D12RootSignature> m_Sig;
 	};

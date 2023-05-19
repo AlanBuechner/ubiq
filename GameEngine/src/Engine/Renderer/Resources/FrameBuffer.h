@@ -1,60 +1,21 @@
 #pragma once
 
 #include "Engine/Core/Core.h"
+#include "Texture.h"
+#include "ResourceState.h"
 
 namespace Engine
 {
-	enum class FrameBufferTextureFormat
-	{
-		None = 0,
-
-		// Color
-		// 4 component float
-		RGBA8,
-		RGBA16,
-		RGBA32,
-
-		// 2 component float
-		RG16,
-		RG32,
-
-		// 1 component int
-		RED_INTEGER,
-
-		// Depth/Stencil
-		DEPTH24STENCIL8,
-
-		Depth = DEPTH24STENCIL8
-
-	};
-
-	enum FrameBufferState
-	{
-		RenderTarget,
-		SRV,
-		Common,
-	};
 
 	struct FrameBufferTextureSpecification
 	{
 		FrameBufferTextureSpecification() = default;
-		FrameBufferTextureSpecification(FrameBufferTextureFormat format, Math::Vector4 color) :
-			TextureFormat(format), ClearColor(color)
+		FrameBufferTextureSpecification(TextureFormat format, Math::Vector4 color) :
+			textureFormat(format), clearColor(color)
 		{}
 
-		FrameBufferTextureFormat TextureFormat = FrameBufferTextureFormat::None;
-		Math::Vector4 ClearColor;
-		inline bool IsDepthStencil() const
-		{
-			switch (TextureFormat)
-			{
-			case FrameBufferTextureFormat::DEPTH24STENCIL8:
-				return true;
-			default:
-				break;
-			}
-			return false;
-		}
+		TextureFormat textureFormat = TextureFormat::None;
+		Math::Vector4 clearColor;
 
 	};
 
@@ -73,7 +34,7 @@ namespace Engine
 		uint32 Width, Height;
 		FrameBufferAttachmentSpecification Attachments;
 		uint32 Samples = 1;
-		FrameBufferState InitalState = FrameBufferState::Common;
+		ResourceState InitalState = ResourceState::Common;
 
 		bool SwapChainTarget = false;
 	};
@@ -92,9 +53,6 @@ namespace Engine
 
 		virtual const FrameBufferSpecification& GetSpecification() const = 0;
 		virtual bool HasDepthAttachment() const = 0;
-
-		virtual bool Cleared() = 0;
-		virtual void ResetClear() = 0; // only called by render graph
 
 		static Ref<FrameBuffer> Create(const FrameBufferSpecification& spec);
 	};

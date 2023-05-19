@@ -1,14 +1,17 @@
 #pragma once
 #include "Engine/Core/Core.h"
+#include "ResourceState.h"
 
 namespace Engine
 {
-	class ConstantBufferResource
+	class ConstantBufferResource : public GPUResource
 	{
 	public:
 		virtual ~ConstantBufferResource() = 0;
 
 		uint32 GetSize() { return m_Size; }
+
+		virtual bool SupportState(ResourceState state) override;
 
 	protected:
 		uint32 m_Size = 0;

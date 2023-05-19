@@ -2,6 +2,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Math/Math.h"
 #include "Engine/AssetManager/AssetManager.h"
+#include "ResourceState.h"
 
 namespace Engine
 {
@@ -30,7 +31,7 @@ namespace Engine
 	};
 	bool IsDepthStencil(TextureFormat format);
 
-	class Texture2DResource
+	class Texture2DResource : public GPUResource
 	{
 	public:
 		virtual ~Texture2DResource() = 0;
@@ -40,6 +41,10 @@ namespace Engine
 		TextureFormat GetFormat() { return m_Format; }
 
 		uint32 GetStride();
+
+	protected:
+
+		virtual bool SupportState(ResourceState state) override;
 
 	protected:
 		uint32 m_Width = 1;

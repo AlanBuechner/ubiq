@@ -1,9 +1,10 @@
 #pragma once
 #include "Engine/Core/Core.h"
+#include "ResourceState.h"
 
 namespace Engine
 {
-	class StructuredBufferResource
+	class StructuredBufferResource : public GPUResource
 	{
 	public:
 		virtual ~StructuredBufferResource() = 0;
@@ -11,10 +12,11 @@ namespace Engine
 		uint32 GetStride() { return m_Stride; }
 		uint32 GetCount() { return m_Count; }
 
+		virtual bool SupportState(ResourceState state) override;
+
 	protected:
 		uint32 m_Stride = 0;
 		uint32 m_Count = 0;
-
 	};
 
 	class StructuredBuffer

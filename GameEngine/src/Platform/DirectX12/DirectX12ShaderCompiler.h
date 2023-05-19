@@ -24,7 +24,7 @@ namespace Engine
 		ShaderBlobs Compile(const std::string& code, const fs::path& file, ShaderType type);
 		void GetShaderParameters(ShaderBlobs& blobs, ShaderSorce::SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type);
 		void GetInputLayout(ShaderBlobs& blobs, std::vector<ShaderInputElement>& inputElements);
-		void GetOutputLayout(ShaderBlobs& blobs, std::vector<FrameBufferTextureFormat>& outputElement);
+		void GetOutputLayout(ShaderBlobs& blobs, std::vector<TextureFormat>& outputElement);
 
 		wrl::ComPtr<ID3D12RootSignature> GenRootSignature(std::vector<ShaderParameter>& params);
 

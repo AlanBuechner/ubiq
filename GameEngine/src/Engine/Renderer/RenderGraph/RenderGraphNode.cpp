@@ -32,7 +32,7 @@ namespace Engine
 
 	void OutputNode::Invalidate()
 	{
-		m_Buffer->ResetClear(); RenderGraphNode::Invalidate();
+		RenderGraphNode::Invalidate();
 	}
 
 	// frame buffer node

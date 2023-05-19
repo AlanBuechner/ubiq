@@ -24,6 +24,9 @@ namespace Engine
 		void CreateSRVHandle();
 		void CreateUAVHandle();
 
+		void* GetGPUResourcePointer() override;
+		uint32 GetState(ResourceState state) override;
+
 	private:
 		wrl::ComPtr<ID3D12Resource> m_Buffer;
 		DirectX12DescriptorHandle m_SRVHandle;

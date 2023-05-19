@@ -8,6 +8,19 @@ namespace Engine
 
 	StructuredBufferResource::~StructuredBufferResource() {}
 
+	bool StructuredBufferResource::SupportState(ResourceState state)
+	{
+		switch (state)
+		{
+		case ResourceState::ShaderResource:
+		case ResourceState::UnorderedResource:
+			return true;
+		case ResourceState::Common:
+		case ResourceState::RenderTarget:
+			return false;
+		}
+	}
+
 	Ref<StructuredBuffer> StructuredBuffer::Create(uint32 stride, uint32 count)
 	{
 		switch (Renderer::GetAPI())

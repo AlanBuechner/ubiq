@@ -48,14 +48,14 @@ namespace Engine
 
 	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::GetPipelineState(Ref<FrameBuffer> target)
 	{
-		std::vector<FrameBufferTextureFormat> formates;
-		FrameBufferTextureFormat depthFormat = FrameBufferTextureFormat::None;
+		std::vector<TextureFormat> formates;
+		TextureFormat depthFormat = TextureFormat::None;
 		for (auto& attachment : target->GetSpecification().Attachments.Attachments)
 		{
-			if (!attachment.IsDepthStencil())
-				formates.push_back(attachment.TextureFormat);
+			if (!IsDepthStencil(attachment.textureFormat))
+				formates.push_back(attachment.textureFormat);
 			else
-				depthFormat = attachment.TextureFormat;
+				depthFormat = attachment.textureFormat;
 		}
 		formates.push_back(depthFormat);
 
@@ -110,7 +110,7 @@ namespace Engine
 		}
 	}
 
-	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::CreatePiplineState(const std::vector<FrameBufferTextureFormat>& formats)
+	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::CreatePiplineState(const std::vector<TextureFormat>& formats)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -173,16 +173,16 @@ namespace Engine
 
 			switch (formats[i])
 			{
-			case FrameBufferTextureFormat::RGBA8:
-			case FrameBufferTextureFormat::RGBA16:
-			case FrameBufferTextureFormat::RGBA32:
+			case TextureFormat::RGBA8:
+			case TextureFormat::RGBA16:
+			case TextureFormat::RGBA32:
 			{
 				desc.BlendState.RenderTarget[i].BlendEnable = TRUE;
 				desc.BlendState.RenderTarget[i].LogicOpEnable = FALSE;
 				desc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 				if(m_PassConfig.blendMode == ShaderConfig::RenderPass::Blend)
 					desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-				else if(m_PassConfig.blendMode = ShaderConfig::RenderPass::Add)
+				else if(m_PassConfig.blendMode == ShaderConfig::RenderPass::Add)
 					desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_SRC_ALPHA;
 				desc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
 				desc.BlendState.RenderTarget[i].SrcBlendAlpha = D3D12_BLEND_ONE;
@@ -192,7 +192,7 @@ namespace Engine
 				desc.BlendState.RenderTarget[i].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 				break;
 			}
-			case FrameBufferTextureFormat::RED_INTEGER:
+			case TextureFormat::RED_INTEGER:
 			{
 				desc.BlendState.RenderTarget[i].BlendEnable = FALSE;
 				desc.BlendState.RenderTarget[i].LogicOpEnable = FALSE;
@@ -211,7 +211,7 @@ namespace Engine
 			}
 		}
 
-		if (formats.back() != FrameBufferTextureFormat::None)
+		if (formats.back() != TextureFormat::None)
 		{
 			desc.DepthStencilState.DepthEnable = TRUE;
 			desc.DSVFormat = UbiqToDXGI(formats.back());
