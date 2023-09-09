@@ -112,7 +112,7 @@ namespace Engine
 		if (m_CurrentDirectory != s_AssetsDirectory)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-			ImGui::ImageButton((ImTextureID)EditorAssets::s_BackIcon->GetSRVHandle(), imageSize);
+			ImGui::ImageButton((ImTextureID)EditorAssets::s_BackIcon->GetSRVDescriptor()->GetGPUHandlePointer(), imageSize);
 			ImGui::PopStyleColor();
 			FileDropTarget(m_CurrentDirectory.parent_path());
 			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
@@ -134,7 +134,7 @@ namespace Engine
 			ImGui::PushID(itemID);
 			Ref<Texture2D> icon = GetFileIcon(p);
 			if (icon)
-				ImGui::ImageButton((ImTextureID)icon->GetSRVHandle(), imageSize);
+				ImGui::ImageButton((ImTextureID)icon->GetSRVDescriptor()->GetGPUHandlePointer(), imageSize);
 			ImGui::PopStyleColor();
 
 			if (path == m_SelectedAsset)
@@ -249,7 +249,7 @@ namespace Engine
 		ImGui::SetNextItemOpen(m_OpenFolders[path]);
 		if (!p.is_directory())
 		{
-			ImGui::Image((ImTextureID)GetFileIcon(p)->GetSRVHandle(), { 20,20 });
+			ImGui::Image((ImTextureID)GetFileIcon(p)->GetSRVDescriptor()->GetGPUHandlePointer(), { 20,20 });
 			ImGui::SameLine();
 		}
 		ImGuiTreeNodeFlags flags = (path == m_CurrentDirectory ? ImGuiTreeNodeFlags_Selected : 0) |
@@ -311,7 +311,7 @@ namespace Engine
 		{
 			const wchar_t* itempath = path.c_str();
 			ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itempath, (wcslen(itempath) + 1) * sizeof(wchar_t));
-			ImGui::Image((ImTextureID)GetFileIcon(fs::directory_entry(path))->GetSRVHandle(), { 50,50 });
+			ImGui::Image((ImTextureID)GetFileIcon(fs::directory_entry(path))->GetSRVDescriptor()->GetGPUHandlePointer(), { 50,50 });
 			ImGui::Text(path.filename().string().c_str());
 			ImGui::EndDragDropSource();
 		}

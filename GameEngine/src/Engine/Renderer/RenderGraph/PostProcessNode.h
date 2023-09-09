@@ -9,9 +9,9 @@ namespace Engine
 	public:
 		PostProcessNode(RenderGraph& graph);
 
-		void SetRenderTarget(Ref<FrameBuffer> fb);
+		void SetRenderTarget(Ref<RenderTarget2D> fb);
 		void SetInput(const PostProcessInput& input) { m_Input = input; }
-		void SetSrc(uint64 descriptorLocation) { m_SrcDescriptorLocation = descriptorLocation; }
+		void SetSrc(Ref<Texture2D> src) { m_Src = src; }
 		void AddPostProcess(Ref<PostProcess> post) { m_PostProcessStack.push_back(post); }
 
 		void InitPostProcessStack();
@@ -22,9 +22,9 @@ namespace Engine
 		virtual void BuildImpl() override;
 
 	private:
-		Ref<FrameBuffer> m_RenderTarget;
-		Ref<FrameBuffer> m_BackBuffer;
-		uint64 m_SrcDescriptorLocation;
+		Ref<RenderTarget2D> m_RenderTarget;
+		Ref<RenderTarget2D> m_BackBuffer;
+		Ref<Texture2D> m_Src;
 
 		std::vector<Ref<PostProcess>> m_PostProcessStack;
 

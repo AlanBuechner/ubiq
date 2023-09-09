@@ -41,23 +41,32 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS); // create event for command queue completion
 		m_Fence->Signal(0);
+
 		for (uint32 d = 0; d < m_Commands.size(); d++)
 		{
 			if(m_Commands[d].empty())
 				continue;
 
-			std::vector<ID3D12CommandList*> cmdList(m_Commands[d].size());
+			std::vector<Ref<DirectX12CommandList>> dxCmdLists;
+			dxCmdLists.reserve(m_Commands[d].size());
+			std::vector<ID3D12CommandList*> cmdLists;
+			cmdLists.reserve(dxCmdLists.size()*2);
 			for (uint32 i = 0; i < m_Commands[d].size(); i++)
-				cmdList[i] = std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[d][i])->GetCommandList().Get();
+			{
+				Ref<DirectX12CommandList> dxCmdList = std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[d][i]);
+				dxCmdLists.push_back(dxCmdList);
 
-			//m_Fence->SetEventOnCompletion(d, eventHandle); // call event when fence val has been reached
-			//WaitForSingleObject(eventHandle, INFINITE); // wait for event to be triggered
+				if (dxCmdList->RecordPrependCommands())
+					cmdLists.push_back(dxCmdList->GetPrependCommandList().Get());
+				dxCmdList->InternalClose();
+				cmdLists.push_back(dxCmdList->GetCommandList().Get());
+			}
 
-			m_CommandQueue->ExecuteCommandLists((uint32)cmdList.size(), cmdList.data());
+			m_CommandQueue->ExecuteCommandLists((uint32)cmdLists.size(), cmdLists.data());
 			m_CommandQueue->Signal(m_Fence.Get(), d+1); // signal fence when execution has finished
 
-			for (uint32 i = 0; i < m_Commands[d].size(); i++)
-				m_Commands[d][i]->SignalRecording();
+			for (uint32 i = 0; i < dxCmdLists.size(); i++)
+				dxCmdLists[i]->SignalRecording();
 		}
 
 		m_Fence->SetEventOnCompletion(m_Commands.size(), eventHandle); // call event when fence val has been reached
@@ -72,15 +81,26 @@ namespace Engine
 		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS); // create event for command queue completion
 		m_Fence->Signal(0);
 
-		std::vector<ID3D12CommandList*> cmdList(commandLists.size());
+		std::vector<Ref<DirectX12CommandList>> dxCmdLists;
+		dxCmdLists.reserve(commandLists.size());
+		std::vector<ID3D12CommandList*> cmdLists;
+		cmdLists.reserve(dxCmdLists.size() * 2);
 		for (uint32 i = 0; i < commandLists.size(); i++)
-			cmdList[i] = std::dynamic_pointer_cast<DirectX12CommandList>(commandLists[i])->GetCommandList().Get();
+		{
+			Ref<DirectX12CommandList> dxCmdList = std::dynamic_pointer_cast<DirectX12CommandList>(commandLists[i]);
+			dxCmdLists.push_back(dxCmdList);
 
-		m_CommandQueue->ExecuteCommandLists((uint32)cmdList.size(), cmdList.data());
-		m_CommandQueue->Signal(m_Fence.Get(), 1);
+			if (dxCmdList->RecordPrependCommands())
+				cmdLists.push_back(dxCmdList->GetPrependCommandList().Get());
+			dxCmdList->InternalClose();
+			cmdLists.push_back(dxCmdList->GetCommandList().Get());
+		}
+
+		m_CommandQueue->ExecuteCommandLists((uint32)cmdLists.size(), cmdLists.data());
+		m_CommandQueue->Signal(m_Fence.Get(), 1); // signal fence when execution has finished
 
 		for (uint32 i = 0; i < commandLists.size(); i++)
-			commandLists[i]->SignalRecording();
+			dxCmdLists[i]->SignalRecording();
 
 		m_Fence->SetEventOnCompletion(1, eventHandle); // call event when fence val has been reached
 		WaitForSingleObject(eventHandle, INFINITE); // wait for event to be triggered

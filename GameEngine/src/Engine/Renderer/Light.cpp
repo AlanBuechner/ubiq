@@ -70,22 +70,18 @@ namespace Engine
 		for (uint32 i = 0; i < s_NumShadowMaps; i++)
 		{
 			m_Cameras[i] = CreateRef<Camera>();
-
-			FrameBufferSpecification fbSpec;
-			fbSpec.Attachments = { 
-				{ TextureFormat::RG16, {FLT_MAX,0,0,0} },
-				{ TextureFormat::Depth, { 1,0,0,0 } },
-			};
-			fbSpec.Width = 4000 - (i*500);
-			fbSpec.Height = 4000 - (i*500);
-			fbSpec.InitalState = ResourceState::ShaderResource;
-			m_ShadowMaps[i] = FrameBuffer::Create(fbSpec);
+			uint32 width = 4000 - (i*500);
+			uint32 height = 4000 - (i*500);
+			m_ShadowMaps[i] = FrameBuffer::Create({
+				RenderTarget2D::Create(width, height, 1, TextureFormat::RG16),
+				RenderTarget2D::Create(width, height, 1, TextureFormat::Depth),
+			});
 
 			cascadeData.push_back(
 				CascadeData{
-					m_Cameras[i]->GetCameraBuffer()->GetDescriptorLocation(),
-					m_ShadowMaps[i]->GetAttachmentShaderDescriptoLocation(1),
-					fbSpec.Width, fbSpec.Height,
+					m_Cameras[i]->GetCameraBuffer()->GetCBVDescriptor()->GetIndex(),
+					m_ShadowMaps[i]->GetAttachment(1)->GetSRVDescriptor()->GetIndex(),
+					width, height,
 					nearPlan, nearPlan + size
 				}
 			);

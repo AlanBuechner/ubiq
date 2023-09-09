@@ -109,6 +109,9 @@ namespace Engine
 		Renderer2D::Destroy();
 		LineRenderer::Destroy();
 
+		s_MainCommandList = nullptr;
+		s_MainCommandQueue = nullptr;
+
 		s_Context.reset(); // destroy context before atexit
 	}
 
@@ -154,7 +157,9 @@ namespace Engine
 		Instrumentor::Get().RegisterThread("Render", 1);
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		Ref<ResourceManager> resourceManager = s_Context->GetResourceManager();
-		Ref<ResourceDeletionPool> deletionPool = resourceManager->CreateNewDeletionPool();
+		ResourceDeletionPool* deletionPool = resourceManager->CreateNewDeletionPool();
+		GPUProfiler::TriggerGPUCapture();
+		static int frame = 0;
 		while (Application::Get().IsRunning())
 		{
 			// copy commands
@@ -168,7 +173,19 @@ namespace Engine
 			// rendering commands
 			s_RenderFlag.Wait();
 			timer.Start("Render");
+			CORE_INFO("Executing command lists");
+#if defined(RELEASE)
+			try 
+			{
+				s_MainCommandQueue->Execute();
+			}
+			catch (...)
+			{
+				CORE_ERROR("Failed To Render the Scene");
+			}
+#else
 			s_MainCommandQueue->Execute();
+#endif
 			s_MainCommandQueue->ExecuteImmediate({s_MainCommandList});
 			s_RenderFlag.Clear();
 			GPUProfiler::EndFrame();
@@ -178,9 +195,13 @@ namespace Engine
 			WindowManager::UpdateWindows();
 
 			// prepare for next frame
+			CORE_INFO("Cleaning up reousrces");
 			deletionPool->Clear();
 			deletionPool = resourceManager->CreateNewDeletionPool();
 			s_SwapFlag.Signal();
+
+			frame++;
+			CORE_INFO("{0}", frame);
 		}
 	}
 

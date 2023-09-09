@@ -59,7 +59,7 @@ namespace Engine
 					if (p.type == MaterialParameter::TextureID)
 					{
 						mat->m_ReferensedTextures.push_back(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
-						uint32 descLoc = mat->m_ReferensedTextures.back()->GetDescriptorLocation();
+						uint32 descLoc = mat->m_ReferensedTextures.back()->GetSRVDescriptor()->GetIndex();
 						*(uint32*)location = descLoc; // set asset value
 					}
 					else if (p.type == MaterialParameter::Float)
@@ -72,13 +72,13 @@ namespace Engine
 					if (p.type == MaterialParameter::TextureID)
 					{
 						if (p.defaultValue == "white")
-							*(uint32*)location = Renderer::GetWhiteTexture()->GetDescriptorLocation();
+							*(uint32*)location = Renderer::GetWhiteTexture()->GetSRVDescriptor()->GetIndex();
 						else if (p.defaultValue == "black")
-							*(uint32*)location = Renderer::GetBlackTexture()->GetDescriptorLocation();
+							*(uint32*)location = Renderer::GetBlackTexture()->GetSRVDescriptor()->GetIndex();
 						else if (p.defaultValue == "normal")
-							*(uint32*)location = Renderer::GetNormalTexture()->GetDescriptorLocation();
+							*(uint32*)location = Renderer::GetNormalTexture()->GetSRVDescriptor()->GetIndex();
 						else
-							*(uint32*)location = Renderer::GetWhiteTexture()->GetDescriptorLocation();
+							*(uint32*)location = Renderer::GetWhiteTexture()->GetSRVDescriptor()->GetIndex();
 					}
 					else if (p.type == MaterialParameter::Float)
 					{

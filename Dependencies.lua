@@ -24,10 +24,11 @@ IncludeDir["Assimp"] = "%{wks.location}/GameEngine/vendor/Assimp"
 IncludeDir["json"] = "%{wks.location}/GameEngine/vendor/json"
 IncludeDir["dxc"] = "%{wks.location}/GameEngine/vendor/dxc"
 IncludeDir["pix"] = "%{wks.location}/GameEngine/vendor/pix"
-
+IncludeDir["Aftermath"] = "%{wks.location}/GameEngine/vendor/Aftermath"
 
 -- sdks
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
+
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_SDK}/Lib"

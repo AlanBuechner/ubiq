@@ -33,11 +33,13 @@ namespace Engine
 		m_ScreenMesh = meshBuilder.mesh;
 	}
 
-	void PostProcessNode::SetRenderTarget(Ref<FrameBuffer> fb)
+	void PostProcessNode::SetRenderTarget(Ref<RenderTarget2D> fb)
 	{
 		m_RenderTarget = fb;
-		FrameBufferSpecification spec = m_RenderTarget->GetSpecification();
-		m_BackBuffer = FrameBuffer::Create(spec);
+		uint32 width = fb->GetResource()->GetWidth();
+		uint32 height = fb->GetResource()->GetHeight();
+		TextureFormat format = fb->GetResource()->GetFormat();
+		m_BackBuffer = RenderTarget2D::Create(width, height, 1, format);
 	}
 
 	void PostProcessNode::InitPostProcessStack()
@@ -59,35 +61,30 @@ namespace Engine
 
 	void PostProcessNode::BuildImpl()
 	{
-		Ref<FrameBuffer> curr = m_PostProcessStack.size() % 2 == 0 ? m_BackBuffer : m_RenderTarget;
+		Ref<RenderTarget2D> curr = m_PostProcessStack.size() % 2 == 0 ? m_BackBuffer : m_RenderTarget;
 
 		GPUTimer::BeginEvent(m_CommandList, "Post Processing");
 
-		m_CommandList->Transition({
-			{curr, ResourceState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
+		m_CommandList->ValidateStates({
+			{curr->GetResource(), ResourceState::RenderTarget },
 		});
 
 		for (uint32 i = 0; i < m_PostProcessStack.size(); i++)
 		{
 			Ref<PostProcess> post = m_PostProcessStack[i];
-			Ref<FrameBuffer> lastPass = (curr == m_BackBuffer) ? m_RenderTarget : m_BackBuffer;
-			uint64 srcLoc = lastPass->GetAttachmentShaderDescriptoLocation(0);
-			if (i == 0) srcLoc = m_SrcDescriptorLocation;
+			Ref<RenderTarget2D> lastPass = (curr == m_BackBuffer) ? m_RenderTarget : m_BackBuffer;
+			Ref<Texture2D> src = lastPass;
+			if (i == 0) src = m_Src;
 
-			post->RecordCommands(m_CommandList, curr, srcLoc, m_Input, m_ScreenMesh);
-
-			std::vector<CommandList::FBTransitionObject> transitions;
-			transitions.reserve(2);
+			post->RecordCommands(m_CommandList, curr, src, m_Input, m_ScreenMesh);
 
 			if (i + 1 < m_PostProcessStack.size())
 			{
-				m_CommandList->Transition({
-					{ lastPass, ResourceState::RenderTarget, m_RenderTarget->GetSpecification().InitalState },
-					{ curr, m_RenderTarget->GetSpecification().InitalState, ResourceState::RenderTarget },
+				m_CommandList->ValidateStates({
+					{ lastPass->GetResource(), ResourceState::RenderTarget },
+					{ curr->GetResource(), m_RenderTarget->GetResource()->GetDefultState() },
 				});
 			}
-
-
 
 			curr = (curr == m_BackBuffer) ? m_RenderTarget : m_BackBuffer; // swap buffers
 		}

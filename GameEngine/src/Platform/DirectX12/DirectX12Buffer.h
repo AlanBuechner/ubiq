@@ -4,52 +4,71 @@
 
 namespace Engine
 {
-	class ENGINE_API DirectX12VertexBuffer : public VertexBuffer
+	// VertexBuffer -------------------------------------------------------------------------------------
+
+	class DirectX12VertexBufferResource : public VertexBufferResource
 	{
 	public:
-		DirectX12VertexBuffer(uint32 count, uint32 stride);
-		DirectX12VertexBuffer(const void* vertices, uint32 count, uint32 stride);
-		virtual ~DirectX12VertexBuffer();
+		DirectX12VertexBufferResource(uint32 count, uint32 stride);
+		virtual ~DirectX12VertexBufferResource();
 
-		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; };
-		virtual BufferLayout& GetLayout() override { return m_Layout; };
+		ID3D12Resource* GetBuffer() { return m_Buffer; }
 
-		virtual void SetData(const void* data, uint32 count) override;
+		virtual void SetData(const void* data) override;
 
-		D3D12_VERTEX_BUFFER_VIEW GetView() { return m_View; }
-
-	private:
-		void CreateBuffer(uint32 count);
+	protected:
+		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
+		virtual uint32 GetState(ResourceState state) override;
 
 	private:
-		wrl::ComPtr<ID3D12Resource> m_Buffer;
-		D3D12_VERTEX_BUFFER_VIEW m_View;
-
-		BufferLayout m_Layout;
-		uint32 m_Count = 0;
-		uint32 m_Stride = 0;
+		ID3D12Resource* m_Buffer;
 	};
 
-	class ENGINE_API DirectX12IndexBuffer : public IndexBuffer
+
+	class DirectX12VertexBufferView : public VertexBufferView
 	{
 	public:
-		DirectX12IndexBuffer(uint32 count);
-		DirectX12IndexBuffer(const uint32* indices, uint32 count);
-		virtual ~DirectX12IndexBuffer();
+		virtual ~DirectX12VertexBufferView() override = default;
 
-		virtual uint32 GetCount() override { return m_Count; }
+		virtual void ReBind(VertexBufferResource* resource) override;
 
-		virtual void SetData(const uint32* data, uint32 count) override;
-
-		const D3D12_INDEX_BUFFER_VIEW& GetView() { return m_View; }
+		D3D12_VERTEX_BUFFER_VIEW& GetView() { return m_View; }
 
 	private:
-		void CreateBuffer(uint32 count);
+		D3D12_VERTEX_BUFFER_VIEW m_View;
+	};
+
+	// IndexBuffer -------------------------------------------------------------------------------------
+
+	class DirectX12IndexBufferResource : public IndexBufferResource
+	{
+	public:
+		DirectX12IndexBufferResource(uint32 count);
+		virtual ~DirectX12IndexBufferResource();
+
+		ID3D12Resource* GetBuffer() { return m_Buffer; }
+
+		virtual void SetData(const void* data) override;
+
+	protected:
+		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
+		virtual uint32 GetState(ResourceState state) override;
 
 	private:
-		wrl::ComPtr<ID3D12Resource> m_Buffer;
+		ID3D12Resource* m_Buffer;
+	};
+
+
+	class DirectX12IndexBufferView : public IndexBufferView
+	{
+	public:
+		virtual ~DirectX12IndexBufferView() override = default;
+
+		virtual void ReBind(IndexBufferResource* resource) override;
+
+		D3D12_INDEX_BUFFER_VIEW& GetView() { return m_View; }
+
+	private:
 		D3D12_INDEX_BUFFER_VIEW m_View;
-
-		uint32 m_Count = 0;
 	};
 }

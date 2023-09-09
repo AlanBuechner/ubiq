@@ -13,16 +13,15 @@ void Sandbox2DLayer::OnAttach()
 	m_LogoTexture = Engine::Texture2D::Create("Assets/Images/wood.png");
 	m_Texture = Engine::SubTexture2D::Create(m_LogoTexture, { 2,2 }, { 0,0 }, { 1,2 });
 
-	Engine::FrameBufferSpecification specs;
+	/*Engine::FrameBufferSpecification specs;
 	specs.Attachments = {
 		{ Engine::TextureFormat::RGBA8, {1,0,0,1} },
-		{ Engine::TextureFormat::RED_INTEGER, (Math::Vector4)-1 },
 		{ Engine::TextureFormat::Depth, { 1,0,0,0 } }
 	};
 	Engine::Window& window = Engine::Application::Get().GetWindow();
 	specs.Width = window.GetWidth();
 	specs.Height = window.GetHeight();
-	m_Frame = Engine::FrameBuffer::Create(specs);
+	m_Frame = Engine::FrameBuffer::Create(specs);*/
 
 	m_Camera = Engine::Camera(Math::Perspective(Math::Radians(45), 16.0f/9.0f, 0.001f, 100));
 	m_CameraTransform = Math::Translate({ 0,0,2.5 });
@@ -38,13 +37,13 @@ void Sandbox2DLayer::OnUpdate()
 {
 	CREATE_PROFILE_FUNCTIONI();
 
-	Engine::FrameBufferSpecification spec = m_Frame->GetSpecification();
+	/*Engine::FrameBufferSpecification spec = m_Frame->GetSpecification();
 	if (m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
 		(spec.Width != m_ViewPortSize.x || spec.Height != m_ViewPortSize.y))
 	{
 		m_Frame->Resize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_Camera = Engine::Camera(Math::Perspective(Math::Radians(45), m_ViewPortSize.x/m_ViewPortSize.y, 0.001f, 1000));
-	}
+	}*/
 
 }
 
@@ -61,7 +60,7 @@ void Sandbox2DLayer::OnRender()
 
 	//Engine::Renderer::Build();
 
-	commandList->Present(Engine::ResourceState::RenderTarget);
+	//commandList->Present(Engine::ResourceState::RenderTarget);
 
 	timer.End();
 }
@@ -133,7 +132,7 @@ void Sandbox2DLayer::OnImGuiRender()
 	ImVec2 viewPortPanalSize = ImGui::GetContentRegionAvail();
 	if (m_ViewPortSize != *(Math::Vector2*)&viewPortPanalSize)
 		m_ViewPortSize = { viewPortPanalSize.x, viewPortPanalSize.y };
-	ImGui::Image((ImTextureID)m_Frame->GetAttachmentShaderHandle(0), viewPortPanalSize);
+	//ImGui::Image((ImTextureID)m_Frame->GetAttachmentShaderHandle(0), viewPortPanalSize);
 	ImGui::End();
 
 	static bool show = true;

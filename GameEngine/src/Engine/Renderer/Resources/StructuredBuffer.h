@@ -1,9 +1,12 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "ResourceState.h"
+#include "Descriptor.h"
 
 namespace Engine
 {
+	// Structured Buffer Resource ---------------------------------------------------------- //
+
 	class StructuredBufferResource : public GPUResource
 	{
 	public:
@@ -14,36 +17,71 @@ namespace Engine
 
 		virtual bool SupportState(ResourceState state) override;
 
+		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) = 0;
+
+		static StructuredBufferResource* Create(uint32 stride, uint32 count);
+
 	protected:
 		uint32 m_Stride = 0;
 		uint32 m_Count = 0;
 	};
 
+	// Descriptor Handles ---------------------------------------------------------- //
+
+	class StructuredBufferSRVDescriptorHandle : public Descriptor
+	{
+	public:
+		virtual uint64 GetGPUHandlePointer() const = 0;
+		virtual uint32 GetIndex() const = 0;
+		virtual void ReBind(StructuredBufferResource* resource) = 0;
+
+		static StructuredBufferSRVDescriptorHandle* Create(StructuredBufferResource* resource);
+	};
+
+	class StructuredBufferUAVDescriptorHandle : public Descriptor
+	{
+	public:
+		virtual uint64 GetGPUHandlePointer() const = 0;
+		virtual uint32 GetIndex() const = 0;
+		virtual void ReBind(StructuredBufferResource* resource) = 0;
+
+		static StructuredBufferUAVDescriptorHandle* Create(StructuredBufferResource* resource);
+	};
+
+
+	// Structured Buffer Objects ---------------------------------------------------------- //
+
 	class StructuredBuffer
 	{
 	public:
-		virtual void Resize(uint32 count) = 0;
-		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) = 0;
+		StructuredBuffer(uint32 stride, uint32 count);
+		virtual ~StructuredBuffer();
+		StructuredBufferResource* GetResource() { return m_Resource; }
+		StructuredBufferSRVDescriptorHandle* GetSRVDescriptor() { return m_SRVDescriptor; }
 
-		virtual uint32 GetDescriptorLocation() const = 0;
-
-		virtual Ref<StructuredBufferResource> GetResource() = 0;
+		virtual void Resize(uint32 count);
+		void SetData(void* data, uint32 count = 1, uint32 start = 0) { m_Resource->SetData(data, count, start); }
 
 		static Ref<StructuredBuffer> Create(uint32 stride, uint32 count);
-		static Ref<StructuredBuffer> Create(Ref<StructuredBufferResource> resource);
+
+	protected:
+		StructuredBufferResource* m_Resource;
+		StructuredBufferSRVDescriptorHandle* m_SRVDescriptor;
 	};
 
-	class RWStructuredBuffer
+	class RWStructuredBuffer : public StructuredBuffer
 	{
 	public:
-		virtual void Resize(uint32 count) = 0;
-		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) = 0;
+		RWStructuredBuffer(uint32 stride, uint32 count);
+		virtual ~RWStructuredBuffer();
 
-		virtual uint32 GetDescriptorLocation() const = 0;
+		StructuredBufferUAVDescriptorHandle* GetUAVDescriptor() { return m_UAVDescriptor; }
 
-		virtual Ref<StructuredBufferResource> GetResource() = 0;
+		virtual void Resize(uint32 count) override;
 
 		static Ref<RWStructuredBuffer> Create(uint32 stride, uint32 count);
-		static Ref<RWStructuredBuffer> Create(Ref<StructuredBufferResource> resource);
+
+	protected:
+		StructuredBufferUAVDescriptorHandle* m_UAVDescriptor;
 	};
 }

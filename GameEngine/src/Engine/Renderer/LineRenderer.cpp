@@ -45,7 +45,7 @@ namespace Engine
 
 		s_LineData.Instances = InstanceBuffer::Create(sizeof(Math::Mat4), 1);
 		Math::Mat4 transform = Math::Mat4(1);
-		s_LineData.Instances->SetData(0, 1, &transform);
+		s_LineData.Instances->Get<Math::Mat4>(0) = transform;
 		s_LineData.Instances->Apply();
 
 		s_LineData.Camera = ConstantBuffer::Create(sizeof(Math::Mat4));

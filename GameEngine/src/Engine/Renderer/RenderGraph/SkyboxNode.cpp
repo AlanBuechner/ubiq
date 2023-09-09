@@ -51,7 +51,7 @@ namespace Engine
 		{
 			Ref<ShaderPass> pass = m_SkyboxShader->GetPass("main");
 			m_CommandList->SetShader(pass);
-			m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), scene.m_MainCamera->GetCameraBuffer()->GetDescriptorLocation());
+			m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), scene.m_MainCamera->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
 			m_CommandList->SetTexture(pass->GetUniformLocation("texture"), scene.m_Skybox);
 			m_CommandList->DrawMesh(m_SkyboxMesh);
 		}

@@ -1,78 +1,114 @@
 #pragma once
 #include "Engine/Core/Core.h"
+#include "ResourceState.h"
+#include "Descriptor.h"
 
 namespace Engine
 {
-	enum class ShaderDataType
-	{
-		None = 0, 
-		Float, Float2, Float3, Float4, 
-		Mat3, Mat4,
-		Int, Int2, Int3, Int4,
-		Bool
-	};
+	// VertexBuffer -------------------------------------------------------------------------------------
 
-	[[maybe_unused]]static uint32 ShaderDataTypeSize(ShaderDataType type);
-
-	struct BufferElement
-	{
-		std::string Name;
-		ShaderDataType Type;
-		uint32 Size;
-		uint32 Offset;
-		bool Normalized;
-
-		BufferElement(){}
-		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false);
-
-		uint32 GetComponentCount();
-	};
-
-	class BufferLayout
+	class VertexBufferResource : public GPUResource
 	{
 	public:
-		BufferLayout(){}
-		BufferLayout(const std::vector<BufferElement>& elements);
-		BufferLayout(const std::initializer_list<BufferElement>& elements);
+		virtual ~VertexBufferResource() = 0;
 
-		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
-		inline const uint32 GetStride() const { return m_Stride; }
+		uint32 GetCount() { return m_Count; }
+		uint32 GetStride() { return m_Stride; }
 
-		std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
-		std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
-		std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
-		std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
-	private:
-		void CalculateOffsetsAndStride();
-	private:
-		std::vector<BufferElement> m_Elements;
-		uint32 m_Stride = 0;
+		virtual void SetData(const void* data) = 0;
+
+		static VertexBufferResource* Create(uint32 count, uint32 stride);
+
+	protected:
+		bool SupportState(ResourceState state) override;
+
+	protected:
+		uint32 m_Count;
+		uint32 m_Stride;
+
+	};
+
+	// vertex buffers don't use descriptors they use views but architecturally they are similar
+	class VertexBufferView : public Descriptor
+	{
+	public:
+		virtual void ReBind(VertexBufferResource* resource) = 0;
+
+		static VertexBufferView* Create(VertexBufferResource* resource);
 	};
 
 	class VertexBuffer
 	{
 	public:
-		virtual ~VertexBuffer() {}
+		VertexBuffer(uint32 count, uint32 stride);
+		~VertexBuffer();
 
-		virtual void SetLayout(const BufferLayout& layout) = 0;
-		virtual BufferLayout& GetLayout() = 0;
+		VertexBufferResource* GetResource() { return m_Resource; }
+		VertexBufferView* GetView() { return m_View; }
 
-		virtual void SetData(const void* data, uint32 size) = 0;
+		void Resize(uint32 count);
+
+		void SetData(const void* data) { m_Resource->SetData(data); }
 
 		static Ref<VertexBuffer> Create(uint32 count, uint32 stride);
 		static Ref<VertexBuffer> Create(const void* vertices, uint32 count, uint32 stride);
+
+	protected:
+		VertexBufferResource* m_Resource;
+		VertexBufferView* m_View;
+	};
+
+
+
+
+	// IndexBuffer ---------------------------------------------------------------------------------------
+
+	class IndexBufferResource : public GPUResource
+	{
+	public:
+		virtual ~IndexBufferResource() = 0;
+
+		uint32 GetCount() { return m_Count; }
+
+		virtual void SetData(const void* data) = 0;
+
+		static IndexBufferResource* Create(uint32 count);
+
+	protected:
+		bool SupportState(ResourceState state) override;
+
+	protected:
+		uint32 m_Count;
+
+	};
+
+	// index buffers don't use descriptors they use views but architecturally they are similar
+	class IndexBufferView : public Descriptor
+	{
+	public:
+		virtual void ReBind(IndexBufferResource* resource) = 0;
+
+		static IndexBufferView* Create(IndexBufferResource* resource);
 	};
 
 	class IndexBuffer
 	{
 	public:
-		virtual ~IndexBuffer() {}
+		IndexBuffer(uint32 count);
+		~IndexBuffer();
 
-		virtual uint32 GetCount() = 0;
+		IndexBufferResource* GetResource() { return m_Resource; }
+		IndexBufferView* GetView() { return m_View; }
 
-		virtual void SetData(const uint32* data, uint32 count) = 0;
+		void Resize(uint32 count);
+
+		void SetData(const void* data) { m_Resource->SetData(data); }
 
 		static Ref<IndexBuffer> Create(uint32 count);
-		static Ref<IndexBuffer> Create(const uint32* indices, uint32 count);
+		static Ref<IndexBuffer> Create(const void* indices, uint32 count);
+
+	protected:
+		IndexBufferResource* m_Resource;
+		IndexBufferView* m_View;
 	};
 }

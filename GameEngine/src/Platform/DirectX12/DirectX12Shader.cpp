@@ -50,12 +50,13 @@ namespace Engine
 	{
 		std::vector<TextureFormat> formates;
 		TextureFormat depthFormat = TextureFormat::None;
-		for (auto& attachment : target->GetSpecification().Attachments.Attachments)
+		for (Ref<RenderTarget2D> rt : target->GetAttachments())
 		{
-			if (!IsDepthStencil(attachment.textureFormat))
-				formates.push_back(attachment.textureFormat);
+			TextureFormat format = rt->GetResource()->GetFormat();
+			if (IsDepthStencil(format))
+				depthFormat = format;
 			else
-				depthFormat = attachment.textureFormat;
+				formates.push_back(format);
 		}
 		formates.push_back(depthFormat);
 
@@ -169,7 +170,7 @@ namespace Engine
 		desc.NumRenderTargets = (uint32)formats.size();
 		for (uint32 i = 0; i < formats.size(); i++)
 		{
-			desc.RTVFormats[i] = UbiqToDXGI(formats[i]);
+			desc.RTVFormats[i] = GetDXGITextureFormat(formats[i]);
 
 			switch (formats[i])
 			{
@@ -214,7 +215,7 @@ namespace Engine
 		if (formats.back() != TextureFormat::None)
 		{
 			desc.DepthStencilState.DepthEnable = TRUE;
-			desc.DSVFormat = UbiqToDXGI(formats.back());
+			desc.DSVFormat = GetDXGITextureFormat(formats.back());
 			desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 			if(m_PassConfig.depthTest == ShaderConfig::RenderPass::Less)
 				desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;

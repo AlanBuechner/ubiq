@@ -12,15 +12,15 @@ namespace Engine
 {
 	struct PostProcessInput
 	{
-		std::unordered_map<std::string, uint64> m_TextureHandles;
-		std::unordered_map<std::string, uint64> m_CBHandles;
+		std::unordered_map<std::string, Ref<Texture2D>> m_TextureHandles;
+		std::unordered_map<std::string, Ref<ConstantBuffer>> m_CBHandles;
 	};
 
 	class PostProcess
 	{
 	public:
 		virtual void Init(const PostProcessInput& input, SceneData& scene) = 0;
-		virtual void RecordCommands(Ref<CommandList> commandList, Ref<FrameBuffer> renderTarget, uint64 srcDescriptorLocation, const PostProcessInput& input, Ref<Mesh> screenMesh) = 0;
+		virtual void RecordCommands(Ref<CommandList> commandList, Ref<RenderTarget2D> renderTarget, Ref<Texture2D> src, const PostProcessInput& input, Ref<Mesh> screenMesh) = 0;
 
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
 

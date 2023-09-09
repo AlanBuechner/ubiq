@@ -24,6 +24,7 @@ namespace Engine
 		uint32 size = m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER ? D3D12_MAX_SHADER_VISIBLE_SAMPLER_HEAP_SIZE : D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_2;
 		m_Capacity = size;
 		m_FreeSlots.reserve(size);
+		m_UsedSlots.reserve(size);
 
 		D3D12_DESCRIPTOR_HEAP_DESC desc;
 		desc.Flags = m_IsShaderVisable ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
@@ -65,6 +66,7 @@ namespace Engine
 
 		// remove the slot from the list of free slots
 		m_FreeSlots.pop_back();
+		m_FreeSlots.push_back(slot);
 
 		return handle;
 	}
@@ -76,6 +78,13 @@ namespace Engine
 
 		m_FreeSlots.push_back(handle.m_Index); // add the slot to the list of free slots
 		handle = {}; // invalidate the handle
+	}
+
+	void DirectX12DescriptorHeap::Clear()
+	{
+		for (uint32 slot : m_UsedSlots)
+			m_FreeSlots.push_back(slot);
+		m_UsedSlots.clear();
 	}
 
 }

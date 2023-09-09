@@ -1,142 +1,162 @@
 #include "pch.h"
-#include "Engine/Core/Core.h"
 #include "Buffer.h"
+#include "Engine/Renderer/ResourceManager.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Platform/DirectX12/DirectX12Buffer.h"
 
 namespace Engine
 {
 
-	uint32 ShaderDataTypeSize(ShaderDataType type)
-	{
-		switch (type)
-		{
-		case Engine::ShaderDataType::Float:		return 4;
-		case Engine::ShaderDataType::Float2:	return 4 * 2;
-		case Engine::ShaderDataType::Float3:	return 4 * 3;
-		case Engine::ShaderDataType::Float4:	return 4 * 4;
-		case Engine::ShaderDataType::Mat3:		return 4 * 3 * 3;
-		case Engine::ShaderDataType::Mat4:		return 4 * 4 * 4;
-		case Engine::ShaderDataType::Int:		return 4;
-		case Engine::ShaderDataType::Int2:		return 4 * 2;
-		case Engine::ShaderDataType::Int3:		return 4 * 3;
-		case Engine::ShaderDataType::Int4:		return 4 * 4;
-		case Engine::ShaderDataType::Bool:		return 1;
-		default: break;
-		}
-		CORE_ASSERT(false, "Unknown ShaderDataType!");
-		return 0;
-	}
+	// VertexBuffer -------------------------------------------------------------------------------------
 
+	VertexBufferResource::~VertexBufferResource() {}
 
-	BufferElement::BufferElement(ShaderDataType type, const std::string& name, bool normalized /*= false*/) : 
-		Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
-	{}
-
-	uint32 BufferElement::GetComponentCount()
-	{
-		switch (Type)
-		{
-		case Engine::ShaderDataType::Float:		return 1;
-		case Engine::ShaderDataType::Float2:	return 2;
-		case Engine::ShaderDataType::Float3:	return 3;
-		case Engine::ShaderDataType::Float4:	return 4;
-		case Engine::ShaderDataType::Mat3:		return 3 * 3;
-		case Engine::ShaderDataType::Mat4:		return 4 * 4;
-		case Engine::ShaderDataType::Int:		return 1;
-		case Engine::ShaderDataType::Int2:		return 2;
-		case Engine::ShaderDataType::Int3:		return 3;
-		case Engine::ShaderDataType::Int4:		return 4;
-		case Engine::ShaderDataType::Bool:		return 1;
-		default: break;
-		}
-		CORE_ASSERT(false, "Unknown ShaderDataType!");
-		return 0;
-	}
-
-	BufferLayout::BufferLayout(const std::vector<BufferElement>& elements) :
-		m_Elements(elements)
-	{
-		CalculateOffsetsAndStride();
-	}
-
-	BufferLayout::BufferLayout(const std::initializer_list<BufferElement>& elements) :
-		m_Elements(elements)
-	{
-		CalculateOffsetsAndStride();
-	}
-
-	void BufferLayout::CalculateOffsetsAndStride()
-	{
-		uint32 offset = 0;
-		m_Stride = 0;
-		for (auto& element : m_Elements)
-		{
-			element.Offset = offset;
-			offset += element.Size;
-		}
-		m_Stride = offset;
-	}
-
-
-
-
-
-
-
-	Ref<VertexBuffer> VertexBuffer::Create(uint32 count, uint32 stride)
+	VertexBufferResource* VertexBufferResource::Create(uint32 count, uint32 stride)
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:
-			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
 		case RendererAPI::DirectX12:
-			return CreateRef<DirectX12VertexBuffer>(count, stride);
+			return new DirectX12VertexBufferResource(count, stride);
 		}
-		CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
+	}
+
+	bool VertexBufferResource::SupportState(ResourceState state)
+	{
+		switch (state)
+		{
+		case ResourceState::ShaderResource:
+			return true;
+		}
+		return false;
+	}
+
+
+
+
+	VertexBufferView* VertexBufferView::Create(VertexBufferResource* resource)
+	{
+		VertexBufferView* handle = nullptr;
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			handle = new DirectX12VertexBufferView();
+			break;
+		}
+
+		if (handle)
+			handle->ReBind(resource);
+		return handle;
+	}
+
+
+
+	VertexBuffer::VertexBuffer(uint32 count, uint32 stride)
+	{
+		m_Resource = VertexBufferResource::Create(count, stride);
+		m_View = VertexBufferView::Create(m_Resource);
+	}
+
+	VertexBuffer::~VertexBuffer()
+	{
+		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
+		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
+	}
+
+	void VertexBuffer::Resize(uint32 count)
+	{
+		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
+
+		m_Resource = VertexBufferResource::Create(count, m_Resource->GetStride());
+
+		m_View->ReBind(m_Resource);
+	}
+
+	Ref<VertexBuffer> VertexBuffer::Create(uint32 count, uint32 stride)
+	{
+		return CreateRef<VertexBuffer>(count, stride);
 	}
 
 	Ref<VertexBuffer> VertexBuffer::Create(const void* vertices, uint32 count, uint32 stride)
 	{
+		Ref<VertexBuffer> buffer = Create(count, stride);
+		buffer->SetData(vertices);
+		return buffer;
+	}
+
+
+	// IndexBuffer ---------------------------------------------------------------------------------------
+
+	IndexBufferResource::~IndexBufferResource() {}
+
+	IndexBufferResource* IndexBufferResource::Create(uint32 count)
+	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:
-			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
 		case RendererAPI::DirectX12:
-			return CreateRef<DirectX12VertexBuffer>(vertices, count, stride);
+			return new DirectX12IndexBufferResource(count);
 		}
-		CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
+	}
+
+	bool IndexBufferResource::SupportState(ResourceState state)
+	{
+		switch (state)
+		{
+		case ResourceState::ShaderResource:
+			return true;
+		}
+		return false;
+	}
+
+
+
+
+	IndexBufferView* IndexBufferView::Create(IndexBufferResource* resource)
+	{
+		IndexBufferView* handle = nullptr;
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			handle = new DirectX12IndexBufferView();
+			break;
+		}
+
+		if (handle)
+			handle->ReBind(resource);
+		return handle;
+	}
+
+
+
+	IndexBuffer::IndexBuffer(uint32 count)
+	{
+		m_Resource = IndexBufferResource::Create(count);
+		m_View = IndexBufferView::Create(m_Resource);
+	}
+
+	IndexBuffer::~IndexBuffer()
+	{
+		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
+		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
+	}
+
+	void IndexBuffer::Resize(uint32 count)
+	{
+		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
+
+		m_Resource = IndexBufferResource::Create(count);
+
+		m_View->ReBind(m_Resource);
 	}
 
 	Ref<IndexBuffer> IndexBuffer::Create(uint32 count)
 	{
-		switch (Renderer::GetAPI())
-		{
-		case RendererAPI::None:
-			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-		case RendererAPI::DirectX12:
-			return CreateRef<DirectX12IndexBuffer>(count);
-		}
-		CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
+		return CreateRef<IndexBuffer>(count);
 	}
 
-	Ref<IndexBuffer> IndexBuffer::Create(const uint32* indices, uint32 count)
+	Ref<IndexBuffer> IndexBuffer::Create(const void* vertices, uint32 count)
 	{
-		switch (Renderer::GetAPI())
-		{
-		case RendererAPI::None:
-			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-		case RendererAPI::DirectX12:
-			return CreateRef<DirectX12IndexBuffer>(indices, count);
-		}
-		CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
+		Ref<IndexBuffer> buffer = Create(count);
+		buffer->SetData(vertices);
+		return buffer;
 	}
 }

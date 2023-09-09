@@ -56,7 +56,7 @@ namespace Engine
 	class FrameBufferNode : public RenderGraphNode
 	{
 	public:
-		FrameBufferNode(RenderGraph& graph, const FrameBufferSpecification& fbSpec);
+		FrameBufferNode(RenderGraph& graph, const std::vector<Ref<RenderTarget2D>>& fbSpec);
 		
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 
@@ -67,13 +67,21 @@ namespace Engine
 	class TransitionNode : public RenderGraphNode
 	{
 	public:
+		struct TransitionObject
+		{
+			GPUResourceHandle handle;
+			ResourceState state;
+		};
+
+	public:
 		TransitionNode(RenderGraph& graph);
 
-		void AddBuffer(const CommandList::FBTransitionObject& transition);
+		void AddBuffer(const TransitionObject& transition);
 
 		virtual void BuildImpl() override;
 
+
 	private:
-		std::vector<CommandList::FBTransitionObject> m_Transitions;
+		std::vector<TransitionObject> m_Transitions;
 	};
 }

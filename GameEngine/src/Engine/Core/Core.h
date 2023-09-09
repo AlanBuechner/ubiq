@@ -50,7 +50,7 @@
 
 #ifdef ENABLE_ASSERTS
 	#define ASSERT(x, ...) {if(!(x)) {DEBUG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
-	#define CORE_ASSERT(x, msg, ...) {if(!(x)) {CORE_ERROR((std::string("Assertion Failed: ") + msg).c_str(), __VA_ARGS__); __debugbreak();}}
+	#define CORE_ASSERT(x, msg, ...) {if(!(x)) {CORE_ERROR((std::string("Assertion Failed: ") + (msg)).c_str(), __VA_ARGS__); __debugbreak();}}
 #else
 	#define ASSERT(x, ...)
 	#define CORE_ASSERT(x, ...)
@@ -65,6 +65,8 @@
 #define MEM_KiB(kib)	(kib * 1024)
 #define MEM_MiB(mib)	MEM_KiB(mib * 1024)
 #define MEM_GiB(gib)	MEM_MiB(gib * 1024)
+
+#define DISABLE_COPY(type) type(const type&) = delete;
 
 namespace Engine
 {

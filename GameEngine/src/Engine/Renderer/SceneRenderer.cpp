@@ -19,9 +19,8 @@ namespace Engine
 	// ObjectControlBlock
 	void SceneRenderer::ObjectControlBlock::UpdateTransform(const Math::Mat4& transform)
 	{
-		InstanceData data = m_Object.m_Instances->Get<InstanceData>(m_InstanceLocation);
+		InstanceData& data = m_Object.m_Instances->Get<InstanceData>(m_InstanceLocation);
 		data.m_Transform = transform;
-		m_Object.m_Instances->SetData(m_InstanceLocation, 1, &data);
 	}
 
 	SceneRenderer::RenderObject::RenderObject()
@@ -32,8 +31,8 @@ namespace Engine
 	// RenderObject
 	SceneRenderer::ObjectControlBlockRef SceneRenderer::RenderObject::AddInstance(const Math::Mat4& transform, Ref<Material> mat)
 	{
-		InstanceData data{ transform, mat->GetBuffer()->GetDescriptorLocation() };
-		m_Instances->PushBack(1, &data); // create new instance
+		InstanceData data{ transform, mat->GetBuffer()->GetCBVDescriptor()->GetIndex() };
+		m_Instances->PushBack(&data); // create new instance
 		m_ControlBlocks.push_front(ObjectControlBlock{*this, (uint32)m_Instances->GetCount()-1}); // create new control block
 		return &m_ControlBlocks.front(); // return control block
 	}
@@ -50,8 +49,7 @@ namespace Engine
 			if (block.m_InstanceLocation == swapIndex)
 			{
 				// swap the buffer data
-				m_Instances->SetData(controlBlock->m_InstanceLocation, 1, &m_Instances->Get<InstanceData>(block.m_InstanceLocation));
-				//std::swap(m_Instances[controlBlock->m_InstanceLocation], m_Instances[block.m_InstanceLocation]);
+				m_Instances->Get<InstanceData>(controlBlock->m_InstanceLocation) = m_Instances->Get<InstanceData>(block.m_InstanceLocation);
 				m_Instances->PopBack(); // remove the last buffer
 
 				block.m_InstanceLocation = controlBlock->m_InstanceLocation; // swap the instance locations on the control blocks
@@ -194,6 +192,7 @@ namespace Engine
 			}
 
 			m_RenderGraph->Build();
+			m_Invalid = true;
 		}
 	}
 

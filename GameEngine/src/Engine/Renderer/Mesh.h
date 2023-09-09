@@ -14,7 +14,6 @@ namespace Engine
 		inline Ref<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
 		inline Ref<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
 
-		static Ref<Mesh> Create(BufferLayout layout);
 		static Ref<Mesh> Create(uint32 vertexStride);
 
 	private:

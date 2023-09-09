@@ -41,7 +41,8 @@ project "GameEngine"
 		"%{IncludeDir.Assimp}/include",
 		"%{IncludeDir.json}/single_include",
 		"%{IncludeDir.dxc}/inc",
-		"%{IncludeDir.pix}/include"
+		"%{IncludeDir.pix}/include",
+		"%{IncludeDir.Aftermath}/include"
 	}
 
 	sysincludedirs 
@@ -56,7 +57,8 @@ project "GameEngine"
 		"Box2D",
 		"%{IncludeDir.Assimp}/assimp-vc140-mt.lib",
 		"%{IncludeDir.dxc}/lib/x64/dxcompiler.lib",
-		"%{IncludeDir.pix}/bin/x64/WinPixEventRuntime.lib"
+		"%{IncludeDir.pix}/bin/x64/WinPixEventRuntime.lib",
+		"%{IncludeDir.Aftermath}/lib/x64/GFSDK_Aftermath_Lib.x64.lib"
 	}
 
 	debugenvs

@@ -10,17 +10,17 @@ namespace Engine
 	{
 	public:
 		virtual void Init(const PostProcessInput& input, SceneData& scene) override;
-		virtual void RecordCommands(Ref<CommandList> commandList, Ref<FrameBuffer> renderTarget, uint64 srcDescriptorLocation, const PostProcessInput& input, Ref<Mesh> screenMesh) override;
+		virtual void RecordCommands(Ref<CommandList> commandList, Ref<RenderTarget2D> renderTarget, Ref<Texture2D> src, const PostProcessInput& input, Ref<Mesh> screenMesh) override;
 
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 
 	private:
 		Ref<Shader> m_DepthOfFieldShader;
-		Ref<FrameBuffer> m_TempTexture;
-		Ref<FrameBuffer> m_COCTexture;
 
-		Ref<FrameBuffer> m_FarBlur;
-		Ref<FrameBuffer> m_NearBlur;
+		Ref<RenderTarget2D> m_TempTexture;
+		Ref<RenderTarget2D> m_COCTexture;
+		Ref<RenderTarget2D> m_FarBlur;
+		Ref<RenderTarget2D> m_NearBlur;
 
 		SceneData* m_Scene;
 

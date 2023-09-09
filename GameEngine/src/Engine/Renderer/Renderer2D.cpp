@@ -47,7 +47,7 @@ namespace Engine
 
 		void AddInstance(const QuadInstance& instance)
 		{
-			QuadInstanceBuffer->PushBack(1, &instance);
+			QuadInstanceBuffer->PushBack(&instance);
 		}
 	};
 
@@ -282,7 +282,7 @@ namespace Engine
 		QuadInstance i;
 		i.Transform = transform;
 		i.Color = color;
-		i.TextureID = texture->GetDescriptorLocation();
+		i.TextureID = texture->GetSRVDescriptor()->GetIndex();
 		i.EntityID = entityID;
 		i.UVSize = uvSize;
 		i.UVPosition = uvPosition;

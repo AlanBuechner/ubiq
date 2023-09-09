@@ -34,6 +34,7 @@ namespace Engine
 
 		DirectX12DescriptorHandle Allocate();
 		void Free(DirectX12DescriptorHandle& handle);
+		void Clear();
 
 		D3D12_DESCRIPTOR_HEAP_TYPE GetType() const { return m_Type; }
 		uint32 GetCapacity() { return m_Capacity; }
@@ -50,6 +51,7 @@ namespace Engine
 		D3D12_CPU_DESCRIPTOR_HANDLE m_CPUHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE m_GPUHandle;
 		std::vector<uint32> m_FreeSlots;
+		std::vector<uint32> m_UsedSlots;
 		uint32 m_Capacity = 0;
 		uint32 m_DescriporSize;
 		bool m_IsShaderVisable;

@@ -4,37 +4,38 @@
 
 namespace Engine
 {
-	class DirectX12InstanceBuffer : public InstanceBuffer
+	class DirectX12InstanceBufferResource : public InstanceBufferResource
 	{
 	public:
-		DirectX12InstanceBuffer(uint32 stride, uint32 count);
-		~DirectX12InstanceBuffer();
+		DirectX12InstanceBufferResource(uint32 capacity, uint32 stride);
+		virtual ~DirectX12InstanceBufferResource() override;
 
-		virtual void SetData(uint32 start, uint32 count, const void* data) override;
-		virtual void PushBack(uint32 count, const void* data) override;
-		virtual void PopBack() override { m_UploadCount--; }
-		virtual void Clear() override { m_UploadCount = 0; }
-		virtual void Apply() override;
-		virtual void* At(uint32 index) override;
-		virtual uint32 GetCount() override { return m_UploadCount; }
+		ID3D12Resource* GetBuffer() { return m_Buffer; }
+
+		virtual void SetData(const void* data, uint32 count) override;
+
+	protected:
+		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
+		virtual uint32 GetState(ResourceState state) override;
+
+	private:
+		ID3D12Resource* m_Buffer;
+		ID3D12Resource* m_UploadBuffer;
+
+		void* m_MapLoc = nullptr;
+	};
+
+	class DirectX12InstanceBufferView : public InstanceBufferView
+	{
+	public:
+		virtual ~DirectX12InstanceBufferView() override = default;
+
+		virtual void ReBind(InstanceBufferResource* resource) override;
 
 		D3D12_VERTEX_BUFFER_VIEW GetView() { return m_View; }
 
 	private:
-		void CreateBuffer(uint32 count);
-		void CreateUploadBuffer(uint32 count);
-
-	private:
-		wrl::ComPtr<ID3D12Resource> m_Buffer;
-		wrl::ComPtr<ID3D12Resource> m_UploadBuffer;
 		D3D12_VERTEX_BUFFER_VIEW m_View;
 
-		void* m_MapLoc = nullptr;
-
-		uint32 m_Count = 0;
-		uint32 m_Stride = 0;
-
-		uint32 m_Capacity = 0;
-		uint32 m_UploadCount = 0;
 	};
 }

@@ -16,7 +16,7 @@ namespace Engine
 		virtual void CleanUp() = 0;
 		virtual uint32 GetBufferCount() = 0;
 
-		virtual Ref<FrameBuffer> GetCurrentFrameBuffer() = 0;
+		virtual Ref<RenderTarget2D> GetCurrentRenderTarget() = 0;
 
 		static Ref<SwapChain> Create(Window& window);
 	};

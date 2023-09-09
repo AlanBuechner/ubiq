@@ -15,16 +15,6 @@ namespace Engine
 
 namespace Engine
 {
-	class DirectX12ResourceDeletionPool : public ResourceDeletionPool
-	{
-	public:
-		virtual void Clear() override;
-		void AddResource(wrl::ComPtr<ID3D12Resource> resource);
-		void AddHandle(DirectX12DescriptorHandle handle);
-	public:
-		std::vector<wrl::ComPtr<ID3D12Resource>> m_Pool;
-		std::vector<DirectX12DescriptorHandle> m_HandlePool;
-	};
 
 	class DirectX12UploadPage
 	{
@@ -81,18 +71,13 @@ namespace Engine
 		DirectX12ResourceManager();
 		~DirectX12ResourceManager();
 
-		virtual Ref<ResourceDeletionPool> CreateNewDeletionPool() override;
-
 		static wrl::ComPtr<ID3D12Resource> CreateUploadTexture2D(DXGI_FORMAT format, uint32 width, uint32 height);
-		static wrl::ComPtr<ID3D12Resource> CreateUploadBuffer(uint32 size);
+		static ID3D12Resource* CreateUploadBuffer(uint32 size);
 		void UploadBuffer(wrl::ComPtr<ID3D12Resource> dest, const void* data, uint32 size, D3D12_RESOURCE_STATES state);
 		void UploadBufferRegion(wrl::ComPtr<ID3D12Resource> dest, uint64 offset, const void* data, uint32 size, D3D12_RESOURCE_STATES state);
 		void CopyBuffer(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 size, D3D12_RESOURCE_STATES state);
 
 		void UploadTexture(wrl::ComPtr<ID3D12Resource> dest, wrl::ComPtr<ID3D12Resource> src, uint32 width, uint32 height, uint32 pitch, uint32 numMips, D3D12_RESOURCE_STATES state, DXGI_FORMAT format);
-
-		void ScheduleResourceDeletion(wrl::ComPtr<ID3D12Resource> resource) { m_DeletionPool->AddResource(resource); }
-		void ScheduleHandleDeletion(DirectX12DescriptorHandle handle) { m_DeletionPool->AddHandle(handle); }
 
 	private:
 		virtual void UploadData() override;
@@ -105,11 +90,12 @@ namespace Engine
 		Ref<DirectX12CommandList> m_BufferCopyCommandList;
 		Ref<DirectX12CommandList> m_TextureCopyCommandList;
 
+		Ref<DirectX12DescriptorHeap> m_UploadDescriptors;
+		std::vector<wrl::ComPtr<ID3D12Resource>> m_TempUplaodResourecs;
+
 		std::queue<UploadBufferData> m_BufferUploadQueue;
 		std::queue<UploadTextureData> m_TextureUploadQueue;
 		std::vector<DirectX12UploadPage> m_UploadPages;
-
-		Ref<DirectX12ResourceDeletionPool> m_DeletionPool;
 
 		std::mutex m_UploadMutex;
 	};

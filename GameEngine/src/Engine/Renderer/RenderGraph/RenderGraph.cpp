@@ -34,28 +34,21 @@ namespace Engine
 	{
 		Window& window = Application::Get().GetWindow();
 
+		Ref<CommandList> commandList = CommandList::Create(CommandList::Direct);;
+		m_CommandLists.push_back(commandList);
 
 		float clearval = pow(0.2f, 2.2);
-		FrameBufferSpecification fbSpec1;
-		fbSpec1.Attachments = {
-			{ TextureFormat::RGBA16, {clearval,clearval,clearval,1} },
-			{ TextureFormat::Depth, { 1,0,0,0 } }
-		};
-		fbSpec1.InitalState = ResourceState::Common;
-
-		fbSpec1.Width = window.GetWidth();
-		fbSpec1.Height = window.GetHeight();
-
-		Ref<FrameBufferNode> renderTargetNode = CreateRef<FrameBufferNode>(*this, fbSpec1);
+		Ref<FrameBufferNode> renderTargetNode = CreateRef<FrameBufferNode>(*this, std::vector<Ref<RenderTarget2D>>{
+			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), 1, TextureFormat::RGBA16),
+			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), 1, TextureFormat::Depth),
+		});
 		m_Nodes.push_back(renderTargetNode);
-
-		Ref<CommandList> commandList = CommandList::Create(CommandList::Direct);
-		m_CommandLists.push_back(commandList);
 
 		// set frame buffer to render target
 		Ref<TransitionNode> t1 = CreateRef<TransitionNode>(*this);
 		t1->SetCommandList(commandList);
-		t1->AddBuffer({ renderTargetNode->m_Buffer, ResourceState::RenderTarget, ResourceState::Common });
+		t1->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), ResourceState::RenderTarget });
+		t1->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), ResourceState::RenderTarget });
 		m_Nodes.push_back(t1);
 
 		// shadow pass
@@ -86,45 +79,50 @@ namespace Engine
 		m_Nodes.push_back(mainPass);
 
 		// create post processing render target
-		FrameBufferSpecification fbSpec2;
-		fbSpec2.Attachments = {
-			{ TextureFormat::RGBA16, {0,0,0,1} },
-			{ TextureFormat::Depth, { 1,0,0,0 } }
-		};
-		fbSpec2.InitalState = ResourceState::Common;
-		fbSpec2.Width = window.GetWidth();
-		fbSpec2.Height = window.GetHeight();
-
-		Ref<FrameBufferNode> postRenderTargetNode = CreateRef<FrameBufferNode>(*this, fbSpec2);
+		Ref<FrameBufferNode> postRenderTargetNode = CreateRef<FrameBufferNode>(*this, std::vector<Ref<RenderTarget2D>>{
+			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), 1, TextureFormat::RGBA16),
+		});
 		m_Nodes.push_back(postRenderTargetNode);
 
 		// set frame buffer to srv for use in post processing
 		Ref<TransitionNode> t2 = CreateRef<TransitionNode>(*this);
 		t2->SetCommandList(commandList);
-		t2->AddBuffer({ renderTargetNode->m_Buffer, ResourceState::Common, ResourceState::RenderTarget });
+		t2->AddBuffer({ postRenderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), ResourceState::RenderTarget });
+		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), ResourceState::Common });
+		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), ResourceState::Common });
 		t2->AddDependincy(mainPass);
 		m_Nodes.push_back(t2);
 
 		// post processing
 		PostProcessInput input;
-		input.m_TextureHandles["Color Buffer"] = renderTargetNode->m_Buffer->GetAttachmentShaderDescriptoLocation(0);
-		input.m_TextureHandles["Depth Buffer"] = renderTargetNode->m_Buffer->GetAttachmentShaderDescriptoLocation(1);
+		input.m_TextureHandles["Color Buffer"] = renderTargetNode->m_Buffer->GetAttachment(0);
+		input.m_TextureHandles["Depth Buffer"] = renderTargetNode->m_Buffer->GetAttachment(1);
 
 		Ref<PostProcessNode> postPass = CreateRef<PostProcessNode>(*this);
 		postPass->SetCommandList(commandList);
-		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer );
+		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer->GetAttachment(0));
 		postPass->SetInput(input);
-		//postPass->AddPostProcess(CreateRef<DepthOfField>());
+		postPass->AddPostProcess(CreateRef<DepthOfField>());
 		postPass->AddPostProcess(CreateRef<Bloom>());
 		postPass->AddPostProcess(CreateRef<ToneMapping>());
-		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachmentShaderDescriptoLocation(0));
+		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachment(0));
 		postPass->InitPostProcessStack();
 		postPass->AddDependincy(t2);
 		m_Nodes.push_back(postPass);
 
+		Ref<TransitionNode> t3 = CreateRef<TransitionNode>(*this);
+		t2->SetCommandList(commandList);
+		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), ResourceState::RenderTarget });
+		t2->AddDependincy(mainPass);
+		m_Nodes.push_back(t2);
+
 		// create outputNode
 		m_OutputNode = CreateRef<OutputNode>(*this);
-		m_OutputNode->m_Buffer = postRenderTargetNode->m_Buffer;
+		m_OutputNode->m_Buffer = FrameBuffer::Create({
+			//renderTargetNode->m_Buffer->GetAttachment(0),
+			postRenderTargetNode->m_Buffer->GetAttachment(0),
+			renderTargetNode->m_Buffer->GetAttachment(1),
+		});
 		m_Nodes.push_back(m_OutputNode);
 
 		m_Order = ExecutionOrder::Create();

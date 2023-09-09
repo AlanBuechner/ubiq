@@ -6,54 +6,23 @@
 
 namespace Engine
 {
-
-	struct FrameBufferTextureSpecification
-	{
-		FrameBufferTextureSpecification() = default;
-		FrameBufferTextureSpecification(TextureFormat format, Math::Vector4 color) :
-			textureFormat(format), clearColor(color)
-		{}
-
-		TextureFormat textureFormat = TextureFormat::None;
-		Math::Vector4 clearColor;
-
-	};
-
-	struct FrameBufferAttachmentSpecification
-	{
-		FrameBufferAttachmentSpecification() = default;
-		FrameBufferAttachmentSpecification(std::initializer_list<FrameBufferTextureSpecification> attachments) :
-			Attachments(attachments)
-		{}
-
-		std::vector<FrameBufferTextureSpecification> Attachments;
-	};
-
-	struct FrameBufferSpecification
-	{
-		uint32 Width, Height;
-		FrameBufferAttachmentSpecification Attachments;
-		uint32 Samples = 1;
-		ResourceState InitalState = ResourceState::Common;
-
-		bool SwapChainTarget = false;
-	};
-
 	class FrameBuffer
 	{
 	public:
-		virtual ~FrameBuffer() = default;
+		FrameBuffer(const std::vector<Ref<RenderTarget2D>>& attachments);
 
-		virtual void Resize(uint32 width, uint32 height) = 0;
+		void Resize(uint32 width, uint32 height);
 
-		virtual uint64 GetAttachmentRenderHandle(uint32 index = 0) const = 0;
-		virtual uint64 GetAttachmentShaderHandle(uint32 index = 0) const = 0;
-		virtual uint32 GetAttachmentShaderDescriptoLocation(uint32 index = 0) const = 0;
-		virtual int ReadPixle(uint32 attachment, int x, int y) = 0;
+		Ref<RenderTarget2D> GetAttachment(uint32 i) const { return m_Attachments[i]; }
+		const std::vector<Ref<RenderTarget2D>>& GetAttachments() const { return m_Attachments; }
 
-		virtual const FrameBufferSpecification& GetSpecification() const = 0;
-		virtual bool HasDepthAttachment() const = 0;
+		bool HasDepthAttachment() const;
 
-		static Ref<FrameBuffer> Create(const FrameBufferSpecification& spec);
+		static Ref<FrameBuffer> Create(const std::vector<Ref<RenderTarget2D>>& spec);
+
+	private:
+
+		std::vector<Ref<RenderTarget2D>> m_Attachments;
+
 	};
 }

@@ -36,10 +36,10 @@ namespace Engine
 	}
 
 	// frame buffer node
-	FrameBufferNode::FrameBufferNode(RenderGraph& graph, const FrameBufferSpecification& fbSpec) :
+	FrameBufferNode::FrameBufferNode(RenderGraph& graph, const std::vector<Ref<RenderTarget2D>>& attachments) :
 		RenderGraphNode(graph)
 	{
-		m_Buffer = FrameBuffer::Create(fbSpec);
+		m_Buffer = FrameBuffer::Create(attachments);
 	}
 
 
@@ -52,14 +52,21 @@ namespace Engine
 		RenderGraphNode(graph)
 	{}
 
-	void TransitionNode::AddBuffer(const CommandList::FBTransitionObject& transition)
+	void TransitionNode::AddBuffer(const TransitionObject& transition)
 	{
 		m_Transitions.push_back(transition);
 	}
 
 	void TransitionNode::BuildImpl()
 	{
-		m_CommandList->Transition(m_Transitions);
+		std::vector<ResourceStateObject> transitions(m_Transitions.size());
+		for (uint32 i = 0; i < transitions.size(); i++)
+		{
+			transitions[i].resource = *m_Transitions[i].handle;
+			transitions[i].state = m_Transitions[i].state;
+		}
+
+		m_CommandList->ValidateStates(transitions);
 	}
 
 }

@@ -13,6 +13,8 @@
 #include "DirectX12InstanceBuffer.h"
 #include "DirectX12ResourceManager.h"
 
+#include "Engine/Renderer/GPUProfiler.h"
+
 #include "Engine/Util/Performance.h"
 #include "Engine/Renderer/Mesh.h"
 
@@ -49,20 +51,39 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		const uint32 numAllocators = 2;
-		m_Allocators.resize(numAllocators);
+		m_Frames.resize(numAllocators);
 		D3D12_COMMAND_LIST_TYPE type = GetD3D12CommandListType(m_Type);
 		for (uint32 i = 0; i < numAllocators; i++)
 		{
-			CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(m_Allocators[i].GetAddressOf())),
-				"Faild to Create Command List Allocator");
-			m_Allocators[i]->SetName(L"Command Allocator");
+			CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(m_Frames[i].commandAllocator.GetAddressOf())),
+				"Failed to Create Command List Allocator");
+			m_Frames[i].commandAllocator->SetName(L"Command Allocator");
 		}
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0, type, m_Allocators[0].Get(), nullptr, IID_PPV_ARGS(m_CommandList.GetAddressOf())),
-			"Faild to Create Commnd List");
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0, type, m_Frames[0].commandAllocator.Get(), nullptr, IID_PPV_ARGS(m_CommandList.GetAddressOf())),
+			"Failed to Create Commnd List");
 		m_CommandList->SetName(L"Command List");
 		m_CommandList->Close();
 
+		
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(m_PrependAllocator.GetAddressOf())),
+			"Failed to Create Prepend Command List Allocator");
+		m_PrependAllocator->SetName(L"Prepend Allocator");
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0,type, m_PrependAllocator.Get(), nullptr, IID_PPV_ARGS(m_PrependList.GetAddressOf())),
+			"Failed to Create Prepend Command List");
+		m_PrependList->SetName(L"Prepend Command List");
+		m_PrependList->Close();
+
 		m_RecordFlag.Signal();
+	}
+
+	void DirectX12CommandList::InternalClose()
+	{
+		// TODO
+		if (m_State != RecordState::Closed)
+		{
+			m_CommandList->Close();
+			m_State = RecordState::Closed;
+		}
 	}
 
 	void DirectX12CommandList::StartRecording()
@@ -70,91 +91,126 @@ namespace Engine
 		m_RecordFlag.Wait();
 		m_RecordFlag.Clear();
 		m_RenderTarget = nullptr;
+		m_State = RecordState::Open;
 		wrl::ComPtr<ID3D12CommandAllocator> allocator = GetAllocator();
 		CORE_ASSERT_HRESULT(allocator->Reset(), "Failed to reset command allocator");
 		CORE_ASSERT_HRESULT(m_CommandList->Reset(allocator.Get(), nullptr), "Failed to reset command list");
 
 		ID3D12DescriptorHeap* heaps[]{ DirectX12ResourceManager::s_SRVHeap->GetHeap().Get(), DirectX12ResourceManager::s_SamplerHeap->GetHeap().Get() };
 		m_CommandList->SetDescriptorHeaps(2, heaps);
+
+		GetCurrentPendingTransitions().clear();
+		GetResourceStates().clear();
 	}
 
 
-	// transitions 
+	// transitions
 
-	void DirectX12CommandList::Present(Ref<FrameBuffer> fb, ResourceState from)
+	void DirectX12CommandList::Present(Ref<FrameBuffer> fb)
 	{
 		if (fb == nullptr)
 			fb = m_RenderTarget;
 
-		Transition({ fb }, ResourceState::Common, from);
+		std::vector<ResourceStateObject> transitions(fb->GetAttachments().size());
+		for (uint32 i = 0; i < fb->GetAttachments().size(); i++)
+			transitions[i] = { fb->GetAttachment(i)->GetResource(), ResourceState::Common };
+
+		ValidateStates(transitions);
 
 		if (fb == m_RenderTarget)
 			m_RenderTarget = nullptr;
 	}
 
-	void DirectX12CommandList::Transition(std::vector<Ref<FrameBuffer>> fbs, ResourceState to, ResourceState from)
-	{
-		std::vector<D3D12_RESOURCE_BARRIER> barriers;
-		for (auto fb : fbs)
-		{
-			Ref<DirectX12FrameBuffer> dxfb = std::dynamic_pointer_cast<DirectX12FrameBuffer>(fb);
-
-			std::vector<FrameBufferTextureSpecification> attachments = dxfb->GetSpecification().Attachments.Attachments;
-			barriers.reserve(attachments.size());
-
-			for (uint32 i = 0; i < attachments.size(); i++)
-			{
-				if (IsDepthStencil(attachments[i].textureFormat))
-					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXDepthState(from), DirectX12FrameBuffer::GetDXDepthState(to)));
-				else
-					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXState(from), DirectX12FrameBuffer::GetDXState(to)));
-			}
-		}
-
-		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
-	}
-
-	void DirectX12CommandList::Transition(std::vector<FBTransitionObject> transitions)
-	{
-		std::vector<D3D12_RESOURCE_BARRIER> barriers;
-		for (auto transition : transitions)
-		{
-			Ref<DirectX12FrameBuffer> dxfb = std::dynamic_pointer_cast<DirectX12FrameBuffer>(transition.fb);
-			std::vector<FrameBufferTextureSpecification> attachments = dxfb->GetSpecification().Attachments.Attachments;
-			barriers.reserve(attachments.size());
-
-			for (uint32 i = 0; i < attachments.size(); i++)
-			{
-				if (IsDepthStencil(attachments[i].textureFormat))
-					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXDepthState(transition.from), DirectX12FrameBuffer::GetDXDepthState(transition.to)));
-				else
-					barriers.push_back(TransitionResource(dxfb->GetBuffer(i).Get(), DirectX12FrameBuffer::GetDXState(transition.from), DirectX12FrameBuffer::GetDXState(transition.to)));
-			}
-		}
-
-		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
-	}
-
-
 
 	void DirectX12CommandList::Transition(std::vector<ResourceTransitionObject> transitions)
 	{
+		std::unordered_map<GPUResource*, ResourceState>& resourceStates = GetResourceStates();
+
 		std::vector<D3D12_RESOURCE_BARRIER> barriers;
 		barriers.resize(transitions.size());
 		for (uint32 i = 0; i < transitions.size(); i++)
 		{
 			ResourceState to = transitions[i].to;
 			ResourceState from = transitions[i].from;
-			Ref<GPUResource> resource = transitions[i].resource;
+			GPUResource* resource = transitions[i].resource;
 			CORE_ASSERT(resource->SupportState(to), "resouce does not support state");
 			barriers[i] = TransitionResource((ID3D12Resource*)resource->GetGPUResourcePointer(), 
 				(D3D12_RESOURCE_STATES)resource->GetState(from), (D3D12_RESOURCE_STATES)resource->GetState(to));
+
+			resourceStates[resource] = to;
 		}
 
 		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
 	}
 
+	void DirectX12CommandList::ValidateStates(std::vector<ResourceStateObject> resources)
+	{
+		std::vector<ResourceStateObject>& pendingTransitions = GetCurrentPendingTransitions();
+		std::unordered_map<GPUResource*, ResourceState>& resourceStates = GetResourceStates();
+
+		std::vector<ResourceTransitionObject> transitions;
+		transitions.reserve(resources.size());
+
+		for (ResourceStateObject& res : resources)
+		{
+			const std::unordered_map<GPUResource*, ResourceState>::iterator& foundResouce = resourceStates.find(res.resource);
+
+			if (foundResouce == resourceStates.end())
+			{
+				pendingTransitions.push_back(res);
+				resourceStates[res.resource] = res.state;
+			}
+			else
+			{
+				ResourceState currState = foundResouce->second;
+				if (currState != res.state)
+					transitions.push_back({ res.resource, res.state, currState });
+			}
+		}
+
+		if (!transitions.empty())
+			Transition(transitions);
+	}
+
 	// rendering
+
+	void DirectX12CommandList::SetRenderTarget(Ref<RenderTarget2D> renderTarget)
+	{
+		if (m_Type == CommandList::Bundle)
+		{
+			CORE_WARN("Command bundle can not set render targets. command will be ignored");
+			return;
+		}
+
+		m_RenderTarget = FrameBuffer::Create({ renderTarget });
+
+		ValidateState(renderTarget->GetResource(), ResourceState::RenderTarget);
+
+		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)renderTarget->GetResource();
+		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)renderTarget->GetRTVDSVDescriptor();
+
+		D3D12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle = rtv->GetHandle().cpu;
+		m_CommandList->OMSetRenderTargets(1, &cpuDescriptorHandle, FALSE, nullptr);
+
+		uint32 width = res->GetWidth();
+		uint32 height = res->GetHeight();
+
+		const D3D12_VIEWPORT viewport{
+			0,0,
+			(float)width,
+			(float)height,
+			0,1
+		};
+
+		const D3D12_RECT rect{
+			0,0,
+			(long)width,
+			(long)height
+		};
+
+		m_CommandList->RSSetViewports(1, &viewport);
+		m_CommandList->RSSetScissorRects(1, &rect);
+	}
 
 	void DirectX12CommandList::SetRenderTarget(Ref<FrameBuffer> buffer)
 	{
@@ -166,35 +222,57 @@ namespace Engine
 		}
 
 		// get directX 12 frame buffer
-		m_RenderTarget = std::dynamic_pointer_cast<DirectX12FrameBuffer>(buffer);
+		m_RenderTarget = buffer;
 
 		// get render target information
-		std::vector<FrameBufferTextureSpecification> attachments = m_RenderTarget->GetSpecification().Attachments.Attachments;
-		std::vector<uint64> rendertargetHandles(attachments.size() - (size_t)m_RenderTarget->HasDepthAttachment());
+		uint32 numRenderTargets = buffer->GetAttachments().size() - (size_t)m_RenderTarget->HasDepthAttachment();
+		std::vector<ResourceStateObject> resourceStateValidation;
+		std::vector<uint64> rendertargetHandles(numRenderTargets);
+		std::vector<D3D12_VIEWPORT> viewports(numRenderTargets);
+		std::vector<D3D12_RECT> rects(numRenderTargets);
 		uint64 depthHandle = 0;
-		for (uint32 i = 0; i < attachments.size(); i++)
+
+		for (uint32 i = 0; i < buffer->GetAttachments().size(); i++)
 		{
-			if (IsDepthStencil(attachments[i].textureFormat))
-				depthHandle = m_RenderTarget->GetAttachmentRenderHandle(i);
+			resourceStateValidation.push_back({ buffer->GetAttachment(i)->GetResource(), ResourceState::RenderTarget });
+			DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)buffer->GetAttachment(i)->GetResource();
+			DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)buffer->GetAttachment(i)->GetRTVDSVDescriptor();
+
+
+			if (IsDepthStencil(buffer->GetAttachment(i)->GetResource()->GetFormat()))
+				depthHandle = rtv->GetHandle().cpu.ptr;
 			else
-				rendertargetHandles[i] = m_RenderTarget->GetAttachmentRenderHandle(i);
+			{
+				viewports[i] = {
+					0,0,
+					(float)res->GetWidth(),
+					(float)res->GetHeight(),
+					0, 1
+				};
+
+				rects[i] = {
+					0,0,
+					(long)res->GetWidth(),
+					(long)res->GetHeight()
+				};
+
+				rendertargetHandles[i] = rtv->GetHandle().cpu.ptr;
+			}
 		}
+
+		ValidateStates(resourceStateValidation);
 
 		// set render target
 		m_CommandList->OMSetRenderTargets(
-			(uint32)rendertargetHandles.size(), 
+			(uint32)numRenderTargets, 
 			(D3D12_CPU_DESCRIPTOR_HANDLE*)rendertargetHandles.data(), 
 			FALSE, 
 			depthHandle ? (D3D12_CPU_DESCRIPTOR_HANDLE*)&depthHandle : nullptr
 		);
 
 		// set scissor and viewport
-		LONG width = (LONG)m_RenderTarget->GetSpecification().Width;
-		LONG height = (LONG)m_RenderTarget->GetSpecification().Height;
-		const D3D12_VIEWPORT viewport = { 0, 0, (FLOAT)width, (FLOAT)height, 0, 1 };
-		m_CommandList->RSSetViewports(1, &viewport);
-		const D3D12_RECT r = { 0, 0, width, height };
-		m_CommandList->RSSetScissorRects(1, &r);
+		m_CommandList->RSSetViewports(numRenderTargets, viewports.data());
+		m_CommandList->RSSetScissorRects(numRenderTargets, rects.data());
 	}
 
 	void DirectX12CommandList::ClearRenderTarget()
@@ -214,14 +292,14 @@ namespace Engine
 
 	void DirectX12CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer)
 	{
-		for (uint32 i = 0; i < frameBuffer->GetSpecification().Attachments.Attachments.size(); i++)
+		for (uint32 i = 0; i < frameBuffer->GetAttachments().size(); i++)
 			ClearRenderTarget(frameBuffer, i);
 	}
 
 	void DirectX12CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment)
 	{
-		Math::Vector4 color = frameBuffer->GetSpecification().Attachments.Attachments[attachment].clearColor;
-		ClearRenderTarget(frameBuffer, attachment, color);
+		//Math::Vector4 color = frameBuffer->GetAttachment(attachment).clearColor;
+		ClearRenderTarget(frameBuffer, attachment, { 0,0,0,0 });
 	}
 
 	void DirectX12CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment, const Math::Vector4& color)
@@ -232,15 +310,35 @@ namespace Engine
 			return;
 		}
 
-		D3D12_CPU_DESCRIPTOR_HANDLE handle;
-		handle.ptr = frameBuffer->GetAttachmentRenderHandle(attachment);
-		if (IsDepthStencil(frameBuffer->GetSpecification().Attachments.Attachments[attachment].textureFormat))
+		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)frameBuffer->GetAttachment(attachment)->GetResource();
+		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)frameBuffer->GetAttachment(attachment)->GetRTVDSVDescriptor();
+
+		ValidateState({ res, ResourceState::RenderTarget });
+
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetHandle().cpu;
+		if (IsDepthStencil(res->GetFormat()))
 			m_CommandList->ClearDepthStencilView(handle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, color.r, (uint8)color.g, 0, nullptr);
 		else
 			m_CommandList->ClearRenderTargetView(handle, (float*)&color, 0, nullptr);
 	}
 
 
+
+	void DirectX12CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget)
+	{
+		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)renderTarget->GetResource();
+		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)renderTarget->GetRTVDSVDescriptor();
+
+		const Math::Vector4 color = { 0,0,0,0 };
+
+		ValidateState({ res, ResourceState::RenderTarget });
+
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetHandle().cpu;
+		if (IsDepthStencil(res->GetFormat()))
+			m_CommandList->ClearDepthStencilView(handle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, color.r, (uint8)color.g, 0, nullptr);
+		else
+			m_CommandList->ClearRenderTargetView(handle, (float*)&color, 0, nullptr);
+	}
 
 	void DirectX12CommandList::SetShader(Ref<ShaderPass> shader)
 	{
@@ -293,17 +391,8 @@ namespace Engine
 		if (index == UINT32_MAX || buffer == nullptr)
 			return; // invalid bind slot
 
-		Ref<DirectX12ConstantBuffer> cb = std::dynamic_pointer_cast<DirectX12ConstantBuffer>(buffer);
-		m_CommandList->SetGraphicsRootConstantBufferView(index, cb->GetDXResource()->GetBuffer()->GetGPUVirtualAddress());
-	}
-
-	void DirectX12CommandList::SetConstantBuffer(uint32 index, Ref<RWConstantBuffer> buffer)
-	{
-		if (index == UINT32_MAX || buffer == nullptr)
-			return; // invalid bind slot
-
-		Ref<DirectX12RWConstantBuffer> cb = std::dynamic_pointer_cast<DirectX12RWConstantBuffer>(buffer);
-		m_CommandList->SetGraphicsRootUnorderedAccessView(index, cb->GetDXResource()->GetBuffer()->GetGPUVirtualAddress());
+		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)buffer->GetResource();
+		m_CommandList->SetGraphicsRootConstantBufferView(index, dxResource->GetBuffer()->GetGPUVirtualAddress());
 	}
 
 	void DirectX12CommandList::SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer)
@@ -311,17 +400,8 @@ namespace Engine
 		if (index == UINT32_MAX || buffer == nullptr)
 			return;
 
-		Ref<DirectX12StructuredBuffer> sb = std::dynamic_pointer_cast<DirectX12StructuredBuffer>(buffer);
-		m_CommandList->SetGraphicsRootDescriptorTable(index, sb->GetDXResource()->GetSRVHandle().gpu);
-	}
-
-	void DirectX12CommandList::SetStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer)
-	{
-		if (index == UINT32_MAX || buffer == nullptr)
-			return;
-
-		Ref<DirectX12StructuredBuffer> sb = std::dynamic_pointer_cast<DirectX12StructuredBuffer>(buffer);
-		m_CommandList->SetGraphicsRootDescriptorTable(index, sb->GetDXResource()->GetUAVHandle().gpu);
+		DirectX12StructuredBufferSRVDescriptorHandle* srv = (DirectX12StructuredBufferSRVDescriptorHandle*)buffer->GetSRVDescriptor();
+		m_CommandList->SetGraphicsRootDescriptorTable(index, srv->GetHandle().gpu);
 	}
 
 	void DirectX12CommandList::SetRootConstant(uint32 index, uint32 data)
@@ -337,43 +417,36 @@ namespace Engine
 		if (index == UINT32_MAX)
 			return; // invalid bind slot
 
-		Ref<DirectX12Texture2D> d3dTexture = std::dynamic_pointer_cast<DirectX12Texture2D>(texture);
-		m_CommandList->SetGraphicsRootDescriptorTable(index, d3dTexture->GetDXResource()->GetSRVHandle().gpu);
-	}
+		ValidateState(texture->GetResource(), ResourceState::ShaderResource);
 
-	void DirectX12CommandList::SetFrameBuffer(uint32 index, Ref<FrameBuffer> buffer, uint32 attatchment)
-	{
-		if (index == UINT32_MAX)
-			return; // invalid bind slot
+		DirectX12Texture2DSRVDescriptorHandle* srv = (DirectX12Texture2DSRVDescriptorHandle*)texture->GetSRVDescriptor();
 
-		Ref<DirectX12FrameBuffer> d3dTexture = std::dynamic_pointer_cast<DirectX12FrameBuffer>(buffer);
-		D3D12_GPU_DESCRIPTOR_HANDLE handle;
-		handle.ptr = d3dTexture->GetAttachmentShaderHandle(attatchment);
-		m_CommandList->SetGraphicsRootDescriptorTable(index, handle);
+		m_CommandList->SetGraphicsRootDescriptorTable(index, srv->GetHandle().gpu);
 	}
 
 	void DirectX12CommandList::DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, int numInstances)
 	{
-		Ref<DirectX12VertexBuffer> vb = std::dynamic_pointer_cast<DirectX12VertexBuffer>(mesh->GetVertexBuffer());
-		Ref<DirectX12IndexBuffer> ib = std::dynamic_pointer_cast<DirectX12IndexBuffer>(mesh->GetIndexBuffer());
+		uint32 indexCount = mesh->GetIndexBuffer()->GetResource()->GetCount();
+		DirectX12VertexBufferView* vertexBufferView = (DirectX12VertexBufferView*)mesh->GetVertexBuffer()->GetView();
+		DirectX12IndexBufferView* indexBufferView = (DirectX12IndexBufferView*)mesh->GetIndexBuffer()->GetView();
 
 		if (instanceBuffer)
 		{
-			Ref<DirectX12InstanceBuffer> isb = std::dynamic_pointer_cast<DirectX12InstanceBuffer>(instanceBuffer);
+			DirectX12InstanceBufferView* instanceBufferView = (DirectX12InstanceBufferView*)instanceBuffer->GetView();
 			if (numInstances < 0)
-				numInstances = isb->GetCount();
+				numInstances = instanceBuffer->GetCount();
 
-			D3D12_VERTEX_BUFFER_VIEW views[] = { vb->GetView(), isb->GetView() };
+			D3D12_VERTEX_BUFFER_VIEW views[] = { vertexBufferView->GetView(), instanceBufferView->GetView() };
 			m_CommandList->IASetVertexBuffers(0, 2, views);
-			m_CommandList->IASetIndexBuffer(&ib->GetView());
-			m_CommandList->DrawIndexedInstanced(ib->GetCount(), numInstances, 0, 0, 0);
+			m_CommandList->IASetIndexBuffer(&indexBufferView->GetView());
+			m_CommandList->DrawIndexedInstanced(indexCount, numInstances, 0, 0, 0);
 		}
 		else
 		{
-			D3D12_VERTEX_BUFFER_VIEW views[] = { vb->GetView() };
+			D3D12_VERTEX_BUFFER_VIEW views[] = { vertexBufferView->GetView() };
 			m_CommandList->IASetVertexBuffers(0, 1, views);
-			m_CommandList->IASetIndexBuffer(&ib->GetView());
-			m_CommandList->DrawIndexedInstanced(ib->GetCount(), 1, 0, 0, 0);
+			m_CommandList->IASetIndexBuffer(&indexBufferView->GetView());
+			m_CommandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
 		}
 	}
 
@@ -414,14 +487,53 @@ namespace Engine
 
 	void DirectX12CommandList::Close()
 	{
-		m_CommandList->Close();
+		m_State = RequestClose;
 		m_RenderTarget = nullptr;
-		m_CurrentCommandAllocator = (m_CurrentCommandAllocator + 1) % m_Allocators.size();
+		m_CurrentFrame = (m_CurrentFrame + 1) % m_Frames.size();
 	}
 
-	wrl::ComPtr<ID3D12CommandAllocator> DirectX12CommandList::GetAllocator()
+	bool DirectX12CommandList::RecordPrependCommands()
 	{
-		return m_Allocators[m_CurrentCommandAllocator];
+		std::vector<ResourceStateObject>& pendingTransitions = GetPendingTransitions();
+
+		// get list off all resources that need to be changed
+		std::vector<D3D12_RESOURCE_BARRIER> transitions;
+		transitions.reserve(pendingTransitions.size());
+
+		for (uint32 i = 0; i < pendingTransitions.size(); i++)
+		{
+			ResourceStateObject& rso = pendingTransitions[i];
+
+			GPUResource* resource = rso.resource;
+
+			ResourceState to = rso.state;
+			ResourceState from = resource->GetDefultState();
+			CORE_ASSERT(resource->SupportState(to), "resouce does not support state");
+			if (rso.resource->GetDefultState() != rso.state)
+			{
+				ID3D12Resource* gpuResourcePointer = (ID3D12Resource*)resource->GetGPUResourcePointer();
+				CORE_ASSERT(gpuResourcePointer != nullptr, "{0}", i);
+				transitions.push_back(TransitionResource(gpuResourcePointer,
+					(D3D12_RESOURCE_STATES)resource->GetState(from), (D3D12_RESOURCE_STATES)resource->GetState(to)));
+			}
+		}
+
+		if (!transitions.empty())
+		{
+			CORE_ASSERT_HRESULT(m_PrependAllocator->Reset(), "Failed to reset prepend command allocator");
+			CORE_ASSERT_HRESULT(m_PrependList->Reset(m_PrependAllocator.Get(), nullptr), "Failed to reset prepend command list");
+
+			ID3D12DescriptorHeap* heaps[]{ DirectX12ResourceManager::s_SRVHeap->GetHeap().Get(), DirectX12ResourceManager::s_SamplerHeap->GetHeap().Get() };
+			m_PrependList->SetDescriptorHeaps(2, heaps);
+
+			m_PrependList->ResourceBarrier((uint32)transitions.size(), transitions.data());
+
+
+			m_PrependList->Close();
+
+			return true;
+		}
+		return false;
 	}
 
 }

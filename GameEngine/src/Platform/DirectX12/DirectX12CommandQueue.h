@@ -24,6 +24,5 @@ namespace Engine
 		D3D12_COMMAND_LIST_TYPE m_Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
 		InstrumentationTimer m_Timer = CREATE_PROFILEI();
-
 	};
 }

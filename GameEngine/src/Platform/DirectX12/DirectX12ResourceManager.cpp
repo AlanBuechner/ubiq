@@ -13,26 +13,6 @@ Engine::Ref<Engine::DirectX12DescriptorHeap> Engine::DirectX12ResourceManager::s
 namespace Engine
 {
 
-	// deletion pool
-	void DirectX12ResourceDeletionPool::Clear()
-	{
-		m_Pool.clear();
-
-		for (DirectX12DescriptorHandle h : m_HandlePool)
-			h.Free();
-		m_HandlePool.clear();
-	}
-
-	void DirectX12ResourceDeletionPool::AddResource(wrl::ComPtr<ID3D12Resource> resource)
-	{
-		m_Pool.push_back(resource);
-	}
-
-	void DirectX12ResourceDeletionPool::AddHandle(DirectX12DescriptorHandle handle)
-	{
-		m_HandlePool.push_back(handle);
-	}
-
 	// upload page
 	DirectX12UploadPage::DirectX12UploadPage(uint32 size) :
 		m_Size(size), m_UsedMemory(0)
@@ -89,23 +69,24 @@ namespace Engine
 	}
 
 	// resource manager
-	DirectX12ResourceManager::DirectX12ResourceManager()
+	DirectX12ResourceManager::DirectX12ResourceManager() :
+		ResourceManager()
 	{
 		s_SRVHeap = std::make_shared<DirectX12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, true);
 		s_RTVHeap = std::make_shared<DirectX12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, false);
 		s_DSVHeap = std::make_shared<DirectX12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, false);
 		s_SamplerHeap = std::make_shared<DirectX12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, true);
 
-		m_DeletionPool = CreateRef<DirectX12ResourceDeletionPool>();
-
 		m_CommandQueue = std::dynamic_pointer_cast<DirectX12CommandQueue>(CommandQueue::Create(CommandQueue::Type::Direct));
 		m_BufferCopyCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandList::Direct));
 		m_TextureCopyCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandList::Direct));
+
+		m_UploadDescriptors = std::make_shared<DirectX12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, true);
 	}
 
 	DirectX12ResourceManager::~DirectX12ResourceManager()
 	{
-		m_DeletionPool.reset();
+		ResourceManager::~ResourceManager();
 
 		s_SRVHeap.reset();
 		s_RTVHeap.reset();
@@ -134,7 +115,7 @@ namespace Engine
 		return constantBufferUploadHeap;
 	}
 
-	wrl::ComPtr<ID3D12Resource> DirectX12ResourceManager::CreateUploadBuffer(uint32 size)
+	ID3D12Resource* DirectX12ResourceManager::CreateUploadBuffer(uint32 size)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
@@ -142,7 +123,7 @@ namespace Engine
 		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
 
-		wrl::ComPtr<ID3D12Resource> constantBufferUploadHeap;
+		ID3D12Resource* constantBufferUploadHeap;
 		context->GetDevice()->CreateCommittedResource(
 			&props, // this heap will be used to upload the constant buffer data
 			D3D12_HEAP_FLAG_NONE, // no flags
@@ -248,13 +229,6 @@ namespace Engine
 		m_TextureUploadQueue.push(uploadData);
 	}
 
-	Ref<ResourceDeletionPool> DirectX12ResourceManager::CreateNewDeletionPool()
-	{
-		Ref<ResourceDeletionPool> pool = m_DeletionPool;
-		m_DeletionPool = CreateRef<DirectX12ResourceDeletionPool>();
-		return pool;
-	}
-
 	void DirectX12ResourceManager::UploadData()
 	{
 		CREATE_PROFILE_FUNCTIONI();
@@ -344,6 +318,8 @@ namespace Engine
 
 	void DirectX12ResourceManager::RecordTextureCommands(Ref<DirectX12Context> context)
 	{
+		m_UploadDescriptors->Clear();
+		m_TempUplaodResourecs.clear();
 		CREATE_PROFILE_FUNCTIONI();
 		// structs
 		struct TextureCopyInfo
@@ -411,6 +387,7 @@ namespace Engine
 				);
 				mipTexture->SetName(L"MipTexture");
 				mipTextures.push_back({ data.destResource, mipTexture, data.width, data.height, rDesc.MipLevels, data.state, data.format });
+				m_TempUplaodResourecs.push_back(mipTexture);
 
 				startb.push_back(CD3DX12_RESOURCE_BARRIER::Transition(data.destResource.Get(), data.state, D3D12_RESOURCE_STATE_COPY_DEST)); // transition final texture to copy destination
 				textureCopys.push_back({ mipTexture.Get(), data.uploadResource.Get(), data.width, data.height, data.pitch, data.format });
@@ -429,6 +406,8 @@ namespace Engine
 
 		// start recording 
 		m_TextureCopyCommandList->StartRecording(); // start recording 
+		ID3D12DescriptorHeap* heaps[]{ m_UploadDescriptors->GetHeap().Get()};
+		m_TextureCopyCommandList->GetCommandList()->SetDescriptorHeaps(1, heaps);
 		m_TextureCopyCommandList->GetCommandList()->ResourceBarrier((uint32)startb.size(), startb.data()); // transition resources to copy
 
 		// copy textures
@@ -472,7 +451,7 @@ namespace Engine
 				DirectX12DescriptorHandle currMip;
 
 				// create SRV for last mip level
-				lastMip = s_SRVHeap->Allocate();
+				lastMip = m_UploadDescriptors->Allocate();
 				D3D12_UNORDERED_ACCESS_VIEW_DESC lastUavDesc = {};
 				lastUavDesc.Format = mipTexture.format;
 				lastUavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
@@ -480,7 +459,7 @@ namespace Engine
 				context->GetDevice()->CreateUnorderedAccessView(mipTexture.mipTexture.Get(), nullptr, &lastUavDesc, lastMip.cpu);
 
 				// create UAV for current mip level
-				currMip = s_SRVHeap->Allocate();
+				currMip = m_UploadDescriptors->Allocate();
 				D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 				uavDesc.Format = mipTexture.format;
 				uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
@@ -496,10 +475,6 @@ namespace Engine
 
 				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV(mipTexture.mipTexture.Get());
 				m_TextureCopyCommandList->GetCommandList()->ResourceBarrier(1, &barrier);
-
-				// delete handles
-				ScheduleHandleDeletion(lastMip);
-				ScheduleHandleDeletion(currMip);
 			}
 
 
@@ -509,9 +484,6 @@ namespace Engine
 
 			// copy resource to final texture
 			mipCopys.push_back({ mipTexture.texture.Get(), mipTexture.mipTexture.Get(), 0,0,0 });
-
-			// schedule freeing of mip texture
-			ScheduleResourceDeletion(mipTexture.mipTexture);
 		}
 
 		m_TextureCopyCommandList->GetCommandList()->ResourceBarrier((uint32)mipBarrier.size(), mipBarrier.data()); // transition mips to copy src

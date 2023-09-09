@@ -20,7 +20,7 @@ namespace Engine
 		GPUTimer::BeginEvent(m_CommandList, "Shadow Pass");
 
 		// convert all frame buffers to render targets
-		std::vector<Ref<FrameBuffer>> fbs;
+		std::vector<ResourceStateObject> transitions;
 
 		// directional light
 		if (scene.m_DirectinalLight)
@@ -35,11 +35,15 @@ namespace Engine
 			{
 				const DirectionalLight::CascadedShadowMaps& maps = cm.second;
 				for (Ref<FrameBuffer> fb : maps.m_ShadowMaps)
-					fbs.push_back(fb);
+				{
+					for (Ref<RenderTarget2D> rt : fb->GetAttachments())
+						transitions.push_back({ rt->GetResource(), ResourceState::RenderTarget });
+				}
 			}
 		}
 
-		m_CommandList->Transition(fbs, ResourceState::RenderTarget, ResourceState::ShaderResource);
+		if(!transitions.empty())
+			m_CommandList->ValidateStates(transitions);
 
 
 		// directional light
@@ -71,7 +75,7 @@ namespace Engine
 						if (pass)
 						{
 							m_CommandList->SetShader(pass);
-							m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), camera->GetCameraBuffer()->GetDescriptorLocation());
+							m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), camera->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
 							m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
 						}
 					}
@@ -82,10 +86,13 @@ namespace Engine
 
 			GPUTimer::EndEvent(m_CommandList);
 		}
-		
-		
-		// convert all render target to srv
-		m_CommandList->Transition(fbs, ResourceState::ShaderResource, ResourceState::RenderTarget);
+
+		// convert all render targets to srv
+		for (auto& transition : transitions)
+			transition.state = ResourceState::ShaderResource;
+
+		if(!transitions.empty())
+			m_CommandList->ValidateStates(transitions);
 
 		GPUTimer::EndEvent(m_CommandList);
 	}

@@ -14,22 +14,16 @@ namespace Engine
 
 		m_Scene = &scene;
 
-		FrameBufferSpecification spec;
-		spec.Attachments = {
-			{ TextureFormat::RGBA16, {0.1f,0.1f,0.1f,1} },
-			{ TextureFormat::Depth, { 1,0,0,0 } }
-		};
-		spec.InitalState = ResourceState::RenderTarget;
-		spec.Width = 100;
-		spec.Height = 100;
+		uint32 width = 100;
+		uint32 height = 100;
 
-		m_COCTexture = FrameBuffer::Create(spec);
-		m_TempTexture = FrameBuffer::Create(spec);
-		m_NearBlur = FrameBuffer::Create(spec);
-		m_FarBlur = FrameBuffer::Create(spec);
+		m_TempTexture	= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
+		m_COCTexture	= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
+		m_NearBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
+		m_FarBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
 	}
 
-	void DepthOfField::RecordCommands(Ref<CommandList> commandList, Ref<FrameBuffer> renderTarget, uint64 srcDescriptorLocation, const PostProcessInput& input, Ref<Mesh> screenMesh)
+	void DepthOfField::RecordCommands(Ref<CommandList> commandList, Ref<RenderTarget2D> renderTarget, Ref<Texture2D> src, const PostProcessInput& input, Ref<Mesh> screenMesh)
 	{
 		GPUTimer::BeginEvent(commandList, "Depth Of Field");
 
@@ -46,7 +40,7 @@ namespace Engine
 		commandList->SetRenderTarget(m_COCTexture);
 		commandList->ClearRenderTarget(m_COCTexture);
 		commandList->SetShader(coc);
-		commandList->SetRootConstant(coc->GetUniformLocation("RC_DepthLoc"), (uint32)input.m_TextureHandles.at("Depth Buffer"));
+		commandList->SetRootConstant(coc->GetUniformLocation("RC_DepthLoc"), input.m_TextureHandles.at("Depth Buffer")->GetSRVDescriptor()->GetIndex());
 		commandList->SetRootConstant(coc->GetUniformLocation("RC_Radius"), m_ConfusionRadius);
 		commandList->SetRootConstant(coc->GetUniformLocation("RC_FocalPlane"), m_FocalPlane);
 		commandList->SetConstantBuffer(coc->GetUniformLocation("camera"), m_Scene->m_MainCamera->GetCameraBuffer());
@@ -56,19 +50,19 @@ namespace Engine
 
 		GPUTimer::BeginEvent(commandList, "expand COC");
 
-		commandList->Transition({ m_COCTexture }, ResourceState::ShaderResource, ResourceState::RenderTarget);
+		commandList->ValidateState({ m_COCTexture->GetResource(), ResourceState::ShaderResource });
 
 		commandList->SetRenderTarget(m_TempTexture);
 		commandList->ClearRenderTarget(m_TempTexture);
 		commandList->SetShader(expandcoc);
 		commandList->SetRootConstant(expandcoc->GetUniformLocation("RC_Radius"), m_COCBlurRadius);
 		commandList->SetRootConstant(expandcoc->GetUniformLocation("RC_X"), 1u);
-		commandList->SetRootConstant(expandcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_COCTexture->GetAttachmentShaderDescriptoLocation(0));
+		commandList->SetRootConstant(expandcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_COCTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
-		commandList->Transition({
-			{m_COCTexture, ResourceState::RenderTarget, ResourceState::ShaderResource},
-			{m_TempTexture, ResourceState::ShaderResource, ResourceState::RenderTarget},
+		commandList->ValidateStates({
+			{ m_COCTexture->GetResource(), ResourceState::RenderTarget },
+			{ m_TempTexture->GetResource(), ResourceState::ShaderResource },
 		});
 
 		commandList->SetRenderTarget(m_COCTexture);
@@ -76,12 +70,12 @@ namespace Engine
 		commandList->SetShader(expandcoc);
 		commandList->SetRootConstant(expandcoc->GetUniformLocation("RC_Radius"), m_COCBlurRadius);
 		commandList->SetRootConstant(expandcoc->GetUniformLocation("RC_X"), 0u);
-		commandList->SetRootConstant(expandcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_TempTexture->GetAttachmentShaderDescriptoLocation(0));
+		commandList->SetRootConstant(expandcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_TempTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
-		commandList->Transition({
-			{m_COCTexture, ResourceState::ShaderResource, ResourceState::RenderTarget},
-			{m_TempTexture, ResourceState::RenderTarget, ResourceState::ShaderResource},
+		commandList->ValidateStates({
+			{ m_COCTexture->GetResource(), ResourceState::ShaderResource },
+			{ m_TempTexture->GetResource(), ResourceState::RenderTarget },
 		});
 
 		GPUTimer::EndEvent(commandList); // end expand coc
@@ -93,12 +87,12 @@ namespace Engine
 		commandList->SetShader(blurcoc);
 		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_Radius"), m_COCBlurRadius);
 		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_X"), 1u);
-		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_COCTexture->GetAttachmentShaderDescriptoLocation(0));
+		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_COCTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
-		commandList->Transition({
-			{m_COCTexture, ResourceState::RenderTarget, ResourceState::ShaderResource},
-			{m_TempTexture, ResourceState::ShaderResource, ResourceState::RenderTarget},
+		commandList->ValidateStates({
+			{ m_COCTexture->GetResource(), ResourceState::RenderTarget },
+			{ m_TempTexture->GetResource(), ResourceState::ShaderResource },
 		});
 
 		commandList->SetRenderTarget(m_COCTexture);
@@ -106,10 +100,10 @@ namespace Engine
 		commandList->SetShader(blurcoc);
 		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_Radius"), m_COCBlurRadius);
 		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_X"), 0u);
-		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_TempTexture->GetAttachmentShaderDescriptoLocation(0));
+		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_TempTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
-		commandList->Transition({ m_TempTexture }, ResourceState::RenderTarget, ResourceState::ShaderResource);
+		commandList->ValidateState({ m_TempTexture->GetResource(), ResourceState::RenderTarget });
 
 		GPUTimer::EndEvent(commandList); // end blur coc
 
@@ -120,22 +114,22 @@ namespace Engine
 		commandList->SetRenderTarget(m_NearBlur);
 		commandList->ClearRenderTarget(m_NearBlur);
 		commandList->SetShader(bokehBlur);
-		commandList->SetRootConstant(bokehBlur->GetUniformLocation("RC_SrcLoc"), (uint32)srcDescriptorLocation);
+		commandList->SetRootConstant(bokehBlur->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
 		commandList->SetRootConstant(bokehBlur->GetUniformLocation("RC_Strength"), m_BokehStrangth);
-		commandList->SetRootConstant(bokehBlur->GetUniformLocation("RC_COC"), (uint32)m_COCTexture->GetAttachmentShaderDescriptoLocation(0));
+		commandList->SetRootConstant(bokehBlur->GetUniformLocation("RC_COC"), (uint32)m_COCTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
 		commandList->SetRenderTarget(m_FarBlur);
 		commandList->ClearRenderTarget(m_FarBlur);
 		commandList->SetShader(farBokehBlur);
-		commandList->SetRootConstant(farBokehBlur->GetUniformLocation("RC_SrcLoc"), (uint32)srcDescriptorLocation);
+		commandList->SetRootConstant(farBokehBlur->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
 		commandList->SetRootConstant(farBokehBlur->GetUniformLocation("RC_Strength"), m_BokehStrangth);
-		commandList->SetRootConstant(farBokehBlur->GetUniformLocation("RC_COC"), (uint32)m_COCTexture->GetAttachmentShaderDescriptoLocation(0));
+		commandList->SetRootConstant(farBokehBlur->GetUniformLocation("RC_COC"), (uint32)m_COCTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
-		commandList->Transition({
-			{m_NearBlur, ResourceState::ShaderResource, ResourceState::RenderTarget},
-			{m_FarBlur, ResourceState::ShaderResource, ResourceState::RenderTarget},
+		commandList->ValidateStates({
+			{ m_NearBlur->GetResource(), ResourceState::ShaderResource },
+			{ m_FarBlur->GetResource(), ResourceState::ShaderResource },
 		});
 
 		GPUTimer::EndEvent(commandList); // end bokeh blur
@@ -143,15 +137,16 @@ namespace Engine
 		commandList->SetRenderTarget(renderTarget);
 		commandList->ClearRenderTarget(renderTarget);
 		commandList->SetShader(composit);
-		commandList->SetRootConstant(composit->GetUniformLocation("RC_SrcLoc"), (uint32)srcDescriptorLocation);
-		commandList->SetRootConstant(composit->GetUniformLocation("RC_NearLoc"), (uint32)m_NearBlur->GetAttachmentShaderDescriptoLocation(0));
-		commandList->SetRootConstant(composit->GetUniformLocation("RC_FarLoc"), (uint32)m_FarBlur->GetAttachmentShaderDescriptoLocation(0));
-		commandList->SetRootConstant(composit->GetUniformLocation("RC_COC"), (uint32)m_COCTexture->GetAttachmentShaderDescriptoLocation(0));
+		commandList->SetRootConstant(composit->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
+		commandList->SetRootConstant(composit->GetUniformLocation("RC_NearLoc"), (uint32)m_NearBlur->GetSRVDescriptor()->GetIndex());
+		commandList->SetRootConstant(composit->GetUniformLocation("RC_FarLoc"), (uint32)m_FarBlur->GetSRVDescriptor()->GetIndex());
+		commandList->SetRootConstant(composit->GetUniformLocation("RC_COC"), (uint32)m_COCTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
-		commandList->Transition({
-			{m_NearBlur, ResourceState::RenderTarget, ResourceState::ShaderResource},
-			{m_FarBlur, ResourceState::RenderTarget, ResourceState::ShaderResource},
+
+		commandList->ValidateStates({
+			{m_NearBlur->GetResource(), ResourceState::RenderTarget},
+			{m_FarBlur->GetResource(), ResourceState::RenderTarget},
 		});
 
 

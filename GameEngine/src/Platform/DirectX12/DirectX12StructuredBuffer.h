@@ -6,81 +6,58 @@
 
 namespace Engine
 {
+	
 	class DirectX12StructuredBufferResource : public StructuredBufferResource
 	{
 	public:
 		DirectX12StructuredBufferResource(uint32 stride, uint32 count);
-		~DirectX12StructuredBufferResource();
+		virtual ~DirectX12StructuredBufferResource() override;
 
-		wrl::ComPtr<ID3D12Resource> GetBuffer() { return m_Buffer; }
+		ID3D12Resource* GetBuffer() { return m_Buffer; }
 
-		DirectX12DescriptorHandle& GetSRVHandle() { return m_SRVHandle; }
-		DirectX12DescriptorHandle& GetUAVHandle() { return m_UAVHandle; }
-
-	private:
-		void Resize(uint32 count);
-		void SetData(const void* data, uint32 count = 1, uint32 start = 0);
-
-		void CreateSRVHandle();
-		void CreateUAVHandle();
-
-		void* GetGPUResourcePointer() override;
-		uint32 GetState(ResourceState state) override;
+		virtual void SetData(const void* data, uint32 count, uint32 start) override;
 
 	private:
-		wrl::ComPtr<ID3D12Resource> m_Buffer;
+		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
+		virtual uint32 GetState(ResourceState state) override;
+
+	private:
+		ID3D12Resource* m_Buffer;
+	};
+
+
+
+
+	class DirectX12StructuredBufferSRVDescriptorHandle : public StructuredBufferSRVDescriptorHandle
+	{
+	public:
+		DirectX12StructuredBufferSRVDescriptorHandle();
+		virtual ~DirectX12StructuredBufferSRVDescriptorHandle() override { m_SRVHandle.Free(); }
+
+		virtual uint64 GetGPUHandlePointer() const override { return m_SRVHandle.gpu.ptr; }
+		virtual uint32 GetIndex() const override { return m_SRVHandle.GetIndex(); }
+		virtual void ReBind(StructuredBufferResource* resource) override;
+
+		const DirectX12DescriptorHandle& GetHandle() { return m_SRVHandle; }
+
+	private:
 		DirectX12DescriptorHandle m_SRVHandle;
+	};
+
+	class DirectX12StructuredBufferUAVDescriptorHandle : public StructuredBufferUAVDescriptorHandle
+	{
+	public:
+		DirectX12StructuredBufferUAVDescriptorHandle();
+		virtual ~DirectX12StructuredBufferUAVDescriptorHandle() override { m_UAVHandle.Free(); }
+
+		virtual uint64 GetGPUHandlePointer() const override { return m_UAVHandle.gpu.ptr; }
+		virtual uint32 GetIndex() const override { return m_UAVHandle.GetIndex(); }
+		virtual void ReBind(StructuredBufferResource* resource) override;
+
+		const DirectX12DescriptorHandle& GetHandle() { return m_UAVHandle; }
+
+	private:
 		DirectX12DescriptorHandle m_UAVHandle;
-
-		friend class DirectX12StructuredBuffer;
-		friend class DirectX12RWStructuredBuffer;
 	};
-
-
-	class DirectX12StructuredBuffer : public StructuredBuffer
-	{
-	public:
-		DirectX12StructuredBuffer(uint32 stride, uint32 count);
-		DirectX12StructuredBuffer(Ref<StructuredBufferResource> resource);
-
-		virtual void Resize(uint32 count) override { m_Resource->Resize(count); }
-
-		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) { m_Resource->SetData(data, count, start); }
-
-		virtual uint32 GetDescriptorLocation() const override { return m_Resource->m_SRVHandle.GetIndex(); }
-
-		virtual Ref<StructuredBufferResource> GetResource() { return m_Resource; }
-		virtual Ref<DirectX12StructuredBufferResource> GetDXResource() { return m_Resource; }
-
-	private:
-		Ref<DirectX12StructuredBufferResource> m_Resource;
-
-	};
-
-
-
-
-	class DirectX12RWStructuredBuffer : public RWStructuredBuffer
-	{
-	public:
-		DirectX12RWStructuredBuffer(uint32 stride, uint32 count);
-		DirectX12RWStructuredBuffer(Ref<StructuredBufferResource> resource);
-
-		virtual void Resize(uint32 count) override { m_Resource->Resize(count); }
-
-		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) { m_Resource->SetData(data, count, start); }
-
-		virtual uint32 GetDescriptorLocation() const override { return m_Resource->m_SRVHandle.GetIndex(); }
-
-		virtual Ref<StructuredBufferResource> GetResource() { return m_Resource; }
-		virtual Ref<DirectX12StructuredBufferResource> GetDXResource() { return m_Resource; }
-
-	private:
-		Ref<DirectX12StructuredBufferResource> m_Resource;
-
-	};
-
-
-
 
 }

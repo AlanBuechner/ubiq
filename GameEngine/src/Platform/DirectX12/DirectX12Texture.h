@@ -1,97 +1,70 @@
 #pragma once
 #include "Engine/Renderer/Resources/Texture.h"
+#include "DirectX12ResourceManager.h"
 #include "DirectX12Descriptors.h"
 #include "DX.h"
 
 namespace Engine
 {
 	DXGI_FORMAT GetDXGITextureFormat(TextureFormat format);
+	DXGI_FORMAT GetDXGISRVTextureFormat(TextureFormat format);
 
 	class DirectX12Texture2DResource : public Texture2DResource
 	{
 	public:
 		DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format);
-		~DirectX12Texture2DResource();
+		DISABLE_COPY(DirectX12Texture2DResource);
+		virtual ~DirectX12Texture2DResource() override;
 
-		wrl::ComPtr<ID3D12Resource> GetBuffer() { return m_Buffer; }
-		DirectX12DescriptorHandle& GetSRVHandle() { return m_SRVHandle; }
-		DirectX12DescriptorHandle& GetRTVDSVHandle() { return m_RTVDSVHandle; }
-		DirectX12DescriptorHandle& GetUAVHandle(uint32 i) { return m_UAVHandles[i]; }
+		ID3D12Resource* GetBuffer() { return m_Buffer; }
 
 		DXGI_FORMAT GetDXGIFormat() { return GetDXGITextureFormat(m_Format); }
+		DXGI_FORMAT GetDXGISRVFormat() { return GetDXGISRVTextureFormat(m_Format); }
 
-	private:
+		virtual void SetData(void* data) override;
 
-		void Resize(uint32 width, uint32 height);
-		void SetData(void* data);
-		
-		void CreateSRVHandle();
-		void CreateRTVDSVHandle();
-		void CreateUAVHandle();
-
-		void* GetGPUResourcePointer() override;
-		uint32 GetState(ResourceState state) override;
-
-	private:
-		wrl::ComPtr<ID3D12Resource> m_Buffer;
-		DirectX12DescriptorHandle m_SRVHandle;
-		DirectX12DescriptorHandle m_RTVDSVHandle;
-		std::vector<DirectX12DescriptorHandle> m_UAVHandles;
-
-		uint32 m_NumMips = 0;
-
-		friend class DirectX12Texture2D;
-		friend class DirectX12RenderTarget2D;
 	protected:
-
-	};
-
-
-	class DirectX12Texture2D : public Texture2D
-	{
-	public:
-		DirectX12Texture2D(const fs::path& path);
-		DirectX12Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format);
-		DirectX12Texture2D(Ref<Texture2DResource> resource);
-
-		virtual uint32 GetWidth() const override { return m_Resource->m_Width; }
-		virtual uint32 GetHeight() const override { return m_Resource->m_Height; }
-		virtual uint64 GetSRVHandle() const override { return m_Resource->m_SRVHandle.gpu.ptr; }
-		virtual uint32 GetDescriptorLocation() const override { return m_Resource->m_SRVHandle.GetIndex(); }
-
-		virtual Ref<Texture2DResource> GetResource() override { return m_Resource; }
-
-		Ref<DirectX12Texture2DResource> GetDXResource() { return m_Resource; }
-
-		virtual void SetData(void* data) override { m_Resource->SetData(data); }
-		virtual void LoadFromFile(const fs::path& path) override;
-
-		virtual bool operator==(const Texture2D& other) const override
-		{
-			return m_Resource->m_SRVHandle.cpu.ptr == ((DirectX12Texture2D&)other).m_Resource->m_SRVHandle.cpu.ptr;
-		}
+		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
+		virtual uint32 GetState(ResourceState state) override;
 
 	private:
-		fs::path m_Path;
+		ID3D12Resource* m_Buffer;
+		ID3D12Resource* m_UploadBuffer;
 
-		Ref<DirectX12Texture2DResource> m_Resource;
-
+		friend class DirectX12SwapChain;
 	};
 
-
-	class DirectX12RenderTarget2D : public RenderTarget2D
+	class DirectX12Texture2DSRVDescriptorHandle : public Texture2DSRVDescriptorHandle
 	{
 	public:
-		DirectX12RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format);
-		DirectX12RenderTarget2D(Ref<Texture2DResource> resource);
+		DirectX12Texture2DSRVDescriptorHandle();
+		virtual ~DirectX12Texture2DSRVDescriptorHandle() override { m_SRVHandle.Free(); }
 
-		void Resize(uint32 width, uint32 height) override { m_Resource->Resize(width, height); }
-		Ref<Texture2DResource> GetResource() override { return m_Resource; }
-		Ref<DirectX12Texture2DResource> GetDXResource() { return m_Resource; }
+		virtual uint64 GetGPUHandlePointer() const override { return m_SRVHandle.gpu.ptr; }
+		virtual uint32 GetIndex() const override { return m_SRVHandle.GetIndex(); }
+		virtual void ReBind(Texture2DResource* resource) override;
 
+		const DirectX12DescriptorHandle& GetHandle() { return m_SRVHandle; }
 
 	private:
-		Ref<DirectX12Texture2DResource> m_Resource;
+		DirectX12DescriptorHandle m_SRVHandle;
+	};
+
+	class DirectX12Texture2DRTVDSVDescriptorHandle : public Texture2DRTVDSVDescriptorHandle
+	{
+	public:
+		DirectX12Texture2DRTVDSVDescriptorHandle(Texture2DResource* resource);
+		virtual ~DirectX12Texture2DRTVDSVDescriptorHandle() override { m_RTVDSVHandle.Free(); }
+
+		virtual uint64 GetGPUHandlePointer() const override { return m_RTVDSVHandle.gpu.ptr; }
+		virtual uint32 GetIndex() const override { return m_RTVDSVHandle.GetIndex(); }
+		virtual void ReBind(Texture2DResource* resource) override;
+
+		const DirectX12DescriptorHandle& GetHandle() { return m_RTVDSVHandle; }
+
+	private:
+		DirectX12DescriptorHandle m_RTVDSVHandle;
+		bool m_DSV;
 	};
 
 }

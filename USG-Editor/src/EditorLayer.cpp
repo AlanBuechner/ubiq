@@ -70,12 +70,12 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 
 		// resize
-		if (FrameBufferSpecification spec = m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetSpecification();
-			m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
-			(spec.Width != m_ViewPortSize.x || spec.Height != m_ViewPortSize.y))
+		uint32 width = m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetResource()->GetWidth();
+		uint32 height = m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetResource()->GetHeight();
+		if (m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
+			(width != m_ViewPortSize.x || height != m_ViewPortSize.y))
 		{
 			m_EditorCamera->SetViewportSize(m_ViewPortSize.x, m_ViewPortSize.y);
-
 			m_ActiveScene->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		}
 
@@ -120,7 +120,7 @@ namespace Engine
 		Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
 		commandList->SetRenderTarget(framBuffer);
 		Renderer::Build(commandList);
-		commandList->Present(framBuffer, ResourceState::RenderTarget); // present the render target
+		commandList->Present(framBuffer); // present the render target
 		Engine::GPUTimer::EndEvent(commandList);
 
 		timer.End();
@@ -409,7 +409,7 @@ namespace Engine
 		float Size = ImGui::GetWindowHeight() - 4.0f;
 		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x*0.5f)-(Size*0.5f));
 		Ref<Texture2D> button = (m_SceneState == SceneState::Edit ? EditorAssets::s_PlayButton : EditorAssets::s_StopButton);
-		if (ImGui::ImageButton((ImTextureID)button->GetSRVHandle(), { Size, Size }, { 0,0 }, {1,1}, 0))
+		if (ImGui::ImageButton((ImTextureID)button->GetSRVDescriptor()->GetGPUHandlePointer(), { Size, Size }, { 0,0 }, {1,1}, 0))
 		{
 			if (m_SceneState == SceneState::Edit)
 				OnScenePlay();
@@ -438,7 +438,7 @@ namespace Engine
 			m_ViewPortSize = { viewPortPanalSize.x, viewPortPanalSize.y };
 		}
 
-		ImGui::Image((ImTextureID)m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetAttachmentShaderHandle(0), viewPortPanalSize);
+		ImGui::Image((ImTextureID)m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetSRVDescriptor()->GetGPUHandlePointer(), viewPortPanalSize);
 		if (ImGui::BeginDragDropTarget())
 		{
 			/*if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))

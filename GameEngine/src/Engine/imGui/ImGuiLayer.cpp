@@ -150,14 +150,14 @@ namespace Engine
 		Ref<DirectX12SwapChain> swapChain = std::dynamic_pointer_cast<DirectX12SwapChain>(Application::Get().GetWindow().GetSwapChain());
 		Ref<DirectX12CommandList> commandList = Renderer::GetMainCommandList<DirectX12CommandList>();
 		GPUTimer::BeginEvent(commandList, "ImGui");
-		commandList->ToRenderTarget(swapChain->GetCurrentFrameBuffer(), ResourceState::Common);
-		commandList->SetRenderTarget(swapChain->GetCurrentFrameBuffer());
+		//commandList->ValidateState({ swapChain->GetCurrentRenderTarget()->GetResource(), ResourceState::RenderTarget });
+		commandList->SetRenderTarget(swapChain->GetCurrentRenderTarget());
 		commandList->ClearRenderTarget(0, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
 		wrl::ComPtr<ID3D12DescriptorHeap> heap = DirectX12ResourceManager::s_SRVHeap->GetHeap();
 		std::vector<ID3D12DescriptorHeap*> descheap{ heap.Get() };
 		commandList->GetCommandList()->SetDescriptorHeaps((uint32)descheap.size(), descheap.data());
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList().Get());
-		commandList->Present(ResourceState::RenderTarget);
+		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList().Get());
+		commandList->Present();
 		GPUTimer::EndEvent(commandList);
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

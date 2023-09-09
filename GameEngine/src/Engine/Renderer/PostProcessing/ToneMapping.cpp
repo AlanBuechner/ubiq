@@ -11,7 +11,7 @@ namespace Engine
 		m_ToneMappingShader = Shader::CreateFromEmbeded(TONEMAPPING, "ToneMapping.hlsl");
 	}
 
-	void ToneMapping::RecordCommands(Ref<CommandList> commandList, Ref<FrameBuffer> renderTarget, uint64 srcDescriptorLocation, const PostProcessInput& input, Ref<Mesh> screenMesh)
+	void ToneMapping::RecordCommands(Ref<CommandList> commandList, Ref<RenderTarget2D> renderTarget, Ref<Texture2D> src, const PostProcessInput& input, Ref<Mesh> screenMesh)
 	{
 		Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("HillACES");
 		//Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("NarkowiczACES");
@@ -21,7 +21,7 @@ namespace Engine
 		commandList->SetRenderTarget(renderTarget);
 		commandList->ClearRenderTarget(renderTarget);
 		commandList->SetShader(pass);
-		commandList->SetRootConstant(pass->GetUniformLocation("RC_SrcLoc"), (uint32)srcDescriptorLocation);
+		commandList->SetRootConstant(pass->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
 		GPUTimer::EndEvent(commandList);

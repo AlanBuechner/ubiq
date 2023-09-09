@@ -5,6 +5,7 @@
 #include "Directx12Context.h"
 #include "DirectX12CommandQueue.h"
 #include "Engine/Util/Performance.h"
+#include "DirectX12Texture.h"
 
 namespace Engine
 {
@@ -20,15 +21,9 @@ namespace Engine
 
 	void DirectX12SwapChain::Init(uint32 numBuffers)
 	{
-		FrameBufferSpecification fbSpec;
-		fbSpec.Attachments = { {TextureFormat::RGBA8, {0,0,0,0}} };
-		fbSpec.Width = 0;
-		fbSpec.Height = 0;
-		fbSpec.SwapChainTarget = true;
-
-		m_FrameBuffers.reserve(numBuffers);
+		m_Buffers.reserve(numBuffers);
 		for (uint32 i = 0; i < numBuffers; i++)
-			m_FrameBuffers.push_back(std::dynamic_pointer_cast<DirectX12FrameBuffer>(FrameBuffer::Create(fbSpec)));
+			m_Buffers.push_back(RenderTarget2D::Create(1, 1, 1, TextureFormat::RGBA8));
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		wrl::ComPtr<IDXGIFactory2> factory2;
@@ -40,7 +35,7 @@ namespace Engine
 
 		// Describe heap
 		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-		rtvHeapDesc.NumDescriptors = (uint32)m_FrameBuffers.size();
+		rtvHeapDesc.NumDescriptors = (uint32)m_Buffers.size();
 		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		rtvHeapDesc.NodeMask = NULL;
 
@@ -68,7 +63,7 @@ namespace Engine
 		swapChainDesc.Stereo = false;		 // No 3D
 		swapChainDesc.SampleDesc = { 1, 0 }; // No MSAA (not supported by D3D12 here)
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesc.BufferCount = (uint32)m_FrameBuffers.size();
+		swapChainDesc.BufferCount = (uint32)m_Buffers.size();
 		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
@@ -102,11 +97,16 @@ namespace Engine
 
 	void DirectX12SwapChain::Resize(uint32 width, uint32 height)
 	{
-		for (uint32 i = 0; i < m_FrameBuffers.size(); i++)
-			m_FrameBuffers[i]->GetBuffer(0).Reset();
+		for (uint32 i = 0; i < m_Buffers.size(); i++)
+		{
+			DirectX12Texture2DResource* dxResource = ((DirectX12Texture2DResource*)m_Buffers[i]->GetResource());
+			dxResource->m_Buffer->Release();
+			dxResource->m_Buffer = 0;
+
+		}
 
 		// Resize swap chain
-		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_FrameBuffers.size(), width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH),
+		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_Buffers.size(), width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH),
 			"Faild to Resize the swapchain");
 
 		// Recreate buffer
@@ -143,7 +143,7 @@ namespace Engine
 	void DirectX12SwapChain::UpdateBackBufferIndex()
 	{
 		// Increment buffer index
-		m_CurrentBuffer = (m_CurrentBuffer + 1) % m_FrameBuffers.size();
+		m_CurrentBuffer = (m_CurrentBuffer + 1) % m_Buffers.size();
 	}
 
 	void DirectX12SwapChain::CleanUp()
@@ -155,25 +155,21 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		CORE_ASSERT(m_SwapChain, "Invalid Swapchain! can not get frame buffers from null");
-		for (unsigned int i = 0; i < m_FrameBuffers.size(); i++)
+		for (unsigned int i = 0; i < m_Buffers.size(); i++)
 		{
 			// Get buffer
-			m_FrameBuffers[i]->GetBuffer(0).Reset();
-			CORE_ASSERT_HRESULT(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(m_FrameBuffers[i]->GetBuffer(0).GetAddressOf())), "Failed to Get Frame Buffer");
+			DirectX12Texture2DResource* dxResource = ((DirectX12Texture2DResource*)m_Buffers[i]->GetResource());
+			dxResource->m_Buffer->Release();
+			dxResource->m_Buffer = 0;
+			CORE_ASSERT_HRESULT(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&dxResource->m_Buffer)), "Failed to Get Frame Buffer");
 
-			// Get heap buffer handle
-			DirectX12DescriptorHandle handle;
-			handle.cpu = m_DescHeap->GetCPUDescriptorHandleForHeapStart();
-			handle.cpu.ptr += (size_t)m_RTVHeapIncrement * i;
-			m_FrameBuffers[i]->SetDescriptorHandle(0, handle);
-
-			// Create RTV
-			context->GetDevice()->CreateRenderTargetView(m_FrameBuffers[i]->GetBuffer(0).Get(), NULL, handle.cpu);
+			// create new handle
+			m_Buffers[i]->GetSRVDescriptor()->ReBind(m_Buffers[i]->GetResource());
 
 			// Name buffer
 			std::wstringstream wss;
 			wss << L"Back Buffer #" << i;
-			m_FrameBuffers[i]->GetBuffer(0)->SetName(wss.str().c_str());
+			dxResource->m_Buffer->SetName(wss.str().c_str());
 		}
 	}
 
