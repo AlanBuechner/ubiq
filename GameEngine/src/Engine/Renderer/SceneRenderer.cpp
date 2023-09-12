@@ -192,7 +192,6 @@ namespace Engine
 			}
 
 			m_RenderGraph->Build();
-			m_Invalid = true;
 		}
 	}
 

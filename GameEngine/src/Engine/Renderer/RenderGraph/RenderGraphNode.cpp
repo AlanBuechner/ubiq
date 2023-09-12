@@ -30,9 +30,16 @@ namespace Engine
 		RenderGraphNode(graph)
 	{}
 
-	void OutputNode::Invalidate()
+	void OutputNode::BuildImpl()
 	{
-		RenderGraphNode::Invalidate();
+		std::vector<ResourceStateObject> transitions(m_Buffer->GetAttachments().size());
+		for (uint32 i = 0; i < transitions.size(); i++)
+		{
+			transitions[i].resource = m_Buffer->GetAttachment(i)->GetResource();
+			transitions[i].state = ResourceState::RenderTarget;
+		}
+
+		m_CommandList->ValidateStates(transitions);
 	}
 
 	// frame buffer node

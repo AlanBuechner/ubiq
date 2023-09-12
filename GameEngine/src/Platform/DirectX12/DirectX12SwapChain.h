@@ -29,18 +29,15 @@ namespace Engine
 		
 		virtual uint32 GetBufferCount() override { return (uint32)m_Buffers.size(); }
 
-		wrl::ComPtr<ID3D12DescriptorHeap> GetDescriptorHeap() { return m_DescHeap; }
-
 		virtual Ref<RenderTarget2D> GetCurrentRenderTarget() override { return m_Buffers[m_CurrentBuffer]; }
 
 	private:
-		void GetFrameBuffers();
+		void GetFrameBuffers(uint32 width, uint32 height);
 
 	private:
 		std::vector<Ref<RenderTarget2D>> m_Buffers;
 
 		wrl::ComPtr<IDXGISwapChain3> m_SwapChain;
-		wrl::ComPtr<ID3D12DescriptorHeap> m_DescHeap;
 
 		uint32 m_RTVHeapIncrement = 0;
 		uint32 m_CurrentBuffer = 0;

@@ -59,15 +59,12 @@ namespace Engine
 		virtual void SetRenderTarget(Ref<RenderTarget2D> renderTarget) = 0;
 		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) = 0;
 
-		virtual void ClearRenderTarget() = 0;
-		virtual void ClearRenderTarget(uint32 attachment) = 0;
-		virtual void ClearRenderTarget(uint32 attachment, const Math::Vector4& color) = 0;
+		void ClearRenderTarget(Ref<FrameBuffer> frameBuffer);
+		void ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment);
+		void ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment, const Math::Vector4& color);
 
-		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer) = 0;
-		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment) = 0;
-		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment, const Math::Vector4& color) = 0;
-
-		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget) = 0;
+		void ClearRenderTarget(Ref<RenderTarget2D> renderTarget);
+		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color) = 0;
 
 		virtual void SetShader(Ref<ShaderPass> shader) = 0;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) = 0;

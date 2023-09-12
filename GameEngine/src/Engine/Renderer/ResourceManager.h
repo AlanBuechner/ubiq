@@ -12,10 +12,11 @@ namespace Engine
 	class ResourceDeletionPool
 	{
 	public:
+		~ResourceDeletionPool();
 		void Clear();
 
 		std::vector<GPUResource*> m_Resources;
-		std::vector<Descriptor*> m_Descriptor;
+		std::vector<Descriptor*> m_Descriptors;
 	};
 
 	class ResourceManager
@@ -29,9 +30,9 @@ namespace Engine
 		virtual void UploadData() = 0;
 
 		void ScheduleResourceDeletion(GPUResource* resource) { m_DeletionPool->m_Resources.push_back(resource); }
-		void ScheduleHandleDeletion(Descriptor* descriptor) { m_DeletionPool->m_Descriptor.push_back(descriptor); }
-	private:
+		void ScheduleHandleDeletion(Descriptor* descriptor) { m_DeletionPool->m_Descriptors.push_back(descriptor); }
 
+	protected:
 		ResourceDeletionPool* m_DeletionPool;
 
 	};

@@ -86,7 +86,7 @@ namespace Engine
 
 	DirectX12ResourceManager::~DirectX12ResourceManager()
 	{
-		ResourceManager::~ResourceManager();
+		delete m_DeletionPool; // needs to be destroyed before the heaps
 
 		s_SRVHeap.reset();
 		s_RTVHeap.reset();

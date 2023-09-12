@@ -149,14 +149,12 @@ namespace Engine
 #ifdef PLATFORM_WINDOWS
 		Ref<DirectX12SwapChain> swapChain = std::dynamic_pointer_cast<DirectX12SwapChain>(Application::Get().GetWindow().GetSwapChain());
 		Ref<DirectX12CommandList> commandList = Renderer::GetMainCommandList<DirectX12CommandList>();
+		Ref<RenderTarget2D> rt = swapChain->GetCurrentRenderTarget();
 		GPUTimer::BeginEvent(commandList, "ImGui");
-		//commandList->ValidateState({ swapChain->GetCurrentRenderTarget()->GetResource(), ResourceState::RenderTarget });
-		commandList->SetRenderTarget(swapChain->GetCurrentRenderTarget());
-		commandList->ClearRenderTarget(0, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
-		wrl::ComPtr<ID3D12DescriptorHeap> heap = DirectX12ResourceManager::s_SRVHeap->GetHeap();
-		std::vector<ID3D12DescriptorHeap*> descheap{ heap.Get() };
-		commandList->GetCommandList()->SetDescriptorHeaps((uint32)descheap.size(), descheap.data());
-		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList().Get());
+		//commandList->ValidateState({ rt->GetResource(), ResourceState::RenderTarget });
+		commandList->SetRenderTarget(rt);
+		commandList->ClearRenderTarget(rt, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList().Get());
 		commandList->Present();
 		GPUTimer::EndEvent(commandList);
 

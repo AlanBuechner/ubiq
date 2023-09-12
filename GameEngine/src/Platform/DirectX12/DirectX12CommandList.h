@@ -36,15 +36,7 @@ namespace Engine
 		virtual void SetRenderTarget(Ref<RenderTarget2D> renderTarget) override;
 		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) override;
 
-		virtual void ClearRenderTarget() override;
-		virtual void ClearRenderTarget(uint32 attachment) override;
-		virtual void ClearRenderTarget(uint32 attachment, const Math::Vector4& color) override;
-
-		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer) override;
-		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment) override;
-		virtual void ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment, const Math::Vector4& color) override;
-
-		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget) override;
+		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color) override;
 
 		virtual void SetShader(Ref<ShaderPass> shader) override;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;

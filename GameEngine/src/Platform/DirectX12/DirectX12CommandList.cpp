@@ -124,8 +124,6 @@ namespace Engine
 
 	void DirectX12CommandList::Transition(std::vector<ResourceTransitionObject> transitions)
 	{
-		std::unordered_map<GPUResource*, ResourceState>& resourceStates = GetResourceStates();
-
 		std::vector<D3D12_RESOURCE_BARRIER> barriers;
 		barriers.resize(transitions.size());
 		for (uint32 i = 0; i < transitions.size(); i++)
@@ -136,8 +134,6 @@ namespace Engine
 			CORE_ASSERT(resource->SupportState(to), "resouce does not support state");
 			barriers[i] = TransitionResource((ID3D12Resource*)resource->GetGPUResourcePointer(), 
 				(D3D12_RESOURCE_STATES)resource->GetState(from), (D3D12_RESOURCE_STATES)resource->GetState(to));
-
-			resourceStates[resource] = to;
 		}
 
 		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
@@ -164,7 +160,10 @@ namespace Engine
 			{
 				ResourceState currState = foundResouce->second;
 				if (currState != res.state)
+				{
 					transitions.push_back({ res.resource, res.state, currState });
+					resourceStates[res.resource] = res.state;
+				}
 			}
 		}
 
@@ -275,34 +274,7 @@ namespace Engine
 		m_CommandList->RSSetScissorRects(numRenderTargets, rects.data());
 	}
 
-	void DirectX12CommandList::ClearRenderTarget()
-	{
-		ClearRenderTarget(m_RenderTarget);
-	}
-
-	void DirectX12CommandList::ClearRenderTarget(uint32 attachment)
-	{
-		ClearRenderTarget(m_RenderTarget, attachment);
-	}
-
-	void DirectX12CommandList::ClearRenderTarget(uint32 attachment, const Math::Vector4& color)
-	{
-		ClearRenderTarget(m_RenderTarget, attachment, color);
-	}
-
-	void DirectX12CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer)
-	{
-		for (uint32 i = 0; i < frameBuffer->GetAttachments().size(); i++)
-			ClearRenderTarget(frameBuffer, i);
-	}
-
-	void DirectX12CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment)
-	{
-		//Math::Vector4 color = frameBuffer->GetAttachment(attachment).clearColor;
-		ClearRenderTarget(frameBuffer, attachment, { 0,0,0,0 });
-	}
-
-	void DirectX12CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment, const Math::Vector4& color)
+	void DirectX12CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color)
 	{
 		if (m_Type == CommandList::Bundle)
 		{
@@ -310,26 +282,8 @@ namespace Engine
 			return;
 		}
 
-		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)frameBuffer->GetAttachment(attachment)->GetResource();
-		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)frameBuffer->GetAttachment(attachment)->GetRTVDSVDescriptor();
-
-		ValidateState({ res, ResourceState::RenderTarget });
-
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetHandle().cpu;
-		if (IsDepthStencil(res->GetFormat()))
-			m_CommandList->ClearDepthStencilView(handle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, color.r, (uint8)color.g, 0, nullptr);
-		else
-			m_CommandList->ClearRenderTargetView(handle, (float*)&color, 0, nullptr);
-	}
-
-
-
-	void DirectX12CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget)
-	{
 		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)renderTarget->GetResource();
 		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)renderTarget->GetRTVDSVDescriptor();
-
-		const Math::Vector4 color = { 0,0,0,0 };
 
 		ValidateState({ res, ResourceState::RenderTarget });
 
@@ -495,6 +449,7 @@ namespace Engine
 	bool DirectX12CommandList::RecordPrependCommands()
 	{
 		std::vector<ResourceStateObject>& pendingTransitions = GetPendingTransitions();
+		std::unordered_map<GPUResource*, ResourceState> endingStates = GetEndingResourceStates();
 
 		// get list off all resources that need to be changed
 		std::vector<D3D12_RESOURCE_BARRIER> transitions;
@@ -517,6 +472,9 @@ namespace Engine
 					(D3D12_RESOURCE_STATES)resource->GetState(from), (D3D12_RESOURCE_STATES)resource->GetState(to)));
 			}
 		}
+
+		for (auto resState : endingStates)
+			resState.first->m_DefultState = resState.second;
 
 		if (!transitions.empty())
 		{

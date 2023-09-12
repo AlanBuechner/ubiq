@@ -66,7 +66,7 @@ namespace Engine
 
 		// remove the slot from the list of free slots
 		m_FreeSlots.pop_back();
-		m_FreeSlots.push_back(slot);
+		m_UsedSlots.push_back(slot);
 
 		return handle;
 	}

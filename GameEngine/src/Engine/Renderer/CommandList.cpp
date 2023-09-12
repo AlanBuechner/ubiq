@@ -23,4 +23,27 @@ namespace Engine
 		return Ref<CommandList>();
 	}
 
+	void CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer)
+	{
+		for (uint32 i = 0; i < frameBuffer->GetAttachments().size(); i++)
+			ClearRenderTarget(frameBuffer, i);
+	}
+
+	void CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment)
+	{
+		//Math::Vector4 color = frameBuffer->GetAttachment(attachment).clearColor;
+		ClearRenderTarget(frameBuffer, attachment, { 0,0,0,0 });
+	}
+
+	void CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment, const Math::Vector4& color)
+	{
+		ClearRenderTarget(frameBuffer->GetAttachment(attachment), color);
+	}
+
+	void CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget)
+	{
+		const static Math::Vector4 color = { 0,0,0,0 };
+		ClearRenderTarget(renderTarget, color);
+	}
+
 }

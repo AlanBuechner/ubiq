@@ -72,7 +72,7 @@ namespace Engine
 
 	void Bloom::OnViewportResize(uint32 width, uint32 height)
 	{
-
+		m_NumberDownSamples = (uint32)std::floor(std::log2(std::max(width, height)));
 		if (m_GaussianSumTextures.size() != m_NumberDownSamples)
 		{
 			m_GaussianSumTextures.resize(m_NumberDownSamples);

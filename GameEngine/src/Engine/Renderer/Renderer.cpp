@@ -173,7 +173,6 @@ namespace Engine
 			// rendering commands
 			s_RenderFlag.Wait();
 			timer.Start("Render");
-			CORE_INFO("Executing command lists");
 #if defined(RELEASE)
 			try 
 			{
@@ -195,13 +194,12 @@ namespace Engine
 			WindowManager::UpdateWindows();
 
 			// prepare for next frame
-			CORE_INFO("Cleaning up reousrces");
 			deletionPool->Clear();
 			deletionPool = resourceManager->CreateNewDeletionPool();
 			s_SwapFlag.Signal();
 
 			frame++;
-			CORE_INFO("{0}", frame);
+			//CORE_INFO("{0}", frame);
 		}
 	}
 

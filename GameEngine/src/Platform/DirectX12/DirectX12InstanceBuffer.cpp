@@ -38,13 +38,13 @@ namespace Engine
 
 	DirectX12InstanceBufferResource::~DirectX12InstanceBufferResource()
 	{
+		CD3DX12_RANGE range = CD3DX12_RANGE(0, 0);
+		m_UploadBuffer->Unmap(0, &range);
+		m_MapLoc = nullptr;
 		m_Buffer->Release();
 		m_Buffer = nullptr;
 		m_UploadBuffer->Release();
 		m_UploadBuffer = nullptr;
-		CD3DX12_RANGE range = CD3DX12_RANGE(0, 0);
-		m_UploadBuffer->Unmap(0, &range);
-		m_MapLoc = nullptr;
 	}
 
 	void DirectX12InstanceBufferResource::SetData(const void* data, uint32 count)

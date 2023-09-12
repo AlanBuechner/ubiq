@@ -76,7 +76,7 @@ namespace Engine
 		}
 
 		if (handle)
-			handle->ReBind(resource);
+			handle->Bind(resource);
 		return handle;
 	}
 
@@ -91,7 +91,7 @@ namespace Engine
 		}
 
 		if (handle)
-			handle->ReBind(resource);
+			handle->Bind(resource);
 		return handle;
 	}
 
@@ -108,27 +108,32 @@ namespace Engine
 
 	Texture2D::~Texture2D()
 	{
-		CORE_INFO("Deleteing Texture : {0}", (uint64)m_Resource->GetGPUResourcePointer());
-		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
 		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_SRVDescriptor);
+		m_SRVDescriptor = nullptr;
+
+		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
+		m_Resource = nullptr;
 	}
 
 	void Texture2D::Resize(uint32 width, uint32 height)
 	{
+		if (!m_Resizeable)
+		{
+			CORE_WARN("Can not resize texture");
+			return;
+		}
+
 		// schedule old resource destruction
 		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
 
 		Texture2DResource** p = &m_Resource;
 
 		// create new resource
-		uint32 oldWidth = m_Resource->GetWidth();
-		uint32 oldHeight = m_Resource->GetHeight();
-		uint64 oldPointer = (uint64)m_Resource->GetGPUResourcePointer();
 		m_Resource = Texture2DResource::Create(width, height, m_Resource->GetMips(), m_Resource->GetFormat());
-		CORE_INFO("Resizeing Texture : {0}({1}, {2}) -> {3}({4}, {5})", oldPointer, oldWidth, oldHeight, (uint64)m_Resource->GetGPUResourcePointer(), m_Resource->GetWidth(), m_Resource->GetHeight());
 
 		// rebind srv handles
-		m_SRVDescriptor->ReBind(m_Resource);
+		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_SRVDescriptor);
+		m_SRVDescriptor = Texture2DSRVDescriptorHandle::Create(m_Resource);
 	}
 
 	Ref<Texture2D> Texture2D::Create(uint32 width, uint32 height)
@@ -156,6 +161,7 @@ namespace Engine
 	{
 		CORE_ASSERT(path != "", "Path must be given");
 		TextureFile* file = TextureFile::LoadFile(path);
+		file->ConvertToChannels(4);
 
 		Ref<Texture2D> texture = Create(file->width, file->height, file->GetTextureFormat());
 		texture->SetData(file->data);
@@ -179,17 +185,23 @@ namespace Engine
 
 	RenderTarget2D::~RenderTarget2D()
 	{
-		Texture2D::~Texture2D();
 		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_RTVDSVDescriptor);
+		m_RTVDSVDescriptor = nullptr;
 	}
 
 	void RenderTarget2D::Resize(uint32 width, uint32 height)
 	{
+		if (!m_Resizeable)
+		{
+			CORE_WARN("Can not resize texture");
+			return;
+		}
+
 		// resize the base texture
 		Texture2D::Resize(width, height);
-
 		// rebind the rtv/dsv handle
-		m_RTVDSVDescriptor->ReBind(m_Resource);
+		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_RTVDSVDescriptor);
+		m_RTVDSVDescriptor = Texture2DRTVDSVDescriptorHandle::Create(m_Resource);
 	}
 
 	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format)
@@ -214,7 +226,7 @@ namespace Engine
 			switch (channels)
 			{
 			case 1: return TextureFormat::None; // TODO : add in new texture format
-			case 2: return TextureFormat::None; // TODO : add in new texture format
+			case 2: return TextureFormat::RG16; // TODO : add in new texture format
 			case 3: return TextureFormat::None; // TODO : add in new texture format
 			case 4: return TextureFormat::RGBA16;
 			}
@@ -233,6 +245,14 @@ namespace Engine
 
 	void TextureFile::ConvertToChannels(uint8 numChannels)
 	{
+
+		if (channels == numChannels)
+			return;
+
+		uint8 minChannels = channels < numChannels ? channels : numChannels;
+		uint32 oldImageStrid = width * channels;
+		uint32 newImageStrid = width * numChannels;
+
 #define MAP_DATA(type){ type* newData = new type[width * height * channels]; \
 		for (uint32 x = 0; x < width; x++){\
 			for (uint32 y = 0; y < height; y++){\
@@ -246,18 +266,14 @@ namespace Engine
 		delete[] data;\
 		data = newData;}
 
-		if (channels == numChannels)
-			return;
-
-		uint8 minChannels = channels < numChannels ? channels : numChannels;
-		uint8 oldImageStrid = width * channels;
-		uint8 newImageStrid = width * numChannels;
 		if (HDR)
 			MAP_DATA(uint16)
 		else
 			MAP_DATA(uint8)
 
-			channels = numChannels;
+		channels = numChannels;
+
+#undef MAP_DATA
 	}
 
 	TextureFile* TextureFile::LoadFile(const fs::path& file)
@@ -266,16 +282,17 @@ namespace Engine
 
 		TextureFile* texture = new TextureFile();
 		int width, height, channels;
+		int reqChannels = 0;
 
 		if (file.extension() == ".hdr")
 		{
 			texture->HDR = true;
-			texture->data = stbi_load_16(file.string().c_str(), &width, &height, &channels, STBI_rgb_alpha);
+			texture->data = stbi_load_16(file.string().c_str(), &width, &height, &channels, reqChannels);
 		}
 		else
 		{
 			texture->HDR = false;
-			texture->data = stbi_load(file.string().c_str(), &width, &height, &channels, STBI_rgb_alpha);
+			texture->data = stbi_load(file.string().c_str(), &width, &height, &channels, reqChannels);
 		}
 
 		texture->width = width;

@@ -47,7 +47,7 @@ namespace Engine
 	public:
 		OutputNode(RenderGraph& graph);
 
-		virtual void Invalidate();
+		virtual void BuildImpl() override;
 
 		Ref<FrameBuffer> m_Buffer;
 	};

@@ -12,6 +12,7 @@ namespace Engine
 	class DirectX12Texture2DResource : public Texture2DResource
 	{
 	public:
+		DirectX12Texture2DResource(uint32 width, uint32 height, TextureFormat format, ID3D12Resource* resource);
 		DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format);
 		DISABLE_COPY(DirectX12Texture2DResource);
 		virtual ~DirectX12Texture2DResource() override;
@@ -42,7 +43,7 @@ namespace Engine
 
 		virtual uint64 GetGPUHandlePointer() const override { return m_SRVHandle.gpu.ptr; }
 		virtual uint32 GetIndex() const override { return m_SRVHandle.GetIndex(); }
-		virtual void ReBind(Texture2DResource* resource) override;
+		virtual void Bind(Texture2DResource* resource) override;
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_SRVHandle; }
 
@@ -58,7 +59,7 @@ namespace Engine
 
 		virtual uint64 GetGPUHandlePointer() const override { return m_RTVDSVHandle.gpu.ptr; }
 		virtual uint32 GetIndex() const override { return m_RTVDSVHandle.GetIndex(); }
-		virtual void ReBind(Texture2DResource* resource) override;
+		virtual void Bind(Texture2DResource* resource) override;
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_RTVDSVHandle; }
 

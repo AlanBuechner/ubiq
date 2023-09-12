@@ -23,7 +23,11 @@ namespace Engine
 	{
 		m_Buffers.reserve(numBuffers);
 		for (uint32 i = 0; i < numBuffers; i++)
-			m_Buffers.push_back(RenderTarget2D::Create(1, 1, 1, TextureFormat::RGBA8));
+		{
+			Ref<RenderTarget2D> renderTarget = RenderTarget2D::Create(1, 1, 1, TextureFormat::RGBA8);
+			renderTarget->SetResizable(false);
+			m_Buffers.push_back(renderTarget);
+		}
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		wrl::ComPtr<IDXGIFactory2> factory2;
@@ -38,11 +42,6 @@ namespace Engine
 		rtvHeapDesc.NumDescriptors = (uint32)m_Buffers.size();
 		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		rtvHeapDesc.NodeMask = NULL;
-
-		// Create heap
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(m_DescHeap.GetAddressOf())),
-			"ID3D12Device->CreateDescriptorHeap(...) for Heap type D3D12_DESCRIPTOR_HEAP_TYPE_RTV");
-		m_DescHeap->SetName(L"SwapChain RTV Heap");
 
 		// Get heap increment size
 		m_RTVHeapIncrement = context->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -88,7 +87,7 @@ namespace Engine
 		CORE_ASSERT_HRESULT(factory2->MakeWindowAssociation(m_WindowHandle, DXGI_MWA_NO_ALT_ENTER),
 			"Failed to make window association");
 
-		GetFrameBuffers();
+		GetFrameBuffers(swapChainDesc.Width, swapChainDesc.Height);
 		m_CurrentBuffer = m_SwapChain->GetCurrentBackBufferIndex();
 
 		if (swapChainFDesc)
@@ -97,20 +96,12 @@ namespace Engine
 
 	void DirectX12SwapChain::Resize(uint32 width, uint32 height)
 	{
-		for (uint32 i = 0; i < m_Buffers.size(); i++)
-		{
-			DirectX12Texture2DResource* dxResource = ((DirectX12Texture2DResource*)m_Buffers[i]->GetResource());
-			dxResource->m_Buffer->Release();
-			dxResource->m_Buffer = 0;
-
-		}
-
 		// Resize swap chain
 		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_Buffers.size(), width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH),
 			"Faild to Resize the swapchain");
 
 		// Recreate buffer
-		GetFrameBuffers();
+		GetFrameBuffers(width, height);
 		m_CurrentBuffer = m_SwapChain->GetCurrentBackBufferIndex();
 	}
 
@@ -151,25 +142,31 @@ namespace Engine
 		//SwapBuffers();
 	}
 
-	void DirectX12SwapChain::GetFrameBuffers()
+	void DirectX12SwapChain::GetFrameBuffers(uint32 width, uint32 height)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		CORE_ASSERT(m_SwapChain, "Invalid Swapchain! can not get frame buffers from null");
 		for (unsigned int i = 0; i < m_Buffers.size(); i++)
 		{
+			Ref<RenderTarget2D> renderTarget = m_Buffers[i];
+			context->GetResourceManager()->ScheduleResourceDeletion(renderTarget->m_Resource);
+
 			// Get buffer
-			DirectX12Texture2DResource* dxResource = ((DirectX12Texture2DResource*)m_Buffers[i]->GetResource());
-			dxResource->m_Buffer->Release();
-			dxResource->m_Buffer = 0;
-			CORE_ASSERT_HRESULT(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&dxResource->m_Buffer)), "Failed to Get Frame Buffer");
+			ID3D12Resource* res = nullptr;
+			CORE_ASSERT_HRESULT(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&res)), "Failed to Get Frame Buffer");
+			renderTarget->m_Resource = new DirectX12Texture2DResource(width, height, TextureFormat::RGBA8, res);
 
 			// create new handle
-			m_Buffers[i]->GetSRVDescriptor()->ReBind(m_Buffers[i]->GetResource());
+			
+			context->GetResourceManager()->ScheduleHandleDeletion(renderTarget->GetSRVDescriptor());
+			context->GetResourceManager()->ScheduleHandleDeletion(renderTarget->GetRTVDSVDescriptor());
+			renderTarget->m_SRVDescriptor = Texture2DSRVDescriptorHandle::Create(renderTarget->m_Resource);
+			renderTarget->m_RTVDSVDescriptor = Texture2DRTVDSVDescriptorHandle::Create(renderTarget->m_Resource);
 
 			// Name buffer
 			std::wstringstream wss;
 			wss << L"Back Buffer #" << i;
-			dxResource->m_Buffer->SetName(wss.str().c_str());
+			res->SetName(wss.str().c_str());
 		}
 	}
 

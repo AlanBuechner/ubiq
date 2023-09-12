@@ -69,9 +69,11 @@ namespace Engine
 	public:
 		virtual uint64 GetGPUHandlePointer() const = 0;
 		virtual uint32 GetIndex() const = 0;
-		virtual void ReBind(Texture2DResource* resource) = 0;
+		virtual void Bind(Texture2DResource* resource) = 0;
 
 		static Texture2DSRVDescriptorHandle* Create(Texture2DResource* resource);
+
+		Texture2DResource* m_Resource;
 	};
 
 	class Texture2DRTVDSVDescriptorHandle : public Descriptor
@@ -79,9 +81,11 @@ namespace Engine
 	public:
 		virtual uint64 GetGPUHandlePointer() const = 0;
 		virtual uint32 GetIndex() const = 0;
-		virtual void ReBind(Texture2DResource* resource) = 0;
+		virtual void Bind(Texture2DResource* resource) = 0;
 
 		static Texture2DRTVDSVDescriptorHandle* Create(Texture2DResource* resource);
+
+		Texture2DResource* m_Resource;
 	};
 
 	class Texture2DUAVDescriptorHandle : public Descriptor // TODO
@@ -111,6 +115,7 @@ namespace Engine
 		GPUResourceHandle GetResourceHandle()const { return (GPUResource**) & m_Resource; }
 		Texture2DSRVDescriptorHandle* GetSRVDescriptor() const { return m_SRVDescriptor; }
 
+		void SetResizable(bool resizeable) { m_Resizeable = resizeable; }
 		virtual void Resize(uint32 width, uint32 height);
 
 		void SetData(void* data) { m_Resource->SetData(data); }
@@ -128,6 +133,7 @@ namespace Engine
 	protected:
 		Texture2DResource* m_Resource;
 		Texture2DSRVDescriptorHandle* m_SRVDescriptor;
+		bool m_Resizeable = true;
 	};
 
 	class RenderTarget2D : public Texture2D
@@ -145,6 +151,8 @@ namespace Engine
 
 	protected:
 		Texture2DRTVDSVDescriptorHandle* m_RTVDSVDescriptor;
+
+		friend class DirectX12SwapChain;
 
 	};
 

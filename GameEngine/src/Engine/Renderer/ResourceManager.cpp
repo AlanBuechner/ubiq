@@ -8,16 +8,21 @@
 namespace Engine
 {
 
+	ResourceDeletionPool::~ResourceDeletionPool()
+	{
+		Clear();
+	}
+
 	void ResourceDeletionPool::Clear()
 	{
-		for (GPUResource* res : m_Resources)
-			delete res;
+		for (uint32 i = 0; i < m_Resources.size(); i++)
+			delete m_Resources[i];
 
-		for (Descriptor* desc : m_Descriptor)
-			delete desc;
+		for (uint32 i = 0; i < m_Descriptors.size(); i++)
+			delete m_Descriptors[i];
 
 		m_Resources.clear();
-		m_Resources.clear();
+		m_Descriptors.clear();
 	}
 
 	ResourceManager::ResourceManager()
@@ -26,9 +31,7 @@ namespace Engine
 	}
 
 	ResourceManager::~ResourceManager()
-	{
-		delete m_DeletionPool;
-	}
+	{}
 
 
 	ResourceDeletionPool* ResourceManager::CreateNewDeletionPool()

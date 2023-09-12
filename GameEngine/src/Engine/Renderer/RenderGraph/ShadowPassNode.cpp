@@ -66,7 +66,7 @@ namespace Engine
 					GPUTimer::BeginEvent(m_CommandList, "Cascade " + std::to_string(i));
 
 					m_CommandList->SetRenderTarget(fb);
-					m_CommandList->ClearRenderTarget();
+					m_CommandList->ClearRenderTarget(fb);
 
 					// for each object in the scene
 					for (auto& cmd : scene.m_DrawCommands)

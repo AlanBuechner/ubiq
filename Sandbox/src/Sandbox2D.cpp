@@ -56,7 +56,7 @@ void Sandbox2DLayer::OnRender()
 	Engine::Ref<Engine::CommandList> commandList = Engine::Renderer::GetMainCommandList();
 
 	commandList->SetRenderTarget(m_Frame);
-	commandList->ClearRenderTarget();
+	commandList->ClearRenderTarget(m_Frame);
 
 	//Engine::Renderer::Build();
 

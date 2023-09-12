@@ -117,11 +117,11 @@ namespace Engine
 		m_ActiveScene->GetSceneRenderer()->Build();
 		m_ActiveScene->GetSceneRenderer()->Render(Renderer::GetMainCommandQueue());
 
-		Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
-		commandList->SetRenderTarget(framBuffer);
-		Renderer::Build(commandList);
+		//Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
+		//commandList->SetRenderTarget(framBuffer);
+		//Renderer::Build(commandList);
 		commandList->Present(framBuffer); // present the render target
-		Engine::GPUTimer::EndEvent(commandList);
+		//Engine::GPUTimer::EndEvent(commandList);
 
 		timer.End();
 	}

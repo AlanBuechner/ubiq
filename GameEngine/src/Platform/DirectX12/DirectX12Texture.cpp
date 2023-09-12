@@ -61,6 +61,15 @@ namespace Engine
 		return DXGI_FORMAT_UNKNOWN;
 	}
 
+	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, TextureFormat format, ID3D12Resource* resource)
+	{
+		m_Buffer = resource;
+		m_UploadBuffer = nullptr;
+		m_Width = width;
+		m_Height = height;
+		m_Mips = 1;
+		m_Format = format;
+	}
 
 
 	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format)
@@ -131,19 +140,24 @@ namespace Engine
 
 	DirectX12Texture2DResource::~DirectX12Texture2DResource()
 	{
-		CORE_INFO("Deleting {0}", (uint64)m_Buffer);
-
 		m_Buffer->Release();
-		//m_Buffer = nullptr;
+		m_Buffer = nullptr;
 
-		m_UploadBuffer->Release();
-		m_UploadBuffer = nullptr;
-
-		m_Width = -1;
+		if (m_UploadBuffer)
+		{
+			m_UploadBuffer->Release();
+			m_UploadBuffer = nullptr;
+		}
 	}
 
 	void DirectX12Texture2DResource::SetData(void* data)
 	{
+		if (!m_UploadBuffer)
+		{
+			CORE_WARN("missing upload resource");
+			return;
+		}
+
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		UINT stride = GetStride();
@@ -188,7 +202,7 @@ namespace Engine
 		m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
-	void DirectX12Texture2DSRVDescriptorHandle::ReBind(Texture2DResource* resource)
+	void DirectX12Texture2DSRVDescriptorHandle::Bind(Texture2DResource* resource)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)resource;
@@ -201,6 +215,8 @@ namespace Engine
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 		context->GetDevice()->CreateShaderResourceView(dxResource->GetBuffer(), &srvDesc, m_SRVHandle.cpu);
+
+		m_Resource = resource;
 	}
 
 	DirectX12Texture2DRTVDSVDescriptorHandle::DirectX12Texture2DRTVDSVDescriptorHandle(Texture2DResource* resource)
@@ -212,7 +228,7 @@ namespace Engine
 			m_RTVDSVHandle = DirectX12ResourceManager::s_RTVHeap->Allocate();
 	}
 
-	void DirectX12Texture2DRTVDSVDescriptorHandle::ReBind(Texture2DResource* resource)
+	void DirectX12Texture2DRTVDSVDescriptorHandle::Bind(Texture2DResource* resource)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)resource;
@@ -225,6 +241,8 @@ namespace Engine
 			context->GetDevice()->CreateDepthStencilView(dxResource->GetBuffer(), nullptr, m_RTVDSVHandle.cpu);
 		else
 			context->GetDevice()->CreateRenderTargetView(dxResource->GetBuffer(), nullptr, m_RTVDSVHandle.cpu);
+
+		m_Resource = resource;
 	}
 
 }

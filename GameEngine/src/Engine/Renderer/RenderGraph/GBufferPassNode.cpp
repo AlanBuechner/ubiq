@@ -18,7 +18,7 @@ namespace Engine
 		GPUTimer::BeginEvent(m_CommandList, "Depth pre pass");
 		// set up render target
 		m_CommandList->SetRenderTarget(m_RenderTarget);
-		m_CommandList->ClearRenderTarget();
+		m_CommandList->ClearRenderTarget(m_RenderTarget);
 
 		// render all objects
 		for (auto& cmd : scene.m_DrawCommands)
