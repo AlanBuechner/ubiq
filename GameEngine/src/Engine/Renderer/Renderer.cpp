@@ -172,6 +172,7 @@ namespace Engine
 
 			// rendering commands
 			s_RenderFlag.Wait();
+			//CORE_INFO("{0}", frame);
 			timer.Start("Render");
 #if defined(RELEASE)
 			try 
@@ -199,7 +200,6 @@ namespace Engine
 			s_SwapFlag.Signal();
 
 			frame++;
-			//CORE_INFO("{0}", frame);
 		}
 	}
 

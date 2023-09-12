@@ -35,7 +35,7 @@ namespace Engine
 		Ref<ShaderPass> composit = m_DepthOfFieldShader->GetPass("composit");
 
 		GPUTimer::BeginEvent(commandList, "COC");
-		GPUTimer::BeginEvent(commandList, "calculate COC");
+		GPUTimer::BeginEvent(commandList, "Calculate COC");
 
 		commandList->SetRenderTarget(m_COCTexture);
 		commandList->ClearRenderTarget(m_COCTexture);
@@ -48,7 +48,7 @@ namespace Engine
 
 		GPUTimer::EndEvent(commandList); // end calc coc
 
-		GPUTimer::BeginEvent(commandList, "expand COC");
+		GPUTimer::BeginEvent(commandList, "Expand COC");
 
 		commandList->ValidateState({ m_COCTexture->GetResource(), ResourceState::ShaderResource });
 
@@ -80,7 +80,7 @@ namespace Engine
 
 		GPUTimer::EndEvent(commandList); // end expand coc
 
-		GPUTimer::BeginEvent(commandList, "blur COC");
+		GPUTimer::BeginEvent(commandList, "Blur COC");
 
 		commandList->SetRenderTarget(m_TempTexture);
 		commandList->ClearRenderTarget(m_TempTexture);
@@ -103,13 +103,16 @@ namespace Engine
 		commandList->SetRootConstant(blurcoc->GetUniformLocation("RC_SrcLoc"), (uint32)m_TempTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
-		commandList->ValidateState({ m_TempTexture->GetResource(), ResourceState::RenderTarget });
+		commandList->ValidateStates({
+			{ m_COCTexture->GetResource(), ResourceState::ShaderResource },
+			{ m_TempTexture->GetResource(), ResourceState::RenderTarget },
+		});
 
 		GPUTimer::EndEvent(commandList); // end blur coc
 
 		GPUTimer::EndEvent(commandList); // end coc
 
-		GPUTimer::BeginEvent(commandList, "bokeh blur");
+		GPUTimer::BeginEvent(commandList, "Bokeh Blur");
 
 		commandList->SetRenderTarget(m_NearBlur);
 		commandList->ClearRenderTarget(m_NearBlur);

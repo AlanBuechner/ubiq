@@ -42,8 +42,8 @@ namespace Engine
 			}
 		}
 
-		if(!transitions.empty())
-			m_CommandList->ValidateStates(transitions);
+
+		m_CommandList->ValidateStates(transitions);
 
 
 		// directional light

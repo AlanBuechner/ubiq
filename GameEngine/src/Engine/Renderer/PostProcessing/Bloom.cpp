@@ -19,19 +19,28 @@ namespace Engine
 
 		Ref<ShaderPass> downSample = m_BloomShader->GetPass("downSample");
 		Ref<ShaderPass> upSample = m_BloomShader->GetPass("upSample");
-		Ref<ShaderPass> composit = m_BloomShader->GetPass("composit");
+		Ref<ShaderPass> composite = m_BloomShader->GetPass("composite");
 
+		GPUTimer::BeginEvent(commandList, "Down Sample");
 		for (uint32 i = 0; i < m_NumberDownSamples; i++)
 		{
-			uint32 srcLoc = (i==0) ? src->GetSRVDescriptor()->GetIndex() : m_GaussianSumTextures[i - 1]->GetSRVDescriptor()->GetIndex();
+			GPUTimer::BeginEvent(commandList, std::to_string(i));
+			Ref<Texture2D> srcTexture = (i==0) ? src : m_GaussianSumTextures[i - 1];
+
+			commandList->ValidateStates({
+				{ m_GaussianSumTextures[i]->GetResource(), ResourceState::RenderTarget },
+				{ srcTexture->GetResource(), ResourceState::ShaderResource },
+			});
+
 			commandList->SetRenderTarget(m_GaussianSumTextures[i]);
 			commandList->ClearRenderTarget(m_GaussianSumTextures[i]);
 			commandList->SetShader(downSample);
-			commandList->SetRootConstant(downSample->GetUniformLocation("RC_SrcLoc"), srcLoc);
+			commandList->SetRootConstant(downSample->GetUniformLocation("RC_SrcLoc"), srcTexture->GetSRVDescriptor()->GetIndex());
 			float threshold = i == 0 ? 1 : 0;
 			commandList->SetRootConstant(downSample->GetUniformLocation("RC_Threshold"), threshold);
 			commandList->DrawMesh(screenMesh);
-			commandList->ValidateState({m_GaussianSumTextures[i]->GetResource(), ResourceState::ShaderResource});
+
+			GPUTimer::EndEvent(commandList);
 		}
 
 		{ // validate that all sum textures are render targets
@@ -40,23 +49,41 @@ namespace Engine
 				transitions[i] = { m_GaussianSumTextures[i]->GetResource(), ResourceState::RenderTarget };
 			commandList->ValidateStates(transitions);
 		}
+		GPUTimer::EndEvent(commandList);
 
-
+		GPUTimer::BeginEvent(commandList, "Up Sample");
 		for (int i = m_NumberDownSamples - 2; i >= 0; i--)
 		{
-			uint32 srcLoc = m_GaussianSumTextures[i + 1]->GetSRVDescriptor()->GetIndex();
+			GPUTimer::BeginEvent(commandList, std::to_string(i));
+			Ref<Texture2D> srcTexture = m_GaussianSumTextures[i + 1];
+
+			commandList->ValidateStates({
+				{ m_GaussianSumTextures[i]->GetResource(), ResourceState::RenderTarget },
+				{ srcTexture->GetResource(), ResourceState::ShaderResource },
+			});
+
 			commandList->SetRenderTarget(m_GaussianSumTextures[i]);
-			commandList->DrawMesh(screenMesh);
 			commandList->SetShader(upSample);
-			commandList->SetRootConstant(upSample->GetUniformLocation("RC_SrcLoc"), srcLoc);
-			commandList->ValidateState({ m_GaussianSumTextures[i]->GetResource(), ResourceState::ShaderResource });
+			commandList->SetRootConstant(upSample->GetUniformLocation("RC_SrcLoc"), srcTexture->GetSRVDescriptor()->GetIndex());
+			commandList->DrawMesh(screenMesh);
+
+			GPUTimer::EndEvent(commandList);
 		}
+
+		GPUTimer::EndEvent(commandList);
+
+		GPUTimer::BeginEvent(commandList, "Composite");
+
+		commandList->ValidateStates({
+			{ src->GetResource(), ResourceState::ShaderResource },
+			{ m_GaussianSumTextures[0]->GetResource(), ResourceState::ShaderResource },
+		});
 
 		commandList->SetRenderTarget(renderTarget);
 		commandList->ClearRenderTarget(renderTarget);
-		commandList->SetShader(composit);
-		commandList->SetRootConstant(composit->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
-		commandList->SetRootConstant(composit->GetUniformLocation("RC_Bloom"), m_GaussianSumTextures[0]->GetSRVDescriptor()->GetIndex());
+		commandList->SetShader(composite);
+		commandList->SetRootConstant(composite->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
+		commandList->SetRootConstant(composite->GetUniformLocation("RC_Bloom"), m_GaussianSumTextures[0]->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
 		{ // validate that all sum textures are render targets
@@ -65,6 +92,7 @@ namespace Engine
 				transitions[i] = { m_GaussianSumTextures[i]->GetResource(), ResourceState::RenderTarget };
 			commandList->ValidateStates(transitions);
 		}
+		GPUTimer::EndEvent(commandList);
 
 		GPUTimer::EndEvent(commandList);
 
@@ -78,14 +106,17 @@ namespace Engine
 			m_GaussianSumTextures.resize(m_NumberDownSamples);
 			for (uint32 i = 0; i < m_NumberDownSamples; i++)
 			{
-				uint32 w = width;
-				uint32 h = height;
 				uint32 fac = Math::Pow(2, i + 1);
+				uint32 w = width / fac;
+				uint32 h = height / fac;
+
+				w = (w == 0) ? 1 : w;
+				h = (h == 0) ? 1 : h;
 
 				if (m_GaussianSumTextures[i])
-					m_GaussianSumTextures[i]->Resize(w / fac, h / fac);
+					m_GaussianSumTextures[i]->Resize(w, h);
 				else
-					m_GaussianSumTextures[i] = RenderTarget2D::Create(w / fac, h / fac, 1, TextureFormat::RGBA16);
+					m_GaussianSumTextures[i] = RenderTarget2D::Create(w, h, 1, TextureFormat::RGBA16);
 			}
 		}
 	}

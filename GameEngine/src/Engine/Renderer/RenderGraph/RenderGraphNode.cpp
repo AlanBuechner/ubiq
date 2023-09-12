@@ -5,6 +5,7 @@
 
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/CommandList.h"
+#include "Engine/Renderer/GPUProfiler.h"
 
 namespace Engine
 {
@@ -32,14 +33,14 @@ namespace Engine
 
 	void OutputNode::BuildImpl()
 	{
+		GPUTimer::BeginEvent(m_CommandList, "Output Node");
+
 		std::vector<ResourceStateObject> transitions(m_Buffer->GetAttachments().size());
 		for (uint32 i = 0; i < transitions.size(); i++)
-		{
-			transitions[i].resource = m_Buffer->GetAttachment(i)->GetResource();
-			transitions[i].state = ResourceState::RenderTarget;
-		}
+			transitions[i] = { m_Buffer->GetAttachment(i)->GetResource(), ResourceState::RenderTarget };
 
 		m_CommandList->ValidateStates(transitions);
+		GPUTimer::EndEvent(m_CommandList);
 	}
 
 	// frame buffer node

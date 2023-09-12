@@ -65,10 +65,6 @@ namespace Engine
 
 		GPUTimer::BeginEvent(m_CommandList, "Post Processing");
 
-		m_CommandList->ValidateStates({
-			{curr->GetResource(), ResourceState::RenderTarget },
-		});
-
 		for (uint32 i = 0; i < m_PostProcessStack.size(); i++)
 		{
 			Ref<PostProcess> post = m_PostProcessStack[i];
@@ -76,18 +72,19 @@ namespace Engine
 			Ref<Texture2D> src = lastPass;
 			if (i == 0) src = m_Src;
 
-			post->RecordCommands(m_CommandList, curr, src, m_Input, m_ScreenMesh);
+			m_CommandList->ValidateStates({
+				{ curr->GetResource(), ResourceState::RenderTarget },
+				{ src->GetResource(), ResourceState::ShaderResource },
+			});
 
-			if (i + 1 < m_PostProcessStack.size())
-			{
-				m_CommandList->ValidateStates({
-					{ lastPass->GetResource(), ResourceState::RenderTarget },
-					{ curr->GetResource(), m_RenderTarget->GetResource()->GetDefultState() },
-				});
-			}
+			post->RecordCommands(m_CommandList, curr, src, m_Input, m_ScreenMesh);
 
 			curr = (curr == m_BackBuffer) ? m_RenderTarget : m_BackBuffer; // swap buffers
 		}
+
+		m_CommandList->ValidateStates({
+			{ m_RenderTarget->GetResource(), ResourceState::RenderTarget },
+		});
 
 		GPUTimer::EndEvent(m_CommandList);
 	}

@@ -11,9 +11,9 @@ passes = {
 		PS = upSample;
 		blendMode = add;
 	};
-	composit = {
+	composite = {
 		VS = vertex;
-		PS = composit;
+		PS = composite;
 	};
 };
 
@@ -166,7 +166,7 @@ PS_Output main(PS_Input input)
 }
 
 
-#section composit
+#section composite
 
 cbuffer RC_SrcLoc
 {

@@ -16,6 +16,11 @@ namespace Engine
 		Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("HillACES");
 		//Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("NarkowiczACES");
 
+		commandList->ValidateStates({
+			{ renderTarget->GetResource(), ResourceState::RenderTarget },
+			{ src->GetResource(), ResourceState::ShaderResource },
+		});
+
 		GPUTimer::BeginEvent(commandList, "ToneMapping");
 
 		commandList->SetRenderTarget(renderTarget);
