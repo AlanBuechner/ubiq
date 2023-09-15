@@ -43,9 +43,9 @@ namespace Engine
 
 		s_LineData.m_Mesh = Mesh::Create(sizeof(LineVertex));
 
-		s_LineData.Instances = InstanceBuffer::Create(sizeof(Math::Mat4), 1);
+		s_LineData.Instances = InstanceBuffer::Create(1, sizeof(Math::Mat4));
 		Math::Mat4 transform = Math::Mat4(1);
-		s_LineData.Instances->Get<Math::Mat4>(0) = transform;
+		s_LineData.Instances->PushBack(&transform);
 		s_LineData.Instances->Apply();
 
 		s_LineData.Camera = ConstantBuffer::Create(sizeof(Math::Mat4));

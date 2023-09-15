@@ -8,6 +8,9 @@ passes = {
 	};
 };
 
+
+
+
 #section common
 #pragma enable_d3d12_debug_symbols
 
@@ -33,6 +36,11 @@ struct PS_Output
 	float4 color : SV_TARGET0;
 };
 
+
+
+
+
+
 #section vertex
 
 cbuffer Camera
@@ -47,6 +55,10 @@ VS_Output main(VS_Input input)
 	output.color = input.color;
 	return output;
 }
+
+
+
+
 
 #section pixel
 
