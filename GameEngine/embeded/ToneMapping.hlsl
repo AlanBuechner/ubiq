@@ -10,6 +10,10 @@ passes = {
 		VS = vertex;
 		PS = NarkowiczACES;
 	};
+	Uncharted = {
+		VS = vertex;
+		PS = Uncharted;
+	};
 };
 
 #section common
@@ -128,6 +132,52 @@ PS_Output main(PS_Input input)
 
 	color = saturate((color * (2.51f * color + 0.03f)) / (color * (2.43f * color + 0.59f) + 0.14f));
 	color = saturate(pow(abs(color), 1.0/2.2));
+
+	output.color.rgb = color;
+	output.color.a = 1;
+	return output;
+}
+
+#section Uncharted
+
+cbuffer RC_SrcLoc
+{
+	uint srcLoc;
+};
+
+Texture2D<float4> textures[];
+StaticSampler textureSampler = StaticSampler(repeat, repeat, point, point);
+
+float3 uncharted2_tonemap_partial(float3 x)
+{
+	float A = 0.15f;
+	float B = 0.50f;
+	float C = 0.10f;
+	float D = 0.20f;
+	float E = 0.02f;
+	float F = 0.30f;
+	return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
+}
+
+float3 uncharted2_filmic(float3 v)
+{
+	float exposure_bias = 2.0f;
+	float3 curr = uncharted2_tonemap_partial(v * exposure_bias);
+
+	float3 W = float3(11.2f, 11.2f, 11.2f);
+	float3 white_scale = float3(1.0f, 1.0f, 1.0f) / uncharted2_tonemap_partial(W);
+	return curr * white_scale;
+}
+
+PS_Output main(PS_Input input)
+{
+	PS_Output output;
+
+	Texture2D<float4> src = textures[srcLoc];
+
+	float3 color = src.Sample(textureSampler, input.uv).rgb;
+
+	color = uncharted2_filmic(color);
 
 	output.color.rgb = color;
 	output.color.a = 1;

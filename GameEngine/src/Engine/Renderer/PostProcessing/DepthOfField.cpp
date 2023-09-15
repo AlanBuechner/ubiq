@@ -21,6 +21,10 @@ namespace Engine
 		m_COCTexture	= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
 		m_NearBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
 		m_FarBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
+
+		m_BokehBlur = FrameBuffer::Create({
+			m_NearBlur, m_FarBlur
+		});
 	}
 
 	void DepthOfField::RecordCommands(Ref<CommandList> commandList, Ref<RenderTarget2D> renderTarget, Ref<Texture2D> src, const PostProcessInput& input, Ref<Mesh> screenMesh)
@@ -114,20 +118,12 @@ namespace Engine
 
 		GPUTimer::BeginEvent(commandList, "Bokeh Blur");
 
-		commandList->SetRenderTarget(m_NearBlur);
-		commandList->ClearRenderTarget(m_NearBlur);
+		commandList->SetRenderTarget(m_BokehBlur);
+		commandList->ClearRenderTarget(m_BokehBlur);
 		commandList->SetShader(bokehBlur);
 		commandList->SetRootConstant(bokehBlur->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
 		commandList->SetRootConstant(bokehBlur->GetUniformLocation("RC_Strength"), m_BokehStrangth);
 		commandList->SetRootConstant(bokehBlur->GetUniformLocation("RC_COC"), (uint32)m_COCTexture->GetSRVDescriptor()->GetIndex());
-		commandList->DrawMesh(screenMesh);
-
-		commandList->SetRenderTarget(m_FarBlur);
-		commandList->ClearRenderTarget(m_FarBlur);
-		commandList->SetShader(farBokehBlur);
-		commandList->SetRootConstant(farBokehBlur->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
-		commandList->SetRootConstant(farBokehBlur->GetUniformLocation("RC_Strength"), m_BokehStrangth);
-		commandList->SetRootConstant(farBokehBlur->GetUniformLocation("RC_COC"), (uint32)m_COCTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
 		commandList->ValidateStates({

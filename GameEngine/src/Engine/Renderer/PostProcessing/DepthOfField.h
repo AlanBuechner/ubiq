@@ -21,6 +21,7 @@ namespace Engine
 		Ref<RenderTarget2D> m_COCTexture;
 		Ref<RenderTarget2D> m_FarBlur;
 		Ref<RenderTarget2D> m_NearBlur;
+		Ref<FrameBuffer> m_BokehBlur;
 
 		SceneData* m_Scene;
 
