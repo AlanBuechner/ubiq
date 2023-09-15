@@ -36,7 +36,7 @@ namespace Engine
 
 		virtual uint64 GetGPUHandlePointer() const override { return m_SRVHandle.gpu.ptr; }
 		virtual uint32 GetIndex() const override { return m_SRVHandle.GetIndex(); }
-		virtual void ReBind(StructuredBufferResource* resource) override;
+		virtual void Bind(StructuredBufferResource* resource) override;
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_SRVHandle; }
 
@@ -52,7 +52,7 @@ namespace Engine
 
 		virtual uint64 GetGPUHandlePointer() const override { return m_UAVHandle.gpu.ptr; }
 		virtual uint32 GetIndex() const override { return m_UAVHandle.GetIndex(); }
-		virtual void ReBind(StructuredBufferResource* resource) override;
+		virtual void Bind(StructuredBufferResource* resource) override;
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_UAVHandle; }
 

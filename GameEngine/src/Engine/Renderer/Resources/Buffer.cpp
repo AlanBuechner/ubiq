@@ -44,7 +44,7 @@ namespace Engine
 		}
 
 		if (handle)
-			handle->ReBind(resource);
+			handle->Bind(resource);
 		return handle;
 	}
 
@@ -65,10 +65,10 @@ namespace Engine
 	void VertexBuffer::Resize(uint32 count)
 	{
 		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
+		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
 
 		m_Resource = VertexBufferResource::Create(count, m_Resource->GetStride());
-
-		m_View->ReBind(m_Resource);
+		m_View = VertexBufferView::Create(m_Resource);
 	}
 
 	Ref<VertexBuffer> VertexBuffer::Create(uint32 count, uint32 stride)
@@ -121,7 +121,7 @@ namespace Engine
 		}
 
 		if (handle)
-			handle->ReBind(resource);
+			handle->Bind(resource);
 		return handle;
 	}
 
@@ -142,10 +142,10 @@ namespace Engine
 	void IndexBuffer::Resize(uint32 count)
 	{
 		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
+		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
 
 		m_Resource = IndexBufferResource::Create(count);
-
-		m_View->ReBind(m_Resource);
+		m_View = IndexBufferView::Create(m_Resource);
 	}
 
 	Ref<IndexBuffer> IndexBuffer::Create(uint32 count)

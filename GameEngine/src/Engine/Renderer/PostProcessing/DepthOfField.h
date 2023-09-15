@@ -27,6 +27,6 @@ namespace Engine
 		float m_FocalPlane = 50;
 		float m_ConfusionRadius = 200;
 		float m_COCBlurRadius = 0.019f;
-		float m_BokehStrangth = 0.7f;
+		float m_BokehStrangth = 0.3f;
 	};
 }

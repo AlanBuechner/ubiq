@@ -46,7 +46,7 @@ namespace Engine
 		}
 
 		if (handle)
-			handle->ReBind(resource);
+			handle->Bind(resource);
 		return handle;
 	}
 
@@ -62,7 +62,7 @@ namespace Engine
 		}
 
 		if (handle)
-			handle->ReBind(resource);
+			handle->Bind(resource);
 		return handle;
 	}
 
@@ -92,7 +92,8 @@ namespace Engine
 		m_Resource = StructuredBufferResource::Create(m_Resource->GetStride(), count);
 
 		// rebind srv handles
-		m_SRVDescriptor->ReBind(m_Resource);
+		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_SRVDescriptor);
+		m_SRVDescriptor = StructuredBufferSRVDescriptorHandle::Create(m_Resource);
 	}
 
 	Ref<StructuredBuffer> StructuredBuffer::Create(uint32 stride, uint32 count)
@@ -116,7 +117,8 @@ namespace Engine
 	void RWStructuredBuffer::Resize(uint32 count)
 	{
 		StructuredBuffer::Resize(count);
-		m_UAVDescriptor->ReBind(m_Resource);
+		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_UAVDescriptor);
+		m_UAVDescriptor = StructuredBufferUAVDescriptorHandle::Create(m_Resource);
 	}
 
 	Ref<RWStructuredBuffer> RWStructuredBuffer::Create(uint32 stride, uint32 count)

@@ -67,7 +67,7 @@ namespace Engine
 		}
 	}
 
-	void DirectX12InstanceBufferView::ReBind(InstanceBufferResource* resource)
+	void DirectX12InstanceBufferView::Bind(InstanceBufferResource* resource)
 	{
 		DirectX12InstanceBufferResource* dxResource = (DirectX12InstanceBufferResource*)resource;
 

@@ -30,7 +30,7 @@ namespace Engine
 	public:
 		virtual ~DirectX12VertexBufferView() override = default;
 
-		virtual void ReBind(VertexBufferResource* resource) override;
+		virtual void Bind(VertexBufferResource* resource) override;
 
 		D3D12_VERTEX_BUFFER_VIEW& GetView() { return m_View; }
 
@@ -64,7 +64,7 @@ namespace Engine
 	public:
 		virtual ~DirectX12IndexBufferView() override = default;
 
-		virtual void ReBind(IndexBufferResource* resource) override;
+		virtual void Bind(IndexBufferResource* resource) override;
 
 		D3D12_INDEX_BUFFER_VIEW& GetView() { return m_View; }
 

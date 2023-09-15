@@ -73,7 +73,7 @@ namespace Engine
 			uint32 width = 4000 - (i*500);
 			uint32 height = 4000 - (i*500);
 			m_ShadowMaps[i] = FrameBuffer::Create({
-				//RenderTarget2D::Create(width, height, 1, TextureFormat::RG16),
+				RenderTarget2D::Create(width, height, 1, TextureFormat::RG16),
 				RenderTarget2D::Create(width, height, 1, TextureFormat::Depth, {1,0,0,0}),
 			});
 

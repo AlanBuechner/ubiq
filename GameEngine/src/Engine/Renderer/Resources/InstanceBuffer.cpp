@@ -40,7 +40,7 @@ namespace Engine
 		}
 
 		if (handle)
-			handle->ReBind(resource);
+			handle->Bind(resource);
 		return handle;
 	}
 
@@ -93,8 +93,9 @@ namespace Engine
 		if (m_Resource->GetCapacity() != m_Capacity)
 		{
 			Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
+			Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
 			m_Resource = InstanceBufferResource::Create(m_Stride, m_Capacity);
-			m_View->ReBind(m_Resource);
+			m_View = InstanceBufferView::Create(m_Resource);
 		}
 		m_Resource->SetData(m_Data, m_Count);
 	}

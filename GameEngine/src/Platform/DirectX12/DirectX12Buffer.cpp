@@ -53,7 +53,7 @@ namespace Engine
 
 
 
-	void DirectX12VertexBufferView::ReBind(VertexBufferResource* resource)
+	void DirectX12VertexBufferView::Bind(VertexBufferResource* resource)
 	{
 		DirectX12VertexBufferResource* dxResource = (DirectX12VertexBufferResource*)resource;
 		m_View.BufferLocation = dxResource->GetBuffer()->GetGPUVirtualAddress();
@@ -113,7 +113,7 @@ namespace Engine
 
 
 
-	void DirectX12IndexBufferView::ReBind(IndexBufferResource* resource)
+	void DirectX12IndexBufferView::Bind(IndexBufferResource* resource)
 	{
 		DirectX12IndexBufferResource* dxResource = (DirectX12IndexBufferResource*)resource;
 		m_View.BufferLocation = dxResource->GetBuffer()->GetGPUVirtualAddress();

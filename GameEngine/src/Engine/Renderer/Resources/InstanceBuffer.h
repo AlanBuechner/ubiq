@@ -31,7 +31,7 @@ namespace Engine
 	class InstanceBufferView : public Descriptor
 	{
 	public:
-		virtual void ReBind(InstanceBufferResource* resource) = 0;
+		virtual void Bind(InstanceBufferResource* resource) = 0;
 
 		static InstanceBufferView* Create(InstanceBufferResource* resource);
 	};

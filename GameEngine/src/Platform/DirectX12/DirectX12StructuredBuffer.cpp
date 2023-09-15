@@ -57,7 +57,7 @@ namespace Engine
 		m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
-	void DirectX12StructuredBufferSRVDescriptorHandle::ReBind(StructuredBufferResource* resource)
+	void DirectX12StructuredBufferSRVDescriptorHandle::Bind(StructuredBufferResource* resource)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		DirectX12StructuredBufferResource* dxResource = (DirectX12StructuredBufferResource*)resource;
@@ -79,7 +79,7 @@ namespace Engine
 		m_UAVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
-	void DirectX12StructuredBufferUAVDescriptorHandle::ReBind(StructuredBufferResource* resource)
+	void DirectX12StructuredBufferUAVDescriptorHandle::Bind(StructuredBufferResource* resource)
 	{
 		// TODO
 	}

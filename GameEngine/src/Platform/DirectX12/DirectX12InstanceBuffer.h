@@ -30,7 +30,7 @@ namespace Engine
 	public:
 		virtual ~DirectX12InstanceBufferView() override = default;
 
-		virtual void ReBind(InstanceBufferResource* resource) override;
+		virtual void Bind(InstanceBufferResource* resource) override;
 
 		D3D12_VERTEX_BUFFER_VIEW GetView() { return m_View; }
 

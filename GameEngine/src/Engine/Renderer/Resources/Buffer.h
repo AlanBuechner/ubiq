@@ -32,7 +32,7 @@ namespace Engine
 	class VertexBufferView : public Descriptor
 	{
 	public:
-		virtual void ReBind(VertexBufferResource* resource) = 0;
+		virtual void Bind(VertexBufferResource* resource) = 0;
 
 		static VertexBufferView* Create(VertexBufferResource* resource);
 	};
@@ -86,7 +86,7 @@ namespace Engine
 	class IndexBufferView : public Descriptor
 	{
 	public:
-		virtual void ReBind(IndexBufferResource* resource) = 0;
+		virtual void Bind(IndexBufferResource* resource) = 0;
 
 		static IndexBufferView* Create(IndexBufferResource* resource);
 	};

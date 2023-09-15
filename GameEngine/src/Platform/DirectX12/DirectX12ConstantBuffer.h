@@ -35,7 +35,7 @@ namespace Engine
 
 		virtual uint64 GetGPUHandlePointer() const override { return m_CBVHandle.gpu.ptr; }
 		virtual uint32 GetIndex() const override { return m_CBVHandle.GetIndex(); }
-		virtual void ReBind(ConstantBufferResource* resource) override;
+		virtual void Bind(ConstantBufferResource* resource) override;
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_CBVHandle; }
 

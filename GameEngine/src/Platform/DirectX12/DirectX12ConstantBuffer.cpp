@@ -63,7 +63,7 @@ namespace Engine
 		m_CBVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
-	void DirectX12ConstantBufferCBVDescriptorHandle::ReBind(ConstantBufferResource* resource)
+	void DirectX12ConstantBufferCBVDescriptorHandle::Bind(ConstantBufferResource* resource)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)resource;

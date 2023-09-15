@@ -32,7 +32,7 @@ namespace Engine
 	public:
 		virtual uint64 GetGPUHandlePointer() const = 0;
 		virtual uint32 GetIndex() const = 0;
-		virtual void ReBind(ConstantBufferResource* resource) = 0;
+		virtual void Bind(ConstantBufferResource* resource) = 0;
 
 		static ConstantBufferCBVDescriptorHandle* Create(ConstantBufferResource* resource);
 	};

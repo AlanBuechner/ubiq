@@ -48,7 +48,7 @@ namespace Engine
 		}
 
 		if (handle)
-			handle->ReBind(resource);
+			handle->Bind(resource);
 		return handle;
 	}
 
