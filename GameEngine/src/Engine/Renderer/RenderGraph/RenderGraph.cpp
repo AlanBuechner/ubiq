@@ -39,8 +39,8 @@ namespace Engine
 
 		float clearval = pow(0.2f, 2.2);
 		Ref<FrameBufferNode> renderTargetNode = CreateRef<FrameBufferNode>(*this, std::vector<Ref<RenderTarget2D>>{
-			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), 1, TextureFormat::RGBA16),
-			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), 1, TextureFormat::Depth),
+			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), 1, TextureFormat::RGBA16, { clearval, clearval, clearval, 1 }),
+			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), 1, TextureFormat::Depth, { 1,0,0,0 }),
 		});
 		m_Nodes.push_back(renderTargetNode);
 
@@ -56,27 +56,27 @@ namespace Engine
 		shadowPass->SetCommandList(commandList);
 		m_Nodes.push_back(shadowPass);
 
-		//// gbuffer pass
-		//Ref<GBufferPassNode> gBufferPass = CreateRef<GBufferPassNode>(*this);
-		//gBufferPass->SetCommandList(commandList);
-		//gBufferPass->SetRenderTarget(renderTargetNode->m_Buffer);
-		//gBufferPass->AddDependincy(t1);
-		//m_Nodes.push_back(gBufferPass);
+		// gbuffer pass
+		Ref<GBufferPassNode> gBufferPass = CreateRef<GBufferPassNode>(*this);
+		gBufferPass->SetCommandList(commandList);
+		gBufferPass->SetRenderTarget(renderTargetNode->m_Buffer);
+		gBufferPass->AddDependincy(t1);
+		m_Nodes.push_back(gBufferPass);
 
-		//// skybox pass
-		//Ref<SkyboxNode> skyboxPass = CreateRef<SkyboxNode>(*this);
-		//skyboxPass->SetCommandList(commandList);
-		//skyboxPass->SetRenderTarget(renderTargetNode->m_Buffer);
-		//skyboxPass->AddDependincy(gBufferPass);
-		//m_Nodes.push_back(skyboxPass);
+		// skybox pass
+		Ref<SkyboxNode> skyboxPass = CreateRef<SkyboxNode>(*this);
+		skyboxPass->SetCommandList(commandList);
+		skyboxPass->SetRenderTarget(renderTargetNode->m_Buffer);
+		skyboxPass->AddDependincy(gBufferPass);
+		m_Nodes.push_back(skyboxPass);
 
-		//// main lit pass
-		//Ref<ShaderPassNode> mainPass = CreateRef<ShaderPassNode>(*this, "lit");
-		//mainPass->SetCommandList(commandList);
-		//mainPass->SetRenderTarget(renderTargetNode->m_Buffer);
-		//mainPass->AddDependincy(shadowPass);
-		//mainPass->AddDependincy(skyboxPass);
-		//m_Nodes.push_back(mainPass);
+		// main lit pass
+		Ref<ShaderPassNode> mainPass = CreateRef<ShaderPassNode>(*this, "lit");
+		mainPass->SetCommandList(commandList);
+		mainPass->SetRenderTarget(renderTargetNode->m_Buffer);
+		mainPass->AddDependincy(shadowPass);
+		mainPass->AddDependincy(skyboxPass);
+		m_Nodes.push_back(mainPass);
 
 		// create post processing render target
 		Ref<FrameBufferNode> postRenderTargetNode = CreateRef<FrameBufferNode>(*this, std::vector<Ref<RenderTarget2D>>{
@@ -90,7 +90,7 @@ namespace Engine
 		t2->AddBuffer({ postRenderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), ResourceState::RenderTarget });
 		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), ResourceState::ShaderResource });
 		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), ResourceState::ShaderResource });
-		t2->AddDependincy(shadowPass);
+		t2->AddDependincy(mainPass);
 		m_Nodes.push_back(t2);
 
 		// post processing
@@ -114,8 +114,7 @@ namespace Engine
 		m_OutputNode = CreateRef<OutputNode>(*this);
 		m_OutputNode->SetCommandList(commandList);
 		m_OutputNode->m_Buffer = FrameBuffer::Create({
-			renderTargetNode->m_Buffer->GetAttachment(0),
-			//postRenderTargetNode->m_Buffer->GetAttachment(0),
+			postRenderTargetNode->m_Buffer->GetAttachment(0),
 			renderTargetNode->m_Buffer->GetAttachment(1),
 		});
 		m_Nodes.push_back(m_OutputNode);

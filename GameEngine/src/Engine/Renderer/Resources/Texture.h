@@ -139,18 +139,22 @@ namespace Engine
 	class RenderTarget2D : public Texture2D
 	{
 	public:
-		RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format);
+		RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor);
 		DISABLE_COPY(RenderTarget2D);
 		virtual ~RenderTarget2D() override;
+
+		Math::Vector4 GetClearColor() { return m_ClearColor; }
 
 		Texture2DRTVDSVDescriptorHandle* GetRTVDSVDescriptor() { return m_RTVDSVDescriptor; }
 
 		virtual void Resize(uint32 width, uint32 height) override;
 
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor);
 
 	protected:
 		Texture2DRTVDSVDescriptorHandle* m_RTVDSVDescriptor;
+		Math::Vector4 m_ClearColor = { 0,0,0,0 };
 
 		friend class DirectX12SwapChain;
 

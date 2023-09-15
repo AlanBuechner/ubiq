@@ -31,8 +31,8 @@ namespace Engine
 
 	void CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment)
 	{
-		//Math::Vector4 color = frameBuffer->GetAttachment(attachment).clearColor;
-		ClearRenderTarget(frameBuffer, attachment, { 0,0,0,0 });
+		Math::Vector4 color = frameBuffer->GetAttachment(attachment)->GetClearColor();
+		ClearRenderTarget(frameBuffer, attachment, color);
 	}
 
 	void CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment, const Math::Vector4& color)
@@ -42,8 +42,7 @@ namespace Engine
 
 	void CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget)
 	{
-		const static Math::Vector4 color = { 0,0,0,0 };
-		ClearRenderTarget(renderTarget, color);
+		ClearRenderTarget(renderTarget, renderTarget->GetClearColor());
 	}
 
 }

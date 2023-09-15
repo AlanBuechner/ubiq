@@ -177,8 +177,8 @@ namespace Engine
 
 
 
-	RenderTarget2D::RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format) :
-		Texture2D(width, height, mips, format)
+	RenderTarget2D::RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor) :
+		Texture2D(width, height, mips, format), m_ClearColor(clearColor)
 	{
 		m_RTVDSVDescriptor = Texture2DRTVDSVDescriptorHandle::Create(m_Resource);
 	}
@@ -206,11 +206,16 @@ namespace Engine
 
 	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format)
 	{
-		CORE_ASSERT(width != 0 && height != 0, "width and height cant be 0");
-		return CreateRef<RenderTarget2D>(width, height, mips, format);
+		return Create(width, height, mips, format, { 0,0,0,0 });
 	}
 
 
+
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor)
+	{
+		CORE_ASSERT(width != 0 && height != 0, "width and height cant be 0");
+		return CreateRef<RenderTarget2D>(width, height, mips, format, clearClolor);
+	}
 
 	// Utils ---------------------------------------------------------- //
 
@@ -249,27 +254,27 @@ namespace Engine
 		if (channels == numChannels)
 			return;
 
+		const uint16 fillval[] = { 0,0,0,255 };
+
 		uint8 minChannels = channels < numChannels ? channels : numChannels;
 		uint32 oldImageStrid = width * channels;
 		uint32 newImageStrid = width * numChannels;
 
-#define MAP_DATA(type){ type* newData = new type[width * height * channels]; \
-		for (uint32 x = 0; x < width; x++){\
-			for (uint32 y = 0; y < height; y++){\
+#define MAP_DATA(type){ type* newData = new type[width * height * numChannels]; \
+		for (uint32 y = 0; y < height; y++){\
+			for (uint32 x = 0; x < width; x++){\
 				for (uint8 c = 0; c < numChannels; c++){\
 					uint32 oldImageIndex = (oldImageStrid * y) + (x * channels) + c;\
-					uint32 newImageIndex = (newImageStrid * y) + (x * channels) + c;\
-					newData[newImageIndex] = (c < minChannels) ? ((type*)data)[oldImageIndex] : 0;\
+					uint32 newImageIndex = (newImageStrid * y) + (x * numChannels) + c;\
+					newData[newImageIndex] = (c < minChannels) ? ((type*)data)[oldImageIndex] : fillval[c];\
 				}\
 			}\
 		}\
 		delete[] data;\
 		data = newData;}
 
-		if (HDR)
-			MAP_DATA(uint16)
-		else
-			MAP_DATA(uint8)
+		if (HDR) MAP_DATA(uint16)
+		else MAP_DATA(uint8);
 
 		channels = numChannels;
 

@@ -49,11 +49,11 @@ namespace Engine
 
 
 
-	InstanceBuffer::InstanceBuffer(uint32 count, uint32 stride)
+	InstanceBuffer::InstanceBuffer(uint32 capacity, uint32 stride)
 	{
 		m_Stride = stride;
-		m_Count = count;
-		m_Capacity = pow(2, ceil(log2(count)));
+		m_Count = 0;
+		m_Capacity = pow(2, ceil(log2(capacity)));
 
 		m_Resource = InstanceBufferResource::Create(m_Capacity, stride);
 		m_View = InstanceBufferView::Create(m_Resource);

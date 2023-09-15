@@ -25,7 +25,7 @@ namespace Engine
 
 	SceneRenderer::RenderObject::RenderObject()
 	{
-		m_Instances = InstanceBuffer::Create(sizeof(InstanceData), 10); // default to capacity of 10
+		m_Instances = InstanceBuffer::Create(10, sizeof(InstanceData)); // default to capacity of 10
 	}
 
 	// RenderObject
