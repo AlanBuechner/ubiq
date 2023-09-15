@@ -190,7 +190,7 @@ namespace Engine
 
 	Math::Vector3 EditorCamera::GetForwardDirection() const
 	{
-		return GetOrientation() * Math::Vector3(0.0f, 0.0f, -1.0f);
+		return GetOrientation() * Math::Vector3(0.0f, 0.0f, 1.0f);
 	}
 
 	Math::Vector3 EditorCamera::CalculatePosition() const
@@ -205,6 +205,6 @@ namespace Engine
 
 	Math::Quaternion EditorCamera::GetOrientation() const
 	{
-		return Math::Quaternion(Math::Vector3(-m_Pitch, -m_Yaw, 0.0f));
+		return Math::Quaternion(Math::Vector3(m_Pitch, m_Yaw, 0.0f));
 	}
 }

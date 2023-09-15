@@ -98,7 +98,7 @@ namespace Engine
 		// because these are macros for some reason. thanks windows vary cool
 #undef far
 #undef near
-		dir = -dir;
+		//dir = -dir;
 		dir = Math::Normalize(dir);
 
 		Math::Mat4 proj = m_Camera->GetProjectionMatrix();
@@ -106,7 +106,6 @@ namespace Engine
 		Math::Mat4 vp = Math::Inverse(m_Camera->GetCameraData().VPMatrix);
 
 		Math::Vector3 viewDir = m_Camera->GetCameraData().ViewMatrix[2]; // get the camera forward direction
-		viewDir.z = -viewDir.z;
 		// project the camera view vector onto the lights plain
 		viewDir = viewDir - (Math::Dot(viewDir, dir) / Math::LengthSqr(dir)) * dir;
 		viewDir = Math::Normalize(viewDir);
@@ -118,8 +117,8 @@ namespace Engine
 
 		for (uint32 i = 0; i < s_NumShadowMaps; i++)
 		{
-			Math::Vector4 nearPoint = proj * Math::Vector4(0, 0, -nearPlan, 1);
-			Math::Vector4 farPoint = proj * Math::Vector4(0, 0, -(nearPlan + size), 1);
+			Math::Vector4 nearPoint = proj * Math::Vector4(0, 0, nearPlan, 1);
+			Math::Vector4 farPoint = proj * Math::Vector4(0, 0, (nearPlan + size), 1);
 			nearPlan += size;
 			size *= 2;
 

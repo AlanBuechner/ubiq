@@ -108,12 +108,26 @@ namespace Engine
 	Ref<Model> Model::Create(const fs::path& path)
 	{
 		Assimp::Importer imp;
-		auto scene = imp.ReadFile(path.string(),
-			aiProcess_Triangulate |
-			aiProcess_JoinIdenticalVertices |
-			aiProcess_GenNormals |
-			aiProcess_CalcTangentSpace |
-			aiProcess_FlipWindingOrder
+		auto scene = imp.ReadFile(path.string(), 0
+			| aiProcess_Triangulate
+			| aiProcess_GenNormals
+			| aiProcess_GenSmoothNormals
+			| aiProcess_GenUVCoords
+			| aiProcess_CalcTangentSpace
+			//| aiProcess_MakeLeftHanded
+			//| aiProcess_FlipWindingOrder
+
+			| aiProcess_JoinIdenticalVertices
+			| aiProcess_ImproveCacheLocality
+			| aiProcess_LimitBoneWeights
+			| aiProcess_RemoveRedundantMaterials
+			| aiProcess_SplitLargeMeshes
+			| aiProcess_SortByPType
+			| aiProcess_FindDegenerates
+			| aiProcess_FindInvalidData
+			| aiProcess_FindInstances
+			| aiProcess_ValidateDataStructure
+			| aiProcess_OptimizeMeshes
 		);
 
 		Ref<Model> model = CreateRef<Model>();

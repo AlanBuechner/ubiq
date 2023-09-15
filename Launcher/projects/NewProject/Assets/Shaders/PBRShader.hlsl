@@ -112,7 +112,7 @@ VS_Output main(VS_Input input)
 	output.position = mul(mvp, float4(input.position, 1));
 	output.worldPosition = mul(input.transform, float4(input.position, 1));
 	float4 cameraSpacePosition = mul(mv, float4(input.position, 1));
-	output.depth = -cameraSpacePosition.z;
+	output.depth = cameraSpacePosition.z;
 	output.uv = input.uv * mat.tiling;
 	if (mat.flipV)
 		output.uv.y = 1 - output.uv.y;

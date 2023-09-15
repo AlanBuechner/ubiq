@@ -55,7 +55,7 @@ namespace Engine
 		m_ActiveScene = CreateRef<Scene>();
 
 		m_EditorCamera = CreateRef<EditorCamera>();
-		m_EditorCamera->SetOrientation({ Math::Radians(25), Math::Radians(25) });
+		m_EditorCamera->SetOrientation({ Math::Radians(180-25), Math::Radians(25) });
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}

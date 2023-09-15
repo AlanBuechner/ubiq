@@ -101,7 +101,7 @@ ConstantBuffer<Camera> camera;
 float DepthNDCToView(float depth_ndc, float zNear, float zFar) 
 {
 	float2 projParams = float2(zFar / (zNear - zFar), zNear * zFar / (zNear - zFar));
-	return -projParams.y / (depth_ndc + projParams.x);
+	return projParams.y / (depth_ndc + projParams.x);
 }
 
 PS_Output main(PS_Input input)
@@ -111,10 +111,10 @@ PS_Output main(PS_Input input)
 	Texture2D<float4> depthTexture = textures[depthLoc];
 	float depth = depthTexture.Sample(textureSampler, input.uv).r;
 
-	float near = camera.Porjection._m32 / (camera.Porjection._m22 - 1.0);
-	float far = camera.Porjection._m32 / (camera.Porjection._m22 + 1.0);
+	float near = camera.Porjection._m32 / (camera.Porjection._m22 + 1.0);
+	float far = camera.Porjection._m32 / (camera.Porjection._m22 - 1.0);
 
-	depth = -DepthNDCToView(depth, near, far);
+	depth = DepthNDCToView(depth, near, far);
 
 	float nearBegin = max(0.0f, focalPlane - radius);
 	float nearEnd = focalPlane;
@@ -236,11 +236,12 @@ PS_Output main(PS_Input input)
 	int numTexels = radius * srcTexelCount.y;
 	float2 srcPixelUVSize = 1.0 / srcTexelCount;
 
-	float4 sum = float4(0,src.Sample(textureSampler, input.uv).g, 0, 0);
+	float4 sum = float4(0,src.Sample(textureSampler, input.uv).g, 0, 1);
 
 	for (int i = -numTexels; i < numTexels; i++)
 	{
-		float val = src.Sample(textureSampler, input.uv + (float2(blurX ? i : 0, blurX ? 0 : i) * srcPixelUVSize)).r;
+		float2 offset = float2(blurX ? i : 0, blurX ? 0 : i) * srcPixelUVSize;
+		float val = src.Sample(textureSampler, input.uv + offset).r;
 		sum.r += val;
 	}
 
