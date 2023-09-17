@@ -5,7 +5,6 @@
 #include "DirectX12CommandList.h"
 #include "DirectX12Context.h"
 #include "DirectX12Shader.h"
-#include "DirectX12ComputeShader.h"
 #include "DirectX12Buffer.h"
 #include "DirectX12ConstantBuffer.h"
 #include "DirectX12StructuredBuffer.h"
@@ -296,7 +295,9 @@ namespace Engine
 
 	void DirectX12CommandList::SetShader(Ref<ShaderPass> shader)
 	{
-		if (!m_RenderTarget)
+		bool compute = shader->IsComputeShader();
+
+		if (!compute && !m_RenderTarget)
 		{
 			CORE_ERROR("Can not set shader without rendertarget");
 			return;
@@ -304,7 +305,10 @@ namespace Engine
 
 		Ref<DirectX12Shader> dxShader = std::dynamic_pointer_cast<DirectX12Shader>(shader);
 		m_CommandList->SetPipelineState(dxShader->GetPipelineState(m_RenderTarget).Get());
-		m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature().Get());
+		if(compute)
+			m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature().Get());
+		else
+			m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature().Get());
 
 		D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 		switch (dxShader->GetTopologyType())
@@ -330,7 +334,10 @@ namespace Engine
 				case ShaderParameter::DescriptorType::CBV:
 				case ShaderParameter::DescriptorType::SRV:
 				case ShaderParameter::DescriptorType::UAV:
-					m_CommandList->SetGraphicsRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
+					if(compute)
+						m_CommandList->SetComputeRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
+					else
+						m_CommandList->SetGraphicsRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
 					break;
 				default:
 					break;
@@ -411,32 +418,6 @@ namespace Engine
 			return;
 
 		m_CommandList->ExecuteBundle(dxCommandList->GetCommandList().Get());
-	}
-
-	void DirectX12CommandList::SetComputeShader(Ref<ComputeShader> shader)
-	{
-		Ref<DirectX12ComputeShader> dxShader = std::dynamic_pointer_cast<DirectX12ComputeShader>(shader);
-		m_CommandList->SetPipelineState(dxShader->GetPipelineState().Get());
-		m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature().Get());
-
-		std::vector<ShaderParameter> reflectionData = shader->GetReflectionData();
-		for (uint32 i = 0; i < reflectionData.size(); i++)
-		{
-			ShaderParameter& p = reflectionData[i];
-			if (p.type == ShaderParameter::PerameterType::DescriptorTable && p.count > 1)
-			{
-				switch (p.descType)
-				{
-				case ShaderParameter::DescriptorType::CBV:
-				case ShaderParameter::DescriptorType::SRV:
-				case ShaderParameter::DescriptorType::UAV:
-					m_CommandList->SetComputeRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
-					break;
-				default:
-					break;
-				}
-			}
-		}
 	}
 
 	void DirectX12CommandList::Close()

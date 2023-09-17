@@ -33,6 +33,7 @@ namespace Engine
 		{
 			IDxcBlob* vs;
 			IDxcBlob* ps;
+			IDxcBlob* cs;
 
 			operator bool()
 			{

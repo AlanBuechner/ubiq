@@ -41,6 +41,11 @@ namespace Engine
 		static Ref<ShaderPass> Create(Ref<ShaderSorce> src, const std::string& passName);
 
 		virtual uint32 GetUniformLocation(const std::string& name) const = 0;
+
+		bool IsComputeShader() { return m_ComputeShader; }
+
+	protected:
+		bool m_ComputeShader = false;
 	};
 
 	class Shader : public Asset
@@ -58,19 +63,5 @@ namespace Engine
 	private:
 		std::unordered_map<std::string, Ref<ShaderPass>> m_Passes;
 		std::vector<MaterialParameter> m_Params;
-	};
-
-
-	class ComputeShader : public Asset
-	{
-	public:
-
-		virtual std::vector<ShaderParameter> GetReflectionData() const = 0;
-
-		virtual uint32 GetUniformLocation(const std::string& name) const = 0;
-
-		static Ref<ComputeShader> Create(const fs::path& file);
-		static Ref<ComputeShader> CreateFromEmbeded(uint32 id, const fs::path& file);
-		static Ref<ComputeShader> CreateFromSrc(const std::string& src, const fs::path& file = "");
 	};
 }

@@ -222,6 +222,8 @@ namespace Engine
 							rpass.vs = var->value->string;
 						else if (var->name == "PS")
 							rpass.ps = var->value->string;
+						else if (var->name == "CS")
+							rpass.cs = var->value->string;
 						else if (var->name == "blendMode")
 						{
 							if (var->value->string == "blend")

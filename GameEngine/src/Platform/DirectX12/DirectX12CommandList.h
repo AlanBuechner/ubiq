@@ -46,8 +46,6 @@ namespace Engine
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) override;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
 
-		virtual void SetComputeShader(Ref<ComputeShader> shader) override;
-
 		virtual void Close() override;
 
 		std::vector<ResourceStateObject>& GetPendingTransitions() { return m_Frames[GetLastFrameIndex()].pendingTransitions; }

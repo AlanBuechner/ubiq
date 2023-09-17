@@ -48,7 +48,7 @@ namespace Engine
 		static Ref<Texture2D> GetBlackTexture() { return s_BlackTexture; }
 		static Ref<Texture2D> GetNormalTexture() { return s_NormalTexture; }
 		static Ref<Mesh> GetScreenMesh() { return s_ScreenMesh; }
-		static Ref<ComputeShader> GetBlitShader() { return s_BlitShader; }
+		static Ref<Shader> GetBlitShader() { return s_BlitShader; }
 		static Ref<Material> GetDefultMaterial() { return s_DefultMaterial; }
 
 		inline static RendererAPI GetAPI() { return s_Api; }
@@ -86,7 +86,7 @@ namespace Engine
 		static Ref<Texture2D> s_BlackTexture;
 		static Ref<Texture2D> s_NormalTexture;
 		static Ref<Mesh> s_ScreenMesh;
-		static Ref<ComputeShader> s_BlitShader;
+		static Ref<Shader> s_BlitShader;
 
 		static Ref<Material> s_DefultMaterial;
 	};

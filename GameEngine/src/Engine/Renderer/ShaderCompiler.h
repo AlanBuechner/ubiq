@@ -127,6 +127,7 @@ namespace Engine
 			std::string passName;
 			std::string vs;
 			std::string ps;
+			std::string cs;
 			BlendMode blendMode = Blend;
 			CullMode cullMode = Back;
 			DepthTest depthTest = LessOrEqual;

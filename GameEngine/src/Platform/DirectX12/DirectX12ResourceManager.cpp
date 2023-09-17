@@ -467,10 +467,11 @@ namespace Engine
 				context->GetDevice()->CreateUnorderedAccessView(mipTexture.mipTexture.Get(), nullptr, &uavDesc, currMip.cpu);
 
 				// blit the last mip level onto the current mip level
-				Ref<ComputeShader> blit = Renderer::GetBlitShader();
-				m_TextureCopyCommandList->SetComputeShader(blit);
-				m_TextureCopyCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("SrcTexture"), lastMip.gpu);
-				m_TextureCopyCommandList->GetCommandList()->SetComputeRootDescriptorTable(blit->GetUniformLocation("DstTexture"), currMip.gpu);
+				Ref<Shader> blit = Renderer::GetBlitShader();
+				Ref<ShaderPass> blitPass = blit->GetPass("Blit");
+				m_TextureCopyCommandList->SetShader(blitPass);
+				m_TextureCopyCommandList->GetCommandList()->SetComputeRootDescriptorTable(blitPass->GetUniformLocation("SrcTexture"), lastMip.gpu);
+				m_TextureCopyCommandList->GetCommandList()->SetComputeRootDescriptorTable(blitPass->GetUniformLocation("DstTexture"), currMip.gpu);
 				m_TextureCopyCommandList->GetCommandList()->Dispatch(std::max(dstWidth / 8, 1u) + 1, std::max(dstHeight / 8, 1u) + 1, 1);
 
 				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV(mipTexture.mipTexture.Get());

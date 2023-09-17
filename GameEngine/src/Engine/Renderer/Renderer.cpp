@@ -20,7 +20,7 @@ Engine::Ref<Engine::Texture2D> Engine::Renderer::s_WhiteTexture;
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_BlackTexture;
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_NormalTexture;
 Engine::Ref<Engine::Mesh> Engine::Renderer::s_ScreenMesh;
-Engine::Ref<Engine::ComputeShader> Engine::Renderer::s_BlitShader;
+Engine::Ref<Engine::Shader> Engine::Renderer::s_BlitShader;
 
 Engine::Ref<Engine::Material> Engine::Renderer::s_DefultMaterial;
 
@@ -94,7 +94,7 @@ namespace Engine
 
 		s_ScreenMesh = meshBuilder.mesh;
 
-		s_BlitShader = ComputeShader::CreateFromEmbeded(BLIT, "Blit.compute");
+		s_BlitShader = Shader::CreateFromEmbeded(BLIT, "Blit.hlsl");
 	}
 
 	void Renderer::Destroy()
