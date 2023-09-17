@@ -13,8 +13,6 @@ passes = {
 
 RWTexture2D<float4> SrcTexture;
 RWTexture2D<float4> DstTexture;
-sampler BilinearClamp;
-StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
 
 void SampleTexture(uint2 pixel, inout float4 color, uint2 texelSize)
 {

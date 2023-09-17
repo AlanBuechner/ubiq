@@ -26,7 +26,7 @@ namespace Engine
 		void GetInputLayout(ShaderBlobs& blobs, std::vector<ShaderInputElement>& inputElements);
 		void GetOutputLayout(ShaderBlobs& blobs, std::vector<TextureFormat>& outputElement);
 
-		wrl::ComPtr<ID3D12RootSignature> GenRootSignature(std::vector<ShaderParameter>& params);
+		ID3D12RootSignature* GenRootSignature(std::vector<ShaderParameter>& params);
 
 		wrl::ComPtr<IDxcUtils> GetUtils() { return m_Utils; }
 

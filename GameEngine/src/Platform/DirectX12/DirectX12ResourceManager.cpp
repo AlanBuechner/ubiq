@@ -472,7 +472,7 @@ namespace Engine
 				m_TextureCopyCommandList->SetShader(blitPass);
 				m_TextureCopyCommandList->GetCommandList()->SetComputeRootDescriptorTable(blitPass->GetUniformLocation("SrcTexture"), lastMip.gpu);
 				m_TextureCopyCommandList->GetCommandList()->SetComputeRootDescriptorTable(blitPass->GetUniformLocation("DstTexture"), currMip.gpu);
-				m_TextureCopyCommandList->GetCommandList()->Dispatch(std::max(dstWidth / 8, 1u) + 1, std::max(dstHeight / 8, 1u) + 1, 1);
+				m_TextureCopyCommandList->Dispatch(std::max(dstWidth / 8, 1u) + 1, std::max(dstHeight / 8, 1u) + 1, 1);
 
 				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV(mipTexture.mipTexture.Get());
 				m_TextureCopyCommandList->GetCommandList()->ResourceBarrier(1, &barrier);

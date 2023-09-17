@@ -46,6 +46,8 @@ namespace Engine
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) override;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
 
+		virtual void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ) override;
+
 		virtual void Close() override;
 
 		std::vector<ResourceStateObject>& GetPendingTransitions() { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
@@ -74,6 +76,7 @@ namespace Engine
 		};
 
 		Ref<FrameBuffer> m_RenderTarget;
+		Ref<ShaderPass> m_BoundShader;
 
 		uint32 m_CurrentFrame = 0;
 		wrl::ComPtr<ID3D12GraphicsCommandList> m_CommandList;

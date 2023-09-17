@@ -75,6 +75,8 @@ namespace Engine
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) = 0;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) = 0;
 
+		virtual void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ) = 0;
+
 		// mis
 		virtual void Close() = 0;
 

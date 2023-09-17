@@ -330,7 +330,7 @@ namespace Engine
 
 	}
 
-	wrl::ComPtr<ID3D12RootSignature> DirectX12ShaderCompiler::GenRootSignature(std::vector<ShaderParameter>& params)
+	ID3D12RootSignature* DirectX12ShaderCompiler::GenRootSignature(std::vector<ShaderParameter>& params)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -451,9 +451,9 @@ namespace Engine
 			__debugbreak();
 		}
 
-		wrl::ComPtr<ID3D12RootSignature> sig;
+		ID3D12RootSignature* sig;
 
-		hr = context->GetDevice()->CreateRootSignature(0, rootSig->GetBufferPointer(), rootSig->GetBufferSize(), IID_PPV_ARGS(sig.GetAddressOf()));
+		hr = context->GetDevice()->CreateRootSignature(0, rootSig->GetBufferPointer(), rootSig->GetBufferSize(), IID_PPV_ARGS(&sig));
 		CORE_ASSERT_HRESULT(hr, "Failed to create root signature");
 
 		rootSig->Release();

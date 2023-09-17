@@ -37,8 +37,7 @@ namespace Engine
 
 	DirectX12Shader::~DirectX12Shader()
 	{
-		//if(m_Sig)
-		//	m_Sig->Release();
+		m_Sig->Release();
 	}
 
 	std::vector<ShaderParameter> DirectX12Shader::GetReflectionData() const
@@ -129,6 +128,8 @@ namespace Engine
 		{
 			// create root signature
 			m_Sig = DirectX12ShaderCompiler::Get().GenRootSignature(m_ReflectionData);
+			CORE_ASSERT(m_Sig, "Faild To Create Root Signature");
+
 			for (auto& param : m_ReflectionData)
 				m_UniformLocations[param.name] = param.rootIndex;
 		}
@@ -140,12 +141,15 @@ namespace Engine
 
 		wrl::ComPtr<ID3D12PipelineState> state;
 
+		CORE_ASSERT(m_Sig, "Root Signature is null for some reason")
+
 		if (m_ComputeShader)
 		{
 			D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
-			psoDesc.pRootSignature = m_Sig.Get();
-			psoDesc.CS = { reinterpret_cast<UINT8*>(m_Blobs.cs->GetBufferPointer()), m_Blobs.cs->GetBufferSize() };
-			context->GetDevice()->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(state.GetAddressOf()));
+			psoDesc.pRootSignature = m_Sig;
+			psoDesc.CS = { m_Blobs.cs->GetBufferPointer(), m_Blobs.cs->GetBufferSize() };
+			CORE_ASSERT_HRESULT(context->GetDevice()->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(state.GetAddressOf())), 
+				"Faild to create compute pipline state");
 		}
 		else
 		{
@@ -169,7 +173,7 @@ namespace Engine
 			}
 
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc{};
-			desc.pRootSignature = m_Sig.Get();
+			desc.pRootSignature = m_Sig;
 			desc.InputLayout = { ies.data(), (UINT)ies.size() };
 			switch (m_Src->config.topology)
 			{

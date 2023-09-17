@@ -37,9 +37,12 @@ namespace Engine
 
 			operator bool()
 			{
-				if (vs == nullptr) return false;
-				if (ps == nullptr) return false;
-				return true;
+				if (cs != nullptr) return true;
+				else
+				{
+					if (vs && ps) return true;
+				}
+				return false;
 			}
 		} m_Blobs;
 		wrl::ComPtr<ID3D12PipelineState> CreatePiplineState(const std::vector<TextureFormat>& formats);
@@ -69,6 +72,6 @@ namespace Engine
 		std::vector<ShaderParameter> m_ReflectionData;
 		std::vector<TextureFormat> m_RenderTargetFormates;
 
-		wrl::ComPtr<ID3D12RootSignature> m_Sig;
+		ID3D12RootSignature* m_Sig;
 	};
 }

@@ -308,20 +308,21 @@ namespace Engine
 		if(compute)
 			m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature().Get());
 		else
-			m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature().Get());
-
-		D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
-		switch (dxShader->GetTopologyType())
 		{
-		case ShaderConfig::Triangle:
-			top = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
-		case ShaderConfig::Line:
-			top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
-		case ShaderConfig::Point:
-			top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
-		}
+			D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+			switch (dxShader->GetTopologyType())
+			{
+			case ShaderConfig::Triangle:
+				top = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
+			case ShaderConfig::Line:
+				top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
+			case ShaderConfig::Point:
+				top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
+			}
 
-		m_CommandList->IASetPrimitiveTopology(top);
+			m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature().Get());
+			m_CommandList->IASetPrimitiveTopology(top);
+		}
 
 		std::vector<ShaderParameter> reflectionData = shader->GetReflectionData();
 		for (uint32 i = 0; i < reflectionData.size(); i++)
@@ -345,6 +346,8 @@ namespace Engine
 			}
 		}
 
+		m_BoundShader = shader;
+
 	}
 
 	void DirectX12CommandList::SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer)
@@ -353,7 +356,11 @@ namespace Engine
 			return; // invalid bind slot
 
 		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)buffer->GetResource();
-		m_CommandList->SetGraphicsRootConstantBufferView(index, dxResource->GetBuffer()->GetGPUVirtualAddress());
+		D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = dxResource->GetBuffer()->GetGPUVirtualAddress();
+		if (m_BoundShader->IsComputeShader())
+			m_CommandList->SetComputeRootConstantBufferView(index, gpuAddress);
+		else
+			m_CommandList->SetGraphicsRootConstantBufferView(index, gpuAddress);
 	}
 
 	void DirectX12CommandList::SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer)
@@ -362,7 +369,11 @@ namespace Engine
 			return;
 
 		DirectX12StructuredBufferSRVDescriptorHandle* srv = (DirectX12StructuredBufferSRVDescriptorHandle*)buffer->GetSRVDescriptor();
-		m_CommandList->SetGraphicsRootDescriptorTable(index, srv->GetHandle().gpu);
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srv->GetHandle().gpu;
+		if (m_BoundShader->IsComputeShader())
+			m_CommandList->SetComputeRootDescriptorTable(index, gpuHandle);
+		else
+			m_CommandList->SetGraphicsRootDescriptorTable(index, gpuHandle);
 	}
 
 	void DirectX12CommandList::SetRootConstant(uint32 index, uint32 data)
@@ -370,7 +381,10 @@ namespace Engine
 		if (index == UINT32_MAX)
 			return; // invalid bind slot
 
-		m_CommandList->SetGraphicsRoot32BitConstant(index, data, 0);
+		if (m_BoundShader->IsComputeShader())
+			m_CommandList->SetComputeRoot32BitConstant(index, data, 0);
+		else
+			m_CommandList->SetGraphicsRoot32BitConstant(index, data, 0);
 	}
 
 	void DirectX12CommandList::SetTexture(uint32 index, Ref<Texture2D> texture)
@@ -381,8 +395,12 @@ namespace Engine
 		ValidateState(texture->GetResource(), ResourceState::ShaderResource);
 
 		DirectX12Texture2DSRVDescriptorHandle* srv = (DirectX12Texture2DSRVDescriptorHandle*)texture->GetSRVDescriptor();
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srv->GetHandle().gpu;
 
-		m_CommandList->SetGraphicsRootDescriptorTable(index, srv->GetHandle().gpu);
+		if (m_BoundShader->IsComputeShader())
+			m_CommandList->SetComputeRootDescriptorTable(index, gpuHandle);
+		else
+			m_CommandList->SetGraphicsRootDescriptorTable(index, gpuHandle);
 	}
 
 	void DirectX12CommandList::DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, int numInstances)
@@ -418,6 +436,11 @@ namespace Engine
 			return;
 
 		m_CommandList->ExecuteBundle(dxCommandList->GetCommandList().Get());
+	}
+
+	void DirectX12CommandList::Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ)
+	{
+		m_CommandList->Dispatch(threadGroupsX, threadGroupsY, threadGrouptsZ);
 	}
 
 	void DirectX12CommandList::Close()
