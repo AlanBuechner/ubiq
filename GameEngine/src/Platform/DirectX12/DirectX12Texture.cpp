@@ -72,13 +72,15 @@ namespace Engine
 	}
 
 
-	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format)
+	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type)
 	{
 		m_DefultState = ResourceState::ShaderResource;
 		m_Width = width;
 		m_Height = height;
-		m_Mips = numMips == 0 ? (uint32)std::floor(std::log2(std::max(width, height))) + 1 : numMips;
+		m_Mips = FixMipLevels(numMips, width, height);
 		m_Format = format;
+		m_ClearColor = clearColor;
+		m_Type = type;
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -89,13 +91,21 @@ namespace Engine
 			rDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 			rDesc.Format = GetDXGIFormat();
 			rDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-			rDesc.Flags = D3D12_RESOURCE_FLAG_NONE | IsDepthStencil(GetFormat()) ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+			rDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+			if((uint32)m_Type & (uint32)TextureType::RenderTarget)
+				rDesc.Flags |= (IsDepthStencil(GetFormat()) ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			if ((uint32)m_Type & (uint32)TextureType::RWTexture)
+				rDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 			rDesc.MipLevels = m_Mips;
 			rDesc.Width = width;
 			rDesc.Height = height;
 			rDesc.Alignment = 0;
 			rDesc.DepthOrArraySize = 1;
 			rDesc.SampleDesc = { 1, 0 };
+
+			D3D12_CLEAR_VALUE clearValue = {};
+			for(uint32 i = 0; i < 4; i++)
+				clearValue.Color[i] = ((float*)&m_ClearColor)[i];
 
 			context->GetDevice()->CreateCommittedResource(
 				&props,
@@ -218,6 +228,34 @@ namespace Engine
 
 		m_Resource = resource;
 	}
+
+
+
+	DirectX12Texture2DUAVDescriptorHandle::DirectX12Texture2DUAVDescriptorHandle()
+	{
+		m_UAVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+	}
+
+	void DirectX12Texture2DUAVDescriptorHandle::Bind(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height)
+	{
+		m_MipSlice = mipSlice;
+		m_Width = width;
+		m_Height = height;
+
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)resource;
+
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = dxResource->GetDXGISRVFormat();
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+		uavDesc.Texture2D.MipSlice = mipSlice;
+		context->GetDevice()->CreateUnorderedAccessView(dxResource->GetBuffer(), nullptr, &uavDesc, m_UAVHandle.cpu);
+
+		m_Resource = resource;
+	}
+
+
+
 
 	DirectX12Texture2DRTVDSVDescriptorHandle::DirectX12Texture2DRTVDSVDescriptorHandle(Texture2DResource* resource)
 	{

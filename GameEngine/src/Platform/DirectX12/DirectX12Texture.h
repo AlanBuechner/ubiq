@@ -13,7 +13,7 @@ namespace Engine
 	{
 	public:
 		DirectX12Texture2DResource(uint32 width, uint32 height, TextureFormat format, ID3D12Resource* resource);
-		DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format);
+		DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type);
 		DISABLE_COPY(DirectX12Texture2DResource);
 		virtual ~DirectX12Texture2DResource() override;
 
@@ -35,6 +35,8 @@ namespace Engine
 		friend class DirectX12SwapChain;
 	};
 
+
+
 	class DirectX12Texture2DSRVDescriptorHandle : public Texture2DSRVDescriptorHandle
 	{
 	public:
@@ -50,6 +52,22 @@ namespace Engine
 	private:
 		DirectX12DescriptorHandle m_SRVHandle;
 	};
+
+
+	class DirectX12Texture2DUAVDescriptorHandle : public Texture2DUAVDescriptorHandle
+	{
+	public:
+		DirectX12Texture2DUAVDescriptorHandle();
+		virtual ~DirectX12Texture2DUAVDescriptorHandle() { m_UAVHandle.Free(); }
+
+		virtual uint64 GetGPUHandlePointer() const override { return m_UAVHandle.gpu.ptr; }
+		virtual uint32 GetIndex() const override { return m_UAVHandle.GetIndex(); }
+		virtual void Bind(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height) override;
+
+	private:
+		DirectX12DescriptorHandle m_UAVHandle;
+	};
+
 
 	class DirectX12Texture2DRTVDSVDescriptorHandle : public Texture2DRTVDSVDescriptorHandle
 	{

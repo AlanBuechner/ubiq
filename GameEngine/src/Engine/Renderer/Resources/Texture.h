@@ -33,6 +33,13 @@ namespace Engine
 	};
 	bool IsDepthStencil(TextureFormat format);
 
+	enum class TextureType
+	{
+		Texture = BIT(0),
+		RWTexture = BIT(1),
+		RenderTarget = BIT(2)
+	};
+
 	class Texture2DResource : public GPUResource
 	{
 	public:
@@ -44,12 +51,14 @@ namespace Engine
 		uint32 GetHeight() { return m_Height; }
 		uint32 GetMips() { return m_Mips; }
 		TextureFormat GetFormat() { return m_Format; }
+		Math::Vector4 GetClearColor() { return m_ClearColor; }
+		TextureType GetTextureType() { return m_Type; }
 
 		uint32 GetStride();
 
 		virtual void SetData(void* data) = 0;
 
-		static Texture2DResource* Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
+		static Texture2DResource* Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type);
 
 	protected:
 		virtual bool SupportState(ResourceState state) override;
@@ -59,6 +68,8 @@ namespace Engine
 		uint32 m_Height = 1;
 		uint32 m_Mips = 1;
 		TextureFormat m_Format = TextureFormat::RGBA8;
+		Math::Vector4 m_ClearColor = { 0,0,0,0 };
+		TextureType m_Type;
 
 	};
 
@@ -76,6 +87,20 @@ namespace Engine
 		Texture2DResource* m_Resource;
 	};
 
+	class Texture2DUAVDescriptorHandle : public Descriptor
+	{
+	public:
+		virtual uint64 GetGPUHandlePointer() const = 0;
+		virtual uint32 GetIndex() const = 0;
+		virtual void Bind(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height) = 0;
+
+		static Texture2DUAVDescriptorHandle* Create(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height);
+
+		Texture2DResource* m_Resource;
+		uint32 m_MipSlice;
+		uint32 m_Width, m_Height;
+	};
+
 	class Texture2DRTVDSVDescriptorHandle : public Descriptor
 	{
 	public:
@@ -88,22 +113,13 @@ namespace Engine
 		Texture2DResource* m_Resource;
 	};
 
-	class Texture2DUAVDescriptorHandle : public Descriptor // TODO
-	{
-	public:
-		virtual uint64 GetGPUHandlePointer(uint32 slice) const = 0;
-		virtual uint32 GetIndex(uint32 slice) const = 0;
-
-		uint32 GetSlices() { return m_Slices; }
-
-	private:
-		uint32 m_Slices = 0;
-	};
 
 	// Texture Objects ---------------------------------------------------------- //
 
 	class Texture2D : public Asset
 	{
+	protected:
+		Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type);
 	public:
 		Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format);
 		DISABLE_COPY(Texture2D);
@@ -136,25 +152,49 @@ namespace Engine
 		bool m_Resizeable = true;
 	};
 
+
+	class RWTexture2D : public Texture2D
+	{
+	public:
+		RWTexture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor);
+		DISABLE_COPY(RWTexture2D);
+		virtual ~RWTexture2D() override;
+
+		Math::Vector4 GetClearColor() { return m_Resource->GetClearColor(); }
+
+		virtual void Resize(uint32 width, uint32 height) override;
+
+		static Ref<RWTexture2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
+		static Ref<RWTexture2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor);
+
+	protected:
+		std::vector<Texture2DUAVDescriptorHandle*> m_UAVDescriptors;
+
+		friend class RenderTarget2D;
+	};
+
+
 	class RenderTarget2D : public Texture2D
 	{
 	public:
-		RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor);
+		RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, bool RWCapable);
 		DISABLE_COPY(RenderTarget2D);
 		virtual ~RenderTarget2D() override;
 
-		Math::Vector4 GetClearColor() { return m_ClearColor; }
+		Math::Vector4 GetClearColor() { return m_Resource->GetClearColor(); }
 
 		Texture2DRTVDSVDescriptorHandle* GetRTVDSVDescriptor() { return m_RTVDSVDescriptor; }
 
 		virtual void Resize(uint32 width, uint32 height) override;
 
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, bool RWCapable);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, bool RWCapable);
 
 	protected:
 		Texture2DRTVDSVDescriptorHandle* m_RTVDSVDescriptor;
-		Math::Vector4 m_ClearColor = { 0,0,0,0 };
 
 		friend class DirectX12SwapChain;
 
@@ -178,4 +218,6 @@ namespace Engine
 
 		static TextureFile* LoadFile(const fs::path& file);
 	};
+
+	uint32 FixMipLevels(uint32 mips, uint32 width, uint32 height);
 }

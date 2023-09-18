@@ -21,7 +21,6 @@ namespace Engine
 		return false;
 	}
 
-
 	Texture2DResource::~Texture2DResource() {}
 
 
@@ -40,12 +39,12 @@ namespace Engine
 		return 0;
 	}
 
-	Texture2DResource* Texture2DResource::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format)
+	Texture2DResource* Texture2DResource::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			return new DirectX12Texture2DResource(width, height, mips, format);
+			return new DirectX12Texture2DResource(width, height, mips, format, clearColor, type);
 		}
 		return nullptr;
 	}
@@ -80,6 +79,24 @@ namespace Engine
 		return handle;
 	}
 
+
+	Texture2DUAVDescriptorHandle* Texture2DUAVDescriptorHandle::Create(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height)
+	{
+		Texture2DUAVDescriptorHandle* handle = nullptr;
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			handle = new DirectX12Texture2DUAVDescriptorHandle();
+			break;
+		}
+
+		if (handle)
+			handle->Bind(resource, mipSlice, width, height);
+		return handle;
+	}
+
+
+
 	Texture2DRTVDSVDescriptorHandle* Texture2DRTVDSVDescriptorHandle::Create(Texture2DResource* resource)
 	{
 		Texture2DRTVDSVDescriptorHandle* handle = nullptr;
@@ -99,12 +116,17 @@ namespace Engine
 
 	// Texture Objects ---------------------------------------------------------- //
 
-	Texture2D::Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format)
+	Texture2D::Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type)
 	{
-		m_Resource = Texture2DResource::Create(width, height, mips, format);
+		m_Resource = Texture2DResource::Create(width, height, mips, format, clearColor, type);
 
 		m_SRVDescriptor = Texture2DSRVDescriptorHandle::Create(m_Resource);
 	}
+
+	Texture2D::Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format) :
+		Texture2D(width, height, mips, format, {0,0,0,0}, TextureType::Texture)
+	{}
+
 
 	Texture2D::~Texture2D()
 	{
@@ -126,10 +148,8 @@ namespace Engine
 		// schedule old resource destruction
 		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
 
-		Texture2DResource** p = &m_Resource;
-
 		// create new resource
-		m_Resource = Texture2DResource::Create(width, height, m_Resource->GetMips(), m_Resource->GetFormat());
+		m_Resource = Texture2DResource::Create(width, height, m_Resource->GetMips(), m_Resource->GetFormat(), m_Resource->GetClearColor(), m_Resource->GetTextureType());
 
 		// rebind srv handles
 		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_SRVDescriptor);
@@ -176,9 +196,63 @@ namespace Engine
 
 
 
+	RWTexture2D::RWTexture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor) :
+		Texture2D(width, height, mips, format, clearColor, TextureType::RWTexture)
+	{
+		m_UAVDescriptors.resize(m_Resource->GetMips());
+		for (uint32 i = 0; i < m_Resource->GetMips(); i++)
+		{
+			uint32 w = i == 0 ? width : width / (2 * i);
+			uint32 h = i == 0 ? height : height / (2 * i);
+			m_UAVDescriptors[i] = Texture2DUAVDescriptorHandle::Create(m_Resource, i, w, h);
+		}
+	}
 
-	RenderTarget2D::RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor) :
-		Texture2D(width, height, mips, format), m_ClearColor(clearColor)
+	RWTexture2D::~RWTexture2D()
+	{
+		for (uint32 i = 0; i < m_Resource->GetMips(); i++)
+			Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_UAVDescriptors[i]);
+		m_UAVDescriptors.clear();
+	}
+
+	void RWTexture2D::Resize(uint32 width, uint32 height)
+	{
+		if (!m_Resizeable)
+		{
+			CORE_WARN("Can not resize texture");
+			return;
+		}
+
+		// resize the base texture
+		Texture2D::Resize(width, height);
+
+		for (uint32 i = 0; i < m_Resource->GetMips(); i++)
+			Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_UAVDescriptors[i]);
+
+		m_UAVDescriptors.resize(m_Resource->GetMips());
+		for (uint32 i = 0; i < m_Resource->GetMips(); i++)
+		{
+			uint32 w = i == 0 ? width : width / (2 * i);
+			uint32 h = i == 0 ? height : height / (2 * i);
+			m_UAVDescriptors[i] = Texture2DUAVDescriptorHandle::Create(m_Resource, i, w, h);
+		}
+
+	}
+
+	Ref<RWTexture2D> RWTexture2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format)
+	{
+		return Create(width, height, mips, format, { 0,0,0,0 });
+	}
+
+	Ref<RWTexture2D> RWTexture2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor)
+	{
+		return CreateRef<RWTexture2D>(width, height, mips, format, clearClolor);
+	}
+
+
+
+	RenderTarget2D::RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, bool RWCapable) :
+		Texture2D(width, height, mips, format, clearColor, (TextureType)((uint32)TextureType::RenderTarget | (RWCapable ? (uint32)TextureType::RWTexture : 0)))
 	{
 		m_RTVDSVDescriptor = Texture2DRTVDSVDescriptorHandle::Create(m_Resource);
 	}
@@ -204,17 +278,30 @@ namespace Engine
 		m_RTVDSVDescriptor = Texture2DRTVDSVDescriptorHandle::Create(m_Resource);
 	}
 
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format)
+	{
+		return Create(width, height, 1, format);
+	}
+
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, bool RWCapable)
+	{
+		return Create(width, height, 1, format, {0,0,0,0}, RWCapable);
+	}
+
 	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format)
 	{
 		return Create(width, height, mips, format, { 0,0,0,0 });
 	}
 
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor)
+	{
+		return Create(width, height, mips, format, clearColor, false);
+	}
 
-
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor)
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, bool RWCapable)
 	{
 		CORE_ASSERT(width != 0 && height != 0, "width and height cant be 0");
-		return CreateRef<RenderTarget2D>(width, height, mips, format, clearClolor);
+		return CreateRef<RenderTarget2D>(width, height, mips, format, clearColor, RWCapable);
 	}
 
 	// Utils ---------------------------------------------------------- //
@@ -307,5 +394,10 @@ namespace Engine
 		CORE_ASSERT(texture->data, "Failed to load image \"{0}\"", file.string());
 
 		return texture;
+	}
+
+	uint32 FixMipLevels(uint32 mips, uint32 width, uint32 height)
+	{
+		return mips == 0 ? (uint32)std::floor(std::log2(std::max(width, height))) + 1 : mips;
 	}
 }
