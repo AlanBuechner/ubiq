@@ -64,6 +64,8 @@ namespace Engine
 		virtual uint32 GetIndex() const override { return m_UAVHandle.GetIndex(); }
 		virtual void Bind(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height) override;
 
+		const DirectX12DescriptorHandle& GetHandle() { return m_UAVHandle; }
+
 	private:
 		DirectX12DescriptorHandle m_UAVHandle;
 	};

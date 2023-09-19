@@ -72,6 +72,8 @@ namespace Engine
 		virtual void SetRootConstant(uint32 index, uint32 data) = 0;
 		void SetRootConstant(uint32 index, float data) { SetRootConstant(index, *(uint32*)&data); }
 		virtual void SetTexture(uint32 index, Ref<Texture2D> texture) = 0;
+		void SetRWTexture(uint32 index, Ref<RWTexture2D> texture, uint32 mip) { SetRWTexture(index, texture->GetUAVDescriptor(mip)); }
+		virtual void SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav) = 0;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) = 0;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) = 0;
 

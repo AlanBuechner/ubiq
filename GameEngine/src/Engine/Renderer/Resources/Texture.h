@@ -163,6 +163,7 @@ namespace Engine
 		DISABLE_COPY(RWTexture2D);
 		virtual ~RWTexture2D() override;
 
+		Texture2DUAVDescriptorHandle* GetUAVDescriptor(uint32 index) { return m_UAVDescriptors[index]; }
 		Math::Vector4 GetClearColor() { return m_Resource->GetClearColor(); }
 
 		virtual void Resize(uint32 width, uint32 height) override;

@@ -403,6 +403,21 @@ namespace Engine
 			m_CommandList->SetGraphicsRootDescriptorTable(index, gpuHandle);
 	}
 
+	void DirectX12CommandList::SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav)
+	{
+		if (index == UINT32_MAX)
+			return; // invalid bind slot
+
+		ValidateState(uav->m_Resource, ResourceState::UnorderedResource);
+
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = ((DirectX12Texture2DUAVDescriptorHandle*)uav)->GetHandle().gpu;
+
+		if (m_BoundShader->IsComputeShader())
+			m_CommandList->SetComputeRootDescriptorTable(index, gpuHandle);
+		else
+			m_CommandList->SetGraphicsRootDescriptorTable(index, gpuHandle);
+	}
+
 	void DirectX12CommandList::DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, int numInstances)
 	{
 		uint32 indexCount = mesh->GetIndexBuffer()->GetResource()->GetCount();
