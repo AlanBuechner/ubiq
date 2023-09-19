@@ -35,9 +35,9 @@ namespace Engine
 
 	enum class TextureType
 	{
-		Texture = BIT(0),
-		RWTexture = BIT(1),
-		RenderTarget = BIT(2)
+		Texture = 0,
+		RWTexture = BIT(0),
+		RenderTarget = BIT(1)
 	};
 
 	class Texture2DResource : public GPUResource
@@ -119,6 +119,7 @@ namespace Engine
 	class Texture2D : public Asset
 	{
 	protected:
+		Texture2D(Texture2DResource* resource, Texture2DSRVDescriptorHandle* srv);
 		Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type);
 	public:
 		Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format);
@@ -150,12 +151,14 @@ namespace Engine
 		Texture2DResource* m_Resource;
 		Texture2DSRVDescriptorHandle* m_SRVDescriptor;
 		bool m_Resizeable = true;
+		bool m_DataOwner = true;
 	};
 
 
 	class RWTexture2D : public Texture2D
 	{
 	public:
+		RWTexture2D(Texture2DResource* resource, Texture2DSRVDescriptorHandle* srv, class RenderTarget2D* owner);
 		RWTexture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor);
 		DISABLE_COPY(RWTexture2D);
 		virtual ~RWTexture2D() override;
@@ -168,7 +171,11 @@ namespace Engine
 		static Ref<RWTexture2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor);
 
 	protected:
+		void GenerateUAVDescriptors();
+
+	protected:
 		std::vector<Texture2DUAVDescriptorHandle*> m_UAVDescriptors;
+		class RenderTarget2D* m_Owner;
 
 		friend class RenderTarget2D;
 	};
@@ -182,6 +189,7 @@ namespace Engine
 		virtual ~RenderTarget2D() override;
 
 		Math::Vector4 GetClearColor() { return m_Resource->GetClearColor(); }
+		Ref<RWTexture2D> GetRWTexture2D() { return m_RWTexture; }
 
 		Texture2DRTVDSVDescriptorHandle* GetRTVDSVDescriptor() { return m_RTVDSVDescriptor; }
 
@@ -189,12 +197,16 @@ namespace Engine
 
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, bool RWCapable);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor, bool RWCapable);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, bool RWCapable);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, bool RWCapable);
 
 	protected:
 		Texture2DRTVDSVDescriptorHandle* m_RTVDSVDescriptor;
+		Ref<RWTexture2D> m_RWTexture = nullptr;
 
 		friend class DirectX12SwapChain;
 
