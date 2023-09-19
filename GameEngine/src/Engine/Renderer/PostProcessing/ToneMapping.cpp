@@ -13,7 +13,8 @@ namespace Engine
 
 	void ToneMapping::RecordCommands(Ref<CommandList> commandList, Ref<RenderTarget2D> renderTarget, Ref<Texture2D> src, const PostProcessInput& input, Ref<Mesh> screenMesh)
 	{
-		Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("HillACES");
+		Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("HillACES_Compute");
+		//Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("HillACES");
 		//Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("Uncharted");
 		//Ref<ShaderPass> pass = m_ToneMappingShader->GetPass("NarkowiczACES");
 
@@ -24,11 +25,16 @@ namespace Engine
 
 		GPUTimer::BeginEvent(commandList, "ToneMapping");
 
-		commandList->SetRenderTarget(renderTarget);
+		commandList->SetShader(pass);
+		commandList->SetRootConstant(pass->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
+		commandList->SetRWTexture(pass->GetUniformLocation("DstTexture"), renderTarget->GetRWTexture2D(), 0);
+		commandList->Dispatch(std::max(renderTarget->GetWidth() / 8, 1u) + 1, std::max(renderTarget->GetHeight() / 8, 1u) + 1, 1);
+
+		/*commandList->SetRenderTarget(renderTarget);
 		commandList->ClearRenderTarget(renderTarget);
 		commandList->SetShader(pass);
 		commandList->SetRootConstant(pass->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
-		commandList->DrawMesh(screenMesh);
+		commandList->DrawMesh(screenMesh);*/
 
 		GPUTimer::EndEvent(commandList);
 	}

@@ -87,7 +87,7 @@ namespace Engine
 		// set frame buffer to srv for use in post processing
 		Ref<TransitionNode> t2 = CreateRef<TransitionNode>(*this);
 		t2->SetCommandList(commandList);
-		t2->AddBuffer({ postRenderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), ResourceState::RenderTarget });
+		t2->AddBuffer({ postRenderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), ResourceState::UnorderedResource });
 		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), ResourceState::ShaderResource });
 		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), ResourceState::ShaderResource });
 		t2->AddDependincy(mainPass);
@@ -102,8 +102,8 @@ namespace Engine
 		postPass->SetCommandList(commandList);
 		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer->GetAttachment(0));
 		postPass->SetInput(input);
-		postPass->AddPostProcess(CreateRef<DepthOfField>());
-		postPass->AddPostProcess(CreateRef<Bloom>());
+		//postPass->AddPostProcess(CreateRef<DepthOfField>());
+		//postPass->AddPostProcess(CreateRef<Bloom>());
 		postPass->AddPostProcess(CreateRef<ToneMapping>());
 		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachment(0));
 		postPass->InitPostProcessStack();

@@ -351,7 +351,7 @@ namespace Engine
 	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, bool RWCapable)
 	{
 		CORE_ASSERT(width != 0 && height != 0, "width and height cant be 0");
-		CORE_ASSERT(IsDepthStencil(format) && RWCapable, "Depth Stencil formats can not be Read/Write capable");
+		CORE_ASSERT(!(IsDepthStencil(format) && RWCapable), "Depth Stencil formats can not be Read/Write capable");
 		return CreateRef<RenderTarget2D>(width, height, mips, format, clearColor, RWCapable);
 	}
 
