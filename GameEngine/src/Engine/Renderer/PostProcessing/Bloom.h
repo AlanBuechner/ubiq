@@ -4,6 +4,8 @@
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/Resources/ConstantBuffer.h"
 
+//#define USE_BLOOM_COMPUTE
+
 namespace Engine
 {
 	class Bloom : public PostProcess
@@ -17,7 +19,10 @@ namespace Engine
 	private:
 		Ref<Shader> m_BloomShader;
 		uint32 m_NumberDownSamples = 1;
-
+#ifdef USE_BLOOM_COMPUTE
+		std::vector<Ref<RWTexture2D>> m_GaussianSumTextures;
+#else
 		std::vector<Ref<RenderTarget2D>> m_GaussianSumTextures;
+#endif
 	};
 }

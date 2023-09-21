@@ -208,7 +208,7 @@ namespace Engine
 
 
 	RWTexture2D::RWTexture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor) :
-		Texture2D(width, height, mips, format, clearColor, TextureType::RWTexture)
+		Texture2D(width, height, mips, format, clearColor, TextureType::RWTexture), m_Owner(nullptr)
 	{
 		GenerateUAVDescriptors();
 	}

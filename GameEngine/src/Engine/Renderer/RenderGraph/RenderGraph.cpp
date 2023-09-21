@@ -102,7 +102,7 @@ namespace Engine
 		postPass->SetCommandList(commandList);
 		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer->GetAttachment(0));
 		postPass->SetInput(input);
-		postPass->AddPostProcess(CreateRef<DepthOfField>());
+		//postPass->AddPostProcess(CreateRef<DepthOfField>());
 		postPass->AddPostProcess(CreateRef<Bloom>());
 		postPass->AddPostProcess(CreateRef<ToneMapping>());
 		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachment(0));

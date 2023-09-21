@@ -62,13 +62,15 @@ float3 RRTAndODTFit(float3 v)
 [numthreads(8, 8, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-	uint2 destTexelSize;
-	DstTexture.GetDimensions(destTexelSize.x, destTexelSize.y);
-	if (DTid.x < destTexelSize.x && DTid.y < destTexelSize.y)
+	uint2 destTexelCount;
+	DstTexture.GetDimensions(destTexelCount.x, destTexelCount.y);
+	float2 destTexelSize = 1.0/destTexelCount;
+	float2 uv = ((float2)DTid.xy / (float2)destTexelCount) + (destTexelSize/2);
+	if (DTid.x < destTexelCount.x && DTid.y < destTexelCount.y)
 	{
 		Texture2D<float4> src = textures[srcLoc];
 	
-		float3 color = src.SampleLevel(textureSampler, (float2)DTid.xy / (float2)destTexelSize, 0).rgb;
+		float3 color = src.SampleLevel(textureSampler, uv, 0).rgb;
 		color = mul(ACESInputMat, color);
 		color = RRTAndODTFit(color);
 		color = mul(ACESOutputMat, color);
@@ -102,13 +104,15 @@ RWTexture2D<float4> DstTexture;
 [numthreads(8, 8, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-	uint2 destTexelSize;
-	DstTexture.GetDimensions(destTexelSize.x, destTexelSize.y);
-	if (DTid.x < destTexelSize.x && DTid.y < destTexelSize.y)
+	uint2 destTexelCount;
+	DstTexture.GetDimensions(destTexelCount.x, destTexelCount.y);
+	float2 destTexelSize = 1.0/destTexelCount;
+	float2 uv = ((float2)DTid.xy / (float2)destTexelCount) + (destTexelSize/2);
+	if (DTid.x < destTexelCount.x && DTid.y < destTexelCount.y)
 	{
 		Texture2D<float4> src = textures[srcLoc];
 
-		float3 color = src.SampleLevel(textureSampler, (float2)DTid.xy / (float2)destTexelSize, 0).rgb;
+		float3 color = src.SampleLevel(textureSampler, uv, 0).rgb;
 		color = saturate((color * (2.51f * color + 0.03f)) / (color * (2.43f * color + 0.59f) + 0.14f));
 		color = saturate(pow(abs(color), 1.0/2.2));
 
@@ -161,15 +165,15 @@ RWTexture2D<float4> DstTexture;
 [numthreads(8, 8, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-	uint2 destTexelSize;
-	DstTexture.GetDimensions(destTexelSize.x, destTexelSize.y);
-	if (DTid.x < destTexelSize.x && DTid.y < destTexelSize.y)
-	{
-		Texture2D<float4> src = textures[srcLoc];
+	uint2 destTexelCount;
+	DstTexture.GetDimensions(destTexelCount.x, destTexelCount.y);
+	float2 destTexelSize = 1.0/destTexelCount;
+	float2 uv = ((float2)DTid.xy / (float2)destTexelCount) + (destTexelSize/2);
 
-		float3 color = src.SampleLevel(textureSampler, (float2)DTid.xy / (float2)destTexelSize, 0).rgb;
-		color = uncharted2_filmic(color);
+	Texture2D<float4> src = textures[srcLoc];
 
-		DstTexture[DTid.xy] = float4(color, 1);
-	}
+	float3 color = src.SampleLevel(textureSampler, uv, 0).rgb;
+	color = uncharted2_filmic(color);
+
+	DstTexture[DTid.xy] = float4(color, 1);
 }

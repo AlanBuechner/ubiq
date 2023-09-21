@@ -39,7 +39,7 @@ namespace Engine
 		uint32 width = fb->GetResource()->GetWidth();
 		uint32 height = fb->GetResource()->GetHeight();
 		TextureFormat format = fb->GetResource()->GetFormat();
-		m_BackBuffer = RenderTarget2D::Create(width, height, 1, format);
+		m_BackBuffer = RenderTarget2D::Create(width, height, format, true);
 	}
 
 	void PostProcessNode::InitPostProcessStack()

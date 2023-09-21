@@ -17,6 +17,9 @@ passes = {
 	};
 };
 
+
+
+
 #section common
 #pragma enable_d3d12_debug_symbols
 
@@ -38,16 +41,11 @@ struct PS_Output
 	float4 color : SV_TARGET0;
 };
 
-struct Camera
-{
-	float4x4 View;
-	float4x4 Porjection;
-	float4x4 InvProjection;
-	float4x4 ViewPorjection;
 
-	float3 Position;
-	float3 Rotation;
-};
+
+
+
+
 
 #section vertex
 
@@ -59,19 +57,24 @@ VS_Output main(VS_Input input)
 	return output;
 }
 
+
+
+
+
+
+
+
+
+
 #section downSample
 
-cbuffer RC_SrcLoc
-{
-	uint srcLoc;
-};
 
 cbuffer RC_Threshold
 {
 	float threshold;
 };
 
-Texture2D<float4> textures[];
+Texture2D<float4> src;
 StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
 
 float4 average(float4 a, float4 b, float4 c, float4 d)
@@ -87,7 +90,6 @@ float max3(float a, float b, float c)
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
-	Texture2D<float4> src = textures[srcLoc];
 
 	uint2 srcTexelSize;
 	src.GetDimensions(srcTexelSize.x, srcTexelSize.y);
@@ -144,21 +146,25 @@ PS_Output main(PS_Input input)
 }
 
 
+
+
+
+
+
+
+
+
 #section upSample
 
-cbuffer RC_SrcLoc
-{
-	uint srcLoc;
-};
 
-Texture2D<float4> textures[];
+Texture2D<float4> src;
 StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
 
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
 
-	float4 srcColor = textures[srcLoc].Sample(textureSampler, input.uv);
+	float4 srcColor = src.Sample(textureSampler, input.uv);
 
 	output.color = srcColor;
 	output.color.a = 1;
@@ -166,27 +172,30 @@ PS_Output main(PS_Input input)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
 #section composite
 
-cbuffer RC_SrcLoc
-{
-	uint srcLoc;
-};
 
-cbuffer RC_Bloom
-{
-	uint bloomLoc;
-};
-
-Texture2D<float4> textures[];
+Texture2D<float4> src;
+Texture2D<float4> bloomTex;
 StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
 
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
 
-	float4 srcColor = textures[srcLoc].Sample(textureSampler, input.uv);
-	float4 bloom = textures[bloomLoc].Sample(textureSampler, input.uv);
+	float4 srcColor = src.Sample(textureSampler, input.uv);
+	float4 bloom = bloomTex.Sample(textureSampler, input.uv);
 
 	output.color = srcColor + bloom;
 	output.color.a = 1;
