@@ -60,12 +60,12 @@ namespace Engine
 
 	void DirectX12GPUProfiler::BeginEvent(Ref<DirectX12CommandList> commandList, const std::string& eventName)
 	{
-		PIXBeginEvent(commandList->GetCommandList().Get(), 0, eventName.c_str());
+		PIXBeginEvent(commandList->GetCommandList(), 0, eventName.c_str());
 	}
 
 	void DirectX12GPUProfiler::EndEvent(Ref<DirectX12CommandList> commandList)
 	{
-		PIXEndEvent(commandList->GetCommandList().Get());
+		PIXEndEvent(commandList->GetCommandList());
 	}
 
 	void DirectX12GPUProfiler::SetTargetWindow(void* nativeWindow)

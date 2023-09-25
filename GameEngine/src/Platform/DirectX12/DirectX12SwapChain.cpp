@@ -80,7 +80,7 @@ namespace Engine
 
 		Ref<DirectX12CommandQueue> commandQueue = Renderer::GetMainCommandQueue<DirectX12CommandQueue>();
 		wrl::ComPtr<IDXGISwapChain1> swapChain;
-		CORE_ASSERT_HRESULT(factory2->CreateSwapChainForHwnd(commandQueue->GetCommandQueue().Get(), m_WindowHandle, &swapChainDesc, swapChainFDesc, nullptr, swapChain.GetAddressOf()),
+		CORE_ASSERT_HRESULT(factory2->CreateSwapChainForHwnd(commandQueue->GetCommandQueue(), m_WindowHandle, &swapChainDesc, swapChainFDesc, nullptr, swapChain.GetAddressOf()),
 			"Failed To Create Swapchain");
 		CORE_ASSERT_HRESULT(swapChain->QueryInterface(IID_PPV_ARGS(m_SwapChain.GetAddressOf())), "Failed to get swap chain");
 

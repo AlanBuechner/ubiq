@@ -54,20 +54,20 @@ namespace Engine
 		D3D12_COMMAND_LIST_TYPE type = GetD3D12CommandListType(m_Type);
 		for (uint32 i = 0; i < numAllocators; i++)
 		{
-			CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(m_Frames[i].commandAllocator.GetAddressOf())),
+			CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(&m_Frames[i].commandAllocator)),
 				"Failed to Create Command List Allocator");
 			m_Frames[i].commandAllocator->SetName(L"Command Allocator");
 		}
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0, type, m_Frames[0].commandAllocator.Get(), nullptr, IID_PPV_ARGS(m_CommandList.GetAddressOf())),
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0, type, m_Frames[0].commandAllocator, nullptr, IID_PPV_ARGS(&m_CommandList)),
 			"Failed to Create Commnd List");
 		m_CommandList->SetName(L"Command List");
 		m_CommandList->Close();
 
 		
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(m_PrependAllocator.GetAddressOf())),
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(&m_PrependAllocator)),
 			"Failed to Create Prepend Command List Allocator");
 		m_PrependAllocator->SetName(L"Prepend Allocator");
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0,type, m_PrependAllocator.Get(), nullptr, IID_PPV_ARGS(m_PrependList.GetAddressOf())),
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0,type, m_PrependAllocator, nullptr, IID_PPV_ARGS(&m_PrependList)),
 			"Failed to Create Prepend Command List");
 		m_PrependList->SetName(L"Prepend Command List");
 		m_PrependList->Close();
@@ -450,7 +450,7 @@ namespace Engine
 		if (dxCommandList->m_Type != CommandList::Bundle)
 			return;
 
-		m_CommandList->ExecuteBundle(dxCommandList->GetCommandList().Get());
+		m_CommandList->ExecuteBundle(dxCommandList->GetCommandList());
 	}
 
 	void DirectX12CommandList::Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ)
@@ -498,7 +498,7 @@ namespace Engine
 		if (!transitions.empty())
 		{
 			CORE_ASSERT_HRESULT(m_PrependAllocator->Reset(), "Failed to reset prepend command allocator");
-			CORE_ASSERT_HRESULT(m_PrependList->Reset(m_PrependAllocator.Get(), nullptr), "Failed to reset prepend command list");
+			CORE_ASSERT_HRESULT(m_PrependList->Reset(m_PrependAllocator, nullptr), "Failed to reset prepend command list");
 
 			ID3D12DescriptorHeap* heaps[]{ DirectX12ResourceManager::s_SRVHeap->GetHeap().Get(), DirectX12ResourceManager::s_SamplerHeap->GetHeap().Get() };
 			m_PrependList->SetDescriptorHeaps(2, heaps);

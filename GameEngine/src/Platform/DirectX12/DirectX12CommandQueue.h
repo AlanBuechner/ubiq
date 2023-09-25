@@ -16,15 +16,14 @@ namespace Engine
 		virtual bool InExecution() override;
 		virtual void Await() override;
 
-		inline wrl::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return m_CommandQueue; }
+		inline ID3D12CommandQueue* GetCommandQueue() { return m_CommandQueue; }
 
 	private:
-		wrl::ComPtr<ID3D12CommandQueue> m_CommandQueue;
-		wrl::ComPtr<ID3D12Fence1> m_Fence;
+		ID3D12CommandQueue* m_CommandQueue;
+		ID3D12Fence1* m_Fence;
 		std::vector<ID3D12CommandList*> m_DXCommandLists;
 		HANDLE m_EventHandle = nullptr;
 		uint32 m_SignalCount = 0;
-		std::thread m_ExcutionThread;
 		D3D12_COMMAND_LIST_TYPE m_Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
 		InstrumentationTimer m_Timer = CREATE_PROFILEI();

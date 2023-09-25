@@ -189,7 +189,6 @@ namespace Engine
 #else
 			s_MainCommandQueue->Execute();
 #endif
-			//s_MainCommandQueue->ExecuteImmediate({s_MainCommandList});
 			s_MainCommandQueue->Await();
 			s_RenderFlag.Clear();
 			GPUProfiler::EndFrame();

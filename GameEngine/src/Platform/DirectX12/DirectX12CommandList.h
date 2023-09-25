@@ -1,7 +1,6 @@
 #pragma once
 #include "Engine/Renderer/CommandList.h"
 #include "DX.h"
-#include "Engine/Core/Flag.h"
 
 namespace Engine
 {
@@ -9,7 +8,7 @@ namespace Engine
 	{
 	public:
 		DirectX12CommandList(CommandListType type) :
-			m_Type(type)
+			CommandList(type)
 		{ Init(); }
 
 		
@@ -18,7 +17,6 @@ namespace Engine
 		void Init();
 
 	protected:
-		virtual void SignalRecording() override { m_RecordFlag.Signal(); }
 		virtual void InternalClose() override;
 
 	public:
@@ -53,16 +51,16 @@ namespace Engine
 
 		std::vector<ResourceStateObject>& GetPendingTransitions() { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
 		std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() { return m_Frames[GetLastFrameIndex()].resourceStates; }
-		wrl::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return m_CommandList; }
+		ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList; }
 
 	private:
 		std::vector<ResourceStateObject>& GetCurrentPendingTransitions() { return m_Frames[m_CurrentFrame].pendingTransitions; }
-		wrl::ComPtr<ID3D12CommandList> GetPrependCommandList() { return m_PrependList; }
+		ID3D12CommandList* GetPrependCommandList() { return m_PrependList; }
 
 		bool RecordPrependCommands();
 
 	private:
-		wrl::ComPtr<ID3D12CommandAllocator>& GetAllocator() { return m_Frames[m_CurrentFrame].commandAllocator; }
+		ID3D12CommandAllocator* GetAllocator() { return m_Frames[m_CurrentFrame].commandAllocator; }
 		std::unordered_map<GPUResource*, ResourceState>& GetResourceStates() { return m_Frames[m_CurrentFrame].resourceStates; }
 
 		uint32 GetLastFrameIndex() { return (m_CurrentFrame - 1) % m_Frames.size(); }
@@ -71,26 +69,17 @@ namespace Engine
 
 		struct RecordFrame
 		{
-			wrl::ComPtr<ID3D12CommandAllocator> commandAllocator;
+			ID3D12CommandAllocator* commandAllocator;
 			std::vector<ResourceStateObject> pendingTransitions;
 			std::unordered_map<GPUResource*, ResourceState> resourceStates;
 		};
 
-		Ref<FrameBuffer> m_RenderTarget;
-		Ref<ShaderPass> m_BoundShader;
-
 		uint32 m_CurrentFrame = 0;
-		wrl::ComPtr<ID3D12GraphicsCommandList> m_CommandList;
+		ID3D12GraphicsCommandList* m_CommandList;
 		std::vector<RecordFrame> m_Frames;
 
-		wrl::ComPtr<ID3D12CommandAllocator> m_PrependAllocator;
-		wrl::ComPtr<ID3D12GraphicsCommandList> m_PrependList;
-
-		CommandListType m_Type;
-
-		Flag m_RecordFlag;
-
-		RecordState m_State = CommandList::Closed;
+		ID3D12CommandAllocator* m_PrependAllocator;
+		ID3D12GraphicsCommandList* m_PrependList;
 
 		friend class DirectX12CommandQueue;
 	};

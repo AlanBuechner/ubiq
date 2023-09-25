@@ -2,6 +2,7 @@
 #include "Engine/Core/Core.h"
 #include "Resources/FrameBuffer.h"
 #include "Resources/ResourceState.h"
+#include "Engine/Core/Flag.h"
 
 namespace Engine
 {
@@ -36,7 +37,12 @@ namespace Engine
 		};
 
 	protected:
-		virtual void SignalRecording() = 0;
+		CommandList(CommandListType type) :
+			m_Type(type)
+		{}
+
+	protected:
+		void SignalRecording() { m_RecordFlag.Signal(); }
 		virtual void InternalClose() = 0;
 
 		virtual void Transition(std::vector<ResourceTransitionObject> transitions) = 0;
@@ -88,5 +94,15 @@ namespace Engine
 		static Ref<CommandList> Create(CommandListType type = CommandListType::Direct);
 
 		friend class CommandQueue;
+
+	protected:
+		Flag m_RecordFlag;
+
+		Ref<FrameBuffer> m_RenderTarget;
+		Ref<ShaderPass> m_BoundShader;
+
+		CommandListType m_Type;
+
+		RecordState m_State = CommandList::Closed;
 	};
 }

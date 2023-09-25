@@ -154,14 +154,14 @@ namespace Engine
 		//commandList->ValidateState({ rt->GetResource(), ResourceState::RenderTarget });
 		commandList->SetRenderTarget(rt);
 		commandList->ClearRenderTarget(rt, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList().Get());
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList());
 		commandList->Present();
 		GPUTimer::EndEvent(commandList);
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault(nullptr, (void*)commandList->GetCommandList().Get());
+			ImGui::RenderPlatformWindowsDefault(nullptr, (void*)commandList->GetCommandList());
 		}
 #endif // PLATFORM_WINDOWS
 	}

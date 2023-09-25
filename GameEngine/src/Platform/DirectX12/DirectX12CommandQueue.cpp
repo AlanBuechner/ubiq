@@ -28,11 +28,11 @@ namespace Engine
 		qDesc.NodeMask = NULL;
 
 		// Create command queue
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandQueue(&qDesc, IID_PPV_ARGS(m_CommandQueue.GetAddressOf())),
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandQueue(&qDesc, IID_PPV_ARGS(&m_CommandQueue)),
 			"Faild To Create Command Queue");
 
 		// create fence and set initial value to 1 to indicate it is not currently executing
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_Fence.GetAddressOf())),
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence)),
 			"Faild to Create Fence");
 	}
 
@@ -44,9 +44,9 @@ namespace Engine
 			Ref<DirectX12CommandList> dxCmdList = std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[i]);
 
 			if (dxCmdList->RecordPrependCommands())
-				m_DXCommandLists.push_back(dxCmdList->GetPrependCommandList().Get());
+				m_DXCommandLists.push_back(dxCmdList->GetPrependCommandList());
 			dxCmdList->InternalClose();
-			m_DXCommandLists.push_back(dxCmdList->GetCommandList().Get());
+			m_DXCommandLists.push_back(dxCmdList->GetCommandList());
 		}
 	}
 
@@ -55,7 +55,7 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		
 		m_CommandQueue->ExecuteCommandLists((uint32)m_DXCommandLists.size(), m_DXCommandLists.data());
-		m_CommandQueue->Signal(m_Fence.Get(), ++m_SignalCount); // signal fence when execution has finished
+		m_CommandQueue->Signal(m_Fence, ++m_SignalCount); // signal fence when execution has finished
 
 		for (uint32 i = 0; i < m_Commands.size(); i++)
 			std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[i])->SignalRecording();
@@ -64,7 +64,6 @@ namespace Engine
 		m_DXCommandLists.clear();
 	}
 
-	// returns wrong value some times
 	bool DirectX12CommandQueue::InExecution()
 	{
 		return m_Fence->GetCompletedValue() != 0;
