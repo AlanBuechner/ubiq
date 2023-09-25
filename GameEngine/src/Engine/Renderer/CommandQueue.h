@@ -10,21 +10,6 @@ namespace Engine
 namespace Engine
 {
 
-	class ExecutionOrder
-	{
-	public:
-		void Add(Ref<CommandList> commandList, std::vector<Ref<CommandList>> dependencys = {});
-		void Remove(Ref<CommandList> commandList); // don't forget to remove all dependence 
-		void Clear() { m_Commands.clear(); }
-
-		std::vector<std::vector<Ref<CommandList>>>& GetCommandLists() { return m_Commands; }
-
-		static Ref<ExecutionOrder> Create() { return CreateRef<ExecutionOrder>(); }
-
-	private:
-		std::vector<std::vector<Ref<CommandList>>> m_Commands;
-	};
-
 	class CommandQueue
 	{
 	public:
@@ -35,16 +20,21 @@ namespace Engine
 			Compute = 2,
 		};
 
-		void Submit(Ref<CommandList> commandList, uint32 dcount = 0);
-		void Submit(Ref<ExecutionOrder> order, uint32 dcount = 0);
+		void PrependSubmit(Ref<CommandList> commandList);
+		void PrependSubmit(std::vector<Ref<CommandList>> commandLists);
+
+		void Submit(Ref<CommandList> commandList);
+		void Submit(std::vector<Ref<CommandList>> commandLists);
+
+		virtual void Build() = 0;
 
 		virtual void Execute() = 0;
-		virtual void ExecuteImmediate(std::vector<Ref<CommandList>> commandLists) = 0;
 		virtual bool InExecution() = 0;
+		virtual void Await() = 0;
 
 		static Ref<CommandQueue> Create(Type type);
 
 	protected:
-		std::vector<std::vector<Ref<CommandList>>> m_Commands;
+		std::vector<Ref<CommandList>> m_Commands;
 	};
 }

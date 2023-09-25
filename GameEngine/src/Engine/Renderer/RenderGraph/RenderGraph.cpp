@@ -4,6 +4,7 @@
 #include "Engine/Core/Window.h"
 #include "Engine/Core/Application.h"
 
+#include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Resources/FrameBuffer.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/Mesh.h"
@@ -14,6 +15,7 @@
 #include "Engine/Renderer/CommandList.h"
 #include "Engine/Renderer/CommandQueue.h"
 #include "Engine/Renderer/Camera.h"
+
 
 // nodes
 #include "GBufferPassNode.h"
@@ -118,9 +120,6 @@ namespace Engine
 			renderTargetNode->m_Buffer->GetAttachment(1),
 		});
 		m_Nodes.push_back(m_OutputNode);
-
-		m_Order = ExecutionOrder::Create();
-		m_Order->Add(commandList);
 	}
 
 	RenderGraph::~RenderGraph()
@@ -129,7 +128,7 @@ namespace Engine
 
 	void RenderGraph::Submit(Ref<CommandQueue> queue)
 	{
-		queue->Submit(m_Order);
+		queue->Submit(m_CommandLists);
 	}
 
 	void RenderGraph::OnViewportResize(uint32 width, uint32 height)

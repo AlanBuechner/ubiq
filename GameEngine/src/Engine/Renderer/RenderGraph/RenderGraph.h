@@ -59,7 +59,6 @@ namespace Engine
 		Ref<OutputNode> m_OutputNode;
 
 		std::vector<Ref<CommandList>> m_CommandLists;
-		Ref<ExecutionOrder> m_Order;
 
 		SceneData m_Scene;
 	};

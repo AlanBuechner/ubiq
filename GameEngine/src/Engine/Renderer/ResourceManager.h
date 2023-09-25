@@ -28,6 +28,9 @@ namespace Engine
 		ResourceDeletionPool* CreateNewDeletionPool();
 
 		virtual void UploadData() = 0;
+		virtual void Clean() = 0;
+
+		virtual std::vector<Ref<CommandList>> GetUploadCommandLists() = 0;
 
 		void ScheduleResourceDeletion(GPUResource* resource) { m_DeletionPool->m_Resources.push_back(resource); }
 		void ScheduleHandleDeletion(Descriptor* descriptor) { m_DeletionPool->m_Descriptors.push_back(descriptor); }

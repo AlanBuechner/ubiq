@@ -81,12 +81,13 @@ namespace Engine
 
 	private:
 		virtual void UploadData() override;
+		virtual void Clean() override;
+		virtual std::vector<Ref<CommandList>> GetUploadCommandLists() override { return { m_BufferCopyCommandList, m_TextureCopyCommandList }; }
 
 		void RecordBufferCommands(Ref<DirectX12Context> context);
 		void RecordTextureCommands(Ref<DirectX12Context> context);
 
 	private:
-		Ref<DirectX12CommandQueue> m_CommandQueue;
 		Ref<DirectX12CommandList> m_BufferCopyCommandList;
 		Ref<DirectX12CommandList> m_TextureCopyCommandList;
 

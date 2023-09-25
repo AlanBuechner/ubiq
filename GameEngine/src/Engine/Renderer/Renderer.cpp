@@ -166,7 +166,7 @@ namespace Engine
 			s_CopyFlag.Wait();
 			timer.Start("Copy");
 			GPUProfiler::StartFrame();
-			s_Context->GetResourceManager()->UploadData();
+			resourceManager->UploadData();
 			timer.End();
 			s_CopyFlag.Clear();
 
@@ -174,6 +174,9 @@ namespace Engine
 			s_RenderFlag.Wait();
 			//CORE_INFO("{0}", frame);
 			timer.Start("Render");
+			s_MainCommandQueue->PrependSubmit(resourceManager->GetUploadCommandLists());
+			s_MainCommandQueue->Submit(s_MainCommandList);
+			s_MainCommandQueue->Build();
 #if defined(RELEASE)
 			try 
 			{
@@ -186,7 +189,8 @@ namespace Engine
 #else
 			s_MainCommandQueue->Execute();
 #endif
-			s_MainCommandQueue->ExecuteImmediate({s_MainCommandList});
+			//s_MainCommandQueue->ExecuteImmediate({s_MainCommandList});
+			s_MainCommandQueue->Await();
 			s_RenderFlag.Clear();
 			GPUProfiler::EndFrame();
 			timer.End();
@@ -195,6 +199,7 @@ namespace Engine
 			WindowManager::UpdateWindows();
 
 			// prepare for next frame
+			resourceManager->Clean();
 			deletionPool->Clear();
 			deletionPool = resourceManager->CreateNewDeletionPool();
 			s_SwapFlag.Signal();

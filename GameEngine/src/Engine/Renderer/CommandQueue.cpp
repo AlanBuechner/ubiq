@@ -11,66 +11,28 @@
 namespace Engine
 {
 
-	void ExecutionOrder::Add(Ref<CommandList> commandList, std::vector<Ref<CommandList>> dependencys /*= {}*/)
+	void CommandQueue::PrependSubmit(Ref<CommandList> commandList)
 	{
-		// find the command list's dependency count
-		int dcount = -1;
-		for (uint32 i = 0; i < m_Commands.size(); i++)
-		{
-			for (uint32 j = 0; j < m_Commands[i].size(); j++)
-			{
-				for (uint32 k = 0; k < dependencys.size(); k++)
-				{
-					if (m_Commands[i][j] == dependencys[k])
-					{
-						dcount = (uint32)Math::Max((float)i, (float)dcount); // TODO: make an int version of max
-					}
-				}
-			}
-		}
-
-		dcount++;
-
-		// add new dependency list
-		if (dcount >= m_Commands.size())
-			m_Commands.push_back(std::vector<Ref<CommandList>>());
-
-		m_Commands[dcount].push_back(commandList);
+		m_Commands.insert(m_Commands.begin(), commandList);
 	}
 
-	void ExecutionOrder::Remove(Ref<CommandList> commandList)
+	void CommandQueue::PrependSubmit(std::vector<Ref<CommandList>> commandLists)
 	{
-		for (uint32 i = 0; i < m_Commands.size(); i++)
-		{
-			for (uint32 j = 0; j < m_Commands[i].size(); j++)
-			{
-				if (m_Commands[i][j] == commandList)
-				{
-					m_Commands[i][j] = m_Commands[i].back();
-					m_Commands[i].pop_back();
-				}
-			}
-		}
+		m_Commands.reserve(commandLists.size());
+		for (uint32 i = 0; i < commandLists.size(); i++)
+			m_Commands.insert(m_Commands.begin(), commandLists[i]);
 	}
 
-	void CommandQueue::Submit(Ref<CommandList> commandList, uint32 dcount)
+	void CommandQueue::Submit(Ref<CommandList> commandList)
 	{
-		// add new dependency list
-		if (dcount >= m_Commands.size())
-			m_Commands.resize(dcount + 1);
-
-		m_Commands[dcount].push_back(commandList);
+		m_Commands.push_back(commandList);
 	}
 
-	void CommandQueue::Submit(Ref<ExecutionOrder> order, uint32 dcount /*= 0*/)
+	void CommandQueue::Submit(std::vector<Ref<CommandList>> commandLists)
 	{
-		auto& commands = order->GetCommandLists();
-		for (uint32 i = 0; i < commands.size(); i++)
-		{
-			std::vector<Ref<CommandList>>& list = commands[i];
-			for (auto& command : list)
-				Submit(command, dcount + i);
-		}
+		m_Commands.reserve(commandLists.size());
+		for(uint32 i = 0; i < commandLists.size(); i++)
+			m_Commands.push_back(commandLists[i]);
 	}
 
 	Ref<CommandQueue> CommandQueue::Create(Type type)

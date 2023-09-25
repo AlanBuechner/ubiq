@@ -108,7 +108,7 @@ namespace Engine
 		switch (level)
 		{
 		case Engine::Logger::Trace:
-			std::cout << "\x1B[37m";
+			//std::cout << "\x1B[37m";
 			break;
 		case Engine::Logger::Info:
 			std::cout << "\x1B[32m";
