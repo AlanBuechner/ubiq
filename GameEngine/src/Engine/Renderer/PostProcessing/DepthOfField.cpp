@@ -17,10 +17,10 @@ namespace Engine
 		uint32 width = 100;
 		uint32 height = 100;
 
-		m_TempTexture	= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
-		m_COCTexture	= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
-		m_NearBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
-		m_FarBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16);
+		m_TempTexture	= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16_FLOAT);
+		m_COCTexture	= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16_FLOAT);
+		m_NearBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16_FLOAT);
+		m_FarBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16_FLOAT);
 
 		m_BokehBlur = FrameBuffer::Create({
 			m_NearBlur, m_FarBlur

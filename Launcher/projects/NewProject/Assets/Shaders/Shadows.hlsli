@@ -1,16 +1,107 @@
 #define DEPTH_BIAS (0.00005)
 
+
+
+
+
+
+
+
+// ---------------------- Hard Shadows ---------------------- //
 float HardShadow(Texture2D shadowMap, sampler s, float4 coords, float depthBias = DEPTH_BIAS)
 {
 	float depthSample = shadowMap.Sample(s, coords.xy).r + depthBias;
 	return (depthSample < coords.z ? 0 : 1);
 }
 
+
+
+
+
+
+
+
+// ---------------------- Moment Shadows ---------------------- //
+float4 compressMoments(float4 moments)
+{
+	float4x4 mat = {
+		1.5,			0,		-2,				 0,
+		0,				4,		 0,				-4,
+		0.86602540378,	0,		-0.38490017946,	 0,
+		0,				0.5,	 0,				 0.5	
+	};
+
+	return  mul(mat, moments) + float4(0.5, 0, 0.5, 0);
+}
+
+float4 decompressMoments(float4 moments)
+{
+	float4x4 mat = {
+		-1/3,	 0,		1.73205080757,	0,
+		 0,		 0.125,	0,				1,
+		-0.75,	 0,		1.29903810568,	0,
+		 0,		-0.125,	0,				1	
+	};
+
+	return  mul(mat, moments - float4(0.5, 0, 0.5, 0));
+}
+
+float4 biasMoments(float4 moments, float a)
+{
+	return (1.0-a) * moments + a * pow(float4(0, 0.63, 0, 0.63), 1); // what the FUCK is T
+}
+
+
+float MomentShadow(Texture2D shadowMap, sampler s, float4 coords, float depth, float depthBias = DEPTH_BIAS)
+{
+	float4 moments = shadowMap.Sample(s, coords.xy);
+	moments = decompressMoments(moments);
+	moments = biasMoments(moments, 6 * pow(10, -5));
+
+	float L32D22=mad(-moments[0],moments[1],moments[2]);
+	float D22=mad(-moments[0],moments[0], moments[1]);
+	float SquaredDepthVariance=mad(-moments[1],moments[1], moments[3]);
+	float D33D22=dot(float2(SquaredDepthVariance,-L32D22), float2(D22, L32D22));
+	float InvD22=1.0f/D22;
+	float L32=L32D22*InvD22;
+	
+	float3 z;
+	z[0]=depth;
+	float3 c=float3(1.0f,z[0],z[0]*z[0]);
+	c[1]-=moments.x;
+	c[2]-=moments.y+L32*c[1];
+	c[1]*=InvD22;
+	c[2]*=D22/D33D22;
+	c[1]-=L32*c[2];
+	c[0]-=dot(c.yz,moments.xy);
+	float InvC2=1.0f/c[2];
+	float p=c[1]*InvC2;
+	float q=c[0]*InvC2;
+	float r=sqrt((p*p*0.25f)-q);
+	z[1]=-p*0.5f-r;
+	z[2]=-p*0.5f+r;
+	float4 Switch=
+	(z[2]<z[0])?float4(z[1],z[0],1.0f,1.0f):(
+	(z[1]<z[0])?float4(z[0],z[1],0.0f,1.0f):float4(0.0f,0.0f,0.0f,0.0f));
+	float Quotient=(Switch[0]*z[2]-moments[0]*(Switch[0]+z[2])+moments[1])/((z[2]-Switch[1])*(z[0]-z[1]));
+	return saturate(Switch[2]+Switch[3]*Quotient);
+
+}
+
+
+
+
+
+
+
+
+
+// ---------------------- PCSS Shadows ---------------------- //
 #define DITHER_OFFSETS 32
 #define BLOCKER_SEARCH_NUM_SAMPLES 32
 #define PCF_NUM_SAMPLES 32
 
-static float2 poissonDisk[32] = {
+static float2 poissonDisk[PCF_NUM_SAMPLES] = {
 	float2(0.000000, 0.000000),
 	float2(-0.132461, -0.121293),
 	float2(0.022314, 0.253018),
@@ -78,39 +169,8 @@ static float2 ditherOffsets[DITHER_OFFSETS] = {
 	float2(-0.084597, -0.873808),
 	float2(-0.523440, 0.941268),
 	float2(0.804416, 0.701840),
-	/*float2(-0.466668, 0.079521),
-	float2(-0.249586, 0.520497),
-	float2(0.025071, 0.335448),
-	float2(0.063213, -0.921439),
-	float2(-0.124725, 0.863670),
-	float2(0.861620, 0.441905),
-	float2(-0.431413, 0.477069),
-	float2(0.279958, -0.291903),
-	float2(0.375723, -0.668052),
-	float2(-0.119791, 0.760150),
-	float2(0.658402, -0.339326),
-	float2(-0.542064, 0.786745),
-	float2(-0.299280, 0.373340),
-	float2(0.912936, 0.177280),
-	float2(0.314608, 0.717353),
-	float2(-0.120880, 0.847940),
-	float2(-0.203127, 0.629534),
-	float2(0.368437, 0.821944),
-	float2(-0.035019, -0.568350),
-	float2(0.900505, 0.840256),
-	float2(-0.704680, 0.762124),
-	float2(0.282161, -0.136093),
-	float2(0.239193, -0.437881),
-	float2(0.572004, -0.385084),
-	float2(-0.105933, -0.547787),
-	float2(-0.624934, -0.447531),
-	float2(0.112888, -0.166997),
-	float2(-0.660786, 0.813608),
-	float2(-0.793658, -0.747849),
-	float2(-0.009112, 0.520950),
-	float2(0.969503, 0.870008),
-	float2(0.368890, -0.233623),*/
 };
+
 
 float PenumbraSize(float zReceiver, float zBlocker) //Parallel plane estimation
 {

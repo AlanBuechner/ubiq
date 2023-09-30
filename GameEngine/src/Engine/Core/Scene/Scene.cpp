@@ -46,6 +46,9 @@ namespace Engine
 
 	void Scene::OnUpdateEditor(Ref<EditorCamera> camera)
 	{
+
+		bool newCamera = m_SceneRenderer->GetMainCamera() != camera;
+
 		// updating
 		// update transforms
 		m_Registry.Each([&](EntityType entityID) {
@@ -66,10 +69,20 @@ namespace Engine
 		// rendering
 		auto dirLightView = m_Registry.View<DirectionalLightComponent>();
 		for (auto& comp : dirLightView)
+		{
+			if (newCamera)
+			{
+				// remove all cameras from directional light
+				comp.GetDirectinalLight()->ClearCameras();
+				// re add cameras to directional light
+				comp.GetDirectinalLight()->AddCamera(camera);
+			}
 			comp.UpdateShadowMaps();
+		}
 		
 		// render 3d models
-		m_SceneRenderer->SetMainCamera(camera);
+		if(newCamera)
+			m_SceneRenderer->SetMainCamera(camera);
 		m_SceneRenderer->UpdateBuffers();
 
 		// render sprites

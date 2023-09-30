@@ -77,6 +77,7 @@ namespace Engine
 		SceneRenderer();
 
 		Ref<FrameBuffer> GetRenderTarget();
+		Ref<Camera> GetMainCamera() { return m_MainCamera; }
 		void OnViewportResize(uint32 width, uint32 height);
 		void SetMainCamera(Ref<Camera> camera);
 		void SetDirectionalLight(Ref<DirectionalLight> light);

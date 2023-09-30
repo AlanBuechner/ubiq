@@ -94,6 +94,7 @@ namespace Engine
 	void SceneRenderer::SetMainCamera(Ref<Camera> camera)
 	{
 		m_MainCamera = camera;
+		Invalidate();
 	}
 
 	void SceneRenderer::SetDirectionalLight(Ref<DirectionalLight> light)

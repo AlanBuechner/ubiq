@@ -3,6 +3,7 @@
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/Light.h"
+#include "Engine/Renderer/Renderer.h"
 
 #include "Engine/Renderer/GPUProfiler.h"
 
@@ -25,11 +26,6 @@ namespace Engine
 		// directional light
 		if (scene.m_DirectinalLight)
 		{
-			// remove all cameras from directional light
-			scene.m_DirectinalLight->ClearCameras();
-			// re add cameras to directional light
-			scene.m_DirectinalLight->AddCamera(scene.m_MainCamera);
-
 			// for each camera on the directional light
 			for (auto& cm : scene.m_DirectinalLight->GetShadowMaps())
 			{
@@ -71,7 +67,7 @@ namespace Engine
 					// for each object in the scene
 					for (auto& cmd : scene.m_DrawCommands)
 					{
-						Ref<ShaderPass> pass = cmd.m_Shader->GetPass("depth");
+						Ref<ShaderPass> pass = cmd.m_Shader->GetPass("directionalShadowMap");
 						if (pass)
 						{
 							m_CommandList->SetShader(pass);
@@ -86,6 +82,59 @@ namespace Engine
 
 			GPUTimer::EndEvent(m_CommandList);
 		}
+
+
+
+		// convert all render targets to uav
+		for (auto& transition : transitions)
+			transition.state = ResourceState::UnorderedResource;
+		GPUTimer::BeginEvent(m_CommandList, "Filter ShadowMaps");
+		Ref<ShaderPass> blurXPass = Renderer::GetBlitShader()->GetPass("BlurX");
+		Ref<ShaderPass> blurYPass = Renderer::GetBlitShader()->GetPass("BlurY");
+
+		if (scene.m_DirectinalLight)
+		{
+			for (auto& cm : scene.m_DirectinalLight->GetShadowMaps())
+			{
+				Ref<Camera> camera = cm.first;
+				const DirectionalLight::CascadedShadowMaps& maps = cm.second;
+
+				// for each cascade in the shadow map
+				for (uint32 i = 0; i < DirectionalLight::s_NumShadowMaps; i++)
+				{
+					Ref<RWTexture2D> shadowMap = maps.m_ShadowMaps[i]->GetAttachment(0)->GetRWTexture2D();
+					Ref<RWTexture2D> shadowMapTemp = maps.m_ShadowMapsTemp[i];
+
+					GPUTimer::BeginEvent(m_CommandList, "Cascade " + std::to_string(i));
+
+					GPUTimer::BeginEvent(m_CommandList, "Blur");
+
+					const uint32 ThreadSize = 64;
+
+					m_CommandList->SetShader(blurXPass);
+					m_CommandList->SetRWTexture(blurXPass->GetUniformLocation("DstTexture"), shadowMapTemp, 0);
+					m_CommandList->SetRWTexture(blurXPass->GetUniformLocation("SrcTexture"), shadowMap, 0);
+					m_CommandList->Dispatch(std::ceil((float)shadowMap->GetWidth() / (float)ThreadSize), shadowMap->GetHeight(), 1);
+
+					m_CommandList->SetShader(blurYPass);
+					m_CommandList->SetRWTexture(blurYPass->GetUniformLocation("DstTexture"), shadowMap, 0);
+					m_CommandList->SetRWTexture(blurYPass->GetUniformLocation("SrcTexture"), shadowMapTemp, 0);
+					m_CommandList->Dispatch(shadowMap->GetWidth(), std::ceil((float)shadowMap->GetHeight() / (float)ThreadSize), 1);
+
+					GPUTimer::EndEvent(m_CommandList);
+
+					GPUTimer::BeginEvent(m_CommandList, "Create Mips");
+
+					GPUTimer::EndEvent(m_CommandList);
+
+					GPUTimer::EndEvent(m_CommandList);
+				}
+			}
+		}
+
+		GPUTimer::EndEvent(m_CommandList);
+
+
 
 		// convert all render targets to srv
 		for (auto& transition : transitions)

@@ -26,17 +26,69 @@ namespace Engine
 
 	uint32 Texture2DResource::GetStride()
 	{
+#define FORMAT_1(bit, type) case TextureFormat::R##bit##_##type: return 1*bit/8
+#define FORMAT_2(bit, type) case TextureFormat::RG##bit##_##type: return 2*bit/8
+#define FORMAT_4(bit, type) case TextureFormat::RGBA##bit##_##type: return 4*bit/8
 		switch (m_Format)
 		{
-		case TextureFormat::RGBA8:				return 4*1;
-		case TextureFormat::RGBA16:				return 4*2;
-		case TextureFormat::RGBA32:				return 4*4;
-		case TextureFormat::RG16:				return 2*2;
-		case TextureFormat::RG32:				return 2*4;
-		case TextureFormat::RED_INTEGER:		return 4*1;
-		case TextureFormat::DEPTH24STENCIL8:	return 24+8;
+			// 8 bit components normalized
+			FORMAT_1(8, UNORM);
+			FORMAT_2(8, UNORM);
+			FORMAT_4(8, UNORM);
+			FORMAT_1(8, SNORM);
+			FORMAT_2(8, SNORM);
+			FORMAT_4(8, SNORM);
+
+			// 8 bit components int
+			FORMAT_1(8, UINT);
+			FORMAT_2(8, UINT);
+			FORMAT_4(8, UINT);
+			FORMAT_1(8, SINT);
+			FORMAT_2(8, SINT);
+			FORMAT_4(8, SINT);
+
+			// 16 bit components normalized
+			FORMAT_1(16, UNORM);
+			FORMAT_2(16, UNORM);
+			FORMAT_4(16, UNORM);
+			FORMAT_1(16, SNORM);
+			FORMAT_2(16, SNORM);
+			FORMAT_4(16, SNORM);
+
+			// 16 bit components int
+			FORMAT_1(16, UINT);
+			FORMAT_2(16, UINT);
+			FORMAT_4(16, UINT);
+			FORMAT_1(16, SINT);
+			FORMAT_2(16, SINT);
+			FORMAT_4(16, SINT);
+
+			// 16 bit components float
+			FORMAT_1(16, FLOAT);
+			FORMAT_2(16, FLOAT);
+			FORMAT_4(16, FLOAT);
+
+
+			// 32 bit components int
+			FORMAT_1(32, UINT);
+			FORMAT_2(32, UINT);
+			FORMAT_4(32, UINT);
+			FORMAT_1(32, SINT);
+			FORMAT_2(32, SINT);
+			FORMAT_4(32, SINT);
+
+			// 32 bit components float
+			FORMAT_1(32, FLOAT);
+			FORMAT_2(32, FLOAT);
+			FORMAT_4(32, FLOAT);
+
+
+		case TextureFormat::DEPTH24STENCIL8:	return 4;
 		}
 		return 0;
+#undef FORMAT_1
+#undef FORMAT_2
+#undef FORMAT_4
 	}
 
 	Texture2DResource* Texture2DResource::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type)
@@ -169,12 +221,12 @@ namespace Engine
 
 	Ref<Texture2D> Texture2D::Create(uint32 width, uint32 height)
 	{
-		return Create(width, height, 0, TextureFormat::RGBA8);
+		return Create(width, height, 0, TextureFormat::RGBA8_UNORM);
 	}
 
 	Ref<Texture2D> Texture2D::Create(uint32 width, uint32 height, uint32 mips)
 	{
-		return Create(width, height, mips, TextureFormat::RGBA8);
+		return Create(width, height, mips, TextureFormat::RGBA8_UNORM);
 	}
 
 	Ref<Texture2D> Texture2D::Create(uint32 width, uint32 height, TextureFormat format)
@@ -192,7 +244,8 @@ namespace Engine
 	{
 		CORE_ASSERT(path != "", "Path must be given");
 		TextureFile* file = TextureFile::LoadFile(path);
-		file->ConvertToChannels(4);
+		if(file->channels == 3) // no 3 component texture format exists
+			file->ConvertToChannels(4);
 
 		Ref<Texture2D> texture = Create(file->width, file->height, file->GetTextureFormat());
 		texture->SetData(file->data);
@@ -368,22 +421,21 @@ namespace Engine
 		{
 			switch (channels)
 			{
-			case 1: return TextureFormat::None; // TODO : add in new texture format
-			case 2: return TextureFormat::RG16; // TODO : add in new texture format
-			case 3: return TextureFormat::None; // TODO : add in new texture format
-			case 4: return TextureFormat::RGBA16;
+			case 1: return TextureFormat::R16_FLOAT;
+			case 2: return TextureFormat::RG16_FLOAT;
+			case 4: return TextureFormat::RGBA16_FLOAT;
 			}
 		}
 		else
 		{
 			switch (channels)
 			{
-			case 1: return TextureFormat::None; // TODO : add in new texture format
-			case 2: return TextureFormat::None; // TODO : add in new texture format
-			case 3: return TextureFormat::None; // TODO : add in new texture format
-			case 4: return TextureFormat::RGBA8;
+			case 1: return TextureFormat::R8_UNORM;
+			case 2: return TextureFormat::RG8_UNORM;
+			case 4: return TextureFormat::RGBA8_UNORM;
 			}
 		}
+		return TextureFormat::None;
 	}
 
 	void TextureFile::ConvertToChannels(uint8 numChannels)

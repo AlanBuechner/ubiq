@@ -106,18 +106,19 @@ namespace Engine
 
 		struct RenderPass
 		{
-			enum BlendMode {
+			enum class BlendMode {
 				Blend,
-				Add
+				Add,
+				None
 			};
 
-			enum CullMode {
+			enum class CullMode {
 				Back,
 				Front,
 				None
 			};
 			
-			enum DepthTest {
+			enum class DepthTest {
 				Less,
 				LessOrEqual,
 				Greater,
@@ -128,9 +129,9 @@ namespace Engine
 			std::string vs;
 			std::string ps;
 			std::string cs;
-			BlendMode blendMode = Blend;
-			CullMode cullMode = Back;
-			DepthTest depthTest = LessOrEqual;
+			BlendMode blendMode = BlendMode::Blend;
+			CullMode cullMode = CullMode::Back;
+			DepthTest depthTest = DepthTest::LessOrEqual;
 
 		};
 

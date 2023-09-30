@@ -1,0 +1,587 @@
+Log file created on Fri Sep 29 16:01:37 2023.
+Failed to load the configuration file. The exception is:
+ios_base::failbit set: iostream stream error
+* Warning: Failed to open the FX file at "Shaders/_2DDrawing.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/Colors.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/Constants.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/Lighting.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/LightSources.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/Sampling.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/Shadow.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/ParticipatingMedia.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/Skinning.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/TexCoord.fx". No functions or types were loaded.
+* Warning: Failed to open the FX file at "Shaders/Transformation.fx". No functions or types were loaded.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to MedievalSeaport is of version 0.0.0. This version is not supported.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to Escher is of version 0.0.0. This version is not supported.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to Foliage is of version 0.0.0. This version is not supported.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to Columns is of version 0.0.0. This version is not supported.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to SmokeAndPipes is of version 0.0.0. This version is not supported.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to Sintel is of version 0.0.0. This version is not supported.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to Quadbot is of version 0.0.0. This version is not supported.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to ThinWall is of version 0.0.0. This version is not supported.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to Planes is of version 0.0.0. This version is not supported.
+* Warning: A chunk has been skipped since the chunk identifier was wrong. It was supposed to be "$U3D_FILE_HEADER" but it is "".
+* Warning: The Ultimate 3D model file being loaded to AnimatedModelDefinition is of version 0.0.0. This version is not supported.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctions2DDrawing(class CRoot & __ptr64)'::`2'::CComputeInverseTranslation for the function at path /Definition/Function/_2DDrawing/ComputeInverseTranslation. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctions2DDrawing(class CRoot & __ptr64)'::`2'::CComputeSpriteToViewportSpace for the function at path /Definition/Function/_2DDrawing/ComputeSpriteToViewportSpace. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctions2DDrawing(class CRoot & __ptr64)'::`2'::CComputeViewportToProjectionSpace for the function at path /Definition/Function/_2DDrawing/ComputeViewportToProjectionSpace. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsConstants(class CRoot & __ptr64)'::`2'::CInvertMatrix for the function at path /Definition/Function/Constants/InvertMatrix. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsConstants(class CRoot & __ptr64)'::`2'::CTransformMatrix for the function at path /Definition/Function/Constants/TransformMatrix. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsConstants(class CRoot & __ptr64)'::`2'::CComputeAverageScaling for the function at path /Definition/Function/Constants/ComputeAverageScaling. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsConstants(class CRoot & __ptr64)'::`2'::CComputeClippingPlanes for the function at path /Definition/Function/Constants/ComputeClippingPlanes. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsConstants(class CRoot & __ptr64)'::`2'::CComputeBillboardData for the function at path /Definition/Function/Constants/ComputeBillboardData. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsConstants(class CRoot & __ptr64)'::`2'::CComputeWorldSpaceCameraPosition for the function at path /Definition/Function/Constants/ComputeWorldSpaceCameraPosition. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsConstants(class CRoot & __ptr64)'::`2'::CComputeMeshSpaceCameraPosition for the function at path /Definition/Function/Constants/ComputeMeshSpaceCameraPosition. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsLightSources(class CRoot & __ptr64)'::`2'::CComputePointLightUnitSphereIrradiance for the function at path /Definition/Function/LightSources/ComputePointLightUnitSphereIrradiance. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsLightSources(class CRoot & __ptr64)'::`2'::CComputeSpotConeCoefficients for the function at path /Definition/Function/LightSources/ComputeSpotConeCoefficients. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsLighting(class CRoot & __ptr64)'::`2'::CScaleRadiance for the function at path /Definition/Function/Lighting/ScaleRadiance. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsLighting(class CRoot & __ptr64)'::`2'::CScaleAndAddRadiance for the function at path /Definition/Function/Lighting/ScaleAndAddRadiance. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsLighting(class CRoot & __ptr64)'::`2'::CAddRadiance for the function at path /Definition/Function/Lighting/AddRadiance. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsLighting(class CRoot & __ptr64)'::`2'::CComputeCosineLobeFactor for the function at path /Definition/Function/Lighting/ComputeCosineLobeFactor. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsLighting(class CRoot & __ptr64)'::`2'::CComputeTorranceSparrowConstants for the function at path /Definition/Function/Lighting/ComputeTorranceSparrowConstants. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsColors(class CRoot & __ptr64)'::`2'::CChooseAdditiveColor for the function at path /Definition/Function/Colors/ChooseAdditiveColor. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsColors(class CRoot & __ptr64)'::`2'::CMultiplyColors for the function at path /Definition/Function/Colors/MultiplyColors. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsColors(class CRoot & __ptr64)'::`2'::CAddColors for the function at path /Definition/Function/Colors/AddColors. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsColors(class CRoot & __ptr64)'::`2'::CLerpColors for the function at path /Definition/Function/Colors/LerpColors. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsColors(class CRoot & __ptr64)'::`2'::CGetAlpha for the function at path /Definition/Function/Colors/GetAlpha. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsColors(class CRoot & __ptr64)'::`2'::CApplyAlpha for the function at path /Definition/Function/Colors/ApplyAlpha. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsColors(class CRoot & __ptr64)'::`2'::CAppendAlpha for the function at path /Definition/Function/Colors/AppendAlpha. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsColors(class CRoot & __ptr64)'::`2'::CSplitColorAndAlpha for the function at path /Definition/Function/Colors/SplitColorAndAlpha. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsShadow(class CRoot & __ptr64)'::`2'::CComputeDirectionalLightCamera for the function at path /Definition/Function/Shadow/ComputeDirectionalLightCamera. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsShadow(class CRoot & __ptr64)'::`2'::CComputeSpotLightCamera for the function at path /Definition/Function/Shadow/ComputeSpotLightCamera. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsShadow(class CRoot & __ptr64)'::`2'::CGetSummedAreaTableThreadGroupCount for the function at path /Definition/Function/Shadow/GetSummedAreaTableThreadGroupCount. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsShadow(class CRoot & __ptr64)'::`2'::CComputeDirectionalLightSoftShadowParameters for the function at path /Definition/Function/Shadow/ComputeDirectionalLightSoftShadowParameters. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsShadow(class CRoot & __ptr64)'::`2'::CComputeFixedPrecision for the function at path /Definition/Function/Shadow/ComputeFixedPrecision. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsParticipatingMedia(class CRoot & __ptr64)'::`2'::CComputeRectificationToWorldSpaceDirectional for the function at path /Definition/Function/ParticipatingMedia/ComputeRectificationToWorldSpaceDirectional. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsParticipatingMedia(class CRoot & __ptr64)'::`2'::CGetRectifiedSpaceFrustumBounds for the function at path /Definition/Function/ParticipatingMedia/GetRectifiedSpaceFrustumBounds. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsParticipatingMedia(class CRoot & __ptr64)'::`2'::CComputeExtinctionCoefficient for the function at path /Definition/Function/ParticipatingMedia/ComputeExtinctionCoefficient. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsParticipatingMedia(class CRoot & __ptr64)'::`2'::CComputeSingleScatteringFactors for the function at path /Definition/Function/ParticipatingMedia/ComputeSingleScatteringFactors. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsParticipatingMedia(class CRoot & __ptr64)'::`2'::CGetPrefixSumThreadGroupCount for the function at path /Definition/Function/ParticipatingMedia/GetPrefixSumThreadGroupCount. There is no function definition at this path.
+* Warning: Failed to declare a CPU implementation of type `void __cdecl DeclareCPUFunctionsParticipatingMedia(class CRoot & __ptr64)'::`2'::CGetShadowMapToRectificationDepthTransform for the function at path /Definition/Function/ParticipatingMedia/GetShadowMapToRectificationDepthTransform. There is no function definition at this path.
+* Warning: Dependencies of the context at /Engine/Window could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Dependencies of the context at /Engine/Device could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Dependencies of the context at /View/Renderer/Scene/BatchSet could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/BatchSet could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Dependencies of the context at /View/BatchSet/PlainScene could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /View/BatchSet/PlainScene could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Dependencies of the context at /View/BatchSet/Scene could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /View/BatchSet/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Dependencies of the context at /View/Renderer/HUD/BatchSet could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/BatchSet could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Dependencies of the context at /View/BatchSet/HUD could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /View/BatchSet/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/BatchSet could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Failed to compile the context at path /View/Sprite/ShadowMapBatch.
+Reason: The binding VertexBufferCollection requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at path /View/Sprite/ShadowMapBatch/VertexBufferCollection.
+Reason: The binding VertexBuffer0 requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at /Resource/VertexBuffer/Quad.
+Reason: CVertexBufferContext::DoCompile() has led to an exception.
+Failed to resolve all dependencies of the context at /Resource/VertexBuffer/Quad.
+Reason: Resolution of all dependencies requires enumeration of all dependencies.
+Indirectly referenced contexts of the context at /Resource/VertexBuffer/Quad could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Failed to compile the context at path /Engine/Application.
+Reason: The binding Camera requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to resolve the context at /World/DefaultRoom/Camera.
+Failed to resolve the binding WorldToViewSpace for the context at /World/DefaultRoom/Camera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/Camera/WorldToViewSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/Camera/WorldToViewSpace.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/Camera/CameraLibrary/WorldToViewSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/Camera/CameraLibrary/WorldToViewSpace.
+Resolving the reference at /World/DefaultRoom/Camera/CameraLibrary/WorldToViewSpace failed. Its context path is Parent/ComputeWorldToViewSpace/OutBToA.
+
+* Warning: Failed to compile the context at path /View/SettingsText/TextBatch.
+Reason: The binding VertexBufferCollection requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at path /View/SettingsText/TextBatch/VertexBufferCollection.
+Reason: The binding VertexBuffer0 requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at /View/SettingsText/TextVertexBuffer.
+Reason: CVertexBufferContext::DoCompile() has led to an exception.
+Failed to resolve all dependencies of the context at /View/SettingsText/TextVertexBuffer.
+Reason: Resolution of all dependencies requires enumeration of all dependencies.
+Indirectly referenced contexts of the context at /View/SettingsText/TextVertexBuffer could not be enumerated.
+Indirectly referenced contexts of the context at /View/SettingsText/TextVertexSource could not be enumerated.
+Indirectly referenced contexts of the context at /View/SettingsText/GlyphLayout could not be enumerated.
+Indirectly referenced contexts of the context at /View/GlyphTexture could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Failed to compile the context at path /View/FrameRateText/TextBatch.
+Reason: The binding VertexBufferCollection requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at path /View/FrameRateText/TextBatch/VertexBufferCollection.
+Reason: The binding VertexBuffer0 requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at /View/FrameRateText/TextVertexBuffer.
+Reason: CVertexBufferContext::DoCompile() has led to an exception.
+Failed to resolve all dependencies of the context at /View/FrameRateText/TextVertexBuffer.
+Reason: Resolution of all dependencies requires enumeration of all dependencies.
+Indirectly referenced contexts of the context at /View/FrameRateText/TextVertexBuffer could not be enumerated.
+Indirectly referenced contexts of the context at /View/FrameRateText/TextVertexSource could not be enumerated.
+Indirectly referenced contexts of the context at /View/FrameRateText/GlyphLayout could not be enumerated.
+Indirectly referenced contexts of the context at /View/GlyphTexture could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Failed to compile the context at path /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Batch.
+Reason: The binding VertexFormat requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at path /Resource/VertexFormat/PlanarShape.
+Reason: The binding VertexBuffer0 requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at /Resource/VertexBuffer/Quad.
+Reason: CVertexBufferContext::DoCompile() has led to an exception.
+Failed to resolve all dependencies of the context at /Resource/VertexBuffer/Quad.
+Reason: Resolution of all dependencies requires enumeration of all dependencies.
+Indirectly referenced contexts of the context at /Resource/VertexBuffer/Quad could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Dependencies of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload/BatchSet could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload/BatchSet could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Failed to compile the context at path /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Batch.
+Reason: The binding VertexFormat requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at path /Resource/VertexFormat/PlanarShape.
+Reason: The binding VertexBuffer0 requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at /Resource/VertexBuffer/Quad.
+Reason: CVertexBufferContext::DoCompile() has led to an exception.
+Failed to resolve all dependencies of the context at /Resource/VertexBuffer/Quad.
+Reason: Resolution of all dependencies requires enumeration of all dependencies.
+Indirectly referenced contexts of the context at /Resource/VertexBuffer/Quad could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Dependencies of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload/BatchSet could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload/BatchSet could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Failed to compile the context at path /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Batch.
+Reason: The binding VertexFormat requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at path /Resource/VertexFormat/PlanarShape.
+Reason: The binding VertexBuffer0 requires, that the bound context is at least in state U3DCS_COMPILED.
+Failed to compile the context at /Resource/VertexBuffer/Quad.
+Reason: CVertexBufferContext::DoCompile() has led to an exception.
+Failed to resolve all dependencies of the context at /Resource/VertexBuffer/Quad.
+Reason: Resolution of all dependencies requires enumeration of all dependencies.
+Indirectly referenced contexts of the context at /Resource/VertexBuffer/Quad could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+
+* Warning: Dependencies of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload/BatchSet could not be compiled.
+Reason: One of its directly or indirectly referenced contexts could not be resolved.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload/BatchSet could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Device could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Window/OnWindowClosed could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/Application could not be enumerated.
+Indirectly referenced contexts of the context at /Engine/RenderTargetManager could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/HUD/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene could not be enumerated.
+Indirectly referenced contexts of the context at /View/Renderer/Scene/Dependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/VerticalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapPostProcessor/HorizontalFilter/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/Workload could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapResolve/WorkloadDependency could not be enumerated.
+Indirectly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapRenderer/Renderer could not be enumerated.
+Directly referenced contexts of the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera could not be enumerated.
+Reason: Enumeration of referenced contexts requires state U3DCS_RESOLVED.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Failed to resolve the binding ViewToWorldSpace for the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera.
+Reason: Either no context is bound or a reference without proper resolution is bound.
+Failed to retrieve the referenced context of the reference context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Reason: The reference context could not be resolved.
+Failed to resolve the context at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace.
+Resolving the reference at /World/DefaultRoom/DirectionalLightShadowMap/ShadowMapCamera/ViewToWorldSpace failed. Its context path is Parent/ComputeDirectionalLightCamera/OutViewToWorldSpace.
+

@@ -41,7 +41,7 @@ namespace Engine
 
 		float clearval = pow(0.2f, 2.2);
 		Ref<FrameBufferNode> renderTargetNode = CreateRef<FrameBufferNode>(*this, std::vector<Ref<RenderTarget2D>>{
-			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), TextureFormat::RGBA16, { clearval, clearval, clearval, 1 }),
+			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), TextureFormat::RGBA16_FLOAT, { clearval, clearval, clearval, 1 }),
 			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), TextureFormat::Depth, { 1,0,0,0 }),
 		});
 		m_Nodes.push_back(renderTargetNode);
@@ -82,7 +82,7 @@ namespace Engine
 
 		// create post processing render target
 		Ref<FrameBufferNode> postRenderTargetNode = CreateRef<FrameBufferNode>(*this, std::vector<Ref<RenderTarget2D>>{
-			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), TextureFormat::RGBA16, true),
+			RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), TextureFormat::RGBA16_FLOAT, true),
 		});
 		m_Nodes.push_back(postRenderTargetNode);
 

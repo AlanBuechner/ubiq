@@ -10,6 +10,13 @@ passes = {
 		VS = vertex;
 		PS = depth;
 	};
+	directionalShadowMap = {
+		VS = vertex;
+		PS = directionalShadowMap;
+		blendMode = none;
+		//depthTest = Greater;
+		//cullMode = back;
+	};
 };
 
 material = {
@@ -25,6 +32,14 @@ material = {
 	invertParallax = bool(false);
 	flipV = bool(false);
 };
+
+
+
+
+
+
+
+
 
 #section common
 #pragma enable_d3d12_debug_symbols
@@ -87,6 +102,18 @@ struct Camera
 	float3 Rotation;
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
 #section vertex
 
 // RC_ defines the cbuffer as a root constant
@@ -128,6 +155,18 @@ VS_Output main(VS_Input input)
 
 	return output;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 #section pixel
 
@@ -250,9 +289,11 @@ PS_Output main(PS_Input input)
 			float4 pos = mul(shadowCamera.ViewPorjection, input.worldPosition);
 			pos.y = -pos.y; // flip v
 			pos = pos / pos.w;
-			pos.xy = pos.xy * 0.5 + 0.5;
+			pos.xy = pos.xy * 0.5 + 0.5; // map from -1:1 -> 0:1
 
-			shadowAmount = PCSSDirectional(textures[c.texture], shadowSampler, pos, shadowCamera.InvProjection, DirLight.size, (float3)input.worldPosition, DEPTH_BIAS * (ci+1));
+			float bias = DEPTH_BIAS * (ci+1) * dot(input.normal, -DirLight.direction);
+			shadowAmount = MomentShadow(textures[c.texture], shadowSampler, pos, input.position.z, bias);
+			//shadowAmount = PCSSDirectional(textures[c.texture], shadowSampler, pos, shadowCamera.InvProjection, DirLight.size, (float3)input.worldPosition, bias);
 			//shadowAmount = HardShadow(textures[c.texture], shadowSampler, pos);
 		}
 
@@ -269,13 +310,52 @@ PS_Output main(PS_Input input)
 	return output;
 }
 
+
+
+
+
+
+
+
 #section depth
 
-ConstantBuffer<Material> materials[];
-Texture2D<float4> textures[];
-sampler s;
 
 void main(PS_Input input)
 {
 
+}
+
+
+
+
+
+
+
+
+
+#section directionalShadowMap
+
+struct PS_Output
+{
+	float4 color : SV_TARGET0;
+};
+
+#include "Shadows.hlsli"
+
+[earlydepthstencil]
+PS_Output main(PS_Input input)
+{
+	PS_Output output;
+
+	float d = input.position.z;
+
+	float4 moments;
+	moments.r = d;
+	moments.g = d*d;
+	moments.b = d*d*d;
+	moments.a = d*d*d*d;
+
+	output.color = compressMoments(moments);
+
+	return output;
 }

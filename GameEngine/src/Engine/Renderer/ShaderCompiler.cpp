@@ -129,6 +129,10 @@ namespace Engine
 		std::string line;
 		while (getline(ss, line))
 		{
+			const std::string delims(" \t");
+			if (line.rfind("//", line.find_first_not_of(delims)) == 0)
+				continue;
+
 			std::vector<std::string> tokens = Tokenize(line);
 			if (!tokens.empty())
 			{
@@ -227,29 +231,31 @@ namespace Engine
 						else if (var->name == "blendMode")
 						{
 							if (var->value->string == "blend")
-								rpass.blendMode = ShaderConfig::RenderPass::Blend;
+								rpass.blendMode = ShaderConfig::RenderPass::BlendMode::Blend;
 							else if (var->value->string == "add")
-								rpass.blendMode = ShaderConfig::RenderPass::Add;
+								rpass.blendMode = ShaderConfig::RenderPass::BlendMode::Add;
+							else if (var->value->string == "none")
+								rpass.blendMode = ShaderConfig::RenderPass::BlendMode::None;
 						}
 						else if (var->name == "cullMode")
 						{
 							if (var->value->string == "back")
-								rpass.cullMode = ShaderConfig::RenderPass::Back;
+								rpass.cullMode = ShaderConfig::RenderPass::CullMode::Back;
 							else if (var->value->string == "front")
-								rpass.cullMode = ShaderConfig::RenderPass::Front;
+								rpass.cullMode = ShaderConfig::RenderPass::CullMode::Front;
 							else if (var->value->string == "none")
-								rpass.cullMode = ShaderConfig::RenderPass::None;
+								rpass.cullMode = ShaderConfig::RenderPass::CullMode::None;
 						}
 						else if (var->name == "depthTest")
 						{
 							if (var->value->string == "less")
-								rpass.depthTest = ShaderConfig::RenderPass::Less;
+								rpass.depthTest = ShaderConfig::RenderPass::DepthTest::Less;
 							else if (var->value->string == "lessOrEqual")
-								rpass.depthTest = ShaderConfig::RenderPass::LessOrEqual;
+								rpass.depthTest = ShaderConfig::RenderPass::DepthTest::LessOrEqual;
 							else if (var->value->string == "greater")
-								rpass.depthTest = ShaderConfig::RenderPass::Greater;
+								rpass.depthTest = ShaderConfig::RenderPass::DepthTest::Greater;
 							else if (var->value->string == "greaterOrEqual")
-								rpass.depthTest = ShaderConfig::RenderPass::GreaterOrEqual;
+								rpass.depthTest = ShaderConfig::RenderPass::DepthTest::GreaterOrEqual;
 						}
 					}
 					config.passes.push_back(rpass);

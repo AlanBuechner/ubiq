@@ -316,12 +316,12 @@ namespace Engine
 			switch (outputParam.ComponentType)
 			{
 			case D3D_REGISTER_COMPONENT_FLOAT32:
-				outputElement.push_back(TextureFormat::RGBA16);
+				outputElement.push_back(TextureFormat::RGBA16_FLOAT);
 				break;
 			case D3D_REGISTER_COMPONENT_UINT32:
 				break;
 			case D3D_REGISTER_COMPONENT_SINT32:
-				outputElement.push_back(TextureFormat::RED_INTEGER);
+				outputElement.push_back(TextureFormat::R32_UINT);
 				break;
 			default:
 				break;

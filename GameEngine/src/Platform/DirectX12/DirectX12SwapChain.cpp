@@ -24,7 +24,7 @@ namespace Engine
 		m_Buffers.reserve(numBuffers);
 		for (uint32 i = 0; i < numBuffers; i++)
 		{
-			Ref<RenderTarget2D> renderTarget = RenderTarget2D::Create(1, 1, 1, TextureFormat::RGBA8);
+			Ref<RenderTarget2D> renderTarget = RenderTarget2D::Create(1, 1, 1, TextureFormat::RGBA8_UNORM);
 			renderTarget->SetResizable(false);
 			m_Buffers.push_back(renderTarget);
 		}
@@ -154,7 +154,7 @@ namespace Engine
 			// Get buffer
 			ID3D12Resource* res = nullptr;
 			CORE_ASSERT_HRESULT(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&res)), "Failed to Get Frame Buffer");
-			renderTarget->m_Resource = new DirectX12Texture2DResource(width, height, TextureFormat::RGBA8, res);
+			renderTarget->m_Resource = new DirectX12Texture2DResource(width, height, TextureFormat::RGBA8_UNORM, res);
 
 			// create new handle
 			

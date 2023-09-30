@@ -200,7 +200,7 @@ namespace Engine
 #ifdef USE_BLOOM_COMPUTE
 					m_GaussianSumTextures[i] = RWTexture2D::Create(w, h, 1, TextureFormat::RGBA16);
 #else
-					m_GaussianSumTextures[i] = RenderTarget2D::Create(w, h, TextureFormat::RGBA16);
+					m_GaussianSumTextures[i] = RenderTarget2D::Create(w, h, TextureFormat::RGBA16_FLOAT);
 #endif
 			}
 		}

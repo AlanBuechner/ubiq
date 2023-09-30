@@ -188,11 +188,11 @@ namespace Engine
 			desc.PS = { m_Blobs.ps->GetBufferPointer(), m_Blobs.ps->GetBufferSize() };
 
 			desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
-			if (m_PassConfig.cullMode == ShaderConfig::RenderPass::Back)
+			if (m_PassConfig.cullMode == ShaderConfig::RenderPass::CullMode::Back)
 				desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
-			else if (m_PassConfig.cullMode == ShaderConfig::RenderPass::Front)
+			else if (m_PassConfig.cullMode == ShaderConfig::RenderPass::CullMode::Front)
 				desc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
-			else if (m_PassConfig.cullMode == ShaderConfig::RenderPass::None)
+			else if (m_PassConfig.cullMode == ShaderConfig::RenderPass::CullMode::None)
 				desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 			desc.RasterizerState.FrontCounterClockwise = FALSE;
 			desc.RasterizerState.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
@@ -214,26 +214,29 @@ namespace Engine
 
 				switch (formats[i])
 				{
-				case TextureFormat::RGBA8:
-				case TextureFormat::RGBA16:
-				case TextureFormat::RGBA32:
-				{
-					desc.BlendState.RenderTarget[i].BlendEnable = TRUE;
-					desc.BlendState.RenderTarget[i].LogicOpEnable = FALSE;
-					desc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-					if (m_PassConfig.blendMode == ShaderConfig::RenderPass::Blend)
-						desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-					else if (m_PassConfig.blendMode == ShaderConfig::RenderPass::Add)
-						desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_SRC_ALPHA;
-					desc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
-					desc.BlendState.RenderTarget[i].SrcBlendAlpha = D3D12_BLEND_ONE;
-					desc.BlendState.RenderTarget[i].DestBlendAlpha = D3D12_BLEND_ONE;
-					desc.BlendState.RenderTarget[i].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-					desc.BlendState.RenderTarget[i].LogicOp = D3D12_LOGIC_OP_NOOP;
-					desc.BlendState.RenderTarget[i].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-					break;
-				}
-				case TextureFormat::RED_INTEGER:
+				case TextureFormat::R8_UINT:
+				case TextureFormat::RG8_UINT:
+				case TextureFormat::RGBA8_UINT:
+
+				case TextureFormat::R8_SINT:
+				case TextureFormat::RG8_SINT:
+				case TextureFormat::RGBA8_SINT:
+
+				case TextureFormat::R16_UINT:
+				case TextureFormat::RG16_UINT:
+				case TextureFormat::RGBA16_UINT:
+
+				case TextureFormat::R16_SINT:
+				case TextureFormat::RG16_SINT:
+				case TextureFormat::RGBA16_SINT:
+
+				case TextureFormat::R32_UINT:
+				case TextureFormat::RG32_UINT:
+				case TextureFormat::RGBA32_UINT:
+
+				case TextureFormat::R32_SINT:
+				case TextureFormat::RG32_SINT:
+				case TextureFormat::RGBA32_SINT:
 				{
 					desc.BlendState.RenderTarget[i].BlendEnable = FALSE;
 					desc.BlendState.RenderTarget[i].LogicOpEnable = FALSE;
@@ -248,7 +251,24 @@ namespace Engine
 					break;
 				}
 				default:
+				{
+					desc.BlendState.RenderTarget[i].BlendEnable = m_PassConfig.blendMode != ShaderConfig::RenderPass::BlendMode::None;
+					desc.BlendState.RenderTarget[i].LogicOpEnable = FALSE;
+					desc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+					if (m_PassConfig.blendMode == ShaderConfig::RenderPass::BlendMode::Blend)
+						desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+					else if (m_PassConfig.blendMode == ShaderConfig::RenderPass::BlendMode::Add)
+						desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_SRC_ALPHA;
+					else
+						desc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_ONE;
+					desc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
+					desc.BlendState.RenderTarget[i].SrcBlendAlpha = D3D12_BLEND_ONE;
+					desc.BlendState.RenderTarget[i].DestBlendAlpha = D3D12_BLEND_ONE;
+					desc.BlendState.RenderTarget[i].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+					desc.BlendState.RenderTarget[i].LogicOp = D3D12_LOGIC_OP_NOOP;
+					desc.BlendState.RenderTarget[i].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 					break;
+				}
 				}
 			}
 
@@ -257,13 +277,13 @@ namespace Engine
 				desc.DepthStencilState.DepthEnable = TRUE;
 				desc.DSVFormat = GetDXGITextureFormat(formats.back());
 				desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-				if (m_PassConfig.depthTest == ShaderConfig::RenderPass::Less)
+				if (m_PassConfig.depthTest == ShaderConfig::RenderPass::DepthTest::Less)
 					desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-				else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::LessOrEqual)
+				else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::DepthTest::LessOrEqual)
 					desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-				else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::Greater)
+				else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::DepthTest::Greater)
 					desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
-				else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::GreaterOrEqual)
+				else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::DepthTest::GreaterOrEqual)
 					desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
 				desc.DepthStencilState.StencilEnable = TRUE;
 				desc.DepthStencilState.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;

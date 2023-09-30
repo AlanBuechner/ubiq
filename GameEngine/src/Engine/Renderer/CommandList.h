@@ -76,7 +76,8 @@ namespace Engine
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) = 0;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) = 0;
 		virtual void SetRootConstant(uint32 index, uint32 data) = 0;
-		void SetRootConstant(uint32 index, float data) { SetRootConstant(index, *(uint32*)&data); }
+		template<typename T>
+		void SetRootConstant(uint32 index, T data) { SetRootConstant(index, *(uint32*)&data); }
 		virtual void SetTexture(uint32 index, Ref<Texture2D> texture) = 0;
 		void SetRWTexture(uint32 index, Ref<RWTexture2D> texture, uint32 mip) { SetRWTexture(index, texture->GetUAVDescriptor(mip)); }
 		virtual void SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav) = 0;

@@ -5,6 +5,7 @@ namespace Engine
 {
 	class Camera;
 	class FrameBuffer;
+	class RWTexture2D;
 	class ConstantBuffer;
 	class StructuredBuffer;
 }
@@ -57,6 +58,7 @@ namespace Engine
 			float m_BaseFactor = 5;
 
 			Ref<FrameBuffer> m_ShadowMaps[s_NumShadowMaps];
+			Ref<RWTexture2D> m_ShadowMapsTemp[s_NumShadowMaps];
 			Ref<Camera> m_Cameras[s_NumShadowMaps];
 
 			Ref<StructuredBuffer> m_CameraIndeces;
