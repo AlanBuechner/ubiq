@@ -291,9 +291,9 @@ PS_Output main(PS_Input input)
 			pos = pos / pos.w;
 			pos.xy = pos.xy * 0.5 + 0.5; // map from -1:1 -> 0:1
 
-			float bias = DEPTH_BIAS * (ci+1) * dot(input.normal, -DirLight.direction);
-			shadowAmount = MomentShadow(textures[c.texture], shadowSampler, pos, input.position.z, bias);
-			//shadowAmount = PCSSDirectional(textures[c.texture], shadowSampler, pos, shadowCamera.InvProjection, DirLight.size, (float3)input.worldPosition, bias);
+			float bias = DEPTH_BIAS + (0.0002 * ci) * dot(input.normal, -DirLight.direction);
+			//shadowAmount = MomentShadow(textures[c.texture], shadowSampler, pos, input.position.z, bias);
+			shadowAmount = PCSSDirectional(textures[c.texture], shadowSampler, pos, shadowCamera.InvProjection, DirLight.size, (float3)input.worldPosition, bias);
 			//shadowAmount = HardShadow(textures[c.texture], shadowSampler, pos);
 		}
 
@@ -338,6 +338,7 @@ void main(PS_Input input)
 struct PS_Output
 {
 	float4 color : SV_TARGET0;
+	float depth : SV_DEPTH;
 };
 
 #include "Shadows.hlsli"
@@ -349,13 +350,16 @@ PS_Output main(PS_Input input)
 
 	float d = input.position.z;
 
-	float4 moments;
-	moments.r = d;
-	moments.g = d*d;
-	moments.b = d*d*d;
-	moments.a = d*d*d*d;
+	//float4 moments;
+	//moments.r = d;
+	//moments.g = d*d;
+	//moments.b = d*d*d;
+	//moments.a = d*d*d*d;
 
-	output.color = compressMoments(moments);
+	//output.color = compressMoments(moments);
+
+	output.color = float4(d,0,0,0);
+	output.depth = d;
 
 	return output;
 }

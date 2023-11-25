@@ -57,49 +57,54 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
 #section BlurX
 
-static const uint cashSize = 64+2+2;
+#define computeSize 128
+
+static const uint cashSize = computeSize+2+2;
 groupshared float4 gs_cash[cashSize];
 
 RWTexture2D<float4> SrcTexture;
 RWTexture2D<float4> DstTexture;
 
-[numthreads(64, 1, 1)]
+[numthreads(computeSize, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID, uint3 GTid : SV_GroupThreadID, uint3 Gid : SV_GroupID)
 {
-	[unroll]
-	for(uint i = 0; i < cashSize; i++)
-		gs_cash[i] = SrcTexture[int2(Gid.x*64, Gid.y) + int2(i-2, 0)];
-
+	
+	if(GTid.x < 4)
+		gs_cash[GTid.x] = SrcTexture[DTid.xy];
+	gs_cash[GTid.x+4] = SrcTexture[DTid.xy + uint2(4,0)];
+	
 	GroupMemoryBarrierWithGroupSync();
 
 	float4 color = float4(0, 0, 0, 0);
-	for(i = 0; i < 5; i++)
+	for(uint i = 0; i < 5; i++)
 		color += gs_cash[GTid.x + i];
 
 	DstTexture[DTid.xy] = color / 5.0;
-
 }
 
 
 #section BlurY
 
-static const uint cashSize = 64+2+2;
+#define computeSize 128
+
+static const uint cashSize = computeSize+2+2;
 groupshared float4 gs_cash[cashSize];
 
 RWTexture2D<float4> SrcTexture;
 RWTexture2D<float4> DstTexture;
 
-[numthreads(1, 64, 1)]
+[numthreads(1, computeSize, 1)]
 void main(uint3 DTid : SV_DispatchThreadID, uint3 GTid : SV_GroupThreadID, uint3 Gid : SV_GroupID)
 {
-	[unroll]
-	for(uint i = 0; i < cashSize; i++)
-		gs_cash[i] = SrcTexture[int2(Gid.x, Gid.y*64) + int2(0, i-2)];
 
+	if(GTid.x < 4)
+		gs_cash[GTid.y] = SrcTexture[DTid.xy];
+	gs_cash[GTid.y+4] = SrcTexture[DTid.xy + uint2(0,4)];
+	
 	GroupMemoryBarrierWithGroupSync();
 
 	float4 color = float4(0, 0, 0, 0);
-	for(i = 0; i < 5; i++)
+	for(uint i = 0; i < 5; i++)
 		color += gs_cash[GTid.y + i];
 
 	DstTexture[DTid.xy] = color / 5.0;

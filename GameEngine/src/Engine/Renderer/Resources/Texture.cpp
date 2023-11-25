@@ -244,7 +244,7 @@ namespace Engine
 	{
 		CORE_ASSERT(path != "", "Path must be given");
 		TextureFile* file = TextureFile::LoadFile(path);
-		if(file->channels == 3) // no 3 component texture format exists
+		//if(file->channels == 3) // no 3 component texture format exists
 			file->ConvertToChannels(4);
 
 		Ref<Texture2D> texture = Create(file->width, file->height, file->GetTextureFormat());

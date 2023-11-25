@@ -1,4 +1,4 @@
-#define DEPTH_BIAS (0.00005)
+#define DEPTH_BIAS (0.00001)
 
 
 
@@ -48,7 +48,7 @@ float4 decompressMoments(float4 moments)
 
 float4 biasMoments(float4 moments, float a)
 {
-	return (1.0-a) * moments + a * pow(float4(0, 0.63, 0, 0.63), 1); // what the FUCK is T
+	return (1.0-a) * moments + a * float4(0, 0.63, 0, 0.63);
 }
 
 

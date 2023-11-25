@@ -295,7 +295,7 @@ if(!m_Selected.HasComponent<component>()){\
 			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera->GetProjectionType()];
 			if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
 			{
-				for (int i = 0; i < 2; i++)
+				for (int i = 0; i < _countof(projectionTypeStrings); i++)
 				{
 					bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
 

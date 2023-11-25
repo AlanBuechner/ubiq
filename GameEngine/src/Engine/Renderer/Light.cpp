@@ -70,16 +70,16 @@ namespace Engine
 		for (uint32 i = 0; i < s_NumShadowMaps; i++)
 		{
 			m_Cameras[i] = CreateRef<Camera>();
-			/*uint32 width = 4000 - (i*500);
-			uint32 height = 4000 - (i*500);*/
-			uint32 width = 1024;
-			uint32 height = 1024;
+			uint32 width = 4000 - (i*500);
+			uint32 height = 4000 - (i*500);
+			//uint32 width = 1024;
+			//uint32 height = 1024;
 			m_ShadowMaps[i] = FrameBuffer::Create({
-				RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16_UNORM, { 1, 1, 1, 1 }, true),
+				RenderTarget2D::Create(width, height, 1, TextureFormat::R32_FLOAT, { 1, 1, 1, 1 }, true),
 				RenderTarget2D::Create(width, height, 1, TextureFormat::Depth, {1,0,0,0}),
 			});
 
-			m_ShadowMapsTemp[i] = RWTexture2D::Create(width, height, 1, TextureFormat::RGBA16_UNORM);
+			//m_ShadowMapsTemp[i] = RWTexture2D::Create(width, height, 1, TextureFormat::RGBA16_UNORM);
 
 			cascadeData.push_back(
 				CascadeData{
