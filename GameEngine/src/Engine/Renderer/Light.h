@@ -76,7 +76,7 @@ namespace Engine
 		float GetSize() const { return m_Data.size; }
 
 		void SetAngles(Math::Vector2 rot);
-		void SetDirection(Math::Vector3 dir) { m_Data.direction = dir; }
+		void SetDirection(Math::Vector3 dir) { m_Data.direction = dir; m_Angles = Math::CartesianToSpherical(dir); }
 		void SetTint(Math::Vector3 tint) { m_Tint = tint; m_Data.color = m_Tint * CCTToRGB(m_CCT); }
 		void SetCCT(float cct) { m_CCT = cct; m_Data.color = m_Tint * CCTToRGB(m_CCT); }
 		void SetIntensity(float intensity) { m_Data.intensity = intensity; }

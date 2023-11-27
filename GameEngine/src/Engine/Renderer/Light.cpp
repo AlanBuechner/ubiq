@@ -208,19 +208,28 @@ namespace Engine
 	DirectionalLight::DirectionalLight(Math::Vector3 dir, Math::Vector3 color, float intensity) :
 		m_Data(dir, color, intensity)
 	{
+		m_Angles.y = Math::Degrees(Math::Asin(dir.y));
+		float c = Math::Acos(dir.x);
+		float s = Math::Degrees(Math::Asin(dir.z));
+		if (c > 0)
+			m_Angles.x = s;
+		else
+			m_Angles.x = -s;
+		
 		m_Buffer = ConstantBuffer::Create(sizeof(DirectionalLightData));
 	}
 
 	void DirectionalLight::SetAngles(Math::Vector2 rot)
 	{
 		m_Angles = rot;
-		rot = { Math::Radians(rot.x), Math::Radians(rot.y) };
-		Math::Vector3 dir = {
+		rot = Math::Radians(rot);
+		Math::Vector3 dir = Math::SphericalToCartesian(rot);
+		/*Math::Vector3 dir = {
 			Math::Cos(rot.x) * Math::Cos(rot.y),
 			Math::Sin(rot.y),
 			Math::Sin(rot.x) * Math::Cos(rot.y),
-		};
-		SetDirection(dir);
+		};*/
+		m_Data.direction = dir;
 	}
 
 	void DirectionalLight::Apply()

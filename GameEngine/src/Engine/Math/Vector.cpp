@@ -84,6 +84,16 @@ namespace Math
 		return glm::cross(v1, v2);
 	}
 
+	Vector2 Degrees(Vector2 rad)
+	{
+		return { Degrees(rad.x), Degrees(rad.y) };
+	}
+
+	Vector2 Radians(Vector2 deg)
+	{
+		return { Radians(deg.x), Radians(deg.y) };
+	}
+
 	Vector2 Normalized(const Vector2& v)
 	{
 		return glm::normalize(v);
@@ -129,14 +139,28 @@ namespace Math
 		return (v1 * a) + v2 * (1.f - a);
 	}
 
-	Math::Vector3 SphericalToCartesian(float t1, float t2)
+	Math::Vector3 SphericalToCartesian(Vector2 rot)
 	{
 		Vector3 pos;
-		pos.x = Sin(t2);
-		pos.z = Cos(t2);
-		pos *= Cos(t1);
-		pos.y = Sin(t1);
+		float c = Cos(rot.y);
+		pos.x = Cos(rot.x) * c;
+		pos.y = Sin(rot.y);
+		pos.z = Sin(rot.x) * c;
 		return pos;
+	}
+
+	Vector2 CartesianToSpherical(Vector3 dir)
+	{
+		Vector2 angles;
+		angles.y = Math::Degrees(Math::Asin(dir.y));
+		float sy = Math::Sin(angles.y);
+		float c = Math::Acos(dir.x/sy);
+		float s = Math::Degrees(Math::Asin(dir.z/sy));
+		if (c > 0)
+			angles.x = s;
+		else
+			angles.x = 180 - s;
+		return angles;
 	}
 
 }

@@ -16,7 +16,7 @@ namespace Engine
 			{
 				float t2 = Math::PI * ((float)v / (float)vSeg) * 2;
 				RendererVertex vertex;
-				vertex.position = Math::SphericalToCartesian(t1 - Math::PI / 2, t2);
+				vertex.position = Math::SphericalToCartesian({ t1 - Math::PI / 2, t2 });
 				vertex.normal = vertex.position;
 				vertex.uv = { u / uSeg, v / vSeg };
 				builder.vertices.push_back(vertex);
