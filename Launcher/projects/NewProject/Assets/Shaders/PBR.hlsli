@@ -40,6 +40,10 @@ float3 PBR(float3 color, float3 lightDirection, float3 lightColor, float intensi
 	float reflectance = 0.04;
 	//float3 f0 = 0.16 * reflectance * reflectance * (1.0 - metallic) + color * metallic;
 	float3 f0 = lerp(float3(reflectance, reflectance, reflectance), color, metallic);
+	
+	//float reflectance = 1.635;
+	//float3 ior = float3(reflectance, reflectance, reflectance);
+	//float3 f0 = pow((ior - 1) / (ior + 1), 2);
 
 	// lighting
 	float3 dir = normalize(-lightDirection);

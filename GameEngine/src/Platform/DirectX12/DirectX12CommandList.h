@@ -51,7 +51,7 @@ namespace Engine
 
 		std::vector<ResourceStateObject>& GetPendingTransitions() { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
 		std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() { return m_Frames[GetLastFrameIndex()].resourceStates; }
-		ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList; }
+		ID3D12GraphicsCommandList4* GetCommandList() { return m_CommandList; }
 
 	private:
 		std::vector<ResourceStateObject>& GetCurrentPendingTransitions() { return m_Frames[m_CurrentFrame].pendingTransitions; }
@@ -75,11 +75,11 @@ namespace Engine
 		};
 
 		uint32 m_CurrentFrame = 0;
-		ID3D12GraphicsCommandList* m_CommandList;
+		ID3D12GraphicsCommandList4* m_CommandList;
 		std::vector<RecordFrame> m_Frames;
 
 		ID3D12CommandAllocator* m_PrependAllocator;
-		ID3D12GraphicsCommandList* m_PrependList;
+		ID3D12GraphicsCommandList4* m_PrependList;
 
 		friend class DirectX12CommandQueue;
 	};

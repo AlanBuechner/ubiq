@@ -70,8 +70,8 @@ namespace Engine
 		for (uint32 i = 0; i < s_NumShadowMaps; i++)
 		{
 			m_Cameras[i] = CreateRef<Camera>();
-			uint32 width = 4000 - (i*500);
-			uint32 height = 4000 - (i*500);
+			uint32 width = 4096 - (i*512);
+			uint32 height = 4096 - (i*512);
 			//uint32 width = 1024;
 			//uint32 height = 1024;
 			m_ShadowMaps[i] = FrameBuffer::Create({
