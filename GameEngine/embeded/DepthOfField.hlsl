@@ -362,7 +362,7 @@ PS_BokehOutput main(PS_Input input)
 
 	// near blur
 	float4 nearSum = src.Sample(textureSampler, input.uv);
-	for (i = 0; i < 48; i++)
+	for (uint i = 0; i < 48; i++)
 	{
 		float2 offset = offsets[i] * strength * srcPixelUVSize;
 		nearSum += src.Sample(textureSampler, input.uv + offset);
@@ -370,10 +370,10 @@ PS_BokehOutput main(PS_Input input)
 
 	// far blur
 	float4 farSum = src.Sample(textureSampler, input.uv);
-	for (uint j = 0; j < 48; j++)
+	for (uint i = 0; i < 48; i++)
 	{
-		float2 offset = offsets[j] * strength * srcPixelUVSize * pixelCOC;
-		float farCOC = COCs[j];
+		float2 offset = offsets[i] * strength * srcPixelUVSize * pixelCOC;
+		float farCOC = COCs[i];
 		farSum += src.Sample(textureSampler, input.uv + offset) * (farCOC / avgCOC);
 	}
 
