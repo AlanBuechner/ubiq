@@ -24,8 +24,8 @@
 #include "Engine/Renderer/LineRenderer.h"
 
 #include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/CommandList.h"
-#include "Engine/Renderer/CommandQueue.h"
+#include "Engine/Renderer/Commands/CommandList.h"
+#include "Engine/Renderer/Commands/CommandQueue.h"
 #include "Engine/Renderer/SwapChain.h"
 #include "Engine/Renderer/GPUProfiler.h"
 

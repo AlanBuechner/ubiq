@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "DirectX12ConstantBuffer.h"
 #include "Engine/Renderer/Renderer.h"
-#include "DirectX12Context.h"
-#include "DirectX12CommandList.h"
+#include "Platform/DirectX12/DirectX12Context.h"
+#include "Platform/DirectX12/Commands/DirectX12CommandList.h"
 #include "DirectX12ResourceManager.h"
 
 #include "Engine/Util/Performance.h"

@@ -11,7 +11,7 @@
 
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/SwapChain.h"
-#include "Engine/Renderer/ResourceManager.h"
+#include "Engine/Renderer/Resources/ResourceManager.h"
 
 #include "Engine/Util/Performance.h"
 

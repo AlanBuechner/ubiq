@@ -6,9 +6,9 @@
 #include "Camera.h"
 #include "EditorCamera.h"
 #include "Mesh.h"
-#include "CommandList.h"
+#include "Commands/CommandList.h"
 #include "Resources/InstanceBuffer.h"
-#include "CommandList.h"
+#include "Commands/CommandList.h"
 
 #include "EngineResource.h"
 

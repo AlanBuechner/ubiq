@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Engine/Renderer/CommandList.h"
-#include "Engine/Renderer/CommandQueue.h"
+#include "Engine/Renderer/Commands/CommandList.h"
+#include "Engine/Renderer/Commands/CommandQueue.h"
 #include "Engine/Core/Flag.h"
 #include "Engine/Renderer/Resources/Descriptor.h"
 #include "Engine/Renderer/Resources/ResourceState.h"

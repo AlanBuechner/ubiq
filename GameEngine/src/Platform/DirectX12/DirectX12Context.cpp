@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Directx12Context.h"
-#include "DirectX12ResourceManager.h"
+#include "Resources/DirectX12ResourceManager.h"
 #include "DX.h"
 
 namespace Engine

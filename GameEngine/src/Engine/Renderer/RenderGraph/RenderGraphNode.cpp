@@ -4,7 +4,7 @@
 #include "Engine/Core/Window.h"
 
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/CommandList.h"
+#include "Engine/Renderer/Commands/CommandList.h"
 #include "Engine/Renderer/GPUProfiler.h"
 
 namespace Engine

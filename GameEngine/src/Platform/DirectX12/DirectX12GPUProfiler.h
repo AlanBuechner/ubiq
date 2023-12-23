@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Renderer/GPUProfiler.h"
-#include "DirectX12CommandList.h"
+#include "Commands/DirectX12CommandList.h"
 
 namespace Engine
 {

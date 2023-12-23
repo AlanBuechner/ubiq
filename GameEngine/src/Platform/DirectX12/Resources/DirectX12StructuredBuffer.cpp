@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DirectX12StructuredBuffer.h"
 #include "Engine/Renderer/Renderer.h"
-#include "DirectX12Context.h"
+#include "Platform/DirectX12/DirectX12Context.h"
 
 namespace Engine
 {

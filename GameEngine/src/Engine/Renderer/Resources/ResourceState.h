@@ -22,7 +22,7 @@ namespace Engine
 		ResourceState GetDefultState() { return m_DefultState; }
 
 		virtual void* GetGPUResourcePointer() = 0;
-	protected:
+
 		virtual bool SupportState(ResourceState state) = 0;
 		virtual uint32 GetState(ResourceState state) = 0;
 

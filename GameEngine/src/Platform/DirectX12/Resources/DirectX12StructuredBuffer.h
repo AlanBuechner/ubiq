@@ -2,7 +2,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Renderer/Resources/StructuredBuffer.h"
 #include "DirectX12ResourceManager.h"
-#include "DX.h"
+#include "Platform/DirectX12/DX.h"
 
 namespace Engine
 {

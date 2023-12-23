@@ -2,7 +2,7 @@
 #include "ConstantBuffer.h"
 #include "Engine/Renderer/Renderer.h"
 
-#include "Platform/DirectX12/DirectX12ConstantBUffer.h"
+#include "Platform/DirectX12/Resources/DirectX12ConstantBUffer.h"
 
 namespace Engine
 {

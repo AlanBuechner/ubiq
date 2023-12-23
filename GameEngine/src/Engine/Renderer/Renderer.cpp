@@ -4,9 +4,10 @@
 #include "Camera.h"
 #include "Renderer2D.h"
 #include "LineRenderer.h"
-#include "ResourceManager.h"
+#include "Resources/ResourceManager.h"
 #include "Engine/Core/MeshBuilder.h"
 #include "GPUProfiler.h"
+#include "Commands/Commands.h"
 
 #include "EngineResource.h"
 
@@ -42,6 +43,8 @@ namespace Engine
 
 		s_Context = GraphicsContext::Create();
 		s_Context->Init();
+
+		Command::InitCommands();
 		
 		// graphics command queue
 		s_MainCommandQueue = CommandQueue::Create(CommandQueue::Type::Direct);

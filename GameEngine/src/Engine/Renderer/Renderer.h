@@ -1,7 +1,7 @@
 #pragma once
-#include "Engine\Core\Core.h"
+#include "Engine/Core/Core.h"
 #include "GraphicsContext.h"
-#include "CommandQueue.h"
+#include "Commands/CommandQueue.h"
 
 #include "Material.h"
 

@@ -12,8 +12,8 @@
 #include "Engine/Renderer/Resources/ConstantBuffer.h"
 #include "Engine/Renderer/Resources/Texture.h"
 #include "Engine/Renderer/Light.h"
-#include "Engine/Renderer/CommandList.h"
-#include "Engine/Renderer/CommandQueue.h"
+#include "Engine/Renderer/Commands/CommandList.h"
+#include "Engine/Renderer/Commands/CommandQueue.h"
 #include "Engine/Renderer/Camera.h"
 
 

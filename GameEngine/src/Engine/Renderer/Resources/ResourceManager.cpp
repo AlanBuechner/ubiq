@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "ResourceManager.h"
-#include "Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 #include "Engine/Util/Performance.h"
 
-#include "Platform/DirectX12/DirectX12ResourceManager.h"
+#include "Platform/DirectX12/Resources/DirectX12ResourceManager.h"
 
 namespace Engine
 {

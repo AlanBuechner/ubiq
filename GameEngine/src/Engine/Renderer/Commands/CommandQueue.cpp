@@ -5,7 +5,7 @@
 #include "Engine/Util/Performance.h"
 
 #ifdef PLATFORM_WINDOWS
-#include "Platform/DirectX12/DirectX12CommandQueue.h"
+#include "Platform/DirectX12/Commands/DirectX12CommandQueue.h"
 #endif
 
 namespace Engine

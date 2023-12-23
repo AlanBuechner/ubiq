@@ -2,7 +2,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Renderer/SwapChain.h"
 #include "Engine/Core/Window.h"
-#include "DirectX12Texture.h"
+#include "Resources/DirectX12Texture.h"
 #include "DX.h"
 
 namespace Engine

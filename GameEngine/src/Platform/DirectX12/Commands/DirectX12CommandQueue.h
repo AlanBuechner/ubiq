@@ -1,7 +1,7 @@
 #pragma once
-#include "Engine/Renderer/CommandQueue.h"
+#include "Engine/Renderer/Commands/CommandQueue.h"
 #include "Engine/Util/Performance.h"
-#include "DX.h"
+#include "Platform/DirectX12/DX.h"
 #include <thread>
 
 namespace Engine

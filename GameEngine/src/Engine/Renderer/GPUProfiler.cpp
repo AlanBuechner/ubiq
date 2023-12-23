@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "GPUProfiler.h"
 #include "Renderer.h"
-#include "CommandList.h"
+#include "Commands/CommandList.h"
 #include <memory>
 
 #if defined(PLATFORM_WINDOWS)
-#include "Platform/DirectX12/DirectX12CommandList.h"
+#include "Platform/DirectX12/Commands/DirectX12CommandList.h"
 #include "Platform/DirectX12/DirectX12GPUProfiler.h"
 #endif
 

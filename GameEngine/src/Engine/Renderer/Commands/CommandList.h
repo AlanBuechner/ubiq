@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Resources/FrameBuffer.h"
-#include "Resources/ResourceState.h"
+#include "Engine/Renderer/Resources/FrameBuffer.h"
+#include "Engine/Renderer/Resources/ResourceState.h"
 #include "Engine/Core/Flag.h"
 
 namespace Engine
@@ -73,6 +73,7 @@ namespace Engine
 		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color) = 0;
 
 		virtual void SetShader(Ref<ShaderPass> shader) = 0;
+
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) = 0;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) = 0;
 		virtual void SetRootConstant(uint32 index, uint32 data) = 0;
@@ -81,6 +82,7 @@ namespace Engine
 		virtual void SetTexture(uint32 index, Ref<Texture2D> texture) = 0;
 		void SetRWTexture(uint32 index, Ref<RWTexture2D> texture, uint32 mip) { SetRWTexture(index, texture->GetUAVDescriptor(mip)); }
 		virtual void SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav) = 0;
+
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) = 0;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) = 0;
 

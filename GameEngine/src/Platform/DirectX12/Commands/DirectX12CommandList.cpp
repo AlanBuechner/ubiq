@@ -3,14 +3,14 @@
 #include "Engine/Renderer/Renderer.h"
 
 #include "DirectX12CommandList.h"
-#include "DirectX12Context.h"
-#include "DirectX12Shader.h"
-#include "DirectX12Buffer.h"
-#include "DirectX12ConstantBuffer.h"
-#include "DirectX12StructuredBuffer.h"
-#include "DirectX12Texture.h"
-#include "DirectX12InstanceBuffer.h"
-#include "DirectX12ResourceManager.h"
+#include "Platform/DirectX12/DirectX12Context.h"
+#include "Platform/DirectX12/DirectX12Shader.h"
+#include "Platform/DirectX12/Resources/DirectX12Buffer.h"
+#include "Platform/DirectX12/Resources/DirectX12ConstantBuffer.h"
+#include "Platform/DirectX12/Resources/DirectX12StructuredBuffer.h"
+#include "Platform/DirectX12/Resources/DirectX12Texture.h"
+#include "Platform/DirectX12/Resources/DirectX12InstanceBuffer.h"
+#include "Platform/DirectX12/Resources/DirectX12ResourceManager.h"
 
 #include "Engine/Renderer/GPUProfiler.h"
 
@@ -180,34 +180,7 @@ namespace Engine
 			return;
 		}
 
-		m_RenderTarget = FrameBuffer::Create({ renderTarget });
-
-		ValidateState(renderTarget->GetResource(), ResourceState::RenderTarget);
-
-		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)renderTarget->GetResource();
-		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)renderTarget->GetRTVDSVDescriptor();
-
-		D3D12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle = rtv->GetHandle().cpu;
-		m_CommandList->OMSetRenderTargets(1, &cpuDescriptorHandle, FALSE, nullptr);
-
-		uint32 width = res->GetWidth();
-		uint32 height = res->GetHeight();
-
-		const D3D12_VIEWPORT viewport{
-			0,0,
-			(float)width,
-			(float)height,
-			0,1
-		};
-
-		const D3D12_RECT rect{
-			0,0,
-			(long)width,
-			(long)height
-		};
-
-		m_CommandList->RSSetViewports(1, &viewport);
-		m_CommandList->RSSetScissorRects(1, &rect);
+		SetRenderTarget(FrameBuffer::Create({ renderTarget }));
 	}
 
 	void DirectX12CommandList::SetRenderTarget(Ref<FrameBuffer> buffer)
@@ -304,7 +277,7 @@ namespace Engine
 		}
 
 		Ref<DirectX12Shader> dxShader = std::dynamic_pointer_cast<DirectX12Shader>(shader);
-		m_CommandList->SetPipelineState(dxShader->GetPipelineState(m_RenderTarget).Get());
+		m_CommandList->SetPipelineState(dxShader->GetPipelineState(m_RenderTarget.get()).Get());
 		if(compute)
 			m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature().Get());
 		else

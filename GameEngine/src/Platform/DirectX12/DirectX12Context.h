@@ -4,7 +4,7 @@
 #include "Engine/Core/UUID.h"
 #include "DX.h"
 #include "DirectX12Debug.h"
-#include "DirectX12ResourceManager.h"
+#include "Resources/DirectX12ResourceManager.h"
 
 namespace Engine
 {

@@ -45,7 +45,7 @@ namespace Engine
 		return m_ReflectionData;
 	}
 
-	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::GetPipelineState(Ref<FrameBuffer> target)
+	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::GetPipelineState(FrameBuffer* target)
 	{
 		std::vector<TextureFormat> formates;
 

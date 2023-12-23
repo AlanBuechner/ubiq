@@ -3,9 +3,9 @@
 #include "Engine/Core/Application.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Directx12Context.h"
-#include "DirectX12CommandQueue.h"
+#include "Commands/DirectX12CommandQueue.h"
 #include "Engine/Util/Performance.h"
-#include "DirectX12Texture.h"
+#include "Platform/DirectX12/Resources/DirectX12Texture.h"
 
 namespace Engine
 {

@@ -1,12 +1,12 @@
 #pragma once
-#include "Engine/Renderer/ResourceManager.h"
+#include "Engine/Renderer/Resources/ResourceManager.h"
 #include "DirectX12Descriptors.h"
-#include "DX.h"
+#include "Platform/DirectX12/DX.h"
 #include <queue>
 #include <mutex>
 
-#include "DirectX12CommandQueue.h"
-#include "DirectX12CommandList.h"
+#include "Platform/DirectX12/Commands/DirectX12CommandQueue.h"
+#include "Platform/DirectX12/Commands/DirectX12CommandList.h"
 
 namespace Engine
 {

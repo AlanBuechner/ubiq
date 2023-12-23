@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "InstanceBuffer.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/ResourceManager.h"
+#include "Engine/Renderer/Resources/ResourceManager.h"
 
-#include "Platform/DirectX12/DirectX12InstanceBuffer.h"
+#include "Platform/DirectX12/Resources/DirectX12InstanceBuffer.h"
 
 namespace Engine
 {

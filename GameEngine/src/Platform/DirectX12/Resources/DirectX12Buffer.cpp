@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "DirectX12Buffer.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Directx12Context.h"
-#include "DirectX12CommandList.h"
+#include "Platform/DirectX12/Directx12Context.h"
+#include "Platform/DirectX12/Commands/DirectX12CommandList.h"
 #include "DirectX12ResourceManager.h"
 
 namespace Engine

@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Renderer/Resources/InstanceBuffer.h"
-#include "DX.h"
+#include "Platform/DirectX12/DX.h"
 
 namespace Engine
 {

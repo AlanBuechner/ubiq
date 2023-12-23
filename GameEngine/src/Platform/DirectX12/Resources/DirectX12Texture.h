@@ -2,7 +2,7 @@
 #include "Engine/Renderer/Resources/Texture.h"
 #include "DirectX12ResourceManager.h"
 #include "DirectX12Descriptors.h"
-#include "DX.h"
+#include "Platform/DirectX12/DX.h"
 
 namespace Engine
 {

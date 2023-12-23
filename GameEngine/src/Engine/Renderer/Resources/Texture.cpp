@@ -2,7 +2,7 @@
 #include "Texture.h"
 
 #include "Engine/Renderer/Renderer.h"
-#include "Platform/DirectX12/DirectX12Texture.h"
+#include "Platform/DirectX12/Resources/DirectX12Texture.h"
 
 #include "stb_image.h"
 

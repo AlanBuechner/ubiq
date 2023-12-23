@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "CommandList.h"
-#include "Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 
 #include "Engine/Util/Performance.h"
 
 #ifdef PLATFORM_WINDOWS
-#include "Platform/DirectX12/DirectX12CommandList.h"
+#include "Platform/DirectX12/Commands/DirectX12CommandList.h"
 #endif
 
 namespace Engine

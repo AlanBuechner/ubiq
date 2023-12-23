@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Buffer.h"
-#include "Engine/Renderer/ResourceManager.h"
+#include "Engine/Renderer/Resources/ResourceManager.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Platform/DirectX12/DirectX12Buffer.h"
+#include "Platform/DirectX12/Resources/DirectX12Buffer.h"
 
 namespace Engine
 {

@@ -1,6 +1,6 @@
 #pragma once
-#include "Engine/Renderer/CommandList.h"
-#include "DX.h"
+#include "Engine/Renderer/Commands/CommandList.h"
+#include "Platform/DirectX12/DX.h"
 
 namespace Engine
 {
@@ -36,12 +36,16 @@ namespace Engine
 
 		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color) override;
 
+		// shaders
 		virtual void SetShader(Ref<ShaderPass> shader) override;
+
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) override;
 		virtual void SetRootConstant(uint32 index, uint32 data) override;
 		virtual void SetTexture(uint32 index, Ref<Texture2D> texture) override;
 		virtual void SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav) override;
+
+		// execution
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) override;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
 
