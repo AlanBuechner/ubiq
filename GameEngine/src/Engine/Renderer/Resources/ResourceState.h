@@ -5,11 +5,13 @@ namespace Engine
 {
 	enum ResourceState
 	{
-		Unknown,
+		Unknown = 0,
 		Common,
 		ShaderResource,
 		UnorderedResource,
 		RenderTarget,
+		CopyDestination,
+		CopySource
 	};
 
 

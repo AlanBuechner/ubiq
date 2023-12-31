@@ -16,11 +16,11 @@ namespace Engine
 		{
 		case ResourceState::ShaderResource:
 		case ResourceState::UnorderedResource:
+		case ResourceState::CopyDestination:
+		case ResourceState::CopySource:
 			return true;
-		case ResourceState::Common:
-		case ResourceState::RenderTarget:
-			return false;
 		}
+		return false;
 	}
 
 	StructuredBufferResource* StructuredBufferResource::Create(uint32 stride, uint32 count)

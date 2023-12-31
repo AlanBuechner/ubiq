@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Engine/Renderer/Resources/ResourceState.h"
+#include "Engine/Renderer/Resources/Texture.h"
 
 namespace Engine
 {
@@ -9,13 +10,17 @@ namespace Engine
 	class FrameBuffer;
 	class ShaderPass;
 
-	class ConstantBuffer;
-	class StructuredBuffer;
+	class ConstantBufferCBVDescriptorHandle;
+	class StructuredBufferSRVDescriptorHandle;
 	class Texture2D;
 	class RenderTarget2D;
+	class Texture2DSRVDescriptorHandle;
 	class Texture2DUAVDescriptorHandle;
-	class Mesh;
-	class InstanceBuffer;
+	class Texture2DRTVDSVDescriptorHandle;
+	class VertexBufferView;
+	class IndexBufferView;
+	class InstanceBufferView;
+
 }
 
 namespace Engine
@@ -24,12 +29,12 @@ namespace Engine
 	{
 		static void InitCommands();
 
-		void(*RecoardCommand)(CommandList& cmdList, Command& commandData);
+		void(*RecordCommand)(CommandList& cmdList, Command& commandData);
 	};
 
 #define CommandBody(className) \
-static void (*RecoardCommandFunc)(CommandList& cmd, Command& commandData);\
-className() {RecoardCommand = RecoardCommandFunc;}
+static void (*RecordCommandFunc)(CommandList& cmd, Command& commandData);\
+className() {RecordCommand = RecordCommandFunc;}
 
 	struct TransitionCommand : public Command
 	{
@@ -40,13 +45,14 @@ className() {RecoardCommand = RecoardCommandFunc;}
 	struct SetRenderTargetCommand : public Command 
 	{
 		CommandBody(SetRenderTargetCommand);
-		FrameBuffer* m_FrameBuffer;
+		std::vector<Texture2DRTVDSVDescriptorHandle*> m_AttachmentHandles;
+		bool m_HasDepthAttachment;
 	};
 
 	struct ClearRenderTargetCommand : public Command
 	{
 		CommandBody(ClearRenderTargetCommand);
-		RenderTarget2D* m_RenderTarget;
+		Texture2DRTVDSVDescriptorHandle* m_RenderTargetHandle;
 		Math::Vector4 m_Color;
 	};
 
@@ -54,7 +60,7 @@ className() {RecoardCommand = RecoardCommandFunc;}
 	{
 		CommandBody(SetShaderCommand);
 		ShaderPass* m_ShaderPass;
-		FrameBuffer* m_BoundFrameBuffer;
+		std::vector<TextureFormat> m_FrameBufferSpecification;
 	};
 
 	struct SetRootConstantCommand : public Command
@@ -70,7 +76,7 @@ className() {RecoardCommand = RecoardCommandFunc;}
 		CommandBody(SetConstantBufferCommand);
 		bool m_IsComputeShader;
 		uint32 m_Index;
-		ConstantBuffer* m_Buffer;
+		ConstantBufferCBVDescriptorHandle* m_CBVHandle;
 	};
 
 	struct SetStructuredBufferCommand : public Command 
@@ -78,7 +84,7 @@ className() {RecoardCommand = RecoardCommandFunc;}
 		CommandBody(SetStructuredBufferCommand);
 		bool m_IsComputeShader;
 		uint32 m_Index;
-		StructuredBuffer* m_Buffer;
+		StructuredBufferSRVDescriptorHandle* m_SRVHandle;
 	};
 
 	struct SetTextureCommand : public Command
@@ -86,7 +92,7 @@ className() {RecoardCommand = RecoardCommandFunc;}
 		CommandBody(SetTextureCommand);
 		bool m_IsComputeShader;
 		uint32 m_Index;
-		Texture2D* m_Texture;
+		Texture2DSRVDescriptorHandle* m_SRVHandle;
 	};
 
 	struct SetRWTextureCommand : public Command
@@ -100,8 +106,9 @@ className() {RecoardCommand = RecoardCommandFunc;}
 	struct DrawMeshCommand : public Command
 	{
 		CommandBody(DrawMeshCommand);
-		Mesh* m_Mesh;
-		InstanceBuffer* m_Instances;
+		VertexBufferView* m_VertexBufferView;
+		IndexBufferView* m_IndexBufferView;
+		InstanceBufferView* m_Instances;
 		uint32 m_NumberOfInstances;
 	};
 

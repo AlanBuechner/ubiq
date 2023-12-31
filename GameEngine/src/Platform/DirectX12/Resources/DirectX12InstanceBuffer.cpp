@@ -64,6 +64,10 @@ namespace Engine
 		{
 		case ResourceState::ShaderResource:
 			return D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		case ResourceState::CopyDestination:
+			return D3D12_RESOURCE_STATE_COPY_DEST;
+		case ResourceState::CopySource:
+			return D3D12_RESOURCE_STATE_COPY_SOURCE;
 		}
 	}
 

@@ -38,15 +38,17 @@ namespace Engine
 
 	void DirectX12CommandQueue::Build()
 	{
+		std::unordered_map<GPUResource*, ResourceState> resourceStates;
 		m_DXCommandLists.reserve(m_Commands.size());
 		for (uint32 i = 0; i < m_Commands.size(); i++)
 		{
-			Ref<DirectX12CommandList> dxCmdList = std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[i]);
+			m_Commands[i]->Build(resourceStates);
 
-			if (dxCmdList->RecordPrependCommands())
-				m_DXCommandLists.push_back(dxCmdList->GetPrependCommandList());
-			dxCmdList->InternalClose();
+			Ref<DirectX12CommandList> dxCmdList = std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[i]);
 			m_DXCommandLists.push_back(dxCmdList->GetCommandList());
+
+			for (auto& state : m_Commands[i]->GetEndingResourceStates())
+				resourceStates[state.first] = state.second;
 		}
 	}
 
@@ -58,7 +60,7 @@ namespace Engine
 		m_CommandQueue->Signal(m_Fence, ++m_SignalCount); // signal fence when execution has finished
 
 		for (uint32 i = 0; i < m_Commands.size(); i++)
-			std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[i])->SignalRecording();
+			m_Commands[i]->SignalRecording();
 
 		m_Commands.clear();
 		m_DXCommandLists.clear();

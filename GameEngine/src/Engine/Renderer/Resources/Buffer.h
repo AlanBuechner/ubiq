@@ -20,7 +20,7 @@ namespace Engine
 		static VertexBufferResource* Create(uint32 count, uint32 stride);
 
 	protected:
-		bool SupportState(ResourceState state) override;
+		virtual bool SupportState(ResourceState state) override;
 
 	protected:
 		uint32 m_Count;
@@ -35,6 +35,8 @@ namespace Engine
 		virtual void Bind(VertexBufferResource* resource) = 0;
 
 		static VertexBufferView* Create(VertexBufferResource* resource);
+
+		VertexBufferResource* m_Resource;
 	};
 
 	class VertexBuffer
@@ -89,6 +91,8 @@ namespace Engine
 		virtual void Bind(IndexBufferResource* resource) = 0;
 
 		static IndexBufferView* Create(IndexBufferResource* resource);
+
+		IndexBufferResource* m_Resource;
 	};
 
 	class IndexBuffer

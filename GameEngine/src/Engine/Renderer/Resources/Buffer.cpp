@@ -25,6 +25,8 @@ namespace Engine
 		switch (state)
 		{
 		case ResourceState::ShaderResource:
+		case ResourceState::CopyDestination:
+		case ResourceState::CopySource:
 			return true;
 		}
 		return false;
@@ -102,6 +104,8 @@ namespace Engine
 		switch (state)
 		{
 		case ResourceState::ShaderResource:
+		case ResourceState::CopyDestination:
+		case ResourceState::CopySource:
 			return true;
 		}
 		return false;

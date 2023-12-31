@@ -20,7 +20,7 @@ namespace Engine
 		virtual std::vector<ShaderParameter> GetReflectionData() const override;
 
 		wrl::ComPtr<ID3D12RootSignature> GetRootSignature() { return m_Sig; }
-		wrl::ComPtr<ID3D12PipelineState> GetPipelineState(FrameBuffer* target);
+		wrl::ComPtr<ID3D12PipelineState> GetPipelineState(std::vector<TextureFormat> specification);
 
 		ShaderConfig::Topology GetTopologyType() { return m_Src->config.topology; }
 

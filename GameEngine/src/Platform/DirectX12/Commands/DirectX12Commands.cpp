@@ -65,21 +65,22 @@ namespace Engine
 		DirectX12CommandList& dxCmdList = (DirectX12CommandList&)cmdList;
 		SetRenderTargetCommand& setRenderTargetCommandData = (SetRenderTargetCommand&)commandData;
 
-		FrameBuffer* buffer = setRenderTargetCommandData.m_FrameBuffer;
+		std::vector<Texture2DRTVDSVDescriptorHandle*> attachmentHandles = setRenderTargetCommandData.m_AttachmentHandles;
+		bool hasDepthAttachment = setRenderTargetCommandData.m_HasDepthAttachment;
 
-		uint32 numRenderTargets = buffer->GetAttachments().size() - (size_t)buffer->HasDepthAttachment();
+		uint32 numRenderTargets = attachmentHandles.size() - (size_t)hasDepthAttachment;
 		std::vector<uint64> rendertargetHandles(numRenderTargets);
 		std::vector<D3D12_VIEWPORT> viewports(numRenderTargets);
 		std::vector<D3D12_RECT> rects(numRenderTargets);
 		uint64 depthHandle = 0;
 
-		for (uint32 i = 0; i < buffer->GetAttachments().size(); i++)
+		for (uint32 i = 0; i < attachmentHandles.size(); i++)
 		{
-			DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)buffer->GetAttachment(i)->GetResource();
-			DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)buffer->GetAttachment(i)->GetRTVDSVDescriptor();
+			DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)attachmentHandles[i]->m_Resource;
+			DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)attachmentHandles[i];
 
 
-			if (IsDepthStencil(buffer->GetAttachment(i)->GetResource()->GetFormat()))
+			if (IsDepthStencil(res->GetFormat()))
 				depthHandle = rtv->GetHandle().cpu.ptr;
 			else
 			{
@@ -118,11 +119,11 @@ namespace Engine
 		DirectX12CommandList& dxCmdList = (DirectX12CommandList&)cmdList;
 		ClearRenderTargetCommand& clearRenderTargetCommandData = (ClearRenderTargetCommand&)commandData;
 
-		RenderTarget2D* renderTarget = clearRenderTargetCommandData.m_RenderTarget;
+		Texture2DRTVDSVDescriptorHandle* rtvHandle = clearRenderTargetCommandData.m_RenderTargetHandle;
 		Math::Vector4 color = clearRenderTargetCommandData.m_Color;
 
-		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)renderTarget->GetResource();
-		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)renderTarget->GetRTVDSVDescriptor();
+		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)rtvHandle->m_Resource;
+		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)rtvHandle;
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetHandle().cpu;
 		if (IsDepthStencil(res->GetFormat()))
@@ -139,12 +140,12 @@ namespace Engine
 		SetShaderCommand& setShaderCommandData = (SetShaderCommand&)commandData;
 
 		ShaderPass* shader = setShaderCommandData.m_ShaderPass;
-		FrameBuffer* renderTarget = setShaderCommandData.m_BoundFrameBuffer;
+		std::vector<TextureFormat> specification = setShaderCommandData.m_FrameBufferSpecification;
 
 		bool compute = shader->IsComputeShader();
 
 		DirectX12Shader* dxShader = (DirectX12Shader*)shader;
-		dxCmdList.GetCommandList()->SetPipelineState(dxShader->GetPipelineState(renderTarget).Get());
+		dxCmdList.GetCommandList()->SetPipelineState(dxShader->GetPipelineState(specification).Get());
 		if (compute)
 			dxCmdList.GetCommandList()->SetComputeRootSignature(dxShader->GetRootSignature().Get());
 		else
@@ -210,9 +211,9 @@ namespace Engine
 
 		bool isComputeShader = setConstantBufferCommandData.m_IsComputeShader;
 		uint32 index = setConstantBufferCommandData.m_Index;
-		ConstantBuffer* buffer = setConstantBufferCommandData.m_Buffer;
+		ConstantBufferCBVDescriptorHandle* CBVHandle = setConstantBufferCommandData.m_CBVHandle;
 
-		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)buffer->GetResource();
+		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)CBVHandle->m_Resource;
 		D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = dxResource->GetBuffer()->GetGPUVirtualAddress();
 		if (isComputeShader)
 			dxCmdList.GetCommandList()->SetComputeRootConstantBufferView(index, gpuAddress);
@@ -227,9 +228,9 @@ namespace Engine
 
 		bool isComputeShader = setStructuredBufferCommandData.m_IsComputeShader;
 		uint32 index = setStructuredBufferCommandData.m_Index;
-		StructuredBuffer* buffer = setStructuredBufferCommandData.m_Buffer;
+		StructuredBufferSRVDescriptorHandle* SRVHandle = setStructuredBufferCommandData.m_SRVHandle;
 
-		DirectX12StructuredBufferSRVDescriptorHandle* srv = (DirectX12StructuredBufferSRVDescriptorHandle*)buffer->GetSRVDescriptor();
+		DirectX12StructuredBufferSRVDescriptorHandle* srv = (DirectX12StructuredBufferSRVDescriptorHandle*)SRVHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srv->GetHandle().gpu;
 		if (isComputeShader)
 			dxCmdList.GetCommandList()->SetComputeRootDescriptorTable(index, gpuHandle);
@@ -244,9 +245,9 @@ namespace Engine
 
 		bool isComputeShader = setTextureCommandData.m_IsComputeShader;
 		uint32 index = setTextureCommandData.m_Index;
-		Texture2D* texture = setTextureCommandData.m_Texture;
+		Texture2DSRVDescriptorHandle* SRVHandle = setTextureCommandData.m_SRVHandle;
 
-		DirectX12Texture2DSRVDescriptorHandle* srv = (DirectX12Texture2DSRVDescriptorHandle*)texture->GetSRVDescriptor();
+		DirectX12Texture2DSRVDescriptorHandle* srv = (DirectX12Texture2DSRVDescriptorHandle*)SRVHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srv->GetHandle().gpu;
 
 		if (isComputeShader)
@@ -280,17 +281,18 @@ namespace Engine
 		DirectX12CommandList& dxCmdList = (DirectX12CommandList&)cmdList;
 		DrawMeshCommand& drawCommandData = (DrawMeshCommand&)commandData;
 
-		Mesh* mesh = drawCommandData.m_Mesh;
-		InstanceBuffer* instanceBuffer = drawCommandData.m_Instances;
+		VertexBufferView* verts = drawCommandData.m_VertexBufferView;
+		IndexBufferView* indices = drawCommandData.m_IndexBufferView;
+		InstanceBufferView* instances = drawCommandData.m_Instances;
 		uint32 numInstances = drawCommandData.m_NumberOfInstances;
 
-		uint32 indexCount = mesh->GetIndexBuffer()->GetResource()->GetCount();
-		DirectX12VertexBufferView* vertexBufferView = (DirectX12VertexBufferView*)mesh->GetVertexBuffer()->GetView();
-		DirectX12IndexBufferView* indexBufferView = (DirectX12IndexBufferView*)mesh->GetIndexBuffer()->GetView();
+		uint32 indexCount = indices->m_Resource->GetCount();
+		DirectX12VertexBufferView* vertexBufferView = (DirectX12VertexBufferView*)verts;
+		DirectX12IndexBufferView* indexBufferView = (DirectX12IndexBufferView*)indices;
 
-		if (instanceBuffer)
+		if (instances)
 		{
-			DirectX12InstanceBufferView* instanceBufferView = (DirectX12InstanceBufferView*)instanceBuffer->GetView();
+			DirectX12InstanceBufferView* instanceBufferView = (DirectX12InstanceBufferView*)instances;
 
 			D3D12_VERTEX_BUFFER_VIEW views[] = { vertexBufferView->GetView(), instanceBufferView->GetView() };
 			dxCmdList.GetCommandList()->IASetVertexBuffers(0, 2, views);
@@ -322,7 +324,7 @@ namespace Engine
 	// init
 	void InitDirectX12Commands()
 	{
-#define SetCommandFunctionPointer(commandStruct) commandStruct::RecoardCommandFunc = Recoard##commandStruct;
+#define SetCommandFunctionPointer(commandStruct) commandStruct::RecordCommandFunc = Recoard##commandStruct;
 		SetCommandFunctionPointer(TransitionCommand);
 		SetCommandFunctionPointer(SetRenderTargetCommand);
 		SetCommandFunctionPointer(ClearRenderTargetCommand);

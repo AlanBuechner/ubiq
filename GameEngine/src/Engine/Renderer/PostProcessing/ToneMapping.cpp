@@ -27,7 +27,7 @@ namespace Engine
 		commandList->SetShader(pass);
 		commandList->SetRootConstant(pass->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
 		commandList->SetRWTexture(pass->GetUniformLocation("DstTexture"), renderTarget->GetRWTexture2D(), 0);
-		commandList->Dispatch(std::max(renderTarget->GetWidth() / 8, 1u) + 1, std::max(renderTarget->GetHeight() / 8, 1u) + 1, 1);
+		commandList->DispatchCompute(std::max(renderTarget->GetWidth() / 8, 1u) + 1, std::max(renderTarget->GetHeight() / 8, 1u) + 1, 1);
 
 		GPUTimer::EndEvent(commandList);
 	}

@@ -8,17 +8,17 @@
 
 namespace Engine
 {
-	void (*TransitionCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*SetRenderTargetCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*ClearRenderTargetCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*SetShaderCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*SetRootConstantCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*SetConstantBufferCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*SetStructuredBufferCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*SetTextureCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*SetRWTextureCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*DrawMeshCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
-	void (*DisbatchComputeCommand::RecoardCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*TransitionCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*SetRenderTargetCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*ClearRenderTargetCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*SetShaderCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*SetRootConstantCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*SetConstantBufferCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*SetStructuredBufferCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*SetTextureCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*SetRWTextureCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*DrawMeshCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
+	void (*DisbatchComputeCommand::RecordCommandFunc)(CommandList&, Command&) = nullptr;
 }
 
 namespace Engine

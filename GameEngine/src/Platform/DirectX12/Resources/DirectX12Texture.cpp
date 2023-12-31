@@ -225,8 +225,10 @@ namespace Engine
 			return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		case ResourceState::RenderTarget:
 			return IsDepthStencil(m_Format) ? D3D12_RESOURCE_STATE_DEPTH_WRITE : D3D12_RESOURCE_STATE_RENDER_TARGET;
-		default:
-			break;
+		case ResourceState::CopyDestination:
+			return D3D12_RESOURCE_STATE_COPY_DEST;
+		case ResourceState::CopySource:
+			return D3D12_RESOURCE_STATE_COPY_SOURCE;
 		}
 	}
 

@@ -49,6 +49,10 @@ namespace Engine
 			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		case ResourceState::UnorderedResource:
 			return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		case ResourceState::CopyDestination:
+			return D3D12_RESOURCE_STATE_COPY_DEST;
+		case ResourceState::CopySource:
+			return D3D12_RESOURCE_STATE_COPY_SOURCE;
 		}
 	}
 

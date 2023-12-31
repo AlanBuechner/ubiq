@@ -45,27 +45,11 @@ namespace Engine
 		return m_ReflectionData;
 	}
 
-	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::GetPipelineState(FrameBuffer* target)
+	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::GetPipelineState(std::vector<TextureFormat> specification)
 	{
-		std::vector<TextureFormat> formates;
-
-		if (!m_ComputeShader)
-		{
-			TextureFormat depthFormat = TextureFormat::None;
-			for (Ref<RenderTarget2D> rt : target->GetAttachments())
-			{
-				TextureFormat format = rt->GetResource()->GetFormat();
-				if (IsDepthStencil(format))
-					depthFormat = format;
-				else
-					formates.push_back(format);
-			}
-			formates.push_back(depthFormat);
-		}
-
-		auto state = m_PiplineStates.find(formates);
+		auto state = m_PiplineStates.find(specification);
 		if (state == m_PiplineStates.end())
-			return CreatePiplineState(formates);
+			return CreatePiplineState(specification);
 
 		return state->second;
 	}

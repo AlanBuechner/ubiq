@@ -108,6 +108,8 @@ namespace Engine
 		case ResourceState::Common:
 		case ResourceState::ShaderResource:
 		case ResourceState::RenderTarget:
+		case ResourceState::CopyDestination:
+		case ResourceState::CopySource:
 			return true;
 		}
 

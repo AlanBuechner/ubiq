@@ -35,6 +35,8 @@ namespace Engine
 		virtual void Bind(ConstantBufferResource* resource) = 0;
 
 		static ConstantBufferCBVDescriptorHandle* Create(ConstantBufferResource* resource);
+
+		ConstantBufferResource* m_Resource;
 	};
 
 	// Constant Buffer Objects ---------------------------------------------------------- //

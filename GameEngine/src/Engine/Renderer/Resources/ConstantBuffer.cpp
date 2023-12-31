@@ -17,11 +17,11 @@ namespace Engine
 		{
 		case ResourceState::ShaderResource:
 		case ResourceState::UnorderedResource:
+		case ResourceState::CopyDestination:
+		case ResourceState::CopySource:
 			return true;
-		case ResourceState::Common:
-		case ResourceState::RenderTarget:
-			return false;
 		}
+		return false;
 	}
 
 	ConstantBufferResource* ConstantBufferResource::Create(uint32 size)
