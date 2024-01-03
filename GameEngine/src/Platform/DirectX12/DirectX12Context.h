@@ -1,10 +1,10 @@
 #pragma once
-#include "DirectX12SwapChain.h"
-#include "Engine/Renderer/GraphicsContext.h"
+#include "Resources/DirectX12SwapChain.h"
+#include "Engine/Renderer/Abstractions/GraphicsContext.h"
 #include "Engine/Core/UUID.h"
 #include "DX.h"
 #include "DirectX12Debug.h"
-#include "DirectX12ResourceManager.h"
+#include "Resources/DirectX12ResourceManager.h"
 
 namespace Engine
 {

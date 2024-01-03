@@ -3,8 +3,8 @@
 
 #include "Engine/Core/Core.h"
 #include "Renderer.h"
-#include "Engine/Renderer/Resources/InstanceBuffer.h"
-#include "Shader.h"
+#include "Abstractions/Resources/InstanceBuffer.h"
+#include "Abstractions/Shader.h"
 #include "Camera.h"
 #include "EditorCamera.h"
 #include "Engine/Core/Scene/Entity.h"

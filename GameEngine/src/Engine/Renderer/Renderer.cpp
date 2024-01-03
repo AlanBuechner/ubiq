@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "Renderer.h"
-#include "Shader.h"
+#include "Abstractions/Shader.h"
 #include "Camera.h"
 #include "Renderer2D.h"
 #include "LineRenderer.h"
-#include "ResourceManager.h"
+#include "Abstractions/Resources/ResourceManager.h"
 #include "Engine/Core/MeshBuilder.h"
-#include "GPUProfiler.h"
+#include "Abstractions/GPUProfiler.h"
 
 #include "EngineResource.h"
 

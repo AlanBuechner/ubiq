@@ -4,12 +4,12 @@
 
 #include "Mesh.h"
 #include "Material.h"
-#include "Resources/InstanceBuffer.h"
+#include "Abstractions/Resources/InstanceBuffer.h"
 #include "Camera.h"
 #include "EditorCamera.h"
-#include "Resources/ConstantBuffer.h"
-#include "CommandList.h"
-#include "Resources/FrameBuffer.h"
+#include "Abstractions/Resources/ConstantBuffer.h"
+#include "Abstractions/CommandList.h"
+#include "Abstractions/Resources/FrameBuffer.h"
 #include "RenderGraph/RenderGraph.h"
 #include "Light.h"
 

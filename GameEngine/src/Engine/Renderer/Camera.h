@@ -1,5 +1,5 @@
 #pragma once
-#include "Resources/ConstantBuffer.h"
+#include "Abstractions/Resources/ConstantBuffer.h"
 #include <Engine/Math/Math.h>
 
 namespace Engine

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Engine/Math/Math.h"
-#include "Resources/Texture.h"
-#include "Resources/SubTexture.h"
-#include "CommandList.h"
+#include "Abstractions/Resources/Texture.h"
+#include "Abstractions/Resources/SubTexture.h"
+#include "Abstractions/CommandList.h"
 
 namespace Engine
 {

@@ -2,9 +2,9 @@
 #include "MainPassNode.h"
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/Light.h"
-#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Abstractions/Shader.h"
 
-#include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 namespace Engine
 {

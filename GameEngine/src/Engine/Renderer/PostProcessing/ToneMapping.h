@@ -1,6 +1,6 @@
 #pragma once
 #include "PostProcess.h"
-#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Abstractions/Shader.h"
 
 namespace Engine
 {

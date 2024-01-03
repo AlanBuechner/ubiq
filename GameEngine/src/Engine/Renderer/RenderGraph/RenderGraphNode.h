@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RenderGraph.h"
-#include "Engine/Renderer/CommandList.h"
+#include "Engine/Renderer/Abstractions/CommandList.h"
 
 namespace Engine
 {

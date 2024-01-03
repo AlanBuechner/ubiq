@@ -15,15 +15,15 @@
 #include "Engine/Events/MouseEvent.h"
 
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
-#ifdef PLATFORM_WINDOWS
+#if defined(PLATFORM_WINDOWS)
 #include "Platform/Windows/Win.h"
 #include "Platform/Windows/WindowsWindow.h"
-#include "Platform/DirectX12/DirectX12SwapChain.h"
+#include "Platform/DirectX12/Resources/DirectX12SwapChain.h"
 #include "Platform/DirectX12/Directx12Context.h"
-#include "Platform/DirectX12/DirectX12Descriptors.h"
-#include "Platform/DirectX12/DirectX12ResourceManager.h"
+#include "Platform/DirectX12/Resources/DirectX12Descriptors.h"
+#include "Platform/DirectX12/Resources/DirectX12ResourceManager.h"
 #include "Platform/DirectX12/DirectX12CommandList.h"
 #include "Platform/DirectX12/DX.h"
 #endif // PLATFORM_WINDOWS

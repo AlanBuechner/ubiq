@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "SkyboxNode.h"
 #include "Engine/Core/Application.h"
-#include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/Shader.h"
 #include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/Shader.h"
 
 #include "Engine/Core/MeshBuilder.h"
 

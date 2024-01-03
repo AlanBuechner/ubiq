@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Engine/Core/Window.h"
-#include "Engine/Renderer/SwapChain.h"
-#include "Engine/Renderer/GraphicsContext.h"
+#include "Engine/Renderer/Abstractions/Resources/SwapChain.h"
+#include "Engine/Renderer/Abstractions/GraphicsContext.h"
 #include <thread>
 
 namespace Engine 

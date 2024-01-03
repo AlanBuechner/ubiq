@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "Light.h"
 
-#include "Resources/ConstantBuffer.h"
-#include "Resources/StructuredBuffer.h"
+#include "Abstractions/Resources/ConstantBuffer.h"
+#include "Abstractions/Resources/StructuredBuffer.h"
+#include "Abstractions/Resources/FrameBuffer.h"
+#include "Abstractions/Resources/StructuredBuffer.h"
 #include "Camera.h"
-#include "Resources/FrameBuffer.h"
-#include "Resources/StructuredBuffer.h"
 
 namespace Engine
 {

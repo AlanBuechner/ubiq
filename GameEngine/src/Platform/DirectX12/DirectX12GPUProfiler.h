@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
 #include "DirectX12CommandList.h"
 
 namespace Engine

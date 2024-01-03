@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Engine/Renderer/ShaderCompiler.h"
+#include "Engine/Renderer/Abstractions/ShaderCompiler.h"
 #include "DX.h"
 #include <dxc/inc/dxcapi.h>
 #include <dxc/inc/d3d12shader.h>

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Renderer/CommandQueue.h"
+#include "Engine/Renderer/Abstractions/CommandQueue.h"
 #include "Engine/Util/Performance.h"
 #include "DX.h"
 #include <thread>

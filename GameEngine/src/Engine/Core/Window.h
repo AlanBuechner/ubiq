@@ -2,7 +2,7 @@
 
 #include "Engine/Core/Core.h"
 #include "Engine/Events/Event.h"
-#include "Engine/Renderer/GraphicsContext.h"
+#include "Engine/Renderer/Abstractions/GraphicsContext.h"
 
 namespace Engine 
 {

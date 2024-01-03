@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "GBufferPassNode.h"
-#include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/Shader.h"
 #include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/Shader.h"
 
 namespace Engine
 {

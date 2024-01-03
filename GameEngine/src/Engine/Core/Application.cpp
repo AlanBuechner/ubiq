@@ -10,12 +10,12 @@
 #include "Engine/imGui/ImGuiLayer.h"
 
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/SwapChain.h"
-#include "Engine/Renderer/ResourceManager.h"
+#include "Engine/Renderer/Abstractions/Resources/SwapChain.h"
+#include "Engine/Renderer/Abstractions/Resources/ResourceManager.h"
 
 #include "Engine/Util/Performance.h"
 
-#include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 #include <Reflection.h>
 //LINK_REFLECTION_DATA(GameEngine)

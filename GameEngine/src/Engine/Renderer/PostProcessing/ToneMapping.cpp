@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ToneMapping.h"
 #include "EngineResource.h"
-#include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 namespace Engine
 {

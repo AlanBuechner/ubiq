@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Time.h"
 
-#include "Engine/Renderer/Resources/Texture.h"
+#include "Engine/Renderer/Abstractions/Resources/Texture.h"
 #include "Engine/Core/UUID.h"
 
 #include "Engine/Renderer/SceneRenderer.h"

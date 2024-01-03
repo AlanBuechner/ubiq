@@ -13,7 +13,7 @@
 #include "Engine/Util/Performance.h"
 
 // temp
-#include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 namespace YAML 
 {

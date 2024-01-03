@@ -1,5 +1,5 @@
 #pragma once
-#include "Resources/Buffer.h"
+#include "Abstractions/Resources/Buffer.h"
 
 namespace Engine
 {

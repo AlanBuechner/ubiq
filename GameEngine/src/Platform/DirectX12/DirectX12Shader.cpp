@@ -2,7 +2,7 @@
 #include "DirectX12Shader.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Directx12Context.h"
-#include "Engine/Renderer/ShaderCompiler.h"
+#include "Engine/Renderer/Abstractions/ShaderCompiler.h"
 
 
 DXGI_FORMAT GetDXGIFormatFromShaderUniformType(Engine::ShaderPass::Uniform::Type type)

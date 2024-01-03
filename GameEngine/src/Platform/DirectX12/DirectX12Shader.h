@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Abstractions/Shader.h"
 #include "DirectX12ShaderCompiler.h"
 #include "DX.h"
 #include <unordered_map>

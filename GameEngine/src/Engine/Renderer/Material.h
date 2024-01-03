@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Engine/AssetManager/AssetManager.h"
-#include "Shader.h"
+#include "Abstractions/Shader.h"
 #include <unordered_map>
 
 namespace Engine

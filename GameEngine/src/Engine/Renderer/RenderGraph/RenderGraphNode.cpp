@@ -4,8 +4,8 @@
 #include "Engine/Core/Window.h"
 
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/CommandList.h"
-#include "Engine/Renderer/GPUProfiler.h"
+#include "Engine/Renderer/Abstractions/CommandList.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 namespace Engine
 {
