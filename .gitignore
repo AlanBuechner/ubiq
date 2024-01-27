@@ -11,6 +11,8 @@ GameEngine/vendor/dxc
 GameEngine/vendor/pix
 Directory.build.props
 vendor/Compiler
+vendor/python
+vendor/premake/premake5.exe
 
 dxcompiler.dll
 dxil.dll
