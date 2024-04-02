@@ -6,6 +6,7 @@ Sandbox/*.json
 GameEngine/generated
 Sandbox/generated
 USG-Editor/generated
+__pycache__
 
 GameEngine/vendor/dxc
 GameEngine/vendor/pix

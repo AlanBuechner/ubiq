@@ -159,12 +159,11 @@ C:\Users\abuechner\source\repos\ubiq\vendor/Compiler/bin/clang-cl.exe -cc1 -trip
  -internal-isystem "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include"^
  -internal-isystem "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\atlmfc\include"^
  -internal-isystem "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\VS\include"^
- -internal-isystem "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\ucrt"^
  -internal-isystem "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\VS\UnitTest\include"^
+ -internal-isystem "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\ucrt"^
  -internal-isystem "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\um"^
  -internal-isystem "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\shared"^
  -internal-isystem "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\winrt"^
  -internal-isystem "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\cppwinrt"^
  -internal-isystem "C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\Include\um"^
  generated/generated.cpp -o generated/generated.obj
- 

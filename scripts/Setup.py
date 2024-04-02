@@ -145,14 +145,6 @@ else:
 print()
 
 
-# install scons
-with pushd("vendor/python/Scripts"):
-	os.system('pip.exe install SCons')
-
-
-print()
-
-
 # generate project
 print("Generating projects")
 os.chdir("scripts")
