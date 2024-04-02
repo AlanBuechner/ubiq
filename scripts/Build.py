@@ -25,6 +25,16 @@ parser.add_argument('-a', type=str, help='the architecture (x64)') # architectur
 parser.add_argument('-s', type=str, help='the system (windows)') # system
 args = parser.parse_args()
 
+def CollapseProject(projectkey, projectvalue):
+	if(isinstance(projectvalue, dict)):
+		for key, value in projectvalue.items():
+			CollapseProject(key, value)
+	else:
+		Config.projects.append(projectvalue)
+
+for key, value in Config.p.items():
+		CollapseProject(key, value) 
+
 buildScripts = {}
 for proj in Config.projects:
 	module = importlib.import_module(proj.replace("/", ".") + ".Build")
@@ -35,21 +45,20 @@ for proj in Config.projects:
 	}
 
 def GenerateProjects():
-	code = """
+	code = f"""
 workspace "UbiqEngine"
 	architecture "x64"
-	startproject "USG-Editor"
+	startproject "{Config.startupProject}"
 
 	configurations
-	{
-		"Debug",
-		"Release",
-		"Dist"
-	}
+	{{
 """
+	for c in Config.configurations:
+		code += f"\t\t\"{c}\",\n"
+	code += "\t}\n\n"
 
 	for key, value in Config.p.items():
-		code = AddProject(code, key, value, "")
+		code = AddProject(code, key, value, "", 0)
 
 	f=open("premake5.lua", "w")
 	f.write(code)
@@ -68,31 +77,36 @@ project "{projName}"
 	objdir ("{idir}")
 
 	buildcommands {{
-		"\\"../vendor/python/python.exe\\" ../scripts/Build.py -br -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {projName}"
+		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -b -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {projName}"
 	}}
 
 	files
 	{{
-		"src/**.h",
-		"src/**.cpp",
-		"embeded/**.rc",
-	}}
 """
-		f=open(proj.projectDirectory + "/premake5.lua", "w")
+		for x in proj.sources:
+			code += f"\t\t\"{x}\",\n"
+		for x in proj.headers:
+			code += f"\t\t\"{x}\",\n"
+		for x in proj.resources:
+			code += f"\t\t\"{x}\",\n"
+
+		code += "\t}"
+
+		f = open(proj.projectDirectory + "/premake5.lua", "w")
 		f.write(code)
 		f.close()
 
 	os.system("call vendor\premake\premake5.exe vs2022")
 
-def AddProject(code, projectkey, projectvalue, group):
+def AddProject(code, projectkey, projectvalue, group, indent):
 	if(isinstance(projectvalue, dict)):
 		newgorup = group + ("" if group == "" else "/") + projectkey
 		code += f"group \"{newgorup}\"\n"
 		for key, value in projectvalue.items():
-			code = AddProject(code, key, value, newgorup)
+			code = AddProject(code, key, value, newgorup, indent + 1)
 		code += f"group \"{group}\"\n"
 	else:
-		code += f"include \"{projectvalue}\"\n"
+		code += ("\t" * indent) + f"include \"{projectvalue}\"\n"
 	return code
 
 if(args.gs):
@@ -181,7 +195,7 @@ if(shouldBuild):
 
 if(shouldRun):
 	if(buildProject == ""):
-		RunProject(Config.projects[0].split("/")[-1])
+		RunProject(Config.startupProject.split("/")[-1])
 	else:
 		RunProject(buildProject.split("/")[-1])
 

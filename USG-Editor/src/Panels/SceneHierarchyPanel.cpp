@@ -395,55 +395,6 @@ if(!m_Selected.HasComponent<component>()){\
 				component.SetSkyboxTexture(texture);
 		});
 
-		DrawComponent<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&]() {
-			auto& component = *entity.GetComponent<Rigidbody2DComponent>();
-
-			const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
-			const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
-			if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
-			{
-				for (uint32 i = 0; i < 3; i++)
-				{
-					bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
-					if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
-					{
-						currentBodyTypeString = bodyTypeStrings[i];
-						component.Type = (Rigidbody2DComponent::BodyType)i;
-					}
-
-					if (isSelected)
-						ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
-			}
-
-			ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
-		});
-
-		DrawComponent<BoxCollider2DComponent>(entity, "Box Collider 2D", [&]() {
-			auto& component = *entity.GetComponent<BoxCollider2DComponent>();
-
-			PropertysPanel::DrawVec2Control("Offset", component.Offset, 0.0f);
-			PropertysPanel::DrawVec2Control("Size", component.Size, 0.0f);
-
-			PropertysPanel::DrawFloatControl("Density", component.Density, 1.0f);
-			PropertysPanel::DrawFloatControl("Friction", component.Friction, 0.5f);
-			PropertysPanel::DrawFloatControl("Restitution", component.Restitution, 0.0f);
-			PropertysPanel::DrawFloatControl("Restitution Threshold", component.RestitutionThreshold, 0.5f);
-		});
-
-		DrawComponent<CircleColliderComponent>(entity, "Circle Collider 2D", [&]() {
-			auto& component = *entity.GetComponent<CircleColliderComponent>();
-
-			PropertysPanel::DrawVec2Control("Offset", component.Offset, 0.0f);
-
-			PropertysPanel::DrawFloatControl("Size", component.Size, 0.5f);
-			PropertysPanel::DrawFloatControl("Density", component.Density, 1.0f);
-			PropertysPanel::DrawFloatControl("Friction", component.Friction, 0.5f);
-			PropertysPanel::DrawFloatControl("Restitution", component.Restitution, 0.0f);
-			PropertysPanel::DrawFloatControl("Restitution Threshold", component.RestitutionThreshold, 0.5f);
-		});
-
 	}
 
 }

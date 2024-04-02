@@ -54,7 +54,6 @@ defines = [
 dependancys = [
 	f"imgui",
 	f"yaml-cpp",
-	f"Box2D",
 ]
 
 links = [

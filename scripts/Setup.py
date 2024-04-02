@@ -106,22 +106,6 @@ else:
 print()
 
 
-#install vulkan
-print("downloading vulkan SDK installer")
-try:
-	urllib.request.urlretrieve("https://sdk.lunarg.com/sdk/download/1.3.268.0/windows/VulkanSDK-1.3.268.0-Installer.exe", "vulkan.exe")
-	os.system("vulkan.exe")
-except Exception as e:
-	print(e)
-	print("Failed to install vulkan")
-	print("try installing the vulkan sdk from \"https://sdk.lunarg.com/sdk/download/1.3.268.0/windows/VulkanSDK-1.3.268.0-Installer.exe\" than re generate the project")
-if DoesFileExist("vulkan.exe"):
-	os.remove("vulkan.exe")
-
-
-print()
-
-
 # install premake
 premakeEXE = premakeInstallLocation+"/premake5.exe"
 if not DoesFileExist(premakeEXE):

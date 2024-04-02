@@ -1,27 +1,19 @@
 import os
-location = os.path.dirname(__file__)
+location = os.path.dirname(__file__).replace("\\", "/")
 vulkanSDK = os.getenv("VULKAN_SDK")
 
-# first entry is startup project
-projects = [
-	"USG-Editor",
-	"GameEngine",
-	"vendor/imgui",
-	"vendor/yaml-cpp",
-	"vendor/ProjectManager",
-	"GameEngine/vendor/Box2D",
-]
-
+projects = [] # will be populated by the p dictinary
 p = {
 	"Dependancies" : {
 		"imgui" : "vendor/imgui",
 		"yaml-cpp" : "vendor/yaml-cpp",
 		"ProjectManager" : "vendor/ProjectManager",
-		"Box2D" : "GameEngine/vendor/Box2D",
 	},
 	"USG-Editor" : "USG-Editor",
 	"GameEngine" : "GameEngine",
 }
+
+startupProject = "USG-Editor"
 
 configurations = [
 	"Debug",

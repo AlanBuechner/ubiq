@@ -51,11 +51,6 @@
 #include "Engine/Core/Scene/Components.h"
 // ----------------------------------------
 
-// Physics --------------------------------
-#include "Engine/Physics/Physics2D.h"
-#include "Engine/Physics/PhysicsComponent.h"
-// ----------------------------------------
-
 // Mesh -----------------------------------
 #include "Engine/Core/MeshBuilder.h"
 // ----------------------------------------

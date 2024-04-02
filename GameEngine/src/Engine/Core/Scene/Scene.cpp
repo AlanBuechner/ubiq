@@ -5,9 +5,6 @@
 #include "Entity.h"
 #include "Engine/Core/UUID.h"
 
-#include "Engine/Physics/Physics2D.h"
-#include "Engine/Physics/PhysicsComponent.h"
-
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/LineRenderer.h"
@@ -16,11 +13,6 @@
 #include "Engine/Renderer/Components/StaticModelRendererComponent.h"
 
 #include "glm/glm.hpp"
-
-#include "box2d/b2_world.h"
-#include "box2d/b2_body.h"
-#include "box2d/b2_fixture.h"
-#include "box2d/b2_polygon_shape.h"
 
 namespace Engine
 {
@@ -36,12 +28,10 @@ namespace Engine
 
 	void Scene::OnRuntimeStart()
 	{
-		Physics2D::OnPhysicsStart(this);
 	}
 
 	void Scene::OnRuntimeStop()
 	{
-		Physics2D::OnPhysicsStop();
 	}
 
 	void Scene::OnUpdateEditor(Ref<EditorCamera> camera)
@@ -113,9 +103,6 @@ namespace Engine
 			TransformComponent& tc = entity.GetTransform();
 			tc.UpdateHierarchyGlobalTransform();
 		});
-
-		// Physics
-		Physics2D::OnPysicsUpdate();
 
 		// update transforms
 		m_Registry.Each([&](EntityType entityID) {
@@ -234,9 +221,6 @@ namespace Engine
 
 		CopyComponent<TransformComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<CameraComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
-		CopyComponent<Rigidbody2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
-		CopyComponent<BoxCollider2DComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
-		CopyComponent<CircleColliderComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<DirectionalLightComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<SkyboxComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
 		CopyComponent<StaticModelRendererComponent>(destSceneRegisry, srcSceneRegistry, enttMap);
@@ -276,24 +260,6 @@ namespace Engine
 
 	template<>
 	void Scene::OnComponentAdded<SkyboxComponent>(Entity entity, SkyboxComponent& component)
-	{
-
-	}
-
-	template<>
-	void Scene::OnComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component)
-	{
-
-	}
-
-	template<>
-	void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
-	{
-
-	}
-
-	template<>
-	void Scene::OnComponentAdded<CircleColliderComponent>(Entity entity, CircleColliderComponent& component)
 	{
 
 	}

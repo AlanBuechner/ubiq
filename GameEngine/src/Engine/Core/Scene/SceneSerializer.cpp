@@ -5,7 +5,6 @@
 
 #include "Engine/Renderer/Components/SceneRendererComponents.h"
 #include "Engine/Renderer/Components/StaticModelRendererComponent.h"
-#include "Engine/Physics/PhysicsComponent.h"
 
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -236,56 +235,6 @@ namespace Engine
 			out << YAML::EndMap;
 		}
 
-		if (entity.HasComponent<Rigidbody2DComponent>())
-		{
-			out << YAML::Key << "Rigidbody2DComponent";
-			out << YAML::BeginMap;
-
-			auto& component = *entity.GetComponent<Rigidbody2DComponent>();
-			out << YAML::Key << "Type";
-			switch (component.Type)
-			{
-			case Engine::Rigidbody2DComponent::BodyType::Static:	out << YAML::Value << "Static"; break;
-			case Engine::Rigidbody2DComponent::BodyType::Dynamic:	out << YAML::Value << "Dynamic"; break;
-			case Engine::Rigidbody2DComponent::BodyType::Kinematic:	out << YAML::Value << "Kinematic"; break;
-			}
-			out << YAML::Key << "FixedRotation" << YAML::Value << component.FixedRotation;
-
-			out << YAML::EndMap;
-		}
-
-		if (entity.HasComponent<BoxCollider2DComponent>())
-		{
-			out << YAML::Key << "BoxCollider2DComponent";
-			out << YAML::BeginMap;
-
-			auto& component = *entity.GetComponent<BoxCollider2DComponent>();
-			out << YAML::Key << "Offset" << YAML::Value << component.Offset;
-			out << YAML::Key << "Size" << YAML::Value << component.Size;
-			out << YAML::Key << "Density" << YAML::Value << component.Density;
-			out << YAML::Key << "Friction" << YAML::Value << component.Friction;
-			out << YAML::Key << "Restitution" << YAML::Value << component.Restitution;
-			out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.RestitutionThreshold;
-
-			out << YAML::EndMap;
-		}
-		
-		if (entity.HasComponent<CircleColliderComponent>())
-		{
-			out << YAML::Key << "CircleColiderComponent";
-			out << YAML::BeginMap;
-
-			auto& component = *entity.GetComponent<CircleColliderComponent>();
-			out << YAML::Key << "Offset" << YAML::Value << component.Offset;
-			out << YAML::Key << "Size" << YAML::Value << component.Size;
-			out << YAML::Key << "Density" << YAML::Value << component.Density;
-			out << YAML::Key << "Friction" << YAML::Value << component.Friction;
-			out << YAML::Key << "Restitution" << YAML::Value << component.Restitution;
-			out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.RestitutionThreshold;
-
-			out << YAML::EndMap;
-		}
-
 		out << YAML::EndMap;
 	}
 
@@ -414,43 +363,6 @@ namespace Engine
 					auto& sbc = *deserializedEntity.AddComponent<SkyboxComponent>();
 					if (skyboxComponent["Texture"])
 						sbc.SetSkyboxTexture(Application::Get().GetAssetManager().GetAsset<Texture2D>(skyboxComponent["Texture"].as<uint64>()));
-				}
-
-				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];
-				if (rigidbody2DComponent)
-				{
-					auto& rbc = *deserializedEntity.AddComponent<Rigidbody2DComponent>();
-
-					std::string type = rigidbody2DComponent["Type"].as<std::string>();
-					if (type == "Static") rbc.Type = Rigidbody2DComponent::BodyType::Static;
-					else if (type == "Dynamic") rbc.Type = Rigidbody2DComponent::BodyType::Dynamic;
-					else if (type == "Kinematic") rbc.Type = Rigidbody2DComponent::BodyType::Kinematic;
-
-					rbc.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
-				}
-
-				auto boxCollider2DComponent = entity["BoxCollider2DComponent"];
-				if (boxCollider2DComponent)
-				{
-					auto& bcc = *deserializedEntity.AddComponent<BoxCollider2DComponent>();
-					bcc.Offset = boxCollider2DComponent["Offset"].as<Math::Vector2>();
-					bcc.Size = boxCollider2DComponent["Size"].as<Math::Vector2>();
-					bcc.Density = boxCollider2DComponent["Density"].as<float>();
-					bcc.Friction = boxCollider2DComponent["Friction"].as<float>();
-					bcc.Restitution = boxCollider2DComponent["Restitution"].as<float>();
-					bcc.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
-				}
-				
-				auto circleCollider2DComponent = entity["CircleColiderComponent"];
-				if (circleCollider2DComponent)
-				{
-					auto& bcc = *deserializedEntity.AddComponent<CircleColliderComponent>();
-					bcc.Offset = circleCollider2DComponent["Offset"].as<Math::Vector2>();
-					bcc.Size = circleCollider2DComponent["Size"].as<float>();
-					bcc.Density = circleCollider2DComponent["Density"].as<float>();
-					bcc.Friction = circleCollider2DComponent["Friction"].as<float>();
-					bcc.Restitution = circleCollider2DComponent["Restitution"].as<float>();
-					bcc.RestitutionThreshold = circleCollider2DComponent["RestitutionThreshold"].as<float>();
 				}
 			}
 
