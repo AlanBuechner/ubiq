@@ -15,6 +15,7 @@ import scripts.BuildUtils as BuildUtils
 os.system("color")
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-gs', action='store_true', help='generate project files') # generate project files
 parser.add_argument('-r', action='store_true', help='run the project') # run
 parser.add_argument('-b', action='store_true', help='build the project') # build
 parser.add_argument('-br', action='store_true', help='build and run the project') # build and run
@@ -23,6 +24,80 @@ parser.add_argument('-c', type=str, help='the configuration (Release, Debug, Dis
 parser.add_argument('-a', type=str, help='the architecture (x64)') # architecture
 parser.add_argument('-s', type=str, help='the system (windows)') # system
 args = parser.parse_args()
+
+buildScripts = {}
+for proj in Config.projects:
+	module = importlib.import_module(proj.replace("/", ".") + ".Build")
+	buildScripts[proj] = {
+		"module" : module,
+		"built" : False,
+		"folder" : proj
+	}
+
+def GenerateProjects():
+	code = """
+workspace "UbiqEngine"
+	architecture "x64"
+	startproject "USG-Editor"
+
+	configurations
+	{
+		"Debug",
+		"Release",
+		"Dist"
+	}
+"""
+
+	for key, value in Config.p.items():
+		code = AddProject(code, key, value, "")
+
+	f=open("premake5.lua", "w")
+	f.write(code)
+	f.close()
+
+	for script in buildScripts.values():
+		proj = script["module"].GetProject()
+		projName = os.path.basename(proj.projectDirectory)
+		idir = BuildUtils.GetIntDir(projName).replace("\\", "/")
+		bdir = BuildUtils.GetBinDir(projName).replace("\\", "/")
+		code = f"""
+project "{projName}"
+	kind "Makefile"
+
+	targetdir ("{bdir}")
+	objdir ("{idir}")
+
+	buildcommands {{
+		"\\"../vendor/python/python.exe\\" ../scripts/Build.py -br -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {projName}"
+	}}
+
+	files
+	{{
+		"src/**.h",
+		"src/**.cpp",
+		"embeded/**.rc",
+	}}
+"""
+		f=open(proj.projectDirectory + "/premake5.lua", "w")
+		f.write(code)
+		f.close()
+
+	os.system("call vendor\premake\premake5.exe vs2022")
+
+def AddProject(code, projectkey, projectvalue, group):
+	if(isinstance(projectvalue, dict)):
+		newgorup = group + ("" if group == "" else "/") + projectkey
+		code += f"group \"{newgorup}\"\n"
+		for key, value in projectvalue.items():
+			code = AddProject(code, key, value, newgorup)
+		code += f"group \"{group}\"\n"
+	else:
+		code += f"include \"{projectvalue}\"\n"
+	return code
+
+if(args.gs):
+	GenerateProjects()
+	exit()
 
 shouldBuild = True
 shouldRun = False
@@ -71,14 +146,6 @@ if(args.s != None):
 	else:
 		Config.system = s
 
-buildScripts = {}
-for proj in Config.projects:
-	module = importlib.import_module(proj.replace("/", ".") + ".Build")
-	buildScripts[proj] = {
-		"module" : module,
-		"built" : False,
-	}
-
 def BuildProject(proj):
 	# return if project has already been built
 	if(proj == "" or buildScripts[proj]["built"]):
@@ -117,3 +184,5 @@ if(shouldRun):
 		RunProject(Config.projects[0].split("/")[-1])
 	else:
 		RunProject(buildProject.split("/")[-1])
+
+

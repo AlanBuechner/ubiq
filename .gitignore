@@ -21,6 +21,7 @@ dxil.dll
 *.sln
 *.vsxproj*
 *.vcxproj*
+premake5.lua
 USG-Editor/startup.json
 USG-Editor/runtime.json
 

@@ -10,12 +10,18 @@ projects = [
 	"vendor/yaml-cpp",
 	"vendor/ProjectManager",
 	"GameEngine/vendor/Box2D",
-
-	#"vendor/Walnut",
-	#"Launcher",
-	#"Sandbox",
-	#"vendor/GLFW",
 ]
+
+p = {
+	"Dependancies" : {
+		"imgui" : "vendor/imgui",
+		"yaml-cpp" : "vendor/yaml-cpp",
+		"ProjectManager" : "vendor/ProjectManager",
+		"Box2D" : "GameEngine/vendor/Box2D",
+	},
+	"USG-Editor" : "USG-Editor",
+	"GameEngine" : "GameEngine",
+}
 
 configurations = [
 	"Debug",
@@ -25,7 +31,7 @@ configurations = [
 configuration = configurations[1] # defult to release configuration
 
 architectures = [
-	"x64",
+	"x86_64",
 ]
 architecture = architectures[0]
 

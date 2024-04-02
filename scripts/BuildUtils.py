@@ -33,7 +33,7 @@ def GetSysIncludes():
 	return includes
 
 def GetTarget():
-	if(Config.architecture == "x64"):
+	if(Config.architecture == "x86_64"):
 		if(Config.system == "windows"):
 			return "x86_64-pc-windows-msvc"
 
