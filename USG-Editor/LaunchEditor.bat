@@ -1,1 +1,0 @@
-..\bin\Release-windows-x86_64\USG-Editor\USG-Editor.exe %1

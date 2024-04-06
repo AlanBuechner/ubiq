@@ -329,6 +329,7 @@ class ProjectEnviernment:
 		self.links = []
 		self.dependancys = []
 		self.buildType = BuildType.EXECUTABLE
+		self.genReflection = False
 
 	def Build(self):
 		projName = os.path.basename(self.projectDirectory)
@@ -352,10 +353,17 @@ class ProjectEnviernment:
 			return 1
 
 		# create and build reflection
-		#%{wks.location} \"$(ProjectDir)\\\" \"$(IncludePath)\" \"$(IntermediateOutputPath)\\\"
-		#args = []
-		#args.extend([Config.reflector, projectDirectory])
-		#result = subprocess.run(args, cwd=projectDirectory, capture_output=True, text=True)
+		if(self.genReflection):
+			args = []
+			args.extend([Config.reflector, self.projectDirectory])
+			result = subprocess.run(args, cwd=self.projectDirectory, capture_output=True, text=True)
+			log = f"|------------- Generating reflection : {projName} -------------|\n"
+			log += str(result.stderr)
+			log += str(result.stdout)
+			log += f"|------------- Finished generating reflection : {projName} -------------|\n"
+			print(log)
+			if(BuildSources(["generated/generated.cpp"], self.projectDirectory, idir, self.includes, self.sysIncludes, self.defines) != 0):
+				return 1
 
 		# link
 		ext = [".exe", ".lib"][self.buildType.value]

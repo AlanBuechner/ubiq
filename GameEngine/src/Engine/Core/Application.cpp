@@ -18,7 +18,7 @@
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 #include <Reflection.h>
-//LINK_REFLECTION_DATA(GameEngine)
+LINK_REFLECTION_DATA(GameEngine)
 
 Engine::Application* Engine::Application::s_Instance = nullptr;
 

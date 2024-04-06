@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-gs', action='store_true', help='generate project files') # generate project files
 parser.add_argument('-r', action='store_true', help='run the project') # run
 parser.add_argument('-b', action='store_true', help='build the project') # build
-parser.add_argument('-br', action='store_true', help='build and run the project') # build and run
+parser.add_argument('-fb', action='store_true', help='build the full project') # full build
 parser.add_argument('-p', type=str, help='the project to build') # project
 parser.add_argument('-c', type=str, help='the configuration (Release, Debug, Dist)') # configuration
 parser.add_argument('-a', type=str, help='the architecture (x64)') # architecture
@@ -90,7 +90,20 @@ project "{projName}"
 		for x in proj.resources:
 			code += f"\t\t\"{x}\",\n"
 
-		code += "\t}"
+		code += "\t}\n\n"
+		code += "\tincludedirs = \n\t{\n"
+		for x in proj.includes:
+			code += f"\t\t\"{x}\",\n"
+		code += "\t}\n\n"
+		code += "\tsysincludedirs  = \n\t{\n"
+		for x in proj.sysIncludes:
+			code += f"\t\t\"{x}\",\n"
+		code += "\t}\n"
+
+		code += "\tlinks = \n\t{\n"
+		for x in proj.dependancys:
+			code += f"\t\t\"{x}\",\n"
+		code += "\t}\n"
 
 		f = open(proj.projectDirectory + "/premake5.lua", "w")
 		f.write(code)
@@ -113,16 +126,9 @@ if(args.gs):
 	GenerateProjects()
 	exit()
 
-shouldBuild = True
-shouldRun = False
-
-if(args.r):
-	shouldBuild = False
-	shouldRun = True
-
-if(args.br):
-	shouldBuild = True
-	shouldRun = True
+shouldBuild = args.b
+shouldRun = args.r
+fullbuild = args.fb
 
 buildProject = ""
 if(args.p != None):
@@ -165,8 +171,9 @@ def BuildProject(proj):
 	if(proj == "" or buildScripts[proj]["built"]):
 		return
 
-	for d in buildScripts[proj]["module"].GetProject().dependancys:
-		BuildProject(BuildUtils.FindProject(d))
+	if(fullbuild):
+		for d in buildScripts[proj]["module"].GetProject().dependancys:
+			BuildProject(BuildUtils.FindProject(d))
 
 	print("Building " + proj)
 	startTime = time.time()
@@ -198,5 +205,3 @@ if(shouldRun):
 		RunProject(Config.startupProject.split("/")[-1])
 	else:
 		RunProject(buildProject.split("/")[-1])
-
-

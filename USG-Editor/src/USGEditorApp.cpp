@@ -1,8 +1,11 @@
+#include <Reflection.h>
 #include <Engine.h>
 #include "EditorLayer.h"
 #include "EditorAssets.h"
 #include <Engine/Core/EntryPoint.h>
 #include <Engine/Util/PlatformUtils.h>
+
+LINK_REFLECTION_DATA(USG_Editor)
 
 namespace Engine
 {

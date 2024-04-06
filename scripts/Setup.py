@@ -110,10 +110,11 @@ print()
 premakeEXE = premakeInstallLocation+"/premake5.exe"
 if not DoesFileExist(premakeEXE):
 	print("Installing Premake")
+	os.makedirs(premakeInstallLocation)
 	zipLocation = premakeInstallLocation + "/premake.zip"
 
 	try:
-		urllib.request.urlretrieve("https://github.com/premake/premake-core/releases/download/v5.0.0-beta2/premake-5.0.0-beta2-windows.zip", zipLocation)
+		urllib.request.urlretrieve("https://github.com/premake/premake-core/releases/download/v5.0.0-beta1/premake-5.0.0-beta1-windows.zip", zipLocation)
 		with zipfile.ZipFile(zipLocation, 'r') as zip_ref:
 			zip_ref.extract("premake5.exe", premakeInstallLocation)
 		os.remove(zipLocation)

@@ -40,7 +40,6 @@ cppVersion = "c++17"
 openMP = True
 
 compiler = f"{location}/vendor/Compiler/bin/clang-cl.exe"
-linker = f"{location}/vendor/Compiler/bin/lld-link.exe"
 reflector =  f"{location}/vendor/Compiler/bin/Socrates.exe"
 
 includeDirs = {
@@ -50,21 +49,15 @@ includeDirs = {
 	"glm"				: f"{location}/vendor/glm",
 	"ImGui"				: f"{location}/vendor/imgui",
 	"stb_image"			: f"{location}/vendor/stb_image",
-	"GLFW"				: f"{location}/vendor/GLFW",
-	"Walnut"			: f"{location}/vendor/Walnut",
 	"ProjectManager"	: f"{location}/vendor/ProjectManager",
 
 	# engine includes
 	"ImGuizmo"			: f"{location}/GameEngine/vendor/ImGuizmo",
-	"Box2D"				: f"{location}/GameEngine/vendor/Box2D/Include",
 	"Assimp"			: f"{location}/GameEngine/vendor/Assimp/include",
 	"json"				: f"{location}/GameEngine/vendor/json/single_include",
 	"dxc"				: f"{location}/GameEngine/vendor/dxc/inc",
 	"pix"				: f"{location}/GameEngine/vendor/pix/include",
 	"Aftermath"			: f"{location}/GameEngine/vendor/Aftermath/include",
-
-	# sdks
-	"Vulkan"			: f"{vulkanSDK}/Include"
 }
 
 sysIncludeDirs = {

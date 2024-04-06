@@ -5,7 +5,7 @@ from Config import *
 import time
 
 import inspect
-projDir = os.path.dirname(inspect.getfile(lambda: None))
+projDir = os.path.dirname(inspect.getfile(lambda: None)).replace("\\", "/")
 projName = os.path.basename(projDir)
 
 pchHeader = f"{location}/src/pch.h"
@@ -24,6 +24,7 @@ headers = [
 ]
 
 includes = [
+	projDir,
 	f"src",
 	f"{includeDirs['vendor']}",
 	f"{includeDirs['ImGui']}",
@@ -31,7 +32,6 @@ includes = [
 	f"{includeDirs['stb_image']}",
 	f"{includeDirs['yaml']}",
 	f"{includeDirs['ImGuizmo']}",
-	f"{includeDirs['Box2D']}",
 	f"{includeDirs['Assimp']}",
 	f"{includeDirs['json']}",
 	f"{includeDirs['dxc']}",
@@ -82,4 +82,5 @@ def GetProject():
 	proj.links = links
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.EXECUTABLE
+	proj.genReflection = True
 	return proj
