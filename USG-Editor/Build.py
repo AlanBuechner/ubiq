@@ -1,6 +1,7 @@
 # USG-Editor build script
 
 import scripts.BuildUtils as BuildUtils
+from scripts.Utils.Utils import *
 from Config import *
 import time
 
@@ -46,7 +47,7 @@ includes = [
 sysIncludes = [
 	f"{sysIncludeDirs['Compiler']}",
 ]
-sysIncludes.extend(BuildUtils.GetSysIncludes())
+sysIncludes.extend(GetSysIncludes())
 
 defines = [
 	configuration.upper(),

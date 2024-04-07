@@ -1,87 +1,15 @@
 import os
-import inspect
 import subprocess
-import threading
 import multiprocessing
 import concurrent.futures
 from enum import Enum
 import math
-import re
 import Config
 
-def GetBinDir(projName):
-	return os.path.join(Config.location, Config.outDir.format(config=Config.configuration, system=Config.system, arc=Config.architecture, projName=projName))
+from scripts.Utils.Utils import *
+from scripts.Utils.Windows import *
 
-def GetIntDir(projName):
-	return os.path.join(Config.location, Config.intDir.format(config=Config.configuration, system=Config.system, arc=Config.architecture, projName=projName))
-
-def GetLatestDir(dir):
-	return dir + sorted(os.listdir(dir))[-1]
-
-def GetVisualStudioDirectory():
-	return "C:/Program Files/Microsoft Visual Studio/2022/Community/"
-
-def GetMSVCDirectory():
-	return GetLatestDir(GetVisualStudioDirectory() + "VC/Tools/MSVC/")
-
-def GetSysIncludes():
-	# TODO : find visual studio headers programaticly
-	# TODO : find window headers programaticly
-	vsDir = GetVisualStudioDirectory()
-	msvcDir = GetMSVCDirectory()
-	windowsKitIncludeBase = GetLatestDir("C:/Program Files (x86)/Windows Kits/10/Include/")
-	NETFXSDK = GetLatestDir("C:/Program Files (x86)/Windows Kits/NETFXSDK/")
-	includes = []
-	includes.append(f"{Config.location}/vendor/Compiler/lib/clang/16/include")
-	includes.append(f"{Config.location}/vendor/Compiler/include")
-	includes.append(f"{msvcDir}/include")
-	includes.append(f"{msvcDir}/atlmfc/include")
-	includes.append(f"{vsDir}/VC/Auxiliary/VS/include")
-	includes.append(f"{vsDir}/VC/Auxiliary/VS/UnitTest/include")
-	includes.append(f"{windowsKitIncludeBase}/ucrt")
-	includes.append(f"{windowsKitIncludeBase}/um")
-	includes.append(f"{windowsKitIncludeBase}/shared")
-	includes.append(f"{windowsKitIncludeBase}/winrt")
-	includes.append(f"{windowsKitIncludeBase}/cppwinrt")
-	includes.append(f"{NETFXSDK}4.8/Include/um")
-	return includes
-
-def GetFMSVersion():
-	args = ["cl.exe"]
-	path = GetMSVCDirectory() + "/bin/Hostx64/x64"
-	result = subprocess.run(args, cwd=path, capture_output=True, text=True)
-	return re.search(r"\d+\.\d+\.\d+", result.stderr).group() # the version number can be found in the error output and not the standerd output for some reason
-fms_version = GetFMSVersion()
-
-def GetTarget():
-	if(Config.architecture == "x86_64"):
-		if(Config.system == "windows"):
-			return "x86_64-pc-windows-msvc"
-
-def ResolveFiles(filters, d):
-	files = []
-	for filt in filters:
-		name, ext = os.path.splitext(os.path.basename(filt))
-		folder = os.path.dirname(filt)
-		if (folder != ""):
-			folder += "/"
-		if(not os.path.isabs(folder)):
-			folder = d+"/"+folder
-
-		if(name == "**"):
-			for (dirpath, dirnames, filenames) in os.walk(folder):
-				files.extend([dirpath + "/" + f for f in filenames if os.path.splitext(os.path.basename(f))[1] == ext])
-		else:
-			files.append(folder+name+ext)
-
-	return files
-
-def FindProject(projName):
-	for proj in Config.projects:
-		if(proj.endswith(projName)):
-			return proj
-	print(f"project {projName} is not defined")
-	return ""
+# ------------------------------------------- Sources ------------------------------------------- #
 
 class ObjectEnviernment:
 	def __init__(self):
@@ -146,22 +74,20 @@ class ObjectEnviernment:
 				"--dependent-lib=oldnames",
 				"-stack-protector", "2",
 				"-fdefault-calling-conv=cdecl",
-				"-fdiagnostics-format", "msvc",
 				"-gno-column-info",
 				"-gcodeview",
 				"-debug-info-kind=constructor",
 				"-ffunction-sections",
-				"-fcoverage-compilation-dir=C:/Users/abuechner/source/repos/ubiq/GameEngine",
-				"-resource-dir", "C:/Users/abuechner/source/repos/ubiq/vendor/Compiler/lib/clang/16",
 
 				# limits
 				"-ferror-limit", "19",
 
-				# fms compatibility
+				# visual studio
+				"-fdiagnostics-format", "msvc",
 				"-fms-volatile",
 				"-fms-extensions",
 				"-fms-compatibility",
-				f"-fms-compatibility-version={fms_version}",
+				f"-fms-compatibility-version={GetFMSVersion()}",
 
 				# exceptions
 				"-fcxx-exceptions",
@@ -237,6 +163,12 @@ def BuildSources(sources, projDir, intDir, includes, sysIncluds, defines):
 	# build objs
 	return BuildObjectEnviernments(buildActions)
 
+
+
+
+
+
+# ------------------------------------------- Resources ------------------------------------------- #
 class ResourceEnviernment:
 	def __init__(self):
 		self.resource = ""
@@ -251,7 +183,7 @@ class ResourceEnviernment:
 			args.extend(["/I", include])
 		args.append(self.resource)
 		my_env = os.environ.copy()
-		my_env["PATH"] = f"{GetLatestDir('C:/Program Files (x86)/Windows Kits/10/bin/')}/x64:{my_env['PATH']}"
+		my_env["PATH"] = f"{GetWindowsKitBin()}/x64:{my_env['PATH']}"
 		result = subprocess.run(args, cwd=self.workingDir, shell=True, env=my_env, capture_output=True, text=True)
 		log = f"|------------- Building file : {name} -------------|\n"
 		log += str(result.stderr)
@@ -306,6 +238,11 @@ def BuildResources(resources, dependancys, projDir, intDir):
 	return BuildResourceEnviernments(buildActions)
 
 
+
+
+
+
+# ------------------------------------------- Linker ------------------------------------------- #
 class BuildType(Enum):
 	EXECUTABLE = 0
 	STATICLIBRARY = 1
@@ -336,6 +273,12 @@ def LinkObjects(intDir, links, projDir, outputFile, buildType):
 	print(log)
 	return result.returncode
 
+
+
+
+
+
+# ------------------------------------------- Projects ------------------------------------------- #
 class ProjectEnviernment:
 	def __init__(self):
 		self.projectDirectory = ""
