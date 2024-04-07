@@ -6,6 +6,7 @@ import multiprocessing
 import concurrent.futures
 from enum import Enum
 import math
+import re
 import Config
 
 def GetBinDir(projName):
@@ -14,23 +15,43 @@ def GetBinDir(projName):
 def GetIntDir(projName):
 	return os.path.join(Config.location, Config.intDir.format(config=Config.configuration, system=Config.system, arc=Config.architecture, projName=projName))
 
+def GetLatestDir(dir):
+	return dir + sorted(os.listdir(dir))[-1]
+
+def GetVisualStudioDirectory():
+	return "C:/Program Files/Microsoft Visual Studio/2022/Community/"
+
+def GetMSVCDirectory():
+	return GetLatestDir(GetVisualStudioDirectory() + "VC/Tools/MSVC/")
+
 def GetSysIncludes():
 	# TODO : find visual studio headers programaticly
 	# TODO : find window headers programaticly
+	vsDir = GetVisualStudioDirectory()
+	msvcDir = GetMSVCDirectory()
+	windowsKitIncludeBase = GetLatestDir("C:/Program Files (x86)/Windows Kits/10/Include/")
+	NETFXSDK = GetLatestDir("C:/Program Files (x86)/Windows Kits/NETFXSDK/")
 	includes = []
 	includes.append(f"{Config.location}/vendor/Compiler/lib/clang/16/include")
 	includes.append(f"{Config.location}/vendor/Compiler/include")
-	includes.append(f"C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/include")
-	includes.append(f"C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/atlmfc/include")
-	includes.append(f"C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/VS/include")
-	includes.append(f"C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/VS/UnitTest/include")
-	includes.append(f"C:/Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/ucrt")
-	includes.append(f"C:/Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/um")
-	includes.append(f"C:/Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/shared")
-	includes.append(f"C:/Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/winrt")
-	includes.append(f"C:/Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/cppwinrt")
-	includes.append(f"C:/Program Files (x86)/Windows Kits/NETFXSDK/4.8/Include/um")
+	includes.append(f"{msvcDir}/include")
+	includes.append(f"{msvcDir}/atlmfc/include")
+	includes.append(f"{vsDir}/VC/Auxiliary/VS/include")
+	includes.append(f"{vsDir}/VC/Auxiliary/VS/UnitTest/include")
+	includes.append(f"{windowsKitIncludeBase}/ucrt")
+	includes.append(f"{windowsKitIncludeBase}/um")
+	includes.append(f"{windowsKitIncludeBase}/shared")
+	includes.append(f"{windowsKitIncludeBase}/winrt")
+	includes.append(f"{windowsKitIncludeBase}/cppwinrt")
+	includes.append(f"{NETFXSDK}4.8/Include/um")
 	return includes
+
+def GetFMSVersion():
+	args = ["cl.exe"]
+	path = GetMSVCDirectory() + "/bin/Hostx64/x64"
+	result = subprocess.run(args, cwd=path, capture_output=True, text=True)
+	return re.search(r"\d+\.\d+\.\d+", result.stderr).group() # the version number can be found in the error output and not the standerd output for some reason
+fms_version = GetFMSVersion()
 
 def GetTarget():
 	if(Config.architecture == "x86_64"):
@@ -140,7 +161,7 @@ class ObjectEnviernment:
 				"-fms-volatile",
 				"-fms-extensions",
 				"-fms-compatibility",
-				"-fms-compatibility-version=19.34.31935",
+				f"-fms-compatibility-version={fms_version}",
 
 				# exceptions
 				"-fcxx-exceptions",
@@ -230,7 +251,7 @@ class ResourceEnviernment:
 			args.extend(["/I", include])
 		args.append(self.resource)
 		my_env = os.environ.copy()
-		my_env["PATH"] = f"C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x64:{my_env['PATH']}"
+		my_env["PATH"] = f"{GetLatestDir('C:/Program Files (x86)/Windows Kits/10/bin/')}/x64:{my_env['PATH']}"
 		result = subprocess.run(args, cwd=self.workingDir, shell=True, env=my_env, capture_output=True, text=True)
 		log = f"|------------- Building file : {name} -------------|\n"
 		log += str(result.stderr)
