@@ -86,5 +86,7 @@ def GetProject():
 	proj.links = links
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
+	proj.intDir = GetIntDir(projName)
+	proj.binDir = GetBinDir(projName)
 	proj.genReflection = True
 	return proj

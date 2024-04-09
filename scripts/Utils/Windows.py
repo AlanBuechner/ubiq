@@ -16,7 +16,7 @@ def GetMSVCDirectory():
 def CashFMSVersion():
 	args = ["cl.exe"]
 	path = GetMSVCDirectory() + "/bin/Hostx64/x64"
-	result = subprocess.run(args, cwd=path, capture_output=True, text=True)
+	result = subprocess.run(args, cwd=path, shell=True, capture_output=True, text=True)
 	return re.search(r"\d+\.\d+\.\d+", result.stderr).group() # the version number can be found in the error output and not the standerd output for some reason
 fms_version = CashFMSVersion()
 

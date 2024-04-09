@@ -2,7 +2,8 @@ import os
 location = os.path.dirname(__file__).replace("\\", "/")
 vulkanSDK = os.getenv("VULKAN_SDK")
 
-projects = [] # will be populated by the p dictinary
+projects = [] # will be populated later
+buildScripts = {} # will be populated later
 p = {
 	"Dependancies" : {
 		"imgui" : "vendor/imgui",

@@ -84,4 +84,6 @@ def GetProject():
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.EXECUTABLE
 	proj.genReflection = True
+	proj.intDir = GetIntDir(projName)
+	proj.binDir = GetBinDir(projName)
 	return proj

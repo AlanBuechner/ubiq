@@ -23,12 +23,51 @@ class ObjectEnviernment:
 		self._needsBuild = True
 
 	def EvaluateDependencies(self):
-		if(self.treeFile != "" and os.path.exists(self.treeFile)):
+		if(os.path.exists(self.objFile) and self.treeFile != "" and os.path.exists(self.treeFile)):
+			lastModifyTime = os.path.getmtime(self.objFile)
 			file = open(self.treeFile)
-			lines = file.readlines()
+			s = file.read()
+			lines = s.split(".d:")[1].split("\n")
+			#print(self.workingDir)
+			#print()
+			needsBuild = False
 			for line in lines:
-				if(line.endswith("\\\n")):
-					line = line[0:-3]
+				# sanitize path
+				if(line.endswith("\\")):
+					line = line[0:-1]
+				line = line.strip()
+
+				# check the path is not empty
+				if(line == ""):
+					continue
+
+				# get all the tokens in the line
+				tokens = line.split(" ")
+				curr = ""
+				lastSucces = False
+				for t in tokens:
+					lastSucces = False
+					if curr != "":
+						curr += " "
+					curr += t
+					path = curr
+					if(not os.path.isabs(path)):
+						path = os.path.join(self.workingDir, path)
+					#print(f"{curr} : {t} \n{path} : {os.path.isfile(path)}")
+					#print()
+					if os.path.isfile(path):
+						lastTime = os.path.getmtime(path) # get last time file was modified
+						curr = "" # reset path
+						lastSucces = True
+						# check if this dependancy was modified after the last time the obj was built
+						if lastTime > lastModifyTime:
+							needsBuild = True
+							break
+				if lastSucces == False: # hit the end of the line with unresolved path meaning a file was deleted
+					needsBuild = True
+				if needsBuild == True:
+					break
+			self._needsBuild = needsBuild
 			file.close()
 
 	def Build(self):
@@ -97,6 +136,10 @@ class ObjectEnviernment:
 				# suppressions
 				"-Wno-unused-comparison",
 
+
+				"-dependency-file", self.treeFile,
+				"-MT", self.treeFile,
+
 			])
 			for i in self.includeDirs:
 				args.extend(["-I", i])
@@ -105,9 +148,6 @@ class ObjectEnviernment:
 			for d in self.defines:
 				args.extend(["-D", d])
 			result = subprocess.run(args, cwd=self.workingDir, capture_output=True, text=True)
-			#if(result.returncode == 0 and self.treeFile != 0):
-				#args.extend(["-dependency-file", self.treeFile, "-MD", "-MT"]) # generate dependancys
-				#subprocess.run(args, cwd=self.workingDir, capture_output=True, text=True)
 			log = f"|------------- Building file : {file} -------------|\n"
 			log += str(result.stderr)
 			log += str(result.stdout)
@@ -128,7 +168,7 @@ def BuildObjectEnviernments(objects, jobs = 0):
 	pool.shutdown(wait=True)
 
 	numSuccess = 0
-	numFailed = 0;
+	numFailed = 0
 	total = len(objects)
 	for f in futures:
 		if(f.result()==0):
@@ -136,7 +176,9 @@ def BuildObjectEnviernments(objects, jobs = 0):
 		elif(f.result()>0):
 			numFailed+=1
 
-	print(f"finished building : {numSuccess} succeeded : {numFailed} failed")
+	print(f"finished building sources : {numSuccess} succeeded : {numFailed} failed")
+	if(numSuccess == 0 and numFailed == 0):
+		return -1 # no work done
 	return numFailed
 
 def BuildSources(sources, projDir, intDir, includes, sysIncluds, defines):
@@ -212,7 +254,9 @@ def BuildResourceEnviernments(objects, jobs = 0):
 		elif(f.result()>0):
 			numFailed+=1
 
-	print(f"finished building : {numSuccess} succeeded : {numFailed} failed")
+	print(f"finished building resources : {numSuccess} succeeded : {numFailed} failed")
+	if(numSuccess == 0 and numFailed == 0):
+		return -1 # no work done
 	return numFailed
 
 def BuildResources(resources, dependancys, projDir, intDir):
@@ -247,31 +291,51 @@ class BuildType(Enum):
 	EXECUTABLE = 0
 	STATICLIBRARY = 1
 
-def LinkObjects(intDir, links, projDir, outputFile, buildType):
-	projName = os.path.basename(projDir)
-	for i in range(len(links)):
-		if(not links[i].endswith(".lib")):
-			links[i] = GetBinDir(links[i]) + "/" + links[i] + ".lib"
-	args = []
-	args.extend([Config.compiler])
-	#args.extend(["--driver-mode=cpp"])
-	#args.extend([f"-fuse-ld={Config.linker}"])
-	args.extend(["-target", GetTarget()])
-	if(buildType == BuildType.STATICLIBRARY):
-		args.extend(["-fuse-ld=llvm-lib"])
-	elif(buildType == BuildType.EXECUTABLE):
-		args.extend(["-Wl,--subsystem,console"])
-	args.extend(["-o", outputFile])
-	args.extend(ResolveFiles([f"{intDir}/**.obj"], intDir))
-	args.extend(ResolveFiles([f"{intDir}/**.res"], intDir))
-	args.extend(links)
-	result = subprocess.run(args, cwd=projDir, capture_output=True, text=True)
-	log = f"|------------- linking project : {projName} -------------|\n"
-	log += str(result.stderr)
-	log += str(result.stdout)
-	log += f"linking {projName} completed with error code {result.returncode}\n"
-	print(log)
-	return result.returncode
+def LinkObjects(intDir, links, projDir, outputFile, buildType, needsBuild):
+	if(not needsBuild):
+		lastBuildTime = os.path.getmtime(outputFile)
+		for i in range(len(links)):
+			lib = ""
+			if(not links[i].endswith(".lib")):
+				lib = GetProject(links[i])["module"].GetProject().GetOutput()
+				if(not os.path.isabs(lib)):
+					lib = os.path.join(projDir, lib)
+			else:
+				lib = links[i]
+				if(not os.path.isabs(lib)):
+					lib = os.path.join(projDir, lib)
+				if(not os.path.isfile(lib)): # file must be found in the path
+					lib = "" # TODO : find file in path (safe to ignore for now)
+
+			buildTime = os.path.getmtime(lib)
+			if(buildTime > lastBuildTime):
+				needsBuild = True
+
+
+	if(needsBuild):
+		projName = os.path.basename(projDir)
+		for i in range(len(links)):
+			if(not links[i].endswith(".lib")):
+				links[i] = GetProject(links[i])["module"].GetProject().GetOutput()
+		args = []
+		args.extend([Config.compiler])
+		args.extend(["-target", GetTarget()])
+		if(buildType == BuildType.STATICLIBRARY):
+			args.extend(["-fuse-ld=llvm-lib"])
+		elif(buildType == BuildType.EXECUTABLE):
+			args.extend(["-Wl,--subsystem,console"])
+		args.extend(["-o", outputFile])
+		args.extend(ResolveFiles([f"{intDir}/**.obj"], intDir))
+		args.extend(ResolveFiles([f"{intDir}/**.res"], intDir))
+		args.extend(links)
+		result = subprocess.run(args, cwd=projDir, capture_output=True, text=True)
+		log = f"|------------- linking project : {projName} -------------|\n"
+		log += str(result.stderr)
+		log += str(result.stdout)
+		log += f"linking {projName} completed with error code {result.returncode}\n"
+		print(log)
+		return result.returncode
+	return -1
 
 
 
@@ -293,31 +357,40 @@ class ProjectEnviernment:
 		self.links = []
 		self.dependancys = []
 		self.buildType = BuildType.EXECUTABLE
+		self.intDir = ""
+		self.binDir = ""
+		self.buildName = ""
 		self.genReflection = False
+
+	def GetOutput(self):
+		ext = [".exe", ".lib"][self.buildType.value]
+		return self.binDir + "/" +self.buildName + ext
 
 	def Build(self):
 		projName = os.path.basename(self.projectDirectory)
-		idir = GetIntDir(projName)
+		idir = self.intDir
 		if(not os.path.exists(idir)):
 			os.makedirs(idir)
 
-		bdir = GetBinDir(projName)
+		bdir = self.binDir
 		if(not os.path.exists(bdir)):
 			os.makedirs(bdir)
 
 		# build resource files
-		if(BuildResources(self.resources, self.dependancys, self.projectDirectory, idir) != 0):
+		resourceBuildStatus = BuildResources(self.resources, self.dependancys, self.projectDirectory, idir)
+		if(resourceBuildStatus > 0): # faild to build resources
 			return 1
 
 		# build pch
 		# TODO
 
 		# build source files
-		if(BuildSources(self.sources, self.projectDirectory, idir, self.includes, self.sysIncludes, self.defines) != 0):
+		sourceBuildStatus = BuildSources(self.sources, self.projectDirectory, idir, self.includes, self.sysIncludes, self.defines)
+		if(sourceBuildStatus > 0): # faild to build sources
 			return 1
 
 		# create and build reflection
-		if(self.genReflection):
+		if(self.genReflection and sourceBuildStatus != -1):
 			args = []
 			args.extend([Config.reflector, self.projectDirectory])
 			result = subprocess.run(args, cwd=self.projectDirectory, capture_output=True, text=True)
@@ -331,7 +404,9 @@ class ProjectEnviernment:
 
 		# link
 		ext = [".exe", ".lib"][self.buildType.value]
-		if(LinkObjects(idir, self.links, self.projectDirectory, bdir+"/"+projName+ext, self.buildType) != 0):
+		needsBuild = resourceBuildStatus != -1 or sourceBuildStatus != -1
+		linkStatus = LinkObjects(idir, self.links, self.projectDirectory, self.GetOutput(), self.buildType, needsBuild)
+		if(linkStatus > 0):
 			return 1
 
 		return 0

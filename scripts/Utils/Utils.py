@@ -9,7 +9,6 @@ def GetBinDir(projName):
 def GetIntDir(projName):
 	return os.path.join(Config.location, Config.intDir.format(config=Config.configuration, system=Config.system, arc=Config.architecture, projName=projName))
 
-
 def ResolveFiles(filters, d):
 	files = []
 	for filt in filters:
@@ -48,3 +47,7 @@ def FindProject(projName):
 			return proj
 	print(f"project {projName} is not defined")
 	return ""
+
+def GetProject(projName):
+	projName = FindProject(projName)
+	return Config.buildScripts[projName]

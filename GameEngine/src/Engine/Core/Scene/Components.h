@@ -25,7 +25,7 @@
 
 namespace Engine
 {
-	class Component 
+	class Component
 	{
 	public:
 		Entity Owner;
