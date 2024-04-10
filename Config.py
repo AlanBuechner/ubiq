@@ -9,6 +9,7 @@ p = {
 		"imgui" : "vendor/imgui",
 		"yaml-cpp" : "vendor/yaml-cpp",
 		"ProjectManager" : "vendor/ProjectManager",
+		"Reflection" : "vendor/Reflection",
 	},
 	"USG-Editor" : "USG-Editor",
 	"GameEngine" : "GameEngine",

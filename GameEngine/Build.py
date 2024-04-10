@@ -55,6 +55,7 @@ defines = [
 dependancys = [
 	f"imgui",
 	f"yaml-cpp",
+	f"Reflection",
 ]
 
 links = [
@@ -64,13 +65,6 @@ links = [
 	f"{libs['Aftermath']}"
 ]
 links.extend(dependancys)
-
-if(configuration == "Debug"):
-	links.append(f"{libs['ReflectionDebug']}")
-elif(configuration == "Release"):
-	links.append(f"{libs['Reflection']}")
-elif(configuration == "Dist"):
-	links.append(f"{libs['Reflection']}")
 
 def GetProject():
 	proj = BuildUtils.ProjectEnviernment()

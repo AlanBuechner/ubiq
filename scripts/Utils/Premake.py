@@ -37,8 +37,8 @@ workspace "UbiqEngine"
 def GenerateProject(script):
 	proj = script["module"].GetProject()
 	projName = os.path.basename(proj.projectDirectory)
-	idir = BuildUtils.GetIntDir(projName).replace("\\", "/")
-	bdir = BuildUtils.GetBinDir(projName).replace("\\", "/")
+	idir = proj.intDir
+	bdir = proj.binDir
 	code = f"""
 project "{projName}"
 	kind "Makefile"
@@ -68,7 +68,7 @@ project "{projName}"
 	code += "\tsysincludedirs  = \n\t{\n"
 	for x in proj.sysIncludes:
 		code += f"\t\t\"{x}\",\n"
-	code += "\t}\n"
+	code += "\t}\n\n"
 
 	code += "\tlinks = \n\t{\n"
 	for x in proj.dependancys:
@@ -80,6 +80,7 @@ project "{projName}"
 	f.close()
 
 def GenerateProjects():
+	GenerateSolution()
 	for script in Config.buildScripts.values():
 		GenerateProject(script)
 

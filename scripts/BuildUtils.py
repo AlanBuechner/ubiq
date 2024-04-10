@@ -229,7 +229,7 @@ class ResourceEnviernment:
 		result = subprocess.run(args, cwd=self.workingDir, shell=True, env=my_env, capture_output=True, text=True)
 		log = f"|------------- Building file : {name} -------------|\n"
 		log += str(result.stderr)
-		log += str(result.stdout)
+		#log += str(result.stdout)
 		log += f"building {name} completed with error code {result.returncode}\n"
 		print(log)
 		return result.returncode
@@ -293,23 +293,26 @@ class BuildType(Enum):
 
 def LinkObjects(intDir, links, projDir, outputFile, buildType, needsBuild):
 	if(not needsBuild):
-		lastBuildTime = os.path.getmtime(outputFile)
-		for i in range(len(links)):
-			lib = ""
-			if(not links[i].endswith(".lib")):
-				lib = GetProject(links[i])["module"].GetProject().GetOutput()
-				if(not os.path.isabs(lib)):
-					lib = os.path.join(projDir, lib)
-			else:
-				lib = links[i]
-				if(not os.path.isabs(lib)):
-					lib = os.path.join(projDir, lib)
-				if(not os.path.isfile(lib)): # file must be found in the path
-					lib = "" # TODO : find file in path (safe to ignore for now)
+		if(not os.path.isfile(outputFile)):
+			needsBuild = True
+		else:
+			lastBuildTime = os.path.getmtime(outputFile)
+			for i in range(len(links)):
+				lib = ""
+				if(not links[i].endswith(".lib")):
+					lib = GetProject(links[i])["module"].GetProject().GetOutput()
+					if(not os.path.isabs(lib)):
+						lib = os.path.join(projDir, lib)
+				else:
+					lib = links[i]
+					if(not os.path.isabs(lib)):
+						lib = os.path.join(projDir, lib)
+					if(not os.path.isfile(lib)): # file must be found in the path
+						lib = "" # TODO : find file in path (safe to ignore for now)
 
-			buildTime = os.path.getmtime(lib)
-			if(buildTime > lastBuildTime):
-				needsBuild = True
+				buildTime = os.path.getmtime(lib)
+				if(buildTime > lastBuildTime):
+					needsBuild = True
 
 
 	if(needsBuild):
@@ -364,7 +367,10 @@ class ProjectEnviernment:
 
 	def GetOutput(self):
 		ext = [".exe", ".lib"][self.buildType.value]
-		return self.binDir + "/" +self.buildName + ext
+		buildName = self.buildName
+		if(buildName == ""):
+			buildName = os.path.basename(self.projectDirectory)
+		return self.binDir + "/" + buildName + ext
 
 	def Build(self):
 		projName = os.path.basename(self.projectDirectory)
