@@ -27,6 +27,10 @@ workspace "UbiqEngine"
 		code += f"\t\t\"{c}\",\n"
 	code += "\t}\n\n"
 
+	code += "group \"Tools\"\n"
+	for t in Config.tools:
+		code += f"\tinclude \"{t}\""
+	code += "group \"\"\n"
 	for key, value in Config.p.items():
 		code = AddProject(code, key, value, "", 0)
 
@@ -47,7 +51,7 @@ project "{projName}"
 	objdir ("{idir}")
 
 	buildcommands {{
-		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -b -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {projName}"
+		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -fb -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {projName}"
 	}}
 
 	files

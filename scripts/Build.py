@@ -6,6 +6,7 @@ import inspect
 import argparse
 import time
 import importlib
+import subprocess
 
 # set our working directory to the projects root directory
 rootDir = os.path.dirname(os.path.dirname(inspect.getfile(lambda: None)))
@@ -27,7 +28,8 @@ def CollapseProject(projectkey, projectvalue):
 
 # collapse p dictinary into a list of projects
 for key, value in Config.p.items():
-	CollapseProject(key, value) 
+	CollapseProject(key, value)
+Config.projects.extend(Config.tools)
 
 
 # --------------------- Define args --------------------- #
@@ -36,6 +38,7 @@ parser.add_argument('-gs', action='store_true', help='generate project files') #
 parser.add_argument('-r', action='store_true', help='run the project') # run
 parser.add_argument('-b', action='store_true', help='build the project') # build
 parser.add_argument('-fb', action='store_true', help='build the full project') # full build
+parser.add_argument('--BuildTools', action='store_true', help='build tools') # build tools
 parser.add_argument('-p', type=str, help='the project to build') # project
 parser.add_argument('-c', type=str, help='the configuration (Release, Debug, Dist)') # configuration
 parser.add_argument('-a', type=str, help='the architecture (x64)') # architecture
@@ -89,7 +92,19 @@ if(args.s != None):
 	else:
 		Config.system = s
 
-# --------------------- Load Project Scritps ---------------------
+
+# --------------------- Build Tools --------------------- #
+if(args.BuildTools):
+	# overide configurations for build tools
+	 Config.configuration = "Release"
+	 Config.architecture = "x86_64"
+	 Config.system = "windows"
+elif(shouldBuild):
+	# validate build tools have been built
+	a = ["vendor/python/python.exe", "scripts/Build.py", "--BuildTools"]
+	result = subprocess.run(a)
+
+# --------------------- Load Project Scritps --------------------- #
 for proj in Config.projects:
 	module = importlib.import_module(proj.replace("/", ".") + ".Build")
 	Config.buildScripts[proj] = {
@@ -114,20 +129,29 @@ def BuildProject(proj):
 			BuildProject(FindProject(d))
 
 	# build project
-	print("Building " + proj)
+	buildMsg = f"=============== Building: {proj},   {Config.configuration} {Config.architecture} ==============="
+	print("_" * 120)
+	print(buildMsg)
 	startTime = time.time()
 	errorCode = Config.buildScripts[proj]["module"].GetProject().Build()
 	Config.buildScripts[proj]["built"] = True
 	endTime = time.time()
 	if(errorCode != 0):
 		print("Build Failed")
-	print(f"finished building {proj} in {endTime - startTime}s")
+	print(f"========== finished building {proj} in {endTime - startTime:.2f}s ==========")
+	print("_" * 120)
+	print("\n")
 	return errorCode
+
+
+if(args.BuildTools):
+	for t in Config.tools:
+		BuildProject(t)
 
 if(shouldBuild):
 	if(buildProject == ""):
 		fullbuild = True
-		for proj in Config.projects:
+		for	proj in Config.projects:
 			BuildProject(proj)
 	else:
 		BuildProject(buildProject)

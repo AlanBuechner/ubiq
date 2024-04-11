@@ -14,6 +14,9 @@ p = {
 	"USG-Editor" : "USG-Editor",
 	"GameEngine" : "GameEngine",
 }
+tools = [
+	"tools/Socrates"
+]
 
 startupProject = "USG-Editor"
 
@@ -42,7 +45,6 @@ cppVersion = "c++17"
 openMP = True
 
 compiler = f"{location}/vendor/Compiler/bin/clang-cl.exe"
-reflector =  f"{location}/vendor/Compiler/bin/Socrates.exe"
 
 includeDirs = {
 	# general includes

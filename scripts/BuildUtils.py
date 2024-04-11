@@ -176,7 +176,7 @@ def BuildObjectEnviernments(objects, jobs = 0):
 		elif(f.result()>0):
 			numFailed+=1
 
-	print(f"finished building sources : {numSuccess} succeeded : {numFailed} failed")
+	print(f"finished building sources : {numSuccess} succeeded : {numFailed} failed : {total - (numSuccess+numFailed)} up-to-date")
 	if(numSuccess == 0 and numFailed == 0):
 		return -1 # no work done
 	return numFailed
@@ -254,7 +254,7 @@ def BuildResourceEnviernments(objects, jobs = 0):
 		elif(f.result()>0):
 			numFailed+=1
 
-	print(f"finished building resources : {numSuccess} succeeded : {numFailed} failed")
+	print(f"finished building resources : {numSuccess} succeeded : {numFailed} failed : {total - (numSuccess+numFailed)} up-to-date")
 	if(numSuccess == 0 and numFailed == 0):
 		return -1 # no work done
 	return numFailed
@@ -262,6 +262,8 @@ def BuildResourceEnviernments(objects, jobs = 0):
 def BuildResources(resources, dependancys, projDir, intDir):
 	projName = os.path.basename(projDir)
 	files = ResolveFiles(resources, projDir)
+	if(len(files) == 0):
+		return -1
 	includes = []
 	for d in dependancys:
 		includes.append(Config.location + "/" + FindProject(d) + "/embeded")
@@ -398,7 +400,8 @@ class ProjectEnviernment:
 		# create and build reflection
 		if(self.genReflection and sourceBuildStatus != -1):
 			args = []
-			args.extend([Config.reflector, self.projectDirectory])
+			reflectorProject = GetProject("Socrates")["module"].GetProject()
+			args.extend([reflectorProject.GetOutput(), self.projectDirectory])
 			result = subprocess.run(args, cwd=self.projectDirectory, capture_output=True, text=True)
 			log = f"|------------- Generating reflection : {projName} -------------|\n"
 			log += str(result.stderr)

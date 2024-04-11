@@ -1,4 +1,4 @@
-# Reflection build script
+# Socrates build script
 
 import scripts.BuildUtils as BuildUtils
 from scripts.Utils.Utils import *
@@ -39,7 +39,7 @@ def GetProject():
 	proj.sysIncludes = sysIncludes
 	proj.defines = defines
 	proj.links = []
-	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
+	proj.buildType = BuildUtils.BuildType.EXECUTABLE
 	proj.intDir = GetIntDir(projName)
 	proj.binDir = GetBinDir(projName)
 	return proj
