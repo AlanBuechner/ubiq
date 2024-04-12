@@ -60,8 +60,13 @@ namespace Reflect {
 
 } // namespace Reflect
 
-
-#define CLASS(...) class __attribute__((annotate("reflect-class," #__VA_ARGS__)))
-#define PROPERTY(...) __attribute__((annotate("reflect-property;" #__VA_ARGS__)))
+// STRIP_REFLECTION is used so the IDE does not yell at you because it does not know what __attribute__ is
+#if defined(STRIP_REFLECTION)
+	#define CLASS(...) class
+	#define PROPERTY(...)
+#else
+	#define CLASS(...) class __attribute__((annotate("reflect-class," #__VA_ARGS__)))
+	#define PROPERTY(...) __attribute__((annotate("reflect-property;" #__VA_ARGS__)))
+#endif
 
 #define LINK_REFLECTION_DATA(name) void DeadLink##name(); void* _DeadLink##name = &DeadLink##name;

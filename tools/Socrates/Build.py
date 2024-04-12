@@ -40,6 +40,6 @@ def GetProject():
 	proj.defines = defines
 	proj.links = []
 	proj.buildType = BuildUtils.BuildType.EXECUTABLE
-	proj.intDir = GetIntDir(projName)
-	proj.binDir = GetBinDir(projName)
+	proj.intDir = GetToolsIntDir(projName)
+	proj.binDir = GetToolsBinDir(projName)
 	return proj

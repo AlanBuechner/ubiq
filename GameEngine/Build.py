@@ -38,10 +38,11 @@ includes = [
 	f"{includeDirs['dxc']}",
 	f"{includeDirs['pix']}",
 	f"{includeDirs['Aftermath']}",
+	f"{includeDirs['Reflection']}/src",
 ]
 
 sysIncludes = [
-	f"{sysIncludeDirs['Compiler']}",
+
 ]
 sysIncludes.extend(GetSysIncludes())
 

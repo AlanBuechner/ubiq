@@ -39,13 +39,14 @@ includes = [
 	f"{includeDirs['pix']}",
 	f"{includeDirs['Aftermath']}",
 	f"{includeDirs['ProjectManager']}/src",
+	f"{includeDirs['Reflection']}/src",
 	f"{location}/GameEngine/vendor",
 	f"{location}/GameEngine/src",
 	f"{location}/GameEngine/embeded",
 ]
 
 sysIncludes = [
-	f"{sysIncludeDirs['Compiler']}",
+
 ]
 sysIncludes.extend(GetSysIncludes())
 

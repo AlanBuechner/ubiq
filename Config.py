@@ -37,8 +37,11 @@ systems = [
 ]
 system = systems[0] # defult to windows
 
-outDir = "bin/{config}-{system}-{arc}/{projName}"
+binDir = "bin/{config}-{system}-{arc}/{projName}"
 intDir = "bin-int/{config}-{system}-{arc}/{projName}"
+
+toolsBinDir = "bin/tools/{projName}"
+toolsIntDir = "bin-int/tools/{projName}" 
 
 cppVersion = "c++17"
 
@@ -54,6 +57,7 @@ includeDirs = {
 	"ImGui"				: f"{location}/vendor/imgui",
 	"stb_image"			: f"{location}/vendor/stb_image",
 	"ProjectManager"	: f"{location}/vendor/ProjectManager",
+	"Reflection"		: f"{location}/vendor/Reflection",
 
 	# engine includes
 	"ImGuizmo"			: f"{location}/GameEngine/vendor/ImGuizmo",
@@ -65,7 +69,7 @@ includeDirs = {
 }
 
 sysIncludeDirs = {
-	"Compiler"			: f"{location}/vendor/Compiler/include"
+
 }
 
 libs = {

@@ -4,10 +4,16 @@ import Config
 import os
 
 def GetBinDir(projName):
-	return os.path.join(Config.location, Config.outDir.format(config=Config.configuration, system=Config.system, arc=Config.architecture, projName=projName)).replace("\\", "/")
+	return os.path.join(Config.location, Config.binDir.format(config=Config.configuration, system=Config.system, arc=Config.architecture, projName=projName)).replace("\\", "/")
 
 def GetIntDir(projName):
 	return os.path.join(Config.location, Config.intDir.format(config=Config.configuration, system=Config.system, arc=Config.architecture, projName=projName)).replace("\\", "/")
+
+def GetToolsBinDir(projName):
+	return os.path.join(Config.location, Config.toolsBinDir.format(projName=projName)).replace("\\", "/")
+
+def GetToolsIntDir(projName):
+	return os.path.join(Config.location, Config.toolsIntDir.format(projName=projName)).replace("\\", "/")
 
 def ResolveFiles(filters, d):
 	files = []
