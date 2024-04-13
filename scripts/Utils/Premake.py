@@ -54,6 +54,14 @@ project "{projName}"
 		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -fb -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {projName}"
 	}}
 
+	rebuildcommands  {{
+		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -rebuild -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {projName}"
+	}}
+
+	cleancommands  {{
+		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -clean -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {projName}"
+	}}
+
 	files
 	{{
 """

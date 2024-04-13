@@ -2,6 +2,7 @@
 
 import sys
 import os
+import shutil
 import inspect
 import argparse
 import time
@@ -38,6 +39,8 @@ parser.add_argument('-gs', action='store_true', help='generate project files') #
 parser.add_argument('-r', action='store_true', help='run the project') # run
 parser.add_argument('-b', action='store_true', help='build the project') # build
 parser.add_argument('-fb', action='store_true', help='build the full project') # full build
+parser.add_argument('-rebuild', action='store_true', help='rebuild the project') # full build
+parser.add_argument('-clean', action='store_true', help='clean the project') # full build
 parser.add_argument('--BuildTools', action='store_true', help='build tools') # build tools
 parser.add_argument('-p', type=str, help='the project to build') # project
 parser.add_argument('-c', type=str, help='the configuration (Release, Debug, Dist)') # configuration
@@ -46,9 +49,10 @@ parser.add_argument('-s', type=str, help='the system (windows)') # system
 args = parser.parse_args()
 
 # --------------------- Check args --------------------- #
-shouldBuild = args.b
+shouldBuild = args.b or args.rebuild or args.fb
 shouldRun = args.r
 fullbuild = args.fb
+clean = args.clean or args.rebuild
 if(fullbuild):
 	shouldBuild = True
 
@@ -117,7 +121,21 @@ for proj in Config.projects:
 if(args.gs):
 	Premake.GenerateProjects()
 
-# --------------------- Build Project --------------------- #
+# --------------------- Clean Projects --------------------- #
+
+def CleanProject(projName):
+	proj = Config.buildScripts[projName]["module"].GetProject()
+	shutil.rmtree(proj.intDir, ignore_errors=True)
+
+if(clean):
+	if(buildProject == ""):
+		fullbuild = True
+		for	proj in Config.projects:
+			CleanProject(proj)
+	else:
+		CleanProject(buildProject)
+
+# --------------------- Build Projects --------------------- #
 def BuildProject(proj):
 	# return if project has already been built
 	if(proj == "" or Config.buildScripts[proj]["built"]):
