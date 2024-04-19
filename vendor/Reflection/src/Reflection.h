@@ -42,7 +42,7 @@ namespace Reflect {
 			uint64_t size, 
 			const std::string& group,
 			CreateFunc createFunc, 
-			DestroyFunc destrouFunc,
+			DestroyFunc destroyFunc,
 			const std::vector<std::string>& flags
 		)
 			: name(name), sname(sname), typeID(typeID), size(size), group(group), createFunc(createFunc), destroyFunc(destroyFunc)
