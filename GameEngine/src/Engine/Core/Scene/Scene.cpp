@@ -11,6 +11,7 @@
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Components/SceneRendererComponents.h"
 #include "Engine/Renderer/Components/StaticModelRendererComponent.h"
+#include "Engine/Core/Scene/TransformComponent.h"
 
 #include "glm/glm.hpp"
 
@@ -36,38 +37,44 @@ namespace Engine
 
 	void Scene::OnUpdateEditor(Ref<EditorCamera> camera)
 	{
-
+		CREATE_PROFILE_FUNCTIONI();
 		bool newCamera = m_SceneRenderer->GetMainCamera() != camera;
 
 		// updating
-		// update transforms
-		m_Registry.Each([&](EntityType entityID) {
-			Entity entity{ entityID, this };
-			TransformComponent& tc = entity.GetTransform();
-			tc.UpdateHierarchyGlobalTransform();
-		});
+		{
+			// update transforms
+			CREATE_PROFILE_SCOPEI("Update Transforms");
+			auto TransformComponentView = m_Registry.View<TransformComponent>();
+			for (TransformComponent& tc : TransformComponentView)
+				tc.UpdateHierarchyGlobalTransform();
+		}
 
-		
-		//update invalid components
-		m_Registry.Each([&](EntityType entityID) {
-			Entity entity{ entityID, this };
-			std::vector<Component*> components = entity.GetComponents();
-			for (Component* comp : components)
-				comp->OnInvalid();
-		});
+		{
+			CREATE_PROFILE_SCOPEI("Update Invalid Components");
+			//update invalid components
+			m_Registry.EachPool([&](ComponentPool* pool) {
+				pool->EachEntity([&](void* component) {
+					((Component*)component)->OnInvalid();
+				});
+			});
+		}
 
 		// rendering
-		auto dirLightView = m_Registry.View<DirectionalLightComponent>();
-		for (auto& comp : dirLightView)
 		{
-			if (newCamera)
+			auto dirLightView = m_Registry.View<DirectionalLightComponent>();
+			CREATE_PROFILE_SCOPEI("Update Directional Light Components")
+			for (auto& comp : dirLightView)
 			{
-				// remove all cameras from directional light
-				comp.GetDirectinalLight()->ClearCameras();
-				// re add cameras to directional light
-				comp.GetDirectinalLight()->AddCamera(camera);
+				CREATE_PROFILE_SCOPEI("Update Directional Light Component")
+				if (newCamera)
+				{
+					// remove all cameras from directional light
+					comp.GetDirectinalLight()->ClearCameras();
+					// re add cameras to directional light
+					comp.GetDirectinalLight()->AddCamera(camera);
+				}
+				comp.UpdateShadowMaps();
 			}
-			comp.UpdateShadowMaps();
 		}
 		
 		// render 3d models
@@ -98,14 +105,14 @@ namespace Engine
 	void Scene::OnUpdateRuntime()
 	{
 		// update transforms
-		m_Registry.Each([&](EntityType entityID) {
+		m_Registry.EachEntity([&](EntityType entityID) {
 			Entity entity{ entityID, this };
 			TransformComponent& tc = entity.GetTransform();
 			tc.UpdateHierarchyGlobalTransform();
 		});
 
 		// update transforms
-		m_Registry.Each([&](EntityType entityID) {
+		m_Registry.EachEntity([&](EntityType entityID) {
 			Entity entity{ entityID, this };
 			TransformComponent& tc = entity.GetTransform();
 			tc.UpdateHierarchyGlobalTransform();
@@ -130,7 +137,7 @@ namespace Engine
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
 
-		m_Registry.GetComponentPool<CameraComponent>()->Each([&](void* comp) {
+		m_Registry.GetComponentPool<CameraComponent>()->EachEntity([&](void* comp) {
 			CameraComponent* camComp = (CameraComponent*)comp;
 			if (!camComp->FixedAspectRatio)
 				camComp->Camera->SetViewportSize(width, height);
@@ -197,7 +204,7 @@ namespace Engine
 		for (auto srcComponent : view)
 		{
 			EntityType destEntity = map.at(src.GetEntityData(srcComponent.Owner).ID);
-			dest.AddComponent<T>(destEntity, srcComponent);
+			//dest.AddComponent<T>(destEntity, srcComponent); // TODO add copy component
 		}
 	}
 
@@ -213,7 +220,7 @@ namespace Engine
 		auto& srcSceneRegistry = scene->m_Registry;
 		auto& destSceneRegisry = newScene->m_Registry;
 
-		srcSceneRegistry.Each([&](EntityType entity) {
+		srcSceneRegistry.EachEntity([&](EntityType entity) {
 			EntityData& data = srcSceneRegistry.GetEntityData(entity);
 			Entity newEntity = newScene->CreateEntityWithUUID(data.ID, data.name);
 			enttMap[data.ID] = newEntity;

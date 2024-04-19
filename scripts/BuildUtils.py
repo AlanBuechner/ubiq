@@ -85,7 +85,6 @@ class ObjectEnviernment:
 			args.extend(["-o", self.objFile])
 			args.extend([f"-std={Config.cppVersion}"])
 			args.extend([
-
 				"-mincremental-linker-compatible",
 				"--mrelax-relocations",
 				"-disable-free",
@@ -114,12 +113,15 @@ class ObjectEnviernment:
 				"-stack-protector", "2",
 				"-fdefault-calling-conv=cdecl",
 				"-gno-column-info",
-				"-gcodeview",
-				"-debug-info-kind=constructor",
 				"-ffunction-sections",
 
+				# debug
+				#"-fstandalone-debug",
+				"-debug-info-kind=standalone",
+				"-gcodeview",
+
 				# limits
-				"-ferror-limit", "19",
+				"-ferror-limit", "10",
 
 				# visual studio
 				"-fdiagnostics-format", "msvc",
@@ -136,7 +138,7 @@ class ObjectEnviernment:
 				# suppressions
 				"-Wno-unused-comparison",
 
-
+				# dependancy file
 				"-dependency-file", self.treeFile,
 				"-MT", self.treeFile,
 
@@ -324,7 +326,9 @@ def LinkObjects(intDir, links, projDir, outputFile, buildType, needsBuild):
 				links[i] = GetProject(links[i])["module"].GetProject().GetOutput()
 		args = []
 		args.extend([Config.compiler])
+		args.extend(["--driver-mode=cl"])
 		args.extend(["-target", GetTarget()])
+		args.extend(["-Zi"])
 		if(buildType == BuildType.STATICLIBRARY):
 			args.extend(["-fuse-ld=llvm-lib"])
 		elif(buildType == BuildType.EXECUTABLE):
@@ -398,6 +402,7 @@ class ProjectEnviernment:
 			return 1
 
 		# create and build reflection
+		reflectionBuildStatus = -1
 		if(self.genReflection and sourceBuildStatus != -1):
 			args = []
 			reflectorProject = GetProject("Socrates")["module"].GetProject()
@@ -408,12 +413,13 @@ class ProjectEnviernment:
 			log += str(result.stdout)
 			log += f"|------------- Finished generating reflection : {projName} -------------|\n"
 			print(log)
-			if(BuildSources(["generated/generated.cpp"], self.projectDirectory, idir, self.includes, self.sysIncludes, self.defines) != 0):
+			reflectionBuildStatus = BuildSources(["generated/generated.cpp"], self.projectDirectory, idir, self.includes, self.sysIncludes, self.defines)
+			if(reflectionBuildStatus != 0):
 				return 1
 
 		# link
 		ext = [".exe", ".lib"][self.buildType.value]
-		needsBuild = resourceBuildStatus != -1 or sourceBuildStatus != -1
+		needsBuild = resourceBuildStatus != -1 or sourceBuildStatus != -1 or reflectionBuildStatus != -1
 		linkStatus = LinkObjects(idir, self.links, self.projectDirectory, self.GetOutput(), self.buildType, needsBuild)
 		if(linkStatus > 0):
 			return 1

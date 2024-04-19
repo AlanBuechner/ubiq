@@ -3,6 +3,7 @@
 #include <filesystem>
 #include "Engine/Util/Utils.h"
 #include "Engine/Math/Math.h"
+#include "Reflection.h"
 
 #define ENABLE_ASSERTS
 

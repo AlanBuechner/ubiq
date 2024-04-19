@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "SceneSerializer.h"
-#include "Components.h"
 #include "Entity.h"
 
+#include "Components.h"
+#include "TransformComponent.h"
 #include "Engine/Renderer/Components/SceneRendererComponents.h"
 #include "Engine/Renderer/Components/StaticModelRendererComponent.h"
 
@@ -132,7 +133,7 @@ namespace Engine
 
 		if (entity.HasComponent<TransformComponent>())
 		{
-			out << YAML::Key << "TransformComponent";
+			out << YAML::Key << "Engine::TransformComponent";
 			out << YAML::BeginMap;
 
 			auto& transform = entity.GetTransform();
@@ -157,7 +158,7 @@ namespace Engine
 
 		if (entity.HasComponent<CameraComponent>())
 		{
-			out << YAML::Key << "CameraComponent";
+			out << YAML::Key << "Engine::CameraComponent";
 			out << YAML::BeginMap;
 
 			auto& cameraComponent = *entity.GetComponent<CameraComponent>();
@@ -181,7 +182,7 @@ namespace Engine
 
 		if (entity.HasComponent<DirectionalLightComponent>())
 		{
-			out << YAML::Key << "DirectionalLightComponent";
+			out << YAML::Key << "Engine::DirectionalLightComponent";
 			out << YAML::BeginMap;
 
 			auto& dirLightComponent = *entity.GetComponent<DirectionalLightComponent>();
@@ -196,7 +197,7 @@ namespace Engine
 
 		if (entity.HasComponent<StaticModelRendererComponent>())
 		{
-			out << YAML::Key << "StaticModelRendererComponent";
+			out << YAML::Key << "Engine::StaticModelRendererComponent";
 			out << YAML::BeginMap;
 
 			auto& meshRenderer = *entity.GetComponent<StaticModelRendererComponent>();
@@ -225,7 +226,7 @@ namespace Engine
 
 		if (entity.HasComponent<SkyboxComponent>())
 		{
-			out << YAML::Key << "SkyboxComponent";
+			out << YAML::Key << "Engine::SkyboxComponent";
 			out << YAML::BeginMap;
 
 			auto& skyboxComponent = *entity.GetComponent<SkyboxComponent>();
@@ -246,7 +247,7 @@ namespace Engine
 		out << YAML::Value << "Name";
 		out << YAML::Key << "Entities";
 		out << YAML::Value << YAML::BeginSeq;
-		m_Scene->m_Registry.Each([&](auto entityID)
+		m_Scene->m_Registry.EachEntity([&](auto entityID)
 			{
 				Entity entity = {entityID, m_Scene.get()};
 				if (!entity)
@@ -279,7 +280,7 @@ namespace Engine
 			return false;
 
 		std::string sceneName = data["Scene"].as<std::string>();
-
+		CORE_INFO("Deserializeing Scene {0}", sceneName);
 		auto entities = data["Entities"];
 		if (entities)
 		{
@@ -292,7 +293,7 @@ namespace Engine
 
 				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 
-				auto transformComponent = entity["TransformComponent"];
+				auto transformComponent = entity["Engine::TransformComponent"];
 				if (transformComponent)
 				{
 					auto& tc = *deserializedEntity.GetComponent<TransformComponent>();
@@ -305,7 +306,7 @@ namespace Engine
 					tc.SetScale(transformComponent["Scale"].as<Math::Vector3>());
 				}
 
-				auto cameraComponent = entity["CameraComponent"];
+				auto cameraComponent = entity["Engine::CameraComponent"];
 				if (cameraComponent)
 				{
 					auto& cc = *deserializedEntity.AddComponent<CameraComponent>();
@@ -324,7 +325,7 @@ namespace Engine
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
 				}
 
-				auto dirLightComponent = entity["DirectionalLightComponent"];
+				auto dirLightComponent = entity["Engine::DirectionalLightComponent"];
 				if (dirLightComponent)
 				{
 					auto& dlc = *deserializedEntity.AddComponent<DirectionalLightComponent>();
@@ -335,7 +336,7 @@ namespace Engine
 					dlc.SetSize(dirLightComponent["Size"].as<float>());
 				}
 
-				auto staticModelRendererComponent = entity["StaticModelRendererComponent"];
+				auto staticModelRendererComponent = entity["Engine::StaticModelRendererComponent"];
 				if (staticModelRendererComponent)
 				{
 					auto& mrc = *deserializedEntity.AddComponent<StaticModelRendererComponent>();
@@ -357,7 +358,7 @@ namespace Engine
 					mrc.Invalidate();
 				}
 
-				auto skyboxComponent = entity["SkyboxComponent"];
+				auto skyboxComponent = entity["Engine::SkyboxComponent"];
 				if (skyboxComponent)
 				{
 					auto& sbc = *deserializedEntity.AddComponent<SkyboxComponent>();
@@ -371,7 +372,7 @@ namespace Engine
 			{
 				Entity deserializedEntity = m_Scene->GetEntityWithUUID(entity["Entity"].as<uint64>());
 
-				auto transformComponent = entity["TransformComponent"];
+				auto transformComponent = entity["Engine::TransformComponent"];
 				if (transformComponent)
 				{
 					auto& tc = *deserializedEntity.GetComponent<TransformComponent>();
@@ -385,7 +386,7 @@ namespace Engine
 				}
 			}
 		}
-
+		CORE_INFO("Finished Deserializeing Scene {0}", sceneName);
 		return true;
 	}
 

@@ -10,7 +10,7 @@ namespace Engine
 	class ComponentItorator
 	{
 	public:
-		ComponentItorator(SizeComponentPool<sizeof(T)>* pool, uint32 index) :
+		ComponentItorator(ComponentPool* pool, uint32 index) :
 			m_Index(index), m_Pool(pool)
 		{}
 
@@ -42,12 +42,12 @@ namespace Engine
 
 		T& operator[](int index)
 		{
-			return	*(T*)m_Pool->GetComponentMemory(m_Pool->GetUsedSlots()[index]);
+			return	*(T*)m_Pool->GetComponentRaw(m_Pool->GetUsedSlots()[index]);
 		}
 
 		T* operator->()
 		{
-			return (T*)m_Pool->GetComponentMemory(m_Pool->GetUsedSlots()[m_Index]);
+			return (T*)m_Pool->GetComponentRaw(m_Pool->GetUsedSlots()[m_Index]);
 		}
 
 		T& operator*()
@@ -68,7 +68,7 @@ namespace Engine
 
 	private:
 		uint32 m_Index = 0;
-		SizeComponentPool<sizeof(T)>* m_Pool;
+		ComponentPool* m_Pool;
 	};
 
 	template<class T>
@@ -77,7 +77,7 @@ namespace Engine
 	public:
 		using iterator = ComponentItorator<T>;
 
-		ComponentView(SizeComponentPool<sizeof(T)>* pool) :
+		ComponentView(ComponentPool* pool) :
 			m_Pool(pool)
 		{}
 
@@ -92,7 +92,7 @@ namespace Engine
 		}
 
 	private:
-		SizeComponentPool<sizeof(T)>* m_Pool;
+		ComponentPool* m_Pool;
 		
 	};
 }

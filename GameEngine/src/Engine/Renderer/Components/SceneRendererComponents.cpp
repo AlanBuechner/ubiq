@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SceneRendererComponents.h"
+#include "Engine/Util/Performance.h"
 
 namespace Engine
 {
@@ -70,6 +71,7 @@ namespace Engine
 
 	void DirectionalLightComponent::UpdateShadowMaps()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		m_Light->UpdateShadowMaps();
 	}
 

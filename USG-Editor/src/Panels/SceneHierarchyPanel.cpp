@@ -6,6 +6,7 @@
 
 #include "Engine/Renderer/Model.h"
 
+#include "Engine/Core/Scene/TransformComponent.h"
 #include "Engine/Renderer/Components/SceneRendererComponents.h"
 #include "Engine/Renderer/Components/StaticModelRendererComponent.h"
 
@@ -36,7 +37,7 @@ namespace Engine
 		ImGui::Begin("Hierarchy");
 
 		std::vector<Entity> rootEntitys;
-		m_Context->m_Registry.Each([&](auto entityID) {
+		m_Context->m_Registry.EachEntity([&](auto entityID) {
 			Entity entity{ entityID, m_Context.get() };
 			if (entity.GetTransform().GetParent() == Entity::null)
 				rootEntitys.push_back(entity);

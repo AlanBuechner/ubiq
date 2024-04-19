@@ -61,10 +61,87 @@ namespace Engine
 		m_FreeEntitys.push_back(entity);
 	}
 
-	void SceneRegistry::Each(Func func)
+	void* SceneRegistry::AddComponent(EntityType entity, const Reflect::Class& componentClass)
+	{
+		// find the component pool
+		ComponentPool* pool = GetOrCreateCompnentPool(componentClass);
+
+		// allocate memory for component
+		uint32 componentIndex = pool->Allocate(entity);
+		if (componentIndex == UINT32_MAX)
+			return nullptr;
+
+		void* componentLocation = pool->GetComponentRaw(componentIndex);
+		CORE_ASSERT(componentLocation != nullptr, "faild to allocate memory for component"); // validate component was successfully created 
+
+		void* comp = componentClass.CreateInstance(componentLocation); // create component in pre allocated memory
+		m_Entitys[entity].m_Components.push_back({ pool, componentIndex }); // add component to entity's list of components
+		return comp; // return component
+	}
+
+	void SceneRegistry::RemoveComponent(EntityType entity, const Reflect::Class& componentClass)
+	{
+		ComponentType componentID = componentClass.GetTypeID();
+
+		ComponentPool* pool = m_Pools[componentID];
+		if (pool == nullptr) return;
+
+		pool->Free(entity);
+
+		m_Entitys[entity].RemoveComponentReferance(pool);
+	}
+
+	void* SceneRegistry::GetSceneStatic(const Reflect::Class& componentClass)
+	{
+		ComponentType componentID = componentClass.GetTypeID();
+
+		ComponentPool* pool = m_Pools[componentID];
+		if (pool == nullptr) return nullptr;
+
+		return pool->GetComponentRaw(0);
+	}
+
+	void* SceneRegistry::GetComponent(EntityType entity, const Reflect::Class& componentClass)
+	{
+		if (HasComponent(entity, componentClass))
+			return GetOrCreateCompnentPool(componentClass)->GetComponentForEntityRaw(entity);
+		return nullptr;
+	}
+
+	bool SceneRegistry::HasComponent(EntityType entity, const Reflect::Class& componentClass)
+	{
+		if (m_Entitys.size() <= entity)
+			return false;
+
+		ComponentType componentID = componentClass.GetTypeID();
+		EntityData& data = m_Entitys[entity];
+		for (auto& compRef : data.m_Components)
+		{
+			if (compRef.m_Pool->GetTypeID() == componentID)
+				return true;
+		}
+		return false;
+	}
+
+	ComponentPool* SceneRegistry::GetOrCreateCompnentPool(const Reflect::Class& componentClass)
+	{
+		ComponentType componentID = componentClass.GetTypeID();
+		ComponentPool* pool = m_Pools[componentID];
+		if (pool == nullptr)
+			pool = m_Pools[componentID] = new ComponentPool(componentClass);
+		return pool;
+	}
+
+	void SceneRegistry::EachEntity(EachEntityFunc func)
 	{
 		for (EntityType entity : m_UsedEntitys)
 			func(entity);
+	}
+
+	void SceneRegistry::EachPool(EachComponentFunc func)
+	{
+		for (std::pair<ComponentType, ComponentPool*> pool : m_Pools)
+			func(pool.second);
 	}
 
 }

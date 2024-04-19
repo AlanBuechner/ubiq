@@ -14,124 +14,45 @@ namespace Engine
 	class ComponentPool
 	{
 	public:
-		using Func = std::function<void (void*)>;
-		using DestructorFunc = std::function<void (void*)>;
+		using EachEntityFunc = std::function<void (void*)>;
 
-		ComponentPool(ComponentType typeID, uint64 componentSize, DestructorFunc dFunc, bool sceneStatic) :
-			m_TypeID(typeID), m_ComponentSize(componentSize), m_DestructorFunc(dFunc), m_SceneStatic(sceneStatic)
+		ComponentPool(const Reflect::Class& reflectedClass) :
+			m_ReflectionClass(reflectedClass), 
+			m_TypeID(reflectedClass.GetTypeID()),
+			m_ComponentSize(reflectedClass.GetSize()),
+			m_SceneStatic(reflectedClass.HasFlag("SceneStatic")),
+			m_NumComponents(1),
+			m_Data((byte*)malloc(reflectedClass.GetSize())),
+			m_FreeSlots({ 0 })
 		{}
-		virtual ~ComponentPool() {};
+		~ComponentPool();
 
 		ComponentType GetTypeID() { return m_TypeID; }
 		uint64 GetComponentSize() { return m_ComponentSize; }
-		virtual std::vector<uint32>& GetUsedSlots() = 0;
+		std::vector<uint32>& GetUsedSlots() { return m_UsedSlots; }
 
-		virtual void Each(Func func) = 0;
+		void EachEntity(EachEntityFunc func);
 
 		// returns the location in the pool
-		virtual uint32 Allocate(uint64 entity) = 0;
-		virtual void Free(uint64 entity) = 0;
-		virtual void* GetComponentMemory(uint32 index) = 0;
-		virtual void* GetEntityComponentMemory(uint64 entity) = 0;
+		uint32 Allocate(uint64 entity);
+		void Free(uint64 entity);
+		uint32 GetComponentOffset(uint32 i) { return  m_ComponentSize * i; }
+		void* GetComponentRaw(uint32 i) { return (void*)(m_Data + GetComponentOffset(i)); }
+		template<typename T> T* GetComponent(uint32 i) { return (T*)GetComponentRaw(i); }
+		void* GetComponentForEntityRaw(uint32 entityID) { return GetComponentRaw(m_EntityComponentMapping[entityID]); }
+		template<typename T> T* GetComponentForEntity(uint32 entityID) { return GetComponent<T>(m_EntityComponentMapping[entityID]); }
 
 	protected:
+		const Reflect::Class& m_ReflectionClass;
 		const ComponentType m_TypeID;
 		const uint64 m_ComponentSize;
-		const DestructorFunc m_DestructorFunc;
 		const bool m_SceneStatic;
-	};
 
-	template<uint64 TSize>
-	class SizeComponentPool : public ComponentPool
-	{
-	public:
-		struct ComponentData
-		{byte data[TSize];};
-	public:
-		SizeComponentPool(ComponentType typeID, DestructorFunc dfunc, bool sceneStatic) :
-			ComponentPool(typeID, TSize, dfunc, sceneStatic)
-		{}
-
-		~SizeComponentPool()
-		{
-			for (auto& comp : m_UsedSlots)
-			{
-				m_DestructorFunc(GetComponentMemory(comp));
-			}
-		}
-
-		virtual std::vector<uint32>& GetUsedSlots() override
-		{
-			return m_UsedSlots;
-		}
-
-		virtual void Each(Func func) override
-		{
-			for (auto& comp : m_UsedSlots)
-			{
-				func(&m_Components[comp]);
-			}
-		}
-
-		virtual uint32 Allocate(uint64 entity) override
-		{
-			// allocate more room for the entity's list
-			if (m_SceneStatic && m_Entitys.size() >= 1)
-				return UINT32_MAX;
-
-			if (m_Entitys.size() <= entity)
-				m_Entitys.resize(entity+1);
-
-			if (m_FreeSlots.empty())
-			{
-				m_Components.push_back({});
-				m_UsedSlots.push_back((uint32)m_Components.size() - 1);
-				m_Entitys[entity] = (uint32)m_Components.size() - 1;
-				return (uint32)m_Components.size() - 1;
-			}
-
-			uint32 componentIndex = m_FreeSlots.back();
-			m_FreeSlots.pop_back();
-			m_UsedSlots.push_back(componentIndex);
-
-			m_Entitys[componentIndex] = componentIndex;
-			return componentIndex;
-		}
-
-		virtual void Free(uint64 entity) override
-		{
-			uint32 componentIndex = m_Entitys[entity];
-			m_FreeSlots.push_back(componentIndex);
-
-			m_DestructorFunc(GetComponentMemory(componentIndex));
-
-			// remove entity from used list
-			for (uint32 i = 0; i < m_UsedSlots.size(); i++)
-			{
-				if (m_UsedSlots[i] == componentIndex)
-				{
-					m_UsedSlots[i] = m_UsedSlots.back();
-					m_UsedSlots.pop_back();
-				}
-			}
-		}
-
-
-
-		virtual void* GetComponentMemory(uint32 index) override
-		{
-			return &m_Components[index];
-		}
-
-		virtual void* GetEntityComponentMemory(uint64 entity) override
-		{
-			return GetComponentMemory(m_Entitys[entity]);
-		}
-
-	private:
-		std::vector<uint32> m_Entitys; // index is the entity value is the component location
+		std::vector<uint32> m_EntityComponentMapping; // index is the entity value is the component location
 		std::vector<uint32> m_FreeSlots;
 		std::vector<uint32> m_UsedSlots;
-		std::vector<ComponentData> m_Components;
+
+		uint32 m_NumComponents;
+		byte* m_Data;
 	};
 }

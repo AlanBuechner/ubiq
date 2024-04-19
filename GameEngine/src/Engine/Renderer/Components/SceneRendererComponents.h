@@ -6,11 +6,16 @@
 #include "Engine/Renderer/SceneRenderer.h"
 #include "Engine/Renderer/Light.h"
 #include "Engine/Core/Scene/Components.h"
+#include "Engine/Core/Scene/SceneCamera.h"
 
 namespace Engine
 {
-	struct CameraComponent : public Component
+	CLASS(GROUP = Component) CameraComponent : public Component
 	{
+	public:
+		REFLECTED_BODY(Engine::CameraComponent);
+
+	public:
 		CameraComponent() {
 			Camera = CreateRef<SceneCamera>();
 		}
@@ -22,8 +27,11 @@ namespace Engine
 		virtual void OnTransformChange(const Math::Mat4& transform) override;
 	};
 
-	class DirectionalLightComponent : public Component, SceneStatic
+	CLASS(GROUP = Component, SceneStatic) DirectionalLightComponent : public Component
 	{
+	public:
+		REFLECTED_BODY(Engine::DirectionalLightComponent);
+
 	public:
 
 		virtual void OnComponentAdded() override;
@@ -46,8 +54,11 @@ namespace Engine
 		bool m_Dirty = true;
 	};
 
-	class SkyboxComponent : public Component, SceneStatic
+	CLASS(GROUP = Component, SceneStatic) SkyboxComponent : public Component
 	{
+	public:
+		REFLECTED_BODY(Engine::SkyboxComponent);
+
 	public:
 		virtual void OnComponentAdded() override;
 		virtual void OnComponentRemoved() override;

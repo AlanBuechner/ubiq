@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "StaticModelRendererComponent.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Core/Scene/TransformComponent.h"
 
 
 namespace Engine

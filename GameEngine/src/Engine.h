@@ -49,6 +49,7 @@
 #include "Engine/Core/Scene/Scene.h"
 #include "Engine/Core/Scene/Entity.h"
 #include "Engine/Core/Scene/Components.h"
+#include "Engine/Core/Scene/TransformComponent.h"
 // ----------------------------------------
 
 // Mesh -----------------------------------

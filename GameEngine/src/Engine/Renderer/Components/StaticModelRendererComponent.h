@@ -9,8 +9,11 @@
 
 namespace Engine
 {
-	class StaticModelRendererComponent : public Component
+	CLASS(GROUP = Component) StaticModelRendererComponent : public Component
 	{
+	public:
+		REFLECTED_BODY(Engine::StaticModelRendererComponent);
+
 	public:
 
 		struct MeshEntry
@@ -38,7 +41,7 @@ namespace Engine
 		void Invalidate();
 
 	private:
-		Ref<Model> m_Model;
+		PROPERTY() Ref<Model> m_Model;
 		std::vector<MeshEntry> m_CollapsedModelTree;
 		Ref<SceneRenderer> m_SceneRenderer;
 	};

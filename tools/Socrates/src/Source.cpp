@@ -13,30 +13,30 @@
 
 namespace fs = std::filesystem;
 
-int main(int argc, char **argv) {
-  // validate all reflection files are present
-  Validate();
-  
-  // get arguments
-  std::string projectDir = argv[1];
+int main(int argc, char** argv) {
+	// validate all reflection files are present
+	Validate();
 
-  // remove trailing "\" from path
-  if (projectDir[projectDir.size() - 1] == '\\')
-    projectDir = projectDir.substr(0, projectDir.size() - 1);
+	// get arguments
+	std::string projectDir = argv[1];
 
-  // get the name of the project from the folder name
-  std::string projectName = std::filesystem::path(projectDir).filename().string();
-  std::replace(projectName.begin(), projectName.end(), '-', '_');
-  std::replace(projectName.begin(), projectName.end(), ' ', '_');
+	// remove trailing "\" from path
+	if (projectDir[projectDir.size() - 1] == '\\')
+		projectDir = projectDir.substr(0, projectDir.size() - 1);
 
-  // get reflection data from .reflected files
-  std::cout << "building reflection data" << std::endl;
-  ReflectionData data = GetReflectionDataFromFolder("generated");
+	// get the name of the project from the folder name
+	std::string projectName = std::filesystem::path(projectDir).filename().string();
+	std::replace(projectName.begin(), projectName.end(), '-', '_');
+	std::replace(projectName.begin(), projectName.end(), ' ', '_');
 
-  // write reflection code
-  fs::path gen = "generated/generated.cpp";
-  std::cout << "generating source" << std::endl;
-  WriteCode(gen, projectName, data);
+	// get reflection data from .reflected files
+	std::cout << "building reflection data" << std::endl;
+	ReflectionData data = GetReflectionDataFromFolder("generated");
 
-  return 0;
+	// write reflection code
+	fs::path gen = "generated/generated.cpp";
+	std::cout << "generating source" << std::endl;
+	WriteCode(gen, projectName, data);
+
+	return 0;
 }

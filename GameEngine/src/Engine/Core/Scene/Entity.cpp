@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Entity.h"
 #include "Components.h"
+#include "TransformComponent.h"
 
 Engine::Entity Engine::Entity::null = Engine::Entity();
 
@@ -56,7 +57,7 @@ namespace Engine
 		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
 		std::vector<Component*> components(data.m_Components.size());
 		for (uint32 i = 0; i < components.size(); i++)
-			components[i] = (Component*)(data.m_Components[i].m_Pool->GetComponentMemory(data.m_Components[i].m_ComponentLoc));
+			components[i] = (Component*)(data.m_Components[i].m_Pool->GetComponentRaw(data.m_Components[i].m_ComponentLoc));
 
 		return components;
 	}

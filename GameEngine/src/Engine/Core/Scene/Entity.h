@@ -31,11 +31,11 @@ namespace Engine
 			return m_Scene->m_Registry.GetComponent<T>(m_EntityID);
 		}
 
-		template<typename T, typename... Args>
-		T* AddComponent(Args&&... args)
+		template<typename T>
+		T* AddComponent()
 		{
 			CORE_ASSERT(!HasComponent<T>(), "Entity alredy has component");
-			T* component = m_Scene->m_Registry.AddComponent<T>(m_EntityID, std::forward<Args>(args)...);
+			T* component = m_Scene->m_Registry.AddComponent<T>(m_EntityID);
 			if (component != nullptr)
 			{
 				component->Owner = *this;

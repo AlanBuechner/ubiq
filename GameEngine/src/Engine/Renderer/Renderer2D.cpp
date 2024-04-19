@@ -13,6 +13,7 @@
 #include "Engine/Util/Performance.h"
 
 #include "EngineResource.h"
+#include "Engine/Renderer/Mesh.h"
 
 namespace Engine
 {
