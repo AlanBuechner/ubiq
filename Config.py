@@ -49,23 +49,41 @@ openMP = True
 
 compiler = f"{location}/vendor/Compiler/bin/clang-cl.exe"
 
-includeDirs = {
-	# general includes
-	"vendor"			: f"{location}/vendor",
-	"yaml"				: f"{location}/vendor/yaml-cpp/include",
+vendorDirs = {
+	# general
+	"yaml"				: f"{location}/vendor/yaml-cpp",
 	"glm"				: f"{location}/vendor/glm",
 	"ImGui"				: f"{location}/vendor/imgui",
 	"stb_image"			: f"{location}/vendor/stb_image",
 	"ProjectManager"	: f"{location}/vendor/ProjectManager",
 	"Reflection"		: f"{location}/vendor/Reflection",
 
-	# engine includes
+	# engine
 	"ImGuizmo"			: f"{location}/GameEngine/vendor/ImGuizmo",
-	"Assimp"			: f"{location}/GameEngine/vendor/Assimp/include",
-	"json"				: f"{location}/GameEngine/vendor/json/single_include",
-	"dxc"				: f"{location}/GameEngine/vendor/dxc/inc",
-	"pix"				: f"{location}/GameEngine/vendor/pix/include",
-	"Aftermath"			: f"{location}/GameEngine/vendor/Aftermath/include",
+	"Assimp"			: f"{location}/GameEngine/vendor/Assimp",
+	"json"				: f"{location}/GameEngine/vendor/json",
+	"dxc"				: f"{location}/GameEngine/vendor/dxc",
+	"pix"				: f"{location}/GameEngine/vendor/pix",
+	"Aftermath"			: f"{location}/GameEngine/vendor/Aftermath",
+}
+
+includeDirs = {
+	# general includes
+	"vendor"			: f"{location}/vendor",
+	"yaml"				: f"{vendorDirs['yaml']}/include",
+	"glm"				: f"{vendorDirs['glm']}",
+	"ImGui"				: f"{vendorDirs['ImGui']}",
+	"stb_image"			: f"{vendorDirs['stb_image']}",
+	"ProjectManager"	: f"{vendorDirs['ProjectManager']}",
+	"Reflection"		: f"{vendorDirs['Reflection']}",
+
+	# engine includes
+	"ImGuizmo"			: f"{vendorDirs['ImGuizmo']}",
+	"Assimp"			: f"{vendorDirs['Assimp']}/include",
+	"json"				: f"{vendorDirs['json']}/single_include",
+	"dxc"				: f"{vendorDirs['dxc']}/inc",
+	"pix"				: f"{vendorDirs['pix']}/include",
+	"Aftermath"			: f"{vendorDirs['Aftermath']}/include",
 }
 
 sysIncludeDirs = {

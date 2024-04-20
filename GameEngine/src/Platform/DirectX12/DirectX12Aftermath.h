@@ -1,5 +1,5 @@
 #pragma once
-# include "GFSDK_Aftermath.h"
+#include "GFSDK_Aftermath.h"
 
 namespace Engine
 {

@@ -18,6 +18,10 @@ sources = [
 	f"{includeDirs['ImGuizmo']}/ImGuizmo.cpp"
 ]
 
+resources = [
+	f"embeded/**.rc",
+]
+
 headers = [
 	f"src/**.h",
 	f"{includeDirs['stb_image']}/**.h",
@@ -73,7 +77,7 @@ def GetProject():
 	proj.pchSource = pchSource
 	proj.pchHeader = pchHeader
 	proj.sources = sources
-	proj.resources = []
+	proj.resources = resources
 	proj.headers = headers
 	proj.includes = includes
 	proj.sysIncludes = sysIncludes

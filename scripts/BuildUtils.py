@@ -4,6 +4,7 @@ import multiprocessing
 import concurrent.futures
 from enum import Enum
 import math
+import shutil
 import Config
 
 from scripts.Utils.Utils import *
@@ -295,7 +296,15 @@ class BuildType(Enum):
 	EXECUTABLE = 0
 	STATICLIBRARY = 1
 
-def LinkObjects(intDir, links, projDir, outputFile, buildType, needsBuild):
+def CollectIntFolders(dependancys):
+	intDirs = []
+	for d in dependancys:
+		proj = GetProject(d)["module"].GetProject()
+		intDirs.append(proj.intDir)
+		intDirs.extend(CollectIntFolders(proj.dependancys))
+	return intDirs
+
+def LinkObjects(intDir, dependancys, links, projDir, outputFile, buildType, needsBuild):
 	if(not needsBuild):
 		if(not os.path.isfile(outputFile)):
 			needsBuild = True
@@ -336,6 +345,9 @@ def LinkObjects(intDir, links, projDir, outputFile, buildType, needsBuild):
 		args.extend(["-o", outputFile])
 		args.extend(ResolveFiles([f"{intDir}/**.obj"], intDir))
 		args.extend(ResolveFiles([f"{intDir}/**.res"], intDir))
+		intDirs = CollectIntFolders(dependancys)
+		for intd in intDirs:
+			args.extend(ResolveFiles([f"{intd}/**.res"], intd))
 		args.extend(links)
 		result = subprocess.run(args, cwd=projDir, capture_output=True, text=True)
 		log = f"|------------- linking project : {projName} -------------|\n"
@@ -364,6 +376,7 @@ class ProjectEnviernment:
 		self.sysIncludes = []
 		self.defines = []
 		self.links = []
+		self.dlls = []
 		self.dependancys = []
 		self.buildType = BuildType.EXECUTABLE
 		self.intDir = ""
@@ -420,8 +433,13 @@ class ProjectEnviernment:
 		# link
 		ext = [".exe", ".lib"][self.buildType.value]
 		needsBuild = resourceBuildStatus != -1 or sourceBuildStatus != -1 or reflectionBuildStatus != -1
-		linkStatus = LinkObjects(idir, self.links, self.projectDirectory, self.GetOutput(), self.buildType, needsBuild)
+		linkStatus = LinkObjects(idir, self.dependancys, self.links, self.projectDirectory, self.GetOutput(), self.buildType, needsBuild)
 		if(linkStatus > 0):
 			return 1
+
+		# copy dlls
+		for dll in self.dlls:
+			dllName = os.path.basename(dll)
+			shutil.copy(dll, self.binDir + "/" + dllName)
 
 		return 0
