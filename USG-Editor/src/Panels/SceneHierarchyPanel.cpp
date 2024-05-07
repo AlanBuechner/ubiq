@@ -213,50 +213,6 @@ if(!m_Selected.HasComponent<component>()){\
 		}
 	}
 
-	template<typename T>
-	static void DrawComponent(Entity& ent, const char* name, const std::function<void()> func, bool canRemove = true)
-	{
-		if (ent.HasComponent<T>())
-		{
-			ImVec2 contentRegion = ImGui::GetContentRegionAvail();
-
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
-			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth, name);
-			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-			ImVec2 buttonSize = { lineHeight, lineHeight };
-			ImGui::PopStyleVar();
-
-			ImGui::SameLine(contentRegion.x - lineHeight * 0.5f);
-			
-			if (ImGui::Button("+", buttonSize))
-			{
-				ImGui::OpenPopup("ComponentSettings");
-			}
-
-			bool removeComponent = false;
-			if (ImGui::BeginPopup("ComponentSettings"))
-			{
-				if (canRemove && ImGui::MenuItem("Remove Component"))
-				{
-					removeComponent = true;
-					ImGui::CloseCurrentPopup();
-				}
-
-				ImGui::EndPopup();
-			}
-
-			if (open)
-			{
-				func();
-				ImGui::TreePop();
-				ImGui::Spacing();
-			}
-
-			if (removeComponent)
-				ent.RemoveComponent<T>();
-		}
-	}
-
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
 
@@ -268,8 +224,52 @@ if(!m_Selected.HasComponent<component>()){\
 		if (ImGui::InputText("Name", buffer, sizeof(buffer)))
 			name = std::string(buffer);
 		
+		std::vector<Component*> components = entity.GetComponents();
+		for (Component* comp : components)
+		{
+			ImVec2 contentRegion = ImGui::GetContentRegionAvail();
+			const Reflect::Class& componentClass = comp->GetClass();
 
-		DrawComponent<TransformComponent>(entity, "Transform", [&]() {
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
+			bool open = ImGui::TreeNodeEx(
+				(void*)componentClass.GetTypeID(),
+				ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth,
+				componentClass.GetName().c_str()
+			);
+			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+			ImVec2 buttonSize = { lineHeight, lineHeight };
+			ImGui::PopStyleVar();
+
+			ImGui::SameLine(contentRegion.x - lineHeight * 0.5f);
+
+			if (ImGui::Button("+", buttonSize))
+				ImGui::OpenPopup("ComponentSettings");
+
+			bool removeComponent = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				if (!componentClass.HasFlag("DontRemove") && ImGui::MenuItem("Remove Component"))
+				{
+					removeComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+
+			if (open)
+			{
+				PropertysPanel::DrawPropertyControl(comp, componentClass.GetTypeID(), nullptr);
+
+				ImGui::TreePop();
+				ImGui::Spacing();
+			}
+
+			if (removeComponent)
+				entity.RemoveComponent(comp);
+		}
+
+		/*DrawComponent<TransformComponent>(entity, "Transform", [&]() {
 			auto& tc = *entity.GetComponent<TransformComponent>();
 			Math::Vector3 posiiton = tc.GetPosition();
 			if (PropertysPanel::DrawVec3Control("m_Position", posiiton, 0.0f))
@@ -394,8 +394,27 @@ if(!m_Selected.HasComponent<component>()){\
 			Ref<Texture2D> texture = component.GetSkyboxTexture();
 			if (PropertysPanel::DrawTextureControl("Texture", texture))
 				component.SetSkyboxTexture(texture);
-		});
-
+		});*/
 	}
+
+	Engine::PropertysPanel::AddExposePropertyFunc TransformDraw(
+		typeid(TransformComponent).hash_code(),
+		[](void* voidData, uint64 typeID, const Reflect::Property* prop) {
+			bool changed = false;
+			TransformComponent& tc = *(TransformComponent*)voidData;
+			Math::Vector3 posiiton = tc.GetPosition();
+			if (changed |= PropertysPanel::DrawVec3Control("m_Position", posiiton, 0.0f))
+				tc.SetPosition(posiiton);
+
+			Math::Vector3 rotation = glm::degrees(tc.GetRotation());
+			if (changed |= PropertysPanel::DrawVec3Control("Rotation", rotation, 0.0f))
+				tc.SetRotation(glm::radians(rotation));
+
+			Math::Vector3 scale = tc.GetScale();
+			if (changed |= PropertysPanel::DrawVec3Control("Scale", scale, 1.0f))
+				tc.SetScale(scale);
+			return changed;
+		}
+	);
 
 }

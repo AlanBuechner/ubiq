@@ -25,6 +25,7 @@ namespace Engine
 
 	class SceneRenderer
 	{
+	private:
 		struct RenderObject;
 
 	public:

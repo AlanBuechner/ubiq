@@ -15,6 +15,14 @@ struct Attribute {
 	std::string value;
 };
 
+class Property
+{
+public:
+	Property(const std::string& name, const std::string& type);
+	std::string m_Name;
+	std::string m_Type;
+};
+
 class Class {
 public:
 	Class() = default;
@@ -23,6 +31,7 @@ public:
 	std::string m_Group;
 	std::string m_SemanticName;
 	std::vector<Attribute> m_Attributes;
+	std::vector<Property> m_Props;
 
 private:
 	std::vector<Attribute> ParseAttributeString(const std::string& attribString);

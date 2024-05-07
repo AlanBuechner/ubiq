@@ -13,6 +13,15 @@ namespace Engine
 	{
 	}
 
+	void Entity::RemoveComponent(Component* comp)
+	{
+		if (comp != nullptr)
+		{
+			comp->OnComponentRemoved();
+			m_Scene->m_Registry.RemoveComponent(m_EntityID, comp->GetClass());
+		}
+	}
+
 	UUID Entity::GetUUID() { return m_Scene->m_Registry.GetEntityData(m_EntityID).ID; }
 
 	std::string& Entity::GetName()

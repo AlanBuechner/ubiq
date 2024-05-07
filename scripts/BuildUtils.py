@@ -87,7 +87,7 @@ class ObjectEnviernment:
 			args.extend([f"-std={Config.cppVersion}"])
 			args.extend([
 				"-mincremental-linker-compatible",
-				"--mrelax-relocations",
+				#"--mrelax-relocations",
 				"-disable-free",
 				"-clear-ast-before-backend",
 				"-disable-llvm-verifier",
@@ -337,17 +337,19 @@ def LinkObjects(intDir, dependancys, links, projDir, outputFile, buildType, need
 		args.extend([Config.compiler])
 		args.extend(["--driver-mode=cl"])
 		args.extend(["-target", GetTarget()])
-		args.extend(["-Zi"])
+
 		if(buildType == BuildType.STATICLIBRARY):
 			args.extend(["-fuse-ld=llvm-lib"])
 		elif(buildType == BuildType.EXECUTABLE):
+			args.extend(["-Zi"])
 			args.extend(["-Wl,--subsystem,console"])
+			args.extend(ResolveFiles([f"{intDir}/**.res"], intDir))
+			intDirs = CollectIntFolders(dependancys)
+			for intd in intDirs:
+				args.extend(ResolveFiles([f"{intd}/**.res"], intd))
+
 		args.extend(["-o", outputFile])
 		args.extend(ResolveFiles([f"{intDir}/**.obj"], intDir))
-		args.extend(ResolveFiles([f"{intDir}/**.res"], intDir))
-		intDirs = CollectIntFolders(dependancys)
-		for intd in intDirs:
-			args.extend(ResolveFiles([f"{intd}/**.res"], intd))
 		args.extend(links)
 		result = subprocess.run(args, cwd=projDir, capture_output=True, text=True)
 		log = f"|------------- linking project : {projName} -------------|\n"

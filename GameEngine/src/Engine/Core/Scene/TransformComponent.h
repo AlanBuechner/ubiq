@@ -20,7 +20,9 @@
 
 namespace Engine
 {
-	CLASS(GROUP = Component) TransformComponent : public Component
+	typedef TransformComponent TCOMP;
+
+	CLASS(GROUP = Component, DontRemove) TransformComponent : public Component
 	{
 	public:
 		REFLECTED_BODY(Engine::TransformComponent);

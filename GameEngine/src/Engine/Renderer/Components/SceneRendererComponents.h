@@ -21,8 +21,8 @@ namespace Engine
 		}
 
 		Ref<SceneCamera> Camera;
-		bool Primary = true;
-		bool FixedAspectRatio = false;
+		PROPERTY() bool Primary = true;
+		PROPERTY() bool FixedAspectRatio = false;
 
 		virtual void OnTransformChange(const Math::Mat4& transform) override;
 	};
@@ -67,6 +67,6 @@ namespace Engine
 		void SetSkyboxTexture(Ref<Texture2D> texture);
 
 	private:
-		Ref<Texture2D> m_SkyboxTexture;
+		PROPERTY() Ref<Texture2D> m_SkyboxTexture;
 	};
 }

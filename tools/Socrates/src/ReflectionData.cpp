@@ -3,6 +3,10 @@
 #include <fstream>
 #include <iostream>
 
+Property::Property(const std::string& name, const std::string& type) :
+	m_Name(name), m_Type(type)
+{}
+
 // class
 Class::Class(const std::string& name, const std::string& attrib)
 	: m_SemanticName(name) {
@@ -75,6 +79,7 @@ ReflectionData GetReflectionDataFromFolder(const fs::path& path) {
 		if (path.extension() != ".reflected")
 			continue;
 
+		std::string currentClassName = "";
 		std::ifstream ifs(path);
 
 		std::string line = "";
@@ -89,6 +94,15 @@ ReflectionData GetReflectionDataFromFolder(const fs::path& path) {
 				std::string name = tokens[2];
 				std::string attrib = tokens[4];
 				data.m_Classes[name] = Class(name, attrib);
+				currentClassName = name;
+			}
+			else if (tokens[0] == "	prop")
+			{
+				std::string type = "";
+				uint32_t i;
+				for (i = 2; tokens[i] != ";"; i++)
+					type += tokens[i];
+				data.m_Classes[currentClassName].m_Props.push_back(Property(tokens[i+1], type));
 			}
 			else
 			{

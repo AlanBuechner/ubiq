@@ -33,19 +33,6 @@ namespace Engine {
 		auto timer = CREATE_PROFILEI();
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!");
 		s_Instance = this;
-
-		/*CORE_INFO("{0}", TransformComponent::GetStaticTypeID());
-		const Reflect::Class& c = Reflect::Registry::GetRegistry()->GetClass("Engine::TransformComponent");
-		CORE_INFO("{0}", c.GetTypeID());
-		TransformComponent* tc = (TransformComponent*)c.CreateInstance();
-		CORE_INFO("{0}", tc->GetTypeID());
-		delete tc;*/
-
-		/*const std::vector<const Reflect::Class*>& componentGroup = Reflect::Registry::GetRegistry()->GetGroup("Component");
-		for (const Reflect::Class* rc : componentGroup)
-		{
-			CORE_INFO("{0}", rc->GetSname());
-		}*/
 			
 		Renderer::Init();
 

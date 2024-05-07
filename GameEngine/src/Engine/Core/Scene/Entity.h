@@ -49,12 +49,10 @@ namespace Engine
 		void RemoveComponent()
 		{
 			T* comp = GetComponent<T>();
-			if (comp != nullptr)
-			{
-				comp->OnComponentRemoved();
-				m_Scene->m_Registry.RemoveComponent<T>(m_EntityID);
-			}
+			RemoveComponent(comp);
 		}
+
+		void RemoveComponent(Component* comp);
 
 		operator bool() const { return m_EntityID != NullEntity && m_Scene != nullptr; }
 		operator EntityType() const { return m_EntityID; }

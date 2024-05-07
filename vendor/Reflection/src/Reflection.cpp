@@ -6,9 +6,15 @@ namespace Reflect {
 
 	void Registry::AddClass(const Class& c)
 	{
-		const Class& registerdClass = (m_Classes[c.GetSname()] = c);
+		// check that the class was not already registered
+		if (m_ClassesByName.find(c.GetSname()) != m_ClassesByName.end())
+			return;
+		m_Classes.push_back(c);
+		const Class* registerdClass = &m_Classes.back();
+		m_ClassesByName[c.GetSname()] = registerdClass;
+		m_ClassesByTypeID[c.GetTypeID()] = registerdClass;
 		if(!c.GetGroup().empty())
-			m_ClassGroups[c.GetGroup()].push_back(&registerdClass);
+			m_ClassGroups[c.GetGroup()].push_back(registerdClass);
 	}
 
 	Registry* Registry::GetRegistry() {

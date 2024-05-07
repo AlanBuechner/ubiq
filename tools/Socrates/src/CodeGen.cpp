@@ -8,9 +8,11 @@ void WriteCode(const fs::path& path, const std::string& projectName, const Refle
 	std::ofstream ofs(path);
 
 	// generate reflection code
+	ofs << "#define _XKEYCHECK_H" << std::endl;
 	ofs << "#include <pch.h>" << std::endl;
 
 	ofs << "#include \"Reflection.h\"" << std::endl;
+	ofs << "#define private public" << std::endl;
 	for (auto& h : data.m_Headers)
 		ofs << "#include \"" << h << "\"" << std::endl;
 
@@ -21,6 +23,7 @@ void WriteCode(const fs::path& path, const std::string& projectName, const Refle
 		const std::string& group = c.second.m_Group;
 		const std::vector<Attribute> attribs = c.second.m_Attributes;
 		std::vector<std::string> flags;
+		const std::vector<Property>& props = c.second.m_Props;
 		for (const Attribute& attrib : attribs)
 		{
 			if (attrib.type == Attribute::Type::Flag)
@@ -35,6 +38,18 @@ void WriteCode(const fs::path& path, const std::string& projectName, const Refle
 			const std::string& flag = flags[i];
 			ofs << "\"" << flag << "\"";
 			if (i != flags.size() - 1)
+				ofs << ",";
+		}
+		ofs << "}, {";
+		for (uint32_t i = 0; i < props.size(); i++)
+		{
+			const Property& prop = props[i];
+			ofs << "Reflect::Property(\"" << prop.m_Name << "\"," <<
+				"typeid(" << prop.m_Type << ").hash_code()," <<
+				"sizeof(" << prop.m_Type << ")," <<
+				"offsetof(" << sname << "," << prop.m_Name << ")" <<
+				")";
+			if (i != props.size() - 1)
 				ofs << ",";
 		}
 
