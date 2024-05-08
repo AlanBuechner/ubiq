@@ -280,7 +280,6 @@ namespace Engine
 			return false;
 
 		std::string sceneName = data["Scene"].as<std::string>();
-		CORE_INFO("Deserializeing Scene {0}", sceneName);
 		auto entities = data["Entities"];
 		if (entities)
 		{
@@ -386,7 +385,6 @@ namespace Engine
 				}
 			}
 		}
-		CORE_INFO("Finished Deserializeing Scene {0}", sceneName);
 		return true;
 	}
 

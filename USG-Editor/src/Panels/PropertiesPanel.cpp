@@ -349,56 +349,44 @@ namespace Engine
 	{
 		bool changed = false;
 		void* propLoc = prop ? (void*)((uint64)object + prop->GetOffset()) : object;
-		if (!(prop && prop->HasFlag("HideInInspector")))
-		{
-			auto func = PropertysPanel::s_ExposePropertyFunctions.find(typeID);
-			if (func != PropertysPanel::s_ExposePropertyFunctions.end())
-				changed = func->second(propLoc, typeID, prop);
-			else if (prop)
-				CORE_WARN("Could not draw controll for prperty {0} of type {1}", prop->GetName(), prop->GetTypeID());
-		}
+		auto func = PropertysPanel::s_ExposePropertyFunctions.find(typeID);
+		if (func != PropertysPanel::s_ExposePropertyFunctions.end())
+			changed = func->second(propLoc, typeID, prop);
+		else if (prop)
+			CORE_WARN("Could not draw controll for prperty {0} of type {1}", prop->GetName(), prop->GetTypeID());
 		const Reflect::Class* propClass = Reflect::Registry::GetRegistry()->GetClass(typeID);
 		if (propClass)
 		{
 			const std::vector<Reflect::Property>& props = propClass->GetProperties();
-			for(const Reflect::Property& p : props)
-				DrawPropertyControl(propLoc, p.GetTypeID(), &p);
+			for (const Reflect::Property& p : props)
+			{
+				if(!p.HasFlag("HideInInspector"))
+					DrawPropertyControl(propLoc, p.GetTypeID(), &p);
+			}
 		}
 		return changed;
 	}
 
 	std::unordered_map<uint64, PropertysPanel::ExposePropertyFunc> PropertysPanel::s_ExposePropertyFunctions;
 
-	Engine::PropertysPanel::AddExposePropertyFunc BDraw(
-		typeid(bool).hash_code(),
-		[](void* voidData, uint64 typeID, const Reflect::Property* prop) {
-			bool* data = (bool*)voidData;
-			return PropertysPanel::DrawBoolControl(prop->GetName(), *data);
-		}
-	);
+	ADD_EXPOSE_PROP_FUNC(bool) {
+		bool* data = (bool*)voidData;
+		return PropertysPanel::DrawBoolControl(prop->GetName(), *data);
+	});
 
-	Engine::PropertysPanel::AddExposePropertyFunc FDraw(
-		typeid(float).hash_code(),
-		[](void* voidData, uint64 typeID, const Reflect::Property* prop) {
-			float* data = (float*)voidData;
-			return PropertysPanel::DrawFloatControl(prop->GetName(), *data);
-		}
-	);
+	ADD_EXPOSE_PROP_FUNC(float) {
+		float* data = (float*)voidData;
+		return PropertysPanel::DrawFloatControl(prop->GetName(), *data);
+	});
 
-	Engine::PropertysPanel::AddExposePropertyFunc V2Draw(
-		typeid(Math::Vector2).hash_code(),
-		[](void* voidData, uint64 typeID, const Reflect::Property* prop) {
-			Math::Vector2* data = (Math::Vector2*)voidData;
-			return PropertysPanel::DrawVec2Control(prop->GetName(), *data);
-		}
-	);
+	ADD_EXPOSE_PROP_FUNC(Math::Vector2) {
+		Math::Vector2* data = (Math::Vector2*)voidData;
+		return PropertysPanel::DrawVec2Control(prop->GetName(), *data);
+	});
 
-	Engine::PropertysPanel::AddExposePropertyFunc V3Draw(
-		typeid(Math::Vector3).hash_code(),
-		[](void* voidData, uint64 typeID, const Reflect::Property* prop) {
-			Math::Vector3* data = (Math::Vector3*)voidData; 
-			return PropertysPanel::DrawVec3Control(prop->GetName(), *data);
-		}
-	);
+	ADD_EXPOSE_PROP_FUNC(Math::Vector3) {
+		Math::Vector3* data = (Math::Vector3*)voidData; 
+		return PropertysPanel::DrawVec3Control(prop->GetName(), *data);
+	});
 
 }

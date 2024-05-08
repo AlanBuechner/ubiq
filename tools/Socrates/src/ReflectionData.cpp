@@ -3,19 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-Property::Property(const std::string& name, const std::string& type) :
-	m_Name(name), m_Type(type)
-{}
-
-// class
-Class::Class(const std::string& name, const std::string& attrib)
-	: m_SemanticName(name) {
-	m_Attributes = ParseAttributeString(attrib);
-	m_Name = GetName();
-	m_Group = GetGroup();
-}
-
-std::vector<Attribute> Class::ParseAttributeString(const std::string& attribString) {
+std::vector<Attribute> ParseAttributeString(const std::string& attribString) {
 	std::vector<Attribute> attrs;
 
 	std::vector<char> reservedTokens = { ',', '=' };
@@ -26,13 +14,15 @@ std::vector<Attribute> Class::ParseAttributeString(const std::string& attribStri
 		tokens.pop(); // remove name
 
 		if (tokens.empty() || tokens.front() == ",") { // flag
-			if(!tokens.empty())
+			if (!tokens.empty())
 				tokens.pop();
-			attrs.push_back({ Attribute::Flag, name, "" });
+			if(name != "")
+				attrs.push_back({ Attribute::Flag, name, "" });
 		}
 		else if (tokens.front() == "=") {
 			tokens.pop(); // remove "="
-			attrs.push_back({ Attribute::Prop, name, tokens.front() });
+			if(name != "")
+				attrs.push_back({ Attribute::Prop, name, tokens.front() });
 			tokens.pop(); // remove value
 			// remove ","
 			if (tokens.front() == ",")
@@ -40,8 +30,21 @@ std::vector<Attribute> Class::ParseAttributeString(const std::string& attribStri
 		}
 	}
 
-
 	return attrs;
+}
+
+Property::Property(const std::string& name, const std::string& type, const std::string& attrib) :
+	m_Name(name), m_Type(type)
+{
+	m_Attributes = ParseAttributeString(attrib);
+}
+
+// class
+Class::Class(const std::string& name, const std::string& attrib)
+	: m_SemanticName(name) {
+	m_Attributes = ParseAttributeString(attrib);
+	m_Name = GetName();
+	m_Group = GetGroup();
 }
 
 std::string Class::GetGroup() {
@@ -85,28 +88,47 @@ ReflectionData GetReflectionDataFromFolder(const fs::path& path) {
 		std::string line = "";
 		while (getline(ifs, line)) {
 			line.erase(remove(line.begin(), line.end(), ' '), line.end());
-			std::vector<std::string> tokens = QueueToVector(Tokenize(line, reservedTokens));
-			if (tokens[0] == "include") {
-				if (!hasEntry(data.m_Headers, tokens[2]))
-					data.m_Headers.push_back(tokens[2]);
+			std::queue<std::string> tokens = Tokenize(line, reservedTokens);
+			std::string action = tokens.front();
+			tokens.pop();
+			if (action == "include") {
+				tokens.pop(); // remove the "
+				std::string header = tokens.front();
+				tokens.pop(); // remove the token
+				if (!hasEntry(data.m_Headers, header))
+					data.m_Headers.push_back(header);
+				tokens.pop(); // remove the "
 			}
-			else if (tokens[0] == "class") {
-				std::string name = tokens[2];
-				std::string attrib = tokens[4];
+			else if (action == "class") {
+				tokens.pop(); // remove the <
+				std::string name = tokens.front();
+				tokens.pop(); // remove the token
+				tokens.pop(); // remove the >
+				std::string attrib = tokens.front();
+				tokens.pop(); // remove the token
 				data.m_Classes[name] = Class(name, attrib);
 				currentClassName = name;
 			}
-			else if (tokens[0] == "	prop")
+			else if (action == "	prop")
 			{
+				tokens.pop(); // remove the <
 				std::string type = "";
-				uint32_t i;
-				for (i = 2; tokens[i] != ";"; i++)
-					type += tokens[i];
-				data.m_Classes[currentClassName].m_Props.push_back(Property(tokens[i+1], type));
+				while (tokens.front() != ";")
+				{
+					type += tokens.front();
+					tokens.pop(); // remove the token
+				}
+				tokens.pop(); // remove the ;
+				std::string name = tokens.front();
+				tokens.pop(); // remove the token
+				tokens.pop(); // remove the >
+				std::string attrib = tokens.front();
+				tokens.pop(); // remove the token
+				data.m_Classes[currentClassName].m_Props.push_back(Property(name, type, attrib));
 			}
 			else
 			{
-				std::cout << "error unknown token " << tokens[0] << std::endl;
+				std::cout << "error unknown token " << action << std::endl;
 			}
 		}
 

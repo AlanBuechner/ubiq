@@ -15,12 +15,15 @@ struct Attribute {
 	std::string value;
 };
 
+std::vector<Attribute> ParseAttributeString(const std::string& attribString);
+
 class Property
 {
 public:
-	Property(const std::string& name, const std::string& type);
+	Property(const std::string& name, const std::string& type, const std::string& attrib);
 	std::string m_Name;
 	std::string m_Type;
+	std::vector<Attribute> m_Attributes;
 };
 
 class Class {
@@ -34,7 +37,6 @@ public:
 	std::vector<Property> m_Props;
 
 private:
-	std::vector<Attribute> ParseAttributeString(const std::string& attribString);
 	std::string GetGroup();
 	std::string GetName();
 };

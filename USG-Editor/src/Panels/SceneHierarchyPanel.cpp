@@ -268,153 +268,139 @@ if(!m_Selected.HasComponent<component>()){\
 			if (removeComponent)
 				entity.RemoveComponent(comp);
 		}
-
-		/*DrawComponent<TransformComponent>(entity, "Transform", [&]() {
-			auto& tc = *entity.GetComponent<TransformComponent>();
-			Math::Vector3 posiiton = tc.GetPosition();
-			if (PropertysPanel::DrawVec3Control("m_Position", posiiton, 0.0f))
-				tc.SetPosition(posiiton);
-
-			Math::Vector3 rotation = glm::degrees(tc.GetRotation());
-			if (PropertysPanel::DrawVec3Control("Rotation", rotation, 0.0f))
-				tc.SetRotation(glm::radians(rotation));
-
-			Math::Vector3 scale = tc.GetScale();
-			if (PropertysPanel::DrawVec3Control("Scale", scale, 1.0f))
-				tc.SetScale(scale);
-
-		}, false);
-
-		DrawComponent<CameraComponent>(entity, "Camera", [&]() {
-			auto& cameraComponent = *entity.GetComponent<CameraComponent>();
-			auto& camera = cameraComponent.Camera;
-
-			ImGui::Checkbox("Primary", &cameraComponent.Primary);
-			ImGui::Checkbox("Fixed Aspect Ratio", &cameraComponent.FixedAspectRatio);
-
-			const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
-			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera->GetProjectionType()];
-			if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
-			{
-				for (int i = 0; i < _countof(projectionTypeStrings); i++)
-				{
-					bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
-
-					if (ImGui::Selectable(projectionTypeStrings[i], isSelected))
-					{
-						currentProjectionTypeString = projectionTypeStrings[i];
-						camera->SetProjectionType((SceneCamera::ProjectionType)i);
-					}
-
-					if (isSelected)
-						ImGui::SetItemDefaultFocus();
-				}
-
-				ImGui::EndCombo();
-			}
-
-			if (camera->GetProjectionType() == SceneCamera::ProjectionType::Perspective)
-			{
-				float fov = glm::degrees(camera->GetPerspectiveVerticalFOV());
-				if (PropertysPanel::DrawFloatControl("FOV", fov, 45.0f))
-					camera->SetPerspectiveVerticalFOV(glm::radians(fov));
-
-				float nearClip = camera->GetPerspectiveNearClip();
-				if (PropertysPanel::DrawFloatControl("Near Clip", nearClip, 0.01f))
-					camera->SetPerspectiveNearClip(nearClip);
-
-				float farClip = camera->GetPerspectiveFarClip();
-				if (PropertysPanel::DrawFloatControl("Far Clip", farClip, 1000.0f))
-					camera->SetPerspectiveFarClip(farClip);
-			}
-
-			if (camera->GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
-			{
-				float Size = camera->GetOrthographicSize();
-				if (PropertysPanel::DrawFloatControl("Size", Size, 10.0f))
-					camera->SetOrthographicSize(Size);
-
-				float nearClip = camera->GetOrthographicNearClip();
-				if (PropertysPanel::DrawFloatControl("Near Clip", nearClip, -1.0f))
-					camera->SetOrthographicNearClip(nearClip);
-
-				float farClip = camera->GetOrthographicFarClip();
-				if (PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
-					camera->SetOrthographicFarClip(farClip);
-			}
-		});
-
-		DrawComponent<DirectionalLightComponent>(entity, "Directional Light", [&]() {
-			auto& component = *entity.GetComponent<DirectionalLightComponent>();
-
-			Math::Vector3 direction = component.GetDirectinalLight()->GetDirection();
-			Math::Vector2 rot = component.GetDirectinalLight()->GetAngles();
-
-			if (PropertysPanel::DrawVec2Control("Direction", rot))
-				component.SetAngles(rot);
-
-			float temp = component.GetDirectinalLight()->GetCCT();
-			if (PropertysPanel::DrawFloatSlider("Temperature", temp, 1700, 20000, 6600))
-				component.SetTemperature(temp);
-
-			Math::Vector3 color = component.GetDirectinalLight()->GetTint();
-			if (PropertysPanel::DrawColorControl("Color", color))
-				component.SetTint(color);
-
-			float intensity = component.GetDirectinalLight()->GetIntensity();
-			if (PropertysPanel::DrawFloatControl("Intensity", intensity))
-				component.SetIntensity(intensity);
-
-			float size = component.GetDirectinalLight()->GetSize();
-			if (PropertysPanel::DrawFloatControl("Size", size))
-				component.SetSize(size);
-		});
-
-		DrawComponent<StaticModelRendererComponent>(entity, "Static Model Renderer", [&](){
-			auto& component = *entity.GetComponent<StaticModelRendererComponent>();
-			
-			Ref<Model> model = component.GetModel();
-			if (PropertysPanel::DrawModelControl("Model", model))
-			{
-				component.SetModel(model);
-				component.Invalidate();
-			}
-
-			for (uint32_t i = 0; i < component.GetMeshes().size(); i++)
-			{
-				auto& entry = component.GetMeshes()[i];
-				if (PropertysPanel::DrawMaterialControl(entry.m_Name, entry.m_Material))
-					component.Invalidate();
-			}
-		});
-
-		DrawComponent<SkyboxComponent>(entity, "Skybox", [&]() {
-			auto& component = *entity.GetComponent<SkyboxComponent>();
-
-			Ref<Texture2D> texture = component.GetSkyboxTexture();
-			if (PropertysPanel::DrawTextureControl("Texture", texture))
-				component.SetSkyboxTexture(texture);
-		});*/
 	}
 
-	Engine::PropertysPanel::AddExposePropertyFunc TransformDraw(
-		typeid(TransformComponent).hash_code(),
-		[](void* voidData, uint64 typeID, const Reflect::Property* prop) {
-			bool changed = false;
-			TransformComponent& tc = *(TransformComponent*)voidData;
-			Math::Vector3 posiiton = tc.GetPosition();
-			if (changed |= PropertysPanel::DrawVec3Control("m_Position", posiiton, 0.0f))
-				tc.SetPosition(posiiton);
+	ADD_EXPOSE_PROP_FUNC(TransformComponent) {
+		bool changed = false;
+		TransformComponent& tc = *(TransformComponent*)voidData;
+		Math::Vector3 posiiton = tc.GetPosition();
+		if (changed |= PropertysPanel::DrawVec3Control("Position", posiiton, 0.0f))
+			tc.SetPosition(posiiton);
 
-			Math::Vector3 rotation = glm::degrees(tc.GetRotation());
-			if (changed |= PropertysPanel::DrawVec3Control("Rotation", rotation, 0.0f))
-				tc.SetRotation(glm::radians(rotation));
+		Math::Vector3 rotation = glm::degrees(tc.GetRotation());
+		if (changed |= PropertysPanel::DrawVec3Control("Rotation", rotation, 0.0f))
+			tc.SetRotation(glm::radians(rotation));
 
-			Math::Vector3 scale = tc.GetScale();
-			if (changed |= PropertysPanel::DrawVec3Control("Scale", scale, 1.0f))
-				tc.SetScale(scale);
-			return changed;
+		Math::Vector3 scale = tc.GetScale();
+		if (changed |= PropertysPanel::DrawVec3Control("Scale", scale, 1.0f))
+			tc.SetScale(scale);
+		return changed;
+	});
+
+	ADD_EXPOSE_PROP_FUNC(CameraComponent) {
+		bool changed = false;
+		CameraComponent& cameraComponent = *(CameraComponent*)voidData;
+		auto& camera = cameraComponent.Camera;
+
+		ImGui::Checkbox("Primary", &cameraComponent.Primary);
+		ImGui::Checkbox("Fixed Aspect Ratio", &cameraComponent.FixedAspectRatio);
+
+		const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
+		const char* currentProjectionTypeString = projectionTypeStrings[(int)camera->GetProjectionType()];
+		if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
+		{
+			for (int i = 0; i < _countof(projectionTypeStrings); i++)
+			{
+				bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+
+				if (changed |= ImGui::Selectable(projectionTypeStrings[i], isSelected))
+				{
+					currentProjectionTypeString = projectionTypeStrings[i];
+					camera->SetProjectionType((SceneCamera::ProjectionType)i);
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
 		}
-	);
+
+		if (camera->GetProjectionType() == SceneCamera::ProjectionType::Perspective)
+		{
+			float fov = glm::degrees(camera->GetPerspectiveVerticalFOV());
+			if (changed |= PropertysPanel::DrawFloatControl("FOV", fov, 45.0f))
+				camera->SetPerspectiveVerticalFOV(glm::radians(fov));
+
+			float nearClip = camera->GetPerspectiveNearClip();
+			if (changed |= PropertysPanel::DrawFloatControl("Near Clip", nearClip, 0.01f))
+				camera->SetPerspectiveNearClip(nearClip);
+
+			float farClip = camera->GetPerspectiveFarClip();
+			if (changed |= PropertysPanel::DrawFloatControl("Far Clip", farClip, 1000.0f))
+				camera->SetPerspectiveFarClip(farClip);
+		}
+
+		if (camera->GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
+		{
+			float Size = camera->GetOrthographicSize();
+			if (changed |= PropertysPanel::DrawFloatControl("Size", Size, 10.0f))
+				camera->SetOrthographicSize(Size);
+
+			float nearClip = camera->GetOrthographicNearClip();
+			if (changed |= PropertysPanel::DrawFloatControl("Near Clip", nearClip, -1.0f))
+				camera->SetOrthographicNearClip(nearClip);
+
+			float farClip = camera->GetOrthographicFarClip();
+			if (changed |= PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
+				camera->SetOrthographicFarClip(farClip);
+		}
+		return changed;
+	});
+
+	ADD_EXPOSE_PROP_FUNC(DirectionalLightComponent) {
+		bool changed = false;
+		DirectionalLightComponent& component = *(DirectionalLightComponent*)voidData;
+		Math::Vector3 direction = component.GetDirectinalLight()->GetDirection();
+		Math::Vector2 rot = component.GetDirectinalLight()->GetAngles();
+
+		if (changed |= PropertysPanel::DrawVec2Control("Direction", rot))
+			component.SetAngles(rot);
+
+		float temp = component.GetDirectinalLight()->GetCCT();
+		if (changed |= PropertysPanel::DrawFloatSlider("Temperature", temp, 1700, 20000, 6600))
+			component.SetTemperature(temp);
+
+		Math::Vector3 color = component.GetDirectinalLight()->GetTint();
+		if (changed |= PropertysPanel::DrawColorControl("Color", color))
+			component.SetTint(color);
+
+		float intensity = component.GetDirectinalLight()->GetIntensity();
+		if (changed |= PropertysPanel::DrawFloatControl("Intensity", intensity))
+			component.SetIntensity(intensity);
+
+		float size = component.GetDirectinalLight()->GetSize();
+		if (changed |= PropertysPanel::DrawFloatControl("Size", size))
+			component.SetSize(size);
+		return changed;
+	});
+
+	ADD_EXPOSE_PROP_FUNC(StaticModelRendererComponent) {
+		bool changed = false;
+		StaticModelRendererComponent& component = *(StaticModelRendererComponent*)voidData;
+		Ref<Model> model = component.GetModel();
+		if (PropertysPanel::DrawModelControl("Model", model))
+		{
+			component.SetModel(model);
+			component.Invalidate();
+		}
+
+		for (uint32_t i = 0; i < component.GetMeshes().size(); i++)
+		{
+			auto& entry = component.GetMeshes()[i];
+			if (PropertysPanel::DrawMaterialControl(entry.m_Name, entry.m_Material))
+				component.Invalidate();
+		}
+		return changed;
+	});
+
+	ADD_EXPOSE_PROP_FUNC(SkyboxComponent) {
+		bool changed = false;
+		SkyboxComponent& component = *(SkyboxComponent*)voidData;
+		Ref<Texture2D> texture = component.GetSkyboxTexture();
+		if (PropertysPanel::DrawTextureControl("Texture", texture))
+			component.SetSkyboxTexture(texture);
+		return changed;
+	});
 
 }

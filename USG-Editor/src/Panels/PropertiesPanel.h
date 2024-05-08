@@ -31,5 +31,8 @@ namespace Engine
 				s_ExposePropertyFunctions.emplace(typeID, func);
 			}
 		};
+#define TOKEN_PASTE(x, y) x##y
+#define CAT(x,y) TOKEN_PASTE(x,y)
+#define ADD_EXPOSE_PROP_FUNC(type) Engine::PropertysPanel::AddExposePropertyFunc CAT(Draw,__LINE__)(typeid(type).hash_code(), [](void* voidData, uint64 typeID, const Reflect::Property* prop)
 	};
 }

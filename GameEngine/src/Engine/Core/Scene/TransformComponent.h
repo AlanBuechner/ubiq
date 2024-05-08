@@ -66,9 +66,9 @@ namespace Engine
 		void UpdateHierarchyGlobalTransform();
 
 	private:
-		PROPERTY() Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
-		PROPERTY() Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
-		PROPERTY() Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
+		PROPERTY(HideInInspector) Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
+		PROPERTY(HideInInspector) Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
+		PROPERTY(HideInInspector) Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
 
 		Entity Parent;
 		std::vector<Entity> Children;

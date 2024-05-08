@@ -20,7 +20,6 @@ namespace Engine
 
 	uint32 ComponentPool::Allocate(uint64 entity)
 	{
-		CORE_INFO("Allocate Component Data {0}", m_ReflectionClass.GetSname());
 		// allocate more room for the entity's list
 		if (m_SceneStatic && m_EntityComponentMapping.size() >= 1)
 			return UINT32_MAX;
@@ -30,7 +29,6 @@ namespace Engine
 
 		if (m_FreeSlots.empty())
 		{
-			CORE_INFO("Resize Component Data Array {0}", m_ReflectionClass.GetSname());
 			uint32 oldCount = m_NumComponents;
 			byte* oldData = m_Data;
 
@@ -42,10 +40,7 @@ namespace Engine
 			m_Data = newData;
 
 			for (uint32 i = newCount - 1; i >= oldCount; i--)
-			{
-				CORE_INFO("Adding New Index {0}", i);
 				m_FreeSlots.push_back(i);
-			}
 		}
 
 		uint32 componentIndex = m_FreeSlots.back();

@@ -33,9 +33,21 @@ namespace Reflect {
 	{
 	public:
 		Property() = default;
-		Property(const std::string& name, uint64_t typeID, uint32_t size, uint32_t offset) :
-			name(name), typeID(typeID), size(size), offset(offset)
-		{}
+		Property(
+			const std::string& name,
+			uint64_t typeID,
+			uint32_t size,
+			uint32_t offset,
+			const std::vector<std::string>& flags
+		) :
+			name(name),
+			typeID(typeID),
+			size(size),
+			offset(offset)
+		{
+			for (const std::string& flag : flags)
+				this->flags.emplace(flag);
+		}
 
 		const std::string& GetName() const { return name; }
 		uint64_t GetTypeID() const { return typeID; }
@@ -68,8 +80,8 @@ namespace Reflect {
 			DestroyFunc destroyFunc,
 			const std::vector<std::string>& flags,
 			const std::vector<Property>& props
-		)
-			: name(name),
+		): 
+			name(name),
 			sname(sname),
 			typeID(typeID),
 			size(size),
@@ -178,7 +190,7 @@ namespace Reflect {
 	#define PROPERTY(...)
 #else
 	#define CLASS(...) class __attribute__((annotate("reflect-class," #__VA_ARGS__)))
-	#define PROPERTY(...) __attribute__((annotate("reflect-property;" #__VA_ARGS__)))
+	#define PROPERTY(...) __attribute__((annotate("reflect-property," #__VA_ARGS__)))
 #endif
 
 #define LINK_REFLECTION_DATA(name) void DeadLink##name(); void* _DeadLink##name = &DeadLink##name;

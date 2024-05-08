@@ -41,7 +41,7 @@ namespace Engine
 		void Invalidate();
 
 	private:
-		PROPERTY() Ref<Model> m_Model;
+		PROPERTY(HideInInspector) Ref<Model> m_Model;
 		std::vector<MeshEntry> m_CollapsedModelTree;
 		Ref<SceneRenderer> m_SceneRenderer;
 	};
