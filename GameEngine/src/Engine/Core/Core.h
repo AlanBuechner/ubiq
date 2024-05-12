@@ -69,6 +69,9 @@
 
 #define DISABLE_COPY(type) type(const type&) = delete;
 
+#define TOKEN_PASTE(x, y) x##y
+#define CAT(x,y) TOKEN_PASTE(x,y)
+
 namespace Engine
 {
 	template<typename T>

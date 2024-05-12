@@ -2,78 +2,84 @@ Scene: Name
 Entities:
   - Entity: 12554925818194114016
     Name: Skybox
-    Engine::TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Engine::DirectionalLightComponent:
-      Direction: [-0.556801677, -0.722967207, 0.409011483]
-      Temperature: 3185.11011
-      Color: [1, 1, 1]
-      Intensity: 4
-      Size: 0.5
-    Engine::SkyboxComponent:
-      Texture: 44308273739615182
+    Components:
+      - Component: Engine::TransformComponent
+        Position: [0, 0, 0]
+        Rotation: [0, 0, 0]
+        Scale: [1, 1, 1]
+      - Component: Engine::DirectionalLightComponent
+        Direction: [-0.556801677, -0.722967207, 0.409011483]
+        Temperature: 3185.11011
+        Color: [1, 1, 1]
+        Intensity: 4
+        Size: 0.5
+      - Component: Engine::SkyboxComponent
+        Texture: 44308273739615182
   - Entity: 11693751238415598823
     Name: Camera
-    Engine::TransformComponent:
-      Position: [3.19560456, 2.17798662, 5]
-      Rotation: [-0.242119506, 0.782615602, -1.8988132e-08]
-      Scale: [1, 1, 0.99999994]
-    Engine::CameraComponent:
-      Primary: true
-      FixedAspectRatio: false
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00100000005
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
+    Components:
+      - Component: Engine::TransformComponent
+        Position: [3.19560456, 2.17798662, 5]
+        Rotation: [-0.242119506, 0.782615602, -1.8988132e-08]
+        Scale: [1, 1, 0.99999994]
+      - Component: Engine::CameraComponent
+        Primary: true
+        FixedAspectRatio: false
+        Camera:
+          ProjectionType: 0
+          PerspectiveFOV: 0.785398185
+          PerspectiveNear: 0.00100000005
+          PerspectiveFar: 1000
+          OrthographicSize: 10
+          OrthographicNear: -1
+          OrthographicFar: 1
   - Entity: 14785401870932044183
     Name: NanoSuit
-    Engine::TransformComponent:
-      Position: [14.9394608, -1.79635382, -9.45795631]
-      Rotation: [-0.151533961, -0.540926158, 0.169622898]
-      Scale: [0.483800054, 0.483799964, 0.483799994]
-    Engine::StaticModelRendererComponent:
-      Model: 8851507446955619983
-      Materials:
-        Visor: 9193023617033958228
-        Legs: 9193023617033958228
-        hands: 9193023617033958228
-        Lights: 9193023617033958228
-        Arms: 9193023617033958228
-        Helmet: 9193023617033958228
-        Body: 9193023617033958228
+    Components:
+      - Component: Engine::TransformComponent
+        Position: [14.9394608, -1.79635382, -9.45795631]
+        Rotation: [-0.151533961, -0.540926158, 0.169622898]
+        Scale: [0.483800054, 0.483799964, 0.483799994]
+      - Component: Engine::StaticModelRendererComponent
+        Model: 8851507446955619983
+        Materials:
+          Visor: 9193023617033958228
+          Legs: 9193023617033958228
+          hands: 9193023617033958228
+          Lights: 9193023617033958228
+          Arms: 9193023617033958228
+          Helmet: 9193023617033958228
+          Body: 9193023617033958228
   - Entity: 1824081241608119135
     Name: Floor
-    Engine::TransformComponent:
-      Position: [-19.2683067, -7.1497879, 8.20482922]
-      Rotation: [0, 0, 0]
-      Scale: [5, 5, 5]
-    Engine::StaticModelRendererComponent:
-      Model: 15383826060822133857
-      Materials:
-        Cube: 11419106162513771918
+    Components:
+      - Component: Engine::TransformComponent
+        Position: [-19.2683067, -7.1497879, 8.20482922]
+        Rotation: [0, 0, 0]
+        Scale: [5, 5, 5]
+      - Component: Engine::StaticModelRendererComponent
+        Model: 15383826060822133857
+        Materials:
+          Cube: 11419106162513771918
   - Entity: 10453396793969881703
     Name: Mesh
-    Engine::TransformComponent:
-      Position: [-4.025177, 0, -0.0164539814]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Engine::StaticModelRendererComponent:
-      Model: 7711650371006191785
-      Materials:
-        sphere_gltf_Sphere.001: 9193023617033958228
+    Components:
+      - Component: Engine::TransformComponent
+        Position: [-4.025177, 0, -0.0164539814]
+        Rotation: [0, 0, 0]
+        Scale: [1, 1, 1]
+      - Component: Engine::StaticModelRendererComponent
+        Model: 7711650371006191785
+        Materials:
+          sphere_gltf_Sphere.001: 9193023617033958228
   - Entity: 10063963099091963717
     Name: box
-    Engine::TransformComponent:
-      Position: [4.39184475, -2.5049305, 2.61999989]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Engine::StaticModelRendererComponent:
-      Model: 630034325824791667
-      Materials:
-        cube: 0
+    Components:
+      - Component: Engine::TransformComponent
+        Position: [4.39184475, -2.5049305, 2.61999989]
+        Rotation: [0, 0, 0]
+        Scale: [1, 1, 1]
+      - Component: Engine::StaticModelRendererComponent
+        Model: 630034325824791667
+        Materials:
+          cube: 0

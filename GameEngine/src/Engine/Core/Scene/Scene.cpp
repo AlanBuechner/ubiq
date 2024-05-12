@@ -235,40 +235,4 @@ namespace Engine
 		return newScene;
 	}
 
-	template<typename T>
-	void Scene::OnComponentAdded(Entity entity, T& component)
-	{
-		//static_assert(false);
-	}
-
-	template<>
-	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
-	{
-
-	}
-
-	template<>
-	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
-	{
-		component.Camera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
-	}
-
-	template<>
-	void Scene::OnComponentAdded<DirectionalLightComponent>(Entity entity, DirectionalLightComponent& component)
-	{
-
-	}
-
-	template<>
-	void Scene::OnComponentAdded<StaticModelRendererComponent>(Entity entity, StaticModelRendererComponent& component)
-	{
-
-	}
-
-	template<>
-	void Scene::OnComponentAdded<SkyboxComponent>(Entity entity, SkyboxComponent& component)
-	{
-
-	}
-
 }

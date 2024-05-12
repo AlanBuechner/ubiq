@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "SceneRegistry.h"
+#include "Components.h"
+#include "Scene.h"
 
 namespace Engine
 {
@@ -61,7 +63,7 @@ namespace Engine
 		m_FreeEntitys.push_back(entity);
 	}
 
-	void* SceneRegistry::AddComponent(EntityType entity, const Reflect::Class& componentClass)
+	void* SceneRegistry::AddComponent(EntityType entity, Scene* scene, const Reflect::Class& componentClass)
 	{
 		// find the component pool
 		ComponentPool* pool = GetOrCreateCompnentPool(componentClass);
@@ -74,8 +76,10 @@ namespace Engine
 		void* componentLocation = pool->GetComponentRaw(componentIndex);
 		CORE_ASSERT(componentLocation != nullptr, "faild to allocate memory for component"); // validate component was successfully created 
 
-		void* comp = componentClass.CreateInstance(componentLocation); // create component in pre allocated memory
+		Component* comp = (Component*)componentClass.CreateInstance(componentLocation); // create component in pre allocated memory
 		m_Entitys[entity].m_Components.push_back({ pool, componentIndex }); // add component to entity's list of components
+		comp->Owner = { entity, scene };
+		comp->OnComponentAdded();
 		return comp; // return component
 	}
 

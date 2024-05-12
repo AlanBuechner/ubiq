@@ -12,6 +12,11 @@ namespace Engine
 		Camera->SetTransform(transform);
 	}
 
+	void CameraComponent::OnComponentAdded()
+	{
+		Camera->SetViewportSize(Owner.GetScene()->GetViewportWidth(), Owner.GetScene()->GetViewportHeight());
+	}
+
 	// directional Light component
 	void DirectionalLightComponent::OnComponentAdded()
 	{

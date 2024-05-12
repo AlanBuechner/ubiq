@@ -30,6 +30,8 @@ namespace Engine
 	};
 	using EntityType = uint64;
 
+	class Scene;
+
 	class SceneRegistry
 	{
 	public:
@@ -51,8 +53,8 @@ namespace Engine
 		EntityData& GetEntityData(EntityType entity) { return m_Entitys[entity]; }
 
 		template<class T>
-		T* AddComponent(EntityType entity) { return (T*)AddComponent(entity, T::GetStaticClass()); }
-		void* AddComponent(EntityType entity, const Reflect::Class& componentClass);
+		T* AddComponent(EntityType entity, Scene* scene) { return (T*)AddComponent(entity, scene, T::GetStaticClass()); }
+		void* AddComponent(EntityType entity, Scene* scene, const Reflect::Class& componentClass);
 
 		template<class T>
 		void RemoveComponent(EntityType entity) { RemoveComponent(entity, T::GetStaticClass()); }

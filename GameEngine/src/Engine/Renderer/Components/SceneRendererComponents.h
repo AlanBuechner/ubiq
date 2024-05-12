@@ -25,6 +25,7 @@ namespace Engine
 		PROPERTY(HideInInspector) bool FixedAspectRatio = false;
 
 		virtual void OnTransformChange(const Math::Mat4& transform) override;
+		virtual void OnComponentAdded() override;
 	};
 
 	CLASS(GROUP = Component, SceneStatic) DirectionalLightComponent : public Component

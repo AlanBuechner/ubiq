@@ -37,6 +37,9 @@ namespace Engine
 
 		Entity GetPrimaryCameraEntity();
 
+		uint32 GetViewportWidth() { return m_ViewportWidth; }
+		uint32 GetViewportHeight() { return m_ViewportHeight; }
+
 		template<class T>
 		T* GetSceneStatic()
 		{
@@ -47,10 +50,6 @@ namespace Engine
 		SceneRegistry& GetRegistry() { return m_Registry; }
 
 		static Ref<Scene> Copy(Ref<Scene> scene);
-
-	private:
-		template<typename T>
-		void OnComponentAdded(Entity entity, T& component);
 
 	private:
 		uint32 m_ViewportWidth = 0;

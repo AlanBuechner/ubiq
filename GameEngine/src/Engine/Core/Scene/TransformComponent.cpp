@@ -28,6 +28,7 @@ namespace Engine
 
 			tc.Parent = Owner;
 			Children.push_back(child);
+			tc.Dirty();
 		}
 	}
 

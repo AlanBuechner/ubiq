@@ -35,13 +35,7 @@ namespace Engine
 		T* AddComponent()
 		{
 			CORE_ASSERT(!HasComponent<T>(), "Entity alredy has component");
-			T* component = m_Scene->m_Registry.AddComponent<T>(m_EntityID);
-			if (component != nullptr)
-			{
-				component->Owner = *this;
-				m_Scene->OnComponentAdded<T>(*this, *component);
-				component->OnComponentAdded();
-			}
+			T* component = m_Scene->m_Registry.AddComponent<T>(m_EntityID, m_Scene);
 			return component;
 		}
 

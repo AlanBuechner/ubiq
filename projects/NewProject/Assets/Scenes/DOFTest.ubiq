@@ -2,23 +2,25 @@ Scene: Name
 Entities:
   - Entity: 10863390703189385925
     Name: Directional Light
-    Engine::TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Engine::DirectionalLightComponent:
-      Direction: [-0.673012495, -0.739631116, -0]
-      Temperature: 5600
-      Color: [1, 1, 1]
-      Intensity: 2
-      Size: 2
+    Components:
+      - Component: Engine::TransformComponent
+        Position: [0, 0, 0]
+        Rotation: [0, 0, 0]
+        Scale: [1, 1, 1]
+      - Component: Engine::DirectionalLightComponent
+        Direction: [-0.673012495, -0.739631116, -0]
+        Temperature: 5600
+        Color: [1, 1, 1]
+        Intensity: 2
+        Size: 2
   - Entity: 1860839975800616067
     Name: Mesh
-    Engine::TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, -0.436332315, 0]
-      Scale: [1, 1, 100]
-    Engine::StaticModelRendererComponent:
-      Model: 630034325824791667
-      Materials:
-        cube: 14846736622411844726
+    Components:
+      - Component: Engine::TransformComponent
+        Position: [0, 0, 0]
+        Rotation: [0, -0.436332315, 0]
+        Scale: [1, 1, 100]
+      - Component: Engine::StaticModelRendererComponent
+        Model: 630034325824791667
+        Materials:
+          cube: 14846736622411844726

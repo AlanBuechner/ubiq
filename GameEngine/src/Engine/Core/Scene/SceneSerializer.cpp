@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "SceneSerializer.h"
 #include "Entity.h"
+#include "SceneSerializer.h"
 
 #include "Components.h"
 #include "TransformComponent.h"
@@ -8,7 +8,6 @@
 #include "Engine/Renderer/Components/StaticModelRendererComponent.h"
 
 #include <fstream>
-#include <yaml-cpp/yaml.h>
 
 #include "Engine/Util/Performance.h"
 
@@ -125,120 +124,6 @@ namespace Engine
 	{
 	}
 
-	static void SerializeEntity(YAML::Emitter& out, Entity entity)
-	{
-		out << YAML::BeginMap;
-		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
-		out << YAML::Key << "Name" << YAML::Value << entity.GetName();
-
-		if (entity.HasComponent<TransformComponent>())
-		{
-			out << YAML::Key << "Engine::TransformComponent";
-			out << YAML::BeginMap;
-
-			auto& transform = entity.GetTransform();
-			
-			out << YAML::Key << "Position" << YAML::Value << transform.GetPosition();
-			out << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
-			out << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
-
-			if(transform.GetParent())
-				out << YAML::Key << "Parent" << YAML::Value << (uint64)transform.GetParent().GetUUID();
-
-			if (transform.GetChildren().size() > 0)
-			{
-				YAML::Node children;
-				for (auto c : transform.GetChildren())
-					children.push_back((uint64)c.GetUUID());
-				out << YAML::Key << "Children" << YAML::Value << children;
-			}
-
-			out << YAML::EndMap;
-		}
-
-		if (entity.HasComponent<CameraComponent>())
-		{
-			out << YAML::Key << "Engine::CameraComponent";
-			out << YAML::BeginMap;
-
-			auto& cameraComponent = *entity.GetComponent<CameraComponent>();
-			auto& camera = cameraComponent.Camera;
-
-			out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
-			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
-			out << YAML::Key << "Camera";
-			out << YAML::BeginMap;
-			out << YAML::Key << "ProjectionType" << YAML::Value << (int)camera->GetProjectionType();
-			out << YAML::Key << "PerspectiveFOV" << YAML::Value << camera->GetPerspectiveVerticalFOV();
-			out << YAML::Key << "PerspectiveNear" << YAML::Value << camera->GetPerspectiveNearClip();
-			out << YAML::Key << "PerspectiveFar" << YAML::Value << camera->GetPerspectiveFarClip();
-			out << YAML::Key << "OrthographicSize" << YAML::Value << camera->GetOrthographicSize();
-			out << YAML::Key << "OrthographicNear" << YAML::Value << camera->GetOrthographicNearClip();
-			out << YAML::Key << "OrthographicFar" << YAML::Value << camera->GetOrthographicFarClip();
-			out << YAML::EndMap; // end camera
-
-			out << YAML::EndMap; // end camera component
-		}
-
-		if (entity.HasComponent<DirectionalLightComponent>())
-		{
-			out << YAML::Key << "Engine::DirectionalLightComponent";
-			out << YAML::BeginMap;
-
-			auto& dirLightComponent = *entity.GetComponent<DirectionalLightComponent>();
-			out << YAML::Key << "Direction" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetDirection();
-			out << YAML::Key << "Temperature" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetCCT();
-			out << YAML::Key << "Color" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetTint();
-			out << YAML::Key << "Intensity" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetIntensity();
-			out << YAML::Key << "Size" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetSize();
-
-			out << YAML::EndMap;
-		}
-
-		if (entity.HasComponent<StaticModelRendererComponent>())
-		{
-			out << YAML::Key << "Engine::StaticModelRendererComponent";
-			out << YAML::BeginMap;
-
-			auto& meshRenderer = *entity.GetComponent<StaticModelRendererComponent>();
-			if(meshRenderer.GetModel())
-				out << YAML::Key << "Model" << YAML::Value << meshRenderer.GetModel()->GetAssetID();
-
-			if (!meshRenderer.GetMeshes().empty())
-			{
-				out << YAML::Key << "Materials";
-				out << YAML::BeginMap;
-
-				for (auto& entry : meshRenderer.GetMeshes())
-				{
-					uint64 matID = 0;
-					if (entry.m_Material)
-						matID = (uint64)entry.m_Material->GetAssetID();
-
-					out << YAML::Key << entry.m_Name << YAML::Value << matID;
-				}
-
-				out << YAML::EndMap;
-			}
-
-			out << YAML::EndMap;
-		}
-
-		if (entity.HasComponent<SkyboxComponent>())
-		{
-			out << YAML::Key << "Engine::SkyboxComponent";
-			out << YAML::BeginMap;
-
-			auto& skyboxComponent = *entity.GetComponent<SkyboxComponent>();
-			if (skyboxComponent.GetSkyboxTexture())
-				out << YAML::Key << "Texture" << YAML::Value << skyboxComponent.GetSkyboxTexture()->GetAssetID();
-
-			out << YAML::EndMap;
-		}
-
-		out << YAML::EndMap;
-	}
-
 	void SceneSerializer::Serialize(const std::string& filepath)
 	{
 		YAML::Emitter out;
@@ -247,14 +132,37 @@ namespace Engine
 		out << YAML::Value << "Name";
 		out << YAML::Key << "Entities";
 		out << YAML::Value << YAML::BeginSeq;
-		m_Scene->m_Registry.EachEntity([&](auto entityID)
-			{
-				Entity entity = {entityID, m_Scene.get()};
-				if (!entity)
-					return;
 
-				SerializeEntity(out, entity);
-			});
+		// Serialize each entity
+		m_Scene->m_Registry.EachEntity([&](auto entityID)
+		{
+			Entity entity = {entityID, m_Scene.get()};
+			if (!entity)
+				return;
+
+			out << YAML::BeginMap;
+			out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
+			out << YAML::Key << "Name" << YAML::Value << entity.GetName();
+
+			// serialize each component
+			out << YAML::Key << "Components" << YAML::Value << YAML::BeginSeq;
+			for (Component* comp : entity.GetComponents())
+			{
+				const Reflect::Class& componentClass = comp->GetClass();
+
+				out << YAML::BeginMap;
+				out << YAML::Key << "Component" << YAML::Value << componentClass.GetSname();
+
+				auto func = s_ComponentSerializers.find(componentClass.GetTypeID());
+				if (func != s_ComponentSerializers.end())
+					func->second->Serialize(entity, out);
+
+				out << YAML::EndMap;
+			}
+
+			out << YAML::EndSeq;
+			out << YAML::EndMap;
+		});
 
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
@@ -283,6 +191,7 @@ namespace Engine
 		auto entities = data["Entities"];
 		if (entities)
 		{
+			// load each entity and its components
 			for (auto entity : entities)
 			{
 				uint64 uuid = entity["Entity"].as<uint64>();
@@ -292,96 +201,43 @@ namespace Engine
 
 				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 
-				auto transformComponent = entity["Engine::TransformComponent"];
-				if (transformComponent)
+				auto components = entity["Components"];
+				for (auto component : components)
 				{
-					auto& tc = *deserializedEntity.GetComponent<TransformComponent>();
-
-					tc.Owner = deserializedEntity;
-					tc.Parent = Entity::null;
-
-					tc.SetPosition(transformComponent["Position"].as<Math::Vector3>());
-					tc.SetRotation(transformComponent["Rotation"].as<Math::Vector3>());
-					tc.SetScale(transformComponent["Scale"].as<Math::Vector3>());
-				}
-
-				auto cameraComponent = entity["Engine::CameraComponent"];
-				if (cameraComponent)
-				{
-					auto& cc = *deserializedEntity.AddComponent<CameraComponent>();
-
-					auto camera = cameraComponent["Camera"];
-					cc.Camera->SetProjectionType((SceneCamera::ProjectionType)camera["ProjectionType"].as<int>());
-					cc.Camera->SetPerspectiveVerticalFOV(camera["PerspectiveFOV"].as<float>());
-					cc.Camera->SetPerspectiveNearClip(camera["PerspectiveNear"].as<float>());
-					cc.Camera->SetOrthographicFarClip(camera["PerspectiveFar"].as<float>());
-
-					cc.Camera->SetOrthographicSize(camera["OrthographicSize"].as<float>());
-					cc.Camera->SetOrthographicNearClip(camera["OrthographicNear"].as<float>());
-					cc.Camera->SetOrthographicFarClip(camera["OrthographicFar"].as<float>());
-
-					cc.Primary = cameraComponent["Primary"].as<bool>();
-					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
-				}
-
-				auto dirLightComponent = entity["Engine::DirectionalLightComponent"];
-				if (dirLightComponent)
-				{
-					auto& dlc = *deserializedEntity.AddComponent<DirectionalLightComponent>();
-					dlc.SetDirection(dirLightComponent["Direction"].as<Math::Vector3>());
-					dlc.SetIntensity(dirLightComponent["Intensity"].as<float>());
-					dlc.SetTemperature(dirLightComponent["Temperature"].as<float>());
-					dlc.SetTint(dirLightComponent["Color"].as<Math::Vector3>());
-					dlc.SetSize(dirLightComponent["Size"].as<float>());
-				}
-
-				auto staticModelRendererComponent = entity["Engine::StaticModelRendererComponent"];
-				if (staticModelRendererComponent)
-				{
-					auto& mrc = *deserializedEntity.AddComponent<StaticModelRendererComponent>();
-					if(staticModelRendererComponent["Model"])
-						mrc.SetModel(Application::Get().GetAssetManager().GetAsset<Model>(staticModelRendererComponent["Model"].as<uint64>()));
-
-					if (staticModelRendererComponent["Materials"])
-					{
-						YAML::Node materials = staticModelRendererComponent["Materials"];
-
-						for (auto& entry : mrc.GetMeshes())
-						{
-							UUID matID = 0;
-							if(materials[entry.m_Name])
-								matID = materials[entry.m_Name].as<uint64>();
-							entry.m_Material = Application::Get().GetAssetManager().GetAsset<Material>(matID);
-						}
-					}
-					mrc.Invalidate();
-				}
-
-				auto skyboxComponent = entity["Engine::SkyboxComponent"];
-				if (skyboxComponent)
-				{
-					auto& sbc = *deserializedEntity.AddComponent<SkyboxComponent>();
-					if (skyboxComponent["Texture"])
-						sbc.SetSkyboxTexture(Application::Get().GetAssetManager().GetAsset<Texture2D>(skyboxComponent["Texture"].as<uint64>()));
+					std::string componentName = component["Component"].as<std::string>();
+					const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
+					if (componentClass)
+						deserializedEntity.GetScene()->GetRegistry().AddComponent(deserializedEntity, m_Scene.get(), *componentClass);
 				}
 			}
 
-			// update entity and component refs
+			// load entity components
 			for (auto entity : entities)
 			{
 				Entity deserializedEntity = m_Scene->GetEntityWithUUID(entity["Entity"].as<uint64>());
-
-				auto transformComponent = entity["Engine::TransformComponent"];
-				if (transformComponent)
+				auto components = entity["Components"];
+				for (auto component : components)
 				{
-					auto& tc = *deserializedEntity.GetComponent<TransformComponent>();
+					std::string componentName = component["Component"].as<std::string>();
+					const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
+					auto func = s_ComponentSerializers.find(componentClass->GetTypeID());
+					if (func != s_ComponentSerializers.end())
+						func->second->Deserialize(deserializedEntity, component);
+				}
+			}
 
-					if (transformComponent["Children"])
-					{
-						YAML::Node chldren = transformComponent["Children"];
-						for (auto c : chldren)
-							tc.AddChild(m_Scene->GetEntityWithUUID(c.as<uint64>()));
-					}
+			// patch components
+			for (auto entity : entities)
+			{
+				Entity deserializedEntity = m_Scene->GetEntityWithUUID(entity["Entity"].as<uint64>());
+				auto components = entity["Components"];
+				for (auto component : components)
+				{
+					std::string componentName = component["Component"].as<std::string>();
+					const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
+					auto func = s_ComponentSerializers.find(componentClass->GetTypeID());
+					if (func != s_ComponentSerializers.end())
+						func->second->Patch(deserializedEntity);
 				}
 			}
 		}
@@ -394,5 +250,186 @@ namespace Engine
 		CORE_ASSERT(false, "not implemented");
 		return false;
 	}
+
+	std::unordered_map<uint64, ComponentSerializer*> SceneSerializer::s_ComponentSerializers;
+
+	class TransformSerializer : public ComponentSerializer
+	{
+		virtual void Serialize(Entity entity, YAML::Emitter& out) override
+		{
+			auto& transform = entity.GetTransform();
+
+			out << YAML::Key << "Position" << YAML::Value << transform.GetPosition();
+			out << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
+			out << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
+
+			if (transform.GetParent())
+				out << YAML::Key << "Parent" << YAML::Value << (uint64)transform.GetParent().GetUUID();
+
+			if (transform.GetChildren().size() > 0)
+			{
+				YAML::Node children;
+				for (auto c : transform.GetChildren())
+					children.push_back((uint64)c.GetUUID());
+				out << YAML::Key << "Children" << YAML::Value << YAML::DoubleQuoted << children;
+			}
+		}
+
+		virtual void Deserialize(Entity entity, YAML::Node data) override
+		{
+			auto& tc = *entity.GetComponent<TransformComponent>();
+
+			tc.Owner = entity;
+			tc.Parent = Entity::null;
+
+			tc.SetPosition(data["Position"].as<Math::Vector3>());
+			tc.SetRotation(data["Rotation"].as<Math::Vector3>());
+			tc.SetScale(data["Scale"].as<Math::Vector3>());
+
+			if (data["Children"])
+			{
+				YAML::Node chldren = data["Children"];
+				for (auto c : chldren)
+					tc.AddChild(tc.GetOwner().GetScene()->GetEntityWithUUID(c.as<uint64>()));
+			}
+		}
+	};
+	ADD_COMPONENT_SERIALIZER(TransformComponent, TransformSerializer);
+
+
+	class CameraSerializer : public ComponentSerializer
+	{
+		virtual void Serialize(Entity entity, YAML::Emitter& out) override
+		{
+			auto& cameraComponent = *entity.GetComponent<CameraComponent>();
+			auto& camera = cameraComponent.Camera;
+
+			out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
+			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
+			out << YAML::Key << "Camera";
+			out << YAML::BeginMap;
+			out << YAML::Key << "ProjectionType" << YAML::Value << (int)camera->GetProjectionType();
+			out << YAML::Key << "PerspectiveFOV" << YAML::Value << camera->GetPerspectiveVerticalFOV();
+			out << YAML::Key << "PerspectiveNear" << YAML::Value << camera->GetPerspectiveNearClip();
+			out << YAML::Key << "PerspectiveFar" << YAML::Value << camera->GetPerspectiveFarClip();
+			out << YAML::Key << "OrthographicSize" << YAML::Value << camera->GetOrthographicSize();
+			out << YAML::Key << "OrthographicNear" << YAML::Value << camera->GetOrthographicNearClip();
+			out << YAML::Key << "OrthographicFar" << YAML::Value << camera->GetOrthographicFarClip();
+			out << YAML::EndMap; // end camera
+		}
+
+		virtual void Deserialize(Entity entity, YAML::Node data) override
+		{
+			auto& cc = *entity.GetComponent<CameraComponent>();
+
+			auto camera = data["Camera"];
+			cc.Camera->SetProjectionType((SceneCamera::ProjectionType)camera["ProjectionType"].as<int>());
+			cc.Camera->SetPerspectiveVerticalFOV(camera["PerspectiveFOV"].as<float>());
+			cc.Camera->SetPerspectiveNearClip(camera["PerspectiveNear"].as<float>());
+			cc.Camera->SetOrthographicFarClip(camera["PerspectiveFar"].as<float>());
+
+			cc.Camera->SetOrthographicSize(camera["OrthographicSize"].as<float>());
+			cc.Camera->SetOrthographicNearClip(camera["OrthographicNear"].as<float>());
+			cc.Camera->SetOrthographicFarClip(camera["OrthographicFar"].as<float>());
+
+			cc.Primary = data["Primary"].as<bool>();
+			cc.FixedAspectRatio = data["FixedAspectRatio"].as<bool>();
+		}
+	};
+	ADD_COMPONENT_SERIALIZER(CameraComponent, CameraSerializer);
+
+
+	class DirectionalLightSerializer : public ComponentSerializer
+	{
+		virtual void Serialize(Entity entity, YAML::Emitter& out) override
+		{
+			auto& dirLightComponent = *entity.GetComponent<DirectionalLightComponent>();
+			out << YAML::Key << "Direction" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetDirection();
+			out << YAML::Key << "Temperature" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetCCT();
+			out << YAML::Key << "Color" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetTint();
+			out << YAML::Key << "Intensity" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetIntensity();
+			out << YAML::Key << "Size" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetSize();
+		}
+
+		virtual void Deserialize(Entity entity, YAML::Node data) override
+		{
+			auto& dlc = *entity.GetComponent<DirectionalLightComponent>();
+			dlc.SetDirection(data["Direction"].as<Math::Vector3>());
+			dlc.SetIntensity(data["Intensity"].as<float>());
+			dlc.SetTemperature(data["Temperature"].as<float>());
+			dlc.SetTint(data["Color"].as<Math::Vector3>());
+			dlc.SetSize(data["Size"].as<float>());
+		}
+	};
+	ADD_COMPONENT_SERIALIZER(DirectionalLightComponent, DirectionalLightSerializer);
+
+
+	class StaticModelRendererSerializer : public ComponentSerializer
+	{
+		virtual void Serialize(Entity entity, YAML::Emitter& out) override
+		{
+			auto& meshRenderer = *entity.GetComponent<StaticModelRendererComponent>();
+			if (meshRenderer.GetModel())
+				out << YAML::Key << "Model" << YAML::Value << meshRenderer.GetModel()->GetAssetID();
+
+			if (!meshRenderer.GetMeshes().empty())
+			{
+				out << YAML::Key << "Materials";
+				out << YAML::BeginMap;
+
+				for (auto& entry : meshRenderer.GetMeshes())
+				{
+					uint64 matID = 0;
+					if (entry.m_Material)
+						matID = (uint64)entry.m_Material->GetAssetID();
+
+					out << YAML::Key << entry.m_Name << YAML::Value << matID;
+				}
+
+				out << YAML::EndMap;
+			}
+		}
+
+		virtual void Deserialize(Entity entity, YAML::Node data) override
+		{
+			auto& mrc = *entity.GetComponent<StaticModelRendererComponent>();
+			if (data["Model"])
+				mrc.SetModel(Application::Get().GetAssetManager().GetAsset<Model>(data["Model"].as<uint64>()));
+
+			if (data["Materials"])
+			{
+				YAML::Node materials = data["Materials"];
+
+				for (auto& entry : mrc.GetMeshes())
+				{
+					UUID matID = 0;
+					if (materials[entry.m_Name])
+						matID = materials[entry.m_Name].as<uint64>();
+					entry.m_Material = Application::Get().GetAssetManager().GetAsset<Material>(matID);
+				}
+			}
+			mrc.Invalidate();
+		}
+	};
+	ADD_COMPONENT_SERIALIZER(StaticModelRendererComponent, StaticModelRendererSerializer);
+
+
+	class SkyboxSerializer : public ComponentSerializer
+	{
+		virtual void Serialize(Entity entity, YAML::Emitter& out) override
+		{
+			auto& skyboxComponent = *entity.GetComponent<SkyboxComponent>();
+			if (skyboxComponent.GetSkyboxTexture())
+				out << YAML::Key << "Texture" << YAML::Value << skyboxComponent.GetSkyboxTexture()->GetAssetID();
+		}
+
+		virtual void Deserialize(Entity entity, YAML::Node data) override
+		{
+			auto& sbc = *entity.GetComponent<SkyboxComponent>();
+			if (data["Texture"])
+				sbc.SetSkyboxTexture(Application::Get().GetAssetManager().GetAsset<Texture2D>(data["Texture"].as<uint64>()));
+		}
+	};
+	ADD_COMPONENT_SERIALIZER(SkyboxComponent, SkyboxSerializer);
 
 }
