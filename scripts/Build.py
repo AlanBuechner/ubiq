@@ -6,7 +6,7 @@ import shutil
 import inspect
 import argparse
 import time
-import importlib
+import importlib.util
 import subprocess
 
 # set our working directory to the projects root directory
@@ -42,6 +42,7 @@ parser.add_argument('-fb', action='store_true', help='build the full project') #
 parser.add_argument('-rebuild', action='store_true', help='rebuild the project') # full build
 parser.add_argument('-clean', action='store_true', help='clean the project') # full build
 parser.add_argument('--BuildTools', action='store_true', help='build tools') # build tools
+parser.add_argument('-g', type=str, help='path to game project') # generate project files
 parser.add_argument('-p', type=str, help='the project to build') # project
 parser.add_argument('-c', type=str, help='the configuration (Release, Debug, Dist)') # configuration
 parser.add_argument('-a', type=str, help='the architecture (x64)') # architecture
@@ -96,6 +97,14 @@ if(args.s != None):
 	else:
 		Config.system = s
 
+# get the game project
+if(args.g != None):
+	Config.gameProject = args.g.replace("\\", "/")
+	if(Config.gameProject[-1] == "/"):
+		Config.gameProject = Config.gameProject[:-1]
+	Config.gameProject = os.path.abspath(Config.gameProject)
+	Config.projects.append(Config.gameProject)
+
 
 # --------------------- Build Tools --------------------- #
 if(args.BuildTools):
@@ -110,7 +119,10 @@ elif(shouldBuild):
 
 # --------------------- Load Project Scritps --------------------- #
 for proj in Config.projects:
-	module = importlib.import_module(proj.replace("/", ".") + ".Build")
+	projName = os.path.basename(proj)
+	spec=importlib.util.spec_from_file_location(projName, proj+"/Build.py")
+	module = importlib.util.module_from_spec(spec)
+	spec.loader.exec_module(module)
 	Config.buildScripts[proj] = {
 		"module" : module,
 		"built" : False,

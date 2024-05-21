@@ -7,7 +7,7 @@ Entities:
         Position: [0, 0, 0]
         Rotation: [0, 0, 0]
         Scale: [1, 1, 1]
-      - Component: Engine::SkyboxComponent
+      - Component: Game::SkyboxComponent
         Texture: 44308273739615182
   - Entity: 11693751238415598823
     Name: Camera
@@ -16,7 +16,7 @@ Entities:
         Position: [3.19560456, 2.17798662, 5]
         Rotation: [-0.242119506, 0.782615602, -1.8988132e-08]
         Scale: [1, 1, 0.99999994]
-      - Component: Engine::CameraComponent
+      - Component: Game::CameraComponent
         Primary: true
         FixedAspectRatio: false
         Camera:
@@ -34,7 +34,7 @@ Entities:
         Position: [0, 1.46089947, 0]
         Rotation: [0, 0, 0]
         Scale: [1, 1, 1]
-      - Component: Engine::StaticModelRendererComponent
+      - Component: Game::StaticModelRendererComponent
         Model: 7711650371006191785
         Materials:
           sphere_gltf_Sphere.001: 9193023617033958228
@@ -45,7 +45,7 @@ Entities:
         Position: [0, 0, 0]
         Rotation: [0, 0, 0]
         Scale: [1, 1, 1]
-      - Component: Engine::DirectionalLightComponent
+      - Component: Game::DirectionalLightComponent
         Direction: [-0.673012495, -0.739631116, -0]
         Temperature: 5600
         Color: [1, 1, 1]
@@ -58,7 +58,7 @@ Entities:
         Position: [0, 0, 0]
         Rotation: [0, 0, 0]
         Scale: [5, 5, 5]
-      - Component: Engine::StaticModelRendererComponent
+      - Component: Game::StaticModelRendererComponent
         Model: 17720162746019331610
         Materials:
           Plane: 9193023617033958228

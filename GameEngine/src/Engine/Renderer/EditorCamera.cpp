@@ -90,6 +90,8 @@ namespace Engine
 		bool aKey = Input::GetKeyDown(KeyCode::A);
 		bool sKey = Input::GetKeyDown(KeyCode::S);
 		bool dKey = Input::GetKeyDown(KeyCode::D);
+		bool eKey = Input::GetKeyDown(KeyCode::E);
+		bool qKey = Input::GetKeyDown(KeyCode::Q);
 
 		if (rMouse)
 		{
@@ -105,15 +107,14 @@ namespace Engine
 			speed = runSpeed;
 
 		if (rMouse && !alt) {
-			if (wKey)
-				MoveFB(speed);
-			if (sKey)
-				MoveFB(-speed);
+			if (wKey) MoveFB(speed);
+			if (sKey) MoveFB(-speed);
 
-			if (aKey)
-				MoveRL(-speed);
-			if (dKey)
-				MoveRL(speed);
+			if (aKey) MoveRL(-speed);
+			if (dKey) MoveRL(speed);
+
+			if (eKey) MoveUD(speed);
+			if (qKey) MoveUD(-speed);
 		}
 
 
@@ -176,6 +177,11 @@ namespace Engine
 	void EditorCamera::MoveRL(float speed)
 	{
 		m_FocalPoint += GetRightDirection() * speed * Time::GetDeltaTime();
+	}
+
+	void EditorCamera::MoveUD(float speed)
+	{
+		m_FocalPoint += GetUpDirection() * speed * Time::GetDeltaTime();
 	}
 
 	Math::Vector3 EditorCamera::GetUpDirection() const

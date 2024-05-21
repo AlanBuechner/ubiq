@@ -7,8 +7,6 @@
 #include "Engine/Renderer/Model.h"
 
 #include "Engine/Core/Scene/TransformComponent.h"
-#include "Engine/Renderer/Components/SceneRendererComponents.h"
-#include "Engine/Renderer/Components/StaticModelRendererComponent.h"
 
 #include "PropertiesPanel.h"
 
@@ -91,12 +89,25 @@ if(!m_Selected.HasComponent<component>()){\
 		ImGui::CloseCurrentPopup();\
 	}\
 }
-				ADD_COMPONENT(Camera, CameraComponent);
-				ADD_COMPONENT(Directional Light, DirectionalLightComponent);
-				ADD_COMPONENT(Static Model Renderer, StaticModelRendererComponent);
-				ADD_COMPONENT(Skybox, SkyboxComponent);
+				//ADD_COMPONENT(Camera, CameraComponent);
+				//ADD_COMPONENT(Directional Light, DirectionalLightComponent);
+				//ADD_COMPONENT(Static Model Renderer, StaticModelRendererComponent);
+				//ADD_COMPONENT(Skybox, SkyboxComponent);
 
 #undef ADD_COMPONENT
+
+				std::vector<const Reflect::Class*> components = Reflect::Registry::GetRegistry()->GetGroup("Component");
+				for (const Reflect::Class* componetClass : components)
+				{
+					if (!m_Selected.GetScene()->GetRegistry().HasComponent(m_Selected, *componetClass))
+					{
+						if (ImGui::MenuItem(componetClass->GetName().c_str()))
+						{
+							m_Selected.GetScene()->GetRegistry().AddComponent(m_Selected, m_Selected.GetScene(), *componetClass);
+							ImGui::CloseCurrentPopup();
+						}
+					}
+				}
 
 				ImGui::EndPopup();
 			}
@@ -116,30 +127,6 @@ if(!m_Selected.HasComponent<component>()){\
 		if (ImGui::MenuItem("Create Empty Entity"))
 		{
 			createdEntity = m_Context->CreateEntity("Empty Entity");
-			entityAdded = true;
-		}
-
-		if (ImGui::MenuItem("Create Camera"))
-		{
-			(createdEntity = m_Context->CreateEntity("Camera")).AddComponent<CameraComponent>();
-			entityAdded = true;
-		}
-
-		if (ImGui::MenuItem("Create Directional Light"))
-		{
-			(createdEntity = m_Context->CreateEntity("Directional Light")).AddComponent<DirectionalLightComponent>();
-			entityAdded = true;
-		}
-
-		if (ImGui::MenuItem("Create Mesh"))
-		{
-			(createdEntity = m_Context->CreateEntity("Mesh")).AddComponent<StaticModelRendererComponent>();
-			entityAdded = true;
-		}
-
-		if (ImGui::MenuItem("Create Skybox"))
-		{
-			(createdEntity = m_Context->CreateEntity("Skybox")).AddComponent<SkyboxComponent>();
 			entityAdded = true;
 		}
 
@@ -284,122 +271,6 @@ if(!m_Selected.HasComponent<component>()){\
 		Math::Vector3 scale = tc.GetScale();
 		if (changed |= PropertysPanel::DrawVec3Control("Scale", scale, 1.0f))
 			tc.SetScale(scale);
-		return changed;
-	});
-
-	ADD_EXPOSE_PROP_FUNC(CameraComponent) {
-		bool changed = false;
-		CameraComponent& cameraComponent = *(CameraComponent*)voidData;
-		auto& camera = cameraComponent.Camera;
-
-		ImGui::Checkbox("Primary", &cameraComponent.Primary);
-		ImGui::Checkbox("Fixed Aspect Ratio", &cameraComponent.FixedAspectRatio);
-
-		const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
-		const char* currentProjectionTypeString = projectionTypeStrings[(int)camera->GetProjectionType()];
-		if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
-		{
-			for (int i = 0; i < _countof(projectionTypeStrings); i++)
-			{
-				bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
-
-				if (changed |= ImGui::Selectable(projectionTypeStrings[i], isSelected))
-				{
-					currentProjectionTypeString = projectionTypeStrings[i];
-					camera->SetProjectionType((SceneCamera::ProjectionType)i);
-				}
-
-				if (isSelected)
-					ImGui::SetItemDefaultFocus();
-			}
-
-			ImGui::EndCombo();
-		}
-
-		if (camera->GetProjectionType() == SceneCamera::ProjectionType::Perspective)
-		{
-			float fov = glm::degrees(camera->GetPerspectiveVerticalFOV());
-			if (changed |= PropertysPanel::DrawFloatControl("FOV", fov, 45.0f))
-				camera->SetPerspectiveVerticalFOV(glm::radians(fov));
-
-			float nearClip = camera->GetPerspectiveNearClip();
-			if (changed |= PropertysPanel::DrawFloatControl("Near Clip", nearClip, 0.01f))
-				camera->SetPerspectiveNearClip(nearClip);
-
-			float farClip = camera->GetPerspectiveFarClip();
-			if (changed |= PropertysPanel::DrawFloatControl("Far Clip", farClip, 1000.0f))
-				camera->SetPerspectiveFarClip(farClip);
-		}
-
-		if (camera->GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
-		{
-			float Size = camera->GetOrthographicSize();
-			if (changed |= PropertysPanel::DrawFloatControl("Size", Size, 10.0f))
-				camera->SetOrthographicSize(Size);
-
-			float nearClip = camera->GetOrthographicNearClip();
-			if (changed |= PropertysPanel::DrawFloatControl("Near Clip", nearClip, -1.0f))
-				camera->SetOrthographicNearClip(nearClip);
-
-			float farClip = camera->GetOrthographicFarClip();
-			if (changed |= PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
-				camera->SetOrthographicFarClip(farClip);
-		}
-		return changed;
-	});
-
-	ADD_EXPOSE_PROP_FUNC(DirectionalLightComponent) {
-		bool changed = false;
-		DirectionalLightComponent& component = *(DirectionalLightComponent*)voidData;
-		Math::Vector3 direction = component.GetDirectinalLight()->GetDirection();
-		Math::Vector2 rot = component.GetDirectinalLight()->GetAngles();
-
-		if (changed |= PropertysPanel::DrawVec2Control("Direction", rot))
-			component.SetAngles(rot);
-
-		float temp = component.GetDirectinalLight()->GetCCT();
-		if (changed |= PropertysPanel::DrawFloatSlider("Temperature", temp, 1700, 20000, 6600))
-			component.SetTemperature(temp);
-
-		Math::Vector3 color = component.GetDirectinalLight()->GetTint();
-		if (changed |= PropertysPanel::DrawColorControl("Color", color))
-			component.SetTint(color);
-
-		float intensity = component.GetDirectinalLight()->GetIntensity();
-		if (changed |= PropertysPanel::DrawFloatControl("Intensity", intensity))
-			component.SetIntensity(intensity);
-
-		float size = component.GetDirectinalLight()->GetSize();
-		if (changed |= PropertysPanel::DrawFloatControl("Size", size))
-			component.SetSize(size);
-		return changed;
-	});
-
-	ADD_EXPOSE_PROP_FUNC(StaticModelRendererComponent) {
-		bool changed = false;
-		StaticModelRendererComponent& component = *(StaticModelRendererComponent*)voidData;
-		Ref<Model> model = component.GetModel();
-		if (PropertysPanel::DrawModelControl("Model", model))
-		{
-			component.SetModel(model);
-			component.Invalidate();
-		}
-
-		for (uint32_t i = 0; i < component.GetMeshes().size(); i++)
-		{
-			auto& entry = component.GetMeshes()[i];
-			if (PropertysPanel::DrawMaterialControl(entry.m_Name, entry.m_Material))
-				component.Invalidate();
-		}
-		return changed;
-	});
-
-	ADD_EXPOSE_PROP_FUNC(SkyboxComponent) {
-		bool changed = false;
-		SkyboxComponent& component = *(SkyboxComponent*)voidData;
-		Ref<Texture2D> texture = component.GetSkyboxTexture();
-		if (PropertysPanel::DrawTextureControl("Texture", texture))
-			component.SetSkyboxTexture(texture);
 		return changed;
 	});
 

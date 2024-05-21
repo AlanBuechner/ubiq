@@ -1,4 +1,5 @@
 #include "EditorAssets.h"
+#include "Resource.h"
 
 // textures
 Engine::Ref<Engine::Texture2D> Engine::EditorAssets::s_DefaultFileIcon;
@@ -24,19 +25,19 @@ namespace Engine
 	{
 		CORE_INFO("Loading Editor Assets");
 		// Textures
-		s_DefaultFileIcon = Texture2D::Create("Resources/Textures/DefaultFileIcon.png");
-		s_ShaderFileIcon = Texture2D::Create("Resources/Textures/ShaderFileIcon.png");
-		s_SceneFileIcon = Texture2D::Create("Resources/Textures/SceneFileIcon.png");
-		s_ImageFileIcon = Texture2D::Create("Resources/Textures/ImageFileIcon.png");
-		s_FolderIcon = Texture2D::Create("Resources/Textures/FolderIcon.png");
-		s_BackIcon = Texture2D::Create("Resources/Textures/BackIcon.png");
-
-		s_NoTextureIcon = Texture2D::Create("Resources/Textures/NoTextureIcon.png");
-
-		s_PlayButton = Texture2D::Create("Resources/Textures/PlayButton.png");
-		s_StopButton = Texture2D::Create("Resources/Textures/StopButton.png");
-
-		s_CameraIcon = Texture2D::Create("Resources/Textures/CameraIcon.png");
+		s_DefaultFileIcon =		Texture2D::CreateFromEmbeded(DEFULTFILEICON);
+		s_ShaderFileIcon =		Texture2D::CreateFromEmbeded(SHADERFILEICON);
+		s_SceneFileIcon =		Texture2D::CreateFromEmbeded(SCENEFILEICON);
+		s_ImageFileIcon =		Texture2D::CreateFromEmbeded(IMAGEFILEICON);
+		s_FolderIcon =			Texture2D::CreateFromEmbeded(FOLDERICON);
+		s_BackIcon =			Texture2D::CreateFromEmbeded(BACKICON);
+												 
+		s_NoTextureIcon =		Texture2D::CreateFromEmbeded(NOTEXTUREICON);
+												 
+		s_PlayButton =			Texture2D::CreateFromEmbeded(PLAYBUTTON);
+		s_StopButton =			Texture2D::CreateFromEmbeded(STOPBUTTON);
+												 
+		s_CameraIcon =			Texture2D::CreateFromEmbeded(CAMERAICON);
 
 		// shaders
 	}

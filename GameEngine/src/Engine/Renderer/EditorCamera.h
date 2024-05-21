@@ -51,6 +51,7 @@ namespace Engine
 		
 		void MoveFB(float speed);
 		void MoveRL(float speed);
+		void MoveUD(float speed);
 
 		Math::Vector3 CalculatePosition() const;
 		Math::Vector3 CalculateFocal() const;

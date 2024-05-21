@@ -1,0 +1,66 @@
+#include "SkyboxComponent.h"
+
+
+
+namespace Game
+{
+	void SkyboxComponent::OnComponentAdded()
+	{
+
+	}
+
+	void SkyboxComponent::OnComponentRemoved()
+	{
+		Owner.GetScene()->GetSceneRenderer()->SetSkyBox(nullptr);
+	}
+
+	void SkyboxComponent::SetSkyboxTexture(Engine::Ref<Engine::Texture2D> texture)
+	{
+		m_SkyboxTexture = texture;
+		Owner.GetScene()->GetSceneRenderer()->SetSkyBox(m_SkyboxTexture);
+	}
+}
+
+
+#pragma region Editor
+#include "Panels/PropertiesPanel.h"
+
+namespace Game
+{
+	ADD_EXPOSE_PROP_FUNC(SkyboxComponent) {
+		bool changed = false;
+		SkyboxComponent& component = *(SkyboxComponent*)voidData;
+		Engine::Ref<Engine::Texture2D> texture = component.GetSkyboxTexture();
+		if (Engine::PropertysPanel::DrawTextureControl("Texture", texture))
+			component.SetSkyboxTexture(texture);
+		return changed;
+	});
+}
+
+#pragma endregion
+
+#pragma region Serialization
+#include "Engine/Core/Scene/SceneSerializer.h"
+
+namespace Game
+{
+	class SkyboxSerializer : public Engine::ComponentSerializer
+	{
+		virtual void Serialize(Engine::Entity entity, YAML::Emitter& out) override
+		{
+			auto& skyboxComponent = *entity.GetComponent<SkyboxComponent>();
+			if (skyboxComponent.GetSkyboxTexture())
+				out << YAML::Key << "Texture" << YAML::Value << skyboxComponent.GetSkyboxTexture()->GetAssetID();
+		}
+
+		virtual void Deserialize(Engine::Entity entity, YAML::Node data) override
+		{
+			auto& sbc = *entity.GetComponent<SkyboxComponent>();
+			if (data["Texture"])
+				sbc.SetSkyboxTexture(Engine::Application::Get().GetAssetManager().GetAsset<Engine::Texture2D>(data["Texture"].as<uint64>()));
+		}
+	};
+	ADD_COMPONENT_SERIALIZER(SkyboxComponent, SkyboxSerializer);
+
+}
+#pragma endregion

@@ -22,6 +22,9 @@ namespace Engine
 
 	void ContentBrowserPanel::OnImGuiRender()
 	{
+		if (!m_Active)
+			return;
+
 		if(ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 			m_SelectedAsset = "";
 

@@ -65,6 +65,10 @@ namespace Engine
 
 	void* SceneRegistry::AddComponent(EntityType entity, Scene* scene, const Reflect::Class& componentClass)
 	{
+		// check if entity already has component
+		if (HasComponent(entity, componentClass))
+			return nullptr;
+
 		// find the component pool
 		ComponentPool* pool = GetOrCreateCompnentPool(componentClass);
 

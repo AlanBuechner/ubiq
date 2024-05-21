@@ -13,11 +13,12 @@ namespace Engine
 	public:
 		Entity Owner;
 
-		virtual void OnComponentAdded() {};
-		virtual void OnComponentRemoved() {};
+		virtual void OnComponentAdded() {}
+		virtual void OnComponentRemoved() {}
 
-		virtual void OnTransformChange(const Math::Mat4& transform) {};
-		virtual void OnInvalid() {};
+		virtual void OnTransformChange(const Math::Mat4& transform) {}
+		virtual void OnViewportResize(uint32 width, uint32 height) {}
+		virtual void OnPreRender() {}
 	};
 
 }

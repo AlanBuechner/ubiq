@@ -1,4 +1,4 @@
-# engine build script
+# test project build script
 
 import scripts.BuildUtils as BuildUtils
 from scripts.Utils.Utils import *
@@ -9,13 +9,8 @@ import inspect
 projDir = os.path.dirname(inspect.getfile(lambda: None)).replace("\\", "/")
 projName = os.path.basename(projDir)
 
-pchHeader = f"{location}/src/pch.h"
-pchSource = f"{location}/src/pch.cpp"
-
 sources = [
 	f"src/**.cpp",
-	f"{includeDirs['stb_image']}/**.cpp",
-	f"{includeDirs['ImGuizmo']}/ImGuizmo.cpp"
 ]
 
 resources = [
@@ -24,14 +19,12 @@ resources = [
 
 headers = [
 	f"src/**.h",
-	f"{includeDirs['stb_image']}/**.h",
-	f"{includeDirs['ImGuizmo']}/ImGuizmo.h",
 ]
 
 includes = [
 	projDir,
 	f"src",
-	f"vendor",
+	f"{includeDirs['vendor']}",
 	f"{includeDirs['ImGui']}",
 	f"{includeDirs['glm']}",
 	f"{includeDirs['stb_image']}",
@@ -42,12 +35,15 @@ includes = [
 	f"{includeDirs['dxc']}",
 	f"{includeDirs['pix']}",
 	f"{includeDirs['Aftermath']}",
+	f"{includeDirs['ProjectManager']}/src",
 	f"{includeDirs['Reflection']}/src",
+	f"{location}/GameEngine/vendor",
+	f"{location}/GameEngine/src",
+	f"{location}/GameEngine/embeded",
+	f"{location}/USG-Editor/src",
 ]
 
-sysIncludes = [
-
-]
+sysIncludes = []
 sysIncludes.extend(GetSysIncludes())
 
 defines = [
@@ -57,24 +53,15 @@ defines = [
 	"_CRT_SECURE_NO_WARNINGS",
 ]
 
-dependancys = [
-	f"imgui",
-	f"yaml-cpp",
-	f"Reflection",
-]
+dependancys = []
 
-links = [
-	f"{libs['Assimp']}",
-	f"{libs['dxc']}",
-	f"{libs['pix']}",
-	f"{libs['Aftermath']}"
-]
+links = []
 
 def GetProject():
 	proj = BuildUtils.ProjectEnviernment()
 	proj.projectDirectory = projDir
-	proj.pchSource = pchSource
-	proj.pchHeader = pchHeader
+	proj.pchSource = ""
+	proj.pchHeader = ""
 	proj.sources = sources
 	proj.resources = resources
 	proj.headers = headers
@@ -84,7 +71,8 @@ def GetProject():
 	proj.links = links
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
-	proj.intDir = GetIntDir(projName)
-	proj.binDir = GetBinDir(projName)
+	proj.intDir = GetIntDir(projName, Config.gameProject)
+	proj.binDir = GetBinDir(projName, Config.gameProject)
+	print(proj.intDir)
 	proj.genReflection = True
 	return proj

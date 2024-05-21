@@ -7,7 +7,7 @@ Entities:
         Position: [0, 0, 0]
         Rotation: [0, 0, 0]
         Scale: [1, 1, 1]
-      - Component: Engine::DirectionalLightComponent
+      - Component: Game::DirectionalLightComponent
         Direction: [-0.673012495, -0.739631116, -0]
         Temperature: 5600
         Color: [1, 1, 1]
@@ -20,7 +20,7 @@ Entities:
         Position: [0, 0, 0]
         Rotation: [0, -0.436332315, 0]
         Scale: [1, 1, 100]
-      - Component: Engine::StaticModelRendererComponent
+      - Component: Game::StaticModelRendererComponent
         Model: 630034325824791667
         Materials:
           cube: 14846736622411844726

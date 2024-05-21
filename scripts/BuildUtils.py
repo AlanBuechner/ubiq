@@ -80,7 +80,11 @@ class ObjectEnviernment:
 			args.extend([Config.compiler])
 			args.extend(["-cc1"])
 			args.extend(["-x", "c++"])
-			args.extend(["-O2", "-emit-obj"])
+			if(Config.configuration == "Debug"):
+				args.append("-O0")
+			else:
+				args.append("-O2")
+			args.extend(["-emit-obj"])
 			args.extend(["-triple", GetTarget()])
 			args.extend([self.sourceFile])
 			args.extend(["-o", self.objFile])
@@ -194,6 +198,8 @@ def BuildSources(sources, projDir, intDir, includes, sysIncluds, defines):
 		objFile = os.path.join(intDir, name) + ".obj"
 		treeFile = os.path.join(intDir, name) + ".d"
 
+		#print(objFile)
+
 		env = ObjectEnviernment()
 		env.sourceFile = file
 		env.objFile = objFile
@@ -232,7 +238,7 @@ class ResourceEnviernment:
 		result = subprocess.run(args, cwd=self.workingDir, shell=True, env=my_env, capture_output=True, text=True)
 		log = f"|------------- Building file : {name} -------------|\n"
 		log += str(result.stderr)
-		#log += str(result.stdout)
+		log += str(result.stdout)
 		log += f"building {name} completed with error code {result.returncode}\n"
 		print(log)
 		return result.returncode
@@ -305,6 +311,7 @@ def CollectIntFolders(dependancys):
 	return intDirs
 
 def LinkObjects(intDir, dependancys, links, projDir, outputFile, buildType, needsBuild):
+	links.extend(dependancys)
 	if(not needsBuild):
 		if(not os.path.isfile(outputFile)):
 			needsBuild = True
@@ -349,6 +356,7 @@ def LinkObjects(intDir, dependancys, links, projDir, outputFile, buildType, need
 				args.extend(ResolveFiles([f"{intd}/**.res"], intd))
 
 		args.extend(["-o", outputFile])
+		args.append("-Wl,-force-load")
 		args.extend(ResolveFiles([f"{intDir}/**.obj"], intDir))
 		args.extend(links)
 		result = subprocess.run(args, cwd=projDir, capture_output=True, text=True)

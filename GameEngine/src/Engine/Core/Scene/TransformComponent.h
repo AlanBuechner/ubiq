@@ -18,6 +18,8 @@
 
 #include "Engine/Core/MeshBuilder.h"
 
+class TransformSerializer;
+
 namespace Engine
 {
 	typedef TransformComponent TCOMP;
@@ -77,6 +79,6 @@ namespace Engine
 		Math::Mat4 ChashedGloableTransform = Math::Mat4(1.0f);
 
 		friend class Scene;
-		friend class TransformSerializer;
+		friend TransformSerializer;
 	};
 }

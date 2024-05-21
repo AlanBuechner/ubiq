@@ -10,6 +10,7 @@
 #include "Engine/Renderer/SceneRenderer.h"
 
 #include "ProjectManager/Project.h"
+#include "Engine/Core/GameBase.h"
 
 namespace Engine
 {
@@ -17,12 +18,6 @@ namespace Engine
 	class EditorLayer : public Layer
 	{
 		static EditorLayer* s_Instance;
-
-		enum class SceneState
-		{
-			Edit = 0,
-			Play = 1,
-		};
 
 	public:
 		EditorLayer();
@@ -38,12 +33,12 @@ namespace Engine
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& event) override;
 
+		void NewScene();
 		void LoadScene(const std::string& file);
 
 		ContentBrowserPanel& GetContantBrowser() { return m_ContentPanel; }
 
 	private:
-		void NewScene();
 		void OpenScene();
 		void SaveScene();
 		void SaveSceneAs();
@@ -52,16 +47,11 @@ namespace Engine
 
 		void DrawCustomGizmo();
 
-		void UI_Toolbar();
 		void UI_Viewport();
-
-		void OnScenePlay();
-		void OnSceneStop();
 
 		int GetEntityIDAtMousePosition(bool& inWindow);
 
-		void OpenProject(const fs::path& projectFile);
-		void OpenProjectDialog();
+		void LoadProject();
 
 	private:
 		const Math::Vector4 m_GridColor = { 0.5f,0.5f,0.5f,1 };
@@ -74,9 +64,6 @@ namespace Engine
 
 		fs::path m_LoadedScene;
 
-		Ref<Scene> m_ActiveScene;
-		Ref<Scene> m_PlayScene;
-
 		Entity m_CameraEntity;
 
 		Math::Vector2 m_ViewPortSize;
@@ -88,10 +75,9 @@ namespace Engine
 		SceneHierarchyPanel m_HierarchyPanel;
 		ContentBrowserPanel m_ContentPanel;
 
-		SceneState m_SceneState = SceneState::Edit;
+		GameBase* m_Game;
 
 		fs::path m_DropPath;
-
 		fs::path m_EditorDirectory;
 
 		Ref<ProjectManager::Project> m_CurrentProject;

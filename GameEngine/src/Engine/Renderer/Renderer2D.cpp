@@ -73,7 +73,7 @@ namespace Engine
 		s_Data.QuadMesh->SetIndices(indices, _countof(indices));
 
 		// create shader
-		s_Data.SpriteShader = Shader::CreateFromEmbeded(TEXTURE, "TextureShader.hlsl");
+		s_Data.SpriteShader = Shader::CreateFromEmbeded(SPRITE, "TextureShader.hlsl");
 
 		// create instance data
 		s_Data.QuadInstanceBuffer = InstanceBuffer::Create(sizeof(QuadInstance), s_Data.MaxQuades);

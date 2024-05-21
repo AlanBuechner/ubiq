@@ -13,12 +13,18 @@
 #endif
 #endif
 
+// categories
 #define SHADER 255
-#define BLIT 254
-#define LINE 253
-#define TEXTURE 252
-#define DEPTHFOG 251
-#define BLOOM 250
-#define BLOOMCOMPUTE 249
-#define DEPTHOFFIELD 248
-#define TONEMAPPING 247
+#define TEXTURE 254
+
+// shaders
+#define BLIT 253
+#define LINE 252
+#define SPRITE 251
+#define DEPTHFOG 250
+#define BLOOM 249
+#define BLOOMCOMPUTE 248
+#define DEPTHOFFIELD 247
+#define TONEMAPPING 246
+
+// textures

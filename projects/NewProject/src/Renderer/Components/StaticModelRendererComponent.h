@@ -7,25 +7,25 @@
 #include "Engine/Renderer/SceneRenderer.h"
 #include "Engine/Core/Scene/Components.h"
 
-namespace Engine
+namespace Game
 {
-	CLASS(GROUP = Component) StaticModelRendererComponent : public Component
+	CLASS(GROUP = Component) StaticModelRendererComponent : public Engine::Component
 	{
 	public:
-		REFLECTED_BODY(Engine::StaticModelRendererComponent);
+		REFLECTED_BODY(Game::StaticModelRendererComponent);
 
 	public:
 
 		struct MeshEntry
 		{
-			MeshEntry(std::string name, Ref<Mesh> mesh) :
+			MeshEntry(std::string name, Engine::Ref<Engine::Mesh> mesh) :
 				m_Name(name), m_Mesh(mesh)
 			{}
 
 			std::string m_Name;
-			Ref<Mesh> m_Mesh = nullptr;
-			Ref<Material> m_Material = nullptr;
-			SceneRenderer::ObjectControlBlockRef m_Object = nullptr;
+			Engine::Ref<Engine::Mesh> m_Mesh = nullptr;
+			Engine::Ref<Engine::Material> m_Material = nullptr;
+			Engine::SceneRenderer::ObjectControlBlockRef m_Object = nullptr;
 		};
 
 	public:
@@ -33,16 +33,16 @@ namespace Engine
 
 		virtual void OnTransformChange(const Math::Mat4& transform) override;
 
-		void SetModel(Ref<Model> model);
-		Ref<Model> GetModel() { return m_Model; }
+		void SetModel(Engine::Ref<Engine::Model> model);
+		Engine::Ref<Engine::Model> GetModel() { return m_Model; }
 
 		std::vector<MeshEntry>& GetMeshes() { return m_CollapsedModelTree; }
 
 		void Invalidate();
 
 	private:
-		PROPERTY(HideInInspector) Ref<Model> m_Model;
+		PROPERTY(HideInInspector) Engine::Ref<Engine::Model> m_Model;
 		std::vector<MeshEntry> m_CollapsedModelTree;
-		Ref<SceneRenderer> m_SceneRenderer;
+		Engine::Ref<Engine::SceneRenderer> m_SceneRenderer;
 	};
 }

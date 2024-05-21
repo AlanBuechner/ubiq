@@ -2,7 +2,6 @@
 #include "EditorAssets.h"
 
 #include "Engine/Core/Scene/SceneSerializer.h"
-#include "Engine/Renderer/Components/SceneRendererComponents.h"
 #include "Engine/Core/Scene/TransformComponent.h"
 #include "Engine/Math/Math.h"
 #include "Engine/Core/Cursor.h"
@@ -42,23 +41,19 @@ namespace Engine
 			m_GridMesh.m_Indices.push_back((i * 3) + 2);
 		}
 
-		m_EditorDirectory = fs::current_path();
-		Application::Get().GetAssetManager().AddAssetDirectory(m_EditorDirectory / "Assets");
+		m_ViewPortSize = { Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight() };
 
-		std::vector<std::string> args = GetCommandLineArguments();
+		m_Game = CreateGame();
 
-		if (args.size() > 1)
-			OpenProject(args[1]);
+		LoadProject();
 	}
 
 	void EditorLayer::OnAttach()
 	{
-		m_ActiveScene = CreateRef<Scene>();
+		NewScene();
 
 		m_EditorCamera = CreateRef<EditorCamera>();
 		m_EditorCamera->SetOrientation({ Math::Radians(180-25), Math::Radians(25) });
-
-		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -71,25 +66,20 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 
 		// resize
-		uint32 width = m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetResource()->GetWidth();
-		uint32 height = m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetResource()->GetHeight();
+		uint32 width = m_Game->GetScene()->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetResource()->GetWidth();
+		uint32 height = m_Game->GetScene()->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetResource()->GetHeight();
 		if (m_ViewPortSize.x > 0.0f && m_ViewPortSize.y > 0.0f &&
 			(width != m_ViewPortSize.x || height != m_ViewPortSize.y))
 		{
 			m_EditorCamera->SetViewportSize(m_ViewPortSize.x, m_ViewPortSize.y);
-			m_ActiveScene->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
+			m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		}
 
 		m_EditorCamera->OnUpdate();
 
 		// update scene
-		if (m_SceneState == SceneState::Edit)
-		{
-			DrawCustomGizmo();
-			m_ActiveScene->OnUpdateEditor(m_EditorCamera);
-		}
-		else if (m_SceneState == SceneState::Play)
-			m_PlayScene->OnUpdateRuntime();
+		DrawCustomGizmo();
+		m_Game->OnUpdate(m_EditorCamera);
 
 		if (Input::GetMouseButtonPressed(KeyCode::LEFT_MOUSE) && !Input::GetKeyDown(KeyCode::ALT) && !ImGuizmo::IsOver())
 		{
@@ -100,9 +90,12 @@ namespace Engine
 				if (entityID == -1)
 					m_HierarchyPanel.SelectEntity({});
 				else
-					m_HierarchyPanel.SelectEntity({ (EntityType)entityID, m_ActiveScene.get() });
+					m_HierarchyPanel.SelectEntity({ (EntityType)entityID, m_Game->GetScene().get() });
 			}
 		}
+
+		if (Input::GetKeyPressed(KeyCode::SPACE) && Input::GetKeyDown(KeyCode::CONTROL))
+			m_ContentPanel.SetActive(!m_ContentPanel.IsActive());
 
 	}
 
@@ -112,12 +105,11 @@ namespace Engine
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		timer.Start("Recored Commands");
 
+		m_Game->OnRender();
+
 		Ref<CommandList> commandList = Renderer::GetMainCommandList();
 
-		Ref<FrameBuffer> framBuffer = m_ActiveScene->GetSceneRenderer()->GetRenderTarget();
-		m_ActiveScene->GetSceneRenderer()->Build();
-		m_ActiveScene->GetSceneRenderer()->Render(Renderer::GetMainCommandQueue());
-
+		Engine::Ref<Engine::FrameBuffer> framBuffer = m_Game->GetScene()->GetSceneRenderer()->GetRenderTarget();
 		Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
 		commandList->SetRenderTarget(framBuffer);
 		Renderer::Build(commandList);
@@ -180,14 +172,9 @@ namespace Engine
 					// which we can't undo at the moment without finer window depth/z control.
 					//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-					/*if (ImGui::MenuItem("New", "Ctrl+N"))
+					if (ImGui::MenuItem("New", "Ctrl+N"))
 					{
 						NewScene();
-					}*/
-
-					if (ImGui::MenuItem("Open...", "Ctrl+O"))
-					{
-						OpenProjectDialog();
 					}
 
 					ImGui::Separator();
@@ -214,44 +201,7 @@ namespace Engine
 			m_HierarchyPanel.OnImGuiRender();
 			m_ContentPanel.OnImGuiRender();
 			
-			UI_Toolbar();
 			UI_Viewport();
-
-			/*ImGui::Begin("shadow map test");
-
-			auto dirLightView = m_ActiveScene->GetRegistry().View<DirectionalLightComponent>();
-			for (auto& comp : dirLightView)
-			{
-				Ref<const DirectionalLight> light = comp.GetDirectinalLight();
-				for (auto& cm : light->GetShadowMaps())
-				{
-					for (uint32 i = 0; i < light->s_NumShadowMaps; i++)
-					{
-						ImGui::Image((ImTextureID)cm.second.m_ShadowMaps[i]->GetAttachmentShaderHandle(0), { 500,500 });
-					}
-				}
-			}
-
-			ImGui::End();*/
-
-			// Console window
-
-			//ImGui::Begin("Console");
-
-			//ImGui::End();
-
-			ImGui::Begin("Statistics");
-
-			/*ImGui::Text("Renderer2D Statis:");
-			Renderer2D::Statistics stats = Renderer2D::GetStats();
-			ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-			ImGui::Text("Quads: %d", stats.QuadCount);*/
-
-			static float deltaTime = Time::GetDeltaMilliseconds();
-			deltaTime = (0.99f * deltaTime) + ( 0.01f * Time::GetDeltaMilliseconds());
-			ImGui::Text("%f m/s %f (fps)", deltaTime, Time::GetFPS());
-
-			ImGui::End();
 
 			ImGui::End();
 		}
@@ -267,17 +217,21 @@ namespace Engine
 		dispacher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(&EditorLayer::OnKeyPressed));
 	}
 
+	void EditorLayer::NewScene()
+	{
+		m_Game->SwitchScene(CreateRef<Scene>());
+		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
+		m_HierarchyPanel.SetContext(m_Game->GetScene());
+	}
+
 	void EditorLayer::LoadScene(const std::string& file)
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		if (m_SceneState == SceneState::Play)
-			OnSceneStop();
-
 		m_LoadedScene = file;
-
-		NewScene();
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Deserialize(file);
+		Ref<Scene> scene = m_Game->LoadScene(file);
+		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
+		m_Game->SwitchScene(scene);
+		m_HierarchyPanel.SetContext(m_Game->GetScene());
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -302,12 +256,6 @@ namespace Engine
 			{
 				if (controlPressed)
 					NewScene();
-				break;
-			}
-			case KeyCode::O:
-			{
-				if (controlPressed)
-					OpenProjectDialog();
 				break;
 			}
 			}
@@ -353,72 +301,46 @@ namespace Engine
 
 		// draw camera frustum
 		Entity selected = m_HierarchyPanel.GetSelectedEntity();
-		if (selected && selected.HasComponent<CameraComponent>())
-		{
-			auto& tc = selected.GetTransform();
-			auto& cam = selected.GetComponent<CameraComponent>()->Camera;
+		//if (selected && selected.HasComponent<CameraComponent>())
+		//{
+		//	auto& tc = selected.GetTransform();
+		//	auto& cam = selected.GetComponent<CameraComponent>()->Camera;
 
-			const Math::Mat4& proj = glm::inverse(cam->GetProjectionMatrix());
-			const Math::Mat4& transform = tc.GetTransform();
-			Math::Vector4 ltn = proj * Math::Vector4{ -1, 1, 0, 1 };
-			Math::Vector4 ltf = proj * Math::Vector4{ -1, 1, 1, 1 };
+		//	const Math::Mat4& proj = glm::inverse(cam->GetProjectionMatrix());
+		//	const Math::Mat4& transform = tc.GetTransform();
+		//	Math::Vector4 ltn = proj * Math::Vector4{ -1, 1, 0, 1 };
+		//	Math::Vector4 ltf = proj * Math::Vector4{ -1, 1, 1, 1 };
 
-			Math::Vector4 rtn = proj * Math::Vector4{ 1, 1, 0, 1 };
-			Math::Vector4 rtf = proj * Math::Vector4{ 1, 1, 1, 1 };
+		//	Math::Vector4 rtn = proj * Math::Vector4{ 1, 1, 0, 1 };
+		//	Math::Vector4 rtf = proj * Math::Vector4{ 1, 1, 1, 1 };
 
-			Math::Vector4 lbn = proj * Math::Vector4{ -1, -1, 0, 1 };
-			Math::Vector4 lbf = proj * Math::Vector4{ -1, -1, 1, 1 };
+		//	Math::Vector4 lbn = proj * Math::Vector4{ -1, -1, 0, 1 };
+		//	Math::Vector4 lbf = proj * Math::Vector4{ -1, -1, 1, 1 };
 
-			Math::Vector4 rbn = proj * Math::Vector4{ 1, -1, 0, 1 };
-			Math::Vector4 rbf = proj * Math::Vector4{ 1, -1, 1, 1 };
+		//	Math::Vector4 rbn = proj * Math::Vector4{ 1, -1, 0, 1 };
+		//	Math::Vector4 rbf = proj * Math::Vector4{ 1, -1, 1, 1 };
 
-			LineMesh mesh;
-			mesh.m_Vertices = {
-				{ltn / ltn.w, {1,1,1,1}}, // 0
-				{rtn / rtn.w, {1,1,1,1}}, // 1
-				{rbn / rbn.w, {1,1,1,1}}, // 2
-				{lbn / lbn.w, {1,1,1,1}}, // 3
-				{ltf / ltf.w, {1,1,1,1}}, // 4
-				{rtf / rtf.w, {1,1,1,1}}, // 5
-				{rbf / rbf.w, {1,1,1,1}}, // 6
-				{lbf / lbf.w, {1,1,1,1}}, // 7
-			};
+		//	LineMesh mesh;
+		//	mesh.m_Vertices = {
+		//		{ltn / ltn.w, {1,1,1,1}}, // 0
+		//		{rtn / rtn.w, {1,1,1,1}}, // 1
+		//		{rbn / rbn.w, {1,1,1,1}}, // 2
+		//		{lbn / lbn.w, {1,1,1,1}}, // 3
+		//		{ltf / ltf.w, {1,1,1,1}}, // 4
+		//		{rtf / rtf.w, {1,1,1,1}}, // 5
+		//		{rbf / rbf.w, {1,1,1,1}}, // 6
+		//		{lbf / lbf.w, {1,1,1,1}}, // 7
+		//	};
 
-			mesh.m_Indices = {
-				0,4, 1,5, 2,6, 3,7,
-				0,1, 1,2, 2,3, 3,0, // near clipping plane
-				4,5, 5,6, 6,7, 7,4  // far clipping plane
-			};
+		//	mesh.m_Indices = {
+		//		0,4, 1,5, 2,6, 3,7,
+		//		0,1, 1,2, 2,3, 3,0, // near clipping plane
+		//		4,5, 5,6, 6,7, 7,4  // far clipping plane
+		//	};
 
-			LineRenderer::DrawLineMesh(mesh, transform);
-		}
+		//	LineRenderer::DrawLineMesh(mesh, transform);
+		//}
 		LineRenderer::EndScene();
-	}
-
-	void EditorLayer::UI_Toolbar()
-	{
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0,2 });
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0,2 });
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0,0,0,0 });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0,0,0,0 });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0,0,0,0 });
-
-		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar);
-
-		float Size = ImGui::GetWindowHeight() - 4.0f;
-		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x*0.5f)-(Size*0.5f));
-		Ref<Texture2D> button = (m_SceneState == SceneState::Edit ? EditorAssets::s_PlayButton : EditorAssets::s_StopButton);
-		if (ImGui::ImageButton((ImTextureID)button->GetSRVDescriptor()->GetGPUHandlePointer(), { Size, Size }, { 0,0 }, {1,1}, 0))
-		{
-			if (m_SceneState == SceneState::Edit)
-				OnScenePlay();
-			else if (m_SceneState == SceneState::Play)
-				OnSceneStop();
-		}
-
-		ImGui::End();
-		ImGui::PopStyleVar(2);
-		ImGui::PopStyleColor(3);
 	}
 
 	void EditorLayer::UI_Viewport()
@@ -433,11 +355,9 @@ namespace Engine
 
 		ImVec2 viewPortPanalSize = ImGui::GetContentRegionAvail();
 		if (m_ViewPortSize != *(Math::Vector2*)&viewPortPanalSize)
-		{
 			m_ViewPortSize = { viewPortPanalSize.x, viewPortPanalSize.y };
-		}
 
-		ImGui::Image((ImTextureID)m_ActiveScene->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetSRVDescriptor()->GetGPUHandlePointer(), viewPortPanalSize);
+		ImGui::Image((ImTextureID)m_Game->GetScene()->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetSRVDescriptor()->GetGPUHandlePointer(), viewPortPanalSize);
 		if (ImGui::BeginDragDropTarget())
 		{
 			/*if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -466,6 +386,21 @@ namespace Engine
 			Cursor::Lock(false);
 		}
 
+		// overlay
+		float fps = Time::GetFPS();
+		ImGui::SetCursorPos(ImVec2(10, viewportOffset.y + 10));
+		ImGui::PushStyleColor(ImGuiCol_Text, fps > 60.0f ? IM_COL32(0, 255, 0, 255) : IM_COL32(255, 0, 0, 255));
+		ImGui::Text("  FPS : %.2f", fps);
+		ImGui::PopStyleColor();
+
+		float frameTime = Time::GetDeltaMilliseconds();
+		ImGui::SetCursorPosX(10);
+		ImGui::PushStyleColor(ImGuiCol_Text, frameTime < 16.666f ? IM_COL32(0, 255, 0, 255) : IM_COL32(255, 0, 0, 255));
+		ImGui::Text("Frame : %.2f m/s", Time::GetDeltaMilliseconds());
+		ImGui::PopStyleColor();
+
+
+		// gizmos
 		ImVec2 minBound = ImGui::GetWindowPos();
 		minBound.x += viewportOffset.x;
 		minBound.y += viewportOffset.y;
@@ -475,7 +410,7 @@ namespace Engine
 		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 		Entity selected = m_HierarchyPanel.GetSelectedEntity();
-		if (m_SceneState != SceneState::Play && selected)
+		if (selected)
 		{
 			// TODO : Fix for child entity's
 			// Gizmo's
@@ -517,21 +452,6 @@ namespace Engine
 		ImGui::PopStyleVar();
 	}
 
-	void EditorLayer::OnScenePlay()
-	{
-		m_SceneState = SceneState::Play;
-		m_PlayScene = Scene::Copy(m_ActiveScene);
-		m_HierarchyPanel.SetContext(m_PlayScene);
-		m_PlayScene->OnRuntimeStart();
-	}
-
-	void EditorLayer::OnSceneStop()
-	{
-		m_PlayScene->OnRuntimeStop();
-		m_HierarchyPanel.SetContext(m_ActiveScene);
-		m_SceneState = SceneState::Edit;
-	}
-
 	int EditorLayer::GetEntityIDAtMousePosition(bool& inWindow)
 	{
 		inWindow = false;
@@ -557,49 +477,21 @@ namespace Engine
 		return -1;
 	}
 
-	void EditorLayer::OpenProject(const fs::path& projectFile)
+	void EditorLayer::LoadProject()
 	{
-		CORE_INFO("opening project \"{0}\"", projectFile.string());
-		if (m_CurrentProject)
-		{
-			Application::Get().GetAssetManager().RemoveAssetDirectory(m_CurrentProject->GetAssetsDirectory());
-		}
-
-		m_CurrentProject = CreateRef<ProjectManager::Project>(projectFile);
-		fs::current_path(m_CurrentProject->GetRootDirectory());
+		CORE_INFO("Loading project file");
+		m_CurrentProject = CreateRef<ProjectManager::Project>("Project.ubiqproj");
 		Application::Get().GetAssetManager().AddAssetDirectory(m_CurrentProject->GetAssetsDirectory());
 		Renderer::SetDefultMaterial(Application::Get().GetAssetManager().GetAsset<Material>(m_CurrentProject->GetDefultMaterialID()));
 
 		m_ContentPanel.SetDirectory(m_CurrentProject->GetAssetsDirectory());
-
-		NewScene();
-	}
-
-	void EditorLayer::OpenProjectDialog()
-	{
-		std::string filepath = Engine::FileDialogs::OpenFile("Ubiq Project (*.ubiqproj)\0*.ubiqproj\0");
-		if (!filepath.empty())
-		{
-			OpenProject(filepath);
-		}
-	}
-
-	void EditorLayer::NewScene()
-	{
-		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
-		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OpenScene()
 	{
 		std::string filepath = Engine::FileDialogs::OpenFile("Ubiq Scene (*.ubiq)\0*.ubiq\0");
 		if (!filepath.empty())
-		{
-			NewScene();
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(filepath);
-		}
+			LoadScene(filepath);
 	}
 
 	void EditorLayer::SaveScene()
@@ -607,7 +499,7 @@ namespace Engine
 		if (!m_LoadedScene.empty())
 		{
 			CORE_INFO("Saving Scene: {0}", m_LoadedScene.string());
-			SceneSerializer serializer(m_ActiveScene);
+			SceneSerializer serializer(m_Game->GetScene());
 			serializer.Serialize(m_LoadedScene.string());
 		}
 	}
@@ -618,7 +510,7 @@ namespace Engine
 		if (!filepath.empty())
 		{
 			CORE_INFO("Saving Scene As: {0}", filepath);
-			SceneSerializer serializer(m_ActiveScene);
+			SceneSerializer serializer(m_Game->GetScene());
 			serializer.Serialize(filepath);
 		}
 	}

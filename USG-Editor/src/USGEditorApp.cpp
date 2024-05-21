@@ -4,6 +4,7 @@
 #include "EditorAssets.h"
 #include <Engine/Core/EntryPoint.h>
 #include <Engine/Util/PlatformUtils.h>
+#include <Engine/Core/GameBase.h>
 
 LINK_REFLECTION_DATA(USG_Editor)
 

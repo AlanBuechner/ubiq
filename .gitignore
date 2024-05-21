@@ -2,10 +2,9 @@
 .vs/
 bin/
 bin-int/
-Sandbox/*.json
 GameEngine/generated
-Sandbox/generated
 USG-Editor/generated
+projects/NewProject/generated
 __pycache__
 
 GameEngine/vendor/dxc
@@ -22,7 +21,9 @@ dxil.dll
 *.vsxproj*
 *.vcxproj*
 premake5.lua
-USG-Editor/startup.json
-USG-Editor/runtime.json
+startup.json
+runtime.json
 
 *.wpix
+*.aps
+*.reflected

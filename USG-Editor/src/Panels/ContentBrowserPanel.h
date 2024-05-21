@@ -16,6 +16,8 @@ namespace Engine
 
 		void SelectAsset(fs::path path);
 		void SetDirectory(const fs::path& path);
+		bool IsActive() { return m_Active; }
+		void SetActive(bool active) { m_Active = active; }
 
 	private:
 		void DrawDirectory(const fs::path& path);
@@ -39,5 +41,6 @@ namespace Engine
 		float m_DivideLoc = 300.0f;
 
 		bool m_DrawTreeView = true;
+		bool m_Active = false;
 	};
 }

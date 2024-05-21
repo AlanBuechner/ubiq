@@ -68,7 +68,6 @@ links = [
 	"comdlg32.lib",
 	"shell32.lib",
 ]
-links.extend(dependancys)
 
 dlls = [
 	f"{vendorDirs['dxc']}/bin/x64/dxil.dll",
@@ -79,6 +78,9 @@ dlls = [
 ]
 
 def GetProject():
+	if(Config.gameProject != None):
+		dependancys.append(os.path.basename(Config.gameProject))
+
 	proj = BuildUtils.ProjectEnviernment()
 	proj.projectDirectory = projDir
 	proj.pchSource = pchSource
@@ -94,6 +96,7 @@ def GetProject():
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.EXECUTABLE
 	proj.genReflection = True
-	proj.intDir = GetIntDir(projName)
-	proj.binDir = GetBinDir(projName)
+	proj.intDir = GetIntDir(projName, Config.gameProject)
+	proj.binDir = GetBinDir(projName, Config.gameProject)
+	print(proj.intDir)
 	return proj

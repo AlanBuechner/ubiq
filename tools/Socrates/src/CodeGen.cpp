@@ -21,6 +21,26 @@ void WriteFlags(std::ofstream& ofs, const std::vector<Attribute>& attribs)
 	ofs << "}";
 }
 
+void WriteAttributes(std::ofstream& ofs, const std::vector<Attribute>& attribs)
+{
+	std::vector<Attribute> atributes;
+	for (const Attribute& attrib : attribs)
+	{
+		if (attrib.type == Attribute::Type::Prop)
+			atributes.push_back(attrib);
+	}
+	ofs << "{";
+	for (uint32_t i = 0; i < atributes.size(); i++)
+	{
+		const std::string& key = atributes[i].name;
+		const std::string& value = atributes[i].value;
+		ofs << "{\"" << key << "\",\"" << value << "\"}";
+		if (i != atributes.size() - 1)
+			ofs << ",";
+	}
+	ofs << "}";
+}
+
 void WriteProps(std::ofstream& ofs, const std::vector<Property> props, const std::string& parentTypeName)
 {
 	ofs << "{";
@@ -32,6 +52,8 @@ void WriteProps(std::ofstream& ofs, const std::vector<Property> props, const std
 			"sizeof(" << prop.m_Type << ")," <<
 			"offsetof(" << parentTypeName << "," << prop.m_Name << "),";
 		WriteFlags(ofs, prop.m_Attributes);
+		ofs << ",";
+		WriteAttributes(ofs, prop.m_Attributes);
 		ofs << ")";
 		if (i != props.size() - 1)
 			ofs << ",";
@@ -65,6 +87,8 @@ void WriteCode(const fs::path& path, const std::string& projectName, const Refle
 			<< "(\"" << name << "\", \"" << sname << "\", \"" << group << "\",";
 		
 		WriteFlags(ofs, attribs);
+		ofs << ", ";
+		WriteAttributes(ofs, attribs);
 		ofs << ", ";
 		WriteProps(ofs, props, sname);
 		ofs <<");" << std::endl;

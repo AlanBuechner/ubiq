@@ -19,6 +19,7 @@ tools = [
 ]
 
 startupProject = "USG-Editor"
+gameProject = None
 
 configurations = [
 	"Debug",

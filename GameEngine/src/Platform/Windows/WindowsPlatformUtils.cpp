@@ -90,7 +90,11 @@ namespace Engine
 		HMODULE module = GetModule();
 
 		HRSRC res = FindResource(module, MAKEINTRESOURCE(id), MAKEINTRESOURCE(type));
-		if (res == nullptr) return false;
+		if (res == nullptr)
+		{
+			CORE_ASSERT_HRESULT(HRESULT_FROM_WIN32(GetLastError()), "Error failed to find resource");
+			return false;
+		}
 
 		HGLOBAL hdata = LoadResource(module, res);
 		if (hdata == nullptr) return false;

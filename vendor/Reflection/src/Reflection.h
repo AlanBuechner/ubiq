@@ -6,8 +6,6 @@
 #include <vector>
 #include <iostream>
 
-#include "Hash.h"
-
 namespace Reflect {
 
 	template <class T> 
@@ -29,6 +27,22 @@ namespace Reflect {
 
 	}
 
+	class Attribute
+	{
+	public:
+		Attribute() = default;
+		Attribute(const std::string& key, const std::string& value) :
+			key(key), value(value)
+		{}
+
+		const std::string& GetKey() const { return key; }
+		const std::string& GetValue() const { return value; }
+
+	private:
+		std::string key;
+		std::string value;
+	};
+
 	class Property
 	{
 	public:
@@ -38,15 +52,19 @@ namespace Reflect {
 			uint64_t typeID,
 			uint32_t size,
 			uint32_t offset,
-			const std::vector<std::string>& flags
+			const std::vector<std::string>& flags,
+			const std::vector<Attribute>& attributes
 		) :
 			name(name),
 			typeID(typeID),
 			size(size),
-			offset(offset)
+			offset(offset),
+			attributes(attributes)
 		{
 			for (const std::string& flag : flags)
 				this->flags.emplace(flag);
+			for (uint32_t i = 0; i < attributes.size(); i++)
+				attributeMap.emplace(attributes[i].GetKey(), i);
 		}
 
 		const std::string& GetName() const { return name; }
@@ -55,6 +73,10 @@ namespace Reflect {
 		uint32_t GetOffset() const { return offset; }
 		bool HasFlag(const std::string& flag) const { return flags.find(flag) != flags.end(); }
 
+		const std::vector<Attribute>& GetAttributes() const { return attributes; }
+		bool HasAttribute(const std::string& key) const { return attributeMap.find(key) != attributeMap.end(); }
+		const Attribute& GetAttribute(const std::string& key) const { return attributes[attributeMap.at(key)]; }
+
 	private:
 		std::string name = "";
 		uint64_t typeID = 0;
@@ -62,6 +84,9 @@ namespace Reflect {
 		uint32_t offset = 0;
 
 		std::unordered_set<std::string> flags;
+
+		std::vector<Attribute> attributes;
+		std::unordered_map<std::string, uint32_t> attributeMap;
 	};
 
 	class Class {
@@ -79,6 +104,7 @@ namespace Reflect {
 			CreateFunc createFunc, 
 			DestroyFunc destroyFunc,
 			const std::vector<std::string>& flags,
+			const std::vector<Attribute>& attributes,
 			const std::vector<Property>& props
 		): 
 			name(name),
@@ -88,10 +114,13 @@ namespace Reflect {
 			group(group),
 			createFunc(createFunc),
 			destroyFunc(destroyFunc),
+			attributes(attributes),
 			properties(props)
 		{
 			for (const std::string& flag : flags)
 				this->flags.emplace(flag);
+			for (uint32_t i = 0; i < attributes.size(); i++)
+				attributeMap.emplace(attributes[i].GetKey(), i);
 			for (uint32_t i = 0; i < props.size(); i++)
 				propertyMap.emplace(props[i].GetName(), i);
 		}
@@ -107,6 +136,10 @@ namespace Reflect {
 
 		bool HasFlag(const std::string& flag) const { return flags.find(flag) != flags.end(); }
 
+		const std::vector<Attribute>& GetAttributes() const { return attributes; }
+		bool HasAttribute(const std::string& key) const { return attributeMap.find(key) != attributeMap.end(); }
+		const Attribute& GetAttribute(const std::string& key) const { return attributes[attributeMap.at(key)]; }
+
 		const std::vector<Property>& GetProperties() const { return properties; }
 		const Property& GetProperty(const std::string& name) const { return properties[propertyMap.at(name)]; }
 
@@ -119,6 +152,10 @@ namespace Reflect {
 		CreateFunc createFunc;
 		DestroyFunc destroyFunc;
 		std::unordered_set<std::string> flags;
+
+		std::vector<Attribute> attributes;
+		std::unordered_map<std::string, uint32_t> attributeMap;
+
 		std::vector<Property> properties;
 		std::unordered_map<std::string, uint32_t> propertyMap;
 	};
@@ -142,8 +179,9 @@ namespace Reflect {
 				const std::string& sname,
 				const std::string& group,
 				const std::vector<std::string>& flags,
-				const std::vector<Property>& props) 
-			{
+				const std::vector<Attribute>& attributes,
+				const std::vector<Property>& props
+			){
 				Registry::GetRegistry()->AddClass(Class(
 					name,
 					sname,
@@ -153,6 +191,7 @@ namespace Reflect {
 					CreateInstance<T>,
 					DestroyInstance<T>,
 					flags,
+					attributes,
 					props
 				));
 			}
@@ -188,9 +227,11 @@ namespace Reflect {
 #if defined(STRIP_REFLECTION)
 	#define CLASS(...) class
 	#define PROPERTY(...)
+	#define FUNCTION(...)
 #else
 	#define CLASS(...) class __attribute__((annotate("reflect-class," #__VA_ARGS__)))
 	#define PROPERTY(...) __attribute__((annotate("reflect-property," #__VA_ARGS__)))
+	#define FUNCTION(...) __attribute__((annotate("reflect-function," #__VA_ARGS__)))
 #endif
 
 #define LINK_REFLECTION_DATA(name) void DeadLink##name(); void* _DeadLink##name = &DeadLink##name;
