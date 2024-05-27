@@ -39,6 +39,12 @@ Property::Property(const std::string& name, const std::string& type, const std::
 	m_Attributes = ParseAttributeString(attrib);
 }
 
+Function::Function(const std::string& name, const std::vector<std::string>& types, const std::string& attrib) :
+	m_Name(name), m_Types(types)
+{
+	m_Attributes = ParseAttributeString(attrib);
+}
+
 // class
 Class::Class(const std::string& name, const std::string& attrib)
 	: m_SemanticName(name) {
@@ -87,9 +93,9 @@ ReflectionData GetReflectionDataFromFolder(const fs::path& path) {
 
 		std::string line = "";
 		while (getline(ifs, line)) {
-			line.erase(remove(line.begin(), line.end(), ' '), line.end());
 			std::queue<std::string> tokens = Tokenize(line, reservedTokens);
 			std::string action = tokens.front();
+			std::cout << line << std::endl;
 			tokens.pop();
 			if (action == "include") {
 				tokens.pop(); // remove the "
@@ -105,6 +111,7 @@ ReflectionData GetReflectionDataFromFolder(const fs::path& path) {
 				tokens.pop(); // remove the token
 				tokens.pop(); // remove the >
 				std::string attrib = tokens.front();
+				attrib.erase(remove(attrib.begin(), attrib.end(), ' '), attrib.end());
 				tokens.pop(); // remove the token
 				data.m_Classes[name] = Class(name, attrib);
 				currentClassName = name;
@@ -123,8 +130,37 @@ ReflectionData GetReflectionDataFromFolder(const fs::path& path) {
 				tokens.pop(); // remove the token
 				tokens.pop(); // remove the >
 				std::string attrib = tokens.front();
+				attrib.erase(remove(attrib.begin(), attrib.end(), ' '), attrib.end());
 				tokens.pop(); // remove the token
 				data.m_Classes[currentClassName].m_Props.push_back(Property(name, type, attrib));
+			}
+			else if (action == "	func")
+			{
+				tokens.pop(); // remove the <
+				std::string name = tokens.front();
+				tokens.pop(); // remove the name
+				if(tokens.front() == ";")
+					tokens.pop(); // remove the ;
+				std::vector<std::string> types;
+				int indent = 1;
+				while (indent >= 1)
+				{
+					std::string type = "";
+					while (tokens.front() != ";" && indent >= 1)
+					{
+						if (tokens.front() == "<") indent++;
+						if (tokens.front() == ">") indent--;
+						if (indent >= 1)
+							type += tokens.front();
+						tokens.pop(); // remove the token
+					}
+					if (type != "")
+						types.push_back(type);
+				}
+				std::string attrib = tokens.front();
+				attrib.erase(remove(attrib.begin(), attrib.end(), ' '), attrib.end());
+				tokens.pop();
+				data.m_Classes[currentClassName].m_Functions.push_back(Function(name, types, attrib));
 			}
 			else
 			{
@@ -137,3 +173,4 @@ ReflectionData GetReflectionDataFromFolder(const fs::path& path) {
 
 	return data;
 }
+

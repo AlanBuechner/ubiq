@@ -38,7 +38,7 @@ namespace Engine
 
 #define TRANSFORM_PROP(name, additiveName, v) \
 		const Math::Vector3& Get##name() const { return v; }\
-		void Set##name(const Math::Vector3& val) { v = val; Dirty(); }\
+		FUNCTION() void Set##name(const Math::Vector3& val) { v = val; Dirty(); }\
 		void Set##name##X(float val) { v.x = val; Dirty(); }\
 		void Set##name##Y(float val) { v.y = val; Dirty(); }\
 		void Set##name##Z(float val) { v.z = val; Dirty(); }\
@@ -51,7 +51,7 @@ namespace Engine
 #undef TRANSFORM_PROP
 
 		Math::Mat4 GetTransform() const;
-		Math::Mat4 GetGlobalTransform() const;
+		Math::Mat4 GetGlobalTransform();
 
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
@@ -63,14 +63,15 @@ namespace Engine
 
 		bool IsDirty() { return m_Dirty; }
 
-	private:
+	public:
 		void Dirty();
+		FUNCTION() 
 		void UpdateHierarchyGlobalTransform();
 
 	private:
-		PROPERTY(HideInInspector) Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
-		PROPERTY(HideInInspector) Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
-		PROPERTY(HideInInspector) Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
+		PROPERTY(set=SetPosition) Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
+		PROPERTY(set=SetRotation) Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
+		PROPERTY(set=SetScale) Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
 
 		Entity Parent;
 		std::vector<Entity> Children;

@@ -257,7 +257,7 @@ if(!m_Selected.HasComponent<component>()){\
 		}
 	}
 
-	ADD_EXPOSE_PROP_FUNC(TransformComponent) {
+	/*ADD_EXPOSE_PROP_FUNC(TransformComponent) {
 		bool changed = false;
 		TransformComponent& tc = *(TransformComponent*)voidData;
 		Math::Vector3 posiiton = tc.GetPosition();
@@ -272,6 +272,6 @@ if(!m_Selected.HasComponent<component>()){\
 		if (changed |= PropertysPanel::DrawVec3Control("Scale", scale, 1.0f))
 			tc.SetScale(scale);
 		return changed;
-	});
+	});*/
 
 }

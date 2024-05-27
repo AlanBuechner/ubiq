@@ -15,6 +15,7 @@ namespace Game
 
 		virtual void OnUpdate(Engine::Ref<Engine::Camera> overideCamera) override
 		{
+			CREATE_PROFILE_FUNCTIONI();
 			Engine::Ref<Engine::Camera> camera = (overideCamera ? overideCamera : GetSceneCamera());
 
 			if(camera)
@@ -40,7 +41,9 @@ namespace Game
 
 		virtual void OnSceneLoad(Engine::Ref<Engine::Scene> scene) override
 		{
-
+			CREATE_PROFILE_FUNCTIONI();
+			scene->AddUpdateEvent<Engine::ComponentUpdateEvent<Engine::TransformComponent>>("UpdateHierarchyGlobalTransform");
+			scene->AddUpdateEvent<Engine::SceneUpdateEvent>("OnPreRender");
 		}
 
 	};

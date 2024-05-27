@@ -18,7 +18,6 @@ namespace Engine
 
 		virtual void OnTransformChange(const Math::Mat4& transform) {}
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
-		virtual void OnPreRender() {}
 	};
 
 }

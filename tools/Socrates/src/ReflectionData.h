@@ -26,6 +26,15 @@ public:
 	std::vector<Attribute> m_Attributes;
 };
 
+class Function
+{
+public:
+	Function(const std::string& name, const std::vector<std::string>& types, const std::string& attrib);
+	std::string m_Name;
+	std::vector<std::string> m_Types;
+	std::vector<Attribute> m_Attributes;
+};
+
 class Class {
 public:
 	Class() = default;
@@ -35,6 +44,7 @@ public:
 	std::string m_SemanticName;
 	std::vector<Attribute> m_Attributes;
 	std::vector<Property> m_Props;
+	std::vector<Function> m_Functions;
 
 private:
 	std::string GetGroup();

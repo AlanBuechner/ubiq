@@ -17,7 +17,7 @@ namespace Game
 		void SetSkyboxTexture(Engine::Ref<Engine::Texture2D> texture);
 
 	private:
-		PROPERTY(HideInInspector, set=SetSkyboxTexture) 
+		PROPERTY(set=SetSkyboxTexture) 
 		Engine::Ref<Engine::Texture2D> m_SkyboxTexture;
 	};
 }

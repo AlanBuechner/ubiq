@@ -10,11 +10,13 @@ namespace Reflect {
 		if (m_ClassesByName.find(c.GetSname()) != m_ClassesByName.end())
 			return;
 		m_Classes.push_back(c);
-		const Class* registerdClass = &m_Classes.back();
+		Class* registerdClass = &m_Classes.back();
 		m_ClassesByName[c.GetSname()] = registerdClass;
 		m_ClassesByTypeID[c.GetTypeID()] = registerdClass;
-		if(!c.GetGroup().empty())
+		if (!c.GetGroup().empty())
 			m_ClassGroups[c.GetGroup()].push_back(registerdClass);
+		for(Property& prop : registerdClass->properties)
+			prop.c = registerdClass;
 	}
 
 	Registry* Registry::GetRegistry() {

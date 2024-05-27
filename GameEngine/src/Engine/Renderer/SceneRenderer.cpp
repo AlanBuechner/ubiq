@@ -113,6 +113,7 @@ namespace Engine
 
 	void SceneRenderer::UpdateBuffers()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		for (auto& shaderDawSection : m_ShaderDrawSection)
 		{
 			for (auto& renderObject : shaderDawSection)

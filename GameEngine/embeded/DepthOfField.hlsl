@@ -169,7 +169,6 @@ cbuffer RC_SrcLoc
 };
 
 Texture2D<float4> textures[];
-StaticSampler textureSampler = StaticSampler(clamp, clamp, point, point);
 
 
 PS_Output main(PS_Input input)
@@ -181,13 +180,13 @@ PS_Output main(PS_Input input)
 	uint2 srcTexelCount;
 	src.GetDimensions(srcTexelCount.x, srcTexelCount.y);
 	int numTexels = radius * srcTexelCount.y;
-	float2 srcPixelUVSize = 1.0 / srcTexelCount;
 
-	float4 maxval = src.Sample(textureSampler, input.uv);
+	float4 maxval = src.Load(int3(input.position.xy, 0));
 
+	int2 dir = int2(expandX ? 1 : 0, expandX ? 0 : 1);
 	for (int i = -numTexels; i < numTexels; i++)
 	{
-		float val = src.Sample(textureSampler, input.uv + (float2(expandX ? i : 0, expandX ? 0 : i) * srcPixelUVSize)).r;
+		float val = src.Load(int3(input.position.xy + dir * i, 0)).r;
 		maxval.r = max(maxval.r, val);
 	}
 
@@ -223,7 +222,6 @@ cbuffer RC_SrcLoc
 };
 
 Texture2D<float4> textures[];
-StaticSampler textureSampler = StaticSampler(clamp, clamp, point, point);
 
 PS_Output main(PS_Input input)
 {
@@ -234,14 +232,13 @@ PS_Output main(PS_Input input)
 	uint2 srcTexelCount;
 	src.GetDimensions(srcTexelCount.x, srcTexelCount.y);
 	int numTexels = radius * srcTexelCount.y;
-	float2 srcPixelUVSize = 1.0 / srcTexelCount;
+	
+	float4 sum = float4(0, src.Load(int3(input.position.xy, 0)).g, 0, 1);
 
-	float4 sum = float4(0,src.Sample(textureSampler, input.uv).g, 0, 1);
-
+	int2 dir = int2(blurX ? 1 : 0, blurX ? 0 : 1);
 	for (int i = -numTexels; i < numTexels; i++)
 	{
-		float2 offset = float2(blurX ? i : 0, blurX ? 0 : i) * srcPixelUVSize;
-		float val = src.Sample(textureSampler, input.uv + offset).r;
+		float val = src.Load(int3(input.position.xy + dir*i, 0)).r;
 		sum.r += val;
 	}
 

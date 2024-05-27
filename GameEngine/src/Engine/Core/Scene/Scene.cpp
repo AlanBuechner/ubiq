@@ -24,6 +24,8 @@ namespace Engine
 	Scene::~Scene()
 	{
 		m_SceneRenderer = nullptr;
+		for (uint32 i = 0; i < m_UpdateEvents.size(); i++)
+			delete m_UpdateEvents[i];
 	}
 
 	void Scene::OnUpdate(Ref<Camera> camera)
@@ -33,24 +35,8 @@ namespace Engine
 		if(m_CameraChanged)
 			m_SceneRenderer->SetMainCamera(camera);
 
-		// updating
-		{
-			// update transforms
-			CREATE_PROFILE_SCOPEI("Update Transforms");
-			auto TransformComponentView = m_Registry.View<TransformComponent>();
-			for (TransformComponent& tc : TransformComponentView)
-				tc.UpdateHierarchyGlobalTransform();
-		}
-
-		{
-			CREATE_PROFILE_SCOPEI("Prepare components for rendering");
-			//update invalid components
-			m_Registry.EachPool([&](ComponentPool* pool) {
-				pool->EachEntity([&](void* component) {
-					((Component*)component)->OnPreRender();
-				});
-			});
-		}
+		for (uint32 i = 0; i < m_UpdateEvents.size(); i++)
+			m_UpdateEvents[i]->Update();
 		
 		// render 3d models
 		m_SceneRenderer->UpdateBuffers();
@@ -107,4 +93,44 @@ namespace Engine
 		}
 		return Entity::null;
 	}
+
+
+
+
+
+
+
+
+	SceneUpdateEvent::SceneUpdateEvent(const std::string& funcName) :
+		m_FuncName(funcName)
+	{}
+
+	void SceneUpdateEvent::Setup(Scene* scene)
+	{
+		UpdateEvent::Setup(scene);
+
+		const std::vector<const Reflect::Class*> componentClasses = Reflect::Registry::GetRegistry()->GetGroup("Component");
+		for (const Reflect::Class* componentClass : componentClasses)
+		{
+			if (componentClass->HasFunction(m_FuncName))
+			{
+				m_Pools.push_back(scene->GetRegistry().GetOrCreateCompnentPool(*componentClass));
+				m_Funcs.push_back(&componentClass->GetFunction(m_FuncName));
+			}
+		}
+	}
+
+	void SceneUpdateEvent::Update()
+	{
+		CREATE_PROFILE_SCOPEI(m_FuncName);
+		for (uint32 i = 0; i < m_Pools.size(); i++)
+		{
+			ComponentPool* pool = m_Pools[i];
+			const Reflect::Function* func = m_Funcs[i];
+			pool->EachEntity([func](void* component) {
+				func->Invoke(component, {});
+			});
+		}
+	}
+
 }

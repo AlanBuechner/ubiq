@@ -13,8 +13,9 @@ namespace Engine
 			Math::Scale(m_Scale);
 	}
 
-	Math::Mat4 TransformComponent::GetGlobalTransform() const
+	Math::Mat4 TransformComponent::GetGlobalTransform()
 	{
+		UpdateHierarchyGlobalTransform();
 		return ChashedGloableTransform;
 	}
 

@@ -22,7 +22,7 @@ namespace Engine
 		static bool DrawPropertyControl(void* object, uint64 typeID, const Reflect::Property* prop);
 
 
-		typedef std::function<bool(void*, uint64, const Reflect::Property*)> ExposePropertyFunc;
+		typedef std::function<bool(void*, void*, uint64, const Reflect::Property*)> ExposePropertyFunc;
 		static std::unordered_map<uint64, ExposePropertyFunc> s_ExposePropertyFunctions;
 		class AddExposePropertyFunc
 		{
@@ -31,6 +31,6 @@ namespace Engine
 				s_ExposePropertyFunctions.emplace(typeID, func);
 			}
 		};
-#define ADD_EXPOSE_PROP_FUNC(type) Engine::PropertysPanel::AddExposePropertyFunc CAT(Draw,__LINE__)(typeid(type).hash_code(), [](void* voidData, uint64 typeID, const Reflect::Property* prop)
+#define ADD_EXPOSE_PROP_FUNC(type) Engine::PropertysPanel::AddExposePropertyFunc CAT(Draw,__LINE__)(typeid(type).hash_code(), [](void* voidData, void* object, uint64 typeID, const Reflect::Property* prop)
 	};
 }

@@ -351,7 +351,7 @@ namespace Engine
 		void* propLoc = prop ? (void*)((uint64)object + prop->GetOffset()) : object;
 		auto func = PropertysPanel::s_ExposePropertyFunctions.find(typeID);
 		if (func != PropertysPanel::s_ExposePropertyFunctions.end())
-			changed = func->second(propLoc, typeID, prop);
+			changed = func->second(propLoc, object, typeID, prop);
 		else if (prop)
 			CORE_WARN("Could not draw controll for prperty {0} of type {1}", prop->GetName(), prop->GetTypeID());
 		const Reflect::Class* propClass = Reflect::Registry::GetRegistry()->GetClass(typeID);
@@ -371,22 +371,72 @@ namespace Engine
 
 	ADD_EXPOSE_PROP_FUNC(bool) {
 		bool* data = (bool*)voidData;
-		return PropertysPanel::DrawBoolControl(prop->GetName(), *data);
+		if (prop && prop->HasAttribute("set"))
+		{
+			bool val = *data;
+			bool changed = PropertysPanel::DrawBoolControl(prop->GetName(), val);
+			if (changed)
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &val });
+			return changed;
+		}
+		else
+			return PropertysPanel::DrawBoolControl(prop->GetName(), *data);
 	});
 
 	ADD_EXPOSE_PROP_FUNC(float) {
 		float* data = (float*)voidData;
-		return PropertysPanel::DrawFloatControl(prop->GetName(), *data);
+		if (prop && prop->HasAttribute("set"))
+		{
+			float val = *data;
+			bool changed = PropertysPanel::DrawFloatControl(prop->GetName(), val);
+			if (changed)
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &val });
+			return changed;
+		}
+		else
+			return PropertysPanel::DrawFloatControl(prop->GetName(), *data);
 	});
 
 	ADD_EXPOSE_PROP_FUNC(Math::Vector2) {
 		Math::Vector2* data = (Math::Vector2*)voidData;
-		return PropertysPanel::DrawVec2Control(prop->GetName(), *data);
+		if (prop && prop->HasAttribute("set"))
+		{
+			Math::Vector2 vec = *data;
+			bool changed = PropertysPanel::DrawVec2Control(prop->GetName(), vec);
+			if (changed)
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &vec });
+			return changed;
+		}
+		else
+			return PropertysPanel::DrawVec2Control(prop->GetName(), *data);
 	});
 
 	ADD_EXPOSE_PROP_FUNC(Math::Vector3) {
 		Math::Vector3* data = (Math::Vector3*)voidData; 
-		return PropertysPanel::DrawVec3Control(prop->GetName(), *data);
+		if (prop && prop->HasAttribute("set"))
+		{
+			Math::Vector3 vec = *data;
+			bool changed = PropertysPanel::DrawVec3Control(prop->GetName(), vec);
+			if (changed)
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &vec });
+			return changed;
+		}
+		else
+			return PropertysPanel::DrawVec3Control(prop->GetName(), *data);
+	});
+
+	ADD_EXPOSE_PROP_FUNC(Ref<Texture2D>) {
+		Ref<Texture2D>* data = (Ref<Texture2D>*)voidData;
+		if (prop && prop->HasAttribute("set"))
+		{
+			Ref<Texture2D> texture = *data;
+			bool changed = PropertysPanel::DrawTextureControl(prop->GetName(), texture);
+			if(changed)
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &texture });
+			return changed;
+		}
+		else
+			return PropertysPanel::DrawTextureControl(prop->GetName(), *data);
 	});
 
 }

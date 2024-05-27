@@ -32,11 +32,13 @@ int main(int argc, char** argv) {
 	// get reflection data from .reflected files
 	std::cout << "building reflection data" << std::endl;
 	ReflectionData data = GetReflectionDataFromFolder("generated");
+	std::cout << "finished building reflection data" << std::endl;
 
 	// write reflection code
 	fs::path gen = "generated/generated.cpp";
 	std::cout << "generating source" << std::endl;
 	WriteCode(gen, projectName, data);
+	std::cout << "finished generating source" << std::endl;
 
 	return 0;
 }

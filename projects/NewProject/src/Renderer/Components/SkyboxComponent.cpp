@@ -27,14 +27,6 @@ namespace Game
 
 namespace Game
 {
-	ADD_EXPOSE_PROP_FUNC(SkyboxComponent) {
-		bool changed = false;
-		SkyboxComponent& component = *(SkyboxComponent*)voidData;
-		Engine::Ref<Engine::Texture2D> texture = component.GetSkyboxTexture();
-		if (Engine::PropertysPanel::DrawTextureControl("Texture", texture))
-			component.SetSkyboxTexture(texture);
-		return changed;
-	});
 }
 
 #pragma endregion

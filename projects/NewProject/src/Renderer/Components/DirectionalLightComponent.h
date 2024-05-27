@@ -16,8 +16,8 @@ namespace Game
 	public:
 
 		virtual void OnComponentAdded() override;
-		virtual void OnPreRender() override;
 		virtual void OnComponentRemoved() override;
+		FUNCTION() void OnPreRender();
 
 		void SetAngles(Math::Vector2 rot);
 		void SetDirection(Math::Vector3 direction);

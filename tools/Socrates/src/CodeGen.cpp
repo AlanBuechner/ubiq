@@ -1,6 +1,26 @@
 #include "CodeGen.h"
 #include <fstream>
+#include <iostream>
 
+
+void ImplementFunctions(std::ofstream& ofs, const std::vector<Function>& funcs, const std::string& name, const std::string& sname)
+{
+	for (uint32_t i = 0; i < funcs.size(); i++)
+	{
+		const Function& func = funcs[i];
+		ofs << "void " << name << func.m_Name << "(void* obj, std::vector<void*> args){";
+		for (int i = 0; i < func.m_Types.size(); i++)
+			ofs << func.m_Types[i] << "* v" << i << " = (" << func.m_Types[i] << "*)args[" << i << "];";
+		ofs << "((" << sname << "*)obj)->" << func.m_Name << "(";
+		for (int i = 0; i < func.m_Types.size(); i++)
+		{
+			ofs << "*v" << i;
+			if (i != func.m_Types.size() - 1)
+				ofs << ",";
+		}
+		ofs << ");}" << std::endl;
+	}
+}
 
 void WriteFlags(std::ofstream& ofs, const std::vector<Attribute>& attribs)
 {
@@ -61,6 +81,25 @@ void WriteProps(std::ofstream& ofs, const std::vector<Property> props, const std
 	ofs << "}";
 }
 
+void WriteFuncs(std::ofstream& ofs, const std::vector<Function>& funcs, const std::string& name, const std::string& sname)
+{
+	ofs << "{";
+	for (uint32_t i = 0; i < funcs.size(); i++)
+	{
+		const Function& func = funcs[i];
+		ofs << "Reflect::Function(\"" << func.m_Name << "\",";
+		ofs << name << func.m_Name;
+		ofs << ",";
+		WriteFlags(ofs, func.m_Attributes);
+		ofs << ",";
+		WriteAttributes(ofs, func.m_Attributes);
+		ofs << ")";
+		if (i != funcs.size() - 1)
+			ofs << ",";
+	}
+	ofs << "}";
+}
+
 void WriteCode(const fs::path& path, const std::string& projectName, const ReflectionData& data) {
 
 	fs::remove(path);
@@ -69,6 +108,7 @@ void WriteCode(const fs::path& path, const std::string& projectName, const Refle
 	// generate reflection code
 	ofs << "#define _XKEYCHECK_H" << std::endl;
 	ofs << "#include <pch.h>" << std::endl;
+	ofs << "#include <stdarg.h>" << std::endl;
 
 	ofs << "#include \"Reflection.h\"" << std::endl;
 	ofs << "#define private public" << std::endl;
@@ -80,8 +120,11 @@ void WriteCode(const fs::path& path, const std::string& projectName, const Refle
 		const std::string& sname = c.first;
 		const std::string& name = c.second.m_Name;
 		const std::string& group = c.second.m_Group;
-		const std::vector<Attribute> attribs = c.second.m_Attributes;
+		const std::vector<Attribute>& attribs = c.second.m_Attributes;
 		const std::vector<Property>& props = c.second.m_Props;
+		const std::vector<Function>& funcs = c.second.m_Functions;
+
+		ImplementFunctions(ofs, funcs, name, sname);
 
 		ofs << "static Reflect::Registry::Add<" << sname << "> Class" << name
 			<< "(\"" << name << "\", \"" << sname << "\", \"" << group << "\",";
@@ -91,6 +134,8 @@ void WriteCode(const fs::path& path, const std::string& projectName, const Refle
 		WriteAttributes(ofs, attribs);
 		ofs << ", ";
 		WriteProps(ofs, props, sname);
+		ofs << ", ";
+		WriteFuncs(ofs, funcs, name, sname);
 		ofs <<");" << std::endl;
 	}
 
