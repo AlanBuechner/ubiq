@@ -6,23 +6,23 @@
 
 //#define USE_BLOOM_COMPUTE
 
-namespace Engine
+namespace Game
 {
 	class Bloom : public PostProcess
 	{
 	public:
 		virtual void Init(const PostProcessInput& input, SceneData& scene) override;
-		virtual void RecordCommands(Ref<CommandList> commandList, Ref<RenderTarget2D> renderTarget, Ref<Texture2D> src, const PostProcessInput& input, Ref<Mesh> screenMesh) override;
+		virtual void RecordCommands(Engine::Ref<Engine::CommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh) override;
 
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 
 	private:
-		Ref<Shader> m_BloomShader;
+		Engine::Ref<Engine::Shader> m_BloomShader;
 		uint32 m_NumberDownSamples = 1;
 #ifdef USE_BLOOM_COMPUTE
-		std::vector<Ref<RWTexture2D>> m_GaussianSumTextures;
+		std::vector<Engine::Ref<Engine::RWTexture2D>> m_GaussianSumTextures;
 #else
-		std::vector<Ref<RenderTarget2D>> m_GaussianSumTextures;
+		std::vector<Engine::Ref<Engine::RenderTarget2D>> m_GaussianSumTextures;
 #endif
 	};
 }

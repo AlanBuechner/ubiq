@@ -4,18 +4,20 @@
 #include "Engine/Renderer/Abstractions/Shader.h"
 #include "Engine/Renderer/Camera.h"
 
-namespace Engine
+#include "RenderGraph.h"
+
+namespace Game
 {
-	GBufferPassNode::GBufferPassNode(RenderGraph& graph) :
+	GBufferPassNode::GBufferPassNode(Engine::RenderGraph& graph) :
 		RenderGraphNode(graph)
 	{}
 
 	void GBufferPassNode::BuildImpl()
 	{
-		const SceneData& scene = m_Graph.GetScene();
+		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 
 		// depth pre pass
-		GPUTimer::BeginEvent(m_CommandList, "Depth pre pass");
+		Engine::GPUTimer::BeginEvent(m_CommandList, "Depth pre pass");
 		// set up render target
 		m_CommandList->SetRenderTarget(m_RenderTarget);
 		m_CommandList->ClearRenderTarget(m_RenderTarget);
@@ -23,7 +25,7 @@ namespace Engine
 		// render all objects
 		for (auto& cmd : scene.m_DrawCommands)
 		{
-			Ref<ShaderPass> pass = cmd.m_Shader->GetPass("depth");
+			Engine::Ref<Engine::ShaderPass> pass = cmd.m_Shader->GetPass("depth");
 			if (pass)
 			{
 				m_CommandList->SetShader(pass);
@@ -31,11 +33,11 @@ namespace Engine
 				m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
 			}
 		}
-		GPUTimer::EndEvent(m_CommandList); // end depth pre pass
+		Engine::GPUTimer::EndEvent(m_CommandList); // end depth pre pass
 
 		// begin gbuffer pass
-		GPUTimer::BeginEvent(m_CommandList, "GBuffer pass");
-		GPUTimer::EndEvent(m_CommandList); // end gbuffer pass
+		Engine::GPUTimer::BeginEvent(m_CommandList, "GBuffer pass");
+		Engine::GPUTimer::EndEvent(m_CommandList); // end gbuffer pass
 	}
 }
 

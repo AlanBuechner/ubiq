@@ -38,7 +38,7 @@ namespace Engine
 				s_ComponentSerializers.emplace(typeID, serializer);
 			}
 		};
-#define ADD_COMPONENT_SERIALIZER(type, serializer) Engine::SceneSerializer::AddComponentSerializer CAT(Serialize,__LINE__)(typeid(type).hash_code(), new serializer());
+#define ADD_COMPONENT_SERIALIZER(type, serializer) Engine::SceneSerializer::AddComponentSerializer CAT(serializer,__LINE__)(typeid(type).hash_code(), new serializer());
 	};
 }
 

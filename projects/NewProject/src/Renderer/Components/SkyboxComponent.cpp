@@ -1,4 +1,5 @@
 #include "SkyboxComponent.h"
+#include "Renderer/SceneRenderer/SceneRenderer.h"
 
 
 
@@ -11,13 +12,13 @@ namespace Game
 
 	void SkyboxComponent::OnComponentRemoved()
 	{
-		Owner.GetScene()->GetSceneRenderer()->SetSkyBox(nullptr);
+		Owner.GetScene()->GetSceneRendererAs<SceneRenderer>()->SetSkyBox(nullptr);
 	}
 
 	void SkyboxComponent::SetSkyboxTexture(Engine::Ref<Engine::Texture2D> texture)
 	{
 		m_SkyboxTexture = texture;
-		Owner.GetScene()->GetSceneRenderer()->SetSkyBox(m_SkyboxTexture);
+		Owner.GetScene()->GetSceneRendererAs<SceneRenderer>()->SetSkyBox(m_SkyboxTexture);
 	}
 }
 

@@ -15,9 +15,9 @@
 
 namespace Engine
 {
-	Scene::Scene()
+	Scene::Scene(Ref<SceneRenderer> renderer) :
+		m_SceneRenderer(renderer)
 	{
-		m_SceneRenderer = SceneRenderer::Create();
 		OnViewportResize(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
 	}
 

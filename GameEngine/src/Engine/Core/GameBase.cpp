@@ -19,7 +19,7 @@ namespace Engine
 
 	Ref<Scene> GameBase::LoadScene(const std::string& file)
 	{
-		Ref<Scene> scene = CreateRef<Scene>();
+		Ref<Scene> scene = CreateRef<Scene>(CreateSceneRenderer());
 		SceneSerializer serializer(scene);
 		serializer.Deserialize(file);
 		Window& window = Application::Get().GetWindow();

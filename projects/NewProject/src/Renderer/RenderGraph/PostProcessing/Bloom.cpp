@@ -4,7 +4,7 @@
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
-namespace Engine
+namespace Game
 {
 	void Bloom::Init(const PostProcessInput& input, SceneData& scene)
 	{
@@ -12,18 +12,18 @@ namespace Engine
 
 
 #ifdef USE_BLOOM_COMPUTE
-			m_BloomShader = Shader::CreateFromEmbeded(BLOOMCOMPUTE, "Bloom_Compute.hlsl");
+			m_BloomShader = Engine::Shader::CreateFromEmbeded(BLOOMCOMPUTE, "Bloom_Compute.hlsl");
 #else
-			m_BloomShader = Shader::CreateFromEmbeded(BLOOM, "Bloom.hlsl");
+			m_BloomShader = Engine::Shader::CreateFromEmbeded(BLOOM, "Bloom.hlsl");
 #endif
 	}
 
-	void Bloom::RecordCommands(Ref<CommandList> commandList, Ref<RenderTarget2D> renderTarget, Ref<Texture2D> src, const PostProcessInput& input, Ref<Mesh> screenMesh)
+	void Bloom::RecordCommands(Engine::Ref<Engine::CommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
 	{
-		GPUTimer::BeginEvent(commandList, "Bloom");
-		Ref<ShaderPass> downSample = m_BloomShader->GetPass("downSample");
-		Ref<ShaderPass> upSample = m_BloomShader->GetPass("upSample");
-		Ref<ShaderPass> composite = m_BloomShader->GetPass("composite");
+		Engine::GPUTimer::BeginEvent(commandList, "Bloom");
+		Engine::Ref<Engine::ShaderPass> downSample = m_BloomShader->GetPass("downSample");
+		Engine::Ref<Engine::ShaderPass> upSample = m_BloomShader->GetPass("upSample");
+		Engine::Ref<Engine::ShaderPass> composite = m_BloomShader->GetPass("composite");
 
 #ifdef USE_BLOOM_COMPUTE
 			uint32 computeSize = 8;
@@ -101,15 +101,15 @@ namespace Engine
 			}
 			GPUTimer::EndEvent(commandList);
 #else
-			GPUTimer::BeginEvent(commandList, "Down Sample");
+		Engine::GPUTimer::BeginEvent(commandList, "Down Sample");
 			for (uint32 i = 0; i < m_NumberDownSamples; i++)
 			{
-				GPUTimer::BeginEvent(commandList, std::to_string(i));
-				Ref<Texture2D> srcTexture = (i == 0) ? src : m_GaussianSumTextures[i - 1];
+				Engine::GPUTimer::BeginEvent(commandList, std::to_string(i));
+				Engine::Ref<Engine::Texture2D> srcTexture = (i == 0) ? src : m_GaussianSumTextures[i - 1];
 
 				commandList->ValidateStates({
-					{ m_GaussianSumTextures[i]->GetResource(), ResourceState::RenderTarget },
-					{ srcTexture->GetResource(), ResourceState::ShaderResource },
+					{ m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
+					{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource },
 				});
 
 				commandList->SetRenderTarget(m_GaussianSumTextures[i]);
@@ -120,26 +120,26 @@ namespace Engine
 				commandList->SetRootConstant(downSample->GetUniformLocation("RC_Threshold"), threshold);
 				commandList->DrawMesh(screenMesh);
 
-				GPUTimer::EndEvent(commandList);
+				Engine::GPUTimer::EndEvent(commandList);
 			}
 
 			{ // validate that all sum textures are render targets
-				std::vector<ResourceStateObject> transitions(m_GaussianSumTextures.size());
+				std::vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
 				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
-					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), ResourceState::RenderTarget };
+					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);
 			}
-			GPUTimer::EndEvent(commandList);
+			Engine::GPUTimer::EndEvent(commandList);
 
-			GPUTimer::BeginEvent(commandList, "Up Sample");
+			Engine::GPUTimer::BeginEvent(commandList, "Up Sample");
 			for (int i = m_NumberDownSamples - 2; i >= 0; i--)
 			{
-				GPUTimer::BeginEvent(commandList, std::to_string(i));
-				Ref<Texture2D> srcTexture = m_GaussianSumTextures[i + 1];
+				Engine::GPUTimer::BeginEvent(commandList, std::to_string(i));
+				Engine::Ref<Engine::Texture2D> srcTexture = m_GaussianSumTextures[i + 1];
 
 				commandList->ValidateStates({
-					{ m_GaussianSumTextures[i]->GetResource(), ResourceState::RenderTarget },
-					{ srcTexture->GetResource(), ResourceState::ShaderResource },
+					{ m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
+					{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource },
 				});
 
 				commandList->SetRenderTarget(m_GaussianSumTextures[i]);
@@ -147,16 +147,16 @@ namespace Engine
 				commandList->SetTexture(upSample->GetUniformLocation("src"), srcTexture);
 				commandList->DrawMesh(screenMesh);
 
-				GPUTimer::EndEvent(commandList);
+				Engine::GPUTimer::EndEvent(commandList);
 			}
 
-			GPUTimer::EndEvent(commandList);
+			Engine::GPUTimer::EndEvent(commandList);
 
-			GPUTimer::BeginEvent(commandList, "Composite");
+			Engine::GPUTimer::BeginEvent(commandList, "Composite");
 
 			commandList->ValidateStates({
-				{ src->GetResource(), ResourceState::ShaderResource },
-				{ m_GaussianSumTextures[0]->GetResource(), ResourceState::ShaderResource },
+				{ src->GetResource(), Engine::ResourceState::ShaderResource },
+				{ m_GaussianSumTextures[0]->GetResource(), Engine::ResourceState::ShaderResource },
 			});
 
 			commandList->SetRenderTarget(renderTarget);
@@ -167,15 +167,15 @@ namespace Engine
 			commandList->DrawMesh(screenMesh);
 
 			{ // validate that all sum textures are render targets
-				std::vector<ResourceStateObject> transitions(m_GaussianSumTextures.size());
+				std::vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
 				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
-					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), ResourceState::RenderTarget };
+					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);
 			}
-			GPUTimer::EndEvent(commandList);
+			Engine::GPUTimer::EndEvent(commandList);
 #endif
 
-		GPUTimer::EndEvent(commandList);
+			Engine::GPUTimer::EndEvent(commandList);
 
 	}
 
@@ -198,9 +198,9 @@ namespace Engine
 					m_GaussianSumTextures[i]->Resize(w, h);
 				else
 #ifdef USE_BLOOM_COMPUTE
-					m_GaussianSumTextures[i] = RWTexture2D::Create(w, h, 1, TextureFormat::RGBA16);
+					m_GaussianSumTextures[i] = Engine::RWTexture2D::Create(w, h, 1, Engine::TextureFormat::RGBA16);
 #else
-					m_GaussianSumTextures[i] = RenderTarget2D::Create(w, h, TextureFormat::RGBA16_FLOAT);
+					m_GaussianSumTextures[i] = Engine::RenderTarget2D::Create(w, h, Engine::TextureFormat::RGBA16_FLOAT);
 #endif
 			}
 		}

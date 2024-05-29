@@ -28,6 +28,7 @@ namespace Engine
 		virtual void OnUpdate(Ref<Camera> overideCamera = nullptr) = 0;
 		virtual void OnRender() = 0;
 
+		virtual Ref<SceneRenderer> CreateSceneRenderer() = 0;
 	protected:
 		virtual void OnSceneLoad(Ref<Scene> scene) {};
 		virtual void OnSceneSwitch(Ref<Scene> scene) {};

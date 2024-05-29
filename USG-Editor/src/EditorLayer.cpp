@@ -219,7 +219,7 @@ namespace Engine
 
 	void EditorLayer::NewScene()
 	{
-		m_Game->SwitchScene(CreateRef<Scene>());
+		m_Game->SwitchScene(CreateRef<Scene>(m_Game->CreateSceneRenderer()));
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_HierarchyPanel.SetContext(m_Game->GetScene());
 	}

@@ -7,20 +7,22 @@
 
 #include "Engine/Core/MeshBuilder.h"
 
-namespace Engine
+#include "RenderGraph.h"
+
+namespace Game
 {
 	
-	SkyboxNode::SkyboxNode(RenderGraph& graph) :
+	SkyboxNode::SkyboxNode(Engine::RenderGraph& graph) :
 		RenderGraphNode(graph)
 	{
-		m_SkyboxShader = Application::Get().GetAssetManager().GetAsset<Shader>("Assets/Shaders/SkyboxShader.hlsl");
+		m_SkyboxShader = Engine::Application::Get().GetAssetManager().GetAsset<Engine::Shader>("Assets/Shaders/SkyboxShader.hlsl");
 
 		struct Vertex
 		{
 			Math::Vector4 position;
 		};
 
-		TMeshBuilder<Vertex> meshBuilder;
+		Engine::TMeshBuilder<Vertex> meshBuilder;
 
 		meshBuilder.vertices.push_back({ {-1,-1,1,1} });
 		meshBuilder.vertices.push_back({ { 1,-1,1,1} });
@@ -42,21 +44,21 @@ namespace Engine
 
 	void SkyboxNode::BuildImpl()
 	{
-		const SceneData& scene = m_Graph.GetScene();
+		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 
-		GPUTimer::BeginEvent(m_CommandList, "Skybox Pass");
+		Engine::GPUTimer::BeginEvent(m_CommandList, "Skybox Pass");
 		m_CommandList->SetRenderTarget(m_RenderTarget);
 
 		if (scene.m_Skybox)
 		{
-			Ref<ShaderPass> pass = m_SkyboxShader->GetPass("main");
+			Engine::Ref<Engine::ShaderPass> pass = m_SkyboxShader->GetPass("main");
 			m_CommandList->SetShader(pass);
 			m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), scene.m_MainCamera->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
 			m_CommandList->SetTexture(pass->GetUniformLocation("texture"), scene.m_Skybox);
 			m_CommandList->DrawMesh(m_SkyboxMesh);
 		}
 
-		GPUTimer::EndEvent(m_CommandList);
+		Engine::GPUTimer::EndEvent(m_CommandList);
 	}
 
 }

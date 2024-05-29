@@ -5,41 +5,41 @@
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
-namespace Engine
+namespace Game
 {
 
 	void DepthOfField::Init(const PostProcessInput& input, SceneData& scene)
 	{
-		m_DepthOfFieldShader = Shader::CreateFromEmbeded(DEPTHOFFIELD, "DepthOfField.hlsl");
+		m_DepthOfFieldShader = Engine::Shader::CreateFromEmbeded(DEPTHOFFIELD, "DepthOfField.hlsl");
 
 		m_Scene = &scene;
 
 		uint32 width = 100;
 		uint32 height = 100;
 
-		m_TempTexture	= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16_FLOAT);
-		m_COCTexture	= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16_FLOAT);
-		m_NearBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16_FLOAT);
-		m_FarBlur		= RenderTarget2D::Create(width, height, 1, TextureFormat::RGBA16_FLOAT);
+		m_TempTexture	= Engine::RenderTarget2D::Create(width, height, 1, Engine::TextureFormat::RGBA16_FLOAT);
+		m_COCTexture	= Engine::RenderTarget2D::Create(width, height, 1, Engine::TextureFormat::RGBA16_FLOAT);
+		m_NearBlur		= Engine::RenderTarget2D::Create(width, height, 1, Engine::TextureFormat::RGBA16_FLOAT);
+		m_FarBlur		= Engine::RenderTarget2D::Create(width, height, 1, Engine::TextureFormat::RGBA16_FLOAT);
 
-		m_BokehBlur = FrameBuffer::Create({
+		m_BokehBlur = Engine::FrameBuffer::Create({
 			m_NearBlur, m_FarBlur
 		});
 	}
 
-	void DepthOfField::RecordCommands(Ref<CommandList> commandList, Ref<RenderTarget2D> renderTarget, Ref<Texture2D> src, const PostProcessInput& input, Ref<Mesh> screenMesh)
+	void DepthOfField::RecordCommands(Engine::Ref<Engine::CommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
 	{
-		GPUTimer::BeginEvent(commandList, "Depth Of Field");
+		Engine::GPUTimer::BeginEvent(commandList, "Depth Of Field");
 
-		Ref<ShaderPass> coc = m_DepthOfFieldShader->GetPass("CoC");
-		Ref<ShaderPass> expandcoc = m_DepthOfFieldShader->GetPass("expandCoC");
-		Ref<ShaderPass> blurcoc = m_DepthOfFieldShader->GetPass("blurCoC");
-		Ref<ShaderPass> bokehBlur = m_DepthOfFieldShader->GetPass("bokehBlur");
-		Ref<ShaderPass> farBokehBlur = m_DepthOfFieldShader->GetPass("farBokehBlur");
-		Ref<ShaderPass> composit = m_DepthOfFieldShader->GetPass("composit");
+		Engine::Ref<Engine::ShaderPass> coc = m_DepthOfFieldShader->GetPass("CoC");
+		Engine::Ref<Engine::ShaderPass> expandcoc = m_DepthOfFieldShader->GetPass("expandCoC");
+		Engine::Ref<Engine::ShaderPass> blurcoc = m_DepthOfFieldShader->GetPass("blurCoC");
+		Engine::Ref<Engine::ShaderPass> bokehBlur = m_DepthOfFieldShader->GetPass("bokehBlur");
+		Engine::Ref<Engine::ShaderPass> farBokehBlur = m_DepthOfFieldShader->GetPass("farBokehBlur");
+		Engine::Ref<Engine::ShaderPass> composit = m_DepthOfFieldShader->GetPass("composit");
 
-		GPUTimer::BeginEvent(commandList, "COC");
-		GPUTimer::BeginEvent(commandList, "Calculate COC");
+		Engine::GPUTimer::BeginEvent(commandList, "COC");
+		Engine::GPUTimer::BeginEvent(commandList, "Calculate COC");
 
 		commandList->SetRenderTarget(m_COCTexture);
 		commandList->ClearRenderTarget(m_COCTexture);
@@ -50,11 +50,11 @@ namespace Engine
 		commandList->SetConstantBuffer(coc->GetUniformLocation("camera"), m_Scene->m_MainCamera->GetCameraBuffer());
 		commandList->DrawMesh(screenMesh);
 
-		GPUTimer::EndEvent(commandList); // end calc coc
+		Engine::GPUTimer::EndEvent(commandList); // end calc coc
 
-		GPUTimer::BeginEvent(commandList, "Expand COC");
+		Engine::GPUTimer::BeginEvent(commandList, "Expand COC");
 
-		commandList->ValidateState({ m_COCTexture->GetResource(), ResourceState::ShaderResource });
+		commandList->ValidateState({ m_COCTexture->GetResource(), Engine::ResourceState::ShaderResource });
 
 		commandList->SetRenderTarget(m_TempTexture);
 		commandList->ClearRenderTarget(m_TempTexture);
@@ -65,8 +65,8 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->ValidateStates({
-			{ m_COCTexture->GetResource(), ResourceState::RenderTarget },
-			{ m_TempTexture->GetResource(), ResourceState::ShaderResource },
+			{ m_COCTexture->GetResource(), Engine::ResourceState::RenderTarget },
+			{ m_TempTexture->GetResource(), Engine::ResourceState::ShaderResource },
 		});
 
 		commandList->SetRenderTarget(m_COCTexture);
@@ -78,13 +78,13 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->ValidateStates({
-			{ m_COCTexture->GetResource(), ResourceState::ShaderResource },
-			{ m_TempTexture->GetResource(), ResourceState::RenderTarget },
+			{ m_COCTexture->GetResource(), Engine::ResourceState::ShaderResource },
+			{ m_TempTexture->GetResource(), Engine::ResourceState::RenderTarget },
 		});
 
-		GPUTimer::EndEvent(commandList); // end expand coc
+		Engine::GPUTimer::EndEvent(commandList); // end expand coc
 
-		GPUTimer::BeginEvent(commandList, "Blur COC");
+		Engine::GPUTimer::BeginEvent(commandList, "Blur COC");
 
 		commandList->SetRenderTarget(m_TempTexture);
 		commandList->ClearRenderTarget(m_TempTexture);
@@ -95,8 +95,8 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->ValidateStates({
-			{ m_COCTexture->GetResource(), ResourceState::RenderTarget },
-			{ m_TempTexture->GetResource(), ResourceState::ShaderResource },
+			{ m_COCTexture->GetResource(), Engine::ResourceState::RenderTarget },
+			{ m_TempTexture->GetResource(), Engine::ResourceState::ShaderResource },
 		});
 
 		commandList->SetRenderTarget(m_COCTexture);
@@ -108,15 +108,15 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->ValidateStates({
-			{ m_COCTexture->GetResource(), ResourceState::ShaderResource },
-			{ m_TempTexture->GetResource(), ResourceState::RenderTarget },
+			{ m_COCTexture->GetResource(), Engine::ResourceState::ShaderResource },
+			{ m_TempTexture->GetResource(), Engine::ResourceState::RenderTarget },
 		});
 
-		GPUTimer::EndEvent(commandList); // end blur coc
+		Engine::GPUTimer::EndEvent(commandList); // end blur coc
 
-		GPUTimer::EndEvent(commandList); // end coc
+		Engine::GPUTimer::EndEvent(commandList); // end coc
 
-		GPUTimer::BeginEvent(commandList, "Bokeh Blur");
+		Engine::GPUTimer::BeginEvent(commandList, "Bokeh Blur");
 
 		commandList->SetRenderTarget(m_BokehBlur);
 		commandList->ClearRenderTarget(m_BokehBlur);
@@ -127,11 +127,11 @@ namespace Engine
 		commandList->DrawMesh(screenMesh);
 
 		commandList->ValidateStates({
-			{ m_NearBlur->GetResource(), ResourceState::ShaderResource },
-			{ m_FarBlur->GetResource(), ResourceState::ShaderResource },
+			{ m_NearBlur->GetResource(), Engine::ResourceState::ShaderResource },
+			{ m_FarBlur->GetResource(), Engine::ResourceState::ShaderResource },
 		});
 
-		GPUTimer::EndEvent(commandList); // end bokeh blur
+		Engine::GPUTimer::EndEvent(commandList); // end bokeh blur
 
 		commandList->SetRenderTarget(renderTarget);
 		commandList->ClearRenderTarget(renderTarget);
@@ -144,12 +144,12 @@ namespace Engine
 
 
 		commandList->ValidateStates({
-			{m_NearBlur->GetResource(), ResourceState::RenderTarget},
-			{m_FarBlur->GetResource(), ResourceState::RenderTarget},
+			{m_NearBlur->GetResource(), Engine::ResourceState::RenderTarget},
+			{m_FarBlur->GetResource(), Engine::ResourceState::RenderTarget},
 		});
 
 
-		GPUTimer::EndEvent(commandList);
+		Engine::GPUTimer::EndEvent(commandList);
 	}
 
 	void DepthOfField::OnViewportResize(uint32 width, uint32 height)

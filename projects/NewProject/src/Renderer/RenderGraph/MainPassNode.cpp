@@ -6,22 +6,24 @@
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
-namespace Engine
+#include "RenderGraph.h"
+
+namespace Game
 {
-	ShaderPassNode::ShaderPassNode(RenderGraph& graph, const std::string& passName) :
+	ShaderPassNode::ShaderPassNode(Engine::RenderGraph& graph, const std::string& passName) :
 		RenderGraphNode(graph), m_PassName(passName)
 	{}
 
 	void ShaderPassNode::BuildImpl()
 	{
-		const SceneData& scene = m_Graph.GetScene();
+		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 
-		GPUTimer::BeginEvent(m_CommandList, "Shader Pass");
+		Engine::GPUTimer::BeginEvent(m_CommandList, "Shader Pass");
 		m_CommandList->SetRenderTarget(m_RenderTarget);
 
 		for (auto& cmd : scene.m_DrawCommands)
 		{
-			Ref<ShaderPass> pass = cmd.m_Shader->GetPass(m_PassName);
+			Engine::Ref<Engine::ShaderPass> pass = cmd.m_Shader->GetPass(m_PassName);
 			if (pass)
 			{
 				m_CommandList->SetShader(pass);
@@ -32,7 +34,7 @@ namespace Engine
 			}
 		}
 
-		GPUTimer::EndEvent(m_CommandList);
+		Engine::GPUTimer::EndEvent(m_CommandList);
 	}
 }
 

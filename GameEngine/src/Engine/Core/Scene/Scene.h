@@ -30,7 +30,7 @@ namespace Engine
 	class Scene
 	{
 	public:
-		Scene();
+		Scene(Ref<SceneRenderer> renderer);
 		~Scene();
 
 		void OnUpdate(Ref<Camera> camera);
@@ -54,6 +54,8 @@ namespace Engine
 		}
 
 		Ref<SceneRenderer> GetSceneRenderer() { return m_SceneRenderer; }
+		template<class T>
+		Ref<T> GetSceneRendererAs() { return std::dynamic_pointer_cast<T>(m_SceneRenderer); }
 		SceneRegistry& GetRegistry() { return m_Registry; }
 
 		template<class T, typename ...Args>

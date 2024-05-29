@@ -6,6 +6,7 @@
 #include "Engine/Renderer/Model.h"
 #include "Engine/Renderer/SceneRenderer.h"
 #include "Engine/Core/Scene/Components.h"
+#include "Renderer/SceneRenderer/SceneRenderer.h"
 
 namespace Game
 {
@@ -25,7 +26,7 @@ namespace Game
 			std::string m_Name;
 			Engine::Ref<Engine::Mesh> m_Mesh = nullptr;
 			Engine::Ref<Engine::Material> m_Material = nullptr;
-			Engine::SceneRenderer::ObjectControlBlockRef m_Object = nullptr;
+			SceneRenderer::ObjectControlBlockRef m_Object = nullptr;
 		};
 
 	public:

@@ -22,20 +22,6 @@ namespace Engine
 	class ExecutionOrder;
 	class CommandQueue;
 
-	struct DrawCommand
-	{
-		Ref<Shader> m_Shader;
-		Ref<Mesh> m_Mesh;
-		Ref<InstanceBuffer> m_InstanceBuffer;
-	};
-
-	struct SceneData
-	{
-		std::vector<DrawCommand> m_DrawCommands;
-		Ref<Camera> m_MainCamera;
-		Ref<DirectionalLight> m_DirectinalLight;
-		Ref<Texture2D> m_Skybox;
-	};
 
 	class RenderGraph
 	{
@@ -47,19 +33,17 @@ namespace Engine
 		void Submit(Ref<CommandQueue> queue);
 		void OnViewportResize(uint32 width, uint32 height);
 		void Build();
-		SceneData& GetScene() { return m_Scene; }
 
-		Ref<FrameBuffer> GetRenderTarget();
+		Engine::Ref<Engine::FrameBuffer> GetRenderTarget();
 
-	private:
+		template<class T>
+		T& As() { return *(T*)this; }
 
-	private:
-		std::vector<Ref<RenderGraphNode>> m_Nodes;
+	protected:
+		std::vector<Engine::Ref<RenderGraphNode>> m_Nodes;
 		
-		Ref<OutputNode> m_OutputNode;
+		Engine::Ref<OutputNode> m_OutputNode;
 
-		std::vector<Ref<CommandList>> m_CommandLists;
-
-		SceneData m_Scene;
+		std::vector<Engine::Ref<Engine::CommandList>> m_CommandLists;
 	};
 }
