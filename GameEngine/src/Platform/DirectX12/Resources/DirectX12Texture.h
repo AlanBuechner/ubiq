@@ -1,14 +1,13 @@
 #pragma once
 #include "Engine/Renderer/Abstractions/Resources/Texture.h"
+#include "Engine/Renderer/Abstractions/Resources/UploadBuffer.h"
 #include "DirectX12ResourceManager.h"
 #include "DirectX12Descriptors.h"
 #include "Platform/DirectX12/DX.h"
+#include "DirectX12TextureFormat.h"
 
 namespace Engine
 {
-	DXGI_FORMAT GetDXGITextureFormat(TextureFormat format);
-	DXGI_FORMAT GetDXGISRVTextureFormat(TextureFormat format);
-
 	class DirectX12Texture2DResource : public Texture2DResource
 	{
 	public:
@@ -30,7 +29,7 @@ namespace Engine
 
 	private:
 		ID3D12Resource* m_Buffer;
-		ID3D12Resource* m_UploadBuffer;
+		UploadTextureResource* m_UploadBuffer;
 
 		friend class DirectX12SwapChain;
 	};

@@ -281,38 +281,6 @@ namespace Engine
 		return changed;
 	}
 
-	bool PropertysPanel::DrawModelControl(const std::string& label, Ref<Model>& mesh)
-	{
-		bool changed = false;
-
-		ImGui::Text(label.c_str());
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-			{
-				fs::path path = (const wchar_t*)payload->Data;
-				if (Model::ValidExtension(path.extension().string())) {
-					mesh = Application::Get().GetAssetManager().GetAsset<Model>(path);
-					changed = true;
-				}
-			}
-			ImGui::EndDragDropTarget();
-		}
-		if (mesh)
-		{
-			fs::path path = Application::Get().GetAssetManager().GetRelitiveAssetPath(mesh->GetAssetID());
-			if (ImGui::Button(path.string().c_str()))
-				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Clear")) {
-			mesh = Ref<Model>();
-			changed = true;
-		}
-
-		return changed;
-	}
-
 	bool PropertysPanel::DrawMaterialControl(const std::string& label, Ref<Material>& mat)
 	{
 		bool changed = false;

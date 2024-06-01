@@ -1,12 +1,12 @@
 #include "DirectionalLightComponent.h"
-#include "Engine/Renderer/Light.h"
+#include "Renderer/Lighting/DirectionalLight.h"
 #include "Renderer/SceneRenderer/SceneRenderer.h"
 
 namespace Game
 {
 	void DirectionalLightComponent::OnComponentAdded()
 	{
-		m_Light = Engine::CreateRef<Engine::DirectionalLight>(Math::Vector3{ 0,-1,0 }, Math::Vector3{ 1,1,1 }, 1);
+		m_Light = Engine::CreateRef<DirectionalLight>(Math::Vector3{ 0,-1,0 }, Math::Vector3{ 1,1,1 }, 1);
 
 		Owner.GetScene()->GetSceneRendererAs<SceneRenderer>()->SetDirectionalLight(m_Light);
 	}

@@ -19,7 +19,7 @@ namespace Engine
 
 	bool FrameBuffer::HasDepthAttachment() const
 	{
-		return IsDepthStencil(m_Attachments.back()->GetResource()->GetFormat());
+		return IsTextureFormatDepthStencil(m_Attachments.back()->GetResource()->GetFormat());
 	}
 
 	Ref<FrameBuffer> FrameBuffer::Create(const std::vector<Ref<RenderTarget2D>>& attachments)

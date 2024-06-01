@@ -55,7 +55,7 @@ namespace Engine
 			for (Ref<RenderTarget2D> rt : target->GetAttachments())
 			{
 				TextureFormat format = rt->GetResource()->GetFormat();
-				if (IsDepthStencil(format))
+				if (IsTextureFormatDepthStencil(format))
 					depthFormat = format;
 				else
 					formates.push_back(format);

@@ -11,6 +11,7 @@ namespace Engine
 
 	DirectX12VertexBufferResource::DirectX12VertexBufferResource(uint32 count, uint32 stride)
 	{
+		m_DefultState = ResourceState::ShaderResource;
 		m_Count = count;
 		m_Stride = stride;
 
@@ -23,7 +24,7 @@ namespace Engine
 			&props, // a default heap
 			D3D12_HEAP_FLAG_NONE, // no flags
 			&resDesc, // resource description for a buffer
-			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, // start in the copy destination state
+			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
 			nullptr, // optimized clear value must be null for this type of resource
 			IID_PPV_ARGS(&m_Buffer)
 		);
@@ -39,7 +40,7 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
-		context->GetDX12ResourceManager()->UploadBuffer(m_Buffer, data, m_Count * m_Stride, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		context->GetDX12ResourceManager()->UploadBuffer(this, data, m_Count * m_Stride, m_DefultState);
 	}
 
 	uint32 DirectX12VertexBufferResource::GetState(ResourceState state)
@@ -76,6 +77,7 @@ namespace Engine
 
 	DirectX12IndexBufferResource::DirectX12IndexBufferResource(uint32 count)
 	{
+		m_DefultState = ResourceState::ShaderResource;
 		m_Count = count;
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
@@ -87,7 +89,7 @@ namespace Engine
 			&props, // a default heap
 			D3D12_HEAP_FLAG_NONE, // no flags
 			&resDesc, // resource description for a buffer
-			D3D12_RESOURCE_STATE_INDEX_BUFFER, // start in the copy destination state
+			D3D12_RESOURCE_STATE_INDEX_BUFFER,
 			nullptr, // optimized clear value must be null for this type of resource
 			IID_PPV_ARGS(&m_Buffer)
 		);
@@ -103,7 +105,7 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
-		context->GetDX12ResourceManager()->UploadBuffer(m_Buffer, data, m_Count * sizeof(uint32), D3D12_RESOURCE_STATE_INDEX_BUFFER);
+		context->GetDX12ResourceManager()->UploadBuffer(this, data, m_Count * sizeof(uint32), m_DefultState);
 	}
 
 	uint32 DirectX12IndexBufferResource::GetState(ResourceState state)

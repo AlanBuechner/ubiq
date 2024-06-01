@@ -95,7 +95,6 @@ ReflectionData GetReflectionDataFromFolder(const fs::path& path) {
 		while (getline(ifs, line)) {
 			std::queue<std::string> tokens = Tokenize(line, reservedTokens);
 			std::string action = tokens.front();
-			std::cout << line << std::endl;
 			tokens.pop();
 			if (action == "include") {
 				tokens.pop(); // remove the "

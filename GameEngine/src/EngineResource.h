@@ -21,10 +21,6 @@
 #define BLIT 253
 #define LINE 252
 #define SPRITE 251
-#define DEPTHFOG 250
-#define BLOOM 249
-#define BLOOMCOMPUTE 248
-#define DEPTHOFFIELD 247
-#define TONEMAPPING 246
+
 
 // textures

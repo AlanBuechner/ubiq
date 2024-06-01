@@ -29,8 +29,6 @@ class ObjectEnviernment:
 			file = open(self.treeFile)
 			s = file.read()
 			lines = s.split(".d:")[1].split("\n")
-			#print(self.workingDir)
-			#print()
 			needsBuild = False
 			for line in lines:
 				# sanitize path
@@ -54,8 +52,6 @@ class ObjectEnviernment:
 					path = curr
 					if(not os.path.isabs(path)):
 						path = os.path.join(self.workingDir, path)
-					#print(f"{curr} : {t} \n{path} : {os.path.isfile(path)}")
-					#print()
 					if os.path.isfile(path):
 						lastTime = os.path.getmtime(path) # get last time file was modified
 						curr = "" # reset path
@@ -197,8 +193,6 @@ def BuildSources(sources, projDir, intDir, includes, sysIncluds, defines):
 		name = os.path.splitext(os.path.basename(file))[0]
 		objFile = os.path.join(intDir, name) + ".obj"
 		treeFile = os.path.join(intDir, name) + ".d"
-
-		#print(objFile)
 
 		env = ObjectEnviernment()
 		env.sourceFile = file

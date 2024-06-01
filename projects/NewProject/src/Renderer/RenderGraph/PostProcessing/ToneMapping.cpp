@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ToneMapping.h"
-#include "EngineResource.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
+#include "Resource.h"
 
 namespace Game
 {

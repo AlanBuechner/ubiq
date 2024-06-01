@@ -9,15 +9,15 @@ namespace Engine
 	class Mesh;
 }
 
-namespace Engine
+namespace Game
 {
 
-	class Model : public Asset
+	class Model : public Engine::Asset
 	{
 	public:
 		struct Node
 		{
-			std::vector<MeshBuilder> m_MeshBuilders;
+			std::vector<Engine::MeshBuilder> m_MeshBuilders;
 			std::vector<std::string> m_Names;
 			std::vector<Node> m_Children;
 			Math::Mat4 m_Transform;
@@ -29,10 +29,10 @@ namespace Engine
 		void BakeMesh();
 
 		Node& GetRoot() { return m_Root; }
-		std::vector<Ref<Mesh>>& GetBakedMeshes() { return m_BakedMeshes; }
+		std::vector<Engine::Ref<Engine::Mesh>>& GetBakedMeshes() { return m_BakedMeshes; }
 		std::vector<std::string>& GetNames() { return m_Names; }
 
-		static Ref<Model> Create(const fs::path& path);
+		static Engine::Ref<Model> Create(const fs::path& path);
 
 		static bool ValidExtension(const fs::path& ext);
 
@@ -44,7 +44,7 @@ namespace Engine
 
 		Node m_Root;
 
-		std::vector<Ref<Mesh>> m_BakedMeshes;
+		std::vector<Engine::Ref<Engine::Mesh>> m_BakedMeshes;
 		std::vector<std::string> m_Names;
 	};
 

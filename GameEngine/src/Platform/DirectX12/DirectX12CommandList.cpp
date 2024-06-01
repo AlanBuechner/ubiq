@@ -170,6 +170,38 @@ namespace Engine
 			Transition(transitions);
 	}
 
+	// copying
+	void DirectX12CommandList::CopyBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size)
+	{
+		ID3D12Resource* destp = (ID3D12Resource*)dest->GetGPUResourcePointer();
+		ID3D12Resource* srcp = (ID3D12Resource*)src->GetGPUResourcePointer();
+		m_CommandList->CopyBufferRegion(destp, destOffset, srcp, srcOffset, size);
+	}
+
+	void DirectX12CommandList::CopyResource(GPUResource* dest, GPUResource* src)
+	{
+		m_CommandList->CopyResource((ID3D12Resource*)dest->GetGPUResourcePointer(), (ID3D12Resource*)src->GetGPUResourcePointer());
+	}
+
+	void DirectX12CommandList::UploadTexture(GPUResource* dest, UploadTextureResource* src)
+	{
+		D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+		srcLocation.pResource = (ID3D12Resource*)src->GetGPUResourcePointer();
+		srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+		srcLocation.PlacedFootprint.Offset = 0;
+		srcLocation.PlacedFootprint.Footprint.Format = GetDXGITextureFormat(src->GetFormat());
+		srcLocation.PlacedFootprint.Footprint.Width = src->GetWidth();
+		srcLocation.PlacedFootprint.Footprint.Height = src->GetHeight();
+		srcLocation.PlacedFootprint.Footprint.Depth = 1;
+		srcLocation.PlacedFootprint.Footprint.RowPitch = src->GetPitch();
+
+		D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+		dstLocation.pResource = (ID3D12Resource*)dest->GetGPUResourcePointer();
+		dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+		dstLocation.SubresourceIndex = 0;
+		m_CommandList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+	}
+
 	// rendering
 
 	void DirectX12CommandList::SetRenderTarget(Ref<RenderTarget2D> renderTarget)
@@ -237,7 +269,7 @@ namespace Engine
 			DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)buffer->GetAttachment(i)->GetRTVDSVDescriptor();
 
 
-			if (IsDepthStencil(buffer->GetAttachment(i)->GetResource()->GetFormat()))
+			if (IsTextureFormatDepthStencil(buffer->GetAttachment(i)->GetResource()->GetFormat()))
 				depthHandle = rtv->GetHandle().cpu.ptr;
 			else
 			{
@@ -287,7 +319,7 @@ namespace Engine
 		ValidateState({ res, ResourceState::RenderTarget });
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetHandle().cpu;
-		if (IsDepthStencil(res->GetFormat()))
+		if (IsTextureFormatDepthStencil(res->GetFormat()))
 			m_CommandList->ClearDepthStencilView(handle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, color.r, (uint8)color.g, 0, nullptr);
 		else
 			m_CommandList->ClearRenderTargetView(handle, (float*)&color, 0, nullptr);
@@ -456,6 +488,12 @@ namespace Engine
 	void DirectX12CommandList::Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ)
 	{
 		m_CommandList->Dispatch(threadGroupsX, threadGroupsY, threadGrouptsZ);
+	}
+
+	void DirectX12CommandList::AwaitUAV(GPUResource* uav)
+	{
+		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)uav->GetGPUResourcePointer());
+		m_CommandList->ResourceBarrier(1, &barrier);
 	}
 
 	void DirectX12CommandList::Close()

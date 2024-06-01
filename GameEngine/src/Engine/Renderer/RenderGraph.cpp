@@ -12,7 +12,6 @@
 #include "Engine/Renderer/Abstractions/CommandQueue.h"
 #include "Engine/Renderer/Abstractions/Shader.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/Light.h"
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/Camera.h"
 #include "RenderGraphNode.h"

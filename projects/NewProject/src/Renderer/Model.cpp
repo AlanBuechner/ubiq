@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-namespace Engine
+namespace Game
 {
 	void Model::BakeMesh()
 	{
@@ -17,7 +17,7 @@ namespace Engine
 	{
 		for (uint32 i = 0; i < node.m_MeshBuilders.size(); i++)
 		{
-			MeshBuilder builder(node.m_MeshBuilders[i]);
+			Engine::MeshBuilder builder(node.m_MeshBuilders[i]);
 			for(uint32 i = 0; i < builder.vertices.size(); i++)
 				builder.vertices[i].position = parentTransform * Math::Vector4(builder.vertices[i].position, 1);
 
@@ -71,7 +71,7 @@ namespace Engine
 		for (uint32 i = 0; i < node->mNumMeshes; i++)
 		{
 			model.m_Names[i] = scene->mMeshes[node->mMeshes[i]]->mName.C_Str();
-			MeshBuilder& meshBuilder = model.m_MeshBuilders[i];
+			Engine::MeshBuilder& meshBuilder = model.m_MeshBuilders[i];
 			uint32 vertexOffset = (uint32)meshBuilder.vertices.size();
 			aiMesh* m = scene->mMeshes[node->mMeshes[i]];
 
@@ -105,7 +105,7 @@ namespace Engine
 		}
 	}
 
-	Ref<Model> Model::Create(const fs::path& path)
+	Engine::Ref<Model> Model::Create(const fs::path& path)
 	{
 		Assimp::Importer imp;
 		auto scene = imp.ReadFile(path.string(), 0
@@ -130,7 +130,7 @@ namespace Engine
 			| aiProcess_OptimizeMeshes
 		);
 
-		Ref<Model> model = CreateRef<Model>();
+		Engine::Ref<Model> model = Engine::CreateRef<Model>();
 		ProcessNode(scene, scene->mRootNode, model->GetRoot());
 
 		model->BakeMesh();

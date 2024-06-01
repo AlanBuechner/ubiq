@@ -14,7 +14,6 @@ namespace Engine
 	class ConstantBuffer;
 	class FrameBuffer;
 	class RenderGraph;
-	class DirectionalLight;
 	class Shader;
 	class Texture2D;
 }

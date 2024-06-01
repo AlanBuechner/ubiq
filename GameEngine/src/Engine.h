@@ -24,7 +24,6 @@
 #include "Engine/Renderer/LineRenderer.h"
 
 #include "Engine/Renderer/Mesh.h"
-#include "Engine/Renderer/Model.h"
 // abstractions
 #include "Engine/Renderer/Abstractions/Shader.h"
 #include "Engine/Renderer/Abstractions/CommandList.h"

@@ -2,7 +2,7 @@
 #include "ShadowPassNode.h"
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/Abstractions/Shader.h"
-#include "Engine/Renderer/Light.h"
+#include "Renderer/Lighting/DirectionalLight.h"
 #include "Engine/Renderer/Renderer.h"
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
@@ -31,7 +31,7 @@ namespace Game
 			// for each camera on the directional light
 			for (auto& cm : scene.m_DirectinalLight->GetShadowMaps())
 			{
-				const Engine::DirectionalLight::CascadedShadowMaps& maps = cm.second;
+				const DirectionalLight::CascadedShadowMaps& maps = cm.second;
 				for (Engine::Ref<Engine::FrameBuffer> fb : maps.m_ShadowMaps)
 				{
 					for (Engine::Ref<Engine::RenderTarget2D> rt : fb->GetAttachments())
@@ -53,10 +53,10 @@ namespace Game
 			for (auto& cm : scene.m_DirectinalLight->GetShadowMaps())
 			{
 				Engine::Ref<Engine::Camera> camera = cm.first;
-				const Engine::DirectionalLight::CascadedShadowMaps& maps = cm.second;
+				const DirectionalLight::CascadedShadowMaps& maps = cm.second;
 
 				// for each cascade in the shadow map
-				for(uint32 i = 0; i < Engine::DirectionalLight::s_NumShadowMaps; i++)
+				for(uint32 i = 0; i < DirectionalLight::s_NumShadowMaps; i++)
 				{
 					Engine::Ref<Engine::FrameBuffer> fb = maps.m_ShadowMaps[i];
 					Engine::Ref<Engine::Camera> camera = maps.m_Cameras[i];

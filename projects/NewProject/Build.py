@@ -73,6 +73,5 @@ def GetProject():
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
 	proj.intDir = GetIntDir(projName, Config.gameProject)
 	proj.binDir = GetBinDir(projName, Config.gameProject)
-	print(proj.intDir)
 	proj.genReflection = True
 	return proj

@@ -4,6 +4,11 @@
 
 namespace Engine
 {
+	class UploadBufferResource;
+}
+
+namespace Engine
+{
 	class DirectX12InstanceBufferResource : public InstanceBufferResource
 	{
 	public:
@@ -20,9 +25,7 @@ namespace Engine
 
 	private:
 		ID3D12Resource* m_Buffer;
-		ID3D12Resource* m_UploadBuffer;
-
-		void* m_MapLoc = nullptr;
+		UploadBufferResource* m_UploadBuffer;
 	};
 
 	class DirectX12InstanceBufferView : public InstanceBufferView

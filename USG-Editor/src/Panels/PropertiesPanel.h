@@ -16,7 +16,6 @@ namespace Engine
 		static bool DrawVec3Control(const std::string& label, Math::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 		static bool DrawColorControl(const std::string& label, Math::Vector3& values);
 		static bool DrawTextureControl(const std::string& label, Ref<Texture2D>& texture);
-		static bool DrawModelControl(const std::string& label, Ref<Model>& mesh);
 		static bool DrawMaterialControl(const std::string& label, Ref<Material>& mat);
 
 		static bool DrawPropertyControl(void* object, uint64 typeID, const Reflect::Property* prop);

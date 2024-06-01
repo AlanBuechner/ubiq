@@ -137,6 +137,7 @@ namespace Reflect {
 
 		std::vector<Attribute> attributes;
 		std::unordered_map<std::string, uint32_t> attributeMap;
+		Class* c;
 		friend Class;
 		friend class Registry;
 	};
@@ -201,6 +202,7 @@ namespace Reflect {
 		const Function& GetFunction(const std::string& name) const { return functions[functionMap.at(name)]; }
 
 		const std::vector<Property>& GetProperties() const { return properties; }
+		bool HasProperty(const std::string& name) { return propertyMap.find(name) != propertyMap.end(); }
 		const Property& GetProperty(const std::string& name) const { return properties[propertyMap.at(name)]; }
 
 	private:

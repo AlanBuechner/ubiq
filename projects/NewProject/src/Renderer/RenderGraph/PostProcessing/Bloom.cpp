@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Bloom.h"
-#include "EngineResource.h"
-
+#include "Resource.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 namespace Game

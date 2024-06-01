@@ -27,7 +27,7 @@ namespace Game
 		}
 	}
 
-	void StaticModelRendererComponent::SetModel(Engine::Ref<Engine::Model> model)
+	void StaticModelRendererComponent::SetModel(Engine::Ref<Model> model)
 	{
 		m_Model = model;
 
@@ -70,14 +70,15 @@ namespace Game
 
 #pragma region Editor
 #include "Panels/PropertiesPanel.h"
+#include "Editor/Properties.h"
 
 namespace Game
 {
 	ADD_EXPOSE_PROP_FUNC(StaticModelRendererComponent) {
 		bool changed = false;
 		StaticModelRendererComponent& component = *(StaticModelRendererComponent*)voidData;
-		Engine::Ref<Engine::Model> model = component.GetModel();
-		if (Engine::PropertysPanel::DrawModelControl("Model", model))
+		Engine::Ref<Model> model = component.GetModel();
+		if (DrawModelControl("Model", model))
 		{
 			component.SetModel(model);
 			component.Invalidate();
@@ -129,7 +130,7 @@ namespace Game
 		{
 			auto& mrc = *entity.GetComponent<Game::StaticModelRendererComponent>();
 			if (data["Model"])
-				mrc.SetModel(Engine::Application::Get().GetAssetManager().GetAsset<Engine::Model>(data["Model"].as<uint64>()));
+				mrc.SetModel(Engine::Application::Get().GetAssetManager().GetAsset<Model>(data["Model"].as<uint64>()));
 
 			if (data["Materials"])
 			{

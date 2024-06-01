@@ -8,83 +8,6 @@
 namespace Engine
 {
 
-
-	DXGI_FORMAT GetDXGITextureFormat(TextureFormat format)
-	{
-#define FORMAT_1(bit, type) case TextureFormat::R##bit##_##type: return DXGI_FORMAT_R##bit##_##type
-#define FORMAT_2(bit, type) case TextureFormat::RG##bit##_##type: return DXGI_FORMAT_R##bit##G##bit##_##type
-#define FORMAT_4(bit, type) case TextureFormat::RGBA##bit##_##type: return DXGI_FORMAT_R##bit##G##bit##B##bit##A##bit##_##type
-		switch (format)
-		{
-			// 8 bit components normalized
-			FORMAT_1(8, UNORM);
-			FORMAT_2(8, UNORM);
-			FORMAT_4(8, UNORM);
-			FORMAT_1(8, SNORM);
-			FORMAT_2(8, SNORM);
-			FORMAT_4(8, SNORM);
-
-			// 8 bit components int
-			FORMAT_1(8, UINT);
-			FORMAT_2(8, UINT);
-			FORMAT_4(8, UINT);
-			FORMAT_1(8, SINT);
-			FORMAT_2(8, SINT);
-			FORMAT_4(8, SINT);
-			
-			// 16 bit components normalized
-			FORMAT_1(16, UNORM);
-			FORMAT_2(16, UNORM);
-			FORMAT_4(16, UNORM);
-			FORMAT_1(16, SNORM);
-			FORMAT_2(16, SNORM);
-			FORMAT_4(16, SNORM);
-
-			// 16 bit components int
-			FORMAT_1(16, UINT);
-			FORMAT_2(16, UINT);
-			FORMAT_4(16, UINT);
-			FORMAT_1(16, SINT);
-			FORMAT_2(16, SINT);
-			FORMAT_4(16, SINT);
-
-			// 16 bit components float
-			FORMAT_1(16, FLOAT);
-			FORMAT_2(16, FLOAT);
-			FORMAT_4(16, FLOAT);
-
-
-			// 32 bit components int
-			FORMAT_1(32, UINT);
-			FORMAT_2(32, UINT);
-			FORMAT_4(32, UINT);
-			FORMAT_1(32, SINT);
-			FORMAT_2(32, SINT);
-			FORMAT_4(32, SINT);
-
-			// 32 bit components float
-			FORMAT_1(32, FLOAT);
-			FORMAT_2(32, FLOAT);
-			FORMAT_4(32, FLOAT);
-
-			
-		case TextureFormat::DEPTH24STENCIL8:	return DXGI_FORMAT_D24_UNORM_S8_UINT;
-		}
-		return DXGI_FORMAT_UNKNOWN;
-#undef FORMAT_1
-#undef FORMAT_2
-#undef FORMAT_4
-	}
-
-	DXGI_FORMAT GetDXGISRVTextureFormat(TextureFormat format)
-	{
-		switch (format)
-		{
-		case TextureFormat::DEPTH24STENCIL8:	return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-		}
-		return GetDXGITextureFormat(format);
-	}
-
 	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, TextureFormat format, ID3D12Resource* resource)
 	{
 		m_Buffer = resource;
@@ -117,7 +40,7 @@ namespace Engine
 			rDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 			rDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 			if((uint32)m_Type & (uint32)TextureType::RenderTarget)
-				rDesc.Flags |= (IsDepthStencil(GetFormat()) ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+				rDesc.Flags |= (IsTextureFormatDepthStencil(GetFormat()) ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 			if ((uint32)m_Type & (uint32)TextureType::RWTexture)
 				rDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 			rDesc.MipLevels = m_Mips;
@@ -141,47 +64,16 @@ namespace Engine
 			);
 		}
 
-		{ // create upload buffer
-			D3D12_RESOURCE_DESC rDesc;
-			UINT stride = GetStride();
-			UINT uploadPitch = (m_Width * stride + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
-			UINT uploadSize = m_Height * uploadPitch;
-
-			rDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-			rDesc.Alignment = 0;
-			rDesc.Width = uploadSize;
-			rDesc.Height = 1;
-			rDesc.DepthOrArraySize = 1;
-			rDesc.MipLevels = 1;
-			rDesc.Format = DXGI_FORMAT_UNKNOWN;
-			rDesc.SampleDesc.Count = 1;
-			rDesc.SampleDesc.Quality = 0;
-			rDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-			rDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-			CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-
-			CORE_ASSERT_HRESULT(
-				context->GetDevice()->CreateCommittedResource(
-					&props,
-					D3D12_HEAP_FLAG_NONE,
-					&rDesc,
-					D3D12_RESOURCE_STATE_GENERIC_READ, 0, IID_PPV_ARGS(&m_UploadBuffer)
-				), "Failed To Create Upload Buffer"
-			);
-		}
+		// create upload buffer
+		m_UploadBuffer = UploadTextureResource::Create(width, height, numMips, format);
 	}
 
 	DirectX12Texture2DResource::~DirectX12Texture2DResource()
 	{
 		m_Buffer->Release();
 		m_Buffer = nullptr;
-
-		if (m_UploadBuffer)
-		{
-			m_UploadBuffer->Release();
-			m_UploadBuffer = nullptr;
-		}
+		delete m_UploadBuffer;
+		m_UploadBuffer = nullptr;
 	}
 
 	void DirectX12Texture2DResource::SetData(void* data)
@@ -199,18 +91,15 @@ namespace Engine
 		UINT uploadSize = m_Height * uploadPitch;
 
 		// map the date to the upload buffer
-		void* mapped = nullptr;
-		D3D12_RANGE range = { 0, uploadSize };
-		CORE_ASSERT_HRESULT(m_UploadBuffer->Map(0, &range, &mapped), "Failed to map uplaod buffer");
+		void* mapped = m_UploadBuffer->Map();
 		for (uint32 y = 0; y < m_Height; y++)
 		{
 			byte* pScan = (byte*)mapped + y * uploadPitch;
 			memcpy(pScan, (byte*)data + y * m_Width * 4, m_Width * 4);
 		}
-		m_UploadBuffer->Unmap(0, &range);
+		m_UploadBuffer->UnMap();
 
-		context->GetDX12ResourceManager()->UploadTexture(m_Buffer, m_UploadBuffer, m_Width, m_Height,
-			uploadPitch, m_Mips, (D3D12_RESOURCE_STATES)GetState(m_DefultState), GetDXGIFormat());
+		context->GetDX12ResourceManager()->UploadTexture(this, m_UploadBuffer, m_Width, m_Height, m_Mips, m_DefultState, m_Format);
 	}
 
 	uint32 DirectX12Texture2DResource::GetState(ResourceState state)
@@ -220,11 +109,11 @@ namespace Engine
 		case ResourceState::Common:
 			return D3D12_RESOURCE_STATE_COMMON;
 		case ResourceState::ShaderResource:
-			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | (IsDepthStencil(m_Format) ? D3D12_RESOURCE_STATE_DEPTH_READ : 0);
+			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | (IsTextureFormatDepthStencil(m_Format) ? D3D12_RESOURCE_STATE_DEPTH_READ : 0);
 		case ResourceState::UnorderedResource:
 			return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		case ResourceState::RenderTarget:
-			return IsDepthStencil(m_Format) ? D3D12_RESOURCE_STATE_DEPTH_WRITE : D3D12_RESOURCE_STATE_RENDER_TARGET;
+			return IsTextureFormatDepthStencil(m_Format) ? D3D12_RESOURCE_STATE_DEPTH_WRITE : D3D12_RESOURCE_STATE_RENDER_TARGET;
 		case ResourceState::CopySource:
 			return D3D12_RESOURCE_STATE_COPY_SOURCE;
 		case ResourceState::CopyDestination:
@@ -287,7 +176,7 @@ namespace Engine
 
 	DirectX12Texture2DRTVDSVDescriptorHandle::DirectX12Texture2DRTVDSVDescriptorHandle(Texture2DResource* resource)
 	{
-		m_DSV = IsDepthStencil(resource->GetFormat());
+		m_DSV = IsTextureFormatDepthStencil(resource->GetFormat());
 		if (m_DSV)
 			m_RTVDSVHandle = DirectX12ResourceManager::s_DSVHeap->Allocate();
 		else
@@ -298,7 +187,7 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)resource;
-		bool DSV = IsDepthStencil(resource->GetFormat());
+		bool DSV = IsTextureFormatDepthStencil(resource->GetFormat());
 
 		// no api to change the format so this should never trigger but i want it here just in case
 		CORE_ASSERT(DSV == m_DSV, m_DSV ? "cannot rebind depth stencel as render target" : "cannot rebind render target as depth stencil");

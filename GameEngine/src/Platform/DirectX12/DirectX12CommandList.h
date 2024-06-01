@@ -30,6 +30,13 @@ namespace Engine
 
 		virtual void ValidateStates(std::vector<ResourceStateObject> resources) override;
 
+
+		// copying
+		virtual void CopyBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size) override;
+		virtual void CopyResource(GPUResource* dest, GPUResource* src) override;
+
+		virtual void UploadTexture(GPUResource* dest, UploadTextureResource* src) override;
+
 		// rendering
 		virtual void SetRenderTarget(Ref<RenderTarget2D> renderTarget) override;
 		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) override;
@@ -46,6 +53,8 @@ namespace Engine
 		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
 
 		virtual void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ) override;
+
+		virtual void AwaitUAV(GPUResource* uav) override;
 
 		virtual void Close() override;
 

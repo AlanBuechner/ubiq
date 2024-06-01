@@ -4,8 +4,6 @@
 #include "EditorLayer.h"
 #include "Engine/Core/UUID.h"
 
-#include "Engine/Renderer/Model.h"
-
 #include "Engine/Core/Scene/TransformComponent.h"
 
 #include "PropertiesPanel.h"

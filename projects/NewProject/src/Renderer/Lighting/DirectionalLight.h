@@ -1,20 +1,9 @@
 #pragma once
-#include <Engine/Math/Math.h>
+#include "Engine/Core/Core.h"
+#include "Light.h"
 
-namespace Engine
+namespace Game
 {
-	class Camera;
-	class FrameBuffer;
-	class RWTexture2D;
-	class ConstantBuffer;
-	class StructuredBuffer;
-}
-
-namespace Engine
-{
-
-	Math::Vector3 CCTToRGB(float k);
-
 	class DirectionalLight
 	{
 	public:
@@ -49,19 +38,19 @@ namespace Engine
 			};
 
 			CascadedShadowMaps() = default;
-			CascadedShadowMaps(Ref<Camera> camera);
+			CascadedShadowMaps(Engine::Ref<Engine::Camera> camera);
 
 			void UpdateMaps(Math::Vector3 dir);
 
 		public:
-			Ref<Camera> m_Camera;
+			Engine::Ref<Engine::Camera> m_Camera;
 			float m_BaseFactor = 5;
 
-			Ref<FrameBuffer> m_ShadowMaps[s_NumShadowMaps];
-			Ref<RWTexture2D> m_ShadowMapsTemp[s_NumShadowMaps];
-			Ref<Camera> m_Cameras[s_NumShadowMaps];
+			Engine::Ref<Engine::FrameBuffer> m_ShadowMaps[s_NumShadowMaps];
+			Engine::Ref<Engine::RWTexture2D> m_ShadowMapsTemp[s_NumShadowMaps];
+			Engine::Ref<Engine::Camera> m_Cameras[s_NumShadowMaps];
 
-			Ref<StructuredBuffer> m_CameraIndeces;
+			Engine::Ref<Engine::StructuredBuffer> m_CameraIndeces;
 		};
 
 	public:
@@ -84,35 +73,25 @@ namespace Engine
 
 		void Apply();
 
-		Ref<ConstantBuffer> GetBuffer() { return m_Buffer; }
+		Engine::Ref<Engine::ConstantBuffer> GetBuffer() { return m_Buffer; }
 
-		void AddCamera(Ref<Camera> camera);
+		void AddCamera(Engine::Ref<Engine::Camera> camera);
 
 		void ClearCameras();
 		void UpdateShadowMaps();
 
-		std::unordered_map<Ref<Camera>, CascadedShadowMaps>& GetShadowMaps() { return m_ShadowMaps; }
-		const std::unordered_map<Ref<Camera>, CascadedShadowMaps>& GetShadowMaps() const { return m_ShadowMaps; }
+		std::unordered_map<Engine::Ref<Engine::Camera>, CascadedShadowMaps>& GetShadowMaps() { return m_ShadowMaps; }
+		const std::unordered_map<Engine::Ref<Engine::Camera>, CascadedShadowMaps>& GetShadowMaps() const { return m_ShadowMaps; }
 
 	private:
 		DirectionalLightData m_Data;
-		Ref<ConstantBuffer> m_Buffer;
+		Engine::Ref<Engine::ConstantBuffer> m_Buffer;
 
-		std::unordered_map<Ref<Camera>, CascadedShadowMaps> m_ShadowMaps;
+		std::unordered_map<Engine::Ref<Engine::Camera>, CascadedShadowMaps> m_ShadowMaps;
 
 		Math::Vector2 m_Angles = { 0,-90 };
 
 		float m_CCT = 6600;
 		Math::Vector3 m_Tint;
-	};
-
-	struct PointLight
-	{
-		Math::Vector3 position = { 0.0f, 0.0f, 0.0f };
-		Math::Vector3 color = { 1.0f, 1.0f, 1.0f };
-		float diffuseIntensity = 1;
-		float attConst = 1;
-		float attLin = 1;
-		float attQuad = 1;
 	};
 }

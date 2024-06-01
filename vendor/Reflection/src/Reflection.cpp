@@ -17,6 +17,8 @@ namespace Reflect {
 			m_ClassGroups[c.GetGroup()].push_back(registerdClass);
 		for(Property& prop : registerdClass->properties)
 			prop.c = registerdClass;
+		for (Function& func : registerdClass->functions)
+			func.c = registerdClass;
 	}
 
 	Registry* Registry::GetRegistry() {

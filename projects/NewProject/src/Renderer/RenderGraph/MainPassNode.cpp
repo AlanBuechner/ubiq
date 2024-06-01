@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "MainPassNode.h"
 #include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/Light.h"
 #include "Engine/Renderer/Abstractions/Shader.h"
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
+#include "Renderer/Lighting/DirectionalLight.h"
 #include "RenderGraph.h"
 
 namespace Game

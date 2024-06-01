@@ -61,6 +61,8 @@ dependancys = [
 	"GameEngine",
 	"ProjectManager",
 ]
+if(Config.gameProject != None):
+	dependancys.append(os.path.basename(Config.gameProject))
 
 links = [
 	"kernel32.lib",
@@ -78,8 +80,6 @@ dlls = [
 ]
 
 def GetProject():
-	if(Config.gameProject != None):
-		dependancys.append(os.path.basename(Config.gameProject))
 
 	proj = BuildUtils.ProjectEnviernment()
 	proj.projectDirectory = projDir
@@ -98,5 +98,4 @@ def GetProject():
 	proj.genReflection = True
 	proj.intDir = GetIntDir(projName, Config.gameProject)
 	proj.binDir = GetBinDir(projName, Config.gameProject)
-	print(proj.intDir)
 	return proj

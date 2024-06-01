@@ -3,6 +3,7 @@
 #include "Resources/FrameBuffer.h"
 #include "Resources/ResourceState.h"
 #include "Engine/Core/Flag.h"
+#include "Resources/UploadBuffer.h"
 
 namespace Engine
 {
@@ -55,10 +56,18 @@ namespace Engine
 		void Present() { Present(nullptr); }
 		virtual void Present(Ref<FrameBuffer> fb) = 0;
 
-
 		virtual void ValidateStates(std::vector<ResourceStateObject> resources) = 0;
 		void ValidateState(ResourceStateObject resource) { ValidateStates({ resource }); }
 		void ValidateState(GPUResource* resource, ResourceState state) { ValidateStates({ { resource, state } }); }
+
+	
+		// copying
+		void CopyBuffer(GPUResource* dest, GPUResource* src, uint64 size) { CopyBuffer(dest, 0, src, 0, size); }
+		virtual void CopyBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size) = 0;
+
+		virtual void CopyResource(GPUResource* dest, GPUResource* src) = 0;
+
+		virtual void UploadTexture(GPUResource* dest, UploadTextureResource* src) = 0;
 
 
 		// rendering
@@ -87,6 +96,8 @@ namespace Engine
 		virtual void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ) = 0;
 
 		// mis
+		virtual void AwaitUAV(GPUResource* uav) = 0;
+
 		virtual void Close() = 0;
 
 		virtual std::vector<ResourceStateObject>& GetPendingTransitions() = 0;

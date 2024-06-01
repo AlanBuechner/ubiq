@@ -3,6 +3,11 @@
 
 namespace Game
 {
+	class DirectionalLight;
+}
+
+namespace Game
+{
 	struct DrawCommand
 	{
 		Engine::Ref<Engine::Shader> m_Shader;
@@ -14,7 +19,7 @@ namespace Game
 	{
 		std::vector<DrawCommand> m_DrawCommands;
 		Engine::Ref<Engine::Camera> m_MainCamera;
-		Engine::Ref<Engine::DirectionalLight> m_DirectinalLight;
+		Engine::Ref<DirectionalLight> m_DirectinalLight;
 		Engine::Ref<Engine::Texture2D> m_Skybox;
 	};
 

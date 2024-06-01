@@ -11,7 +11,7 @@
 #include "Engine/Renderer/Abstractions/CommandList.h"
 #include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"
 #include "Engine/Renderer/RenderGraph.h"
-#include "Engine/Renderer/Light.h"
+#include "Renderer/Lighting/DirectionalLight.h"
 #include "Renderer/RenderGraph/RenderGraph.h"
 
 namespace Game
@@ -86,7 +86,7 @@ namespace Game
 		m_RenderGraph->OnViewportResize(width, height);
 	}
 
-	void SceneRenderer::SetDirectionalLight(Engine::Ref<Engine::DirectionalLight> light)
+	void SceneRenderer::SetDirectionalLight(Engine::Ref<DirectionalLight> light)
 	{
 		SceneData& data = m_RenderGraph->As<RenderGraph>().GetScene();
 		data.m_DirectinalLight = light;

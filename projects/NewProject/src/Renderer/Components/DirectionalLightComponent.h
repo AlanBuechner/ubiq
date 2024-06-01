@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Scene/Components.h"
 
-namespace Engine 
+namespace Game 
 {
 	class DirectionalLight;
 }
@@ -25,12 +25,12 @@ namespace Game
 		void SetTemperature(float temp);
 		void SetIntensity(float intensity);
 		void SetSize(float size);
-		Engine::Ref<Engine::DirectionalLight> GetDirectinalLight() { return m_Light; }
+		Engine::Ref<DirectionalLight> GetDirectinalLight() { return m_Light; }
 
 		void UpdateShadowMaps();
 
 	private:
-		Engine::Ref<Engine::DirectionalLight> m_Light;
+		Engine::Ref<DirectionalLight> m_Light;
 
 		bool m_Dirty = true;
 	};

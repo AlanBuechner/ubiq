@@ -1,66 +1,14 @@
-#include "pch.h"
-#include "Light.h"
+#include "DirectionalLight.h"
 
-#include "Abstractions/Resources/ConstantBuffer.h"
-#include "Abstractions/Resources/StructuredBuffer.h"
-#include "Abstractions/Resources/FrameBuffer.h"
-#include "Abstractions/Resources/StructuredBuffer.h"
-#include "Camera.h"
+#include "Engine/Renderer/Abstractions/Resources/ConstantBuffer.h"
+#include "Engine/Renderer/Abstractions/Resources/StructuredBuffer.h"
+#include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"
+#include "Engine/Renderer/Abstractions/Resources/StructuredBuffer.h"
+#include "Engine/Renderer/Camera.h"
 
-namespace Engine
+namespace Game
 {
-
-	Math::Vector3 CCTToRGB(float k)
-	{
-		Math::Vector3 color;
-		float temp = k / 100;
-
-		if (temp <= 66)
-			color.r = 255;
-		else
-		{
-			color.r = temp - 60;
-			color.r = 329.698727446 * Math::Pow(color.r, -0.1332047592);
-			if (color.r < 0) color.r = 0;
-			if (color.r > 255) color.r = 255;
-		}
-		color.r /= 255;
-
-		if (temp <= 66)
-		{
-			color.g = temp;
-			color.g = 99.4708025861 * Math::Log(color.g) - 161.1195681661;
-		}
-		else
-		{
-			color.g = temp - 60;
-			color.g = 288.1221695283 * Math::Pow(color.g, -0.0755148492);
-		}
-		if (color.g < 0) color.g = 0;
-		if (color.g > 255) color.g = 255;
-		color.g /= 255;
-
-		if (temp >= 66)
-			color.b = 255;
-		else
-		{
-			if (temp <= 19)
-				color.b = 0;
-			else
-			{
-				color.b = temp - 10;
-				color.b = 138.5177312231 * log(color.b) - 305.0447927307;
-			}
-		}
-		if (color.b < 0) color.b = 0;
-		if (color.b > 255) color.b = 255;
-		color.b /= 255;
-
-		return color;
-	}
-
-
-	DirectionalLight::CascadedShadowMaps::CascadedShadowMaps(Ref<Camera> camera) :
+	DirectionalLight::CascadedShadowMaps::CascadedShadowMaps(Engine::Ref<Engine::Camera> camera) :
 		m_Camera(camera)
 	{
 		std::vector<CascadeData> cascadeData;
@@ -69,15 +17,15 @@ namespace Engine
 		float size = m_BaseFactor;
 		for (uint32 i = 0; i < s_NumShadowMaps; i++)
 		{
-			m_Cameras[i] = CreateRef<Camera>();
-			uint32 width = 4096 - (i*512);
-			uint32 height = 4096 - (i*512);
+			m_Cameras[i] = Engine::CreateRef<Engine::Camera>();
+			uint32 width = 4096 - (i * 512);
+			uint32 height = 4096 - (i * 512);
 			//uint32 width = 1024;
 			//uint32 height = 1024;
-			m_ShadowMaps[i] = FrameBuffer::Create({
-				RenderTarget2D::Create(width, height, 1, TextureFormat::R32_FLOAT, { 1, 1, 1, 1 }, true),
-				RenderTarget2D::Create(width, height, 1, TextureFormat::Depth, {1,0,0,0}),
-			});
+			m_ShadowMaps[i] = Engine::FrameBuffer::Create({
+				Engine::RenderTarget2D::Create(width, height, 1, Engine::TextureFormat::R32_FLOAT, { 1, 1, 1, 1 }, true),
+				Engine::RenderTarget2D::Create(width, height, 1, Engine::TextureFormat::Depth, {1,0,0,0}),
+				});
 
 			//m_ShadowMapsTemp[i] = RWTexture2D::Create(width, height, 1, TextureFormat::RGBA16_UNORM);
 
@@ -93,7 +41,7 @@ namespace Engine
 			size *= 2;
 		}
 
-		m_CameraIndeces = StructuredBuffer::Create(sizeof(CascadeData), s_NumShadowMaps);
+		m_CameraIndeces = Engine::StructuredBuffer::Create(sizeof(CascadeData), s_NumShadowMaps);
 		m_CameraIndeces->SetData(cascadeData.data(), s_NumShadowMaps);
 	}
 
@@ -179,10 +127,10 @@ namespace Engine
 			}
 
 			// find the center of the vertices in world space
-			Math::Vector3 center = { 
+			Math::Vector3 center = {
 				(minx + maxx),
 				(miny + maxy),
-				(minz + maxz) 
+				(minz + maxz)
 			};
 			center /= 2;
 
@@ -195,7 +143,7 @@ namespace Engine
 			maxz -= center.z;
 
 			// set the camera data
-			Camera::CameraData& cd = m_Cameras[i]->m_CameraData;
+			Engine::Camera::CameraData& cd = m_Cameras[i]->m_CameraData;
 			//cd.Position = center;
 			cd.ViewMatrix = Math::Inverse(TBN * Math::Translate(center));
 			cd.ProjectionMatrix = Math::Ortho(minx, maxx, miny, maxy, (minz - 100) * 3, maxz);
@@ -215,8 +163,8 @@ namespace Engine
 			m_Angles.x = s;
 		else
 			m_Angles.x = -s;
-		
-		m_Buffer = ConstantBuffer::Create(sizeof(DirectionalLightData));
+
+		m_Buffer = Engine::ConstantBuffer::Create(sizeof(DirectionalLightData));
 	}
 
 	void DirectionalLight::SetAngles(Math::Vector2 rot)
@@ -237,7 +185,7 @@ namespace Engine
 		m_Buffer->SetData(&m_Data);
 	}
 
-	void DirectionalLight::AddCamera(Ref<Camera> camera)
+	void DirectionalLight::AddCamera(Engine::Ref<Engine::Camera> camera)
 	{
 		m_ShadowMaps[camera] = CascadedShadowMaps(camera); // add new shadow map
 	}
@@ -252,6 +200,5 @@ namespace Engine
 		for (auto& sm : m_ShadowMaps)
 			sm.second.UpdateMaps(m_Data.direction);
 	}
-
 }
 

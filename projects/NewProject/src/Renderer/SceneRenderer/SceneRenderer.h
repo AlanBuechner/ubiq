@@ -16,9 +16,13 @@ namespace Engine
 	class ConstantBuffer;
 	class FrameBuffer;
 	class RenderGraph;
-	class DirectionalLight;
 	class Shader;
 	class Texture2D;
+}
+
+namespace Game
+{
+	class DirectionalLight;
 }
 
 namespace Game
@@ -82,7 +86,7 @@ namespace Game
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 		virtual void UpdateBuffers() override;
 
-		void SetDirectionalLight(Engine::Ref<Engine::DirectionalLight> light);
+		void SetDirectionalLight(Engine::Ref<DirectionalLight> light);
 		void SetSkyBox(Engine::Ref<Engine::Texture2D> texture);
 
 		ObjectControlBlockRef Submit(Engine::Ref<Engine::Mesh> mesh, Engine::Ref<Engine::Material> material, const Math::Mat4& transform);

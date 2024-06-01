@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DepthOfField.h"
-#include "EngineResource.h"
 #include "Engine/Renderer/Camera.h"
+#include "Resource.h"
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 

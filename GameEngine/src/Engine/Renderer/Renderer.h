@@ -6,7 +6,6 @@
 #include "Material.h"
 
 #include "EditorCamera.h"
-#include "Light.h"
 
 #include "Engine/Util/Performance.h"
 
