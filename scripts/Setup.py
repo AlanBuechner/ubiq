@@ -129,8 +129,3 @@ else:
 
 print()
 
-
-# generate project
-print("Generating projects")
-os.chdir("scripts")
-os.system("GenerateProjects.bat")
