@@ -96,10 +96,9 @@ project "{projName}"
 
 def GenerateProjects():
 	code = GenerateSolution()
-	if(Config.gameProject != None):
-		GenerateProject(Config.buildScripts[Config.gameProject], code)
-		subprocess.run(["vendor\premake\premake5.exe", "vs2022"], cwd=Config.gameProject)
-	else:
-		for script in Config.buildScripts.values():
-			GenerateProject(script)
-		os.system("call vendor\premake\premake5.exe vs2022")
+	for script in Config.buildScripts.values():
+		GenerateProject(script)
+
+	GenerateProject(Config.buildScripts[Config.gameProject], code)
+	subprocess.run(["vendor\premake\premake5.exe", "vs2022"], cwd=Config.gameProject)
+
