@@ -102,7 +102,7 @@ if(args.g != None):
 	Config.gameProject = args.g.replace("\\", "/")
 	if(Config.gameProject[-1] == "/"):
 		Config.gameProject = Config.gameProject[:-1]
-	Config.gameProject = os.path.abspath(Config.gameProject)
+	Config.gameProject = os.path.abspath(Config.gameProject).replace("\\", "/")
 	Config.projects.append(Config.gameProject)
 
 
