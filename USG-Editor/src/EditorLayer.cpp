@@ -7,6 +7,7 @@
 #include "Engine/Core/Cursor.h"
 #include "Engine/Util/Performance.h"
 #include "Engine/Util/PlatformUtils.h"
+#include "Engine/Core/Scene/SceneScriptBase.h"
 
 // temp
 #include "Engine/Core/Scene/SceneRegistry.h"
@@ -219,7 +220,7 @@ namespace Engine
 
 	void EditorLayer::NewScene()
 	{
-		m_Game->SwitchScene(CreateRef<Scene>(m_Game->CreateSceneRenderer()));
+		m_Game->SwitchScene(CreateRef<Scene>(m_Game->CreateSceneScript()));
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_HierarchyPanel.SetContext(m_Game->GetScene());
 	}

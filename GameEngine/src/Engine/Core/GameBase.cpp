@@ -1,6 +1,7 @@
 #include "GameBase.h"
 #include "Scene/SceneSerializer.h"
 #include "Application.h"
+#include "Scene/SceneScriptBase.h"
 
 Engine::GameBase* Engine::GameBase::s_Game = nullptr;
 
@@ -19,12 +20,12 @@ namespace Engine
 
 	Ref<Scene> GameBase::LoadScene(const std::string& file)
 	{
-		Ref<Scene> scene = CreateRef<Scene>(CreateSceneRenderer());
+		Ref<Scene> scene = CreateRef<Scene>(CreateSceneScript());
 		SceneSerializer serializer(scene);
 		serializer.Deserialize(file);
 		Window& window = Application::Get().GetWindow();
 		scene->OnViewportResize(window.GetWidth(), window.GetHeight());
-		OnSceneLoad(scene);
+		scene->GetSceneScript()->OnSceneLoad();
 		return scene;
 	}
 

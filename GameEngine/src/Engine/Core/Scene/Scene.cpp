@@ -3,6 +3,7 @@
 
 #include "Components.h"
 #include "Entity.h"
+#include "SceneScriptBase.h"
 #include "Engine/Core/UUID.h"
 
 #include "Engine/Renderer/Renderer.h"
@@ -11,14 +12,16 @@
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Core/Scene/TransformComponent.h"
 
+
 #include "glm/glm.hpp"
 
 namespace Engine
 {
-	Scene::Scene(Ref<SceneRenderer> renderer) :
-		m_SceneRenderer(renderer)
+	Scene::Scene(Ref<SceneScriptBase> script) :
+		m_SceneScript(script)
 	{
-		OnViewportResize(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
+		m_SceneScript->m_Scene = this;
+		m_SceneScript->OnScenePreLoad();
 	}
 
 	Scene::~Scene()
@@ -34,6 +37,8 @@ namespace Engine
 		m_CameraChanged = m_SceneRenderer->GetMainCamera() != camera;
 		if(m_CameraChanged)
 			m_SceneRenderer->SetMainCamera(camera);
+
+		m_SceneScript->OnUpdate();
 
 		for (uint32 i = 0; i < m_UpdateEvents.size(); i++)
 			m_UpdateEvents[i]->Update();

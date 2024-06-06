@@ -3,6 +3,7 @@
 #include <Engine/Core/GameBase.h>
 #include "Renderer/Components/CameraComponent.h"
 #include "Renderer/SceneRenderer/SceneRenderer.h"
+#include "SceneScripts/DefaultSceneScript.h"
 
 LINK_REFLECTION_DATA(NewProject)
 
@@ -40,15 +41,8 @@ namespace Game
 			m_Scene->GetSceneRenderer()->Render(Engine::Renderer::GetMainCommandQueue());
 		}
 
-		virtual Engine::Ref<Engine::SceneRenderer> CreateSceneRenderer() override {
-			return SceneRenderer::Create();
-		}
-
-		virtual void OnSceneLoad(Engine::Ref<Engine::Scene> scene) override
-		{
-			CREATE_PROFILE_FUNCTIONI();
-			scene->AddUpdateEvent<Engine::ComponentUpdateEvent<Engine::TransformComponent>>("UpdateHierarchyGlobalTransform");
-			scene->AddUpdateEvent<Engine::SceneUpdateEvent>("OnPreRender");
+		virtual Engine::Ref<Engine::SceneScriptBase> CreateSceneScript() override {
+			return Engine::CreateRef<DefaultSceneScript>();
 		}
 
 
