@@ -17,6 +17,7 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 			return new DirectX12VertexBufferResource(count, stride);
+		default: return nullptr;
 		}
 	}
 
@@ -28,8 +29,8 @@ namespace Engine
 		case ResourceState::CopySource:
 		case ResourceState::CopyDestination:
 			return true;
+		default: return false;
 		}
-		return false;
 	}
 
 
@@ -37,17 +38,16 @@ namespace Engine
 
 	VertexBufferView* VertexBufferView::Create(VertexBufferResource* resource)
 	{
-		VertexBufferView* handle = nullptr;
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			handle = new DirectX12VertexBufferView();
-			break;
-		}
-
-		if (handle)
+		{
+			VertexBufferView* handle = new DirectX12VertexBufferView();
 			handle->Bind(resource);
-		return handle;
+			return handle;
+		}
+		default: return nullptr;
+		}
 	}
 
 
@@ -96,6 +96,7 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 			return new DirectX12IndexBufferResource(count);
+		default: return nullptr;
 		}
 	}
 
@@ -107,8 +108,8 @@ namespace Engine
 		case ResourceState::CopySource:
 		case ResourceState::CopyDestination:
 			return true;
+		default: return false;
 		}
-		return false;
 	}
 
 
@@ -116,17 +117,16 @@ namespace Engine
 
 	IndexBufferView* IndexBufferView::Create(IndexBufferResource* resource)
 	{
-		IndexBufferView* handle = nullptr;
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			handle = new DirectX12IndexBufferView();
-			break;
-		}
-
-		if (handle)
+		{
+			IndexBufferView* handle = new DirectX12IndexBufferView();
 			handle->Bind(resource);
-		return handle;
+			return handle;
+		}
+		default: return nullptr;
+		}
 	}
 
 

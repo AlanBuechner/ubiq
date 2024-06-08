@@ -207,7 +207,7 @@ namespace Engine
 		}
 	}
 
-	void EditorLayer::OnEvent(Event& e)
+	void EditorLayer::OnEvent(Event* e)
 	{
 		Super::OnEvent(e);
 
@@ -234,7 +234,7 @@ namespace Engine
 		m_HierarchyPanel.SetContext(m_Game->GetScene());
 	}
 
-	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent* e)
 	{
 		bool controlPressed = Input::GetKeyDown(KeyCode::CONTROL);
 		bool shiftPressed = Input::GetKeyDown(KeyCode::SHIFT);
@@ -242,7 +242,7 @@ namespace Engine
 
 		if (!rightClick)
 		{
-			switch (e.GetKeyCode())
+			switch (e->GetKeyCode())
 			{
 			case KeyCode::S:
 			{
@@ -261,7 +261,7 @@ namespace Engine
 			}
 
 			// imguizmo keyboard shortcuts
-			switch (e.GetKeyCode())
+			switch (e->GetKeyCode())
 			{
 			case KeyCode::Q:
 				m_GizmoType = -1;

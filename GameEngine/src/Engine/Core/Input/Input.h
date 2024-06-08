@@ -5,6 +5,7 @@
 #include <map>
 #include "Engine/Core/Application.h"
 #include "Engine/Math/Math.h"
+#include "Utils/Vector.h"
 
 #define KEY_PRESSED		(int)Engine::Input::KeyPressed
 #define KEY_RELEASED	(int)Engine::Input::KeyReleased
@@ -254,15 +255,15 @@ namespace Engine
 
 		void SetKeyState(int key, KeyState state) { m_KeyStates[key] = state; }
 		void SetMouseButtonState(int button, KeyState state) { m_MouseStates[button] = state; }
-		bool OnKeyPressed(KeyPressedEvent& e);
-		bool OnKeyReleased(KeyReleasedEvent& e);
-		bool OnMousePressed(MouseButtonPressedEvent& e);
-		bool OnMouseReleased(MouseButtonReleasedEvent& e);
-		bool OnMouseMoved(MouseMovedEvent& e);
+		bool OnKeyPressed(KeyPressedEvent* e);
+		bool OnKeyReleased(KeyReleasedEvent* e);
+		bool OnMousePressed(MouseButtonPressedEvent* e);
+		bool OnMouseReleased(MouseButtonReleasedEvent* e);
+		bool OnMouseMoved(MouseMovedEvent* e);
 		static void UpdateKeyState() { s_Instance->UpdateKeyStateImpl(); }
 		void UpdateKeyStateImpl();
 
-		static void GetUpdatedEventList(std::vector<Event*>& events);
+		static void GetUpdatedEventList(Utils::Vector<Event*>& events);
 
 		inline bool isKeyBinded(int key, int type);
 
@@ -278,17 +279,17 @@ namespace Engine
 		std::map<int, KeyState> m_KeyStates;
 		std::map<int, KeyState> m_MouseStates;
 
-		std::vector<int> m_ToUpdate;
-		std::vector<int> m_ToUpdateMouse;
+		Utils::Vector<int> m_ToUpdate;
+		Utils::Vector<int> m_ToUpdateMouse;
 
-		std::vector<int> m_KeysDown;
+		Utils::Vector<int> m_KeysDown;
 		bool m_SendAllEventData = true;
 		unsigned int m_SystemsNeedingAllTypedEvents = 0;
 		unsigned int m_SystemsNeedingAllPressedEvents = 0;
 		unsigned int m_SystemsNeedingAllRelesedEvents = 0;
 		unsigned int m_SystemsNeedingAllRepeatEvents = 0;
 		unsigned int m_SystemsNeedingAllMouseMoveEvents = 0;
-		std::vector<BindedKeyData> m_BindedKeys;
+		Utils::Vector<BindedKeyData> m_BindedKeys;
 
 		Math::Vector2 m_MousePosition;
 		Math::Vector2 m_PreviousMousePosition;

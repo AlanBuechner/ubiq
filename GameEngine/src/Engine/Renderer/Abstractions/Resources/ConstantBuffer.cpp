@@ -22,8 +22,8 @@ namespace Engine
 		case ResourceState::CopySource:
 		case ResourceState::CopyDestination:
 			return true;
+		default: return false;
 		}
-		return false;
 	}
 
 	ConstantBufferResource* ConstantBufferResource::Create(uint32 size)
@@ -32,8 +32,8 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 			return new DirectX12ConstantBufferResource(size);
+		default: return nullptr;
 		}
-		return nullptr;
 	}
 
 	// Descriptor Handles ---------------------------------------------------------- //
@@ -41,17 +41,16 @@ namespace Engine
 
 	ConstantBufferCBVDescriptorHandle* ConstantBufferCBVDescriptorHandle::Create(ConstantBufferResource* resource)
 	{
-		ConstantBufferCBVDescriptorHandle* handle = nullptr;
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			handle = new DirectX12ConstantBufferCBVDescriptorHandle();
-			break;
-		}
-
-		if (handle)
+		{
+			ConstantBufferCBVDescriptorHandle* handle = new DirectX12ConstantBufferCBVDescriptorHandle();
 			handle->Bind(resource);
-		return handle;
+			return handle;
+		}
+		default: return nullptr;
+		}
 	}
 
 

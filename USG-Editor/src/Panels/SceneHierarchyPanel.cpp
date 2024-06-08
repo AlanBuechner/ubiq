@@ -32,14 +32,14 @@ namespace Engine
 	{
 		ImGui::Begin("Hierarchy");
 
-		std::vector<Entity> rootEntitys;
+		Utils::Vector<Entity> rootEntitys;
 		m_Context->m_Registry.EachEntity([&](auto entityID) {
 			Entity entity{ entityID, m_Context.get() };
 			if (entity.GetTransform().GetParent() == Entity::null)
-				rootEntitys.push_back(entity);
+				rootEntitys.Push(entity);
 		});
 
-		for (uint32_t i = 0; i < rootEntitys.size(); i++)
+		for (uint32_t i = 0; i < rootEntitys.Count(); i++)
 			DrawEntityNode(rootEntitys[i]);
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -140,7 +140,7 @@ if(!m_Selected.HasComponent<component>()){\
 	{
 		auto& children = entity.GetTransform().GetChildren();
 		ImGuiTreeNodeFlags flags = ( m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
-			(children.size() == 0 ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow) |
+			(children.Empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow) |
 			ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool open = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity, flags, entity.GetName().c_str());
@@ -182,7 +182,7 @@ if(!m_Selected.HasComponent<component>()){\
 
 		if (open)
 		{
-			for (uint32_t i = 0; i < children.size(); i++)
+			for (uint32_t i = 0; i < children.Count(); i++)
 			{
 				Entity child = children[i];
 				DrawEntityNode(child);
@@ -209,7 +209,7 @@ if(!m_Selected.HasComponent<component>()){\
 		if (ImGui::InputText("Name", buffer, sizeof(buffer)))
 			name = std::string(buffer);
 		
-		std::vector<Component*> components = entity.GetComponents();
+		Utils::Vector<Component*> components = entity.GetComponents();
 		for (Component* comp : components)
 		{
 			ImVec2 contentRegion = ImGui::GetContentRegionAvail();

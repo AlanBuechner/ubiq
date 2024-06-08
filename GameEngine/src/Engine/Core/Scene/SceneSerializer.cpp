@@ -181,7 +181,7 @@ class TransformSerializer : public Engine::ComponentSerializer
 		if (transform.GetParent())
 			out << YAML::Key << "Parent" << YAML::Value << (uint64)transform.GetParent().GetUUID();
 
-		if (transform.GetChildren().size() > 0)
+		if (transform.GetChildren().Count() > 0)
 		{
 			YAML::Node children;
 			for (auto c : transform.GetChildren())

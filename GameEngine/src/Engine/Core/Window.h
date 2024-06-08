@@ -27,7 +27,7 @@ namespace Engine
 	class ENGINE_API Window
 	{
 	public:
-		using EventCallbackFn = std::function<void(Event&)>;
+		using EventCallbackFn = std::function<void(Event*)>;
 
 		virtual ~Window() {}
 		virtual void Destroy() = 0;

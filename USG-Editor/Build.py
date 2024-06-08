@@ -40,6 +40,7 @@ includes = [
 	f"{includeDirs['Aftermath']}",
 	f"{includeDirs['ProjectManager']}/src",
 	f"{includeDirs['Reflection']}/src",
+	f"{includeDirs['Utilities']}/src",
 	f"{location}/GameEngine/vendor",
 	f"{location}/GameEngine/src",
 	f"{location}/GameEngine/embeded",

@@ -18,6 +18,7 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 			return new DirectX12InstanceBufferResource(capacity, stride);
+		default: return nullptr;
 		}
 	}
 
@@ -28,23 +29,22 @@ namespace Engine
 		case ResourceState::CopyDestination:
 		case ResourceState::ShaderResource:
 			return true;
+		default: return false;
 		}
-		return false;
 	}
 
 	InstanceBufferView* InstanceBufferView::Create(InstanceBufferResource* resource)
 	{
-		InstanceBufferView* handle = nullptr;
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			handle = new DirectX12InstanceBufferView();
-			break;
-		}
-
-		if (handle)
+		{
+			InstanceBufferView* handle = new DirectX12InstanceBufferView();
 			handle->Bind(resource);
-		return handle;
+			return handle;
+		} 
+		default: return nullptr;
+		}
 	}
 
 
@@ -69,7 +69,7 @@ namespace Engine
 		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
 		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
 
-		delete[] m_Data;
+		free(m_Data);
 		m_Data = nullptr;
 	}
 
@@ -82,7 +82,7 @@ namespace Engine
 			m_Capacity = pow(2, ceil(log2(newCount)));
 			m_Data = malloc(m_Capacity * m_Stride);
 			memcpy(m_Data, oldData, m_Count * m_Stride);
-			delete[] oldData;
+			free(oldData);
 		}
 
 		void* startLoc = (void*)((uint64)m_Data + (m_Count * m_Stride));

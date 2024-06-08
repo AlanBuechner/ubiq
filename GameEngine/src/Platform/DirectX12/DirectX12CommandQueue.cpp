@@ -73,7 +73,7 @@ namespace Engine
 	{
 		m_Fence->SetEventOnCompletion(m_SignalCount, m_EventHandle); // call event when fence val has been reached
 		WaitForSingleObject(m_EventHandle, INFINITE); // wait for event to be triggered
-		m_EventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS); // create event for command queue completion
+		m_EventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS); // create event for command queue completion
 		m_SignalCount = 0;
 		m_Fence->Signal(0);
 	}

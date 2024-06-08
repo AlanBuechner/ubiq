@@ -16,7 +16,7 @@ namespace Engine
 	{
 	}
 
-	void InputControlerManeger::Update(Event& e)
+	void InputControlerManeger::Update(Event* e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(&InputControlerManeger::OnKeyEvent<KeyPressedEvent>));
@@ -46,50 +46,50 @@ namespace Engine
 		}
 	}
 
-	bool InputControlerManeger::OnMouseMoveEvent(MouseMovedEvent& e)
+	bool InputControlerManeger::OnMouseMoveEvent(MouseMovedEvent* e)
 	{
 		if (m_Controlers.empty())
 			return false;
 		for (auto i : m_Controlers)
 		{
-			i->RaiseMouseMoveEvent(e.GetMouseBindMode(), Math::Vector2(e.GetX(), e.GetY()));
+			i->RaiseMouseMoveEvent(e->GetMouseBindMode(), Math::Vector2(e->GetX(), e->GetY()));
 		}
 		return false;
 	}
 
-	bool InputControlerManeger::OnMouseScrollEvent(MouseScrolledEvent& e)
+	bool InputControlerManeger::OnMouseScrollEvent(MouseScrolledEvent* e)
 	{
 		if (m_Controlers.empty())
 			return false;
 		for (auto i : m_Controlers)
 		{
-			i->RaiseMouseMoveEvent(e.GetMouseBindMode(), Math::Vector2({e.GetXOffset(), e.GetYOffset()}));
-		}
-		return false;
-	}
-
-	template<class T>
-	bool InputControlerManeger::OnKeyEvent(T& e) 
-	{
-		if (m_Controlers.empty())
-			return false;
-		EventType type = e.GetEventType();
-		for (auto i : m_Controlers)
-		{
-			i->RaiseEvent(e.GetKeyCode(), (int)type);
+			i->RaiseMouseMoveEvent(e->GetMouseBindMode(), Math::Vector2({e->GetXOffset(), e->GetYOffset()}));
 		}
 		return false;
 	}
 
 	template<class T>
-	bool InputControlerManeger::OnMouseEvent(T & e)
+	bool InputControlerManeger::OnKeyEvent(T* e) 
 	{
 		if (m_Controlers.empty())
 			return false;
-		EventType type = e.GetEventType();
+		EventType type = e->GetEventType();
 		for (auto i : m_Controlers)
 		{
-			i->RaiseEvent(e.GetMouseButton(), (int)type);
+			i->RaiseEvent(e->GetKeyCode(), (int)type);
+		}
+		return false;
+	}
+
+	template<class T>
+	bool InputControlerManeger::OnMouseEvent(T* e)
+	{
+		if (m_Controlers.empty())
+			return false;
+		EventType type = e->GetEventType();
+		for (auto i : m_Controlers)
+		{
+			i->RaiseEvent(e->GetMouseButton(), (int)type);
 		}
 		return false;
 	}

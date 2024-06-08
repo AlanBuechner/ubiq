@@ -22,8 +22,8 @@ namespace Engine
 		case ResourceState::CopySource:
 		case ResourceState::CopyDestination:
 			return true;
+		default: return false;
 		}
-		return false;
 	}
 
 	StructuredBufferResource* StructuredBufferResource::Create(uint32 stride, uint32 count)
@@ -32,41 +32,39 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 			return new DirectX12StructuredBufferResource(stride, count);
+		default: return nullptr;
 		}
-		return nullptr;
 	}
 
 	// Descriptor Handles ---------------------------------------------------------- //
 
 	StructuredBufferSRVDescriptorHandle* StructuredBufferSRVDescriptorHandle::Create(StructuredBufferResource* resource)
 	{
-		StructuredBufferSRVDescriptorHandle* handle = nullptr;
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			handle = new DirectX12StructuredBufferSRVDescriptorHandle();
-			break;
-		}
-
-		if (handle)
+		{
+			StructuredBufferSRVDescriptorHandle* handle = new DirectX12StructuredBufferSRVDescriptorHandle();
 			handle->Bind(resource);
-		return handle;
+			return handle;
+		}
+		default: return nullptr;
+		}
 	}
 
 
 	StructuredBufferUAVDescriptorHandle* StructuredBufferUAVDescriptorHandle::Create(StructuredBufferResource* resource)
 	{
-		StructuredBufferUAVDescriptorHandle* handle = nullptr;
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			handle = new DirectX12StructuredBufferUAVDescriptorHandle();
-			break;
-		}
-
-		if (handle)
+		{
+			StructuredBufferUAVDescriptorHandle* handle = new DirectX12StructuredBufferUAVDescriptorHandle();
 			handle->Bind(resource);
-		return handle;
+			return handle;
+		}
+		default: return nullptr;
+		}
 	}
 
 

@@ -69,9 +69,9 @@ namespace Engine {
 		m_LayerStack.PushOverlay(layer);
 	}
 
-	void Application::OnEvent(Event& e)
+	void Application::OnEvent(Event* e)
 	{
-		m_InputBuffer.insert(m_InputBuffer.begin(), &e);
+		m_InputBuffer.Push(e);
 	}
 
 	void Application::Run()
@@ -160,12 +160,11 @@ namespace Engine {
 
 	void Application::SendInputBuffer()
 	{
-		if (m_InputBuffer.empty()) return;
+		if (m_InputBuffer.Empty()) return;
 
-		for (auto i = m_InputBuffer.end(); i != m_InputBuffer.begin();)
+		for (Event* i : m_InputBuffer)
 		{
-			Event& e = *(*--i);
-			EventDispatcher dispatcher(e);
+			EventDispatcher dispatcher(i);
 			dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(&Application::OnWindowClose));
 			dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(&Application::OnWindowResize));
 			dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnKeyPressed, Input::s_Instance));
@@ -177,30 +176,29 @@ namespace Engine {
 
 		Input::GetUpdatedEventList(m_InputBuffer);
 
-		for (auto i = m_InputBuffer.end(); i != m_InputBuffer.begin();)
+		for (Event** i = m_InputBuffer.begin(); i != m_InputBuffer.end(); ++i)
 		{
-			Event& e = *(*--i);
-			for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+			for (Layer** it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 			{
-				(*--it)->OnEvent(e);
-				if (e.Handled)
+				(*--it)->OnEvent(*i);
+				if ((*i)->Handled)
 					break;
 			}
-			delete* i;
+			delete *i;
 		}
 
-		m_InputBuffer.clear();
+		m_InputBuffer.Clear();
 	}
 
-	bool Application::OnWindowClose(WindowCloseEvent& e)
+	bool Application::OnWindowClose(WindowCloseEvent* e)
 	{
 		m_Running = false;
 		return true;
 	}
 
-	bool Application::OnWindowResize(WindowResizeEvent& e)
+	bool Application::OnWindowResize(WindowResizeEvent* e)
 	{
-		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		if (e->GetWidth() == 0 || e->GetHeight() == 0)
 			m_Minimized = true;
 		else
 			m_Minimized = false;

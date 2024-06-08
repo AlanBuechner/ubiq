@@ -28,19 +28,19 @@ namespace Engine
 				tc.Parent.GetTransform().RemoveChild(child);
 
 			tc.Parent = Owner;
-			Children.push_back(child);
+			Children.Push(child);
 			tc.Dirty();
 		}
 	}
 
 	void TransformComponent::RemoveChild(Entity child)
 	{
-		for (uint32_t i = 0; i < Children.size(); i++)
+		for (uint32_t i = 0; i < Children.Count(); i++)
 		{
 			if (Children[i] == child)
 			{
-				std::swap(Children[i], Children.back());
-				Children.pop_back();
+				std::swap(Children[i], Children.Back());
+				Children.Pop();
 				return;
 			}
 		}
@@ -58,7 +58,7 @@ namespace Engine
 	void TransformComponent::Dirty()
 	{
 		m_Dirty = true;
-		for (uint32 i = 0; i < Children.size(); i++)
+		for (uint32 i = 0; i < Children.Count(); i++)
 			Children[i].GetTransform().Dirty();
 	}
 
@@ -77,7 +77,7 @@ namespace Engine
 				ChashedGloableTransform = GetTransform();
 
 			// iterate over all components on entity
-			std::vector<Component*> components = Owner.GetComponents();
+			Utils::Vector<Component*> components = Owner.GetComponents();
 			for (Component* comp : components)
 				comp->OnTransformChange(ChashedGloableTransform);
 

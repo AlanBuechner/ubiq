@@ -51,7 +51,7 @@ namespace Engine
 		GetTransform().RemoveChild(child);
 	}
 
-	const std::vector<Entity>& Entity::GetChildren()
+	const Utils::Vector<Entity>& Entity::GetChildren()
 	{
 		return GetTransform().GetChildren();
 	}
@@ -61,11 +61,11 @@ namespace Engine
 		GetTransform().SetParentToRoot();
 	}
 
-	std::vector<Component*> Entity::GetComponents()
+	Utils::Vector<Component*> Entity::GetComponents()
 	{
 		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
-		std::vector<Component*> components(data.m_Components.size());
-		for (uint32 i = 0; i < components.size(); i++)
+		Utils::Vector<Component*> components(data.m_Components.size(), {});
+		for (uint32 i = 0; i < components.Count(); i++)
 			components[i] = (Component*)(data.m_Components[i].m_Pool->GetComponentRaw(data.m_Components[i].m_ComponentLoc));
 
 		return components;

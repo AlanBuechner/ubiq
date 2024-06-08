@@ -24,19 +24,19 @@ namespace Engine
 		InputControlerManeger();
 		~InputControlerManeger();
 
-		void Update(Event& event);
+		void Update(Event* event);
 		void AddControler(InputControler* controler);
 		void RemoveControler(InputControler* controler);
 
 	private:
 		template<class T>
-		bool OnKeyEvent(T& e);
+		bool OnKeyEvent(T* e);
 
 		template<class T>
-		bool OnMouseEvent(T& e);
+		bool OnMouseEvent(T* e);
 
-		bool OnMouseMoveEvent(MouseMovedEvent& e);
-		bool OnMouseScrollEvent(MouseScrolledEvent& e);
+		bool OnMouseMoveEvent(MouseMovedEvent* e);
+		bool OnMouseScrollEvent(MouseScrolledEvent* e);
 
 		std::vector<InputControler*> m_Controlers;
 	};

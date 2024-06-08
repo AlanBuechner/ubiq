@@ -285,12 +285,12 @@ namespace Engine
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN: // key down
 			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(*new KeyPressedEvent(static_cast<unsigned char>(wParam)));
+			m_Data.EventCallback(new KeyPressedEvent(static_cast<unsigned char>(wParam)));
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP: // key up
 			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(*new KeyReleasedEvent(static_cast<unsigned char>(wParam)));
+			m_Data.EventCallback(new KeyReleasedEvent(static_cast<unsigned char>(wParam)));
 			break;
 		case WM_CHAR:
 			// TODO
@@ -301,7 +301,7 @@ namespace Engine
 		{
 			if (m_Data.EventCallback == nullptr) break;
 			POINTS pt = MAKEPOINTS(lParam);
-			m_Data.EventCallback(*new MouseMovedEvent(MOUSE_POSITON, pt.x, pt.y));
+			m_Data.EventCallback(new MouseMovedEvent(MOUSE_POSITON, pt.x, pt.y));
 			//Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
 			//MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y); // creates new mouse moved event
 			//m_Data.EventCallback(*deltaMousePostionEvent);
@@ -310,28 +310,28 @@ namespace Engine
 
 		case WM_LBUTTONDOWN: // left mouse down
 			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(*new MouseButtonPressedEvent(VK_LBUTTON));
+			m_Data.EventCallback(new MouseButtonPressedEvent(VK_LBUTTON));
 			break;
 		case WM_RBUTTONDOWN: // right mouse down
 			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(*new MouseButtonPressedEvent(VK_RBUTTON));
+			m_Data.EventCallback(new MouseButtonPressedEvent(VK_RBUTTON));
 			break;
 		case WM_MBUTTONDOWN: // middle mouse down
 			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(*new MouseButtonPressedEvent(VK_MBUTTON));
+			m_Data.EventCallback(new MouseButtonPressedEvent(VK_MBUTTON));
 			break;
 
 		case WM_LBUTTONUP: // left moues up
 			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(*new MouseButtonReleasedEvent(VK_LBUTTON));
+			m_Data.EventCallback(new MouseButtonReleasedEvent(VK_LBUTTON));
 			break;
 		case WM_RBUTTONUP: // right mouse up
 			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(*new MouseButtonReleasedEvent(VK_RBUTTON));
+			m_Data.EventCallback(new MouseButtonReleasedEvent(VK_RBUTTON));
 			break;
 		case WM_MBUTTONUP: // middle mouse up
 			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(*new MouseButtonReleasedEvent(VK_MBUTTON));
+			m_Data.EventCallback(new MouseButtonReleasedEvent(VK_MBUTTON));
 			break;
 		case WM_INPUT: {
 			unsigned size = 0;
@@ -341,7 +341,7 @@ namespace Engine
 
 			if (raw.header.dwType == RIM_TYPEMOUSE && (raw.data.mouse.lLastX != 0 || raw.data.mouse.lLastY != 0)) {
 				MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)raw.data.mouse.lLastX, (float)raw.data.mouse.lLastY); // creates new mouse moved event
-				m_Data.EventCallback(*deltaMousePostionEvent);
+				m_Data.EventCallback(deltaMousePostionEvent);
 			}
 			break;
 		}
@@ -374,7 +374,7 @@ namespace Engine
 			// resize swap chain
 
 			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(*new WindowResizeEvent(m_Data.Width, m_Data.Height));
+			m_Data.EventCallback(new WindowResizeEvent(m_Data.Width, m_Data.Height));
 			m_SwapChain->Resize(m_Data.Width, m_Data.Height);
 			break;
 		}
@@ -382,7 +382,7 @@ namespace Engine
 			break;
 		case WM_CLOSE: // window close event
 			if (m_Data.EventCallback != nullptr)
-				m_Data.EventCallback(*new WindowCloseEvent());
+				m_Data.EventCallback(new WindowCloseEvent());
 			return 0; // stop DefWindowProc from being called
 			break;
 		}

@@ -3,6 +3,7 @@
 #include "SceneRegistry.h"
 
 #include "Engine/Core/UUID.h"
+#include "Utils/Vector.h"
 
 namespace Engine
 {
@@ -59,9 +60,9 @@ namespace Engine
 		Entity GetParent();
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
-		const std::vector<Entity>& GetChildren();
+		const Utils::Vector<Entity>& GetChildren();
 		void SetParentToRoot();
-		std::vector<Component*> GetComponents();
+		Utils::Vector<Component*> GetComponents();
 
 		Scene* GetScene() { return m_Scene; }
 

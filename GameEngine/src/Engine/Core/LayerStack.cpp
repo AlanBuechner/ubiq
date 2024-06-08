@@ -15,35 +15,41 @@ namespace Engine {
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
+		m_Layers.Insert(m_LayerInsertIndex, layer);
 		m_LayerInsertIndex++;
 		layer->OnAttach();
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay)
 	{
-		m_Layers.emplace_back(overlay);
+		m_Layers.Push(overlay);
 		overlay->OnAttach();
 	}
 
 	void LayerStack::PopLayer(Layer* layer)
 	{
-		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
-		if (it != m_Layers.end())
+		for (Layer** it = m_Layers.begin(); it != m_Layers.end(); ++it)
 		{
-			layer->OnDetach();
-			m_Layers.erase(it);
-			m_LayerInsertIndex--;
+			if (layer == *it)
+			{
+				layer->OnDetach();
+				m_Layers.Remove(it);
+				m_LayerInsertIndex--;
+				break;
+			}
 		}
 	}
 
 	void LayerStack::PopOverlay(Layer* overlay)
 	{
-		auto it = std::find(m_Layers.begin(), m_Layers.end(), overlay);
-		if (it != m_Layers.end())
+		for (Layer** it = m_Layers.begin(); it != m_Layers.end(); ++it)
 		{
-			overlay->OnDetach();
-			m_Layers.erase(it);
+			if (overlay == *it)
+			{
+				overlay->OnDetach();
+				m_Layers.Remove(it);
+				break;
+			}
 		}
 	}
 
@@ -54,7 +60,7 @@ namespace Engine {
 			layer->OnDetach();
 			delete layer;
 		}
-		m_Layers.clear();
+		m_Layers.Clear();
 	}
 
 }

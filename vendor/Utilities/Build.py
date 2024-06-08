@@ -1,4 +1,4 @@
-# Reflection build script
+# Utilities build script
 
 import scripts.BuildUtils as BuildUtils
 from scripts.Utils.Utils import *
@@ -35,11 +35,10 @@ def GetProject():
 	proj.sources = sources
 	proj.resources = []
 	proj.headers = headers
-	proj.includes = [f"{includeDirs['Utilities']}/src"]
+	proj.includes = []
 	proj.sysIncludes = sysIncludes
 	proj.defines = defines
 	proj.links = []
-	proj.dependancys = [f"Utilities"]
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
 	proj.intDir = GetIntDir(projName)
 	proj.binDir = GetBinDir(projName)

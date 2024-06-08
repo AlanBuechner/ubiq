@@ -13,6 +13,7 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 			return new DirectX12UploadBufferResource(size);
+		default: return nullptr;
 		}
 	}
 
@@ -23,8 +24,8 @@ namespace Engine
 		case ResourceState::CopySource:
 		case ResourceState::CopyDestination:
 			return true;
+		default: return false;
 		}
-		return false;
 	}
 
 
@@ -37,6 +38,7 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 			return new DirectX12UploadTextureResource(width, height, mips, format);
+		default: return nullptr;
 		}
 	}
 
@@ -47,8 +49,8 @@ namespace Engine
 		case ResourceState::CopySource:
 		case ResourceState::CopyDestination:
 			return true;
+		default: return false;
 		}
-		return false;
 	}
 }
 

@@ -38,13 +38,13 @@ namespace Game
 		void SetModel(Engine::Ref<Model> model);
 		Engine::Ref<Model> GetModel() { return m_Model; }
 
-		std::vector<MeshEntry>& GetMeshes() { return m_CollapsedModelTree; }
+		Utils::Vector<MeshEntry>& GetMeshes() { return m_CollapsedModelTree; }
 
 		void Invalidate();
 
 	private:
 		PROPERTY(HideInInspector) Engine::Ref<Model> m_Model;
-		std::vector<MeshEntry> m_CollapsedModelTree;
+		Utils::Vector<MeshEntry> m_CollapsedModelTree;
 		Engine::Ref<Engine::SceneRenderer> m_SceneRenderer;
 	};
 }

@@ -76,7 +76,7 @@ namespace Engine
 		for (auto& child : entity.GetTransform().GetChildren())
 			DestroyEntity(child);
 
-		std::vector<Component*> components = entity.GetComponents();
+		Utils::Vector<Component*> components = entity.GetComponents();
 		for (Component* comp : components)
 			comp->OnComponentRemoved();
 

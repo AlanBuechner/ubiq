@@ -58,8 +58,8 @@ namespace Engine
 
 		virtual void Close() override;
 
-		std::vector<ResourceStateObject>& GetPendingTransitions() { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
-		std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() { return m_Frames[GetLastFrameIndex()].resourceStates; }
+		std::vector<ResourceStateObject>& GetPendingTransitions() override { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
+		std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() override { return m_Frames[GetLastFrameIndex()].resourceStates; }
 		ID3D12GraphicsCommandList4* GetCommandList() { return m_CommandList; }
 
 	private:

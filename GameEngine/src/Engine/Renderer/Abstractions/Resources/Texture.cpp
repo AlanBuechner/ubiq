@@ -24,8 +24,9 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 			return new DirectX12Texture2DResource(width, height, mips, format, clearColor, type);
+		default: return nullptr;
 		}
-		return nullptr;
+		
 	}
 
 	bool Texture2DResource::SupportState(ResourceState state)
@@ -38,62 +39,57 @@ namespace Engine
 		case ResourceState::CopySource:
 		case ResourceState::CopyDestination:
 			return true;
+		case ResourceState::UnorderedResource:
+			return (uint32)m_Type & (uint32)TextureType::RWTexture;
+		default: return false;
 		}
-
-		if (state == ResourceState::UnorderedResource && (uint32)m_Type & (uint32)TextureType::RWTexture)
-			return true;
-
-		return false;
 	}
 
 	// Descriptor Handles ---------------------------------------------------------- //
 
 	Texture2DSRVDescriptorHandle* Texture2DSRVDescriptorHandle::Create(Texture2DResource* resource)
 	{
-		Texture2DSRVDescriptorHandle* handle = nullptr;
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			handle = new DirectX12Texture2DSRVDescriptorHandle();
-			break;
-		}
-
-		if (handle)
+		{
+			Texture2DSRVDescriptorHandle* handle = new DirectX12Texture2DSRVDescriptorHandle();
 			handle->Bind(resource);
-		return handle;
+			return handle;
+		}
+		default: return nullptr;
+		}
 	}
 
 
 	Texture2DUAVDescriptorHandle* Texture2DUAVDescriptorHandle::Create(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height)
 	{
-		Texture2DUAVDescriptorHandle* handle = nullptr;
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			handle = new DirectX12Texture2DUAVDescriptorHandle();
-			break;
-		}
-
-		if (handle)
+		{
+			Texture2DUAVDescriptorHandle* handle = new DirectX12Texture2DUAVDescriptorHandle();
 			handle->Bind(resource, mipSlice, width, height);
-		return handle;
+			return handle;
+		}
+		default: return nullptr;
+		}
 	}
 
 
 
 	Texture2DRTVDSVDescriptorHandle* Texture2DRTVDSVDescriptorHandle::Create(Texture2DResource* resource)
 	{
-		Texture2DRTVDSVDescriptorHandle* handle = nullptr;
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			handle = new DirectX12Texture2DRTVDSVDescriptorHandle(resource);
-			break;
-		}
-
-		if (handle)
+		{
+			Texture2DRTVDSVDescriptorHandle* handle = new DirectX12Texture2DRTVDSVDescriptorHandle(resource);
 			handle->Bind(resource);
-		return handle;
+			return handle;
+		}
+		default: return nullptr;
+		}
 	}
 
 

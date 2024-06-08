@@ -8,6 +8,8 @@
 
 #include "Engine/imGui/ImGuiLayer.h"
 
+#include "Utils/Vector.h"
+
 namespace Engine
 {
 	class Layer;
@@ -28,7 +30,7 @@ namespace Engine
 
 		void Close();
 
-		void OnEvent(Event& e);
+		void OnEvent(Event* e);
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
@@ -50,11 +52,11 @@ namespace Engine
 	private:
 		void SendInputBuffer();
 
-		bool OnWindowClose(WindowCloseEvent& e);
-		bool OnWindowResize(WindowResizeEvent& e);
+		bool OnWindowClose(WindowCloseEvent* e);
+		bool OnWindowResize(WindowResizeEvent* e);
 
 		Ref<Window> m_Window;
-		std::vector<Event*> m_InputBuffer;
+		Utils::Vector<Event*> m_InputBuffer;
 		bool m_Running = true;
 		bool m_Minimized = false;
 

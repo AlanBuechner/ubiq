@@ -16,5 +16,5 @@ namespace Engine {
 		m_InputManeger.~shared_ptr();
 	}
 
-	inline void Layer::OnEvent(Event & event) { m_InputManeger->Update(event); }
+	inline void Layer::OnEvent(Event* event) { m_InputManeger->Update(event); }
 }

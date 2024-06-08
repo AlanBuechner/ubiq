@@ -31,7 +31,7 @@ namespace Engine
 		virtual void OnUpdate() override;
 		virtual void OnRender() override;
 		virtual void OnImGuiRender() override;
-		virtual void OnEvent(Event& event) override;
+		virtual void OnEvent(Event* event) override;
 
 		void NewScene();
 		void LoadScene(const std::string& file);
@@ -43,7 +43,7 @@ namespace Engine
 		void SaveScene();
 		void SaveSceneAs();
 
-		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnKeyPressed(KeyPressedEvent* e);
 
 		void DrawCustomGizmo();
 

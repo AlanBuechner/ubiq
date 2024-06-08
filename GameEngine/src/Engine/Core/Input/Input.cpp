@@ -16,25 +16,25 @@ namespace Engine
 			s_Instance = this;
 	}
 
-	bool Input::OnKeyPressed(KeyPressedEvent& e)
+	bool Input::OnKeyPressed(KeyPressedEvent* e)
 	{ 
-		int keycode = e.GetKeyCode();
+		int keycode = e->GetKeyCode();
 		if (m_KeyStates[keycode] != Down)
 		{
 			SetKeyState(keycode, KeyPressed);
-			m_ToUpdate.push_back(keycode);
-			m_KeysDown.push_back(keycode);
+			m_ToUpdate.Push(keycode);
+			m_KeysDown.Push(keycode);
 		}
 		return false; 
 	}
 
-	bool Input::OnKeyReleased(KeyReleasedEvent& e) 
+	bool Input::OnKeyReleased(KeyReleasedEvent* e) 
 	{
-		int keycode = e.GetKeyCode();
-		SetKeyState(keycode, KeyReleased); 
-		m_ToUpdate.push_back(keycode);
-		std::vector<int>::iterator toRemove = m_KeysDown.end();
-		for (std::vector<int>::iterator it = m_KeysDown.begin(); it < m_KeysDown.end(); it++)
+		int keycode = e->GetKeyCode();
+		SetKeyState(keycode, KeyReleased);
+		m_ToUpdate.Push(keycode);
+		int* toRemove = m_KeysDown.end();
+		for (int* it = m_KeysDown.begin(); it < m_KeysDown.end(); it++)
 		{
 			if (*it == keycode)
 			{
@@ -43,30 +43,30 @@ namespace Engine
 			}
 		}
 		if(toRemove != m_KeysDown.end())
-			m_KeysDown.erase(toRemove);
+			m_KeysDown.Remove(toRemove);
 		return false; 
 	}
 
-	bool Input::OnMousePressed(MouseButtonPressedEvent& e)
+	bool Input::OnMousePressed(MouseButtonPressedEvent* e)
 	{
-		int button = e.GetMouseButton();
+		int button = e->GetMouseButton();
 		SetMouseButtonState(button, MousePressed);
-		m_ToUpdateMouse.push_back(button);
+		m_ToUpdateMouse.Push(button);
 		return false;
 	}
 
-	bool Input::OnMouseReleased(MouseButtonReleasedEvent& e)
+	bool Input::OnMouseReleased(MouseButtonReleasedEvent* e)
 	{
-		int button = e.GetMouseButton();
+		int button = e->GetMouseButton();
 		SetMouseButtonState(button, MouseReleased);
-		m_ToUpdateMouse.push_back(button);
+		m_ToUpdateMouse.Push(button);
 		return false;
 	}
 
-	bool Input::OnMouseMoved(MouseMovedEvent& e)
+	bool Input::OnMouseMoved(MouseMovedEvent* e)
 	{
-		if(e.GetMouseBindMode() == MouseMoveBindMode::CurserPosition)
-			m_MousePosition = { e.GetX(), e.GetY() };
+		if(e->GetMouseBindMode() == MouseMoveBindMode::CurserPosition)
+			m_MousePosition = { e->GetX(), e->GetY() };
 		return false;
 	}
 
@@ -85,7 +85,7 @@ namespace Engine
 				SetKeyState(i, Input::Up);
 			}
 		}
-		m_ToUpdate.clear();
+		m_ToUpdate.Clear();
 
 		// mouse
 		for (int i : m_ToUpdateMouse)
@@ -100,89 +100,24 @@ namespace Engine
 				SetMouseButtonState(i, Input::Up);
 			}
 		}
-		m_ToUpdateMouse.clear();
+		m_ToUpdateMouse.Clear();
 		m_PreviousMousePosition = m_MousePosition;
 	}
 
-	void Input::GetUpdatedEventList(std::vector<Event*>& events)
+	void Input::GetUpdatedEventList(Utils::Vector<Event*>& events)
 	{
-		std::vector<Event*> newEventList;
-		if (!s_Instance->m_SendAllEventData)
-		{
-			for (auto e : events)
-			{
-				if ((e->GetCategoryFlags() & (EventCategoryInput | EventCategoryKeyboard | EventCategoryMouse | EventCategoryMouseButton)) != 0)
-				{
-					EventType eventType = e->GetEventType();
-					for (auto i : s_Instance->m_BindedKeys)
-					{
-						if ((int)eventType == *(i.Type))
-						{
-							bool send = false;
-
-							int key = 0;
-							switch (eventType)
-							{
-							case EventType::KeyPressed:
-								if (s_Instance->m_SystemsNeedingAllPressedEvents > 0) { send = true; break; }
-								key = ((KeyPressedEvent*)e)->GetKeyCode();
-								break;
-							case EventType::KeyReleased:
-								if (s_Instance->m_SystemsNeedingAllRelesedEvents > 0) { send = true; break; }
-								key = ((KeyReleasedEvent*)e)->GetKeyCode();
-								break;
-							case EventType::KeyTyped:
-								if (s_Instance->m_SystemsNeedingAllTypedEvents > 0) { send = true; break; }
-								key = ((KeyTypedEvent*)e)->GetKeyCode();
-								break;
-							case EventType::KeyRepeat:
-								if (s_Instance->m_SystemsNeedingAllRepeatEvents > 0) { send = true; break; }
-								key = ((KeyRepeatEvent*)e)->GetKeyCode();
-								break;
-							case EventType::MouseButtonPressed:
-								if (s_Instance->m_SystemsNeedingAllPressedEvents > 0) { send = true; break; }
-								key = ((MouseButtonPressedEvent*)e)->GetMouseButton();
-								break;
-							case EventType::MouseButtonReleased:
-								if (s_Instance->m_SystemsNeedingAllRelesedEvents > 0) { send = true; break; }
-								key = ((MouseButtonReleasedEvent*)e)->GetMouseButton();
-								break;
-							case EventType::None:
-							default:
-								break;
-							}
-
-							if (send || key == *(i.Key))
-							{
-								newEventList.push_back(e);
-							}
-						}
-					}
-					if (eventType == EventType::MouseMoved && s_Instance->m_SystemsNeedingAllMouseMoveEvents > 0)
-					{
-						newEventList.push_back(e);
-					}
-				}
-			}
-		}
-		else
-		{
-			newEventList = events;
-		}
-
 		for (auto i : s_Instance->m_KeysDown)
 		{
 			if (s_Instance->isKeyBinded(i, KeyDown))
 			{
-				newEventList.push_back(new KeyDownEvent(i));
+				events.Push(new KeyDownEvent(i));
 			}
 		}
-		events = newEventList;
 	}
 
 	void Input::BindKey(int* key, int* type)
 	{
-		s_Instance->m_BindedKeys.push_back({ key, type });
+		s_Instance->m_BindedKeys.Push({ key, type });
 	}
 
 	void Input::UnbindKey(int key, int type)
@@ -192,7 +127,7 @@ namespace Engine
 		{
 			if (*(i.Key) == key && *(i.Type) == type)
 			{
-				s_Instance->m_BindedKeys.erase(s_Instance->m_BindedKeys.begin() + index);
+				s_Instance->m_BindedKeys.Remove(index);
 				return;
 			}
 			index++;

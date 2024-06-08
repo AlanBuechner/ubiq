@@ -10,6 +10,8 @@
 #include "Engine/Renderer/Camera.h"
 #include "SceneCamera.h"
 
+#include "Utils/Vector.h"
+
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/Abstractions/Resources/Texture.h"
 #include "Engine/Renderer/Abstractions/Resources/Buffer.h"
@@ -55,7 +57,7 @@ namespace Engine
 
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
-		const std::vector<Entity>& GetChildren() const { return Children; }
+		const Utils::Vector<Entity>& GetChildren() const { return Children; }
 		void SetParentToRoot();
 
 		Entity GetOwner() { return Owner; }
@@ -74,7 +76,7 @@ namespace Engine
 		PROPERTY(set=SetScale) Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
 
 		Entity Parent;
-		std::vector<Entity> Children;
+		Utils::Vector<Entity> Children;
 
 		bool m_Dirty = true;
 		Math::Mat4 ChashedGloableTransform = Math::Mat4(1.0f);

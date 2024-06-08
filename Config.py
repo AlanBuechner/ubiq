@@ -10,6 +10,7 @@ p = {
 		"yaml-cpp" : "vendor/yaml-cpp",
 		"ProjectManager" : "vendor/ProjectManager",
 		"Reflection" : "vendor/Reflection",
+		"Utilities" : "vendor/Utilities",
 	},
 	"USG-Editor" : "USG-Editor",
 	"GameEngine" : "GameEngine",
@@ -58,6 +59,7 @@ vendorDirs = {
 	"stb_image"			: f"{location}/vendor/stb_image",
 	"ProjectManager"	: f"{location}/vendor/ProjectManager",
 	"Reflection"		: f"{location}/vendor/Reflection",
+	"Utilities"			: f"{location}/vendor/Utilities",
 
 	# engine
 	"ImGuizmo"			: f"{location}/GameEngine/vendor/ImGuizmo",
@@ -77,6 +79,7 @@ includeDirs = {
 	"stb_image"			: f"{vendorDirs['stb_image']}",
 	"ProjectManager"	: f"{vendorDirs['ProjectManager']}",
 	"Reflection"		: f"{vendorDirs['Reflection']}",
+	"Utilities"			: f"{vendorDirs['Utilities']}",
 
 	# engine includes
 	"ImGuizmo"			: f"{vendorDirs['ImGuizmo']}",
