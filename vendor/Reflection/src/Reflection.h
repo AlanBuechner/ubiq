@@ -293,7 +293,7 @@ namespace Reflect {
 								virtual uint64_t GetTypeID() override { return GetStaticTypeID(); }
 
 // STRIP_REFLECTION is used so the IDE does not yell at you because it does not know what __attribute__ is
-#if defined(STRIP_REFLECTION)
+#if defined(STRIP_CLANG)
 	#define CLASS(...) class
 	#define PROPERTY(...)
 	#define FUNCTION(...)
