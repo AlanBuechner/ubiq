@@ -7,6 +7,7 @@
 #include "Engine/Core/Cursor.h"
 #include "Engine/Util/Performance.h"
 #include "Engine/Util/PlatformUtils.h"
+#include "Engine/Core/Scene/SceneScriptBase.h"
 
 // temp
 #include "Engine/Core/Scene/SceneRegistry.h"
@@ -45,7 +46,7 @@ namespace Engine
 
 		m_Game = CreateGame();
 
-		LoadProject();
+		m_ContentPanel.SetDirectory(Application::Get().GetProject().GetAssetsDirectory());
 	}
 
 	void EditorLayer::OnAttach()
@@ -219,7 +220,7 @@ namespace Engine
 
 	void EditorLayer::NewScene()
 	{
-		m_Game->SwitchScene(CreateRef<Scene>(m_Game->CreateSceneRenderer()));
+		m_Game->SwitchScene(Scene::Create());
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_HierarchyPanel.SetContext(m_Game->GetScene());
 	}
@@ -228,7 +229,7 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		m_LoadedScene = file;
-		Ref<Scene> scene = m_Game->LoadScene(file);
+		Ref<Scene> scene = Scene::Create(file);
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_Game->SwitchScene(scene);
 		m_HierarchyPanel.SetContext(m_Game->GetScene());
@@ -475,16 +476,6 @@ namespace Engine
 
 		inWindow = false;
 		return -1;
-	}
-
-	void EditorLayer::LoadProject()
-	{
-		CORE_INFO("Loading project file");
-		m_CurrentProject = CreateRef<ProjectManager::Project>("Project.ubiqproj");
-		Application::Get().GetAssetManager().AddAssetDirectory(m_CurrentProject->GetAssetsDirectory());
-		Renderer::SetDefultMaterial(Application::Get().GetAssetManager().GetAsset<Material>(m_CurrentProject->GetDefultMaterialID()));
-
-		m_ContentPanel.SetDirectory(m_CurrentProject->GetAssetsDirectory());
 	}
 
 	void EditorLayer::OpenScene()

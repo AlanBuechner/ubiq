@@ -12,6 +12,7 @@ namespace Engine
 {
 	class Entity;
 	class Camera;
+	class SceneScriptBase;
 }
 
 namespace Engine
@@ -27,10 +28,12 @@ namespace Engine
 		Scene* m_Scene;
 	};
 
+
+
 	class Scene
 	{
 	public:
-		Scene(Ref<SceneRenderer> renderer);
+		Scene(SceneScriptBase* script = nullptr);
 		~Scene();
 
 		void OnUpdate(Ref<Camera> camera);
@@ -53,10 +56,11 @@ namespace Engine
 			return m_Registry.GetSceneStatic<T>();
 		}
 
-		Ref<SceneRenderer> GetSceneRenderer() { return m_SceneRenderer; }
 		template<class T>
 		Ref<T> GetSceneRendererAs() { return std::dynamic_pointer_cast<T>(m_SceneRenderer); }
 		SceneRegistry& GetRegistry() { return m_Registry; }
+		SceneScriptBase* GetSceneScript() { return m_SceneScript; }
+		Ref<SceneRenderer> GetSceneRenderer() { return m_SceneRenderer; }
 
 		template<class T, typename ...Args>
 		void AddUpdateEvent(Args... args) { 
@@ -65,10 +69,14 @@ namespace Engine
 			event->Setup(this);
 		}
 
+		static Ref<Scene> Create();
+		static Ref<Scene> Create(const fs::path& file);
+
 	private:
 		uint32 m_ViewportWidth = 0;
 		uint32 m_ViewportHeight = 0;
 		SceneRegistry m_Registry;
+		SceneScriptBase* m_SceneScript;
 
 		Ref<SceneRenderer> m_SceneRenderer;
 
@@ -80,6 +88,7 @@ namespace Engine
 		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
 		friend class Physics2D;
+		friend class SceneScriptBase;
 	};
 
 

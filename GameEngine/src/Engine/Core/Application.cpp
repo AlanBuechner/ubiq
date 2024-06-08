@@ -33,6 +33,9 @@ namespace Engine {
 		auto timer = CREATE_PROFILEI();
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!");
 		s_Instance = this;
+
+		CORE_INFO("Loading project file");
+		m_CurrentProject = ProjectManager::Project("Project.ubiqproj");
 			
 		Renderer::Init();
 
@@ -46,6 +49,10 @@ namespace Engine {
 		timer.End();
 
 		m_AssetManager.Init();
+
+		CORE_INFO("Configuring Project");
+		m_AssetManager.AddAssetDirectory(m_CurrentProject.GetAssetsDirectory());
+		Renderer::SetDefultMaterial(m_AssetManager.GetAsset<Material>(m_CurrentProject.GetDefultMaterialID()));
 	}
 
 	Application::~Application()

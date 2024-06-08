@@ -43,6 +43,7 @@ includes = [
 	f"{includeDirs['pix']}",
 	f"{includeDirs['Aftermath']}",
 	f"{includeDirs['Reflection']}/src",
+	f"{includeDirs['ProjectManager']}/src",
 	f"{includeDirs['Utilities']}/src",
 ]
 
@@ -63,6 +64,7 @@ dependancys = [
 	f"yaml-cpp",
 	f"Reflection",
 	f"Utilities",
+	f"ProjectManager",
 ]
 
 links = [

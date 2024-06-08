@@ -8,6 +8,7 @@
 
 #include "Engine/imGui/ImGuiLayer.h"
 
+#include "ProjectManager/Project.h"
 #include "Utils/Vector.h"
 
 namespace Engine
@@ -43,6 +44,8 @@ namespace Engine
 
 		inline AssetManager& GetAssetManager() { return m_AssetManager; }
 
+		inline ProjectManager::Project& GetProject() { return m_CurrentProject; }
+
 		inline static bool IsRunning() { return s_Instance->m_Running; }
 
 	protected:
@@ -64,6 +67,8 @@ namespace Engine
 		LayerStack m_LayerStack;
 
 		AssetManager m_AssetManager;
+
+		ProjectManager::Project m_CurrentProject;
 
 	private:
 		static Application* s_Instance;

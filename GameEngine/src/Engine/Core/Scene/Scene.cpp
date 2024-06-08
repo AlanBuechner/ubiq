@@ -3,6 +3,7 @@
 
 #include "Components.h"
 #include "Entity.h"
+#include "SceneScriptBase.h"
 #include "Engine/Core/UUID.h"
 
 #include "Engine/Renderer/Renderer.h"
@@ -10,15 +11,23 @@
 #include "Engine/Renderer/LineRenderer.h"
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Core/Scene/TransformComponent.h"
+#include "SceneSerializer.h"
+
 
 #include "glm/glm.hpp"
 
 namespace Engine
 {
-	Scene::Scene(Ref<SceneRenderer> renderer) :
-		m_SceneRenderer(renderer)
+	Scene::Scene(SceneScriptBase* script) :
+		m_SceneScript(script)
 	{
-		OnViewportResize(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
+		if (script == nullptr)
+			m_SceneScript = SceneScriptBase::GetDefultSceneScriptInstance();
+		else
+			m_SceneScript = script;
+
+		m_SceneScript->m_Scene = this;
+		m_SceneScript->OnScenePreLoad();
 	}
 
 	Scene::~Scene()
@@ -34,6 +43,8 @@ namespace Engine
 		m_CameraChanged = m_SceneRenderer->GetMainCamera() != camera;
 		if(m_CameraChanged)
 			m_SceneRenderer->SetMainCamera(camera);
+
+		m_SceneScript->OnUpdate();
 
 		for (uint32 i = 0; i < m_UpdateEvents.size(); i++)
 			m_UpdateEvents[i]->Update();
@@ -92,6 +103,26 @@ namespace Engine
 				return Entity{ entity, this };
 		}
 		return Entity::null;
+	}
+
+	Ref<Scene> Scene::Create()
+	{
+		Ref<Scene> scene = CreateRef<Scene>(SceneScriptBase::GetDefultSceneScriptInstance());
+		Window& window = Application::Get().GetWindow();
+		scene->OnViewportResize(window.GetWidth(), window.GetHeight());
+		scene->GetSceneScript()->OnSceneLoad();
+		return scene;
+	}
+
+	Ref<Scene> Scene::Create(const fs::path& file)
+	{
+		Ref<Scene> scene = CreateRef<Scene>(SceneScriptBase::GetDefultSceneScriptInstance());
+		SceneSerializer serializer(scene);
+		serializer.Deserialize(file.string());
+		Window& window = Application::Get().GetWindow();
+		scene->OnViewportResize(window.GetWidth(), window.GetHeight());
+		scene->GetSceneScript()->OnSceneLoad();
+		return scene;
 	}
 
 

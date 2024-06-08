@@ -18,7 +18,7 @@ def GenerateSolution():
 	code = f"""
 workspace "UbiqEngine"
 	architecture "x64"
-	startproject "{Config.startupProject}"
+	startproject "{Config.gameProject}"
 
 	configurations
 	{{
@@ -45,7 +45,33 @@ def GenerateProject(script, code = ""):
 	projName = os.path.basename(proj.projectDirectory)
 	idir = proj.intDir
 	bdir = proj.binDir
-	code += f"""
+
+	gameName = os.path.basename(Config.gameProject)
+	if(projName == gameName):
+				code += f"""
+project "{projName}"
+	kind "Makefile"
+
+	targetdir ("{bdir}")
+	objdir ("{idir}")
+
+	buildcommands {{
+		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -fb -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.startupProject} -g {Config.gameProject}"
+	}}
+
+	rebuildcommands  {{
+		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -rebuild -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.startupProject} -g {Config.gameProject}"
+	}}
+
+	cleancommands  {{
+		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -clean -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.startupProject} -g {Config.gameProject}"
+	}}
+
+	files
+	{{
+"""
+	else:
+		code += f"""
 project "{projName}"
 	kind "Makefile"
 

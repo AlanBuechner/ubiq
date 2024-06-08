@@ -4,18 +4,40 @@
 namespace Engine
 {
 
+
+	ComponentPoolPage::ComponentPoolPage(uint32 componentSize) :
+		m_ComponentSize(componentSize)
+	{
+		m_Data = (byte*)malloc(m_ComponentSize*PoolSize);
+	}
+
+
+
 	ComponentPool::~ComponentPool()
 	{
-		for (auto& comp : m_UsedSlots)
+
+		for (ComponentPoolPage& page : m_Pages)
 		{
-			m_ReflectionClass.DestroyInstance(GetComponentRaw(comp), false);
+			for (uint32 i = 0; i < PoolSize; i++)
+			{
+				if (page.HasEntry(i))
+					m_ReflectionClass.DestroyInstance(page.GetComponentMemory(i), false);
+			}
+			free(page.m_Data);
 		}
 	}
 
 	void ComponentPool::EachEntity(EachEntityFunc func)
 	{
-		for (auto& comp : m_UsedSlots)
-			func(GetComponentRaw(comp));
+
+		for (ComponentPoolPage& page : m_Pages)
+		{
+			for (uint32 i = 0; i < PoolSize; i++)
+			{
+				if (page.HasEntry(i))
+					func(page.GetComponentMemory(i));
+			}
+		}
 	}
 
 	uint32 ComponentPool::Allocate(uint64 entity)
@@ -29,23 +51,23 @@ namespace Engine
 
 		if (m_FreeSlots.empty())
 		{
+			// resize
+			m_Pages.push_back(ComponentPoolPage(m_ComponentSize));
+
 			uint32 oldCount = m_NumComponents;
-			byte* oldData = m_Data;
+			uint32 newCount = m_NumComponents + PoolSize;
 
-			uint32 newCount = m_NumComponents * 2;
-			byte* newData = (byte*)malloc(m_ComponentSize * newCount);
-
-			memcpy(newData, oldData, oldCount * m_ComponentSize);
-			m_NumComponents = newCount;
-			m_Data = newData;
-
-			for (uint32 i = newCount - 1; i >= oldCount; i--)
+			for (int64 i = newCount - 1; i >= oldCount; i--)
+			{
 				m_FreeSlots.push_back(i);
+				GetPageForIndex(i).SetEntry(GetIndexInPage(i), false);
+			}
 		}
 
 		uint32 componentIndex = m_FreeSlots.back();
 		m_FreeSlots.pop_back();
 		m_UsedSlots.push_back(componentIndex);
+		GetPageForIndex(componentIndex).SetEntry(GetIndexInPage(componentIndex), true);
 
 		m_EntityComponentMapping[entity] = componentIndex;
 		return componentIndex;
@@ -57,6 +79,7 @@ namespace Engine
 		m_FreeSlots.push_back(componentIndex);
 
 		m_ReflectionClass.DestroyInstance(GetComponentRaw(componentIndex), false);
+		GetPageForIndex(componentIndex).SetEntry(GetIndexInPage(componentIndex), false);
 
 		// remove entity from used list
 		for (uint32 i = 0; i < m_UsedSlots.size(); i++)
