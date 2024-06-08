@@ -59,7 +59,6 @@ defines = [
 
 dependancys = [
 	"GameEngine",
-	"ProjectManager",
 ]
 if(Config.gameProject != None):
 	dependancys.append(os.path.basename(Config.gameProject))

@@ -18,16 +18,6 @@ namespace Engine
 		s_Game = this;
 	}
 
-	Ref<Scene> GameBase::LoadScene(const std::string& file)
-	{
-		Ref<Scene> scene = CreateRef<Scene>(CreateSceneScript());
-		SceneSerializer serializer(scene);
-		serializer.Deserialize(file);
-		Window& window = Application::Get().GetWindow();
-		scene->OnViewportResize(window.GetWidth(), window.GetHeight());
-		scene->GetSceneScript()->OnSceneLoad();
-		return scene;
-	}
 
 	void GameBase::SwitchScene(Ref<Scene> scene)
 	{

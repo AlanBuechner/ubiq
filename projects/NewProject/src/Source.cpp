@@ -41,10 +41,6 @@ namespace Game
 			m_Scene->GetSceneRenderer()->Render(Engine::Renderer::GetMainCommandQueue());
 		}
 
-		virtual Engine::Ref<Engine::SceneScriptBase> CreateSceneScript() override {
-			return Engine::CreateRef<DefaultSceneScript>();
-		}
-
 
 	};
 }

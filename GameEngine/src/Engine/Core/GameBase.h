@@ -22,13 +22,11 @@ namespace Engine
 
 		Ref<Scene> GetScene() { return m_Scene; }
 
-		Ref<Scene> LoadScene(const std::string& file);
 		void SwitchScene(Ref<Scene> scene);
 
 		virtual void OnUpdate(Ref<Camera> overideCamera = nullptr) = 0;
 		virtual void OnRender() = 0;
 
-		virtual Ref<SceneScriptBase> CreateSceneScript() = 0;
 	protected:
 		virtual void OnSceneSwitch(Ref<Scene> scene) {};
 

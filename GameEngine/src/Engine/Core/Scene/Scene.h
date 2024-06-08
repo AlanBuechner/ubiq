@@ -33,7 +33,7 @@ namespace Engine
 	class Scene
 	{
 	public:
-		Scene(Ref<SceneScriptBase> script);
+		Scene(SceneScriptBase* script = nullptr);
 		~Scene();
 
 		void OnUpdate(Ref<Camera> camera);
@@ -59,7 +59,7 @@ namespace Engine
 		template<class T>
 		Ref<T> GetSceneRendererAs() { return std::dynamic_pointer_cast<T>(m_SceneRenderer); }
 		SceneRegistry& GetRegistry() { return m_Registry; }
-		Ref<SceneScriptBase> GetSceneScript() { return m_SceneScript; }
+		SceneScriptBase* GetSceneScript() { return m_SceneScript; }
 		Ref<SceneRenderer> GetSceneRenderer() { return m_SceneRenderer; }
 
 		template<class T, typename ...Args>
@@ -69,11 +69,14 @@ namespace Engine
 			event->Setup(this);
 		}
 
+		static Ref<Scene> Create();
+		static Ref<Scene> Create(const fs::path& file);
+
 	private:
 		uint32 m_ViewportWidth = 0;
 		uint32 m_ViewportHeight = 0;
 		SceneRegistry m_Registry;
-		Ref<SceneScriptBase> m_SceneScript;
+		SceneScriptBase* m_SceneScript;
 
 		Ref<SceneRenderer> m_SceneRenderer;
 

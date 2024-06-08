@@ -43,6 +43,7 @@ includes = [
 	f"{includeDirs['pix']}",
 	f"{includeDirs['Aftermath']}",
 	f"{includeDirs['Reflection']}/src",
+	f"{includeDirs['ProjectManager']}/src",
 ]
 
 sysIncludes = [
@@ -61,6 +62,7 @@ dependancys = [
 	f"imgui",
 	f"yaml-cpp",
 	f"Reflection",
+	f"ProjectManager",
 ]
 
 links = [

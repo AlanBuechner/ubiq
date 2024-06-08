@@ -17,7 +17,7 @@ namespace Engine
 		virtual void OnScenePreLoad() {};
 		virtual void OnSceneLoad() {};
 
-		static Ref<SceneScriptBase> GetDefultSceneScriptInstance();
+		static SceneScriptBase* GetDefultSceneScriptInstance();
 
 	protected:
 		void SetSceneRenderer(Ref<SceneRenderer> renderer);

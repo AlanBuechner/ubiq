@@ -51,8 +51,6 @@ namespace Engine
 
 		int GetEntityIDAtMousePosition(bool& inWindow);
 
-		void LoadProject();
-
 	private:
 		const Math::Vector4 m_GridColor = { 0.5f,0.5f,0.5f,1 };
 		const float m_GridExtent = 40.0f;
@@ -79,7 +77,5 @@ namespace Engine
 
 		fs::path m_DropPath;
 		fs::path m_EditorDirectory;
-
-		Ref<ProjectManager::Project> m_CurrentProject;
 	};
 }
