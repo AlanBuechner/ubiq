@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DirectX12Shader.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Directx12Context.h"
+#include "DirectX12Context.h"
 #include "Engine/Renderer/Abstractions/ShaderCompiler.h"
 
 
@@ -21,8 +21,8 @@ DXGI_FORMAT GetDXGIFormatFromShaderUniformType(Engine::ShaderPass::Uniform::Type
 	case Engine::ShaderPass::Uniform::Uint4:	return DXGI_FORMAT_R32G32B32A32_UINT;
 	case Engine::ShaderPass::Uniform::Int4:		return DXGI_FORMAT_R32G32B32A32_SINT;
 	case Engine::ShaderPass::Uniform::Float4:	return DXGI_FORMAT_R32G32B32A32_FLOAT;
+	default: return DXGI_FORMAT_UNKNOWN;
 	}
-	return DXGI_FORMAT_UNKNOWN;
 }
 
 

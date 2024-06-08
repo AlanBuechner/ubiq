@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DirectX12Debug.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Directx12Context.h"
+#include "DirectX12Context.h"
 
 Engine::DirectX12Debug* Engine::DirectX12Debug::s_Instance = nullptr;
 

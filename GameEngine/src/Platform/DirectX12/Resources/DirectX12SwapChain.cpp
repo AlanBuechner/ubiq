@@ -2,7 +2,7 @@
 #include "DirectX12SwapChain.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Platform/DirectX12/Directx12Context.h"
+#include "Platform/DirectX12/DirectX12Context.h"
 #include "Platform/DirectX12/DirectX12CommandQueue.h"
 #include "Engine/Util/Performance.h"
 #include "DirectX12Texture.h"

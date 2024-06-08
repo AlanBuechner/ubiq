@@ -22,6 +22,7 @@ namespace Engine
 	class UpdateEvent
 	{
 	public:
+		virtual ~UpdateEvent() = default;
 		virtual void Setup(Scene* scene) { m_Scene = scene; };
 		virtual void Update() = 0;
 	protected:

@@ -8,8 +8,8 @@ namespace Engine
 		{
 		case TextureFormat::DEPTH24STENCIL8:
 			return true;
+		default: return false;
 		}
-		return false;
 	}
 
 	uint32 GetTextureFormatStride(TextureFormat format)
@@ -72,8 +72,9 @@ namespace Engine
 
 
 		case TextureFormat::DEPTH24STENCIL8:	return 4;
+		default: return 0;
 		}
-		return 0;
+		
 #undef FORMAT_1
 #undef FORMAT_2
 #undef FORMAT_4

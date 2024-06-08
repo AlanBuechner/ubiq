@@ -893,8 +893,8 @@ namespace ImGuizmo
       case SCALE:       return GetScaleType()      != NONE || IsUsing();
       case ROTATE:      return GetRotateType()     != NONE || IsUsing();
       case TRANSLATE:   return GetMoveType(NULL)   != NONE || IsUsing();
+      default: return false;
       }
-      return false;
    }
 
    void Enable(bool enable)

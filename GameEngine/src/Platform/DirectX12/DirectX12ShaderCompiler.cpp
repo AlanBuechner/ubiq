@@ -85,6 +85,7 @@ D3D12_FILTER GetFilter(Engine::SamplerInfo::MinMagFilter min, Engine::SamplerInf
 	}
 
 	CORE_ASSERT(false, "unknown sampler filter config");
+	return D3D12_FILTER_MIN_MAG_MIP_POINT;
 }
 
 namespace Engine

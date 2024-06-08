@@ -59,6 +59,7 @@ namespace Engine
 			return D3D12_RESOURCE_STATE_COPY_SOURCE;
 		case ResourceState::CopyDestination:
 			return D3D12_RESOURCE_STATE_COPY_DEST;
+		default: return D3D12_RESOURCE_STATE_COMMON;
 		}
 	}
 

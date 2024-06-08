@@ -3,7 +3,7 @@
 #include "Engine/Renderer/Renderer.h"
 
 #if defined(PLATFORM_WINDOWS)
-#include "Platform/DirectX12/Resources/DirectX12ConstantBUffer.h"
+#include "Platform/DirectX12/Resources/DirectX12ConstantBuffer.h"
 #endif
 
 namespace Engine
