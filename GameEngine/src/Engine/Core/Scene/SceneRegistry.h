@@ -9,6 +9,9 @@
 #include <unordered_map>
 #include <type_traits>
 
+#include "Engine/Physics/AABB.h"
+#include "Engine/Physics/Plain.h"
+
 namespace Engine
 {
 
@@ -18,6 +21,11 @@ namespace Engine
 	{
 		UUID ID;
 		std::string name;
+		AABB aabb;
+		PlainVolume volume;
+
+		bool dirtyAABB = true;
+		bool dirtyVolume = true;
 
 		struct ComponentRef {
 			ComponentPool* m_Pool;
@@ -26,7 +34,6 @@ namespace Engine
 		std::vector<ComponentRef> m_Components;
 
 		void RemoveComponentReferance(ComponentPool* pool);
-
 	};
 	using EntityType = uint64;
 

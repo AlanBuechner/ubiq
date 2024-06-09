@@ -58,6 +58,7 @@ namespace Engine
 	void TransformComponent::Dirty()
 	{
 		m_Dirty = true;
+		Owner.DirtyVolume();
 		for (uint32 i = 0; i < Children.Count(); i++)
 			Children[i].GetTransform().Dirty();
 	}

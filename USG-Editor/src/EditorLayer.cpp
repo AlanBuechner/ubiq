@@ -85,14 +85,9 @@ namespace Engine
 		if (Input::GetMouseButtonPressed(KeyCode::LEFT_MOUSE) && !Input::GetKeyDown(KeyCode::ALT) && !ImGuizmo::IsOver())
 		{
 			bool inWindow;
-			int entityID = GetEntityIDAtMousePosition(inWindow);
+			Entity entity = GetEntityAtMousePosition(inWindow);
 			if (inWindow)
-			{
-				if (entityID == -1)
-					m_HierarchyPanel.SelectEntity({});
-				else
-					m_HierarchyPanel.SelectEntity({ (EntityType)entityID, m_Game->GetScene().get() });
-			}
+				m_HierarchyPanel.SelectEntity(entity);
 		}
 
 		if (Input::GetKeyPressed(KeyCode::SPACE) && Input::GetKeyDown(KeyCode::CONTROL))
@@ -302,45 +297,52 @@ namespace Engine
 
 		// draw camera frustum
 		Entity selected = m_HierarchyPanel.GetSelectedEntity();
-		//if (selected && selected.HasComponent<CameraComponent>())
-		//{
-		//	auto& tc = selected.GetTransform();
-		//	auto& cam = selected.GetComponent<CameraComponent>()->Camera;
+		if (selected)
+		{
+			AABB bounds = selected.GetLocalAABB();
+			if (bounds.m_Min == bounds.m_Max)
+			{
+				bounds.m_Min = { -1,-1,-1 };
+				bounds.m_Max = { 1, 1, 1 };
+			}
+			Math::Vector3 min = bounds.m_Min;
+			Math::Vector3 max = bounds.m_Max;
 
-		//	const Math::Mat4& proj = glm::inverse(cam->GetProjectionMatrix());
-		//	const Math::Mat4& transform = tc.GetTransform();
-		//	Math::Vector4 ltn = proj * Math::Vector4{ -1, 1, 0, 1 };
-		//	Math::Vector4 ltf = proj * Math::Vector4{ -1, 1, 1, 1 };
+			auto& tc = selected.GetTransform();
 
-		//	Math::Vector4 rtn = proj * Math::Vector4{ 1, 1, 0, 1 };
-		//	Math::Vector4 rtf = proj * Math::Vector4{ 1, 1, 1, 1 };
+			const Math::Mat4& transform = tc.GetTransform();
+			Math::Vector4 ltn = Math::Vector4{ min.x, max.y, min.z, 1 };
+			Math::Vector4 ltf = Math::Vector4{ min.x, max.y, max.z, 1 };
 
-		//	Math::Vector4 lbn = proj * Math::Vector4{ -1, -1, 0, 1 };
-		//	Math::Vector4 lbf = proj * Math::Vector4{ -1, -1, 1, 1 };
+			Math::Vector4 rtn = Math::Vector4{ max.x, max.y, min.z, 1 };
+			Math::Vector4 rtf = Math::Vector4{ max.x, max.y, max.z, 1 };
 
-		//	Math::Vector4 rbn = proj * Math::Vector4{ 1, -1, 0, 1 };
-		//	Math::Vector4 rbf = proj * Math::Vector4{ 1, -1, 1, 1 };
+			Math::Vector4 lbn = Math::Vector4{ min.x, min.y, min.z, 1 };
+			Math::Vector4 lbf = Math::Vector4{ min.x, min.y, max.z, 1 };
 
-		//	LineMesh mesh;
-		//	mesh.m_Vertices = {
-		//		{ltn / ltn.w, {1,1,1,1}}, // 0
-		//		{rtn / rtn.w, {1,1,1,1}}, // 1
-		//		{rbn / rbn.w, {1,1,1,1}}, // 2
-		//		{lbn / lbn.w, {1,1,1,1}}, // 3
-		//		{ltf / ltf.w, {1,1,1,1}}, // 4
-		//		{rtf / rtf.w, {1,1,1,1}}, // 5
-		//		{rbf / rbf.w, {1,1,1,1}}, // 6
-		//		{lbf / lbf.w, {1,1,1,1}}, // 7
-		//	};
+			Math::Vector4 rbn = Math::Vector4{ max.x, min.y, min.z, 1 };
+			Math::Vector4 rbf = Math::Vector4{ max.x, min.y, max.z, 1 };
 
-		//	mesh.m_Indices = {
-		//		0,4, 1,5, 2,6, 3,7,
-		//		0,1, 1,2, 2,3, 3,0, // near clipping plane
-		//		4,5, 5,6, 6,7, 7,4  // far clipping plane
-		//	};
+			LineMesh mesh;
+			mesh.m_Vertices = {
+				{ltn, {1,1,1,1}}, // 0
+				{rtn, {1,1,1,1}}, // 1
+				{rbn, {1,1,1,1}}, // 2
+				{lbn, {1,1,1,1}}, // 3
+				{ltf, {1,1,1,1}}, // 4
+				{rtf, {1,1,1,1}}, // 5
+				{rbf, {1,1,1,1}}, // 6
+				{lbf, {1,1,1,1}}, // 7
+			};
 
-		//	LineRenderer::DrawLineMesh(mesh, transform);
-		//}
+			mesh.m_Indices = {
+				0,4, 1,5, 2,6, 3,7,
+				0,1, 1,2, 2,3, 3,0, // near clipping plane
+				4,5, 5,6, 6,7, 7,4  // far clipping plane
+			};
+
+			LineRenderer::DrawLineMesh(mesh, transform);
+		}
 		LineRenderer::EndScene();
 	}
 
@@ -453,10 +455,9 @@ namespace Engine
 		ImGui::PopStyleVar();
 	}
 
-	int EditorLayer::GetEntityIDAtMousePosition(bool& inWindow)
+	Entity EditorLayer::GetEntityAtMousePosition(bool& inWindow)
 	{
 		inWindow = false;
-		return -1; // TODO
 
 		auto [mx, my] = ImGui::GetMousePos();
 		mx -= m_ViewportBounds[0].x;
@@ -471,11 +472,43 @@ namespace Engine
 		if ((mousex >= 0 && mousex < (int)viewportSize.x) && (mousey >= 0 && mousey < (int)viewportSize.y))
 		{
 			inWindow = true;
-			//return m_FrameBuffer->ReadPixle(1, mousex, mousey);
+			Engine::Ray ray;
+			ray.m_Origin = m_EditorCamera->GetPosition();
+
+			Math::Vector2 uv = Math::Vector2((float)mousex / viewportSize.x, (float)mousey / viewportSize.y);
+			Math::Vector4 ndc = Math::Vector4(uv * 2.0f - 1.0f, 1, 1);
+			CORE_INFO("{0}, {1}", ndc.x, ndc.y);
+			Math::Vector4 worldSpace = Math::Inverse(m_EditorCamera->GetViewProjection()) * ndc;
+			worldSpace = worldSpace / worldSpace.w;
+			ray.m_Direction = Math::Vector3(worldSpace) - m_EditorCamera->GetPosition();
+
+			Entity hitEntity;
+			float closestHit = FLT_MAX;
+
+			m_Game->GetScene()->GetRegistry().EachEntity([&](EntityType et){
+				Entity e{ et, m_Game->GetScene().get() };
+				AABB aabb = e.GetLocalAABB();
+				if (aabb.m_Min != aabb.m_Max)
+				{
+					PlainVolume volume = e.GetPlainVolume();
+					RayHit hit;
+					if (volume.TestRay(ray, hit))
+					{
+						CORE_INFO("Hit {0}", e.GetName());
+						if (hit.m_Distance < closestHit)
+						{
+							closestHit = hit.m_Distance;
+							hitEntity = e;
+						}
+					}
+				}
+			});
+
+			return hitEntity;
 		}
 
 		inWindow = false;
-		return -1;
+		return Entity::null;
 	}
 
 	void EditorLayer::OpenScene()

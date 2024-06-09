@@ -64,6 +64,12 @@ namespace Engine
 		void SetParentToRoot();
 		Utils::Vector<Component*> GetComponents();
 
+		void DirtyAABB();
+		void DirtyVolume();
+
+		AABB GetLocalAABB();
+		PlainVolume GetPlainVolume();
+
 		Scene* GetScene() { return m_Scene; }
 
 		bool operator == (const Entity& other) const { return m_EntityID == other.m_EntityID && m_Scene == other.m_Scene; }

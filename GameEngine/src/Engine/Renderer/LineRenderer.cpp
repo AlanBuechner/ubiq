@@ -107,7 +107,6 @@ namespace Engine
 
 	void LineRenderer::DrawLineMesh(LineMesh& mesh, const Math::Mat4& transform)
 	{
-
 		uint32 baseVertexIndex = (uint32)s_LineData.Vertices.size();
 		for (uint32 i = 0; i < mesh.m_Vertices.size(); i++)
 		{

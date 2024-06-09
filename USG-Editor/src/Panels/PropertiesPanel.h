@@ -30,6 +30,6 @@ namespace Engine
 				s_ExposePropertyFunctions.emplace(typeID, func);
 			}
 		};
-#define ADD_EXPOSE_PROP_FUNC(type) Engine::PropertysPanel::AddExposePropertyFunc CAT(Draw,__LINE__)(typeid(type).hash_code(), [](void* voidData, void* object, uint64 typeID, const Reflect::Property* prop)
+#define ADD_EXPOSE_PROP_FUNC(type) static Engine::PropertysPanel::AddExposePropertyFunc CAT(Draw,__LINE__)(typeid(type).hash_code(), [](void* voidData, void* object, uint64 typeID, const Reflect::Property* prop)
 	};
 }

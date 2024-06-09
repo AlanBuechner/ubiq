@@ -62,7 +62,15 @@ namespace Game
 				entry.m_Object = Owner.GetScene()->GetSceneRendererAs<SceneRenderer>()->Submit(entry.m_Mesh, mat, Owner.GetTransform().GetTransform());
 			}
 		}
+
+		DirtyVolume();
 	}
+
+	Utils::Vector<Engine::AABB> StaticModelRendererComponent::GenVolumes()
+	{
+		return m_Model->GetVolumes();
+	}
+
 }
 
 

@@ -49,7 +49,7 @@ namespace Engine
 
 		void UI_Viewport();
 
-		int GetEntityIDAtMousePosition(bool& inWindow);
+		Entity GetEntityAtMousePosition(bool& inWindow);
 
 	private:
 		const Math::Vector4 m_GridColor = { 0.5f,0.5f,0.5f,1 };

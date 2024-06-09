@@ -71,4 +71,52 @@ namespace Engine
 		return components;
 	}
 
+	void Entity::DirtyAABB()
+	{
+		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
+		data.dirtyAABB = true;
+		data.dirtyVolume = true;
+	}
+
+	void Entity::DirtyVolume()
+	{
+		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
+		data.dirtyVolume = true;
+	}
+
+	AABB Entity::GetLocalAABB()
+	{
+		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
+		if (data.dirtyAABB)
+		{
+			Utils::Vector<AABB> aabbs;
+			for (Component* component : GetComponents())
+			{
+				Utils::Vector<AABB> componentVolumes = component->GetVolumes();
+				for (AABB aabb : componentVolumes)
+					aabbs.Push(aabb);
+			}
+
+			data.aabb = AABB::GetExtents(aabbs);
+			data.aabb.MinThickness(0.001f);
+			data.dirtyAABB = false;
+		}
+
+		return data.aabb;
+	}
+
+	PlainVolume Entity::GetPlainVolume()
+	{
+		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
+		if (data.dirtyVolume)
+		{
+			AABB aabb = GetLocalAABB();
+			data.volume = aabb.GetPlainVolume();
+			data.volume.Transform(GetTransform().GetGlobalTransform());
+			data.dirtyVolume = false;
+		}
+
+		return data.volume;
+	}
+
 }

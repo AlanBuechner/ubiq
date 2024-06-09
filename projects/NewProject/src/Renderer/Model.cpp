@@ -17,12 +17,17 @@ namespace Game
 	{
 		for (uint32 i = 0; i < node.m_MeshBuilders.Count(); i++)
 		{
+			Engine::AABB aabb;
 			Engine::MeshBuilder builder(node.m_MeshBuilders[i]);
-			for(uint32 j = 0; j < builder.vertices.size(); j++)
+			for (uint32 j = 0; j < builder.vertices.size(); j++)
+			{
 				builder.vertices[j].position = parentTransform * Math::Vector4(builder.vertices[j].position, 1);
+				aabb.AddPosition(builder.vertices[j].position);
+			}
 
 			builder.Apply();
 			m_BakedMeshes.Push(builder.mesh);
+			m_Volumes.Push(aabb);
 			m_Names.Push(node.m_Names[i]);
 		}
 
@@ -134,6 +139,8 @@ namespace Game
 		ProcessNode(scene, scene->mRootNode, model->GetRoot());
 
 		model->BakeMesh();
+
+
 
 		return model;
 	}

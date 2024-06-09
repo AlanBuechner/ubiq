@@ -42,6 +42,9 @@ namespace Game
 
 		void Invalidate();
 
+	protected:
+		virtual Utils::Vector<Engine::AABB> GenVolumes() override;
+
 	private:
 		PROPERTY(HideInInspector) Engine::Ref<Model> m_Model;
 		Utils::Vector<MeshEntry> m_CollapsedModelTree;
