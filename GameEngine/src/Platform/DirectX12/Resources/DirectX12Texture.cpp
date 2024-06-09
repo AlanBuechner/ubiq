@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "DirectX12Texture.h"
-#include "Platform/DirectX12/Directx12Context.h"
+#include "Platform/DirectX12/DirectX12Context.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Platform/DirectX12/DirectX12CommandList.h"
 #include "DirectX12ResourceManager.h"
@@ -118,8 +118,8 @@ namespace Engine
 			return D3D12_RESOURCE_STATE_COPY_SOURCE;
 		case ResourceState::CopyDestination:
 			return D3D12_RESOURCE_STATE_COPY_DEST;
-		default:
-			break;
+		default: 
+			return D3D12_RESOURCE_STATE_COMMON;
 		}
 	}
 

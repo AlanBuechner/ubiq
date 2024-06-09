@@ -277,7 +277,7 @@ namespace Reflect {
 	{
 	public:
 		virtual const Reflect::Class& GetClass() = 0;
-		virtual const std::string& GetTypeName() = 0;
+		virtual const std::string_view& GetTypeName() = 0;
 		virtual uint64_t GetTypeID() = 0;
 	};
 
@@ -286,10 +286,10 @@ namespace Reflect {
 // requires the full semantic name of the class i.e. (SomeNamespace::SomeClass)
 #define REFLECTED_BODY(sname)	\
 								static const Reflect::Class& GetStaticClass() { static auto& c = *(Reflect::Registry::GetRegistry()->GetClass(#sname)); return c; }\
-								static const std::string& GetStaticTypeName() { return #sname; }\
+								static constexpr std::string_view StaticTypeName = #sname;\
 								static uint64_t GetStaticTypeID() { static uint64 tid = GetStaticClass().GetTypeID(); return tid; }\
 								virtual const Reflect::Class& GetClass() override { return GetStaticClass(); }\
-								virtual const std::string& GetTypeName() override { return GetStaticTypeName(); }\
+								virtual const std::string_view& GetTypeName() override { return StaticTypeName; }\
 								virtual uint64_t GetTypeID() override { return GetStaticTypeID(); }
 
 // STRIP_REFLECTION is used so the IDE does not yell at you because it does not know what __attribute__ is
@@ -303,4 +303,4 @@ namespace Reflect {
 	#define FUNCTION(...) __attribute__((annotate("reflect-function," #__VA_ARGS__)))
 #endif
 
-#define LINK_REFLECTION_DATA(name) void DeadLink##name(); void* _DeadLink##name = &DeadLink##name;
+#define LINK_REFLECTION_DATA(name) void DeadLink##name(); void* _DeadLink##name = (void*)&DeadLink##name;

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DirectX12ResourceManager.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Platform/DirectX12/Directx12Context.h"
+#include "Platform/DirectX12/DirectX12Context.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 #include <algorithm>
 

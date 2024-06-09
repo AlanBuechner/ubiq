@@ -47,10 +47,11 @@ namespace Game
 			{
 				bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
 
-				if (changed |= ImGui::Selectable(projectionTypeStrings[i], isSelected))
+				if (ImGui::Selectable(projectionTypeStrings[i], isSelected))
 				{
 					currentProjectionTypeString = projectionTypeStrings[i];
 					camera->SetProjectionType((Engine::SceneCamera::ProjectionType)i);
+					changed = true;
 				}
 
 				if (isSelected)
@@ -63,31 +64,49 @@ namespace Game
 		if (camera->GetProjectionType() == Engine::SceneCamera::ProjectionType::Perspective)
 		{
 			float fov = glm::degrees(camera->GetPerspectiveVerticalFOV());
-			if (changed |= Engine::PropertysPanel::DrawFloatControl("FOV", fov, 45.0f))
+			if (Engine::PropertysPanel::DrawFloatControl("FOV", fov, 45.0f))
+			{
 				camera->SetPerspectiveVerticalFOV(glm::radians(fov));
+				changed = true;
+			}
 
 			float nearClip = camera->GetPerspectiveNearClip();
-			if (changed |= Engine::PropertysPanel::DrawFloatControl("Near Clip", nearClip, 0.01f))
+			if (Engine::PropertysPanel::DrawFloatControl("Near Clip", nearClip, 0.01f))
+			{
 				camera->SetPerspectiveNearClip(nearClip);
+				changed = true;
+			}
 
 			float farClip = camera->GetPerspectiveFarClip();
-			if (changed |= Engine::PropertysPanel::DrawFloatControl("Far Clip", farClip, 1000.0f))
+			if (Engine::PropertysPanel::DrawFloatControl("Far Clip", farClip, 1000.0f))
+			{
 				camera->SetPerspectiveFarClip(farClip);
+				changed = true;
+			}
 		}
 
 		if (camera->GetProjectionType() == Engine::SceneCamera::ProjectionType::Orthographic)
 		{
 			float Size = camera->GetOrthographicSize();
-			if (changed |= Engine::PropertysPanel::DrawFloatControl("Size", Size, 10.0f))
+			if (Engine::PropertysPanel::DrawFloatControl("Size", Size, 10.0f))
+			{
 				camera->SetOrthographicSize(Size);
+				changed = true;
+			}
 
 			float nearClip = camera->GetOrthographicNearClip();
-			if (changed |= Engine::PropertysPanel::DrawFloatControl("Near Clip", nearClip, -1.0f))
+			if (Engine::PropertysPanel::DrawFloatControl("Near Clip", nearClip, -1.0f))
+			{
 				camera->SetOrthographicNearClip(nearClip);
+				changed = true;
+			}
 
 			float farClip = camera->GetOrthographicFarClip();
-			if (changed |= Engine::PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
+			if (Engine::PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
+			{
 				camera->SetOrthographicFarClip(farClip);
+				changed = true;
+			}
 		}
 		return changed;
 	});

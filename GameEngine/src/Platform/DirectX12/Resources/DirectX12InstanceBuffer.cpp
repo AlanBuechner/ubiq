@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "DirectX12InstanceBuffer.h"
-#include "Platform/DirectX12/Directx12Context.h"
+#include "Platform/DirectX12/DirectX12Context.h"
 #include "DirectX12ResourceManager.h"
 
 #include "Engine/Renderer/Renderer.h"
@@ -64,6 +64,7 @@ namespace Engine
 			return D3D12_RESOURCE_STATE_COPY_SOURCE;
 		case ResourceState::CopyDestination:
 			return D3D12_RESOURCE_STATE_COPY_DEST;
+		default: return D3D12_RESOURCE_STATE_COMMON;
 		}
 	}
 

@@ -21,7 +21,7 @@
 #include "Platform/Windows/Win.h"
 #include "Platform/Windows/WindowsWindow.h"
 #include "Platform/DirectX12/Resources/DirectX12SwapChain.h"
-#include "Platform/DirectX12/Directx12Context.h"
+#include "Platform/DirectX12/DirectX12Context.h"
 #include "Platform/DirectX12/Resources/DirectX12Descriptors.h"
 #include "Platform/DirectX12/Resources/DirectX12ResourceManager.h"
 #include "Platform/DirectX12/DirectX12CommandList.h"

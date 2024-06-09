@@ -349,7 +349,7 @@ namespace Engine
 
 	TextureFile::~TextureFile()
 	{
-		delete[] data;
+		free(data);
 	}
 
 	TextureFormat TextureFile::GetTextureFormat()
@@ -387,7 +387,7 @@ namespace Engine
 		uint32 oldImageStrid = width * channels;
 		uint32 newImageStrid = width * numChannels;
 
-#define MAP_DATA(type){ type* newData = new type[width * height * numChannels]; \
+#define MAP_DATA(type){ type* newData = (type*)malloc(width * height * numChannels * sizeof(type)); \
 		for (uint32 y = 0; y < height; y++){\
 			for (uint32 x = 0; x < width; x++){\
 				for (uint8 c = 0; c < numChannels; c++){\
@@ -397,7 +397,7 @@ namespace Engine
 				}\
 			}\
 		}\
-		delete[] data;\
+		free(data);\
 		data = newData;}
 
 		if (HDR) MAP_DATA(uint16)

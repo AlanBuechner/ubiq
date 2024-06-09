@@ -1,6 +1,6 @@
 #include "DirectX12UploadBuffer.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Platform/DirectX12/Directx12Context.h"
+#include "Platform/DirectX12/DirectX12Context.h"
 #include "Platform/DirectX12/DirectX12CommandList.h"
 #include "DirectX12ResourceManager.h"
 
@@ -58,6 +58,8 @@ namespace Engine
 			return D3D12_RESOURCE_STATE_GENERIC_READ;
 		case ResourceState::CopyDestination:
 			return D3D12_RESOURCE_STATE_GENERIC_READ;
+		default:
+			return D3D12_RESOURCE_STATE_COMMON;
 		}
 	}
 
@@ -136,6 +138,8 @@ namespace Engine
 			return D3D12_RESOURCE_STATE_GENERIC_READ;
 		case ResourceState::CopyDestination:
 			return D3D12_RESOURCE_STATE_GENERIC_READ;
+		default:
+			return D3D12_RESOURCE_STATE_COMMON;
 		}
 	}
 

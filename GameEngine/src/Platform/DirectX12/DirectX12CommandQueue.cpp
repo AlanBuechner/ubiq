@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "DirectX12CommandQueue.h"
-#include "Directx12Context.h"
+#include "DirectX12Context.h"
 #include "DirectX12CommandList.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Renderer/Renderer.h"
