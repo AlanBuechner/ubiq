@@ -99,6 +99,6 @@ namespace Game
 
 	private:
 		
-		std::vector<ShaderDrawSection> m_ShaderDrawSection;
+		Utils::Vector<ShaderDrawSection> m_ShaderDrawSection;
 	};
 }

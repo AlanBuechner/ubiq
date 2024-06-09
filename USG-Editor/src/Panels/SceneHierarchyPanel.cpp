@@ -94,7 +94,7 @@ if(!m_Selected.HasComponent<component>()){\
 
 #undef ADD_COMPONENT
 
-				std::vector<const Reflect::Class*> components = Reflect::Registry::GetRegistry()->GetGroup("Component");
+				Utils::Vector<const Reflect::Class*> components = Reflect::Registry::GetRegistry()->GetGroup("Component");
 				for (const Reflect::Class* componetClass : components)
 				{
 					if (!m_Selected.GetScene()->GetRegistry().HasComponent(m_Selected, *componetClass))

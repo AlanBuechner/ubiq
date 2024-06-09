@@ -19,7 +19,7 @@ namespace Engine
 				vertex.position = Math::SphericalToCartesian({ t1 - Math::PI / 2, t2 });
 				vertex.normal = vertex.position;
 				vertex.uv = { u / uSeg, v / vSeg };
-				builder.vertices.push_back(vertex);
+				builder.vertices.Push(vertex);
 			}
 		}
 
@@ -32,12 +32,12 @@ namespace Engine
 				uint32 c = v % vSeg * vSeg + (u % uSeg + 1);
 				uint32 d = (v % vSeg + 1) * vSeg + (u % uSeg + 1);
 
-				builder.indices.push_back(a);
-				builder.indices.push_back(b);
-				builder.indices.push_back(c);
-				builder.indices.push_back(b);
-				builder.indices.push_back(d);
-				builder.indices.push_back(c);
+				builder.indices.Push(a);
+				builder.indices.Push(b);
+				builder.indices.Push(c);
+				builder.indices.Push(b);
+				builder.indices.Push(d);
+				builder.indices.Push(c);
 			}
 		}
 

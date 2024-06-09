@@ -69,6 +69,6 @@ namespace Engine
 		Utils::Vector<uint32> m_UsedSlots;
 
 		uint32 m_NumComponents = 0;
-		std::vector<ComponentPoolPage> m_Pages;
+		Utils::Vector<ComponentPoolPage> m_Pages;
 	};
 }

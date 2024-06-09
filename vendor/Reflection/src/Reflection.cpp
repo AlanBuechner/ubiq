@@ -14,7 +14,7 @@ namespace Reflect {
 		m_ClassesByName[c.GetSname()] = registerdClass;
 		m_ClassesByTypeID[c.GetTypeID()] = registerdClass;
 		if (!c.GetGroup().empty())
-			m_ClassGroups[c.GetGroup()].push_back(registerdClass);
+			m_ClassGroups[c.GetGroup()].Push(registerdClass);
 		for(Property& prop : registerdClass->properties)
 			prop.c = registerdClass;
 		for (Function& func : registerdClass->functions)

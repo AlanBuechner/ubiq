@@ -20,9 +20,9 @@ namespace Game
 		Engine::Ref<Engine::Shader> m_BloomShader;
 		uint32 m_NumberDownSamples = 1;
 #ifdef USE_BLOOM_COMPUTE
-		std::vector<Engine::Ref<Engine::RWTexture2D>> m_GaussianSumTextures;
+		Utils::Vector<Engine::Ref<Engine::RWTexture2D>> m_GaussianSumTextures;
 #else
-		std::vector<Engine::Ref<Engine::RenderTarget2D>> m_GaussianSumTextures;
+		Utils::Vector<Engine::Ref<Engine::RenderTarget2D>> m_GaussianSumTextures;
 #endif
 	};
 }

@@ -8,7 +8,7 @@ void ImplementFunctions(std::ofstream& ofs, const std::vector<Function>& funcs, 
 	for (uint32_t i = 0; i < funcs.size(); i++)
 	{
 		const Function& func = funcs[i];
-		ofs << "void " << name << func.m_Name << "(void* obj, std::vector<void*> args){";
+		ofs << "void " << name << func.m_Name << "(void* obj, Utils::Vector<void*> args){";
 		for (int i = 0; i < func.m_Types.size(); i++)
 			ofs << func.m_Types[i] << "* v" << i << " = (" << func.m_Types[i] << "*)args[" << i << "];";
 		ofs << "((" << sname << "*)obj)->" << func.m_Name << "(";

@@ -23,7 +23,7 @@ namespace Game
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Shadow Pass");
 
 		// convert all frame buffers to render targets
-		std::vector<Engine::ResourceStateObject> transitions;
+		Utils::Vector<Engine::ResourceStateObject> transitions;
 
 		// directional light
 		if (scene.m_DirectinalLight)

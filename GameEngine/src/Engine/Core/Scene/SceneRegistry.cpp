@@ -9,8 +9,8 @@ namespace Engine
 
 	void EntityData::RemoveComponentReferance(ComponentPool* pool)
 	{
-		std::vector<ComponentRef>::const_iterator i = std::find_if(m_Components.begin(), m_Components.end(), [pool](ComponentRef comp) {return comp.m_Pool == pool; });
-		m_Components.erase(i);
+		uint32 i = m_Components.FindIf([pool](const ComponentRef& comp) { return comp.m_Pool == pool; });
+		m_Components.Remove(i);
 	}
 
 	SceneRegistry::~SceneRegistry()
@@ -26,18 +26,18 @@ namespace Engine
 
 	EntityType SceneRegistry::CreateEntity(UUID id, const std::string& name)
 	{
-		if (m_FreeEntitys.empty())
+		if (m_FreeEntitys.Empty())
 		{
 			// no locations in the entity list is free
-			m_Entitys.push_back({ id, name });
-			m_UsedEntitys.push_back(m_Entitys.size()-1);
-			return m_Entitys.size() - 1;
+			m_Entitys.Push({ id, name });
+			m_UsedEntitys.Push(m_Entitys.Count()-1);
+			return m_Entitys.Count() - 1;
 		}
 
-		EntityType entity = m_FreeEntitys.back(); // get the most recently deleted entity
-		m_FreeEntitys.pop_back();
+		EntityType entity = m_FreeEntitys.Back(); // get the most recently deleted entity
+		m_FreeEntitys.Pop();
 		m_Entitys[entity] = { id, name };
-		m_UsedEntitys.push_back(entity);
+		m_UsedEntitys.Push(entity);
 		return entity;
 	}
 
@@ -46,21 +46,21 @@ namespace Engine
 		// remove components from entity
 		for (auto& compRef : m_Entitys[entity].m_Components)
 			compRef.m_Pool->Free(entity);
-		m_Entitys[entity].m_Components.clear();
+		m_Entitys[entity].m_Components.Clear();
 
 		// remove entity from used entity list
-		for (uint32 i = 0; i < m_UsedEntitys.size(); i++)
+		for (uint32 i = 0; i < m_UsedEntitys.Count(); i++)
 		{
 			if (m_UsedEntitys[i] == entity)
 			{
 				// swap and pop
-				m_UsedEntitys[i] = m_UsedEntitys.back();
-				m_UsedEntitys.pop_back();
+				m_UsedEntitys[i] = m_UsedEntitys.Back();
+				m_UsedEntitys.Pop();
 			}
 		}
 
 		// add entity to free entity list
-		m_FreeEntitys.push_back(entity);
+		m_FreeEntitys.Push(entity);
 	}
 
 	void* SceneRegistry::AddComponent(EntityType entity, Scene* scene, const Reflect::Class& componentClass)
@@ -81,7 +81,7 @@ namespace Engine
 		CORE_ASSERT(componentLocation != nullptr, "faild to allocate memory for component"); // validate component was successfully created 
 
 		Component* comp = (Component*)componentClass.CreateInstance(componentLocation); // create component in pre allocated memory
-		m_Entitys[entity].m_Components.push_back({ pool, componentIndex }); // add component to entity's list of components
+		m_Entitys[entity].m_Components.Push({ pool, componentIndex }); // add component to entity's list of components
 		comp->Owner = { entity, scene };
 		comp->OnComponentAdded();
 		return comp; // return component
@@ -118,7 +118,7 @@ namespace Engine
 
 	bool SceneRegistry::HasComponent(EntityType entity, const Reflect::Class& componentClass)
 	{
-		if (m_Entitys.size() <= entity)
+		if (m_Entitys.Count() <= entity)
 			return false;
 
 		ComponentType componentID = componentClass.GetTypeID();

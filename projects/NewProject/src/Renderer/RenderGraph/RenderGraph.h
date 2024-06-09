@@ -17,7 +17,7 @@ namespace Game
 
 	struct SceneData
 	{
-		std::vector<DrawCommand> m_DrawCommands;
+		Utils::Vector<DrawCommand> m_DrawCommands;
 		Engine::Ref<Engine::Camera> m_MainCamera;
 		Engine::Ref<DirectionalLight> m_DirectinalLight;
 		Engine::Ref<Engine::Texture2D> m_Skybox;

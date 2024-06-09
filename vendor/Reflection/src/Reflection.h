@@ -55,8 +55,8 @@ namespace Reflect {
 			uint64_t typeID,
 			uint32_t size,
 			uint32_t offset,
-			const std::vector<std::string>& flags,
-			const std::vector<Attribute>& attributes
+			const Utils::Vector<std::string>& flags,
+			const Utils::Vector<Attribute>& attributes
 		) :
 			name(name),
 			typeID(typeID),
@@ -66,7 +66,7 @@ namespace Reflect {
 		{
 			for (const std::string& flag : flags)
 				this->flags.emplace(flag);
-			for (uint32_t i = 0; i < attributes.size(); i++)
+			for (uint32_t i = 0; i < attributes.Count(); i++)
 				attributeMap.emplace(attributes[i].GetKey(), i);
 		}
 
@@ -76,7 +76,7 @@ namespace Reflect {
 		uint32_t GetOffset() const { return offset; }
 		bool HasFlag(const std::string& flag) const { return flags.find(flag) != flags.end(); }
 
-		const std::vector<Attribute>& GetAttributes() const { return attributes; }
+		const Utils::Vector<Attribute>& GetAttributes() const { return attributes; }
 		bool HasAttribute(const std::string& key) const { return attributeMap.find(key) != attributeMap.end(); }
 		const Attribute& GetAttribute(const std::string& key) const { return attributes[attributeMap.at(key)]; }
 
@@ -90,7 +90,7 @@ namespace Reflect {
 
 		std::unordered_set<std::string> flags;
 
-		std::vector<Attribute> attributes;
+		Utils::Vector<Attribute> attributes;
 		std::unordered_map<std::string, uint32_t> attributeMap;
 
 		Class* c;
@@ -101,14 +101,14 @@ namespace Reflect {
 	class Function 
 	{
 	public:
-		typedef void (*InvokeFunc)(void*, std::vector<void*>);
+		typedef void (*InvokeFunc)(void*, Utils::Vector<void*>);
 
 		Function() = default;
 		Function(
 			const std::string& name,
 			InvokeFunc func,
-			const std::vector<std::string>& flags,
-			const std::vector<Attribute>& attributes
+			const Utils::Vector<std::string>& flags,
+			const Utils::Vector<Attribute>& attributes
 		) :
 			name(name),
 			function(func),
@@ -116,17 +116,17 @@ namespace Reflect {
 		{
 			for (const std::string& flag : flags)
 				this->flags.emplace(flag);
-			for (uint32_t i = 0; i < attributes.size(); i++)
+			for (uint32_t i = 0; i < attributes.Count(); i++)
 				attributeMap.emplace(attributes[i].GetKey(), i);
 		}
 
 		const std::string& GetName() { return name; }
 
-		void Invoke(void* obj, std::vector<void*> args) const { function(obj, args); }
+		void Invoke(void* obj, Utils::Vector<void*> args) const { function(obj, args); }
 
 		bool HasFlag(const std::string& flag) const { return flags.find(flag) != flags.end(); }
 
-		const std::vector<Attribute>& GetAttributes() const { return attributes; }
+		const Utils::Vector<Attribute>& GetAttributes() const { return attributes; }
 		bool HasAttribute(const std::string& key) const { return attributeMap.find(key) != attributeMap.end(); }
 		const Attribute& GetAttribute(const std::string& key) const { return attributes[attributeMap.at(key)]; }
 
@@ -136,7 +136,7 @@ namespace Reflect {
 
 		std::unordered_set<std::string> flags;
 
-		std::vector<Attribute> attributes;
+		Utils::Vector<Attribute> attributes;
 		std::unordered_map<std::string, uint32_t> attributeMap;
 		Class* c;
 		friend Class;
@@ -157,10 +157,10 @@ namespace Reflect {
 			const std::string& group,
 			CreateFunc createFunc, 
 			DestroyFunc destroyFunc,
-			const std::vector<std::string>& flags,
-			const std::vector<Attribute>& attribs,
-			const std::vector<Property>& props,
-			const std::vector<Function>& funcs
+			const Utils::Vector<std::string>& flags,
+			const Utils::Vector<Attribute>& attribs,
+			const Utils::Vector<Property>& props,
+			const Utils::Vector<Function>& funcs
 		): 
 			name(name),
 			sname(sname),
@@ -175,11 +175,11 @@ namespace Reflect {
 		{
 			for (const std::string& flag : flags)
 				this->flags.emplace(flag);
-			for (uint32_t i = 0; i < attributes.size(); i++)
+			for (uint32_t i = 0; i < attributes.Count(); i++)
 				attributeMap.emplace(attributes[i].GetKey(), i);
-			for (uint32_t i = 0; i < properties.size(); i++)
+			for (uint32_t i = 0; i < properties.Count(); i++)
 				propertyMap.emplace(properties[i].GetName(), i);
-			for (uint32_t i = 0; i < functions.size(); i++)
+			for (uint32_t i = 0; i < functions.Count(); i++)
 				functionMap.emplace(functions[i].GetName(), i);
 		}
 
@@ -194,15 +194,15 @@ namespace Reflect {
 
 		bool HasFlag(const std::string& flag) const { return flags.find(flag) != flags.end(); }
 
-		const std::vector<Attribute>& GetAttributes() const { return attributes; }
+		const Utils::Vector<Attribute>& GetAttributes() const { return attributes; }
 		bool HasAttribute(const std::string& key) const { return attributeMap.find(key) != attributeMap.end(); }
 		const Attribute& GetAttribute(const std::string& key) const { return attributes[attributeMap.at(key)]; }
 
-		const std::vector<Function>& GetFunctions() const { return functions; }
+		const Utils::Vector<Function>& GetFunctions() const { return functions; }
 		bool HasFunction(const std::string& name) const { return functionMap.find(name) != functionMap.end(); }
 		const Function& GetFunction(const std::string& name) const { return functions[functionMap.at(name)]; }
 
-		const std::vector<Property>& GetProperties() const { return properties; }
+		const Utils::Vector<Property>& GetProperties() const { return properties; }
 		bool HasProperty(const std::string& name) { return propertyMap.find(name) != propertyMap.end(); }
 		const Property& GetProperty(const std::string& name) const { return properties[propertyMap.at(name)]; }
 
@@ -216,13 +216,13 @@ namespace Reflect {
 		DestroyFunc destroyFunc;
 		std::unordered_set<std::string> flags;
 
-		std::vector<Attribute> attributes;
+		Utils::Vector<Attribute> attributes;
 		std::unordered_map<std::string, uint32_t> attributeMap;
 
-		std::vector<Property> properties;
+		Utils::Vector<Property> properties;
 		std::unordered_map<std::string, uint32_t> propertyMap;
 
-		std::vector<Function> functions;
+		Utils::Vector<Function> functions;
 		std::unordered_map<std::string, uint32_t> functionMap;
 		friend class Registry;
 	};
@@ -236,7 +236,7 @@ namespace Reflect {
 		const Class* GetClass(const std::string& name) { return m_ClassesByName[name]; }
 		const Class* GetClass(uint64_t typeID) { return m_ClassesByTypeID[typeID]; }
 		const std::list<Class>& GetClasses() { return m_Classes; }
-		const std::vector<const Class*>& GetGroup(const std::string& groupName) { return m_ClassGroups[groupName]; }
+		const Utils::Vector<const Class*>& GetGroup(const std::string& groupName) { return m_ClassGroups[groupName]; }
 
 		void AddClass(const Class& c);
 
@@ -245,10 +245,10 @@ namespace Reflect {
 			Add(const std::string& name,
 				const std::string& sname,
 				const std::string& group,
-				const std::vector<std::string>& flags,
-				const std::vector<Attribute>& attributes,
-				const std::vector<Property>& props,
-				const std::vector<Function>& funcs
+				const Utils::Vector<std::string>& flags,
+				const Utils::Vector<Attribute>& attributes,
+				const Utils::Vector<Property>& props,
+				const Utils::Vector<Function>& funcs
 			){
 				Registry::GetRegistry()->AddClass(Class(
 					name,
@@ -269,7 +269,7 @@ namespace Reflect {
 	private:
 		std::unordered_map<std::string, const Class*> m_ClassesByName;
 		std::unordered_map<uint64_t, const Class*> m_ClassesByTypeID;
-		std::unordered_map<std::string, std::vector<const Class*>> m_ClassGroups;
+		std::unordered_map<std::string, Utils::Vector<const Class*>> m_ClassGroups;
 		std::list<Class> m_Classes;
 	};
 

@@ -64,7 +64,7 @@ namespace Engine
 	Utils::Vector<Component*> Entity::GetComponents()
 	{
 		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
-		Utils::Vector<Component*> components(data.m_Components.size(), {});
+		Utils::Vector<Component*> components(data.m_Components.Count(), {});
 		for (uint32 i = 0; i < components.Count(); i++)
 			components[i] = (Component*)(data.m_Components[i].m_Pool->GetComponentRaw(data.m_Components[i].m_ComponentLoc));
 

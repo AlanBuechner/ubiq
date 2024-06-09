@@ -155,11 +155,11 @@ namespace Engine
 		template<typename... Args>
 		void LogMessage(const char* msg, const Args&... args)
 		{
-			std::vector<TemplateElement> templateElements;
-			templateElements.reserve(sizeof...(args));
-			(templateElements.push_back(TemplateElement::GenTemplateElement(args)), ...);
+			Utils::Vector<TemplateElement> templateElements;
+			templateElements.Reserve(sizeof...(args));
+			(templateElements.Push(TemplateElement::GenTemplateElement(args)), ...);
 
-			std::vector<MessageToken> tokens;
+			Utils::Vector<MessageToken> tokens;
 			if (ParseMessage(msg, tokens))
 			{
 				for (MessageToken token : tokens)
@@ -168,7 +168,7 @@ namespace Engine
 						std::cout << token.m_String;
 					else if (token.m_Type == MessageToken::Param)
 					{
-						if (token.m_ParamIndex >= templateElements.size())
+						if (token.m_ParamIndex >= templateElements.Count())
 						{
 							std::cout << "invalid param index \"" << std::to_string(token.m_ParamIndex) << "\"" << std::endl;
 							return;
@@ -215,13 +215,13 @@ namespace Engine
 
 		void ParsePattern();
 
-		bool ParseMessage(const char* msg, std::vector<MessageToken>& tokens);
+		bool ParseMessage(const char* msg, Utils::Vector<MessageToken>& tokens);
 
 		void SetConsoleColor(Level level);
 
 	private:
 		std::string m_Pattern;
-		std::vector<PatternToken> m_PatternTokens;
+		Utils::Vector<PatternToken> m_PatternTokens;
 		Level m_Level = Trace;
 	};
 

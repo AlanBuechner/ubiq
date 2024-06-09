@@ -50,7 +50,7 @@ namespace Game
 			}
 
 			{ // validate that all sum textures are render targets
-				std::vector<ResourceStateObject> transitions(m_GaussianSumTextures.size());
+				Utils::Vector<ResourceStateObject> transitions(m_GaussianSumTextures.size());
 				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), ResourceState::UnorderedResource };
 				commandList->ValidateStates(transitions);
@@ -93,7 +93,7 @@ namespace Game
 			commandList->Dispatch(std::max(renderTarget->GetWidth() / computeSize, 1u) + 1, std::max(renderTarget->GetHeight() / computeSize, 1u) + 1, 1);
 
 			{ // validate that all sum textures are render targets
-				std::vector<ResourceStateObject> transitions(m_GaussianSumTextures.size());
+				Utils::Vector<ResourceStateObject> transitions(m_GaussianSumTextures.size());
 				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), ResourceState::UnorderedResource };
 				commandList->ValidateStates(transitions);
@@ -123,7 +123,7 @@ namespace Game
 			}
 
 			{ // validate that all sum textures are render targets
-				std::vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
+				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
 				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);
@@ -166,7 +166,7 @@ namespace Game
 			commandList->DrawMesh(screenMesh);
 
 			{ // validate that all sum textures are render targets
-				std::vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
+				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
 				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);

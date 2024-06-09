@@ -4,6 +4,7 @@
 #include <memory>
 #include <type_traits>
 
+#include <functional>
 #include <vector>
 
 namespace Utils
@@ -47,6 +48,9 @@ namespace Utils
 		const Type* Data() const;
 		Type* Data();
 
+		uint32 Find(const Type& val) const;
+		uint32 FindIf(std::function<bool(const Type&)> predicate) const;
+
 		Vector& operator=(const Vector& other);
 		Vector& operator=(Vector&& other) noexcept;
 		const Type& operator[](uint32 index) const;
@@ -71,6 +75,26 @@ namespace Utils
 		uint32 m_Capacity = 0;
 		Type* m_Array = nullptr;
 	};
+
+	template<class Type> inline uint32 Utils::Vector<Type>::Find(const Type& val) const
+	{
+		for (uint32 i = 0; i < m_Count; i++)
+		{
+			if (m_Array[i] == val)
+				return i;
+		}
+		return m_Count;
+	}
+
+	template<class Type> uint32 Utils::Vector<Type>::FindIf(std::function<bool(const Type&)> predicate) const
+	{
+		for (uint32 i = 0; i < m_Count; i++)
+		{
+			if (predicate(m_Array[i]))
+				return i;
+		}
+		return m_Count;
+	}
 
 	template<class Type> inline Vector<Type>::Vector() {}
 

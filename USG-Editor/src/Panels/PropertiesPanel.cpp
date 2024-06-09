@@ -325,7 +325,7 @@ namespace Engine
 		const Reflect::Class* propClass = Reflect::Registry::GetRegistry()->GetClass(typeID);
 		if (propClass)
 		{
-			const std::vector<Reflect::Property>& props = propClass->GetProperties();
+			const Utils::Vector<Reflect::Property>& props = propClass->GetProperties();
 			for (const Reflect::Property& p : props)
 			{
 				if(!p.HasFlag("HideInInspector"))
