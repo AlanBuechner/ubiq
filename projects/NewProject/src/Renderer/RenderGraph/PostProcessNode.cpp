@@ -18,17 +18,17 @@ namespace Game
 
 		Engine::TMeshBuilder<Vertex> meshBuilder;
 
-		meshBuilder.vertices.push_back({ {-1,-1,1,1} });
-		meshBuilder.vertices.push_back({ { 1,-1,1,1} });
-		meshBuilder.vertices.push_back({ {-1, 1,1,1} });
-		meshBuilder.vertices.push_back({ { 1, 1,1,1} });
+		meshBuilder.vertices.Push({ {-1,-1,1,1} });
+		meshBuilder.vertices.Push({ { 1,-1,1,1} });
+		meshBuilder.vertices.Push({ {-1, 1,1,1} });
+		meshBuilder.vertices.Push({ { 1, 1,1,1} });
 
-		meshBuilder.indices.push_back(1);
-		meshBuilder.indices.push_back(2);
-		meshBuilder.indices.push_back(3);
-		meshBuilder.indices.push_back(0);
-		meshBuilder.indices.push_back(2);
-		meshBuilder.indices.push_back(1);
+		meshBuilder.indices.Push(1);
+		meshBuilder.indices.Push(2);
+		meshBuilder.indices.Push(3);
+		meshBuilder.indices.Push(0);
+		meshBuilder.indices.Push(2);
+		meshBuilder.indices.Push(1);
 		meshBuilder.Apply();
 
 		m_ScreenMesh = meshBuilder.mesh;
@@ -53,7 +53,7 @@ namespace Game
 	{
 		m_BackBuffer->Resize(width, height);
 
-		for (uint32 i = 0; i < m_PostProcessStack.size(); i++)
+		for (uint32 i = 0; i < m_PostProcessStack.Count(); i++)
 		{
 			Engine::Ref<PostProcess> post = m_PostProcessStack[i];
 			post->OnViewportResize(width, height);
@@ -62,11 +62,11 @@ namespace Game
 
 	void PostProcessNode::BuildImpl()
 	{
-		Engine::Ref<Engine::RenderTarget2D> curr = m_PostProcessStack.size() % 2 == 0 ? m_BackBuffer : m_RenderTarget;
+		Engine::Ref<Engine::RenderTarget2D> curr = m_PostProcessStack.Count() % 2 == 0 ? m_BackBuffer : m_RenderTarget;
 
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Post Processing");
 
-		for (uint32 i = 0; i < m_PostProcessStack.size(); i++)
+		for (uint32 i = 0; i < m_PostProcessStack.Count(); i++)
 		{
 			Engine::Ref<PostProcess> post = m_PostProcessStack[i];
 			Engine::Ref<Engine::RenderTarget2D> lastPass = (curr == m_BackBuffer) ? m_RenderTarget : m_BackBuffer;

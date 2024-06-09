@@ -12,7 +12,7 @@ namespace Game
 		void SetRenderTarget(Engine::Ref<Engine::RenderTarget2D> fb);
 		void SetInput(const PostProcessInput& input) { m_Input = input; }
 		void SetSrc(Engine::Ref<Engine::Texture2D> src) { m_Src = src; }
-		void AddPostProcess(Engine::Ref<PostProcess> post) { m_PostProcessStack.push_back(post); }
+		void AddPostProcess(Engine::Ref<PostProcess> post) { m_PostProcessStack.Push(post); }
 
 		void InitPostProcessStack();
 

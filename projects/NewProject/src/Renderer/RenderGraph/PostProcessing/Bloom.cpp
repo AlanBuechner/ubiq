@@ -123,8 +123,8 @@ namespace Game
 			}
 
 			{ // validate that all sum textures are render targets
-				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
-				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
+				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.Count());
+				for (uint32 i = 0; i < m_GaussianSumTextures.Count(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);
 			}
@@ -166,8 +166,8 @@ namespace Game
 			commandList->DrawMesh(screenMesh);
 
 			{ // validate that all sum textures are render targets
-				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
-				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
+				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.Count());
+				for (uint32 i = 0; i < m_GaussianSumTextures.Count(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);
 			}
@@ -181,9 +181,9 @@ namespace Game
 	void Bloom::OnViewportResize(uint32 width, uint32 height)
 	{
 		m_NumberDownSamples = (uint32)std::floor(std::log2(std::max(width, height))) - 1;
-		if (m_GaussianSumTextures.size() != m_NumberDownSamples)
+		if (m_GaussianSumTextures.Count() != m_NumberDownSamples)
 		{
-			m_GaussianSumTextures.resize(m_NumberDownSamples);
+			m_GaussianSumTextures.Resize(m_NumberDownSamples);
 			for (uint32 i = 0; i < m_NumberDownSamples; i++)
 			{
 				uint32 fac = Math::Pow(2, i + 1);
