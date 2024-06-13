@@ -193,7 +193,7 @@ namespace Engine
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::BeginMenu("Play"))
+				if (ImGui::MenuItem("Play"))
 				{
 					std::string cmd = std::string("\"Build.bat\" -fb -r -c Release -a x86_64 -p Runtime -g ") + fs::current_path().string();
 					system(cmd.c_str());
