@@ -187,9 +187,11 @@ if(shouldBuild):
 
 # --------------------- Run Project --------------------- #
 def RunProject(projName):
-	proj = GetProject(projName)["module"].GetProject()
-	bdir = proj.binDir
-	os.startfile(proj.GetOutput(), cwd = os.path.normpath(proj["folder"]))
+	proj = GetProject(projName)
+	projdata = GetProject(projName)["module"].GetProject()
+	output = projdata.GetOutput()
+	cwd = Config.gameProject
+	os.startfile(output, cwd = cwd)
 
 if(shouldRun):
 	RunProject(Config.project.split("/")[-1])

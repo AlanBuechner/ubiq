@@ -16,6 +16,8 @@
 #include <ImGuizmo/ImGuizmo.h>
 #include <memory>
 
+#include <windows.h>
+
 Engine::EditorLayer* Engine::EditorLayer::s_Instance = nullptr;
 
 namespace Engine
@@ -189,6 +191,12 @@ namespace Engine
 						Application::Get().Close();
 
 					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Play"))
+				{
+					std::string cmd = std::string("\"Build.bat\" -fb -r -c Release -a x86_64 -p Runtime -g ") + fs::current_path().string();
+					system(cmd.c_str());
 				}
 
 				ImGui::EndMenuBar();

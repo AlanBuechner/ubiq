@@ -223,7 +223,7 @@ class ResourceEnviernment:
 
 	def Build(self):
 		name = os.path.basename(self.resource)
-		args = ["rc.exe", "/R", "/FO", self.outFile]
+		args = [f"{GetWindowsKitBin()}/x64/rc.exe", "/R", "/FO", self.outFile]
 		for include in self.includes:
 			args.extend(["/I", include])
 		args.append(self.resource)
@@ -306,7 +306,6 @@ def CollectIntFolders(dependancys):
 
 def LinkObjects(intDir, dependancys, links, projDir, outputFile, buildType, needsBuild):
 	links.extend(dependancys)
-	print(needsBuild)
 	if(not needsBuild):
 		if(not os.path.isfile(outputFile)):
 			needsBuild = True
