@@ -116,7 +116,7 @@ namespace Game
 		m_OutputNode->m_Buffer = Engine::FrameBuffer::Create({
 			postRenderTargetNode->m_Buffer->GetAttachment(0),
 			renderTargetNode->m_Buffer->GetAttachment(1),
-			});
+		});
 		m_Nodes.push_back(m_OutputNode);
 	}
 

@@ -16,6 +16,8 @@
 #include <ImGuizmo/ImGuizmo.h>
 #include <memory>
 
+#include <windows.h>
+
 Engine::EditorLayer* Engine::EditorLayer::s_Instance = nullptr;
 
 namespace Engine
@@ -44,14 +46,14 @@ namespace Engine
 
 		m_ViewPortSize = { Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight() };
 
-		m_Game = CreateGame();
 
 		m_ContentPanel.SetDirectory(Application::Get().GetProject().GetAssetsDirectory());
 	}
 
 	void EditorLayer::OnAttach()
 	{
-		NewScene();
+		m_Game = CreateGame();
+		DefaultScene();
 
 		m_EditorCamera = CreateRef<EditorCamera>();
 		m_EditorCamera->SetOrientation({ Math::Radians(180-25), Math::Radians(25) });
@@ -191,6 +193,12 @@ namespace Engine
 					ImGui::EndMenu();
 				}
 
+				if (ImGui::MenuItem("Play"))
+				{
+					std::string cmd = std::string("\"Build.bat\" -fb -r -c Release -a x86_64 -p Runtime -g ") + fs::current_path().string();
+					system(cmd.c_str());
+				}
+
 				ImGui::EndMenuBar();
 			}
 
@@ -216,6 +224,13 @@ namespace Engine
 	void EditorLayer::NewScene()
 	{
 		m_Game->SwitchScene(Scene::Create());
+		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
+		m_HierarchyPanel.SetContext(m_Game->GetScene());
+	}
+
+	void EditorLayer::DefaultScene()
+	{
+		m_Game->SwitchScene(Scene::CreateDefault());
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_HierarchyPanel.SetContext(m_Game->GetScene());
 	}

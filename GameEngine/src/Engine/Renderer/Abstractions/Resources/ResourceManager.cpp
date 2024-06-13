@@ -315,6 +315,7 @@ namespace Engine
 				//m_TempUplaodResourecs.push_back(mipTexture);
 
 				startb.push_back({ data.destResource, ResourceState::CopyDestination });
+				startb.push_back({ mipTexture->GetResource(), ResourceState::CopyDestination });
 				textureUploads.push_back({ mipTexture->GetResource(), data.uploadResource, data.width, data.height, data.format });
 				endb.push_back({ mipTexture->GetResource(), ResourceState::UnorderedResource });
 			}
@@ -341,6 +342,7 @@ namespace Engine
 			TextureUploadInfo& info = textureUploads[i];
 			m_TextureCopyCommandList->UploadTexture(info.dest, info.src);
 		}
+		GPUTimer::EndEvent(m_TextureCopyCommandList);
 
 		m_TextureCopyCommandList->ValidateStates(endb); // transition resources back to original state
 
@@ -373,7 +375,7 @@ namespace Engine
 
 			// record barrier for texture and mip
 			mipBarrier.push_back({ mipTexture.mipTexture->GetResource(), ResourceState::CopySource });
-			textureBarrier.push_back({ mipTexture.mipTexture->GetResource(), mipTexture.state });
+			textureBarrier.push_back({ mipTexture.texture, mipTexture.state });
 
 			// copy resource to final texture
 			mipCopys.push_back({ mipTexture.texture, mipTexture.mipTexture->GetResource() });

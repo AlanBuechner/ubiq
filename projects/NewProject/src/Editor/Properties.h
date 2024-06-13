@@ -4,5 +4,7 @@
 
 namespace Game
 {
+#if defined(EDITOR)
 	bool DrawModelControl(const std::string& label, Engine::Ref<Model>& mesh);
+#endif
 }

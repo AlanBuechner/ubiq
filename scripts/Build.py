@@ -58,10 +58,9 @@ if(fullbuild):
 	shouldBuild = True
 
 # get the project
-buildProject = ""
 if(args.p != None):
-	buildProject = FindProject(args.p)
-	if(buildProject == ""):
+	Config.project = FindProject(args.p)
+	if(Config.project == ""):
 		exit(1)
 
 def checkArg(arg, options):
@@ -140,12 +139,12 @@ def CleanProject(projName):
 	shutil.rmtree(proj.intDir, ignore_errors=True)
 
 if(clean):
-	if(buildProject == ""):
+	if(Config.project == ""):
 		fullbuild = True
 		for	proj in Config.projects:
 			CleanProject(proj)
 	else:
-		CleanProject(buildProject)
+		CleanProject(Config.project)
 
 # --------------------- Build Projects --------------------- #
 def BuildProject(proj):
@@ -179,21 +178,20 @@ if(args.BuildTools):
 		BuildProject(t)
 
 if(shouldBuild):
-	if(buildProject == ""):
+	if(Config.project == ""):
 		fullbuild = True
 		for	proj in Config.projects:
 			BuildProject(proj)
 	else:
-		BuildProject(buildProject)
+		BuildProject(Config.project)
 
 # --------------------- Run Project --------------------- #
 def RunProject(projName):
-	proj = GetProject(projName)["module"].GetProject()
-	bdir = proj.binDir
-	os.startfile(proj.GetOutput(), cwd = os.path.normpath(proj["folder"]))
+	proj = GetProject(projName)
+	projdata = GetProject(projName)["module"].GetProject()
+	output = projdata.GetOutput()
+	cwd = Config.gameProject
+	os.startfile(output, cwd = cwd)
 
 if(shouldRun):
-	if(buildProject == ""):
-		RunProject(Config.startupProject.split("/")[-1])
-	else:
-		RunProject(buildProject.split("/")[-1])
+	RunProject(Config.project.split("/")[-1])

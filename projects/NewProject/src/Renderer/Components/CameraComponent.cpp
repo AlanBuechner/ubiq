@@ -25,6 +25,8 @@ namespace Game
 
 
 #pragma region Editor
+#if defined(EDITOR)
+
 #include "Panels/PropertiesPanel.h"
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -112,6 +114,7 @@ namespace Game
 	});
 }
 
+#endif
 #pragma endregion
 
 #pragma region Serialization

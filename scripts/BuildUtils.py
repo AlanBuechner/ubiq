@@ -223,7 +223,7 @@ class ResourceEnviernment:
 
 	def Build(self):
 		name = os.path.basename(self.resource)
-		args = ["rc.exe", "/R", "/FO", self.outFile]
+		args = [f"{GetWindowsKitBin()}/x64/rc.exe", "/R", "/FO", self.outFile]
 		for include in self.includes:
 			args.extend(["/I", include])
 		args.append(self.resource)
@@ -321,13 +321,10 @@ def LinkObjects(intDir, dependancys, links, projDir, outputFile, buildType, need
 					lib = links[i]
 					if(not os.path.isabs(lib)):
 						lib = os.path.join(projDir, lib)
-					if(not os.path.isfile(lib)): # file must be found in the path
-						lib = "" # TODO : find file in path (safe to ignore for now)
-
-				buildTime = os.path.getmtime(lib)
-				if(buildTime > lastBuildTime):
-					needsBuild = True
-
+				if(os.path.isfile(lib)):
+					buildTime = os.path.getmtime(lib)
+					if(buildTime > lastBuildTime):
+						needsBuild = True
 
 	if(needsBuild):
 		projName = os.path.basename(projDir)

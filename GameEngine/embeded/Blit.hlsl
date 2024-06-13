@@ -1,6 +1,10 @@
 #section config
 
 passes = {
+	BlitRaster = {
+		VS = vertex;
+		PS = BlitRaster;
+	};
 	Blit = {
 		CS = Blit;
 	};
@@ -14,6 +18,57 @@ passes = {
 
 
 
+#section common
+#pragma enable_d3d12_debug_symbols
+
+struct VS_Input
+{
+	float3 position : POSITION;
+	float2 uv : UV;
+};
+
+struct VS_Output
+{
+	float4 position : SV_POSITION;
+	float2 uv : UV;
+};
+
+typedef VS_Output PS_Input;
+
+struct PS_Output
+{
+	float4 color : SV_TARGET0;
+};
+
+
+
+
+
+
+
+#section vertex
+
+VS_Output main(VS_Input input)
+{
+	VS_Output output;
+	output.position = float4(input.position, 1);
+	output.uv = input.uv;
+	return output;
+}
+
+
+
+#section BlitRaster
+
+Texture2D<float4> src;
+StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
+
+PS_Output main(PS_Input input)
+{
+	PS_Output output;
+	output.color = src.Sample(textureSampler, input.uv);
+	return output;
+}
 
 
 

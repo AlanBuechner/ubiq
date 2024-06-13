@@ -70,8 +70,8 @@ namespace Engine
 
 	void DirectX12GPUProfiler::SetTargetWindow(void* nativeWindow)
 	{
-		//PIXSetTargetWindow((HWND)nativeWindow);
-		//PIXSetHUDOptions(PIX_HUD_SHOW_ON_TARGET_WINDOW_ONLY);
+		PIXSetTargetWindow((HWND)nativeWindow);
+		PIXSetHUDOptions(PIX_HUD_SHOW_ON_NO_WINDOWS);
 	}
 
 	void DirectX12GPUProfiler::TriggerPixGPUCapture()

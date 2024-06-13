@@ -96,6 +96,10 @@ namespace Engine
 
 	void DirectX12SwapChain::Resize(uint32 width, uint32 height)
 	{
+		// release references
+		for (uint32 i = 0; i < m_Buffers.size(); i++)
+			((DirectX12Texture2DResource*)m_Buffers[i]->m_Resource)->GetBuffer()->Release();
+
 		// Resize swap chain
 		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_Buffers.size(), width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH),
 			"Faild to Resize the swapchain");

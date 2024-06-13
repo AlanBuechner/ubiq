@@ -6,13 +6,15 @@
 
 #include "RenderGraph.h"
 
+#include "Utils/Common.h"
+
 namespace Game
 {
 	GBufferPassNode::GBufferPassNode(Engine::RenderGraph& graph) :
 		RenderGraphNode(graph)
 	{}
 
-	void GBufferPassNode::BuildImpl()
+	void DISABLE_OPS GBufferPassNode::BuildImpl()
 	{
 		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 

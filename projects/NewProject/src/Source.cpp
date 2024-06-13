@@ -13,12 +13,18 @@ namespace Game
 	{
 	public:
 		Game()
-		{}
+		{
+			m_DefaultCamera = Engine::CreateRef<Engine::EditorCamera>();
+			m_DefaultCamera->SetOrientation({ Math::Radians(180 - 25), Math::Radians(25) });
+		}
 
 		virtual void OnUpdate(Engine::Ref<Engine::Camera> overideCamera) override
 		{
 			CREATE_PROFILE_FUNCTIONI();
 			Engine::Ref<Engine::Camera> camera = (overideCamera ? overideCamera : GetSceneCamera());
+
+			if (camera == m_DefaultCamera)
+				m_DefaultCamera->OnUpdate();
 
 			if(camera)
 				GetScene()->OnUpdate(camera);
@@ -29,7 +35,7 @@ namespace Game
 			auto view = m_Scene->GetRegistry().View<CameraComponent>();
 			for (auto comp : view)
 				if (comp.Primary) return comp.Camera;
-			return nullptr;
+			return m_DefaultCamera;
 		}
 
 		virtual void OnRender() override
@@ -41,6 +47,8 @@ namespace Game
 			m_Scene->GetSceneRenderer()->Render(Engine::Renderer::GetMainCommandQueue());
 		}
 
+	private:
+		Engine::Ref<Engine::EditorCamera> m_DefaultCamera;
 
 	};
 }
