@@ -13,13 +13,14 @@ p = {
 		"Utilities" : "vendor/Utilities",
 	},
 	"USG-Editor" : "USG-Editor",
+	"Runtime" : "Runtime",
 	"GameEngine" : "GameEngine",
 }
 tools = [
 	"tools/Socrates"
 ]
 
-startupProject = "USG-Editor"
+project = ""
 gameProject = None
 
 configurations = [

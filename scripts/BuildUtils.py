@@ -306,6 +306,7 @@ def CollectIntFolders(dependancys):
 
 def LinkObjects(intDir, dependancys, links, projDir, outputFile, buildType, needsBuild):
 	links.extend(dependancys)
+	print(needsBuild)
 	if(not needsBuild):
 		if(not os.path.isfile(outputFile)):
 			needsBuild = True
@@ -321,13 +322,10 @@ def LinkObjects(intDir, dependancys, links, projDir, outputFile, buildType, need
 					lib = links[i]
 					if(not os.path.isabs(lib)):
 						lib = os.path.join(projDir, lib)
-					if(not os.path.isfile(lib)): # file must be found in the path
-						lib = "" # TODO : find file in path (safe to ignore for now)
-
-				buildTime = os.path.getmtime(lib)
-				if(buildTime > lastBuildTime):
-					needsBuild = True
-
+				if(os.path.isfile(lib)):
+					buildTime = os.path.getmtime(lib)
+					if(buildTime > lastBuildTime):
+						needsBuild = True
 
 	if(needsBuild):
 		projName = os.path.basename(projDir)

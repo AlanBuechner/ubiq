@@ -72,6 +72,7 @@ namespace Engine
 
 		static Ref<Scene> Create();
 		static Ref<Scene> Create(const fs::path& file);
+		static Ref<Scene> CreateDefault();
 
 	private:
 		uint32 m_ViewportWidth = 0;

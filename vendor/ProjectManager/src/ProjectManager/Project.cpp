@@ -61,10 +61,13 @@ namespace ProjectManager
 		m_Version = data["Version"].as<Version>();
 
 		if (data["DefultMaterialID"])
-			m_DefultMaterialID = data["DefultMaterialID"].as<uint64_t>();
+			m_DefaultMaterialID = data["DefultMaterialID"].as<uint64_t>();
 
 		if (data["DefultSceneScript"])
-			m_DefultSceneScriptName = data["DefultSceneScript"].as<std::string>();
+			m_DefaultSceneScriptName = data["DefultSceneScript"].as<std::string>();
+
+		if (data["DefaultSceneID"])
+			m_DefaultScene = data["DefaultSceneID"].as<uint64_t>();
 
 		ifs.close();
 		return true;
@@ -78,8 +81,9 @@ namespace ProjectManager
 
 		out << YAML::BeginMap;
 		out << YAML::Key << "Version" << YAML::Value << m_Version;
-		out << YAML::Key << "DefultMaterialID" << YAML::Value << m_DefultMaterialID;
-		out << YAML::Key << "DefultSceneScript" << YAML::Value << m_DefultSceneScriptName;
+		out << YAML::Key << "DefultMaterialID" << YAML::Value << m_DefaultMaterialID;
+		out << YAML::Key << "DefultSceneScript" << YAML::Value << m_DefaultSceneScriptName;
+		out << YAML::Key << "DefaultSceneID" << YAML::Value << m_DefaultScene;
 
 		out << YAML::EndMap;
 

@@ -125,6 +125,12 @@ namespace Engine
 		return scene;
 	}
 
+	Ref<Scene> Scene::CreateDefault()
+	{
+		fs::path defaultSceneFile = Application::Get().GetAssetManager().GetAssetPath(Application::Get().GetProject().GetDefaultSceneID());
+		return Create(defaultSceneFile);
+	}
+
 
 
 

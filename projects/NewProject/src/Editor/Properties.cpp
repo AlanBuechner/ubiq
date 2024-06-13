@@ -1,12 +1,18 @@
 #include "Properties.h"
+
+#if defined(EDITOR)
 #include "Panels/PropertiesPanel.h"
 #include "EditorLayer.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
+#endif
 
 namespace Game
 {
+
+#if defined(EDITOR)
+
 
 	bool DrawModelControl(const std::string& label, Engine::Ref<Model>& mesh)
 	{
@@ -40,5 +46,6 @@ namespace Game
 		return changed;
 	}
 
+#endif
 }
 
