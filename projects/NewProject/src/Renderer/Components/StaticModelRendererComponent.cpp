@@ -79,7 +79,7 @@ namespace Game
 #pragma region Editor
 #if defined(EDITOR)
 
-#include "Panels/PropertiesPanel.h"
+#include "Editor/Panels/PropertiesPanel.h"
 #include "Editor/Properties.h"
 
 namespace Game
@@ -97,7 +97,7 @@ namespace Game
 		for (uint32_t i = 0; i < component.GetMeshes().Count(); i++)
 		{
 			auto& entry = component.GetMeshes()[i];
-			if (Engine::PropertysPanel::DrawMaterialControl(entry.m_Name, entry.m_Material))
+			if (Editor::PropertysPanel::DrawMaterialControl(entry.m_Name, entry.m_Material))
 				component.Invalidate();
 		}
 		return changed;

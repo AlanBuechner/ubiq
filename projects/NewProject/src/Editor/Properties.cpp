@@ -1,8 +1,8 @@
 #include "Properties.h"
 
 #if defined(EDITOR)
-#include "Panels/PropertiesPanel.h"
-#include "EditorLayer.h"
+#include "Editor/Panels/PropertiesPanel.h"
+#include "Editor/EditorLayer.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -35,7 +35,7 @@ namespace Game
 		{
 			fs::path path = Engine::Application::Get().GetAssetManager().GetRelitiveAssetPath(mesh->GetAssetID());
 			if (ImGui::Button(path.string().c_str()))
-				Engine::EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
+				Editor::EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Clear")) {

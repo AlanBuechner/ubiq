@@ -27,8 +27,8 @@ def UnzipAndDelete(zip, folder):
 
 os.chdir("../")
 
-dxcInstallLocation = "GameEngine/vendor/dxc"
-pixInstallLocation = "GameEngine/vendor/pix"
+dxcInstallLocation = "vendor/dxc"
+pixInstallLocation = "vendor/pix"
 compilerInstallLocation = "vendor/Compiler"
 premakeInstallLocation = "vendor/premake"
 

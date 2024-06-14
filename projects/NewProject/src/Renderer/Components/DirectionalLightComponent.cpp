@@ -80,7 +80,7 @@ namespace Game
 #pragma region Editor
 #if defined(EDITOR)
 
-#include "Panels/PropertiesPanel.h"
+#include "Editor/Panels/PropertiesPanel.h"
 
 namespace Game
 {
@@ -90,32 +90,32 @@ namespace Game
 		Math::Vector3 direction = component.GetDirectinalLight()->GetDirection();
 		Math::Vector2 rot = component.GetDirectinalLight()->GetAngles();
 
-		if (Engine::PropertysPanel::DrawVec2Control("Direction", rot))
+		if (Editor::PropertysPanel::DrawVec2Control("Direction", rot))
 			component.SetAngles(rot); changed = true;
 
 		float temp = component.GetDirectinalLight()->GetCCT();
-		if (Engine::PropertysPanel::DrawFloatSlider("Temperature", temp, 1700, 20000, 6600))
+		if (Editor::PropertysPanel::DrawFloatSlider("Temperature", temp, 1700, 20000, 6600))
 		{
 			component.SetTemperature(temp);
 			changed = true;
 		}
 
 		Math::Vector3 color = component.GetDirectinalLight()->GetTint();
-		if (Engine::PropertysPanel::DrawColorControl("Color", color))
+		if (Editor::PropertysPanel::DrawColorControl("Color", color))
 		{
 			component.SetTint(color);
 			changed = true;
 		}
 
 		float intensity = component.GetDirectinalLight()->GetIntensity();
-		if (Engine::PropertysPanel::DrawFloatControl("Intensity", intensity))
+		if (Editor::PropertysPanel::DrawFloatControl("Intensity", intensity))
 		{
 			component.SetIntensity(intensity);
 			changed = true;
 		}
 
 		float size = component.GetDirectinalLight()->GetSize();
-		if (Engine::PropertysPanel::DrawFloatControl("Size", size))
+		if (Editor::PropertysPanel::DrawFloatControl("Size", size))
 		{
 			component.SetSize(size);
 			changed = true;

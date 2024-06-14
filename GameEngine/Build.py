@@ -41,10 +41,9 @@ includes = [
 	f"{includeDirs['json']}",
 	f"{includeDirs['dxc']}",
 	f"{includeDirs['pix']}",
-	f"{includeDirs['Aftermath']}",
-	f"{includeDirs['Reflection']}/src",
-	f"{includeDirs['ProjectManager']}/src",
-	f"{includeDirs['Utilities']}/src",
+	f"{includeDirs['Reflection']}",
+	f"{includeDirs['ProjectManager']}",
+	f"{includeDirs['Utilities']}",
 ]
 
 sysIncludes = [
@@ -71,7 +70,6 @@ links = [
 	f"{libs['Assimp']}",
 	f"{libs['dxc']}",
 	f"{libs['pix']}",
-	f"{libs['Aftermath']}"
 ]
 
 def GetProject():

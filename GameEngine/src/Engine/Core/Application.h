@@ -17,7 +17,10 @@ namespace Engine
 	class ImGuiLayer;
 	class WindowCloseEvent;
 	class WindowResizeEvent;
+	class Application;
 }
+
+Engine::Application* CreateApplication();
 
 namespace Engine
 {
@@ -73,6 +76,4 @@ namespace Engine
 	private:
 		static Application* s_Instance;
 	};
-
-	Application* CreateApplication();
 }

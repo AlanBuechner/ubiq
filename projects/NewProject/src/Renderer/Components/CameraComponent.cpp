@@ -27,7 +27,7 @@ namespace Game
 #pragma region Editor
 #if defined(EDITOR)
 
-#include "Panels/PropertiesPanel.h"
+#include "Editor/Panels/PropertiesPanel.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -66,21 +66,21 @@ namespace Game
 		if (camera->GetProjectionType() == Engine::SceneCamera::ProjectionType::Perspective)
 		{
 			float fov = glm::degrees(camera->GetPerspectiveVerticalFOV());
-			if (Engine::PropertysPanel::DrawFloatControl("FOV", fov, 45.0f))
+			if (Editor::PropertysPanel::DrawFloatControl("FOV", fov, 45.0f))
 			{
 				camera->SetPerspectiveVerticalFOV(glm::radians(fov));
 				changed = true;
 			}
 
 			float nearClip = camera->GetPerspectiveNearClip();
-			if (Engine::PropertysPanel::DrawFloatControl("Near Clip", nearClip, 0.01f))
+			if (Editor::PropertysPanel::DrawFloatControl("Near Clip", nearClip, 0.01f))
 			{
 				camera->SetPerspectiveNearClip(nearClip);
 				changed = true;
 			}
 
 			float farClip = camera->GetPerspectiveFarClip();
-			if (Engine::PropertysPanel::DrawFloatControl("Far Clip", farClip, 1000.0f))
+			if (Editor::PropertysPanel::DrawFloatControl("Far Clip", farClip, 1000.0f))
 			{
 				camera->SetPerspectiveFarClip(farClip);
 				changed = true;
@@ -90,21 +90,21 @@ namespace Game
 		if (camera->GetProjectionType() == Engine::SceneCamera::ProjectionType::Orthographic)
 		{
 			float Size = camera->GetOrthographicSize();
-			if (Engine::PropertysPanel::DrawFloatControl("Size", Size, 10.0f))
+			if (Editor::PropertysPanel::DrawFloatControl("Size", Size, 10.0f))
 			{
 				camera->SetOrthographicSize(Size);
 				changed = true;
 			}
 
 			float nearClip = camera->GetOrthographicNearClip();
-			if (Engine::PropertysPanel::DrawFloatControl("Near Clip", nearClip, -1.0f))
+			if (Editor::PropertysPanel::DrawFloatControl("Near Clip", nearClip, -1.0f))
 			{
 				camera->SetOrthographicNearClip(nearClip);
 				changed = true;
 			}
 
 			float farClip = camera->GetOrthographicFarClip();
-			if (Engine::PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
+			if (Editor::PropertysPanel::DrawFloatControl("Far Clip", farClip, 1.0f))
 			{
 				camera->SetOrthographicFarClip(farClip);
 				changed = true;

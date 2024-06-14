@@ -17,6 +17,10 @@ headers = [
 	"src/**.h"
 ]
 
+includes = [
+	f"{includeDirs['Utilities']}",
+]
+
 sysIncludes = []
 sysIncludes.extend(GetSysIncludes())
 
@@ -25,7 +29,11 @@ defines = [
 	"_UNICODE",
 	"UNICODE",
 	"_CRT_SECURE_NO_WARNINGS",
-]	
+]
+
+dependancys = [
+	f"Utilities"
+]
 
 def GetProject():
 	proj = BuildUtils.ProjectEnviernment()
@@ -35,11 +43,11 @@ def GetProject():
 	proj.sources = sources
 	proj.resources = []
 	proj.headers = headers
-	proj.includes = [f"{includeDirs['Utilities']}/src"]
+	proj.includes = includes
 	proj.sysIncludes = sysIncludes
 	proj.defines = defines
 	proj.links = []
-	proj.dependancys = [f"Utilities"]
+	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
 	proj.intDir = GetIntDir(projName)
 	proj.binDir = GetBinDir(projName)
