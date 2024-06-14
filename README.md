@@ -56,7 +56,7 @@ When you go to build the game do not press `Ctl+B` the custom build script will 
 
 If you want to create a new project just copy the `NewProject` folder and rename it than run `GenerateProjects.bat`. This will require you to redo step 4 of the setup process.
 
-If you want the game project to exist in a different folder you will need to update the reference to the engine folder in the `GenerateProjects.bat`.
+If you want the game project to exist in a different folder you will need to update the reference to the engine folder in the `local.ini` file.
 
 ## Developers
 

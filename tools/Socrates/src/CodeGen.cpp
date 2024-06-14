@@ -63,11 +63,11 @@ void WriteAttributes(std::ofstream& ofs, const std::vector<Attribute>& attribs)
 
 void WriteProps(std::ofstream& ofs, const std::vector<Property> props, const std::string& parentTypeName)
 {
-	ofs << "{";
+	ofs << "{\n";
 	for (uint32_t i = 0; i < props.size(); i++)
 	{
 		const Property& prop = props[i];
-		ofs << "Reflect::Property(\"" << prop.m_Name << "\"," <<
+		ofs << "\t\tReflect::Property(\"" << prop.m_Name << "\"," <<
 			"typeid(" << prop.m_Type << ").hash_code()," <<
 			"sizeof(" << prop.m_Type << ")," <<
 			"offsetof(" << parentTypeName << "," << prop.m_Name << "),";
@@ -77,17 +77,18 @@ void WriteProps(std::ofstream& ofs, const std::vector<Property> props, const std
 		ofs << ")";
 		if (i != props.size() - 1)
 			ofs << ",";
+		ofs << "\n";
 	}
-	ofs << "}";
+	ofs << "\t}";
 }
 
 void WriteFuncs(std::ofstream& ofs, const std::vector<Function>& funcs, const std::string& name, const std::string& sname)
 {
-	ofs << "{";
+	ofs << "{\n";
 	for (uint32_t i = 0; i < funcs.size(); i++)
 	{
 		const Function& func = funcs[i];
-		ofs << "Reflect::Function(\"" << func.m_Name << "\",";
+		ofs << "\t\tReflect::Function(\"" << func.m_Name << "\",";
 		ofs << name << func.m_Name;
 		ofs << ",";
 		WriteFlags(ofs, func.m_Attributes);
@@ -96,8 +97,9 @@ void WriteFuncs(std::ofstream& ofs, const std::vector<Function>& funcs, const st
 		ofs << ")";
 		if (i != funcs.size() - 1)
 			ofs << ",";
+		ofs << "\n";
 	}
-	ofs << "}";
+	ofs << "\t}";
 }
 
 void WriteCode(const fs::path& path, const std::string& projectName, const ReflectionData& data) {
@@ -127,16 +129,16 @@ void WriteCode(const fs::path& path, const std::string& projectName, const Refle
 		ImplementFunctions(ofs, funcs, name, sname);
 
 		ofs << "static Reflect::Registry::Add<" << sname << "> Class" << name
-			<< "(\"" << name << "\", \"" << sname << "\", \"" << group << "\",";
+			<< "(\n\t\"" << name << "\",\n\t\"" << sname << "\",\n\t\"" << group << "\",\n\t";
 		
 		WriteFlags(ofs, attribs);
-		ofs << ", ";
+		ofs << ",\n\t";
 		WriteAttributes(ofs, attribs);
-		ofs << ", ";
+		ofs << ",\n\t";
 		WriteProps(ofs, props, sname);
 		ofs << ", ";
 		WriteFuncs(ofs, funcs, name, sname);
-		ofs <<");" << std::endl;
+		ofs <<"\n);" << std::endl;
 	}
 
 	ofs << "void DeadLink" << projectName << "() {}" << std::endl;

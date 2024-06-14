@@ -24,12 +24,15 @@ namespace Game
 
 
 #pragma region Editor
+#if defined(EDITOR)
+
 #include "Panels/PropertiesPanel.h"
 
 namespace Game
 {
 }
 
+#endif
 #pragma endregion
 
 #pragma region Serialization

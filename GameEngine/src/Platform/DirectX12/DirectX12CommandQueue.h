@@ -21,7 +21,7 @@ namespace Engine
 	private:
 		ID3D12CommandQueue* m_CommandQueue;
 		ID3D12Fence1* m_Fence;
-		std::vector<ID3D12CommandList*> m_DXCommandLists;
+		Utils::Vector<ID3D12CommandList*> m_DXCommandLists;
 		HANDLE m_EventHandle = nullptr;
 		uint32 m_SignalCount = 0;
 		D3D12_COMMAND_LIST_TYPE m_Type = D3D12_COMMAND_LIST_TYPE_DIRECT;

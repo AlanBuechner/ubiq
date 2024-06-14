@@ -5,7 +5,11 @@ import re
 import os
 
 def GetLatestDir(dir):
-	return dir + sorted(os.listdir(dir))[-1]
+	dirs = []
+	for d in os.listdir(dir):
+		if(d[0].isdigit()):
+			dirs.append(d)
+	return dir + sorted(dirs)[-1]
 
 def GetVisualStudioDirectory():
 	return "C:/Program Files/Microsoft Visual Studio/2022/Community/"

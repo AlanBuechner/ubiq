@@ -34,6 +34,7 @@ namespace Engine
 		virtual void OnEvent(Event* event) override;
 
 		void NewScene();
+		void DefaultScene();
 		void LoadScene(const std::string& file);
 
 		ContentBrowserPanel& GetContantBrowser() { return m_ContentPanel; }

@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include <vector>
+#include "Utils/Vector.h"
 
 namespace Engine
 {
@@ -21,10 +21,10 @@ namespace Engine
 		};
 
 		void PrependSubmit(Ref<CommandList> commandList);
-		void PrependSubmit(std::vector<Ref<CommandList>> commandLists);
+		void PrependSubmit(Utils::Vector<Ref<CommandList>> commandLists);
 
 		void Submit(Ref<CommandList> commandList);
-		void Submit(std::vector<Ref<CommandList>> commandLists);
+		void Submit(Utils::Vector<Ref<CommandList>> commandLists);
 
 		virtual void Build() = 0;
 
@@ -35,6 +35,6 @@ namespace Engine
 		static Ref<CommandQueue> Create(Type type);
 
 	protected:
-		std::vector<Ref<CommandList>> m_Commands;
+		Utils::Vector<Ref<CommandList>> m_Commands;
 	};
 }

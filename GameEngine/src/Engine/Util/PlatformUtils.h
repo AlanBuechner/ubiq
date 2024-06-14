@@ -12,7 +12,7 @@ namespace Engine
 
 	};
 
-	std::vector<std::string> GetCommandLineArguments();
+	Utils::Vector<std::string> GetCommandLineArguments();
 
 	bool GetEmbededResource(uint32 type, uint32 id, byte*& data, uint32& size);
 	void UnloadEmbededResource(uint32 type, uint32 id);

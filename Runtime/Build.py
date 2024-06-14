@@ -1,4 +1,4 @@
-# test project build script
+# Runtime build script
 
 import scripts.BuildUtils as BuildUtils
 from scripts.Utils.Utils import *
@@ -9,7 +9,8 @@ import inspect
 projDir = os.path.dirname(inspect.getfile(lambda: None)).replace("\\", "/")
 projName = os.path.basename(projDir)
 
-inEditor = Config.project == "USG-Editor"
+pchHeader = f"{location}/src/pch.h"
+pchSource = f"{location}/src/pch.cpp"
 
 sources = [
 	f"src/**.cpp",
@@ -43,10 +44,11 @@ includes = [
 	f"{location}/GameEngine/vendor",
 	f"{location}/GameEngine/src",
 	f"{location}/GameEngine/embeded",
-	f"{location}/USG-Editor/src",
 ]
 
-sysIncludes = []
+sysIncludes = [
+
+]
 sysIncludes.extend(GetSysIncludes())
 
 defines = [
@@ -55,18 +57,34 @@ defines = [
 	"UNICODE",
 	"_CRT_SECURE_NO_WARNINGS",
 ]
-if(inEditor):
-	defines.append("EDITOR")
 
-dependancys = []
+dependancys = [
+	"GameEngine",
+]
+if(Config.gameProject != None):
+	dependancys.append(os.path.basename(Config.gameProject))
 
-links = []
+links = [
+	"kernel32.lib",
+	"user32.lib",
+	"comdlg32.lib",
+	"shell32.lib",
+]
+
+dlls = [
+	f"{vendorDirs['dxc']}/bin/x64/dxil.dll",
+	f"{vendorDirs['dxc']}/bin/x64/dxcompiler.dll",
+	f"{vendorDirs['Assimp']}/assimp-vc140-mt.dll",
+	f"{vendorDirs['pix']}/bin/x64/WinPixEventRuntime.dll",
+	f"{projDir}/zlibd.dll",
+]
 
 def GetProject():
+
 	proj = BuildUtils.ProjectEnviernment()
 	proj.projectDirectory = projDir
-	proj.pchSource = ""
-	proj.pchHeader = ""
+	proj.pchSource = pchSource
+	proj.pchHeader = pchHeader
 	proj.sources = sources
 	proj.resources = resources
 	proj.headers = headers
@@ -74,12 +92,10 @@ def GetProject():
 	proj.sysIncludes = sysIncludes
 	proj.defines = defines
 	proj.links = links
+	proj.dlls = dlls
 	proj.dependancys = dependancys
-	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
-	buildLoc = "/Runtime"
-	if(inEditor):
-		buildLoc = "/Editor"
-	proj.intDir = GetIntDir(projName, Config.gameProject) + buildLoc
-	proj.binDir = GetBinDir(projName, Config.gameProject) + buildLoc
+	proj.buildType = BuildUtils.BuildType.EXECUTABLE
 	proj.genReflection = True
+	proj.intDir = GetIntDir(projName, Config.gameProject)
+	proj.binDir = GetBinDir(projName, Config.gameProject)
 	return proj

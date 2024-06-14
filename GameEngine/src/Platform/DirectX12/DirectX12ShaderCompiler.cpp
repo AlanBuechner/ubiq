@@ -303,7 +303,8 @@ namespace Engine
 		reflectionData.Size = blobs.reflection->GetBufferSize();
 
 		wrl::ComPtr<ID3D12ShaderReflection> reflection;
-		CORE_ASSERT_HRESULT(m_Utils->CreateReflection(&reflectionData, IID_PPV_ARGS(&reflection)), "Failed to create reflection data");
+		HRESULT result = m_Utils->CreateReflection(&reflectionData, IID_PPV_ARGS(&reflection));
+		CORE_ASSERT_HRESULT(result, "Failed to create reflection data");
 
 		D3D12_SHADER_DESC reflectionDesc;
 		reflection->GetDesc(&reflectionDesc);
