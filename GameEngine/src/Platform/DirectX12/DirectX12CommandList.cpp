@@ -50,7 +50,7 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		const uint32 numAllocators = 2;
-		m_Frames.resize(numAllocators);
+		m_Frames.Resize(numAllocators);
 		D3D12_COMMAND_LIST_TYPE type = GetD3D12CommandListType(m_Type);
 		for (uint32 i = 0; i < numAllocators; i++)
 		{
@@ -98,7 +98,7 @@ namespace Engine
 		ID3D12DescriptorHeap* heaps[]{ DirectX12ResourceManager::s_SRVHeap->GetHeap().Get(), DirectX12ResourceManager::s_SamplerHeap->GetHeap().Get() };
 		m_CommandList->SetDescriptorHeaps(2, heaps);
 
-		GetCurrentPendingTransitions().clear();
+		GetCurrentPendingTransitions().Clear();
 		GetResourceStates().clear();
 	}
 
@@ -110,8 +110,8 @@ namespace Engine
 		if (fb == nullptr)
 			fb = m_RenderTarget;
 
-		std::vector<ResourceStateObject> transitions(fb->GetAttachments().size());
-		for (uint32 i = 0; i < fb->GetAttachments().size(); i++)
+		Utils::Vector<ResourceStateObject> transitions(fb->GetAttachments().Count());
+		for (uint32 i = 0; i < fb->GetAttachments().Count(); i++)
 			transitions[i] = { fb->GetAttachment(i)->GetResource(), ResourceState::Common };
 
 		ValidateStates(transitions);
@@ -121,11 +121,11 @@ namespace Engine
 	}
 
 
-	void DirectX12CommandList::Transition(std::vector<ResourceTransitionObject> transitions)
+	void DirectX12CommandList::Transition(Utils::Vector<ResourceTransitionObject> transitions)
 	{
-		std::vector<D3D12_RESOURCE_BARRIER> barriers;
-		barriers.resize(transitions.size());
-		for (uint32 i = 0; i < transitions.size(); i++)
+		Utils::Vector<D3D12_RESOURCE_BARRIER> barriers;
+		barriers.Resize(transitions.Count());
+		for (uint32 i = 0; i < transitions.Count(); i++)
 		{
 			ResourceState to = transitions[i].to;
 			ResourceState from = transitions[i].from;
@@ -135,16 +135,16 @@ namespace Engine
 				(D3D12_RESOURCE_STATES)resource->GetState(from), (D3D12_RESOURCE_STATES)resource->GetState(to));
 		}
 
-		m_CommandList->ResourceBarrier((uint32)barriers.size(), barriers.data());
+		m_CommandList->ResourceBarrier((uint32)barriers.Count(), barriers.Data());
 	}
 
-	void DirectX12CommandList::ValidateStates(std::vector<ResourceStateObject> resources)
+	void DirectX12CommandList::ValidateStates(Utils::Vector<ResourceStateObject> resources)
 	{
-		std::vector<ResourceStateObject>& pendingTransitions = GetCurrentPendingTransitions();
+		Utils::Vector<ResourceStateObject>& pendingTransitions = GetCurrentPendingTransitions();
 		std::unordered_map<GPUResource*, ResourceState>& resourceStates = GetResourceStates();
 
-		std::vector<ResourceTransitionObject> transitions;
-		transitions.reserve(resources.size());
+		Utils::Vector<ResourceTransitionObject> transitions;
+		transitions.Reserve(resources.Count());
 
 		for (ResourceStateObject& res : resources)
 		{
@@ -152,7 +152,7 @@ namespace Engine
 
 			if (foundResouce == resourceStates.end())
 			{
-				pendingTransitions.push_back(res);
+				pendingTransitions.Push(res);
 				resourceStates[res.resource] = res.state;
 			}
 			else
@@ -160,13 +160,13 @@ namespace Engine
 				ResourceState currState = foundResouce->second;
 				if (currState != res.state)
 				{
-					transitions.push_back({ res.resource, res.state, currState });
+					transitions.Push({ res.resource, res.state, currState });
 					resourceStates[res.resource] = res.state;
 				}
 			}
 		}
 
-		if (!transitions.empty())
+		if (!transitions.Empty())
 			Transition(transitions);
 	}
 
@@ -255,16 +255,16 @@ namespace Engine
 		m_RenderTarget = buffer;
 
 		// get render target information
-		uint32 numRenderTargets = buffer->GetAttachments().size() - (size_t)m_RenderTarget->HasDepthAttachment();
-		std::vector<ResourceStateObject> resourceStateValidation;
-		std::vector<uint64> rendertargetHandles(numRenderTargets);
-		std::vector<D3D12_VIEWPORT> viewports(numRenderTargets);
-		std::vector<D3D12_RECT> rects(numRenderTargets);
+		uint32 numRenderTargets = buffer->GetAttachments().Count() - (size_t)m_RenderTarget->HasDepthAttachment();
+		Utils::Vector<ResourceStateObject> resourceStateValidation;
+		Utils::Vector<uint64> rendertargetHandles(numRenderTargets);
+		Utils::Vector<D3D12_VIEWPORT> viewports(numRenderTargets);
+		Utils::Vector<D3D12_RECT> rects(numRenderTargets);
 		uint64 depthHandle = 0;
 
-		for (uint32 i = 0; i < buffer->GetAttachments().size(); i++)
+		for (uint32 i = 0; i < buffer->GetAttachments().Count(); i++)
 		{
-			resourceStateValidation.push_back({ buffer->GetAttachment(i)->GetResource(), ResourceState::RenderTarget });
+			resourceStateValidation.Push({ buffer->GetAttachment(i)->GetResource(), ResourceState::RenderTarget });
 			DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)buffer->GetAttachment(i)->GetResource();
 			DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)buffer->GetAttachment(i)->GetRTVDSVDescriptor();
 
@@ -295,14 +295,14 @@ namespace Engine
 		// set render target
 		m_CommandList->OMSetRenderTargets(
 			(uint32)numRenderTargets, 
-			(D3D12_CPU_DESCRIPTOR_HANDLE*)rendertargetHandles.data(), 
+			(D3D12_CPU_DESCRIPTOR_HANDLE*)rendertargetHandles.Data(), 
 			FALSE, 
 			depthHandle ? (D3D12_CPU_DESCRIPTOR_HANDLE*)&depthHandle : nullptr
 		);
 
 		// set scissor and viewport
-		m_CommandList->RSSetViewports(numRenderTargets, viewports.data());
-		m_CommandList->RSSetScissorRects(numRenderTargets, rects.data());
+		m_CommandList->RSSetViewports(numRenderTargets, viewports.Data());
+		m_CommandList->RSSetScissorRects(numRenderTargets, rects.Data());
 	}
 
 	void DirectX12CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color)
@@ -500,19 +500,19 @@ namespace Engine
 	{
 		m_State = RequestClose;
 		m_RenderTarget = nullptr;
-		m_CurrentFrame = (m_CurrentFrame + 1) % m_Frames.size();
+		m_CurrentFrame = (m_CurrentFrame + 1) % m_Frames.Count();
 	}
 
 	bool DirectX12CommandList::RecordPrependCommands()
 	{
-		std::vector<ResourceStateObject>& pendingTransitions = GetPendingTransitions();
+		Utils::Vector<ResourceStateObject>& pendingTransitions = GetPendingTransitions();
 		std::unordered_map<GPUResource*, ResourceState> endingStates = GetEndingResourceStates();
 
 		// get list off all resources that need to be changed
-		std::vector<D3D12_RESOURCE_BARRIER> transitions;
-		transitions.reserve(pendingTransitions.size());
+		Utils::Vector<D3D12_RESOURCE_BARRIER> transitions;
+		transitions.Reserve(pendingTransitions.Count());
 
-		for (uint32 i = 0; i < pendingTransitions.size(); i++)
+		for (uint32 i = 0; i < pendingTransitions.Count(); i++)
 		{
 			ResourceStateObject& rso = pendingTransitions[i];
 
@@ -525,7 +525,7 @@ namespace Engine
 			{
 				ID3D12Resource* gpuResourcePointer = (ID3D12Resource*)resource->GetGPUResourcePointer();
 				CORE_ASSERT(gpuResourcePointer != nullptr, "{0}", i);
-				transitions.push_back(TransitionResource(gpuResourcePointer,
+				transitions.Push(TransitionResource(gpuResourcePointer,
 					(D3D12_RESOURCE_STATES)resource->GetState(from), (D3D12_RESOURCE_STATES)resource->GetState(to)));
 			}
 		}
@@ -533,7 +533,7 @@ namespace Engine
 		for (auto resState : endingStates)
 			resState.first->m_DefultState = resState.second;
 
-		if (!transitions.empty())
+		if (!transitions.Empty())
 		{
 			CORE_ASSERT_HRESULT(m_PrependAllocator->Reset(), "Failed to reset prepend command allocator");
 			CORE_ASSERT_HRESULT(m_PrependList->Reset(m_PrependAllocator, nullptr), "Failed to reset prepend command list");
@@ -541,7 +541,7 @@ namespace Engine
 			ID3D12DescriptorHeap* heaps[]{ DirectX12ResourceManager::s_SRVHeap->GetHeap().Get(), DirectX12ResourceManager::s_SamplerHeap->GetHeap().Get() };
 			m_PrependList->SetDescriptorHeaps(2, heaps);
 
-			m_PrependList->ResourceBarrier((uint32)transitions.size(), transitions.data());
+			m_PrependList->ResourceBarrier((uint32)transitions.Count(), transitions.Data());
 
 
 			m_PrependList->Close();

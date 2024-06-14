@@ -19,6 +19,7 @@ namespace Utils
 		Vector(Vector&& other) noexcept;
 		Vector(uint32 capacity);
 		Vector(uint32 size, const Type& value);
+		Vector(std::initializer_list<Type> list);
 
 		~Vector();
 		void Destroy();
@@ -76,25 +77,6 @@ namespace Utils
 		Type* m_Array = nullptr;
 	};
 
-	template<class Type> inline uint32 Utils::Vector<Type>::Find(const Type& val) const
-	{
-		for (uint32 i = 0; i < m_Count; i++)
-		{
-			if (m_Array[i] == val)
-				return i;
-		}
-		return m_Count;
-	}
-
-	template<class Type> uint32 Utils::Vector<Type>::FindIf(std::function<bool(const Type&)> predicate) const
-	{
-		for (uint32 i = 0; i < m_Count; i++)
-		{
-			if (predicate(m_Array[i]))
-				return i;
-		}
-		return m_Count;
-	}
 
 	template<class Type> inline Vector<Type>::Vector() {}
 
@@ -117,6 +99,13 @@ namespace Utils
 	{
 		Reserve(count);
 		for (Type* t = m_Array, *end = m_Array + m_Count; t != end; ++t) { *t = value; }
+	}
+
+	template<class Type> Utils::Vector<Type>::Vector(std::initializer_list<Type> list)
+	{
+		Reserve(list.size());
+		for (const Type& t : list)
+			Push(t);
 	}
 
 	template<class Type> inline Vector<Type>::~Vector()
@@ -226,9 +215,11 @@ namespace Utils
 
 	template<class Type> inline void Vector<Type>::Resize(uint32 count, const Type& value)
 	{
-		if (count > m_Capacity) { Reserve(count); }
-
-		for (Type* t = m_Array + m_Count, *end = m_Array + count; t != end; ++t) { *t = value; }
+		if (count > m_Capacity) 
+		{
+			Reserve(count); 
+			for (Type* t = m_Array + m_Count, *end = m_Array + count; t != end; ++t) { *t = value; }
+		}
 
 		m_Count = count;
 	}
@@ -250,6 +241,26 @@ namespace Utils
 	template<class Type> inline const Type* Vector<Type>::Data() const { return m_Array; }
 
 	template<class Type> inline Type* Vector<Type>::Data() { return m_Array; }
+
+	template<class Type> inline uint32 Utils::Vector<Type>::Find(const Type& val) const
+	{
+		for (uint32 i = 0; i < m_Count; i++)
+		{
+			if (m_Array[i] == val)
+				return i;
+		}
+		return m_Count;
+	}
+
+	template<class Type> uint32 Utils::Vector<Type>::FindIf(std::function<bool(const Type&)> predicate) const
+	{
+		for (uint32 i = 0; i < m_Count; i++)
+		{
+			if (predicate(m_Array[i]))
+				return i;
+		}
+		return m_Count;
+	}
 
 	template<class Type> inline Vector<Type>& Vector<Type>::operator=(const Vector& other)
 	{

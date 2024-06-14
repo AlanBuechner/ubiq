@@ -3,27 +3,28 @@
 #include "Engine/Core/Core.h"
 #include "Texture.h"
 #include "ResourceState.h"
+#include "Utils/Vector.h"
 
 namespace Engine
 {
 	class FrameBuffer
 	{
 	public:
-		FrameBuffer(const std::vector<Ref<RenderTarget2D>>& attachments);
+		FrameBuffer(const Utils::Vector<Ref<RenderTarget2D>>& attachments);
 
 		void Resize(uint32 width, uint32 height);
 
 		Ref<RenderTarget2D> GetAttachment(uint32 i) const { return m_Attachments[i]; }
-		Ref<RenderTarget2D> GetDepthAttachment() const { return HasDepthAttachment() ? m_Attachments.back() : nullptr; }
-		const std::vector<Ref<RenderTarget2D>>& GetAttachments() const { return m_Attachments; }
+		Ref<RenderTarget2D> GetDepthAttachment() const { return HasDepthAttachment() ? m_Attachments.Back() : nullptr; }
+		const Utils::Vector<Ref<RenderTarget2D>>& GetAttachments() const { return m_Attachments; }
 
 		bool HasDepthAttachment() const;
 
-		static Ref<FrameBuffer> Create(const std::vector<Ref<RenderTarget2D>>& spec);
+		static Ref<FrameBuffer> Create(const Utils::Vector<Ref<RenderTarget2D>>& spec);
 
 	private:
 
-		std::vector<Ref<RenderTarget2D>> m_Attachments;
+		Utils::Vector<Ref<RenderTarget2D>> m_Attachments;
 
 	};
 }

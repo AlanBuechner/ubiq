@@ -4,6 +4,7 @@
 #include "Resources/ResourceState.h"
 #include "Engine/Core/Flag.h"
 #include "Resources/UploadBuffer.h"
+#include "Utils/Vector.h"
 
 namespace Engine
 {
@@ -46,7 +47,7 @@ namespace Engine
 		void SignalRecording() { m_RecordFlag.Signal(); }
 		virtual void InternalClose() = 0;
 
-		virtual void Transition(std::vector<ResourceTransitionObject> transitions) = 0;
+		virtual void Transition(Utils::Vector<ResourceTransitionObject> transitions) = 0;
 
 	public:
 
@@ -56,7 +57,7 @@ namespace Engine
 		void Present() { Present(nullptr); }
 		virtual void Present(Ref<FrameBuffer> fb) = 0;
 
-		virtual void ValidateStates(std::vector<ResourceStateObject> resources) = 0;
+		virtual void ValidateStates(Utils::Vector<ResourceStateObject> resources) = 0;
 		void ValidateState(ResourceStateObject resource) { ValidateStates({ resource }); }
 		void ValidateState(GPUResource* resource, ResourceState state) { ValidateStates({ { resource, state } }); }
 
@@ -100,7 +101,7 @@ namespace Engine
 
 		virtual void Close() = 0;
 
-		virtual std::vector<ResourceStateObject>& GetPendingTransitions() = 0;
+		virtual Utils::Vector<ResourceStateObject>& GetPendingTransitions() = 0;
 		virtual std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() = 0;
 
 		static Ref<CommandList> Create(CommandListType type = CommandListType::Direct);
