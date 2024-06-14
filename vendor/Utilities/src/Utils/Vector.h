@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Types.h"
+
 #include <memory>
 #include <type_traits>
-
 #include <functional>
-#include <vector>
+#include <initializer_list>
 
 namespace Utils
 {
@@ -19,6 +19,7 @@ namespace Utils
 		Vector(Vector&& other) noexcept;
 		Vector(uint32 capacity);
 		Vector(uint32 size, const Type& value);
+		Vector(std::initializer_list<Type> list);
 
 		~Vector();
 		void Destroy();
@@ -49,10 +50,13 @@ namespace Utils
 		Type* Data();
 
 		uint32 Find(const Type& val) const;
+		//TODO: Replace std::function with a function pointer
 		uint32 FindIf(std::function<bool(const Type&)> predicate) const;
 
 		Vector& operator=(const Vector& other);
 		Vector& operator=(Vector&& other) noexcept;
+		bool operator==(const Vector& other) const;
+		bool operator!=(const Vector& other) const;
 		const Type& operator[](uint32 index) const;
 		Type& operator[](uint32 index);
 
@@ -100,8 +104,8 @@ namespace Utils
 
 	template<class Type> inline Vector<Type>::Vector(const Vector<Type>& other) : m_Count{ other.m_Count }
 	{
-		Reserve(other.m_Capacity);
-		Copy(m_Array, other.m_Array, m_Capacity);
+		Reserve(m_Count);
+		Copy(m_Array, other.m_Array, m_Count);
 	}
 
 	template<class Type> inline Vector<Type>::Vector(Vector<Type>&& other) noexcept : m_Count{ other.m_Count }, m_Capacity{ other.m_Capacity }, m_Array{ other.m_Array }
@@ -116,7 +120,18 @@ namespace Utils
 	template<class Type> inline Vector<Type>::Vector(uint32 count, const Type& value) : m_Count{ count }
 	{
 		Reserve(count);
-		for (Type* t = m_Array, *end = m_Array + m_Count; t != end; ++t) { *t = value; }
+		for (Type* t = m_Array, *end = m_Array + m_Count; t != end; ++t) { new (t) Type(value); }
+	}
+
+	template<class Type> inline Vector<Type>::Vector(std::initializer_list<Type> list) : m_Count{ (uint32)list.size() }
+	{
+		Reserve(m_Count);
+
+		Type* arr = m_Array;
+		for (const Type* it = list.begin(); it != list.end(); ++it, ++arr)
+		{
+			new (arr) Type(*it);
+		}
 	}
 
 	template<class Type> inline Vector<Type>::~Vector()
@@ -228,7 +243,10 @@ namespace Utils
 	{
 		if (count > m_Capacity) { Reserve(count); }
 
-		for (Type* t = m_Array + m_Count, *end = m_Array + count; t != end; ++t) { *t = value; }
+		for (Type* t = m_Array + m_Count, *end = m_Array + count; t != end; ++t)
+		{
+			new (t) Type(value);
+		}
 
 		m_Count = count;
 	}
@@ -251,7 +269,7 @@ namespace Utils
 
 	template<class Type> inline Type* Vector<Type>::Data() { return m_Array; }
 
-	template<class Type> inline Vector<Type>& Vector<Type>::operator=(const Vector& other)
+	template<class Type> inline Vector<Type>& Vector<Type>::operator=(const Vector<Type>& other)
 	{
 		Destroy();
 
@@ -261,7 +279,7 @@ namespace Utils
 		return *this;
 	}
 
-	template<class Type> inline Vector<Type>& Vector<Type>::operator=(Vector&& other) noexcept
+	template<class Type> inline Vector<Type>& Vector<Type>::operator=(Vector<Type>&& other) noexcept
 	{
 		Destroy();
 
@@ -274,6 +292,34 @@ namespace Utils
 		other.m_Array = nullptr;
 
 		return *this;
+	}
+
+	template<class Type> inline bool Vector<Type>::operator==(const Vector<Type>& other) const
+	{
+		if (this == &other) { return true; }
+
+		if (m_Count != other.m_Count) { return false; }
+
+		for (const Type* it0 = m_Array, *it1 = other.m_Array, *end = m_Array + m_Count; it0 != end; ++it0, ++it1)
+		{
+			if (*it0 != *it1) { return false; }
+		}
+
+		return true;
+	}
+
+	template<class Type> inline bool Vector<Type>::operator!=(const Vector<Type>& other) const
+	{
+		if (this == &other) { return false; }
+
+		if (m_Count != other.m_Count) { return true; }
+
+		for (const Type* it0 = m_Array, *it1 = other.m_Array, *end = m_Array + m_Count; it0 != end; ++it0, ++it1)
+		{
+			if (*it0 != *it1) { return true; }
+		}
+
+		return false;
 	}
 
 	template<class Type> inline const Type& Vector<Type>::operator[](uint32 index) const

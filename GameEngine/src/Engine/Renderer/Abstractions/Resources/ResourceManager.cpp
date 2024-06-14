@@ -211,15 +211,15 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 
 		// data
-		std::vector<ResourceStateObject> startb;
-		std::vector<ResourceStateObject> endb;
-		std::vector<UploadBufferData> bufferCopys;
+		Utils::Vector<ResourceStateObject> startb;
+		Utils::Vector<ResourceStateObject> endb;
+		Utils::Vector<UploadBufferData> bufferCopys;
 
 
 		uint32 numBufferCopys = (uint32)m_BufferUploadQueue.size();
-		startb.reserve(numBufferCopys);
-		endb.reserve(numBufferCopys);
-		bufferCopys.reserve(numBufferCopys);
+		startb.Reserve(numBufferCopys);
+		endb.Reserve(numBufferCopys);
+		bufferCopys.Reserve(numBufferCopys);
 
 		std::unordered_set<GPUResource*> m_SeenUploads;
 
@@ -230,11 +230,11 @@ namespace Engine
 
 			if (m_SeenUploads.find(data.destResource) == m_SeenUploads.end())
 			{
-				startb.push_back({ data.destResource, ResourceState::CopyDestination });
-				endb.push_back({ data.destResource, data.state });
+				startb.Push({ data.destResource, ResourceState::CopyDestination });
+				endb.Push({ data.destResource, data.state });
 				m_SeenUploads.insert(data.destResource);
 			}
-			bufferCopys.push_back(data);
+			bufferCopys.Push(data);
 
 			m_BufferUploadQueue.pop();
 		}
@@ -295,12 +295,12 @@ namespace Engine
 		// data
 		uint32 numTextureCopys = (uint32)m_TextureUploadQueue.size();
 
-		std::vector<ResourceStateObject> startb;
-		std::vector<ResourceStateObject> endb;
-		std::vector<TextureUploadInfo> textureUploads;
-		std::vector<TextureMipInfo> mipTextures;
+		Utils::Vector<ResourceStateObject> startb;
+		Utils::Vector<ResourceStateObject> endb;
+		Utils::Vector<TextureUploadInfo> textureUploads;
+		Utils::Vector<TextureMipInfo> mipTextures;
 
-		textureUploads.reserve(numTextureCopys);
+		textureUploads.Reserve(numTextureCopys);
 
 		// collect data
 		while (!m_TextureUploadQueue.empty())
@@ -311,18 +311,17 @@ namespace Engine
 			{
 				// create temp texture to generate the mip levels
 				Ref<RWTexture2D> mipTexture = RWTexture2D::Create(data.width, data.height, data.numMips, data.format);
-				mipTextures.push_back({ data.destResource, mipTexture, data.width, data.height, data.numMips, data.state, data.format });
-				//m_TempUplaodResourecs.push_back(mipTexture);
+				mipTextures.Push({ data.destResource, mipTexture, data.width, data.height, data.numMips, data.state, data.format });
 
-				startb.push_back({ data.destResource, ResourceState::CopyDestination });
-				textureUploads.push_back({ mipTexture->GetResource(), data.uploadResource, data.width, data.height, data.format });
-				endb.push_back({ mipTexture->GetResource(), ResourceState::UnorderedResource });
+				startb.Push({ data.destResource, ResourceState::CopyDestination });
+				textureUploads.Push({ mipTexture->GetResource(), data.uploadResource, data.width, data.height, data.format });
+				endb.Push({ mipTexture->GetResource(), ResourceState::UnorderedResource });
 			}
 			else
 			{
-				startb.push_back({ data.destResource, ResourceState::CopyDestination });
-				textureUploads.push_back({ data.destResource, data.uploadResource, data.width, data.height, data.format });
-				endb.push_back({ data.destResource, data.state });
+				startb.Push({ data.destResource, ResourceState::CopyDestination });
+				textureUploads.Push({ data.destResource, data.uploadResource, data.width, data.height, data.format });
+				endb.Push({ data.destResource, data.state });
 			}
 
 			m_TextureUploadQueue.pop();
@@ -336,7 +335,7 @@ namespace Engine
 
 		GPUTimer::BeginEvent(m_TextureCopyCommandList, "Upload Textures");
 		// copy textures to final texture or mip texture
-		for (uint32 i = 0; i < textureUploads.size(); i++)
+		for (uint32 i = 0; i < textureUploads.Count(); i++)
 		{
 			TextureUploadInfo& info = textureUploads[i];
 			m_TextureCopyCommandList->UploadTexture(info.dest, info.src);
@@ -346,9 +345,9 @@ namespace Engine
 
 
 		// generate mip maps
-		std::vector<ResourceStateObject> mipBarrier;
-		std::vector<ResourceStateObject> textureBarrier;
-		std::vector<TextureCopyInfo> mipCopys;
+		Utils::Vector<ResourceStateObject> mipBarrier;
+		Utils::Vector<ResourceStateObject> textureBarrier;
+		Utils::Vector<TextureCopyInfo> mipCopys;
 
 		GPUTimer::BeginEvent(m_TextureCopyCommandList, "Generate Mips");
 
@@ -372,11 +371,11 @@ namespace Engine
 
 
 			// record barrier for texture and mip
-			mipBarrier.push_back({ mipTexture.mipTexture->GetResource(), ResourceState::CopySource });
-			textureBarrier.push_back({ mipTexture.mipTexture->GetResource(), mipTexture.state });
+			mipBarrier.Push({ mipTexture.mipTexture->GetResource(), ResourceState::CopySource });
+			textureBarrier.Push({ mipTexture.mipTexture->GetResource(), mipTexture.state });
 
 			// copy resource to final texture
-			mipCopys.push_back({ mipTexture.texture, mipTexture.mipTexture->GetResource() });
+			mipCopys.Push({ mipTexture.texture, mipTexture.mipTexture->GetResource() });
 		}
 
 		GPUTimer::EndEvent(m_TextureCopyCommandList);
@@ -384,7 +383,7 @@ namespace Engine
 
 		// copy from mip textures to final texture
 		m_TextureCopyCommandList->ValidateStates(mipBarrier); // transition mips to copy src
-		for (uint32 i = 0; i < mipCopys.size(); i++)
+		for (uint32 i = 0; i < mipCopys.Count(); i++)
 			m_TextureCopyCommandList->CopyResource(mipCopys[i].dest, mipCopys[i].src);
 		m_TextureCopyCommandList->ValidateStates(textureBarrier); // transition resources back to original state
 		GPUTimer::EndEvent(m_TextureCopyCommandList);

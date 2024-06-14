@@ -25,7 +25,7 @@ namespace Engine
 
 	void CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer)
 	{
-		for (uint32 i = 0; i < frameBuffer->GetAttachments().size(); i++)
+		for (uint32 i = 0; i < frameBuffer->GetAttachments().Count(); i++)
 			ClearRenderTarget(frameBuffer, i);
 	}
 

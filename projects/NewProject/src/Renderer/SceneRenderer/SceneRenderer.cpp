@@ -132,8 +132,8 @@ namespace Game
 
 		// cant find shader
 		// add new shader
-		m_ShaderDrawSection.push_back({});
-		ShaderDrawSection& sec = m_ShaderDrawSection.back();
+		m_ShaderDrawSection.Push({});
+		ShaderDrawSection& sec = m_ShaderDrawSection.Back();
 		sec.m_Shader = material->shader;
 		return sec.AddObject(mesh, material, transform);
 	}
@@ -153,10 +153,10 @@ namespace Game
 		data.m_MainCamera = m_MainCamera;
 
 		// compile commands
-		data.m_DrawCommands.clear();
+		data.m_DrawCommands.Clear();
 		for (auto& shaderDawSection : m_ShaderDrawSection)
 		{
-			data.m_DrawCommands.reserve(shaderDawSection.m_Objects.size());
+			data.m_DrawCommands.Reserve(shaderDawSection.m_Objects.size());
 			for (auto& renderObject : shaderDawSection)
 			{
 				if (!renderObject.m_Instances->Empty())
@@ -166,7 +166,7 @@ namespace Game
 					cmd.m_Shader = shaderDawSection.m_Shader;
 					cmd.m_InstanceBuffer = renderObject.m_Instances;
 
-					data.m_DrawCommands.push_back(cmd);
+					data.m_DrawCommands.Push(cmd);
 				}
 			}
 		}

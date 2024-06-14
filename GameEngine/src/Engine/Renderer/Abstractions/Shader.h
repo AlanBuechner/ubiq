@@ -36,7 +36,7 @@ namespace Engine
 	public:
 		virtual ~ShaderPass() {};
 
-		virtual std::vector<ShaderParameter> GetReflectionData() const = 0;
+		virtual Utils::Vector<ShaderParameter> GetReflectionData() const = 0;
 
 		static Ref<ShaderPass> Create(Ref<ShaderSorce> src, const std::string& passName);
 
@@ -54,7 +54,7 @@ namespace Engine
 		Shader(const std::string& src, const fs::path& file);
 
 		Ref<ShaderPass> GetPass(const std::string& passName);
-		std::vector<MaterialParameter>& GetParams();
+		Utils::Vector<MaterialParameter>& GetParams();
 
 		static Ref<Shader> Create(const fs::path& file);
 		static Ref<Shader> CreateFromEmbeded(uint32 id, const fs::path& file);
@@ -62,6 +62,6 @@ namespace Engine
 
 	private:
 		std::unordered_map<std::string, Ref<ShaderPass>> m_Passes;
-		std::vector<MaterialParameter> m_Params;
+		Utils::Vector<MaterialParameter> m_Params;
 	};
 }

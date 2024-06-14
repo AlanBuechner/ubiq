@@ -35,7 +35,7 @@ namespace Game
 				for (Engine::Ref<Engine::FrameBuffer> fb : maps.m_ShadowMaps)
 				{
 					for (Engine::Ref<Engine::RenderTarget2D> rt : fb->GetAttachments())
-						transitions.push_back({ rt->GetResource(), Engine::ResourceState::RenderTarget });
+						transitions.Push({ rt->GetResource(), Engine::ResourceState::RenderTarget });
 				}
 			}
 		}
@@ -91,7 +91,7 @@ namespace Game
 		for (auto& transition : transitions)
 			transition.state = Engine::ResourceState::ShaderResource;
 
-		if(!transitions.empty())
+		if(!transitions.Empty())
 			m_CommandList->ValidateStates(transitions);
 
 		Engine::GPUTimer::EndEvent(m_CommandList);

@@ -344,7 +344,7 @@ namespace Engine
 			bool val = *data;
 			bool changed = PropertysPanel::DrawBoolControl(prop->GetName(), val);
 			if (changed)
-				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &val });
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { 1, &val });
 			return changed;
 		}
 		else
@@ -358,7 +358,7 @@ namespace Engine
 			float val = *data;
 			bool changed = PropertysPanel::DrawFloatControl(prop->GetName(), val);
 			if (changed)
-				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &val });
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { 1, &val });
 			return changed;
 		}
 		else
@@ -372,7 +372,7 @@ namespace Engine
 			Math::Vector2 vec = *data;
 			bool changed = PropertysPanel::DrawVec2Control(prop->GetName(), vec);
 			if (changed)
-				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &vec });
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { 1, &vec });
 			return changed;
 		}
 		else
@@ -386,7 +386,7 @@ namespace Engine
 			Math::Vector3 vec = *data;
 			bool changed = PropertysPanel::DrawVec3Control(prop->GetName(), vec);
 			if (changed)
-				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &vec });
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { 1, &vec });
 			return changed;
 		}
 		else
@@ -400,7 +400,7 @@ namespace Engine
 			Ref<Texture2D> texture = *data;
 			bool changed = PropertysPanel::DrawTextureControl(prop->GetName(), texture);
 			if(changed)
-				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &texture });
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { 1, &texture });
 			return changed;
 		}
 		else

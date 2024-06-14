@@ -217,7 +217,7 @@ namespace Engine
 			UpdateDirectory(newPath);
 	}
 
-	void __attribute__((optnone)) AssetManager::ProcessDirectory(const fs::path& directory, Utils::Vector<fs::path>& foundAssets, Utils::Vector<fs::path>& foundMetas)
+	void AssetManager::ProcessDirectory(const fs::path& directory, Utils::Vector<fs::path>& foundAssets, Utils::Vector<fs::path>& foundMetas)
 	{
 		for (auto& p : fs::directory_iterator(directory))
 		{

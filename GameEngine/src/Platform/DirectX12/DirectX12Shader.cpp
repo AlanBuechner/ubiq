@@ -40,14 +40,14 @@ namespace Engine
 		m_Sig->Release();
 	}
 
-	std::vector<ShaderParameter> DirectX12Shader::GetReflectionData() const
+	Utils::Vector<ShaderParameter> DirectX12Shader::GetReflectionData() const
 	{
 		return m_ReflectionData;
 	}
 
 	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::GetPipelineState(Ref<FrameBuffer> target)
 	{
-		std::vector<TextureFormat> formates;
+		Utils::Vector<TextureFormat> formates;
 
 		if (!m_ComputeShader)
 		{
@@ -58,9 +58,9 @@ namespace Engine
 				if (IsTextureFormatDepthStencil(format))
 					depthFormat = format;
 				else
-					formates.push_back(format);
+					formates.Push(format);
 			}
-			formates.push_back(depthFormat);
+			formates.Push(depthFormat);
 		}
 
 		auto state = m_PiplineStates.find(formates);
@@ -135,7 +135,7 @@ namespace Engine
 		}
 	}
 
-	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::CreatePiplineState(const std::vector<TextureFormat>& formats)
+	wrl::ComPtr<ID3D12PipelineState> DirectX12Shader::CreatePiplineState(const Utils::Vector<TextureFormat>& formats)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -154,9 +154,8 @@ namespace Engine
 		else
 		{
 
-
-			std::vector<D3D12_INPUT_ELEMENT_DESC> ies(m_InputElements.size());
-			for (uint32 i = 0; i < m_InputElements.size(); i++)
+			Utils::Vector<D3D12_INPUT_ELEMENT_DESC> ies(m_InputElements.Count());
+			for (uint32 i = 0; i < m_InputElements.Count(); i++)
 			{
 				ShaderInputElement& ie = m_InputElements[i];
 				uint32 slot = 0;
@@ -174,7 +173,7 @@ namespace Engine
 
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc{};
 			desc.pRootSignature = m_Sig;
-			desc.InputLayout = { ies.data(), (UINT)ies.size() };
+			desc.InputLayout = { ies.Data(), (UINT)ies.Count() };
 			switch (m_Src->config.topology)
 			{
 			case ShaderConfig::Triangle:
@@ -207,8 +206,8 @@ namespace Engine
 			desc.BlendState.AlphaToCoverageEnable = FALSE;
 			desc.BlendState.IndependentBlendEnable = FALSE;
 
-			desc.NumRenderTargets = (uint32)formats.size();
-			for (uint32 i = 0; i < formats.size(); i++)
+			desc.NumRenderTargets = (uint32)formats.Count();
+			for (uint32 i = 0; i < formats.Count(); i++)
 			{
 				desc.RTVFormats[i] = GetDXGITextureFormat(formats[i]);
 
@@ -272,10 +271,10 @@ namespace Engine
 				}
 			}
 
-			if (formats.back() != TextureFormat::None)
+			if (formats.Back() != TextureFormat::None)
 			{
 				desc.DepthStencilState.DepthEnable = TRUE;
-				desc.DSVFormat = GetDXGITextureFormat(formats.back());
+				desc.DSVFormat = GetDXGITextureFormat(formats.Back());
 				desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 				if (m_PassConfig.depthTest == ShaderConfig::RenderPass::DepthTest::Less)
 					desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;

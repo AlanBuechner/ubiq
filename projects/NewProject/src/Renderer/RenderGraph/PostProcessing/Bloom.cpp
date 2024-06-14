@@ -106,10 +106,8 @@ namespace Game
 				Engine::GPUTimer::BeginEvent(commandList, std::to_string(i));
 				Engine::Ref<Engine::Texture2D> srcTexture = (i == 0) ? src : m_GaussianSumTextures[i - 1];
 
-				commandList->ValidateStates({
-					{ m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
-					{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource },
-				});
+				commandList->ValidateStates({ { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
+					{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource } });
 
 				commandList->SetRenderTarget(m_GaussianSumTextures[i]);
 				commandList->ClearRenderTarget(m_GaussianSumTextures[i]);
@@ -123,8 +121,8 @@ namespace Game
 			}
 
 			{ // validate that all sum textures are render targets
-				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
-				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
+				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.Count());
+				for (uint32 i = 0; i < m_GaussianSumTextures.Count(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);
 			}
@@ -136,10 +134,8 @@ namespace Game
 				Engine::GPUTimer::BeginEvent(commandList, std::to_string(i));
 				Engine::Ref<Engine::Texture2D> srcTexture = m_GaussianSumTextures[i + 1];
 
-				commandList->ValidateStates({
-					{ m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
-					{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource },
-				});
+				commandList->ValidateStates({ { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
+					{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource } });
 
 				commandList->SetRenderTarget(m_GaussianSumTextures[i]);
 				commandList->SetShader(upSample);
@@ -153,10 +149,8 @@ namespace Game
 
 			Engine::GPUTimer::BeginEvent(commandList, "Composite");
 
-			commandList->ValidateStates({
-				{ src->GetResource(), Engine::ResourceState::ShaderResource },
-				{ m_GaussianSumTextures[0]->GetResource(), Engine::ResourceState::ShaderResource },
-			});
+			commandList->ValidateStates({ { src->GetResource(), Engine::ResourceState::ShaderResource },
+				{ m_GaussianSumTextures[0]->GetResource(), Engine::ResourceState::ShaderResource } });
 
 			commandList->SetRenderTarget(renderTarget);
 			commandList->ClearRenderTarget(renderTarget);
@@ -166,8 +160,8 @@ namespace Game
 			commandList->DrawMesh(screenMesh);
 
 			{ // validate that all sum textures are render targets
-				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
-				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
+				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.Count());
+				for (uint32 i = 0; i < m_GaussianSumTextures.Count(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);
 			}
@@ -181,9 +175,9 @@ namespace Game
 	void Bloom::OnViewportResize(uint32 width, uint32 height)
 	{
 		m_NumberDownSamples = (uint32)std::floor(std::log2(std::max(width, height))) - 1;
-		if (m_GaussianSumTextures.size() != m_NumberDownSamples)
+		if (m_GaussianSumTextures.Count() != m_NumberDownSamples)
 		{
-			m_GaussianSumTextures.resize(m_NumberDownSamples);
+			m_GaussianSumTextures.Resize(m_NumberDownSamples);
 			for (uint32 i = 0; i < m_NumberDownSamples; i++)
 			{
 				uint32 fac = Math::Pow(2, i + 1);

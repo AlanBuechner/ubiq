@@ -142,7 +142,6 @@ namespace Game
 		commandList->SetRootConstant(composit->GetUniformLocation("RC_COC"), (uint32)m_COCTexture->GetSRVDescriptor()->GetIndex());
 		commandList->DrawMesh(screenMesh);
 
-
 		commandList->ValidateStates({
 			{m_NearBlur->GetResource(), Engine::ResourceState::RenderTarget},
 			{m_FarBlur->GetResource(), Engine::ResourceState::RenderTarget},

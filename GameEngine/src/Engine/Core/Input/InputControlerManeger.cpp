@@ -43,6 +43,7 @@ namespace Engine
 			{
 				m_Controlers.Remove(index);
 			}
+			++index;
 		}
 	}
 

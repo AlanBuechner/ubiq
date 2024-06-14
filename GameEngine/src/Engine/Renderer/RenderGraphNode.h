@@ -56,7 +56,7 @@ namespace Engine
 	class FrameBufferNode : public RenderGraphNode
 	{
 	public:
-		FrameBufferNode(RenderGraph& graph, const std::vector<Ref<RenderTarget2D>>& fbSpec);
+		FrameBufferNode(RenderGraph& graph, const Utils::Vector<Ref<RenderTarget2D>>& fbSpec);
 		
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 

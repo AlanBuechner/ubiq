@@ -35,8 +35,8 @@ namespace Engine
 	{
 		GPUTimer::BeginEvent(m_CommandList, "Output Node");
 
-		std::vector<ResourceStateObject> transitions(m_Buffer->GetAttachments().size());
-		for (uint32 i = 0; i < transitions.size(); i++)
+		Utils::Vector<ResourceStateObject> transitions(m_Buffer->GetAttachments().Count());
+		for (uint32 i = 0; i < transitions.Count(); i++)
 			transitions[i] = { m_Buffer->GetAttachment(i)->GetResource(), ResourceState::RenderTarget };
 
 		m_CommandList->ValidateStates(transitions);
@@ -44,7 +44,7 @@ namespace Engine
 	}
 
 	// frame buffer node
-	FrameBufferNode::FrameBufferNode(RenderGraph& graph, const std::vector<Ref<RenderTarget2D>>& attachments) :
+	FrameBufferNode::FrameBufferNode(RenderGraph& graph, const Utils::Vector<Ref<RenderTarget2D>>& attachments) :
 		RenderGraphNode(graph)
 	{
 		m_Buffer = FrameBuffer::Create(attachments);
@@ -67,8 +67,8 @@ namespace Engine
 
 	void TransitionNode::BuildImpl()
 	{
-		std::vector<ResourceStateObject> transitions(m_Transitions.size());
-		for (uint32 i = 0; i < transitions.size(); i++)
+		Utils::Vector<ResourceStateObject> transitions(m_Transitions.size());
+		for (uint32 i = 0; i < transitions.Count(); i++)
 		{
 			transitions[i].resource = *m_Transitions[i].handle;
 			transitions[i].state = m_Transitions[i].state;
