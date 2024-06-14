@@ -77,6 +77,8 @@ namespace Game
 
 
 #pragma region Editor
+#if defined(EDITOR)
+
 #include "Panels/PropertiesPanel.h"
 #include "Editor/Properties.h"
 
@@ -101,6 +103,7 @@ namespace Game
 		return changed;
 	});
 }
+#endif
 #pragma endregion
 
 

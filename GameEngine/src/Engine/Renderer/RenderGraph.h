@@ -40,10 +40,10 @@ namespace Engine
 		T& As() { return *(T*)this; }
 
 	protected:
-		std::vector<Engine::Ref<RenderGraphNode>> m_Nodes;
+		Utils::Vector<Engine::Ref<RenderGraphNode>> m_Nodes;
 		
 		Engine::Ref<OutputNode> m_OutputNode;
 
-		std::vector<Engine::Ref<Engine::CommandList>> m_CommandLists;
+		Utils::Vector<Engine::Ref<Engine::CommandList>> m_CommandLists;
 	};
 }

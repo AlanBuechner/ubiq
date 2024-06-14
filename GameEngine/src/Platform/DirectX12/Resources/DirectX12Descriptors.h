@@ -38,7 +38,7 @@ namespace Engine
 
 		D3D12_DESCRIPTOR_HEAP_TYPE GetType() const { return m_Type; }
 		uint32 GetCapacity() { return m_Capacity; }
-		uint32 GetSize() { return m_Capacity - (uint32)m_FreeSlots.size(); }
+		uint32 GetSize() { return m_Capacity - (uint32)m_FreeSlots.Count(); }
 		wrl::ComPtr<ID3D12DescriptorHeap> GetHeap() { return m_Heap; }
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHeapStart() { return m_CPUHandle; }
@@ -50,8 +50,8 @@ namespace Engine
 		wrl::ComPtr<ID3D12DescriptorHeap> m_Heap;
 		D3D12_CPU_DESCRIPTOR_HANDLE m_CPUHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE m_GPUHandle;
-		std::vector<uint32> m_FreeSlots;
-		std::vector<uint32> m_UsedSlots;
+		Utils::Vector<uint32> m_FreeSlots;
+		Utils::Vector<uint32> m_UsedSlots;
 		uint32 m_Capacity = 0;
 		uint32 m_DescriporSize;
 		bool m_IsShaderVisable;

@@ -39,8 +39,8 @@ namespace Engine
 		~ResourceDeletionPool();
 		void Clear();
 
-		std::vector<GPUResource*> m_Resources;
-		std::vector<Descriptor*> m_Descriptors;
+		Utils::Vector<GPUResource*> m_Resources;
+		Utils::Vector<Descriptor*> m_Descriptors;
 	};
 
 	struct UploadBufferData
@@ -81,10 +81,10 @@ namespace Engine
 
 		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format);
 
-		std::vector<Ref<CommandList>> GetUploadCommandLists() { return { m_BufferCopyCommandList, m_TextureCopyCommandList }; }
+		Utils::Vector<Ref<CommandList>> GetUploadCommandLists() { return { m_BufferCopyCommandList, m_TextureCopyCommandList }; }
 
-		void ScheduleResourceDeletion(GPUResource* resource) { m_DeletionPool->m_Resources.push_back(resource); }
-		void ScheduleHandleDeletion(Descriptor* descriptor) { m_DeletionPool->m_Descriptors.push_back(descriptor); }
+		void ScheduleResourceDeletion(GPUResource* resource) { m_DeletionPool->m_Resources.Push(resource); }
+		void ScheduleHandleDeletion(Descriptor* descriptor) { m_DeletionPool->m_Descriptors.Push(descriptor); }
 		
 	private:
 		void RecordBufferCommands();
@@ -92,7 +92,7 @@ namespace Engine
 
 	protected:
 		ResourceDeletionPool* m_DeletionPool;
-		std::vector<UploadPage*> m_UploadPages;
+		Utils::Vector<UploadPage*> m_UploadPages;
 
 		std::mutex m_UploadMutex;
 

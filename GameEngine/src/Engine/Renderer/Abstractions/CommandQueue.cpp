@@ -13,26 +13,26 @@ namespace Engine
 
 	void CommandQueue::PrependSubmit(Ref<CommandList> commandList)
 	{
-		m_Commands.insert(m_Commands.begin(), commandList);
+		m_Commands.Insert(0, commandList);
 	}
 
-	void CommandQueue::PrependSubmit(std::vector<Ref<CommandList>> commandLists)
+	void CommandQueue::PrependSubmit(Utils::Vector<Ref<CommandList>> commandLists)
 	{
-		m_Commands.reserve(commandLists.size());
-		for (uint32 i = 0; i < commandLists.size(); i++)
-			m_Commands.insert(m_Commands.begin(), commandLists[i]);
+		m_Commands.Reserve(commandLists.Count());
+		for (uint32 i = 0; i < commandLists.Count(); i++)
+			m_Commands.Insert(0, commandLists[i]);
 	}
 
 	void CommandQueue::Submit(Ref<CommandList> commandList)
 	{
-		m_Commands.push_back(commandList);
+		m_Commands.Push(commandList);
 	}
 
-	void CommandQueue::Submit(std::vector<Ref<CommandList>> commandLists)
+	void CommandQueue::Submit(Utils::Vector<Ref<CommandList>> commandLists)
 	{
-		m_Commands.reserve(commandLists.size());
-		for(uint32 i = 0; i < commandLists.size(); i++)
-			m_Commands.push_back(commandLists[i]);
+		m_Commands.Reserve(commandLists.Count());
+		for(uint32 i = 0; i < commandLists.Count(); i++)
+			m_Commands.Push(commandLists[i]);
 	}
 
 	Ref<CommandQueue> CommandQueue::Create(Type type)

@@ -38,8 +38,9 @@ namespace ProjectManager
 		inline fs::path GetScriptsDirectory() { return GetRootDirectory() / "Scripts"; }
 		inline fs::path GetModulesDirectory() { return GetRootDirectory() / "Modules"; }
 
-		inline uint64_t GetDefultMaterialID() { return m_DefultMaterialID; }
-		inline const std::string& GetDefaultSceneScriptName() { return m_DefultSceneScriptName; }
+		inline uint64_t GetDefultMaterialID() { return m_DefaultMaterialID; }
+		inline const std::string& GetDefaultSceneScriptName() { return m_DefaultSceneScriptName; }
+		inline uint64_t GetDefaultSceneID() { return m_DefaultScene; }
 
 		inline Version GetVersion() { return m_Version; }
 		inline void SetVersion(Version version) { m_Version = version; }
@@ -49,8 +50,9 @@ namespace ProjectManager
 
 		Version m_Version;
 
-		uint64_t m_DefultMaterialID = 0;
-		std::string m_DefultSceneScriptName = "";
+		uint64_t m_DefaultMaterialID = 0;
+		std::string m_DefaultSceneScriptName = "";
+		uint64_t m_DefaultScene;
 	};
 }
 

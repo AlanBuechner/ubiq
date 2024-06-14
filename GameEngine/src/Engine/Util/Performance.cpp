@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-	std::vector<ProfileResult> Performance::m_ProfileResults;
+	Utils::Vector<ProfileResult> Performance::m_ProfileResults;
 
 	void Instrumentor::BeginSession(const std::string& name, const std::string& filepath)
 	{
@@ -144,11 +144,11 @@ namespace Engine
 	void Performance::Render()
 	{
 		return;
-		if (m_ProfileResults.size() != 0)
+		if (m_ProfileResults.Count() != 0)
 		{
 			ImGui::Begin("Profiler");
 
-			for (int i = 0; i < m_ProfileResults.size(); i++)
+			for (int i = 0; i < m_ProfileResults.Count(); i++)
 			{
 				auto& result = m_ProfileResults[i];
 				std::string buffer = "%.3fms  ";
@@ -156,7 +156,7 @@ namespace Engine
 				ImGui::Text(buffer.c_str(), ((float)result.end - (float)result.start) / 1000.0f);
 			}
 
-			m_ProfileResults.clear();
+			m_ProfileResults.Clear();
 
 			ImGui::End();
 		}

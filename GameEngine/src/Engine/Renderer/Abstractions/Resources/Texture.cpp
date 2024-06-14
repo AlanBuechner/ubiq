@@ -213,7 +213,7 @@ namespace Engine
 	{
 		for (uint32 i = 0; i < m_Resource->GetMips(); i++)
 			Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_UAVDescriptors[i]);
-		m_UAVDescriptors.clear();
+		m_UAVDescriptors.Clear();
 	}
 
 	void RWTexture2D::Resize(uint32 width, uint32 height)
@@ -250,10 +250,10 @@ namespace Engine
 		uint32 width = m_Resource->GetWidth();
 		uint32 height = m_Resource->GetHeight();
 
-		for (uint32 i = 0; i < m_UAVDescriptors.size(); i++)
+		for (uint32 i = 0; i < m_UAVDescriptors.Count(); i++)
 			Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_UAVDescriptors[i]);
 
-		m_UAVDescriptors.resize(m_Resource->GetMips());
+		m_UAVDescriptors.Resize(m_Resource->GetMips());
 		for (uint32 i = 0; i < m_Resource->GetMips(); i++)
 		{
 			uint32 w = i == 0 ? width : width / (2 * i);

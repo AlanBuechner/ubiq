@@ -21,12 +21,12 @@ namespace Engine
 
 	void DirectX12SwapChain::Init(uint32 numBuffers)
 	{
-		m_Buffers.reserve(numBuffers);
+		m_Buffers.Reserve(numBuffers);
 		for (uint32 i = 0; i < numBuffers; i++)
 		{
 			Ref<RenderTarget2D> renderTarget = RenderTarget2D::Create(1, 1, 1, TextureFormat::RGBA8_UNORM);
 			renderTarget->SetResizable(false);
-			m_Buffers.push_back(renderTarget);
+			m_Buffers.Push(renderTarget);
 		}
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
@@ -39,7 +39,7 @@ namespace Engine
 
 		// Describe heap
 		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-		rtvHeapDesc.NumDescriptors = (uint32)m_Buffers.size();
+		rtvHeapDesc.NumDescriptors = (uint32)m_Buffers.Count();
 		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		rtvHeapDesc.NodeMask = NULL;
 
@@ -62,7 +62,7 @@ namespace Engine
 		swapChainDesc.Stereo = false;		 // No 3D
 		swapChainDesc.SampleDesc = { 1, 0 }; // No MSAA (not supported by D3D12 here)
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesc.BufferCount = (uint32)m_Buffers.size();
+		swapChainDesc.BufferCount = (uint32)m_Buffers.Count();
 		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
@@ -96,8 +96,12 @@ namespace Engine
 
 	void DirectX12SwapChain::Resize(uint32 width, uint32 height)
 	{
+		// release references
+		for (uint32 i = 0; i < m_Buffers.Count(); i++)
+			((DirectX12Texture2DResource*)m_Buffers[i]->m_Resource)->GetBuffer()->Release();
+
 		// Resize swap chain
-		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_Buffers.size(), width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH),
+		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_Buffers.Count(), width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH),
 			"Faild to Resize the swapchain");
 
 		// Recreate buffer
@@ -134,7 +138,7 @@ namespace Engine
 	void DirectX12SwapChain::UpdateBackBufferIndex()
 	{
 		// Increment buffer index
-		m_CurrentBuffer = (m_CurrentBuffer + 1) % m_Buffers.size();
+		m_CurrentBuffer = (m_CurrentBuffer + 1) % m_Buffers.Count();
 	}
 
 	void DirectX12SwapChain::CleanUp()
@@ -146,7 +150,7 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		CORE_ASSERT(m_SwapChain, "Invalid Swapchain! can not get frame buffers from null");
-		for (unsigned int i = 0; i < m_Buffers.size(); i++)
+		for (unsigned int i = 0; i < m_Buffers.Count(); i++)
 		{
 			Ref<RenderTarget2D> renderTarget = m_Buffers[i];
 			context->GetResourceManager()->ScheduleResourceDeletion(renderTarget->m_Resource);

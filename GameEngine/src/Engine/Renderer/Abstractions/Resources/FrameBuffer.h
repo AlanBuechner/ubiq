@@ -3,6 +3,7 @@
 #include "Engine/Core/Core.h"
 #include "Texture.h"
 #include "ResourceState.h"
+#include "Utils/Vector.h"
 
 namespace Engine
 {

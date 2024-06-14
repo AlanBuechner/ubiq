@@ -277,7 +277,7 @@ namespace Engine
 					if (param->value->paramters.Count() > 0)
 						defaultValue = param->value->paramters[0];
 
-					config.params.Push({ param->name, type, defaultValue });
+					config.params.Push({ param->name, type, defaultValue }); 
 				}
 			}
 		}

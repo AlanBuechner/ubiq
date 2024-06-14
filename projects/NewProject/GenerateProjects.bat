@@ -1,8 +1,3 @@
 @echo off
-
-pushd ..
-pushd ..
-call "vendor/python/python.exe" scripts/Build.py -gs -g %~dp0
-popd
-
+call Build.bat -gs -g %~dp0 -p USG-Editor
 PAUSE

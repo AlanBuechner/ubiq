@@ -16,6 +16,8 @@
 #include <ImGuizmo/ImGuizmo.h>
 #include <memory>
 
+#include <windows.h>
+
 Engine::EditorLayer* Engine::EditorLayer::s_Instance = nullptr;
 
 namespace Engine
@@ -27,31 +29,31 @@ namespace Engine
 		if (s_Instance == nullptr)
 			s_Instance = this;
 
-		m_GridMesh.m_Vertices.reserve((size_t)(m_GridLines + 1) * 3);
-		m_GridMesh.m_Indices.reserve((size_t)(m_GridLines + 1) * 4);
+		m_GridMesh.m_Vertices.Reserve((size_t)(m_GridLines + 1) * 3);
+		m_GridMesh.m_Indices.Reserve((size_t)(m_GridLines + 1) * 4);
 		for (uint32 i = 0; i <= m_GridLines; i++)
 		{
 			float posz = (m_GridLineOffset * i) - m_GridExtent;
-			m_GridMesh.m_Vertices.push_back({ { -m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
-			m_GridMesh.m_Vertices.push_back({ { 0				,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, m_GridColor.w - (m_GridColor.w * (abs(posz) / m_GridExtent)) } });
-			m_GridMesh.m_Vertices.push_back({ { m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
+			m_GridMesh.m_Vertices.Push({ { -m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
+			m_GridMesh.m_Vertices.Push({ { 0				,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, m_GridColor.w - (m_GridColor.w * (abs(posz) / m_GridExtent)) } });
+			m_GridMesh.m_Vertices.Push({ { m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
 
-			m_GridMesh.m_Indices.push_back((i * 3) + 0);
-			m_GridMesh.m_Indices.push_back((i * 3) + 1);
-			m_GridMesh.m_Indices.push_back((i * 3) + 1);
-			m_GridMesh.m_Indices.push_back((i * 3) + 2);
+			m_GridMesh.m_Indices.Push((i * 3) + 0);
+			m_GridMesh.m_Indices.Push((i * 3) + 1);
+			m_GridMesh.m_Indices.Push((i * 3) + 1);
+			m_GridMesh.m_Indices.Push((i * 3) + 2);
 		}
 
 		m_ViewPortSize = { Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight() };
 
-		m_Game = CreateGame();
 
 		m_ContentPanel.SetDirectory(Application::Get().GetProject().GetAssetsDirectory());
 	}
 
 	void EditorLayer::OnAttach()
 	{
-		NewScene();
+		m_Game = CreateGame();
+		DefaultScene();
 
 		m_EditorCamera = CreateRef<EditorCamera>();
 		m_EditorCamera->SetOrientation({ Math::Radians(180-25), Math::Radians(25) });
@@ -191,6 +193,12 @@ namespace Engine
 					ImGui::EndMenu();
 				}
 
+				if (ImGui::MenuItem("Play"))
+				{
+					std::string cmd = std::string("\"Build.bat\" -fb -r -c Release -a x86_64 -p Runtime -g ") + fs::current_path().string();
+					system(cmd.c_str());
+				}
+
 				ImGui::EndMenuBar();
 			}
 
@@ -216,6 +224,13 @@ namespace Engine
 	void EditorLayer::NewScene()
 	{
 		m_Game->SwitchScene(Scene::Create());
+		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
+		m_HierarchyPanel.SetContext(m_Game->GetScene());
+	}
+
+	void EditorLayer::DefaultScene()
+	{
+		m_Game->SwitchScene(Scene::CreateDefault());
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_HierarchyPanel.SetContext(m_Game->GetScene());
 	}

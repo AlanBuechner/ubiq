@@ -56,15 +56,15 @@ project "{projName}"
 	objdir ("{idir}")
 
 	buildcommands {{
-		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -fb -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.startupProject} -g {Config.gameProject}"
+		"\\"Build.bat\\" -fb -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.project} -g {Config.gameProject}"
 	}}
 
 	rebuildcommands  {{
-		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -rebuild -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.startupProject} -g {Config.gameProject}"
+		"\\"Build.bat\\" -rebuild -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.project} -g {Config.gameProject}"
 	}}
 
 	cleancommands  {{
-		"\\"{Config.location}/vendor/python/python.exe\\" {Config.location}/scripts/Build.py -clean -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.startupProject} -g {Config.gameProject}"
+		"\\"Build.bat\\"  -clean -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.project} -g {Config.gameProject}"
 	}}
 
 	files

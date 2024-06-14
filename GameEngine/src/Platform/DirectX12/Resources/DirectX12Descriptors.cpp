@@ -23,8 +23,8 @@ namespace Engine
 
 		uint32 size = m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER ? D3D12_MAX_SHADER_VISIBLE_SAMPLER_HEAP_SIZE : D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_2;
 		m_Capacity = size;
-		m_FreeSlots.reserve(size);
-		m_UsedSlots.reserve(size);
+		m_FreeSlots.Reserve(size);
+		m_UsedSlots.Reserve(size);
 
 		D3D12_DESCRIPTOR_HEAP_DESC desc;
 		desc.Flags = m_IsShaderVisable ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
@@ -37,23 +37,23 @@ namespace Engine
 		if(isShaderVisable)
 			m_GPUHandle = m_Heap->GetGPUDescriptorHandleForHeapStart();
 
-		for (uint32 i = 0; i < size; i++) m_FreeSlots.push_back(i);
+		for (uint32 i = 0; i < size; i++) m_FreeSlots.Push(i);
 
 	}
 
 	DirectX12DescriptorHeap::~DirectX12DescriptorHeap()
 	{
-		if(m_FreeSlots.size() < m_Capacity)
+		if(m_FreeSlots.Count() < m_Capacity)
 			CORE_WARN("Not all resorces have been freed prior to deleting descriptor heap");
 	}
 
 	DirectX12DescriptorHandle DirectX12DescriptorHeap::Allocate()
 	{
 		std::lock_guard g(m_Mutex);
-		CORE_ASSERT(!m_FreeSlots.empty(), "Not Enough Memory");
+		CORE_ASSERT(!m_FreeSlots.Empty(), "Not Enough Memory");
 
 		// get a free slot
-		uint32 slot = m_FreeSlots.back();
+		uint32 slot = m_FreeSlots.Back();
 		uint32 offset = slot * m_DescriporSize; // get the memory offset of the slot
 
 		// create the handle
@@ -65,8 +65,8 @@ namespace Engine
 			handle.gpu.ptr = m_GPUHandle.ptr + offset;
 
 		// remove the slot from the list of free slots
-		m_FreeSlots.pop_back();
-		m_UsedSlots.push_back(slot);
+		m_FreeSlots.Pop();
+		m_UsedSlots.Push(slot);
 
 		return handle;
 	}
@@ -76,15 +76,15 @@ namespace Engine
 		if (!handle)
 			return;
 
-		m_FreeSlots.push_back(handle.m_Index); // add the slot to the list of free slots
+		m_FreeSlots.Push(handle.m_Index); // add the slot to the list of free slots
 		handle = {}; // invalidate the handle
 	}
 
 	void DirectX12DescriptorHeap::Clear()
 	{
 		for (uint32 slot : m_UsedSlots)
-			m_FreeSlots.push_back(slot);
-		m_UsedSlots.clear();
+			m_FreeSlots.Push(slot);
+		m_UsedSlots.Clear();
 	}
 
 }
