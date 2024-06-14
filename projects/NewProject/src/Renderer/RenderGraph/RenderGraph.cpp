@@ -35,40 +35,40 @@ namespace Game
 		Engine::Window& window = Engine::Application::Get().GetWindow();
 
 		Engine::Ref<Engine::CommandList> commandList = Engine::CommandList::Create(Engine::CommandList::Direct);;
-		m_CommandLists.push_back(commandList);
+		m_CommandLists.Push(commandList);
 
 		float clearval = pow(0.2f, 2.2);
 		Engine::Ref<Engine::FrameBufferNode> renderTargetNode = Engine::CreateRef<Engine::FrameBufferNode>(*this, Utils::Vector<Engine::Ref<Engine::RenderTarget2D>>{
 			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, { clearval, clearval, clearval, 1 }),
 				Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::Depth, { 1,0,0,0 }),
 		});
-		m_Nodes.push_back(renderTargetNode);
+		m_Nodes.Push(renderTargetNode);
 
 		// set frame buffer to render target
 		Engine::Ref<Engine::TransitionNode> t1 = Engine::CreateRef<Engine::TransitionNode>(*this);
 		t1->SetCommandList(commandList);
 		t1->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), Engine::ResourceState::RenderTarget });
 		t1->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), Engine::ResourceState::RenderTarget });
-		m_Nodes.push_back(t1);
+		m_Nodes.Push(t1);
 
 		// shadow pass
 		Engine::Ref<ShadowPassNode> shadowPass = Engine::CreateRef<ShadowPassNode>(*this);
 		shadowPass->SetCommandList(commandList);
-		m_Nodes.push_back(shadowPass);
+		m_Nodes.Push(shadowPass);
 
 		// gbuffer pass
 		Engine::Ref<GBufferPassNode> gBufferPass = Engine::CreateRef<GBufferPassNode>(*this);
 		gBufferPass->SetCommandList(commandList);
 		gBufferPass->SetRenderTarget(renderTargetNode->m_Buffer);
 		gBufferPass->AddDependincy(t1);
-		m_Nodes.push_back(gBufferPass);
+		m_Nodes.Push(gBufferPass);
 
 		// skybox pass
 		Engine::Ref<SkyboxNode> skyboxPass = Engine::CreateRef<SkyboxNode>(*this);
 		skyboxPass->SetCommandList(commandList);
 		skyboxPass->SetRenderTarget(renderTargetNode->m_Buffer);
 		skyboxPass->AddDependincy(gBufferPass);
-		m_Nodes.push_back(skyboxPass);
+		m_Nodes.Push(skyboxPass);
 
 		// main lit pass
 		Engine::Ref<ShaderPassNode> mainPass = Engine::CreateRef<ShaderPassNode>(*this, "lit");
@@ -76,13 +76,13 @@ namespace Game
 		mainPass->SetRenderTarget(renderTargetNode->m_Buffer);
 		mainPass->AddDependincy(shadowPass);
 		mainPass->AddDependincy(skyboxPass);
-		m_Nodes.push_back(mainPass);
+		m_Nodes.Push(mainPass);
 
 		// create post processing render target
 		Engine::Ref<Engine::FrameBufferNode> postRenderTargetNode = Engine::CreateRef<Engine::FrameBufferNode>(*this, Utils::Vector<Engine::Ref<Engine::RenderTarget2D>>{
 			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, true),
 		});
-		m_Nodes.push_back(postRenderTargetNode);
+		m_Nodes.Push(postRenderTargetNode);
 
 		// set frame buffer to srv for use in post processing
 		Engine::Ref<Engine::TransitionNode> t2 = Engine::CreateRef<Engine::TransitionNode>(*this);
@@ -91,7 +91,7 @@ namespace Game
 		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), Engine::ResourceState::ShaderResource });
 		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), Engine::ResourceState::ShaderResource });
 		t2->AddDependincy(mainPass);
-		m_Nodes.push_back(t2);
+		m_Nodes.Push(t2);
 
 		// post processing
 		PostProcessInput input;
@@ -108,7 +108,7 @@ namespace Game
 		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachment(0));
 		postPass->InitPostProcessStack();
 		postPass->AddDependincy(t2);
-		m_Nodes.push_back(postPass);
+		m_Nodes.Push(postPass);
 
 		// create outputNode
 		m_OutputNode = Engine::CreateRef<Engine::OutputNode>(*this);
@@ -117,7 +117,7 @@ namespace Game
 			postRenderTargetNode->m_Buffer->GetAttachment(0),
 			renderTargetNode->m_Buffer->GetAttachment(1),
 		});
-		m_Nodes.push_back(m_OutputNode);
+		m_Nodes.Push(m_OutputNode);
 	}
 
 }

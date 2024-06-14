@@ -273,13 +273,13 @@ namespace Engine
 
 		static void PushResult(ProfileResult result)
 		{
-			m_ProfileResults.push_back(result);
+			m_ProfileResults.Push(result);
 		}
 
 		static void Render();
 
 	private:
-		static std::vector<ProfileResult> m_ProfileResults;
+		static Utils::Vector<ProfileResult> m_ProfileResults;
 		
 	};
 }

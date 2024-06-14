@@ -24,8 +24,8 @@ namespace Engine
 
 		Ref<Shader> LineShader;
 
-		std::vector<LineVertex> Vertices;
-		std::vector<uint32> Indices;
+		Utils::Vector<LineVertex> Vertices;
+		Utils::Vector<uint32> Indices;
 
 		Ref<InstanceBuffer> Instances;
 		Ref<Mesh> m_Mesh;
@@ -38,8 +38,8 @@ namespace Engine
 	{
 		s_LineData.LineShader = Shader::CreateFromEmbeded(LINE, "LineShader.hlsl");
 
-		s_LineData.Vertices.reserve(s_LineData.MaxVertices);
-		s_LineData.Indices.reserve(s_LineData.MaxIndices);
+		s_LineData.Vertices.Reserve(s_LineData.MaxVertices);
+		s_LineData.Indices.Reserve(s_LineData.MaxIndices);
 
 		s_LineData.m_Mesh = Mesh::Create(sizeof(LineVertex));
 
@@ -73,21 +73,21 @@ namespace Engine
 
 	void LineRenderer::EndScene()
 	{
-		s_LineData.m_Mesh->SetVertices(s_LineData.Vertices.data(), (uint32)s_LineData.Vertices.size());
-		s_LineData.m_Mesh->SetIndices(s_LineData.Indices.data(), (uint32)s_LineData.Indices.size());
+		s_LineData.m_Mesh->SetVertices(s_LineData.Vertices.Data(), (uint32)s_LineData.Vertices.Count());
+		s_LineData.m_Mesh->SetIndices(s_LineData.Indices.Data(), (uint32)s_LineData.Indices.Count());
 	}
 
 	void LineRenderer::Build(Ref<CommandList> commandList)
 	{
-		if (!s_LineData.Vertices.empty())
+		if (!s_LineData.Vertices.Empty())
 		{
 			commandList->SetShader(s_LineData.LineShader->GetPass("main"));
 			commandList->SetConstantBuffer(0, s_LineData.Camera);
 			commandList->DrawMesh(s_LineData.m_Mesh, s_LineData.Instances);
 		}
 
-		s_LineData.Vertices.clear();
-		s_LineData.Indices.clear();
+		s_LineData.Vertices.Clear();
+		s_LineData.Indices.Clear();
 	}
 
 	void LineRenderer::DrawLine(Math::Vector3 p1, Math::Vector3 p2, const Math::Vector4 color, const Math::Mat4& transform)
@@ -95,28 +95,28 @@ namespace Engine
 		LineVertex vert;
 		vert.Color = color;
 
-		uint32 baseVertexIndex = (uint32)s_LineData.Vertices.size();
-		s_LineData.Indices.push_back(baseVertexIndex);
-		s_LineData.Indices.push_back(baseVertexIndex+1);
+		uint32 baseVertexIndex = (uint32)s_LineData.Vertices.Count();
+		s_LineData.Indices.Push(baseVertexIndex);
+		s_LineData.Indices.Push(baseVertexIndex+1);
 
 		vert.Position = transform * Math::Vector4(p1, 1.0f);
-		s_LineData.Vertices.push_back(vert); 
+		s_LineData.Vertices.Push(vert); 
 		vert.Position = transform * Math::Vector4(p2, 1.0f);
-		s_LineData.Vertices.push_back(vert);
+		s_LineData.Vertices.Push(vert);
 	}
 
 	void LineRenderer::DrawLineMesh(LineMesh& mesh, const Math::Mat4& transform)
 	{
-		uint32 baseVertexIndex = (uint32)s_LineData.Vertices.size();
-		for (uint32 i = 0; i < mesh.m_Vertices.size(); i++)
+		uint32 baseVertexIndex = (uint32)s_LineData.Vertices.Count();
+		for (uint32 i = 0; i < mesh.m_Vertices.Count(); i++)
 		{
 			LineVertex vert = mesh.m_Vertices[i];
 			vert.Position = transform * Math::Vector4(vert.Position, 1.0f);
-			s_LineData.Vertices.push_back(vert);
+			s_LineData.Vertices.Push(vert);
 		}
 
-		for (uint32 i = 0; i < mesh.m_Indices.size(); i++)
-			s_LineData.Indices.push_back(baseVertexIndex + mesh.m_Indices[i]);
+		for (uint32 i = 0; i < mesh.m_Indices.Count(); i++)
+			s_LineData.Indices.Push(baseVertexIndex + mesh.m_Indices[i]);
 
 	}
 

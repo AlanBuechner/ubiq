@@ -16,15 +16,15 @@ namespace Engine
 	class MaterialData
 	{
 	public:
-		MaterialData(std::vector<MaterialParameter>& params);
+		MaterialData(Utils::Vector<MaterialParameter>& params);
 
-		std::vector<MaterialParameter>& GetParams() { return m_Params; }
+		Utils::Vector<MaterialParameter>& GetParams() { return m_Params; }
 		void* GetDatalocation(const std::string& name) { return m_DataLocations[name]; }
 		uint32 GetSize() { return m_Size; }
 		const void* GetData() { return m_Data; }
 
 	private:
-		std::vector<MaterialParameter> m_Params;
+		Utils::Vector<MaterialParameter> m_Params;
 
 		std::unordered_map<std::string, void*> m_DataLocations;
 
@@ -46,7 +46,7 @@ namespace Engine
 		static bool ValidExtention(const fs::path& ext);
 
 	private:
-		std::vector<Ref<Texture2D>> m_ReferensedTextures;
+		Utils::Vector<Ref<Texture2D>> m_ReferensedTextures;
 
 		Ref<MaterialData> m_Data;
 

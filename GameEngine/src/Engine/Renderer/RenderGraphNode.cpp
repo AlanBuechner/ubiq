@@ -62,12 +62,12 @@ namespace Engine
 
 	void TransitionNode::AddBuffer(const TransitionObject& transition)
 	{
-		m_Transitions.push_back(transition);
+		m_Transitions.Push(transition);
 	}
 
 	void TransitionNode::BuildImpl()
 	{
-		Utils::Vector<ResourceStateObject> transitions(m_Transitions.size());
+		Utils::Vector<ResourceStateObject> transitions(m_Transitions.Count());
 		for (uint32 i = 0; i < transitions.Count(); i++)
 		{
 			transitions[i].resource = *m_Transitions[i].handle;

@@ -169,7 +169,7 @@ namespace Engine
 		return blobs;
 	}
 
-	void DirectX12ShaderCompiler::GetShaderParameters(ShaderBlobs& blobs, ShaderSorce::SectionInfo& section, std::vector<Engine::ShaderParameter>& params,  ShaderType type)
+	void DirectX12ShaderCompiler::GetShaderParameters(ShaderBlobs& blobs, ShaderSorce::SectionInfo& section, Utils::Vector<Engine::ShaderParameter>& params,  ShaderType type)
 	{
 		if (!blobs.reflection)
 			return;
@@ -186,7 +186,7 @@ namespace Engine
 		reflection->GetDesc(&reflectionDesc);
 
 		// bound resources
-		params.reserve(reflectionDesc.BoundResources);
+		params.Reserve(reflectionDesc.BoundResources);
 		for (uint32 srvIndex = 0; srvIndex < reflectionDesc.BoundResources; srvIndex++)
 		{
 			D3D12_SHADER_INPUT_BIND_DESC bindDesc;
@@ -257,11 +257,11 @@ namespace Engine
 				break;
 			}
 
-			params.push_back(data);
+			params.Push(data);
 		}
 	}
 
-	void DirectX12ShaderCompiler::GetInputLayout(ShaderBlobs& blobs, std::vector<ShaderInputElement>& inputElements)
+	void DirectX12ShaderCompiler::GetInputLayout(ShaderBlobs& blobs, Utils::Vector<ShaderInputElement>& inputElements)
 	{
 		if (!blobs.reflection)
 			return;
@@ -277,7 +277,7 @@ namespace Engine
 		D3D12_SHADER_DESC reflectionDesc;
 		reflection->GetDesc(&reflectionDesc);
 
-		inputElements.reserve(reflectionDesc.InputParameters);
+		inputElements.Reserve(reflectionDesc.InputParameters);
 		for (uint32 ipIndex = 0; ipIndex < reflectionDesc.InputParameters; ipIndex++)
 		{
 			D3D12_SIGNATURE_PARAMETER_DESC inputParam;
@@ -287,12 +287,12 @@ namespace Engine
 			element.semanticName = inputParam.SemanticName;
 			element.semanticIndex = inputParam.SemanticIndex;
 			element.format = GetFormatFromDesc(inputParam);
-			inputElements.push_back(element);
+			inputElements.Push(element);
 		}
 
 	}
 
-	void DirectX12ShaderCompiler::GetOutputLayout(ShaderBlobs& blobs, std::vector<TextureFormat>& outputElement)
+	void DirectX12ShaderCompiler::GetOutputLayout(ShaderBlobs& blobs, Utils::Vector<TextureFormat>& outputElement)
 	{
 		if (!blobs.reflection)
 			return;
@@ -308,7 +308,7 @@ namespace Engine
 		D3D12_SHADER_DESC reflectionDesc;
 		reflection->GetDesc(&reflectionDesc);
 
-		outputElement.reserve(reflectionDesc.OutputParameters);
+		outputElement.Reserve(reflectionDesc.OutputParameters);
 		for (uint32 opIndex = 0; opIndex < reflectionDesc.OutputParameters; opIndex++)
 		{
 			D3D12_SIGNATURE_PARAMETER_DESC outputParam;
@@ -317,12 +317,12 @@ namespace Engine
 			switch (outputParam.ComponentType)
 			{
 			case D3D_REGISTER_COMPONENT_FLOAT32:
-				outputElement.push_back(TextureFormat::RGBA16_FLOAT);
+				outputElement.Push(TextureFormat::RGBA16_FLOAT);
 				break;
 			case D3D_REGISTER_COMPONENT_UINT32:
 				break;
 			case D3D_REGISTER_COMPONENT_SINT32:
-				outputElement.push_back(TextureFormat::R32_UINT);
+				outputElement.Push(TextureFormat::R32_UINT);
 				break;
 			default:
 				break;
@@ -331,29 +331,29 @@ namespace Engine
 
 	}
 
-	ID3D12RootSignature* DirectX12ShaderCompiler::GenRootSignature(std::vector<ShaderParameter>& params)
+	ID3D12RootSignature* DirectX12ShaderCompiler::GenRootSignature(Utils::Vector<ShaderParameter>& params)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		D3D12_VERSIONED_ROOT_SIGNATURE_DESC rsd;
 		rsd.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
 		// create root parameters
-		std::vector<D3D12_ROOT_PARAMETER1> rootParams;
-		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers;
+		Utils::Vector<D3D12_ROOT_PARAMETER1> rootParams;
+		Utils::Vector<D3D12_STATIC_SAMPLER_DESC> samplers;
 
 		uint32 numDescriptorTables = 0;
-		for (uint32 i = 0; i < params.size(); i++)
+		for (uint32 i = 0; i < params.Count(); i++)
 			if (params[i].type == ShaderParameter::PerameterType::DescriptorTable) numDescriptorTables++;
 
 		uint32 currentDescriptor = 0;
-		std::vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRanges(numDescriptorTables);
+		Utils::Vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRanges(numDescriptorTables);
 
 		for (ShaderParameter& rd : params)
 		{
 			if (rd.type != ShaderParameter::PerameterType::StaticSampler)
 			{
 				// populate root index
-				rd.rootIndex = (uint32)rootParams.size();
+				rd.rootIndex = (uint32)rootParams.Count();
 
 				// root parameters
 				D3D12_ROOT_PARAMETER1 param;
@@ -408,7 +408,7 @@ namespace Engine
 					currentDescriptor++;
 				}
 
-				rootParams.push_back(param);
+				rootParams.Push(param);
 
 			}
 			else
@@ -429,16 +429,16 @@ namespace Engine
 
 				ssd.ShaderRegister = rd.reg;
 				ssd.RegisterSpace = rd.space;
-				samplers.push_back(ssd);
+				samplers.Push(ssd);
 			}
 		}
 
 		D3D12_ROOT_SIGNATURE_DESC1 desc{};
 		desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-		desc.NumParameters = (uint32)rootParams.size();
-		desc.pParameters = rootParams.data();
-		desc.NumStaticSamplers = (uint32)samplers.size();
-		desc.pStaticSamplers = samplers.data();
+		desc.NumParameters = (uint32)rootParams.Count();
+		desc.pParameters = rootParams.Data();
+		desc.NumStaticSamplers = (uint32)samplers.Count();
+		desc.pStaticSamplers = samplers.Data();
 
 		rsd.Desc_1_1 = desc;
 

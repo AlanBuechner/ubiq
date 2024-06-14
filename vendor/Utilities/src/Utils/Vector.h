@@ -29,7 +29,6 @@ namespace Utils
 		void Pop();
 
 		Type& Insert(uint32 index, const Type& value);
-		Type& Insert(Type* iter, const Type& value);
 
 		//TODO: These are swap and pop, make that more obvious
 		void Remove(uint32 index);
@@ -56,6 +55,7 @@ namespace Utils
 		Vector& operator=(Vector&& other) noexcept;
 		const Type& operator[](uint32 index) const;
 		Type& operator[](uint32 index);
+		bool operator==(const Vector& other) const;
 
 		const Type& Front() const;
 		Type& Front();
@@ -77,6 +77,18 @@ namespace Utils
 		Type* m_Array = nullptr;
 	};
 
+	template<class Type> bool Utils::Vector<Type>::operator==(const Vector& other) const
+	{
+		if (other.Count() != m_Count)
+			return false;
+
+		for (uint32 i = 0; i < m_Count; i++)
+		{
+			if (!(other[i] == m_Array[i]))
+				return false;
+		}
+		return true;
+	}
 
 	template<class Type> inline Vector<Type>::Vector() {}
 
@@ -162,11 +174,6 @@ namespace Utils
 		++m_Count;
 
 		return m_Array[index];
-	}
-
-	template<class Type> inline Type& Vector<Type>::Insert(Type* iter, const Type& value)
-	{
-		return Insert(iter - m_Array, value);
 	}
 
 	template<class Type> inline void Vector<Type>::Remove(uint32 index)

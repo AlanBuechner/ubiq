@@ -17,7 +17,7 @@ namespace Engine
 		DirectX12Shader(Ref<ShaderSorce> src, const std::string& passName);
 		virtual ~DirectX12Shader();
 
-		virtual std::vector<ShaderParameter> GetReflectionData() const override;
+		virtual Utils::Vector<ShaderParameter> GetReflectionData() const override;
 
 		wrl::ComPtr<ID3D12RootSignature> GetRootSignature() { return m_Sig; }
 		wrl::ComPtr<ID3D12PipelineState> GetPipelineState(Ref<FrameBuffer> target);
@@ -45,7 +45,7 @@ namespace Engine
 				return false;
 			}
 		} m_Blobs;
-		wrl::ComPtr<ID3D12PipelineState> CreatePiplineState(const std::vector<TextureFormat>& formats);
+		wrl::ComPtr<ID3D12PipelineState> CreatePiplineState(const Utils::Vector<TextureFormat>& formats);
 
 
 	private:
@@ -54,7 +54,7 @@ namespace Engine
 		ShaderConfig::RenderPass& m_PassConfig;
 
 		struct FBVectorHash {
-			std::size_t operator()(const std::vector<TextureFormat>& c) const {
+			std::size_t operator()(const Utils::Vector<TextureFormat>& c) const {
 				std::hash<uint32> hasher;
 				size_t seed = 0;
 				for (TextureFormat i : c) {
@@ -65,12 +65,12 @@ namespace Engine
 		};
 
 
-		std::unordered_map<std::vector<TextureFormat>, wrl::ComPtr<ID3D12PipelineState>, FBVectorHash> m_PiplineStates;
+		std::unordered_map<Utils::Vector<TextureFormat>, wrl::ComPtr<ID3D12PipelineState>, FBVectorHash> m_PiplineStates;
 		std::unordered_map<std::string, uint32> m_UniformLocations;
 
-		std::vector<ShaderInputElement> m_InputElements;
-		std::vector<ShaderParameter> m_ReflectionData;
-		std::vector<TextureFormat> m_RenderTargetFormates;
+		Utils::Vector<ShaderInputElement> m_InputElements;
+		Utils::Vector<ShaderParameter> m_ReflectionData;
+		Utils::Vector<TextureFormat> m_RenderTargetFormates;
 
 		ID3D12RootSignature* m_Sig;
 	};

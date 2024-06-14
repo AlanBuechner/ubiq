@@ -137,9 +137,9 @@ namespace Engine
 
 		Topology topology;
 
-		std::vector<RenderPass> passes;
+		Utils::Vector<RenderPass> passes;
 
-		std::vector<MaterialParameter> params;
+		Utils::Vector<MaterialParameter> params;
 
 		std::unordered_map<std::string, void*> m_DataLocations;
 
@@ -186,10 +186,10 @@ namespace Engine
 		static Ref<ShaderSorce> LoadFromSrc(std::istream& src, const fs::path& file = "");
 		static void PreProcess(std::string& src, ShaderSorce::SectionInfo& section, const fs::path& fileLocation);
 		static ShaderConfig CompileConfig(const std::string& code);
-		static std::string GenerateMaterialStruct(std::vector<MaterialParameter>& params);
+		static std::string GenerateMaterialStruct(Utils::Vector<MaterialParameter>& params);
 
 	private:
-		static std::vector<std::string> Tokenize(const std::string& line);
+		static Utils::Vector<std::string> Tokenize(const std::string& line);
 		
 		struct Variable;
 		struct Value;
@@ -209,7 +209,7 @@ namespace Engine
 			bool isString;
 
 			std::string string;
-			std::vector<std::string> paramters;
+			Utils::Vector<std::string> paramters;
 			Ref<Object> object;
 
 			static Ref<Value> Build(std::queue<std::string>& tokenQueue);
@@ -217,7 +217,7 @@ namespace Engine
 
 		struct Object 
 		{
-			std::vector<Ref<Variable>> values;
+			Utils::Vector<Ref<Variable>> values;
 
 			static Ref<Object> Build(std::queue<std::string>& tokenQueue);
 		};

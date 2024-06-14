@@ -356,8 +356,8 @@ namespace Engine
 			m_CommandList->IASetPrimitiveTopology(top);
 		}
 
-		std::vector<ShaderParameter> reflectionData = shader->GetReflectionData();
-		for (uint32 i = 0; i < reflectionData.size(); i++)
+		Utils::Vector<ShaderParameter> reflectionData = shader->GetReflectionData();
+		for (uint32 i = 0; i < reflectionData.Count(); i++)
 		{
 			ShaderParameter& p = reflectionData[i];
 			if (p.type == ShaderParameter::PerameterType::DescriptorTable && p.count > 1)

@@ -46,7 +46,7 @@ namespace Engine
 		return pass->second;
 	}
 
-	std::vector<MaterialParameter>& Shader::GetParams()
+	Utils::Vector<MaterialParameter>& Shader::GetParams()
 	{
 		return m_Params;
 	}

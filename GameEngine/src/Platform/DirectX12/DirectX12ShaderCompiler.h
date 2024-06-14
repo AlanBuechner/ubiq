@@ -22,11 +22,11 @@ namespace Engine
 		static DirectX12ShaderCompiler& Get();
 
 		ShaderBlobs Compile(const std::string& code, const fs::path& file, ShaderType type);
-		void GetShaderParameters(ShaderBlobs& blobs, ShaderSorce::SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type);
-		void GetInputLayout(ShaderBlobs& blobs, std::vector<ShaderInputElement>& inputElements);
-		void GetOutputLayout(ShaderBlobs& blobs, std::vector<TextureFormat>& outputElement);
+		void GetShaderParameters(ShaderBlobs& blobs, ShaderSorce::SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type);
+		void GetInputLayout(ShaderBlobs& blobs, Utils::Vector<ShaderInputElement>& inputElements);
+		void GetOutputLayout(ShaderBlobs& blobs, Utils::Vector<TextureFormat>& outputElement);
 
-		ID3D12RootSignature* GenRootSignature(std::vector<ShaderParameter>& params);
+		ID3D12RootSignature* GenRootSignature(Utils::Vector<ShaderParameter>& params);
 
 		wrl::ComPtr<IDxcUtils> GetUtils() { return m_Utils; }
 

@@ -27,7 +27,7 @@ namespace Engine
 		void SetCommandList(Ref<CommandList> commandList) { m_CommandList = commandList; }
 		Ref<CommandList> GetCommandList() { return m_CommandList; }
 
-		void AddDependincy(Ref<RenderGraphNode> dependency) { m_Dependincys.push_back(dependency); }
+		void AddDependincy(Ref<RenderGraphNode> dependency) { m_Dependincys.Push(dependency); }
 
 	protected:
 		virtual void BuildImpl() {};
@@ -36,7 +36,7 @@ namespace Engine
 		bool m_Built = false;
 		RenderGraph& m_Graph;
 
-		std::vector<Ref<RenderGraphNode>> m_Dependincys;
+		Utils::Vector<Ref<RenderGraphNode>> m_Dependincys;
 		Ref<CommandList> m_CommandList;
 	};
 
@@ -82,6 +82,6 @@ namespace Engine
 
 
 	private:
-		std::vector<TransitionObject> m_Transitions;
+		Utils::Vector<TransitionObject> m_Transitions;
 	};
 }

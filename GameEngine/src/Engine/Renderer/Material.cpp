@@ -11,7 +11,7 @@
 namespace Engine
 {
 
-	MaterialData::MaterialData(std::vector<MaterialParameter>& params) :
+	MaterialData::MaterialData(Utils::Vector<MaterialParameter>& params) :
 		m_Params(params)
 	{
 		// calculate size of buffer
@@ -58,8 +58,8 @@ namespace Engine
 				{
 					if (p.type == MaterialParameter::TextureID)
 					{
-						mat->m_ReferensedTextures.push_back(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
-						uint32 descLoc = mat->m_ReferensedTextures.back()->GetSRVDescriptor()->GetIndex();
+						mat->m_ReferensedTextures.Push(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
+						uint32 descLoc = mat->m_ReferensedTextures.Back()->GetSRVDescriptor()->GetIndex();
 						*(uint32*)location = descLoc; // set asset value
 					}
 					else if (p.type == MaterialParameter::Float)

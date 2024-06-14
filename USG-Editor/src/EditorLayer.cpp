@@ -29,19 +29,19 @@ namespace Engine
 		if (s_Instance == nullptr)
 			s_Instance = this;
 
-		m_GridMesh.m_Vertices.reserve((size_t)(m_GridLines + 1) * 3);
-		m_GridMesh.m_Indices.reserve((size_t)(m_GridLines + 1) * 4);
+		m_GridMesh.m_Vertices.Reserve((size_t)(m_GridLines + 1) * 3);
+		m_GridMesh.m_Indices.Reserve((size_t)(m_GridLines + 1) * 4);
 		for (uint32 i = 0; i <= m_GridLines; i++)
 		{
 			float posz = (m_GridLineOffset * i) - m_GridExtent;
-			m_GridMesh.m_Vertices.push_back({ { -m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
-			m_GridMesh.m_Vertices.push_back({ { 0				,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, m_GridColor.w - (m_GridColor.w * (abs(posz) / m_GridExtent)) } });
-			m_GridMesh.m_Vertices.push_back({ { m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
+			m_GridMesh.m_Vertices.Push({ { -m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
+			m_GridMesh.m_Vertices.Push({ { 0				,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, m_GridColor.w - (m_GridColor.w * (abs(posz) / m_GridExtent)) } });
+			m_GridMesh.m_Vertices.Push({ { m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
 
-			m_GridMesh.m_Indices.push_back((i * 3) + 0);
-			m_GridMesh.m_Indices.push_back((i * 3) + 1);
-			m_GridMesh.m_Indices.push_back((i * 3) + 1);
-			m_GridMesh.m_Indices.push_back((i * 3) + 2);
+			m_GridMesh.m_Indices.Push((i * 3) + 0);
+			m_GridMesh.m_Indices.Push((i * 3) + 1);
+			m_GridMesh.m_Indices.Push((i * 3) + 1);
+			m_GridMesh.m_Indices.Push((i * 3) + 2);
 		}
 
 		m_ViewPortSize = { Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight() };

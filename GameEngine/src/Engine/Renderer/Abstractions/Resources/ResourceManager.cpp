@@ -62,14 +62,14 @@ namespace Engine
 
 	void ResourceDeletionPool::Clear()
 	{
-		for (uint32 i = 0; i < m_Resources.size(); i++)
+		for (uint32 i = 0; i < m_Resources.Count(); i++)
 			delete m_Resources[i];
 
-		for (uint32 i = 0; i < m_Descriptors.size(); i++)
+		for (uint32 i = 0; i < m_Descriptors.Count(); i++)
 			delete m_Descriptors[i];
 
-		m_Resources.clear();
-		m_Descriptors.clear();
+		m_Resources.Clear();
+		m_Descriptors.Clear();
 	}
 
 	ResourceManager::ResourceManager()
@@ -111,7 +111,7 @@ namespace Engine
 	void ResourceManager::Clean()
 	{
 		// clear upload pages
-		for (uint32 i = 0; i < m_UploadPages.size(); i++)
+		for (uint32 i = 0; i < m_UploadPages.Count(); i++)
 			m_UploadPages[i]->Clear();
 	}
 
@@ -133,7 +133,7 @@ namespace Engine
 
 		UploadPage* page;
 		void* loc = nullptr;
-		for (uint32 i = 0; i < m_UploadPages.size(); i++)
+		for (uint32 i = 0; i < m_UploadPages.Count(); i++)
 		{
 			loc = m_UploadPages[i]->Map(data, size);
 			if (loc != nullptr)
@@ -145,8 +145,8 @@ namespace Engine
 
 		if (loc == nullptr)
 		{
-			m_UploadPages.push_back(new UploadPage(size * 2)); // create new page double the size needed
-			page = m_UploadPages.back();
+			m_UploadPages.Push(new UploadPage(size * 2)); // create new page double the size needed
+			page = m_UploadPages.Back();
 			loc = page->Map(data, size);
 			CORE_ASSERT(loc != nullptr, "Failed to upload data");
 		}
