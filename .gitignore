@@ -7,12 +7,11 @@ USG-Editor/generated
 projects/NewProject/generated
 __pycache__
 
-GameEngine/vendor/dxc
-GameEngine/vendor/pix
-Directory.build.props
+vendor/dxc
+vendor/pix
 vendor/Compiler
 vendor/python
-vendor/premake/premake5.exe
+vendor/premake
 
 dxcompiler.dll
 dxil.dll
