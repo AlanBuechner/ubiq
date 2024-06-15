@@ -36,13 +36,7 @@ Goto `projects/NewProject` and run `GenerateProjects.bat` to generate visual stu
 
 Unfortunently premake does not generate NMake project files for visual studio properly. As a result you will need to manualy finish what premake started.
 
-1. For each project copy the contants of the `includedirs` array in the projects `premake5.lua` into the `Include Search Path` field inside the projects properties under the `NMake` tab. Each entry should be seperated by a `;`
-
-2. For each project copy the defines from the projects `Build.py` file and add the `STRIP_CLANG`define to stop visual studio form complaning.
-
-3. Add `/std:c++17` into the `Aditional Options` field under the `NMake` tab otherwise visual studio will think you are using c++ 14 and will give lots of errors.
-
-4. In the properties for `NewProject` in the `Debugging` tab paset `{your project location}\bin\Release-windows-x86_64\USG-Editor\USG-Editor.exe` for the release configuration and do the same for debug and dist but replace Release with Debug and Dist in the file path
+In the properties for `NewProject` in the `Debugging` tab paset `{your project location}\bin\Release-windows-x86_64\USG-Editor\USG-Editor.exe` for the release configuration and do the same for debug and dist but replace Release with Debug and Dist in the file path
 
 Any time you run `GenerateProjects.bat` for you will need to redo this step. 
 

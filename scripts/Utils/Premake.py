@@ -1,5 +1,6 @@
 import Config
 from scripts.Utils.Utils import *
+from scripts.Utils.VSPatch import *
 import subprocess
 
 def AddProject(code, projectkey, projectvalue, group, indent):
@@ -128,3 +129,5 @@ def GenerateProjects():
 	GenerateProject(Config.buildScripts[Config.gameProject], code)
 	subprocess.run(["vendor\premake\premake5.exe", "vs2022"], cwd=Config.gameProject)
 
+	for script in Config.buildScripts.values():
+		PatchVSXProj(script)

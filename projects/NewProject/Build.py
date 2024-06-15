@@ -36,15 +36,14 @@ includes = [
 	f"{includeDirs['json']}",
 	f"{includeDirs['dxc']}",
 	f"{includeDirs['pix']}",
-	f"{includeDirs['Aftermath']}",
-	f"{includeDirs['ProjectManager']}/src",
-	f"{includeDirs['Reflection']}/src",
-	f"{includeDirs['Utilities']}/src",
-	f"{location}/GameEngine/vendor",
+	f"{includeDirs['ProjectManager']}",
+	f"{includeDirs['Reflection']}",
+	f"{includeDirs['Utilities']}",
 	f"{location}/GameEngine/src",
 	f"{location}/GameEngine/embeded",
-	f"{location}/USG-Editor/src",
 ]
+if(inEditor):
+	includes.append(f"{location}/USG-Editor/src")
 
 sysIncludes = []
 sysIncludes.extend(GetSysIncludes())

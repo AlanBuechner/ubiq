@@ -88,8 +88,6 @@ namespace Engine
 
 		friend class Entity;
 		friend class SceneSerializer;
-		friend class SceneHierarchyPanel;
-		friend class Physics2D;
 		friend class SceneScriptBase;
 	};
 

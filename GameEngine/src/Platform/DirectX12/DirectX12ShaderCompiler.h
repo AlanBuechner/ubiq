@@ -3,8 +3,8 @@
 #include "Engine/Renderer/Abstractions/ShaderCompiler.h"
 #include "Utils/Vector.h"
 #include "DX.h"
-#include <dxc/inc/dxcapi.h>
-#include <dxc/inc/d3d12shader.h>
+#include <dxcapi.h>
+#include <d3d12shader.h>
 
 namespace Engine
 {
