@@ -3,6 +3,14 @@
 namespace Engine
 {
 
+	bool AABB::Valid()
+	{
+		if (m_Min.x > m_Max.x) return false;
+		if (m_Min.y > m_Max.y) return false;
+		if (m_Min.z > m_Max.z) return false;
+		return true;
+	}
+
 	void AABB::AddPosition(Math::Vector3 position)
 	{
 		if (position.x < m_Min.x) m_Min.x = position.x;

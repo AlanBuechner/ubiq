@@ -315,7 +315,7 @@ namespace Editor
 		if (selected)
 		{
 			Engine::AABB bounds = selected.GetLocalAABB();
-			if (bounds.m_Min == bounds.m_Max)
+			if (!bounds.Valid())
 			{
 				bounds.m_Min = { -1,-1,-1 };
 				bounds.m_Max = { 1, 1, 1 };
