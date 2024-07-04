@@ -10,7 +10,8 @@ namespace Engine
 	class Mesh;
 	class Shader;
 	class ShaderPass;
-	class ComputeShader;
+	class GraphicsShaderPass;
+	class ComputeShaderPass;
 	class ConstantBuffer;
 	class StructuredBuffer;
 	class RWStructuredBuffer;
@@ -81,7 +82,8 @@ namespace Engine
 		void ClearRenderTarget(Ref<RenderTarget2D> renderTarget);
 		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color) = 0;
 
-		virtual void SetShader(Ref<ShaderPass> shader) = 0;
+		virtual void SetShader(Ref<GraphicsShaderPass> shader) = 0;
+		virtual void SetShader(Ref<ComputeShaderPass> shader) = 0;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) = 0;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) = 0;
 		virtual void SetRootConstant(uint32 index, uint32 data) = 0;

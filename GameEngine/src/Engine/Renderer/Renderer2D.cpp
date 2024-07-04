@@ -4,7 +4,7 @@
 #include "Engine/Core/Core.h"
 #include "Renderer.h"
 #include "Abstractions/Resources/InstanceBuffer.h"
-#include "Abstractions/Shader.h"
+#include "Shaders/Shader.h"
 #include "Camera.h"
 #include "EditorCamera.h"
 #include "Engine/Core/Scene/Entity.h"
@@ -111,7 +111,7 @@ namespace Engine
 	{
 		if (!s_Data.QuadInstanceBuffer->Empty())
 		{
-			commandList->SetShader(s_Data.SpriteShader->GetPass("main"));
+			commandList->SetShader(s_Data.SpriteShader->GetGraphicsPass("main"));
 			commandList->SetConstantBuffer(0, s_Data.Camera);
 			commandList->DrawMesh(s_Data.QuadMesh, s_Data.QuadInstanceBuffer, s_Data.QuadInstanceBuffer->GetCount());
 		}

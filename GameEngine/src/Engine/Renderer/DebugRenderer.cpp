@@ -2,7 +2,7 @@
 #include "DebugRenderer.h"
 #include "Renderer.h"
 #include "Abstractions/Resources/Buffer.h"
-#include "Abstractions/Shader.h"
+#include "Shaders/Shader.h"
 #include "Abstractions/CommandList.h"
 #include "Abstractions/Resources/InstanceBuffer.h"
 #include "Abstractions/CommandList.h"
@@ -18,7 +18,7 @@ namespace Engine
 {
 	struct Pass
 	{
-		Ref<ShaderPass> m_Pass;
+		Ref<GraphicsShaderPass> m_Pass;
 		Ref<Mesh> m_Mesh;
 
 		std::vector<DebugVertex> Vertices;
@@ -54,19 +54,19 @@ namespace Engine
 		s_DebugData.DebugShader = Shader::CreateFromEmbeded(LINE, "LineShader.hlsl");
 
 		// init depth test line pass
-		s_DebugData.DepthTestLinesPass.m_Pass = s_DebugData.DebugShader->GetPass("DepthTestLinePass");
+		s_DebugData.DepthTestLinesPass.m_Pass = s_DebugData.DebugShader->GetGraphicsPass("DepthTestLinePass");
 		s_DebugData.DepthTestLinesPass.m_Mesh = Mesh::Create(sizeof(DebugVertex));
 
 		// init non-depth test line pass
-		s_DebugData.LinesPass.m_Pass = s_DebugData.DebugShader->GetPass("LinePass");
+		s_DebugData.LinesPass.m_Pass = s_DebugData.DebugShader->GetGraphicsPass("LinePass");
 		s_DebugData.LinesPass.m_Mesh = Mesh::Create(sizeof(DebugVertex));
 
 		// init depth test mesh pass
-		s_DebugData.DepthTestMeshPass.m_Pass = s_DebugData.DebugShader->GetPass("DepthTestMeshPass");
+		s_DebugData.DepthTestMeshPass.m_Pass = s_DebugData.DebugShader->GetGraphicsPass("DepthTestMeshPass");
 		s_DebugData.DepthTestMeshPass.m_Mesh = Mesh::Create(sizeof(DebugVertex));
 
 		// init non-depth test mesh pass
-		s_DebugData.MeshPass.m_Pass = s_DebugData.DebugShader->GetPass("MeshPass");
+		s_DebugData.MeshPass.m_Pass = s_DebugData.DebugShader->GetGraphicsPass("MeshPass");
 		s_DebugData.MeshPass.m_Mesh = Mesh::Create(sizeof(DebugVertex));
 	}
 

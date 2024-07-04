@@ -43,7 +43,8 @@ namespace Engine
 
 		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color) override;
 
-		virtual void SetShader(Ref<ShaderPass> shader) override;
+		virtual void SetShader(Ref<GraphicsShaderPass> shader) override;
+		virtual void SetShader(Ref<ComputeShaderPass> shader) override;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) override;
 		virtual void SetRootConstant(uint32 index, uint32 data) override;

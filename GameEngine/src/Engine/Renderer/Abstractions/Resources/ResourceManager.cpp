@@ -363,7 +363,7 @@ namespace Engine
 
 				// blit the last mip level onto the current mip level
 				Ref<Shader> blit = Renderer::GetBlitShader();
-				Ref<ShaderPass> blitPass = blit->GetPass("Blit");
+				Ref<ComputeShaderPass> blitPass = blit->GetComputePass("Blit");
 				m_TextureCopyCommandList->SetShader(blitPass);
 				m_TextureCopyCommandList->SetRWTexture(blitPass->GetUniformLocation("SrcTexture"), lastMip);
 				m_TextureCopyCommandList->SetRWTexture(blitPass->GetUniformLocation("DstTexture"), nextMip);

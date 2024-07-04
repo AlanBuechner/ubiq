@@ -25,7 +25,7 @@
 
 #include "Engine/Renderer/Mesh.h"
 // abstractions
-#include "Engine/Renderer/Abstractions/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 #include "Engine/Renderer/Abstractions/CommandList.h"
 #include "Engine/Renderer/Abstractions/CommandQueue.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"

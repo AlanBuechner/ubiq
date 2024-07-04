@@ -1,47 +1,44 @@
 #include "pch.h"
 #include "Shader.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Platform/DirectX12/DirectX12Shader.h"
+#include "Engine/Renderer/Shaders/ShaderCompiler.h"
+#include "GraphicsShaderPass.h"
+#include "ComputeShaderPass.h"
 
 #include "Engine/Util/PlatformUtils.h"
 #include "EngineResource.h"
-
 
 #include <fstream>
 
 namespace Engine
 {
-	Ref<ShaderPass> ShaderPass::Create(Ref<ShaderSorce> src, const std::string& passName)
-	{
-		switch (Renderer::GetAPI())
-		{
-		case RendererAPI::None:
-			CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-		case RendererAPI::DirectX12:
-			return CreateRef<DirectX12Shader>(src, passName);
-		}
-		CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
+
 
 	Shader::Shader(const std::string& code, const fs::path& file)
 	{
 		std::stringstream is(code);
 		Ref<ShaderSorce> src = ShaderCompiler::LoadFromSrc(is, file);
 
-		for (const ShaderConfig::RenderPass& pass : src->config.passes)
-		{
-			m_Passes[pass.passName] = ShaderPass::Create(src, pass.passName);
-		}
+		for (const GraphicsPassConfig& pass : src->config.graphicsPasses)
+			m_GraphicsPasses[pass.passName] = GraphicsShaderPass::Create(src, pass.passName);
+		for (const ComputePassConfig& pass : src->config.computePasses)
+			m_ComputePasses[pass.passName] = ComputeShaderPass::Create(src, pass.passName);
 
 		m_Params = src->config.params;
 	}
 
-	Ref<ShaderPass> Shader::GetPass(const std::string& passName)
+	Ref<GraphicsShaderPass> Shader::GetGraphicsPass(const std::string& passName)
 	{
-		auto pass = m_Passes.find(passName);
-		if (pass == m_Passes.end())
+		auto pass = m_GraphicsPasses.find(passName);
+		if (pass == m_GraphicsPasses.end())
+			return nullptr;
+		return pass->second;
+	}
+
+	Ref<ComputeShaderPass> Shader::GetComputePass(const std::string& passName)
+	{
+		auto pass = m_ComputePasses.find(passName);
+		if (pass == m_ComputePasses.end())
 			return nullptr;
 		return pass->second;
 	}

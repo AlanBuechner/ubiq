@@ -20,9 +20,9 @@ namespace Game
 	void Bloom::RecordCommands(Engine::Ref<Engine::CommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
 	{
 		Engine::GPUTimer::BeginEvent(commandList, "Bloom");
-		Engine::Ref<Engine::ShaderPass> downSample = m_BloomShader->GetPass("downSample");
-		Engine::Ref<Engine::ShaderPass> upSample = m_BloomShader->GetPass("upSample");
-		Engine::Ref<Engine::ShaderPass> composite = m_BloomShader->GetPass("composite");
+		Engine::Ref<Engine::GraphicsShaderPass> downSample = m_BloomShader->GetGraphicsPass("downSample");
+		Engine::Ref<Engine::GraphicsShaderPass> upSample = m_BloomShader->GetGraphicsPass("upSample");
+		Engine::Ref<Engine::GraphicsShaderPass> composite = m_BloomShader->GetGraphicsPass("composite");
 
 #ifdef USE_BLOOM_COMPUTE
 			uint32 computeSize = 8;

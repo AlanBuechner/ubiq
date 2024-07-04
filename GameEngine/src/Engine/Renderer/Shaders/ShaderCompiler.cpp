@@ -4,53 +4,125 @@
 
 namespace Engine
 {
+#pragma region Utilitis
+
+
+	std::vector<std::string> Tokenize(const std::string& line)
+	{
+		const char delimiters[] = { ' ', '	', '\r', '\n' };
+		const char reservedTokens[] = { "={};\"()," };
+
+		std::vector<std::string> tokens;
+
+		bool lastCharReserved = false;
+		std::string token;
+		for (const char& c : line)
+		{
+			bool endToken = false;
+			// check if it is a delimiter
+			bool delimiter = false;
+			for (uint32 i = 0; i < _countof(delimiters); i++)
+			{
+				if (c == delimiters[i])
+				{
+					endToken = true;
+					delimiter = true;
+					break;
+				}
+			}
+
+			// check if reserved token
+			bool reserved = false;
+			for (uint32 i = 0; i < _countof(reservedTokens); i++)
+			{
+				if (c == reservedTokens[i])
+				{
+					reserved = true;
+					break;
+				}
+			}
+
+			// combine char with last
+			if (reserved && lastCharReserved && !endToken)
+			{
+				endToken = true;
+				//if (token.back() == '=')
+			}
+
+			if (lastCharReserved != reserved)
+				endToken = true;
+
+			if (endToken)
+			{
+				if (!token.empty())
+				{
+					tokens.push_back(token);
+					token.clear();
+				}
+				if (!delimiter)
+					token.push_back(c);
+				lastCharReserved = reserved;
+			}
+			else
+				token.push_back(c);
+		}
+
+		if (!token.empty())
+			tokens.push_back(token); // add the last token
+
+		return tokens;
+	}
+
 
 	uint32 MaterialParameter::GetTypeSize()
 	{
 		switch (type)
 		{
-		case MaterialParameter::TextureID:
-		case MaterialParameter::Bool:
-		case MaterialParameter::Float:
-			return 4;
-		default:
-			return 4;
+		case MaterialParameterType::TextureID:	return 4;
+		case MaterialParameterType::Bool:		return 4;
+		case MaterialParameterType::Float:		return 4;
+		default:								return 4;
 		}
 	}
 
-	SamplerInfo::WrapMode GetWrapMode(const std::string& str)
+	WrapMode GetWrapMode(const std::string& str)
 	{
-		if (str == "repeat")
-			return SamplerInfo::WrapMode::Repeat;
-		else if (str == "repeatMiror")
-			return SamplerInfo::WrapMode::MirroredRepeat;
-		else if (str == "clamp")
-			return SamplerInfo::WrapMode::Clamp;
-		return SamplerInfo::WrapMode::Clamp;
+		if		(str == "repeat")		return WrapMode::Repeat;
+		else if (str == "repeatMiror")	return WrapMode::MirroredRepeat;
+		else if (str == "clamp")		return WrapMode::Clamp;
+		else							return WrapMode::Clamp;
 	}
 
-	SamplerInfo::MinMagFilter GetFilter(const std::string& str)
+	MinMagFilter GetFilter(const std::string& str)
 	{
-		if (str == "point") 
-			return SamplerInfo::MinMagFilter::Point;
-		else if (str == "linear") 
-			return SamplerInfo::MinMagFilter::Linear;
-		else if (str == "anisotropic") 
-			return SamplerInfo::MinMagFilter::Anisotropic;
-		return SamplerInfo::MinMagFilter::Linear;
+		if		(str == "point")		return MinMagFilter::Point;
+		else if (str == "linear")		return MinMagFilter::Linear;
+		else if (str == "anisotropic")	return MinMagFilter::Anisotropic;
+		else							return MinMagFilter::Linear;
 	}
+#pragma endregion
 
 
-	ShaderConfig::RenderPass& ShaderConfig::FindPass(const std::string& passName)
+	GraphicsPassConfig* ShaderConfig::FindGraphicsPass(const std::string& passName)
 	{
-		for (RenderPass& pass : passes)
+		for (GraphicsPassConfig& pass : graphicsPasses)
 		{
 			if (pass.passName == passName)
-				return pass;
+				return &pass;
 		}
-		return passes[0];
+		return nullptr;
 	}
 
+
+	ComputePassConfig* ShaderConfig::FindComputePass(const std::string& passName)
+	{
+		for (ComputePassConfig& pass : computePasses)
+		{
+			if (pass.passName == passName)
+				return &pass;
+		}
+		return nullptr;
+	}
 
 	fs::path ShaderCompiler::FindFilePath(const fs::path& file, const fs::path& parent)
 	{
@@ -67,22 +139,9 @@ namespace Engine
 		return fs::path("");
 	}
 
-	Ref<ShaderSorce> ShaderCompiler::LoadFromFile(const fs::path& file)
-	{
-		std::ifstream shaderFile;
-		shaderFile.open(file);
-		if (shaderFile.fail())
-		{
-			CORE_ERROR("Cant open file {0}", file.string());
-			return CreateRef<ShaderSorce>();
-		}
-
-		return LoadFromSrc(shaderFile, file);
-	}
-
 	Ref<ShaderSorce> ShaderCompiler::LoadFromSrc(std::istream& src, const fs::path& file)
 	{
-		Ref<ShaderSorce> sorce = CreateRef<ShaderSorce>();
+		Ref<ShaderSorce> source = CreateRef<ShaderSorce>();
 
 		std::unordered_map<std::string, std::stringstream> ss;
 		std::stringstream* currSS = &ss["config"];
@@ -99,30 +158,30 @@ namespace Engine
 		}
 
 		std::string configSection = ss["config"].str();
-		sorce->config = CompileConfig(configSection);
+		source->config = CompileConfig(configSection);
 
-		std::string materialCode = GenerateMaterialStruct(sorce->config.params);
+		std::string materialCode = GenerateMaterialStruct(source->config.params);
 
-		ShaderSorce::SectionInfo commonSection;
+		SectionInfo commonSection;
 		std::string commonSrc = materialCode + ss["common"].str();
 		PreProcess(commonSrc, commonSection, file);
 		for (auto& sectionSource : ss)
 		{
 			if (sectionSource.first != "config" && sectionSource.first != "common")
 			{
-				ShaderSorce::SectionInfo section = commonSection;
+				SectionInfo section = commonSection;
 				std::string sectionSrc = sectionSource.second.str();
 				PreProcess(sectionSrc, section, file);
-				sorce->m_Sections[sectionSource.first] = section;
+				source->m_Sections[sectionSource.first] = section;
 			}
 		}
 
-		sorce->file = file;
+		source->file = file;
 
-		return sorce;
+		return source;
 	}
 
-	void ShaderCompiler::PreProcess(std::string& src, ShaderSorce::SectionInfo& section, const fs::path& fileLocation)
+	void ShaderCompiler::PreProcess(std::string& src, SectionInfo& section, const fs::path& fileLocation)
 	{
 		std::stringstream ss(src);
 
@@ -202,7 +261,7 @@ namespace Engine
 		std::vector<Ref<Variable>> vars;
 		while (!tokenQueue.empty())
 			vars.push_back(Variable::Build(tokenQueue));
-		ShaderConfig::RenderPass::Topology baseTopo = ShaderConfig::RenderPass::Topology::Triangle;
+		Topology baseTopo = Topology::Triangle;
 
 		for (Ref<Variable> var : vars)
 		{
@@ -212,30 +271,49 @@ namespace Engine
 			{
 				for (Ref<Variable> pass : var->value->object->values)
 				{
-					ShaderConfig::RenderPass rpass;
-					rpass.passName = pass->name;
-					rpass.topology = baseTopo;
-					for (Ref<Variable> var : pass->value->object->values)
+					Ref<Object> obj = pass->value->object;
+
+					bool hasGeo = obj->HasVariable("VS") || obj->HasVariable("MS");
+					bool hasPixel = obj->HasVariable("PS");
+					bool isGraphics = hasGeo && hasPixel;
+					bool isCompute = obj->HasVariable("CS");
+
+					if (isGraphics)
 					{
-						if (var->name == "VS")				rpass.vs = var->value->string;
-						else if (var->name == "PS")			rpass.ps = var->value->string;
-						else if (var->name == "CS")			rpass.cs = var->value->string;
-						else if (var->name == "blendMode")	rpass.blendMode = ParseBlendMode(var);
-						else if (var->name == "cullMode")	rpass.cullMode = ParseCullMode(var);
-						else if (var->name == "depthTest")	rpass.depthTest = ParseDepthTest(var);
-						else if (var->name == "topology")	rpass.topology = ParseTopology(var);
+						GraphicsPassConfig rpass;
+						rpass.passName = pass->name;
+						rpass.topology = baseTopo;
+						for (Ref<Variable> var : pass->value->object->values)
+						{
+							if (var->name == "VS")				rpass.vs = var->value->string;
+							else if (var->name == "PS")			rpass.ps = var->value->string;
+							else if (var->name == "blendMode")	rpass.blendMode = ParseBlendMode(var);
+							else if (var->name == "cullMode")	rpass.cullMode = ParseCullMode(var);
+							else if (var->name == "depthTest")	rpass.depthTest = ParseDepthTest(var);
+							else if (var->name == "topology")	rpass.topology = ParseTopology(var);
+						}
+						config.graphicsPasses.push_back(rpass);
 					}
-					config.passes.push_back(rpass);
+					if (isCompute)
+					{
+						ComputePassConfig rpass;
+						rpass.passName = pass->name;
+						for (Ref<Variable> var : pass->value->object->values)
+						{
+							if (var->name == "CS")	rpass.cs = var->value->string;
+						}
+						config.computePasses.push_back(rpass);
+					}
 				}
 			}
 			else if (var->name == "material")
 			{
 				for (Ref<Variable> param : var->value->object->values)
 				{
-					MaterialParameter::Type type = MaterialParameter::TextureID;
-					if (param->value->string == "textureID")	type = MaterialParameter::TextureID;
-					else if (param->value->string == "float")	type = MaterialParameter::Float;
-					else if (param->value->string == "bool")	type = MaterialParameter::Bool;
+					MaterialParameterType type = MaterialParameterType::TextureID;
+					if (param->value->string == "textureID")	type = MaterialParameterType::TextureID;
+					else if (param->value->string == "float")	type = MaterialParameterType::Float;
+					else if (param->value->string == "bool")	type = MaterialParameterType::Bool;
 
 					std::string defaultValue = "";
 					if (param->value->paramters.size() > 0)
@@ -262,90 +340,17 @@ namespace Engine
 			// add type
 			switch (p.type)
 			{
-			case MaterialParameter::TextureID:
-				ss << "uint ";
-				break;
-			case MaterialParameter::Float:
-				ss << "float ";
-				break;
-			case MaterialParameter::Bool:
-				ss << "bool ";
-				break;
+			case MaterialParameterType::TextureID:	ss << "uint";	break;
+			case MaterialParameterType::Float:		ss << "float";	break;
+			case MaterialParameterType::Bool:		ss << "bool";	break;
 			}
 
-			ss << p.name << ";" << std::endl;
+			ss << " " << p.name << ";" << std::endl;
 		}
 
 		ss << "};" << std::endl;
 		return ss.str();
 	}
-
-	std::vector<std::string> ShaderCompiler::Tokenize(const std::string& line)
-	{
-		const char delimiters[] = {' ', '	', '\r', '\n'};
-		const char reservedTokens[] = { "={};\"()," };
-
-		std::vector<std::string> tokens;
-
-		bool lastCharReserved = false;
-		std::string token;
-		for (const char& c : line)
-		{
-			bool endToken = false;
-			// check if it is a delimiter
-			bool delimiter = false;
-			for (uint32 i = 0; i < _countof(delimiters); i++)
-			{
-				if (c == delimiters[i])
-				{
-					endToken = true;
-					delimiter = true;
-					break;
-				}
-			}
-
-			// check if reserved token
-			bool reserved = false;
-			for (uint32 i = 0; i < _countof(reservedTokens); i++)
-			{
-				if (c == reservedTokens[i])
-				{
-					reserved = true;
-					break;
-				}
-			}
-
-			// combine char with last
-			if (reserved && lastCharReserved && !endToken)
-			{
-				endToken = true;
-				//if (token.back() == '=')
-			}
-
-			if (lastCharReserved != reserved)
-				endToken = true;
-
-			if (endToken)
-			{
-				if (!token.empty())
-				{
-					tokens.push_back(token);
-					token.clear();
-				}
-				if (!delimiter)
-					token.push_back(c);
-				lastCharReserved = reserved;
-			}
-			else
-				token.push_back(c);
-		}
-
-		if(!token.empty())
-			tokens.push_back(token); // add the last token
-
-		return tokens;
-	}
-
 
 	Ref<ShaderCompiler::Variable> ShaderCompiler::Variable::Build(std::queue<std::string>& tokenQueue)
 	{
@@ -400,6 +405,14 @@ namespace Engine
 		return val;
 	}
 
+	bool ShaderCompiler::Object::HasVariable(const std::string& name)
+	{
+		return std::find_if(values.begin(), values.end(), 
+			[&name](Ref<Variable> var) {
+				return var->name == name; 
+			}) != values.end();
+	}
+
 	Ref<ShaderCompiler::Object> ShaderCompiler::Object::Build(std::queue<std::string>& tokenQueue)
 	{
 		Ref<Object> object = CreateRef<Object>();
@@ -417,39 +430,39 @@ namespace Engine
 		return object;
 	}
 
-	ShaderConfig::RenderPass::Topology ShaderCompiler::ParseTopology(Ref<Variable> var)
+	Topology ShaderCompiler::ParseTopology(Ref<Variable> var)
 	{
-		if (var->value->string == "triangle")	return ShaderConfig::RenderPass::Topology::Triangle;
-		else if (var->value->string == "line")	return ShaderConfig::RenderPass::Topology::Line;
-		else if (var->value->string == "point")	return ShaderConfig::RenderPass::Topology::Point;
-		return ShaderConfig::RenderPass::Topology::Triangle;
+		if (var->value->string == "triangle")	return Topology::Triangle;
+		else if (var->value->string == "line")	return Topology::Line;
+		else if (var->value->string == "point")	return Topology::Point;
+		return Topology::Triangle;
 	}
 
 
-	ShaderConfig::RenderPass::BlendMode ShaderCompiler::ParseBlendMode(Ref<Variable> var)
+	BlendMode ShaderCompiler::ParseBlendMode(Ref<Variable> var)
 	{
-		if (var->value->string == "blend")		return ShaderConfig::RenderPass::BlendMode::Blend;
-		else if (var->value->string == "add")	return ShaderConfig::RenderPass::BlendMode::Add;
-		else if (var->value->string == "none")	return ShaderConfig::RenderPass::BlendMode::None;
-		return ShaderConfig::RenderPass::BlendMode::None;
+		if (var->value->string == "blend")		return BlendMode::Blend;
+		else if (var->value->string == "add")	return BlendMode::Add;
+		else if (var->value->string == "none")	return BlendMode::None;
+		return BlendMode::None;
 	}
 
-	ShaderConfig::RenderPass::CullMode ShaderCompiler::ParseCullMode(Ref<Variable> var)
+	CullMode ShaderCompiler::ParseCullMode(Ref<Variable> var)
 	{
-		if (var->value->string == "back")		return ShaderConfig::RenderPass::CullMode::Back;
-		else if (var->value->string == "front")	return ShaderConfig::RenderPass::CullMode::Front;
-		else if (var->value->string == "none")	return ShaderConfig::RenderPass::CullMode::None;
-		return ShaderConfig::RenderPass::CullMode::None;
+		if (var->value->string == "back")		return CullMode::Back;
+		else if (var->value->string == "front")	return CullMode::Front;
+		else if (var->value->string == "none")	return CullMode::None;
+		return CullMode::None;
 	}
 
-	ShaderConfig::RenderPass::DepthTest ShaderCompiler::ParseDepthTest(Ref<Variable> var)
+	DepthTest ShaderCompiler::ParseDepthTest(Ref<Variable> var)
 	{
-		if (var->value->string == "less")					return ShaderConfig::RenderPass::DepthTest::Less;
-		else if (var->value->string == "lessOrEqual")		return ShaderConfig::RenderPass::DepthTest::LessOrEqual;
-		else if (var->value->string == "greater")			return ShaderConfig::RenderPass::DepthTest::Greater;
-		else if (var->value->string == "greaterOrEqual")	return ShaderConfig::RenderPass::DepthTest::GreaterOrEqual;
-		else if (var->value->string == "none")				return ShaderConfig::RenderPass::DepthTest::None;
-		return ShaderConfig::RenderPass::DepthTest::None;
+		if (var->value->string == "less")					return DepthTest::Less;
+		else if (var->value->string == "lessOrEqual")		return DepthTest::LessOrEqual;
+		else if (var->value->string == "greater")			return DepthTest::Greater;
+		else if (var->value->string == "greaterOrEqual")	return DepthTest::GreaterOrEqual;
+		else if (var->value->string == "none")				return DepthTest::None;
+		return DepthTest::None;
 	}
 
 }

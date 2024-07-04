@@ -1,7 +1,8 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Engine/Renderer/Abstractions/ShaderCompiler.h"
-#include "DX.h"
+#include "Engine/Renderer/Shaders/ShaderCompiler.h"
+#include "Engine/Renderer/Abstractions/Resources/TextureFormat.h"
+#include "Platform/DirectX12/DX.h"
 #include <dxcapi.h>
 #include <d3d12shader.h>
 
@@ -22,9 +23,8 @@ namespace Engine
 		static DirectX12ShaderCompiler& Get();
 
 		ShaderBlobs Compile(const std::string& code, const fs::path& file, ShaderType type);
-		void GetShaderParameters(ShaderBlobs& blobs, ShaderSorce::SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type);
+		void GetShaderParameters(ShaderBlobs& blobs, SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type);
 		void GetInputLayout(ShaderBlobs& blobs, std::vector<ShaderInputElement>& inputElements);
-		void GetOutputLayout(ShaderBlobs& blobs, std::vector<TextureFormat>& outputElement);
 
 		ID3D12RootSignature* GenRootSignature(std::vector<ShaderParameter>& params);
 

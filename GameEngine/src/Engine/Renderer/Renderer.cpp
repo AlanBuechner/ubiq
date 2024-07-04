@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Renderer.h"
-#include "Abstractions/Shader.h"
+#include "Shaders/Shader.h"
 #include "Camera.h"
 #include "Renderer2D.h"
 #include "DebugRenderer.h"
