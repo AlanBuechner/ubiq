@@ -43,7 +43,7 @@ namespace Engine
 			}
 		}
 		if(toRemove != m_KeysDown.end())
-			m_KeysDown.Remove(toRemove);
+			m_KeysDown.Remove(toRemove - m_KeysDown.begin());
 		return false; 
 	}
 

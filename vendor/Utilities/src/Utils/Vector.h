@@ -3,6 +3,7 @@
 #include "Types.h"
 #include <memory>
 #include <type_traits>
+#include <functional>
 
 #include <vector>
 
@@ -12,12 +13,16 @@ namespace Utils
 	template<class Type>
 	class Vector
 	{
+		using Predicate = std::function<bool(const Type&)>;
+		using Conpare = std::function<bool(const Type&, const Type&)>;
+
 	public:
 		Vector();
 		Vector(const Vector& other);
 		Vector(Vector&& other) noexcept;
 		Vector(uint32 capacity);
 		Vector(uint32 size, const Type& value);
+		Vector(std::initializer_list<Type> list);
 
 		~Vector();
 		void Destroy();
@@ -27,15 +32,16 @@ namespace Utils
 		void Pop();
 
 		Type& Insert(uint32 index, const Type& value);
-		Type& Insert(Type* iter, const Type& value);
 
 		//TODO: These are swap and pop, make that more obvious
 		void Remove(uint32 index);
-		void Remove(Type* iter);
 
 		void Reserve(uint32 capacity);
 		void Resize(uint32 size, const Type& value = {});
 		void Clear();
+
+		uint32 Find(const Type& val) const;
+		uint32 FindIf(Predicate predicate) const;
 
 		constexpr uint32 ElementSize() const;
 		uint32 SizeInBytes() const;
@@ -49,6 +55,8 @@ namespace Utils
 
 		Vector& operator=(const Vector& other);
 		Vector& operator=(Vector&& other) noexcept;
+		bool operator==(const Vector<Type>& other) const;
+		bool operator!=(const Vector<Type>& other) const;
 		const Type& operator[](uint32 index) const;
 		Type& operator[](uint32 index);
 
@@ -93,6 +101,17 @@ namespace Utils
 	{
 		Reserve(count);
 		for (Type* t = m_Array, *end = m_Array + m_Count; t != end; ++t) { *t = value; }
+	}
+
+	template<class Type> inline Vector<Type>::Vector(std::initializer_list<Type> list) : m_Count{ (uint32)list.size() }
+	{
+		Reserve(m_Count);
+
+		Type* arr = m_Array;
+		for (const Type* it = list.begin(); it != list.end(); ++it, ++arr)
+		{
+			*arr = *it;
+		}
 	}
 
 	template<class Type> inline Vector<Type>::~Vector()
@@ -151,11 +170,6 @@ namespace Utils
 		return m_Array[index];
 	}
 
-	template<class Type> inline Type& Vector<Type>::Insert(Type* iter, const Type& value)
-	{
-		return Insert(iter - m_Array, value);
-	}
-
 	template<class Type> inline void Vector<Type>::Remove(uint32 index)
 	{
 #if defined(DEBUG)
@@ -164,17 +178,6 @@ namespace Utils
 		m_Array[index] = m_Array[--m_Count];
 	}
 
-	template<class Type> inline void Vector<Type>::Remove(Type* iter)
-	{
-		uint32 index = iter - m_Array;
-
-#if defined(DEBUG)
-		//TODO: Assert index in bounds
-#endif
-
-		m_Array[index] = m_Array[--m_Count];
-	}
-	
 	template<class Type> inline void Vector<Type>::Reserve(uint32 capacity)
 	{
 		//TODO: Realloc with custom memory
@@ -189,7 +192,7 @@ namespace Utils
 
 			if constexpr (std::is_default_constructible_v<Type>) { delete[] temp; }
 			else { free(temp); }
-			
+
 		}
 		else
 		{
@@ -207,6 +210,26 @@ namespace Utils
 		for (Type* t = m_Array + m_Count, *end = m_Array + count; t != end; ++t) { *t = value; }
 
 		m_Count = count;
+	}
+
+	template<class Type> inline uint32 Vector<Type>::Find(const Type& val) const
+	{
+		for (uint32 i = 0; i < m_Count; i++)
+		{
+			if (m_Array[i] == val)
+				return i;
+		}
+		return m_Count;
+	}
+
+	template<class Type> uint32 Vector<Type>::FindIf(Predicate predicate) const
+	{
+		for (uint32 i = 0; i < m_Count; i++)
+		{
+			if (predicate(m_Array[i]))
+				return i;
+		}
+		return m_Count;
 	}
 
 	template<class Type> inline void Vector<Type>::Clear() { m_Count = 0; }
@@ -250,6 +273,34 @@ namespace Utils
 		other.m_Array = nullptr;
 
 		return *this;
+	}
+
+	template<class Type> inline bool Vector<Type>::operator==(const Vector<Type>& other) const
+	{
+		if (this == &other) { return true; }
+
+		if (m_Count != other.m_Count) { return false; }
+
+		for (const Type* it0 = m_Array, *it1 = other.m_Array, *end = m_Array + m_Count; it0 != end; ++it0, ++it1)
+		{
+			if (*it0 != *it1) { return false; }
+		}
+
+		return true;
+	}
+
+	template<class Type> inline bool Vector<Type>::operator!=(const Vector<Type>& other) const
+	{
+		if (this == &other) { return false; }
+
+		if (m_Count != other.m_Count) { return true; }
+
+		for (const Type* it0 = m_Array, *it1 = other.m_Array, *end = m_Array + m_Count; it0 != end; ++it0, ++it1)
+		{
+			if (*it0 != *it1) { return true; }
+		}
+
+		return false;
 	}
 
 	template<class Type> inline const Type& Vector<Type>::operator[](uint32 index) const

@@ -26,3 +26,5 @@ runtime.json
 *.wpix
 *.aps
 *.reflected
+
+# projects/*/imgui.ini
