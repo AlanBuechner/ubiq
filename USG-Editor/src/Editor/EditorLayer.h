@@ -57,7 +57,7 @@ namespace Editor
 		const float m_GridExtent = 40.0f;
 		const uint32 m_GridLines = 80;
 		const float m_GridLineOffset = m_GridExtent * 2 / m_GridLines;
-		Engine::LineMesh m_GridMesh;
+		Engine::DebugMesh m_GridMesh;
 
 		Engine::Ref<Engine::EditorCamera> m_EditorCamera;
 

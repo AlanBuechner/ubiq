@@ -175,13 +175,13 @@ namespace Engine
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc{};
 			desc.pRootSignature = m_Sig;
 			desc.InputLayout = { ies.data(), (UINT)ies.size() };
-			switch (m_Src->config.topology)
+			switch (m_PassConfig.topology)
 			{
-			case ShaderConfig::Triangle:
+			case ShaderConfig::RenderPass::Topology::Triangle:
 				desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; break;
-			case ShaderConfig::Line:
+			case ShaderConfig::RenderPass::Topology::Line:
 				desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE; break;
-			case ShaderConfig::Point:
+			case ShaderConfig::RenderPass::Topology::Point:
 				desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT; break;
 			}
 			desc.VS = { m_Blobs.vs->GetBufferPointer(), m_Blobs.vs->GetBufferSize() };
@@ -285,6 +285,8 @@ namespace Engine
 					desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
 				else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::DepthTest::GreaterOrEqual)
 					desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+				else if (m_PassConfig.depthTest == ShaderConfig::RenderPass::DepthTest::None)
+					desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
 				desc.DepthStencilState.StencilEnable = TRUE;
 				desc.DepthStencilState.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
 				desc.DepthStencilState.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;

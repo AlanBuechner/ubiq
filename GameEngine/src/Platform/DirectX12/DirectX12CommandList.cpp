@@ -344,11 +344,11 @@ namespace Engine
 			D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 			switch (dxShader->GetTopologyType())
 			{
-			case ShaderConfig::Triangle:
+			case ShaderConfig::RenderPass::Topology::Triangle:
 				top = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
-			case ShaderConfig::Line:
+			case ShaderConfig::RenderPass::Topology::Line:
 				top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
-			case ShaderConfig::Point:
+			case ShaderConfig::RenderPass::Topology::Point:
 				top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
 			}
 

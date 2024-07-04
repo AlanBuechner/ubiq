@@ -97,15 +97,16 @@ namespace Engine
 
 	struct ShaderConfig
 	{
-		enum Topology
-		{
-			Triangle,
-			Line,
-			Point,
-		};
 
 		struct RenderPass
 		{
+			enum Topology
+			{
+				Triangle,
+				Line,
+				Point,
+			};
+
 			enum class BlendMode {
 				Blend,
 				Add,
@@ -122,20 +123,21 @@ namespace Engine
 				Less,
 				LessOrEqual,
 				Greater,
-				GreaterOrEqual
+				GreaterOrEqual,
+				None
 			};
 
 			std::string passName;
 			std::string vs;
 			std::string ps;
 			std::string cs;
+			Topology topology;
 			BlendMode blendMode = BlendMode::Blend;
 			CullMode cullMode = CullMode::Back;
 			DepthTest depthTest = DepthTest::LessOrEqual;
 
 		};
 
-		Topology topology;
 
 		std::vector<RenderPass> passes;
 
@@ -223,5 +225,9 @@ namespace Engine
 		};
 		
 
+		static ShaderConfig::RenderPass::Topology ParseTopology(Ref<Variable> var);
+		static ShaderConfig::RenderPass::BlendMode ParseBlendMode(Ref<Variable> var);
+		static ShaderConfig::RenderPass::CullMode ParseCullMode(Ref<Variable> var);
+		static ShaderConfig::RenderPass::DepthTest ParseDepthTest(Ref<Variable> var);
 	};
 }

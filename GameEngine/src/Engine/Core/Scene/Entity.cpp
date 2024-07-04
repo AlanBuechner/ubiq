@@ -98,7 +98,8 @@ namespace Engine
 			}
 
 			data.aabb = AABB::GetExtents(aabbs);
-			data.aabb.MinThickness(0.001f);
+			if(data.aabb.Valid())
+				data.aabb.MinThickness(0.001f);
 			data.dirtyAABB = false;
 		}
 

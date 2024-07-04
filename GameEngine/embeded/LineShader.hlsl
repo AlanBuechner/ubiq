@@ -1,11 +1,29 @@
 #section config
-topology = line;
 
 passes = {
-	main = {
+	DepthTestLinePass = {
 		VS = vertex;
 		PS = pixel;
+		topology = line;
 	};
+	LinePass = {
+		VS = vertex;
+		PS = pixel;
+		topology = line;
+		depthTest = none;
+	};
+	DepthTestMeshPass = {
+		VS = vertex;
+		PS = pixel;
+		topology = triangle;
+	};
+	MeshPass = {
+		VS = vertex;
+		PS = pixel;
+		topology = triangle;
+		depthTest = none;
+	};
+
 };
 
 
@@ -18,9 +36,6 @@ struct VS_Input
 {
 	float3 position : POSITION;
 	float4 color : COLOR;
-
-	// semantics starting with "I_" are per instance data
-	float4x4 transform : I_TRANSFORM;
 };
 
 struct VS_Output
@@ -51,7 +66,7 @@ cbuffer Camera
 VS_Output main(VS_Input input)
 {
 	VS_Output output;
-	output.position = mul(ViewPorjection, mul(input.transform, float4(input.position, 1)));
+	output.position = mul(ViewPorjection, float4(input.position, 1));
 	output.color = input.color;
 	return output;
 }
@@ -61,6 +76,9 @@ VS_Output main(VS_Input input)
 
 
 #section pixel
+
+Texture2D<float4> textures[] : register(space0);
+StaticSampler textureSampler = StaticSampler(repeat, repeat, linear, liner);
 
 PS_Output main(PS_Input input)
 {

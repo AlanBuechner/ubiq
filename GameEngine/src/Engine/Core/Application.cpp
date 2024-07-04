@@ -12,6 +12,7 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Abstractions/Resources/SwapChain.h"
 #include "Engine/Renderer/Abstractions/Resources/ResourceManager.h"
+#include "Engine/Renderer/DebugRenderer.h"
 
 #include "Engine/Util/Performance.h"
 
@@ -125,6 +126,7 @@ namespace Engine {
 			timer.End();
 
 			// begin rendering
+			DebugRenderer::EndScene();
 			Renderer::BeginFrame();
 
 			if (!m_Minimized)

@@ -22,7 +22,7 @@ namespace Engine
 		wrl::ComPtr<ID3D12RootSignature> GetRootSignature() { return m_Sig; }
 		wrl::ComPtr<ID3D12PipelineState> GetPipelineState(Ref<FrameBuffer> target);
 
-		ShaderConfig::Topology GetTopologyType() { return m_Src->config.topology; }
+		ShaderConfig::RenderPass::Topology GetTopologyType() { return m_PassConfig.topology; }
 
 		virtual uint32 GetUniformLocation(const std::string& name) const override;
 	private:

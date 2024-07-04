@@ -202,61 +202,28 @@ namespace Engine
 		std::vector<Ref<Variable>> vars;
 		while (!tokenQueue.empty())
 			vars.push_back(Variable::Build(tokenQueue));
+		ShaderConfig::RenderPass::Topology baseTopo = ShaderConfig::RenderPass::Topology::Triangle;
 
 		for (Ref<Variable> var : vars)
 		{
 			if (var->name == "topology")
-			{
-				if (var->value->string == "triangle")
-					config.topology = ShaderConfig::Triangle;
-				else if (var->value->string == "line")
-					config.topology = ShaderConfig::Line;
-				else if (var->value->string == "point")
-					config.topology = ShaderConfig::Point;
-			}
+				baseTopo = ParseTopology(var);
 			else if (var->name == "passes")
 			{
 				for (Ref<Variable> pass : var->value->object->values)
 				{
 					ShaderConfig::RenderPass rpass;
 					rpass.passName = pass->name;
+					rpass.topology = baseTopo;
 					for (Ref<Variable> var : pass->value->object->values)
 					{
-						if (var->name == "VS")
-							rpass.vs = var->value->string;
-						else if (var->name == "PS")
-							rpass.ps = var->value->string;
-						else if (var->name == "CS")
-							rpass.cs = var->value->string;
-						else if (var->name == "blendMode")
-						{
-							if (var->value->string == "blend")
-								rpass.blendMode = ShaderConfig::RenderPass::BlendMode::Blend;
-							else if (var->value->string == "add")
-								rpass.blendMode = ShaderConfig::RenderPass::BlendMode::Add;
-							else if (var->value->string == "none")
-								rpass.blendMode = ShaderConfig::RenderPass::BlendMode::None;
-						}
-						else if (var->name == "cullMode")
-						{
-							if (var->value->string == "back")
-								rpass.cullMode = ShaderConfig::RenderPass::CullMode::Back;
-							else if (var->value->string == "front")
-								rpass.cullMode = ShaderConfig::RenderPass::CullMode::Front;
-							else if (var->value->string == "none")
-								rpass.cullMode = ShaderConfig::RenderPass::CullMode::None;
-						}
-						else if (var->name == "depthTest")
-						{
-							if (var->value->string == "less")
-								rpass.depthTest = ShaderConfig::RenderPass::DepthTest::Less;
-							else if (var->value->string == "lessOrEqual")
-								rpass.depthTest = ShaderConfig::RenderPass::DepthTest::LessOrEqual;
-							else if (var->value->string == "greater")
-								rpass.depthTest = ShaderConfig::RenderPass::DepthTest::Greater;
-							else if (var->value->string == "greaterOrEqual")
-								rpass.depthTest = ShaderConfig::RenderPass::DepthTest::GreaterOrEqual;
-						}
+						if (var->name == "VS")				rpass.vs = var->value->string;
+						else if (var->name == "PS")			rpass.ps = var->value->string;
+						else if (var->name == "CS")			rpass.cs = var->value->string;
+						else if (var->name == "blendMode")	rpass.blendMode = ParseBlendMode(var);
+						else if (var->name == "cullMode")	rpass.cullMode = ParseCullMode(var);
+						else if (var->name == "depthTest")	rpass.depthTest = ParseDepthTest(var);
+						else if (var->name == "topology")	rpass.topology = ParseTopology(var);
 					}
 					config.passes.push_back(rpass);
 				}
@@ -266,12 +233,9 @@ namespace Engine
 				for (Ref<Variable> param : var->value->object->values)
 				{
 					MaterialParameter::Type type = MaterialParameter::TextureID;
-					if (param->value->string == "textureID")
-						type = MaterialParameter::TextureID;
-					else if (param->value->string == "float")
-						type = MaterialParameter::Float;
-					else if (param->value->string == "bool")
-						type = MaterialParameter::Bool;
+					if (param->value->string == "textureID")	type = MaterialParameter::TextureID;
+					else if (param->value->string == "float")	type = MaterialParameter::Float;
+					else if (param->value->string == "bool")	type = MaterialParameter::Bool;
 
 					std::string defaultValue = "";
 					if (param->value->paramters.size() > 0)
@@ -452,5 +416,41 @@ namespace Engine
 
 		return object;
 	}
+
+	ShaderConfig::RenderPass::Topology ShaderCompiler::ParseTopology(Ref<Variable> var)
+	{
+		if (var->value->string == "triangle")	return ShaderConfig::RenderPass::Topology::Triangle;
+		else if (var->value->string == "line")	return ShaderConfig::RenderPass::Topology::Line;
+		else if (var->value->string == "point")	return ShaderConfig::RenderPass::Topology::Point;
+		return ShaderConfig::RenderPass::Topology::Triangle;
+	}
+
+
+	ShaderConfig::RenderPass::BlendMode ShaderCompiler::ParseBlendMode(Ref<Variable> var)
+	{
+		if (var->value->string == "blend")		return ShaderConfig::RenderPass::BlendMode::Blend;
+		else if (var->value->string == "add")	return ShaderConfig::RenderPass::BlendMode::Add;
+		else if (var->value->string == "none")	return ShaderConfig::RenderPass::BlendMode::None;
+		return ShaderConfig::RenderPass::BlendMode::None;
+	}
+
+	ShaderConfig::RenderPass::CullMode ShaderCompiler::ParseCullMode(Ref<Variable> var)
+	{
+		if (var->value->string == "back")		return ShaderConfig::RenderPass::CullMode::Back;
+		else if (var->value->string == "front")	return ShaderConfig::RenderPass::CullMode::Front;
+		else if (var->value->string == "none")	return ShaderConfig::RenderPass::CullMode::None;
+		return ShaderConfig::RenderPass::CullMode::None;
+	}
+
+	ShaderConfig::RenderPass::DepthTest ShaderCompiler::ParseDepthTest(Ref<Variable> var)
+	{
+		if (var->value->string == "less")					return ShaderConfig::RenderPass::DepthTest::Less;
+		else if (var->value->string == "lessOrEqual")		return ShaderConfig::RenderPass::DepthTest::LessOrEqual;
+		else if (var->value->string == "greater")			return ShaderConfig::RenderPass::DepthTest::Greater;
+		else if (var->value->string == "greaterOrEqual")	return ShaderConfig::RenderPass::DepthTest::GreaterOrEqual;
+		else if (var->value->string == "none")				return ShaderConfig::RenderPass::DepthTest::None;
+		return ShaderConfig::RenderPass::DepthTest::None;
+	}
+
 }
 

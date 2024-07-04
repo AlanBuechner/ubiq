@@ -23,6 +23,8 @@ namespace Game
 			CREATE_PROFILE_FUNCTIONI();
 			Engine::Ref<Engine::Camera> camera = (overideCamera ? overideCamera : GetSceneCamera());
 
+			Engine::DebugRenderer::SetCamera(*camera);
+
 			if (camera == m_DefaultCamera)
 				m_DefaultCamera->OnUpdate();
 
