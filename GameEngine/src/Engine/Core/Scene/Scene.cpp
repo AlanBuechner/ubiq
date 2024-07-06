@@ -33,8 +33,7 @@ namespace Engine
 	Scene::~Scene()
 	{
 		m_SceneRenderer = nullptr;
-		for (uint32 i = 0; i < m_UpdateEvents.size(); i++)
-			delete m_UpdateEvents[i];
+		for (Engine::UpdateEvent* event : m_UpdateEvents) { delete event; }
 	}
 
 	void Scene::OnUpdate(Ref<Camera> camera)
@@ -46,8 +45,7 @@ namespace Engine
 
 		m_SceneScript->OnUpdate();
 
-		for (uint32 i = 0; i < m_UpdateEvents.size(); i++)
-			m_UpdateEvents[i]->Update();
+		for (Engine::UpdateEvent* event : m_UpdateEvents) { event->Update(); }
 		
 		// render 3d models
 		m_SceneRenderer->UpdateBuffers();
@@ -146,13 +144,13 @@ namespace Engine
 	{
 		UpdateEvent::Setup(scene);
 
-		const std::vector<const Reflect::Class*> componentClasses = Reflect::Registry::GetRegistry()->GetGroup("Component");
+		const Utils::Vector<const Reflect::Class*> componentClasses = Reflect::Registry::GetRegistry()->GetGroup("Component");
 		for (const Reflect::Class* componentClass : componentClasses)
 		{
 			if (componentClass->HasFunction(m_FuncName))
 			{
-				m_Pools.push_back(scene->GetRegistry().GetOrCreateCompnentPool(*componentClass));
-				m_Funcs.push_back(&componentClass->GetFunction(m_FuncName));
+				m_Pools.Push(scene->GetRegistry().GetOrCreateCompnentPool(*componentClass));
+				m_Funcs.Push(&componentClass->GetFunction(m_FuncName));
 			}
 		}
 	}
@@ -160,7 +158,7 @@ namespace Engine
 	void SceneUpdateEvent::Update()
 	{
 		CREATE_PROFILE_SCOPEI(m_FuncName);
-		for (uint32 i = 0; i < m_Pools.size(); i++)
+		for (uint32 i = 0; i < m_Pools.Count(); i++)
 		{
 			ComponentPool* pool = m_Pools[i];
 			const Reflect::Function* func = m_Funcs[i];

@@ -3,6 +3,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Events/Event.h"
 #include "Engine/Renderer/Abstractions/GraphicsContext.h"
+#include "Utils/Vector.h"
 
 namespace Engine 
 {
@@ -77,7 +78,7 @@ namespace Engine
 		static void AddWindow(Ref<Window> window);
 
 	private:
-		static std::vector<Ref<Window>> s_Windows;
+		static Utils::Vector<Ref<Window>> s_Windows;
 
 		friend Window;
 	};

@@ -236,7 +236,7 @@ namespace Reflect {
 		const Class* GetClass(const std::string& name) { return m_ClassesByName[name]; }
 		const Class* GetClass(uint64_t typeID) { return m_ClassesByTypeID[typeID]; }
 		const std::list<Class>& GetClasses() { return m_Classes; }
-		const std::vector<const Class*>& GetGroup(const std::string& groupName) { return m_ClassGroups[groupName]; }
+		const Utils::Vector<const Class*>& GetGroup(const std::string& groupName) { return m_ClassGroups[groupName]; }
 
 		void AddClass(const Class& c);
 
@@ -269,7 +269,7 @@ namespace Reflect {
 	private:
 		std::unordered_map<std::string, const Class*> m_ClassesByName;
 		std::unordered_map<uint64_t, const Class*> m_ClassesByTypeID;
-		std::unordered_map<std::string, std::vector<const Class*>> m_ClassGroups;
+		std::unordered_map<std::string, Utils::Vector<const Class*>> m_ClassGroups;
 		std::list<Class> m_Classes;
 	};
 

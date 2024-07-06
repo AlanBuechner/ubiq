@@ -52,7 +52,7 @@ namespace Engine
 		if (m_FreeSlots.Empty())
 		{
 			// resize
-			m_Pages.push_back(ComponentPoolPage(m_ComponentSize));
+			m_Pages.Push(ComponentPoolPage(m_ComponentSize));
 
 			uint32 oldCount = m_NumComponents;
 			uint32 newCount = m_NumComponents + PoolSize;

@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include "Platform/Windows/Win.h"
+#include "Utils/Vector.h"
 
 namespace Engine
 {
@@ -29,12 +30,12 @@ namespace Engine
 		{
 			CREATE_PROFILE_SCOPEI("Cleaning Cashed Assets");
 			CORE_INFO("cleaning cashed assets");
-			std::vector<std::unordered_map<UUID, Ref<Asset>>::iterator> unusedAssets;
+			Utils::Vector<std::unordered_map<UUID, Ref<Asset>>::iterator> unusedAssets;
 
 			for (std::unordered_map<UUID, Ref<Asset>>::iterator asset = m_CashedAssets.begin(); asset != m_CashedAssets.end(); asset++)
 			{
 				if (asset->second.use_count() == 1)
-					unusedAssets.push_back(asset);
+					unusedAssets.Push(asset);
 			}
 
 			for (auto& asset : unusedAssets)

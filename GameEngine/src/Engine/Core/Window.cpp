@@ -3,7 +3,7 @@
 
 #include "Platform/Windows/WindowsWindow.h"
 
-std::vector<Engine::Ref<Engine::Window>> Engine::WindowManager::s_Windows;
+Utils::Vector<Engine::Ref<Engine::Window>> Engine::WindowManager::s_Windows;
 
 namespace Engine
 {
@@ -20,7 +20,7 @@ namespace Engine
 
 	void WindowManager::Destroy()
 	{
-		s_Windows.clear();
+		s_Windows.Destroy();
 	}
 
 	void WindowManager::UpdateWindows()
@@ -37,7 +37,7 @@ namespace Engine
 
 	void WindowManager::AddWindow(Ref<Window> window)
 	{
-		s_Windows.push_back(window);
+		s_Windows.Push(window);
 	}
 
 

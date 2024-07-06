@@ -78,17 +78,17 @@ namespace Engine
 		};
 
 		TMeshBuilder<Vertex> meshBuilder;
-		meshBuilder.vertices.push_back({ { -1,-1,0 }, { 0, 1 } });
-		meshBuilder.vertices.push_back({ {  1,-1,0 }, { 1, 1 } });
-		meshBuilder.vertices.push_back({ { -1, 1,0 }, { 0, 0 } });
-		meshBuilder.vertices.push_back({ {  1, 1,0 }, { 1, 0 } });
+		meshBuilder.vertices.Push({ { -1,-1,0 }, { 0, 1 } });
+		meshBuilder.vertices.Push({ {  1,-1,0 }, { 1, 1 } });
+		meshBuilder.vertices.Push({ { -1, 1,0 }, { 0, 0 } });
+		meshBuilder.vertices.Push({ {  1, 1,0 }, { 1, 0 } });
 
-		meshBuilder.indices.push_back(0);
-		meshBuilder.indices.push_back(3);
-		meshBuilder.indices.push_back(1);
-		meshBuilder.indices.push_back(0);
-		meshBuilder.indices.push_back(2);
-		meshBuilder.indices.push_back(3);
+		meshBuilder.indices.Push(0);
+		meshBuilder.indices.Push(3);
+		meshBuilder.indices.Push(1);
+		meshBuilder.indices.Push(0);
+		meshBuilder.indices.Push(2);
+		meshBuilder.indices.Push(3);
 
 		meshBuilder.Apply();
 

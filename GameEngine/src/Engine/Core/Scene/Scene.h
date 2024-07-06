@@ -66,7 +66,7 @@ namespace Engine
 		template<class T, typename ...Args>
 		void AddUpdateEvent(Args... args) { 
 			T* event = new T(std::forward<Args>(args)...);
-			m_UpdateEvents.push_back(event);
+			m_UpdateEvents.Push(event);
 			event->Setup(this);
 		}
 
@@ -82,7 +82,7 @@ namespace Engine
 
 		Ref<SceneRenderer> m_SceneRenderer;
 
-		std::vector<UpdateEvent*> m_UpdateEvents;
+		Utils::Vector<UpdateEvent*> m_UpdateEvents;
 
 		bool m_CameraChanged = false;
 
@@ -103,8 +103,8 @@ namespace Engine
 		virtual void Update() override;
 
 	private:
-		std::vector<ComponentPool*> m_Pools;
-		std::vector<const Reflect::Function*> m_Funcs;
+		Utils::Vector<ComponentPool*> m_Pools;
+		Utils::Vector<const Reflect::Function*> m_Funcs;
 		std::string m_FuncName;
 	};
 

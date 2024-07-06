@@ -31,7 +31,7 @@ namespace Engine
 			ComponentPool* m_Pool;
 			uint32 m_ComponentLoc;
 		};
-		std::vector<ComponentRef> m_Components;
+		Utils::Vector<ComponentRef> m_Components;
 
 		void RemoveComponentReferance(ComponentPool* pool);
 	};
@@ -47,17 +47,15 @@ namespace Engine
 
 		~SceneRegistry();
 
-		using iterator = std::vector<EntityType>::iterator;
-
-		iterator begin() { return m_UsedEntitys.begin(); }
-		iterator end() { return m_UsedEntitys.end(); }
+		EntityType* begin() { return m_UsedEntities.begin(); }
+		EntityType* end() { return m_UsedEntities.end(); }
 
 		EntityType CreateEntity();
 		EntityType CreateEntity(UUID id, const std::string& name);
 		void DestroyEntity(EntityType entity);
 
 		// EntityData Does not have referential integrity
-		EntityData& GetEntityData(EntityType entity) { return m_Entitys[entity]; }
+		EntityData& GetEntityData(EntityType entity) { return m_Entities[entity]; }
 
 		template<class T>
 		T* AddComponent(EntityType entity, Scene* scene) { return (T*)AddComponent(entity, scene, T::GetStaticClass()); }
@@ -92,9 +90,9 @@ namespace Engine
 		void EachPool(EachComponentFunc func);
 
 	private:
-		std::vector<EntityData> m_Entitys;
-		std::vector<EntityType> m_FreeEntitys;
-		std::vector<EntityType> m_UsedEntitys;
+		Utils::Vector<EntityData> m_Entities;
+		Utils::Vector<EntityType> m_FreeEntities;
+		Utils::Vector<EntityType> m_UsedEntities;
 
 		std::unordered_map<ComponentType, ComponentPool*> m_Pools;
 	};

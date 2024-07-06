@@ -2,6 +2,7 @@
 
 #include "Engine/Core/Core.h"
 #include "Engine/Math/Math.h"
+#include "Utils/Vector.h"
 
 #define BIND_ACTION(x) std::bind(x, this)
 #define BIND_AXIS(x, p) std::bind(x, this, p)
@@ -56,8 +57,8 @@ namespace Engine
 		void UnbindMouseEvent(MouseMoveEventData* event);
 
 	private:
-		std::vector<EventData*> m_Events;
-		std::vector<MouseMoveEventData*> m_MouseMoveEvents;
+		Utils::Vector<EventData*> m_Events;
+		Utils::Vector<MouseMoveEventData*> m_MouseMoveEvents;
 
 		Ref<InputControlerManeger> m_Maneger;
 

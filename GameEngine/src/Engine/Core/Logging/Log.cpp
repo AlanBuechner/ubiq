@@ -48,20 +48,20 @@ namespace Engine
 				findex++;
 
 			std::string_view s(&m_Pattern[sindex], findex - sindex);
-			m_PatternTokens.push_back(PatternToken(PatternToken::String, s));
+			m_PatternTokens.Push(PatternToken(PatternToken::String, s));
 
 			findex++; // skip the %
 
 			if (m_Pattern[findex] == 't')
-				m_PatternTokens.push_back(PatternToken(PatternToken::Time));
+				m_PatternTokens.Push(PatternToken(PatternToken::Time));
 			else if (m_Pattern[findex] == 'm')
-				m_PatternTokens.push_back(PatternToken(PatternToken::Message));
+				m_PatternTokens.Push(PatternToken(PatternToken::Message));
 
 			findex++;
 		}
 	}
 
-	bool Logger::ParseMessage(const char* msg, std::vector<MessageToken>& tokens)
+	bool Logger::ParseMessage(const char* msg, Utils::Vector<MessageToken>& tokens)
 	{
 		uint32 findex = 0;
 		while (msg[findex] != 0)
@@ -71,7 +71,7 @@ namespace Engine
 				findex++;
 
 			std::string_view s(&msg[sindex], findex - sindex);
-			tokens.push_back(MessageToken(s));
+			tokens.Push(MessageToken(s));
 
 			if (msg[findex] != 0)
 			{
@@ -95,7 +95,7 @@ namespace Engine
 					return false;
 				}
 
-				tokens.push_back(MessageToken(index));
+				tokens.Push(MessageToken(index));
 
 				findex++; // skip the }
 			}

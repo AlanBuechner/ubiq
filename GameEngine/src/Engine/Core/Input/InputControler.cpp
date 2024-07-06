@@ -77,7 +77,7 @@ namespace Engine
 		action->Function = func;
 		action->Key = key;
 
-		m_Events.push_back(action);
+		m_Events.Push(action);
 		Input::BindKey(&action->Key, &action->Type);
 		return action;
 	}
@@ -90,7 +90,7 @@ namespace Engine
 			if (e == event)
 			{
 				Input::UnbindKey(e->Key, e->Type);
-				m_Events.erase(m_Events.begin() + index);
+				m_Events.Remove(index);
 				return;
 			}
 			index++;
@@ -102,7 +102,7 @@ namespace Engine
 		MouseMoveEventData* action = new MouseMoveEventData;
 		action->Function = func;
 		action->BindMode = (int)bindMode;
-		m_MouseMoveEvents.push_back(action);
+		m_MouseMoveEvents.Push(action);
 		Input::SendMouseMovedEvents(true);
 		return action;
 	}
@@ -114,7 +114,7 @@ namespace Engine
 		{
 			if (i == event)
 			{
-				m_MouseMoveEvents.erase(m_MouseMoveEvents.begin() + index);
+				m_MouseMoveEvents.Remove(index);
 				Input::SendMouseMovedEvents(false);
 			}
 			index++;

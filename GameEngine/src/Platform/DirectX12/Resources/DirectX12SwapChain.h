@@ -4,6 +4,7 @@
 #include "Engine/Core/Window.h"
 #include "DirectX12Texture.h"
 #include "Platform/DirectX12/DX.h"
+#include "Utils/Vector.h"
 
 namespace Engine
 {
@@ -27,7 +28,7 @@ namespace Engine
 		virtual void UpdateBackBufferIndex() override;
 		virtual void CleanUp() override;
 		
-		virtual uint32 GetBufferCount() override { return (uint32)m_Buffers.size(); }
+		virtual uint32 GetBufferCount() override { return (uint32)m_Buffers.Count(); }
 
 		virtual Ref<RenderTarget2D> GetCurrentRenderTarget() override { return m_Buffers[m_CurrentBuffer]; }
 
@@ -35,7 +36,7 @@ namespace Engine
 		void GetFrameBuffers(uint32 width, uint32 height);
 
 	private:
-		std::vector<Ref<RenderTarget2D>> m_Buffers;
+		Utils::Vector<Ref<RenderTarget2D>> m_Buffers;
 
 		wrl::ComPtr<IDXGISwapChain3> m_SwapChain;
 

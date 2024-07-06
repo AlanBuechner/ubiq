@@ -28,7 +28,8 @@ namespace Engine
 
 			PatternToken(TokenType type, std::string_view string = "") :
 				m_Type(type), m_String(string)
-			{}
+			{
+			}
 
 			TokenType m_Type;
 			std::string_view m_String;
@@ -44,10 +45,12 @@ namespace Engine
 
 			MessageToken(std::string_view string) :
 				m_Type(String), m_String(string)
-			{}
+			{
+			}
 			MessageToken(uint32_t index) :
 				m_Type(Param), m_ParamIndex(index)
-			{}
+			{
+			}
 
 			TokenType m_Type;
 			std::string_view m_String;
@@ -74,7 +77,8 @@ namespace Engine
 
 			TemplateElement(Type t, void* d) :
 				type(t), data(d)
-			{}
+			{
+			}
 
 			template <class T>
 			struct is_char_ptr
@@ -155,11 +159,9 @@ namespace Engine
 		template<typename... Args>
 		void LogMessage(const char* msg, const Args&... args)
 		{
-			std::vector<TemplateElement> templateElements;
-			templateElements.reserve(sizeof...(args));
-			(templateElements.push_back(TemplateElement::GenTemplateElement(args)), ...);
+			Utils::Vector<TemplateElement> templateElements = { TemplateElement::GenTemplateElement(args)... };
 
-			std::vector<MessageToken> tokens;
+			Utils::Vector<MessageToken> tokens;
 			if (ParseMessage(msg, tokens))
 			{
 				for (MessageToken token : tokens)
@@ -168,7 +170,7 @@ namespace Engine
 						std::cout << token.m_String;
 					else if (token.m_Type == MessageToken::Param)
 					{
-						if (token.m_ParamIndex >= templateElements.size())
+						if (token.m_ParamIndex >= templateElements.Count())
 						{
 							std::cout << "invalid param index \"" << std::to_string(token.m_ParamIndex) << "\"" << std::endl;
 							return;
@@ -215,13 +217,13 @@ namespace Engine
 
 		void ParsePattern();
 
-		bool ParseMessage(const char* msg, std::vector<MessageToken>& tokens);
+		bool ParseMessage(const char* msg, Utils::Vector<MessageToken>& tokens);
 
 		void SetConsoleColor(Level level);
 
 	private:
 		std::string m_Pattern;
-		std::vector<PatternToken> m_PatternTokens;
+		Utils::Vector<PatternToken> m_PatternTokens;
 		Level m_Level = Trace;
 	};
 

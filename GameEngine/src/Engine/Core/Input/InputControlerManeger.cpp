@@ -31,26 +31,26 @@ namespace Engine
 
 	void InputControlerManeger::AddControler(InputControler* controler)
 	{
-		m_Controlers.push_back(controler);
+		m_Controllers.Push(controler);
 	}
 
 	void InputControlerManeger::RemoveControler(InputControler* controler)
 	{
 		int index = 0;
-		for (auto i : m_Controlers)
+		for (auto i : m_Controllers)
 		{
 			if (i == controler)
 			{
-				m_Controlers.erase(m_Controlers.begin() + index);
+				m_Controllers.Remove(index);
 			}
 		}
 	}
 
 	bool InputControlerManeger::OnMouseMoveEvent(MouseMovedEvent* e)
 	{
-		if (m_Controlers.empty())
+		if (m_Controllers.Empty())
 			return false;
-		for (auto i : m_Controlers)
+		for (auto i : m_Controllers)
 		{
 			i->RaiseMouseMoveEvent(e->GetMouseBindMode(), Math::Vector2(e->GetX(), e->GetY()));
 		}
@@ -59,9 +59,9 @@ namespace Engine
 
 	bool InputControlerManeger::OnMouseScrollEvent(MouseScrolledEvent* e)
 	{
-		if (m_Controlers.empty())
+		if (m_Controllers.Empty())
 			return false;
-		for (auto i : m_Controlers)
+		for (auto i : m_Controllers)
 		{
 			i->RaiseMouseMoveEvent(e->GetMouseBindMode(), Math::Vector2({e->GetXOffset(), e->GetYOffset()}));
 		}
@@ -71,10 +71,10 @@ namespace Engine
 	template<class T>
 	bool InputControlerManeger::OnKeyEvent(T* e) 
 	{
-		if (m_Controlers.empty())
+		if (m_Controllers.Empty())
 			return false;
 		EventType type = e->GetEventType();
-		for (auto i : m_Controlers)
+		for (auto i : m_Controllers)
 		{
 			i->RaiseEvent(e->GetKeyCode(), (int)type);
 		}
@@ -84,10 +84,10 @@ namespace Engine
 	template<class T>
 	bool InputControlerManeger::OnMouseEvent(T* e)
 	{
-		if (m_Controlers.empty())
+		if (m_Controllers.Empty())
 			return false;
 		EventType type = e->GetEventType();
-		for (auto i : m_Controlers)
+		for (auto i : m_Controllers)
 		{
 			i->RaiseEvent(e->GetMouseButton(), (int)type);
 		}

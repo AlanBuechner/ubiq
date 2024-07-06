@@ -19,7 +19,7 @@ namespace Game
 		{
 			Engine::AABB aabb;
 			Engine::MeshBuilder builder(node.m_MeshBuilders[i]);
-			for (uint32 j = 0; j < builder.vertices.size(); j++)
+			for (uint32 j = 0; j < builder.vertices.Count(); j++)
 			{
 				builder.vertices[j].position = parentTransform * Math::Vector4(builder.vertices[j].position, 1);
 				aabb.AddPosition(builder.vertices[j].position);
@@ -77,10 +77,10 @@ namespace Game
 		{
 			model.m_Names[i] = scene->mMeshes[node->mMeshes[i]]->mName.C_Str();
 			Engine::MeshBuilder& meshBuilder = model.m_MeshBuilders[i];
-			uint32 vertexOffset = (uint32)meshBuilder.vertices.size();
+			uint32 vertexOffset = (uint32)meshBuilder.vertices.Count();
 			aiMesh* m = scene->mMeshes[node->mMeshes[i]];
 
-			meshBuilder.vertices.resize((size_t)vertexOffset + m->mNumVertices);
+			meshBuilder.vertices.Resize((size_t)vertexOffset + m->mNumVertices);
 
 			// vertices
 			for (uint32 v = 0; v < m->mNumVertices; v++)
@@ -92,7 +92,7 @@ namespace Game
 			}
 
 			// indices
-			meshBuilder.indices.resize((size_t)m->mNumFaces * 3);
+			meshBuilder.indices.Resize((size_t)m->mNumFaces * 3);
 			for (uint32 j = 0; j < m->mNumFaces; j++)
 			{
 				for (uint32 k = 0; k < 3; k++)
