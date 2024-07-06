@@ -326,6 +326,31 @@ namespace Engine
 			m_CommandList->ClearRenderTargetView(handle, (float*)&color, 0, nullptr);
 	}
 
+	void DirectX12CommandList::InitalizeDescriptorTables(Ref<ShaderPass> shader)
+	{
+		std::vector<ShaderParameter> reflectionData = shader->GetReflectionData();
+		for (uint32 i = 0; i < reflectionData.size(); i++)
+		{
+			ShaderParameter& p = reflectionData[i];
+			if (p.type == PerameterType::DescriptorTable && p.count > 1)
+			{
+				switch (p.descType)
+				{
+				case DescriptorType::CBV:
+				case DescriptorType::SRV:
+				case DescriptorType::UAV:
+					if(shader->IsComputeShader())
+						m_CommandList->SetComputeRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
+					else
+						m_CommandList->SetGraphicsRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+
 	void DirectX12CommandList::SetShader(Ref<GraphicsShaderPass> shader)
 	{
 
@@ -349,27 +374,9 @@ namespace Engine
 		m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature());
 		m_CommandList->IASetPrimitiveTopology(top);
 
-		std::vector<ShaderParameter> reflectionData = shader->GetReflectionData();
-		for (uint32 i = 0; i < reflectionData.size(); i++)
-		{
-			ShaderParameter& p = reflectionData[i];
-			if (p.type == PerameterType::DescriptorTable && p.count > 1)
-			{
-				switch (p.descType)
-				{
-				case DescriptorType::CBV:
-				case DescriptorType::SRV:
-				case DescriptorType::UAV:
-					m_CommandList->SetGraphicsRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
-					break;
-				default:
-					break;
-				}
-			}
-		}
+		InitalizeDescriptorTables(shader);
 
 		m_BoundShader = shader;
-
 	}
 
 	void DirectX12CommandList::SetShader(Ref<ComputeShaderPass> shader)
@@ -378,24 +385,7 @@ namespace Engine
 		m_CommandList->SetPipelineState(dxShader->GetPipelineState());
 		m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature());
 
-		std::vector<ShaderParameter> reflectionData = shader->GetReflectionData();
-		for (uint32 i = 0; i < reflectionData.size(); i++)
-		{
-			ShaderParameter& p = reflectionData[i];
-			if (p.type == PerameterType::DescriptorTable && p.count > 1)
-			{
-				switch (p.descType)
-				{
-				case DescriptorType::CBV:
-				case DescriptorType::SRV:
-				case DescriptorType::UAV:
-					m_CommandList->SetComputeRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
-					break;
-				default:
-					break;
-				}
-			}
-		}
+		InitalizeDescriptorTables(shader);
 
 		m_BoundShader = shader;
 	}

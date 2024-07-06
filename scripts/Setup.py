@@ -29,6 +29,7 @@ os.chdir("../")
 
 dxcInstallLocation = "vendor/dxc"
 pixInstallLocation = "vendor/pix"
+agilityInstallLocation = "vendor/Agility"
 compilerInstallLocation = "vendor/Compiler"
 premakeInstallLocation = "vendor/premake"
 
@@ -83,6 +84,27 @@ else:
 
 print()
 
+
+# install Agility
+if not DoesFolderExist(agilityInstallLocation):
+	print("Installing Agility")
+	os.makedirs(agilityInstallLocation)
+	zipLocation = agilityInstallLocation + "/Agility.zip"
+
+	try:
+		urllib.request.urlretrieve("https://www.nuget.org/api/v2/package/Microsoft.Direct3D.D3D12/1.614.0", zipLocation)
+		UnzipAndDelete(zipLocation, agilityInstallLocation)
+	except Exception as e:
+		print(e)
+		print("Failed to install Agility")
+		os.rmdir(agilityInstallLocation)
+	else:
+		print("Finished installing Agility")
+else:
+	print("Agility already installed. To reinstall Agility delete the folder \"{agility}\"".format(agility=agilityInstallLocation))
+
+
+print()
 
 # install compiler
 if not DoesFolderExist(compilerInstallLocation):

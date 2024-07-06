@@ -63,6 +63,7 @@ vendorDirs = {
 	"json"				: f"{location}/vendor/json",
 	"dxc"				: f"{location}/vendor/dxc",
 	"pix"				: f"{location}/vendor/pix",
+	"Agility"			: f"{location}/vendor/Agility",
 	
 	# nont-third party
 	"ProjectManager"	: f"{location}/vendor/ProjectManager",
@@ -82,6 +83,7 @@ includeDirs = {
 	"json"				: f"{vendorDirs['json']}/single_include",
 	"dxc"				: f"{vendorDirs['dxc']}/inc",
 	"pix"				: f"{vendorDirs['pix']}/include",
+	"Agility"			: f"{vendorDirs['Agility']}/build/native/include",
 
 	# non-thrid party
 	"ProjectManager"	: f"{vendorDirs['ProjectManager']}/src",

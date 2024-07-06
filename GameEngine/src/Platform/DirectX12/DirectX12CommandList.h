@@ -43,6 +43,7 @@ namespace Engine
 
 		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color) override;
 
+		void InitalizeDescriptorTables(Ref<ShaderPass> shader);
 		virtual void SetShader(Ref<GraphicsShaderPass> shader) override;
 		virtual void SetShader(Ref<ComputeShaderPass> shader) override;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;

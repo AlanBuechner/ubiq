@@ -9,6 +9,7 @@ __pycache__
 
 vendor/dxc
 vendor/pix
+vendor/Agility
 vendor/Compiler
 vendor/python
 vendor/premake
