@@ -24,11 +24,15 @@ namespace Engine
 
 		ShaderBlobs Compile(const std::string& code, const fs::path& file, ShaderType type);
 		void GetShaderParameters(ShaderBlobs& blobs, SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type);
+		void GetLibraryParameters(ShaderBlobs& blobs, SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type);
 		void GetInputLayout(ShaderBlobs& blobs, std::vector<ShaderInputElement>& inputElements);
 
 		ID3D12RootSignature* GenRootSignature(std::vector<ShaderParameter>& params);
 
 		wrl::ComPtr<IDxcUtils> GetUtils() { return m_Utils; }
+
+	private:
+		void AddParameter(D3D12_SHADER_INPUT_BIND_DESC bindDesc, SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type);
 
 	private:
 		wrl::ComPtr<IDxcCompiler3> m_Compiler;

@@ -2,6 +2,7 @@
 #include "DirectX12ShaderCompiler.h"
 #include "Platform/DirectX12/DirectX12Context.h"
 #include "Engine/Renderer/Renderer.h"
+#include "dxcapi.h"
 
 
 Engine::DirectX12ShaderCompiler* Engine::DirectX12ShaderCompiler::s_Instance;
@@ -93,8 +94,28 @@ namespace Engine
 
 	DirectX12ShaderCompiler::DirectX12ShaderCompiler()
 	{
-		CORE_ASSERT_HRESULT(DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(m_Compiler.GetAddressOf())), "Failed to create compiler");
-		CORE_ASSERT_HRESULT(DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(m_Utils.GetAddressOf())), "Failed To Create compiler utils");
+		static HMODULE s_hmod = 0;
+		static HMODULE s_hmodDxil = 0;
+		static DxcCreateInstanceProc s_pDxcCreateInstanceProc = nullptr;
+		if (s_hmodDxil == 0)
+		{
+			s_hmodDxil = LoadLibrary(L"dxil.dll");
+			CORE_ASSERT(s_hmodDxil != 0, "dxil.dll missing or wrong architecture");
+		}
+		if (s_hmod == 0)
+		{
+			s_hmod = LoadLibrary(L"dxcompiler.dll");
+			CORE_ASSERT(s_hmod != 0, "dxcompiler.dll missing or wrong architecture");
+
+			if (s_pDxcCreateInstanceProc == nullptr)
+			{
+				s_pDxcCreateInstanceProc = (DxcCreateInstanceProc)GetProcAddress(s_hmod, "DxcCreateInstance");
+				CORE_ASSERT(s_pDxcCreateInstanceProc != nullptr, "Unable to find dxcompiler!DxcCreateInstance");
+			}
+		}
+
+		CORE_ASSERT_HRESULT(s_pDxcCreateInstanceProc(CLSID_DxcCompiler, IID_PPV_ARGS(m_Compiler.GetAddressOf())), "Failed to create compiler");
+		CORE_ASSERT_HRESULT(s_pDxcCreateInstanceProc(CLSID_DxcUtils, IID_PPV_ARGS(m_Utils.GetAddressOf())), "Failed To Create compiler utils");
 		CORE_ASSERT_HRESULT(m_Utils->CreateDefaultIncludeHandler(m_IncludeHandler.GetAddressOf()), "Failed to Create include handler");
 	}
 
@@ -108,23 +129,26 @@ namespace Engine
 
 	ShaderBlobs DirectX12ShaderCompiler::Compile(const std::string& code, const fs::path& file, ShaderType type)
 	{
-		const std::wstring typeStrings[] = { L"vs_6_5", L"ps_6_5", L"cs_6_5" };
+		const std::wstring typeStrings[] = { L"vs_6_5", L"ps_6_5", L"cs_6_5", L"lib_6_8"};
 		std::wstring profile = typeStrings[(int)log2((int)type)]; // take the log2 of the type enum to convert from bit mask to index
 
-		LPCWSTR args[]
+		Utils::Vector<LPCWSTR> args;
+		args.Push(file.c_str());
+		if (type != ShaderType::WorkGraph)
 		{
-			file.c_str(),
-			L"-E", L"main",
-			L"-T", profile.c_str(),
-			DXC_ARG_ALL_RESOURCES_BOUND,
+			args.Push(L"-E");
+			args.Push(L"main");
+		}
+		args.Push(L"-T"); 
+		args.Push(profile.c_str());
+		args.Push(DXC_ARG_ALL_RESOURCES_BOUND);
 #ifdef DEBUG
-			DXC_ARG_SKIP_OPTIMIZATIONS,
+		args.Push(DXC_ARG_SKIP_OPTIMIZATIONS);
 #else
-			DXC_ARG_OPTIMIZATION_LEVEL3,
+		args.Push(DXC_ARG_OPTIMIZATION_LEVEL3);
 #endif // DEBUG
-			DXC_ARG_DEBUG,
-			L"-Qembed_debug", // strip debug data to another blob
-		};
+		args.Push(DXC_ARG_DEBUG);
+		args.Push(L"-Qembed_debug"); // embed debug information
 
 		DxcBuffer buffer;
 		buffer.Encoding = DXC_CP_ACP;
@@ -132,7 +156,7 @@ namespace Engine
 		buffer.Size = code.size();
 
 		wrl::ComPtr<IDxcResult> result;
-		if (FAILED(m_Compiler->Compile(&buffer, args, _countof(args), m_IncludeHandler.Get(), IID_PPV_ARGS(result.GetAddressOf()))))
+		if (FAILED(m_Compiler->Compile(&buffer, args.Data(), args.Count(), m_IncludeHandler.Get(), IID_PPV_ARGS(result.GetAddressOf()))))
 		{
 			CORE_ERROR("Failed to compile shader");
 			return {};
@@ -169,7 +193,7 @@ namespace Engine
 		return blobs;
 	}
 
-	void DirectX12ShaderCompiler::GetShaderParameters(ShaderBlobs& blobs, SectionInfo& section, std::vector<Engine::ShaderParameter>& params,  ShaderType type)
+	void DirectX12ShaderCompiler::GetShaderParameters(ShaderBlobs& blobs, SectionInfo& section, std::vector<Engine::ShaderParameter>& params, ShaderType type)
 	{
 		if (!blobs.reflection)
 			return;
@@ -179,10 +203,10 @@ namespace Engine
 		reflectionData.Ptr = blobs.reflection->GetBufferPointer();
 		reflectionData.Size = blobs.reflection->GetBufferSize();
 
-		wrl::ComPtr<ID3D12ShaderReflection> reflection;
+		D3D12_SHADER_DESC reflectionDesc;
+		ID3D12ShaderReflection* reflection;
 		CORE_ASSERT_HRESULT(m_Utils->CreateReflection(&reflectionData, IID_PPV_ARGS(&reflection)), "Failed to create reflection data");
 
-		D3D12_SHADER_DESC reflectionDesc;
 		reflection->GetDesc(&reflectionDesc);
 
 		// bound resources
@@ -191,69 +215,39 @@ namespace Engine
 		{
 			D3D12_SHADER_INPUT_BIND_DESC bindDesc;
 			reflection->GetResourceBindingDesc(srvIndex, &bindDesc);
+			AddParameter(bindDesc, section, params, type);
+		}
+	}
 
-			ShaderParameter data;
-			data.shader = type;
-			data.name = bindDesc.Name;
-			data.reg = bindDesc.BindPoint;
-			data.space = bindDesc.Space;
-			data.count = bindDesc.BindCount;
-			if (data.count == 0)
-				data.count = -1;
+	void DirectX12ShaderCompiler::GetLibraryParameters(ShaderBlobs& blobs, SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type)
+	{
+		if (!blobs.reflection)
+			return;
 
-			if (bindDesc.BindCount > 1 || bindDesc.Type == D3D_SIT_TEXTURE || bindDesc.Type == D3D_SIT_UAV_RWTYPED || bindDesc.Type == D3D_SIT_STRUCTURED)
-				data.type = PerameterType::DescriptorTable;
-			else
+		DxcBuffer reflectionData;
+		reflectionData.Encoding = DXC_CP_ACP;
+		reflectionData.Ptr = blobs.reflection->GetBufferPointer();
+		reflectionData.Size = blobs.reflection->GetBufferSize();
+
+		D3D12_LIBRARY_DESC reflectionDesc;
+		ID3D12LibraryReflection* reflection;
+		CORE_ASSERT_HRESULT(m_Utils->CreateReflection(&reflectionData, IID_PPV_ARGS(&reflection)), "Failed to create reflection data");
+		reflection->GetDesc(&reflectionDesc);
+
+		for (uint32 funcIndex = 0; funcIndex < reflectionDesc.FunctionCount; funcIndex++)
+		{
+			ID3D12FunctionReflection* funcReflection = reflection->GetFunctionByIndex(funcIndex);
+
+			D3D12_FUNCTION_DESC funcDesc;
+			CORE_ASSERT_HRESULT(funcReflection->GetDesc(&funcDesc), "Failed to get function descriptor");
+
+			for (uint32 srvIndex = 0; srvIndex < funcDesc.BoundResources; srvIndex++)
 			{
-				if (bindDesc.Type == D3D_SIT_SAMPLER)
-				{
-					data.type = PerameterType::StaticSampler;
-
-					if(section.m_Samplers.find(data.name) != section.m_Samplers.end())
-						data.samplerAttribs = section.m_Samplers[data.name];
-					else
-					{
-						data.samplerAttribs.U = WrapMode::Repeat;
-						data.samplerAttribs.V = WrapMode::Repeat;
-						if (data.name.rfind("A_", 0) == 0)
-						{
-							data.samplerAttribs.Min = MinMagFilter::Anisotropic;
-							data.samplerAttribs.Mag = MinMagFilter::Anisotropic;
-						}
-						else if (data.name.rfind("P_", 0) == 0)
-						{
-							data.samplerAttribs.Min = MinMagFilter::Point;
-							data.samplerAttribs.Mag = MinMagFilter::Point;
-						}
-						else
-						{
-							data.samplerAttribs.Min = MinMagFilter::Anisotropic;
-							data.samplerAttribs.Mag = MinMagFilter::Anisotropic;
-
-						}
-					}
-				}
-				else
-				{
-					if (data.name.rfind("RC_", 0) == 0)
-						data.type = PerameterType::Constants;
-					else
-						data.type = PerameterType::Descriptor;
-				}
+				D3D12_SHADER_INPUT_BIND_DESC bindDesc;
+				funcReflection->GetResourceBindingDesc(srvIndex, &bindDesc);
+				AddParameter(bindDesc, section, params, type);
 			}
 
-			switch (bindDesc.Type)
-			{
-			case D3D_SIT_CBUFFER:		data.descType = DescriptorType::CBV; break;
-			case D3D_SIT_STRUCTURED:
-			case D3D_SIT_TEXTURE:		data.descType = DescriptorType::SRV; break;
-			case D3D_SIT_UAV_RWTYPED:	data.descType = DescriptorType::UAV; break;
-			case D3D_SIT_SAMPLER:		data.descType = DescriptorType::Sampler; break;
-			default:
-				break;
-			}
-
-			params.push_back(data);
 		}
 	}
 
@@ -411,6 +405,72 @@ namespace Engine
 		if (errorBlob) errorBlob->Release();
 
 		return sig;
+	}
+
+	void DirectX12ShaderCompiler::AddParameter(D3D12_SHADER_INPUT_BIND_DESC bindDesc, SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type)
+	{
+		ShaderParameter data;
+		data.shader = type;
+		data.name = bindDesc.Name;
+		data.reg = bindDesc.BindPoint;
+		data.space = bindDesc.Space;
+		data.count = bindDesc.BindCount;
+		if (data.count == 0)
+			data.count = -1;
+
+		if (bindDesc.BindCount > 1 || bindDesc.Type == D3D_SIT_TEXTURE || bindDesc.Type == D3D_SIT_UAV_RWTYPED || bindDesc.Type == D3D_SIT_STRUCTURED)
+			data.type = PerameterType::DescriptorTable;
+		else
+		{
+			if (bindDesc.Type == D3D_SIT_SAMPLER)
+			{
+				data.type = PerameterType::StaticSampler;
+
+				if (section.m_Samplers.find(data.name) != section.m_Samplers.end())
+					data.samplerAttribs = section.m_Samplers[data.name];
+				else
+				{
+					data.samplerAttribs.U = WrapMode::Repeat;
+					data.samplerAttribs.V = WrapMode::Repeat;
+					if (data.name.rfind("A_", 0) == 0)
+					{
+						data.samplerAttribs.Min = MinMagFilter::Anisotropic;
+						data.samplerAttribs.Mag = MinMagFilter::Anisotropic;
+					}
+					else if (data.name.rfind("P_", 0) == 0)
+					{
+						data.samplerAttribs.Min = MinMagFilter::Point;
+						data.samplerAttribs.Mag = MinMagFilter::Point;
+					}
+					else
+					{
+						data.samplerAttribs.Min = MinMagFilter::Anisotropic;
+						data.samplerAttribs.Mag = MinMagFilter::Anisotropic;
+
+					}
+				}
+			}
+			else
+			{
+				if (data.name.rfind("RC_", 0) == 0)
+					data.type = PerameterType::Constants;
+				else
+					data.type = PerameterType::Descriptor;
+			}
+		}
+
+		switch (bindDesc.Type)
+		{
+		case D3D_SIT_CBUFFER:		data.descType = DescriptorType::CBV; break;
+		case D3D_SIT_STRUCTURED:
+		case D3D_SIT_TEXTURE:		data.descType = DescriptorType::SRV; break;
+		case D3D_SIT_UAV_RWTYPED:	data.descType = DescriptorType::UAV; break;
+		case D3D_SIT_SAMPLER:		data.descType = DescriptorType::Sampler; break;
+		default:
+			break;
+		}
+
+		params.push_back(data);
 	}
 
 }

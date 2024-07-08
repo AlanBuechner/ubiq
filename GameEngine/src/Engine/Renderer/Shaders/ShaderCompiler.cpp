@@ -124,6 +124,16 @@ namespace Engine
 		return nullptr;
 	}
 
+	WorkGraphPassConfig* ShaderConfig::FindWorkGraphPass(const std::string& passName)
+	{
+		for (WorkGraphPassConfig& pass : workGraphPasses)
+		{
+			if (pass.passName == passName)
+				return &pass;
+		}
+		return nullptr;
+	}
+
 	fs::path ShaderCompiler::FindFilePath(const fs::path& file, const fs::path& parent)
 	{
 		if (fs::exists(file))
@@ -277,6 +287,7 @@ namespace Engine
 					bool hasPixel = obj->HasVariable("PS");
 					bool isGraphics = hasGeo && hasPixel;
 					bool isCompute = obj->HasVariable("CS");
+					bool isWorkGraph = obj->HasVariable("WG");
 
 					if (isGraphics)
 					{
@@ -303,6 +314,16 @@ namespace Engine
 							if (var->name == "CS")	rpass.cs = var->value->string;
 						}
 						config.computePasses.push_back(rpass);
+					}
+					if (isWorkGraph)
+					{
+						WorkGraphPassConfig rpass;
+						rpass.passName = pass->name;
+						for (Ref<Variable> var : pass->value->object->values)
+						{
+							if (var->name == "WG")	rpass.wg = var->value->string;
+						}
+						config.workGraphPasses.push_back(rpass);
 					}
 				}
 			}

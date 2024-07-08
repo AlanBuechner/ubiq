@@ -8,7 +8,7 @@ namespace Engine
 	// shader type
 	enum class ShaderType
 	{
-		None = -1, Vertex = BIT(0), Pixel = BIT(1), Compute = BIT(2)
+		None = -1, Vertex = BIT(0), Pixel = BIT(1), Compute = BIT(2), WorkGraph = BIT(3)
 	};
 
 	/* ---------------------------- sampler info ---------------------------- */
@@ -147,8 +147,8 @@ namespace Engine
 	struct GraphicsPassConfig
 	{
 		std::string passName;
-		std::string vs;
-		std::string ps;
+		std::string vs; // vertex shader section name
+		std::string ps; // pixel shader section name
 		Topology topology;
 		BlendMode blendMode = BlendMode::Blend;
 		CullMode cullMode = CullMode::Back;
@@ -158,7 +158,13 @@ namespace Engine
 	struct ComputePassConfig
 	{
 		std::string passName;
-		std::string cs;
+		std::string cs; // compute shader section name
+	};
+
+	struct WorkGraphPassConfig
+	{
+		std::string passName;
+		std::string wg; // work graph section name
 	};
 
 	/* ---------------------------- end render pass info ---------------------------- */
@@ -167,6 +173,7 @@ namespace Engine
 	{
 		std::vector<GraphicsPassConfig> graphicsPasses;
 		std::vector<ComputePassConfig> computePasses;
+		std::vector<WorkGraphPassConfig> workGraphPasses;
 
 		std::vector<MaterialParameter> params;
 
@@ -174,6 +181,7 @@ namespace Engine
 
 		GraphicsPassConfig* FindGraphicsPass(const std::string& passName);
 		ComputePassConfig* FindComputePass(const std::string& passName);
+		WorkGraphPassConfig* FindWorkGraphPass(const std::string& passName);
 	};
 
 	struct SectionInfo

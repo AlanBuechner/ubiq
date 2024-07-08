@@ -5,6 +5,7 @@
 #include "ShaderPass.h"
 #include "GraphicsShaderPass.h"
 #include "ComputeShaderPass.h"
+#include "WorkGraphShaderPass.h"
 
 #include <string>
 #include <Engine/Math/Math.h>
@@ -28,6 +29,7 @@ namespace Engine
 
 		Ref<GraphicsShaderPass> GetGraphicsPass(const std::string& passName);
 		Ref<ComputeShaderPass> GetComputePass(const std::string& passName);
+		Ref<WorkGraphShaderPass> GetWorkGraphPass(const std::string& passName);
 		std::vector<MaterialParameter>& GetParams();
 
 		static Ref<Shader> Create(const fs::path& file);
@@ -37,6 +39,7 @@ namespace Engine
 	private:
 		std::unordered_map<std::string, Ref<GraphicsShaderPass>> m_GraphicsPasses;
 		std::unordered_map<std::string, Ref<ComputeShaderPass>> m_ComputePasses;
+		std::unordered_map<std::string, Ref<WorkGraphShaderPass>> m_WorkGraphPasses;
 		std::vector<MaterialParameter> m_Params;
 	};
 }

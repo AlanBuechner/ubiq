@@ -439,8 +439,21 @@ class ProjectEnviernment:
 			return 1
 
 		# copy dlls
+		outProj = None
+		if(Config.project != ""):
+			outProj = Config.buildScripts[Config.project]["module"].GetProject()
+		else:
+			outProj = self
 		for dll in self.dlls:
-			dllName = os.path.basename(dll)
-			shutil.copy(dll, self.binDir + "/" + dllName)
+			if(isinstance(dll, dict)):
+				folder = outProj.binDir + "/" + dll["folder"]
+				if not os.path.exists(folder):
+					os.makedirs(folder)
+				for file in dll["files"]:
+					dllName = os.path.basename(file);
+					shutil.copy(file, folder + "/" + dllName)
+			else:
+				dllName = os.path.basename(dll)
+				shutil.copy(dll, outProj.binDir + "/" + dllName)
 
 		return 0

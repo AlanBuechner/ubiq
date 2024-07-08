@@ -112,9 +112,9 @@ namespace Engine
 
 		ID3D12PipelineState* state;
 
-		CORE_ASSERT(m_Sig, "Root Signature is null for some reason")
+		CORE_ASSERT(m_Sig, "Root Signature is null for some reason");
 
-			std::vector<D3D12_INPUT_ELEMENT_DESC> ies(m_InputElements.size());
+		std::vector<D3D12_INPUT_ELEMENT_DESC> ies(m_InputElements.size());
 		for (uint32 i = 0; i < m_InputElements.size(); i++)
 		{
 			ShaderInputElement& ie = m_InputElements[i];

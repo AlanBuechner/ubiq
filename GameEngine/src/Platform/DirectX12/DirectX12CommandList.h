@@ -46,6 +46,7 @@ namespace Engine
 		void InitalizeDescriptorTables(Ref<ShaderPass> shader);
 		virtual void SetShader(Ref<GraphicsShaderPass> shader) override;
 		virtual void SetShader(Ref<ComputeShaderPass> shader) override;
+		virtual void SetShader(Ref<WorkGraphShaderPass> shader) override;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) override;
 		virtual void SetRootConstant(uint32 index, uint32 data) override;
@@ -62,7 +63,7 @@ namespace Engine
 
 		std::vector<ResourceStateObject>& GetPendingTransitions() override { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
 		std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() override { return m_Frames[GetLastFrameIndex()].resourceStates; }
-		ID3D12GraphicsCommandList4* GetCommandList() { return m_CommandList; }
+		ID3D12GraphicsCommandList10* GetCommandList() { return m_CommandList; }
 
 	private:
 		std::vector<ResourceStateObject>& GetCurrentPendingTransitions() { return m_Frames[m_CurrentFrame].pendingTransitions; }
@@ -86,11 +87,11 @@ namespace Engine
 		};
 
 		uint32 m_CurrentFrame = 0;
-		ID3D12GraphicsCommandList4* m_CommandList;
+		ID3D12GraphicsCommandList10* m_CommandList;
 		std::vector<RecordFrame> m_Frames;
 
 		ID3D12CommandAllocator* m_PrependAllocator;
-		ID3D12GraphicsCommandList4* m_PrependList;
+		ID3D12GraphicsCommandList10* m_PrependList;
 
 		friend class DirectX12CommandQueue;
 	};

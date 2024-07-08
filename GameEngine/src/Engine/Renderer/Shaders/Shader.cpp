@@ -23,6 +23,8 @@ namespace Engine
 			m_GraphicsPasses[pass.passName] = GraphicsShaderPass::Create(src, pass.passName);
 		for (const ComputePassConfig& pass : src->config.computePasses)
 			m_ComputePasses[pass.passName] = ComputeShaderPass::Create(src, pass.passName);
+		for (const WorkGraphPassConfig& pass : src->config.workGraphPasses)
+			m_WorkGraphPasses[pass.passName] = WorkGraphShaderPass::Create(src, pass.passName);
 
 		m_Params = src->config.params;
 	}
@@ -39,6 +41,14 @@ namespace Engine
 	{
 		auto pass = m_ComputePasses.find(passName);
 		if (pass == m_ComputePasses.end())
+			return nullptr;
+		return pass->second;
+	}
+
+	Ref<WorkGraphShaderPass> Shader::GetWorkGraphPass(const std::string& passName)
+	{
+		auto pass = m_WorkGraphPasses.find(passName);
+		if (pass == m_WorkGraphPasses.end())
 			return nullptr;
 		return pass->second;
 	}

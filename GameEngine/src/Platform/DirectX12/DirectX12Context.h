@@ -21,7 +21,7 @@ namespace Engine
 
 		inline wrl::ComPtr<IDXGIFactory1> GetFactory() { return m_Factory; }
 		inline wrl::ComPtr<IDXGIAdapter> GetAdapter() { return m_Adapter; }
-		inline wrl::ComPtr<ID3D12Device2> GetDevice() { return m_Device; }
+		inline wrl::ComPtr<ID3D12Device14> GetDevice() { return m_Device; }
 		inline wrl::ComPtr<IDXGIOutput> GetOutput() { return m_Output; }
 		inline DXGI_FORMAT GetFormat() { return m_Format; };
 
@@ -39,7 +39,7 @@ namespace Engine
 	private:
 		wrl::ComPtr<IDXGIFactory1> m_Factory;
 		wrl::ComPtr<IDXGIAdapter> m_Adapter;
-		wrl::ComPtr<ID3D12Device2> m_Device;
+		wrl::ComPtr<ID3D12Device14> m_Device;
 		wrl::ComPtr<IDXGIOutput> m_Output;
 		D3D_FEATURE_LEVEL m_MaxFeatureLevel = D3D_FEATURE_LEVEL_11_0;
 		DXGI_FORMAT m_Format = DXGI_FORMAT_R8G8B8A8_UNORM;

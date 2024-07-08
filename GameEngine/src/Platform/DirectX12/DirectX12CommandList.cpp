@@ -6,6 +6,7 @@
 #include "DirectX12Context.h"
 #include "Shaders/DirectX12GraphicsShaderPass.h"
 #include "Shaders/DirectX12ComputeShaderPass.h"
+#include "Shaders/DirectX12WorkGraphShaderPass.h"
 #include "Resources/DirectX12Buffer.h"
 #include "Resources/DirectX12ConstantBuffer.h"
 #include "Resources/DirectX12StructuredBuffer.h"
@@ -387,6 +388,23 @@ namespace Engine
 
 		InitalizeDescriptorTables(shader);
 
+		m_BoundShader = shader;
+	}
+
+	void DirectX12CommandList::SetShader(Ref<WorkGraphShaderPass> shader)
+	{
+		Ref<DirectX12WorkGraphShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12WorkGraphShaderPass>(shader);
+
+		m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature());
+
+		D3D12_SET_PROGRAM_DESC setProg = {};
+		setProg.Type = D3D12_PROGRAM_TYPE_WORK_GRAPH;
+		setProg.WorkGraph.ProgramIdentifier = dxShader->GetIdentifier();
+		setProg.WorkGraph.Flags = D3D12_SET_WORK_GRAPH_FLAG_INITIALIZE;
+		setProg.WorkGraph.BackingMemory = dxShader->GetBackingMemory();
+		m_CommandList->SetProgram(&setProg);
+
+		InitalizeDescriptorTables(shader);
 		m_BoundShader = shader;
 	}
 

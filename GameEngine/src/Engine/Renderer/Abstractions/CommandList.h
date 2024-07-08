@@ -12,6 +12,7 @@ namespace Engine
 	class ShaderPass;
 	class GraphicsShaderPass;
 	class ComputeShaderPass;
+	class WorkGraphShaderPass;
 	class ConstantBuffer;
 	class StructuredBuffer;
 	class RWStructuredBuffer;
@@ -84,6 +85,7 @@ namespace Engine
 
 		virtual void SetShader(Ref<GraphicsShaderPass> shader) = 0;
 		virtual void SetShader(Ref<ComputeShaderPass> shader) = 0;
+		virtual void SetShader(Ref<WorkGraphShaderPass> shader) = 0;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) = 0;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) = 0;
 		virtual void SetRootConstant(uint32 index, uint32 data) = 0;
