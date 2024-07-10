@@ -516,6 +516,27 @@ namespace Engine
 		m_CommandList->Dispatch(threadGroupsX, threadGroupsY, threadGrouptsZ);
 	}
 
+	void DirectX12CommandList::DisbatchGraph(Ref<StructuredBuffer> buffer)
+	{
+		DirectX12StructuredBufferResource* res = (DirectX12StructuredBufferResource*)buffer->GetResource();
+
+		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
+		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_GPU_INPUT;
+		DSDesc.NodeGPUInput = res->GetBuffer()->GetGPUVirtualAddress();
+		m_CommandList->DispatchGraph(&DSDesc);
+	}
+
+	void DirectX12CommandList::DispatchGraph(void* data, uint32 stride, uint32 count)
+	{
+		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
+		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_CPU_INPUT;
+		DSDesc.NodeCPUInput.EntrypointIndex = 0; // just one entrypoint in this graph
+		DSDesc.NodeCPUInput.NumRecords = count;
+		DSDesc.NodeCPUInput.RecordStrideInBytes = stride;
+		DSDesc.NodeCPUInput.pRecords = data;
+		m_CommandList->DispatchGraph(&DSDesc);
+	}
+
 	void DirectX12CommandList::AwaitUAV(GPUResource* uav)
 	{
 		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)uav->GetGPUResourcePointer());
