@@ -99,8 +99,8 @@ namespace Engine
 
 		virtual void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ) = 0;
 
-		virtual void DispatchGraph(void* data, uint32 stride, uint32 count) = 0;
 		virtual void DisbatchGraph(Ref<StructuredBuffer> buffer) = 0;
+		virtual void DispatchGraph(void* data, uint32 stride, uint32 count) = 0;
 		template<typename T>
 		void DispatchGraph(Utils::Vector<T> data) { DispatchGraph(data.Data(), data.ElementSize(), data.Count()); }
 

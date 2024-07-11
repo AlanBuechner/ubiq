@@ -27,7 +27,7 @@ namespace Game
 			std::string m_Name;
 			Engine::Ref<Engine::Mesh> m_Mesh = nullptr;
 			Engine::Ref<Engine::Material> m_Material = nullptr;
-			SceneRenderer::ObjectControlBlockRef m_Object = nullptr;
+			ObjectControlBlockRef m_Object = nullptr;
 		};
 
 	public:
