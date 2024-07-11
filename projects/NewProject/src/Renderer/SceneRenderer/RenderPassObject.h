@@ -31,6 +31,7 @@ namespace Game
 		uint32 m_InstanceLocation;
 
 		void UpdateTransform(const Math::Mat4& transform);
+		void DestroySelf();
 	};
 	using ObjectControlBlockRef = ObjectControlBlock*;
 
@@ -68,7 +69,6 @@ namespace Game
 
 		std::list<RenderObject> m_Objects;
 	};
-
 
 
 	class RenderPassObject

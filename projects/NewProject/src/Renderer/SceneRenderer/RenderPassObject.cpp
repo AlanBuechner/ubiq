@@ -20,6 +20,11 @@ namespace Game
 		data.m_Transform = transform;
 	}
 
+	void ObjectControlBlock::DestroySelf()
+	{
+		m_Object.RemoveInstance(this);
+	}
+
 	RenderObject::RenderObject()
 	{
 		m_Instances = Engine::InstanceBuffer::Create(10, sizeof(InstanceData)); // default to capacity of 10
