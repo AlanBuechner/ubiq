@@ -57,8 +57,9 @@ namespace Engine
 
 		virtual void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ) override;
 
+		virtual void DisbatchGraph(uint32 numRecords) override;
 		virtual void DisbatchGraph(Ref<StructuredBuffer> buffer) override;
-		virtual void DispatchGraph(void* data, uint32 stride, uint32 count) override;
+		virtual void DisbatchGraph(void* data, uint32 stride, uint32 count) override;
 
 		virtual void AwaitUAV(GPUResource* uav) override;
 

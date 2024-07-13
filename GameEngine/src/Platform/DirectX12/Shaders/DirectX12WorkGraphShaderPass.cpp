@@ -57,6 +57,9 @@ namespace Engine
 		CD3DX12_SHADER_BYTECODE libCode(m_Blobs.wg->GetBufferPointer(), m_Blobs.wg->GetBufferSize());
 		pLib->SetDXILLibrary(&libCode);
 
+		auto pRs = SO.CreateSubobject<CD3DX12_GLOBAL_ROOT_SIGNATURE_SUBOBJECT>(); 
+		pRs->SetRootSignature(m_Sig);
+
 		auto pWG = SO.CreateSubobject<CD3DX12_WORK_GRAPH_SUBOBJECT>();
 		pWG->IncludeAllAvailableNodes(); // Auto populate the graph
 		LPCWSTR workGraphName = L"HelloWorkGraphs";

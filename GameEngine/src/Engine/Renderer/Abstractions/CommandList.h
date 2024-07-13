@@ -92,17 +92,18 @@ namespace Engine
 		template<typename T>
 		void SetRootConstant(uint32 index, T data) { SetRootConstant(index, *(uint32*)&data); }
 		virtual void SetTexture(uint32 index, Ref<Texture2D> texture) = 0;
-		void SetRWTexture(uint32 index, Ref<RWTexture2D> texture, uint32 mip) { SetRWTexture(index, texture->GetUAVDescriptor(mip)); }
+		void SetRWTexture(uint32 index, Ref<RWTexture2D> texture, uint32 mip = 0) { SetRWTexture(index, texture->GetUAVDescriptor(mip)); }
 		virtual void SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav) = 0;
 		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) = 0;
 		virtual void ExecuteBundle(Ref<CommandList> commandList) = 0;
 
 		virtual void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ) = 0;
 
+		virtual void DisbatchGraph(uint32 numRecords = 1) = 0;
 		virtual void DisbatchGraph(Ref<StructuredBuffer> buffer) = 0;
-		virtual void DispatchGraph(void* data, uint32 stride, uint32 count) = 0;
+		virtual void DisbatchGraph(void* data, uint32 stride, uint32 count) = 0;
 		template<typename T>
-		void DispatchGraph(Utils::Vector<T> data) { DispatchGraph(data.Data(), data.ElementSize(), data.Count()); }
+		void DisbatchGraph(const Utils::Vector<T>& data) { DisbatchGraph((void*)data.Data(), data.ElementSize(), data.Count()); }
 
 		// mis
 		virtual void AwaitUAV(GPUResource* uav) = 0;

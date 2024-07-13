@@ -516,6 +516,17 @@ namespace Engine
 		m_CommandList->Dispatch(threadGroupsX, threadGroupsY, threadGrouptsZ);
 	}
 
+	void DirectX12CommandList::DisbatchGraph(uint32 numRecords)
+	{
+		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
+		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_CPU_INPUT;
+		DSDesc.NodeCPUInput.EntrypointIndex = 0; // just one entrypoint in this graph
+		DSDesc.NodeCPUInput.NumRecords = numRecords;
+		DSDesc.NodeCPUInput.RecordStrideInBytes = 0;
+		DSDesc.NodeCPUInput.pRecords = nullptr;
+		m_CommandList->DispatchGraph(&DSDesc);
+	}
+
 	void DirectX12CommandList::DisbatchGraph(Ref<StructuredBuffer> buffer)
 	{
 		DirectX12StructuredBufferResource* res = (DirectX12StructuredBufferResource*)buffer->GetResource();
@@ -526,7 +537,7 @@ namespace Engine
 		m_CommandList->DispatchGraph(&DSDesc);
 	}
 
-	void DirectX12CommandList::DispatchGraph(void* data, uint32 stride, uint32 count)
+	void DirectX12CommandList::DisbatchGraph(void* data, uint32 stride, uint32 count)
 	{
 		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
 		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_CPU_INPUT;
