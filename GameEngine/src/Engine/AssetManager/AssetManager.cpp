@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include "Platform/Windows/Win.h"
+#include "Utils/Vector.h"
 
 namespace Engine
 {

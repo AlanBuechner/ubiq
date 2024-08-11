@@ -311,8 +311,8 @@ namespace Engine
 			{
 				// create temp texture to generate the mip levels
 				Ref<RWTexture2D> mipTexture = RWTexture2D::Create(data.width, data.height, data.numMips, data.format);
+
 				mipTextures.Push({ data.destResource, mipTexture, data.width, data.height, data.numMips, data.state, data.format });
-				//m_TempUplaodResourecs.push_back(mipTexture);
 
 				startb.Push({ data.destResource, ResourceState::CopyDestination });
 				startb.Push({ mipTexture->GetResource(), ResourceState::CopyDestination });

@@ -4,6 +4,7 @@
 #include "Engine/Core/Window.h"
 #include "DirectX12Texture.h"
 #include "Platform/DirectX12/DX.h"
+#include "Utils/Vector.h"
 
 namespace Engine
 {

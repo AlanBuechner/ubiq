@@ -47,15 +47,16 @@ namespace Engine
 
 		~SceneRegistry();
 
-		EntityType* begin() { return m_UsedEntitys.begin(); }
-		EntityType* end() { return m_UsedEntitys.end(); }
+
+		EntityType* begin() { return m_UsedEntities.begin(); }
+		EntityType* end() { return m_UsedEntities.end(); }
 
 		EntityType CreateEntity();
 		EntityType CreateEntity(UUID id, const std::string& name);
 		void DestroyEntity(EntityType entity);
 
 		// EntityData Does not have referential integrity
-		EntityData& GetEntityData(EntityType entity) { return m_Entitys[entity]; }
+		EntityData& GetEntityData(EntityType entity) { return m_Entities[entity]; }
 
 		template<class T>
 		T* AddComponent(EntityType entity, Scene* scene) { return (T*)AddComponent(entity, scene, T::GetStaticClass()); }
@@ -90,9 +91,10 @@ namespace Engine
 		void EachPool(EachComponentFunc func);
 
 	private:
-		Utils::Vector<EntityData> m_Entitys;
-		Utils::Vector<EntityType> m_FreeEntitys;
-		Utils::Vector<EntityType> m_UsedEntitys;
+
+		Utils::Vector<EntityData> m_Entities;
+		Utils::Vector<EntityType> m_FreeEntities;
+		Utils::Vector<EntityType> m_UsedEntities;
 
 		std::unordered_map<ComponentType, ComponentPool*> m_Pools;
 	};

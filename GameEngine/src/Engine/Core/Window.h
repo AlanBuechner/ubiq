@@ -3,6 +3,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Events/Event.h"
 #include "Engine/Renderer/Abstractions/GraphicsContext.h"
+#include "Utils/Vector.h"
 
 namespace Engine 
 {

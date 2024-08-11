@@ -2,8 +2,7 @@
 #include "Core.h"
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Math/Math.h"
-
-#include <vector>
+#include "Utils/Vector.h"
 
 namespace Engine
 {
@@ -31,8 +30,8 @@ namespace Engine
 
 		void Apply()
 		{
-			mesh->SetVertices(vertices.Data(), (uint32)vertices.Count());
-			mesh->SetIndices(indices.Data(), (uint32)indices.Count());
+			mesh->SetVertices(vertices.Data(), vertices.Count());
+			mesh->SetIndices(indices.Data(), indices.Count());
 		}
 	};
 

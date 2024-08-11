@@ -20,7 +20,7 @@ namespace Engine
 
 	void WindowManager::Destroy()
 	{
-		s_Windows.Clear();
+		s_Windows.Destroy();
 	}
 
 	void WindowManager::UpdateWindows()

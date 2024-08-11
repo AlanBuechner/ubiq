@@ -7,6 +7,8 @@
 #include <functional>
 #include <initializer_list>
 
+
+
 namespace Utils
 {
 	//TODO: Align capacity to power of two
@@ -129,9 +131,6 @@ namespace Utils
 
 	template<class Type> inline void Vector<Type>::Destroy()
 	{
-		m_Count = 0;
-		m_Capacity = 0;
-
 		if (m_Array)
 		{
 			if constexpr (UseDestructor) {
@@ -141,6 +140,8 @@ namespace Utils
 			free(m_Array);
 		}
 
+		m_Count = 0;
+		m_Capacity = 0;
 		m_Array = nullptr;
 	}
 
@@ -260,7 +261,18 @@ namespace Utils
 		m_Count = count;
 	}
 
-	template<class Type> inline void Vector<Type>::Clear() { m_Count = 0; }
+	template<class Type> inline void Vector<Type>::Clear()
+	{
+		if (m_Array)
+		{
+			if constexpr (UseDestructor) {
+				for (uint32 i = 0; i < m_Count; i++)
+					(m_Array + i)->~Type();
+			}
+		}
+
+		m_Count = 0;
+	}
 
 	template<class Type> inline constexpr uint32 Vector<Type>::ElementSize() const { return sizeof(Type); }
 

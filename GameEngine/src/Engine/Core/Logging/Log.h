@@ -28,7 +28,8 @@ namespace Engine
 
 			PatternToken(TokenType type, std::string_view string = "") :
 				m_Type(type), m_String(string)
-			{}
+			{
+			}
 
 			TokenType m_Type;
 			std::string_view m_String;
@@ -44,10 +45,12 @@ namespace Engine
 
 			MessageToken(std::string_view string) :
 				m_Type(String), m_String(string)
-			{}
+			{
+			}
 			MessageToken(uint32_t index) :
 				m_Type(Param), m_ParamIndex(index)
-			{}
+			{
+			}
 
 			TokenType m_Type;
 			std::string_view m_String;
@@ -74,7 +77,8 @@ namespace Engine
 
 			TemplateElement(Type t, void* d) :
 				type(t), data(d)
-			{}
+			{
+			}
 
 			template <class T>
 			struct is_char_ptr
@@ -155,9 +159,7 @@ namespace Engine
 		template<typename... Args>
 		void LogMessage(const char* msg, const Args&... args)
 		{
-			Utils::Vector<TemplateElement> templateElements;
-			templateElements.Reserve(sizeof...(args));
-			(templateElements.Push(TemplateElement::GenTemplateElement(args)), ...);
+			Utils::Vector<TemplateElement> templateElements = { TemplateElement::GenTemplateElement(args)... };
 
 			Utils::Vector<MessageToken> tokens;
 			if (ParseMessage(msg, tokens))

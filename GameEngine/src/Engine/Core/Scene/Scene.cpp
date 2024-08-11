@@ -33,8 +33,9 @@ namespace Engine
 	Scene::~Scene()
 	{
 		m_SceneRenderer = nullptr;
-		for (uint32 i = 0; i < m_UpdateEvents.Count(); i++)
-			delete m_UpdateEvents[i];
+
+		for (Engine::UpdateEvent* e : m_UpdateEvents)
+			delete e;
 	}
 
 	void Scene::OnUpdate(Ref<Camera> camera)
@@ -46,8 +47,9 @@ namespace Engine
 
 		m_SceneScript->OnUpdate();
 
-		for (uint32 i = 0; i < m_UpdateEvents.Count(); i++)
-			m_UpdateEvents[i]->Update();
+
+		for (Engine::UpdateEvent* event : m_UpdateEvents)
+			event->Update();
 		
 		// render 3d models
 		m_SceneRenderer->UpdateBuffers();
