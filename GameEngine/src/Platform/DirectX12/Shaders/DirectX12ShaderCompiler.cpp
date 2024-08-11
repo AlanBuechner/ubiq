@@ -446,7 +446,6 @@ namespace Engine
 					{
 						data.samplerAttribs.Min = MinMagFilter::Anisotropic;
 						data.samplerAttribs.Mag = MinMagFilter::Anisotropic;
-
 					}
 				}
 			}
@@ -468,6 +467,12 @@ namespace Engine
 		case D3D_SIT_SAMPLER:		data.descType = DescriptorType::Sampler; break;
 		default:
 			break;
+		}
+
+		for (uint32 i = 0; i < params.size(); i++)
+		{
+			if (params[i] == data)
+				return;
 		}
 
 		params.push_back(data);

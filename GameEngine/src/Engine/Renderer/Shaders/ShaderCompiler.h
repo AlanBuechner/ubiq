@@ -36,6 +36,19 @@ namespace Engine
 
 		MinMagFilter Min = MinMagFilter::Linear;
 		MinMagFilter Mag = MinMagFilter::Linear;
+
+		bool operator==(const SamplerInfo& other)
+		{
+#define CHECK_PARAM(p) if(p != other.p) return false;
+			CHECK_PARAM(U);
+			CHECK_PARAM(V);
+			CHECK_PARAM(Min);
+			CHECK_PARAM(Mag);
+			return true;
+#undef CHECK_PARAM
+		}
+
+		bool operator!=(const SamplerInfo& other) { return !(*this == other); }
 	};
 	/* ---------------------------- end sampler info ---------------------------- */
 
@@ -93,6 +106,24 @@ namespace Engine
 		SamplerInfo samplerAttribs;
 
 		uint32 rootIndex = 0; // index used when binding
+
+		bool operator==(const ShaderParameter& other)
+		{
+#define CHECK_PARAM(p) if(p != other.p) return false;
+			CHECK_PARAM(shader);
+			CHECK_PARAM(type);
+			CHECK_PARAM(descType);
+			CHECK_PARAM(name);
+			CHECK_PARAM(reg);
+			CHECK_PARAM(space);
+			CHECK_PARAM(count);
+			CHECK_PARAM(samplerAttribs);
+			CHECK_PARAM(rootIndex);
+			return true;
+#undef CHECK_PARAM
+		}
+
+		bool operator!=(const ShaderParameter& other) { return !(*this == other); }
 	};
 	/* ---------------------------- end binding info ---------------------------- */
 
