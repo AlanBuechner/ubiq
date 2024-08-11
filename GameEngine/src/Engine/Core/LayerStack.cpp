@@ -33,7 +33,7 @@ namespace Engine {
 			if (layer == *it)
 			{
 				layer->OnDetach();
-				m_Layers.Remove(it);
+				m_Layers.Remove(it - m_Layers.begin());
 				m_LayerInsertIndex--;
 				break;
 			}
@@ -47,7 +47,7 @@ namespace Engine {
 			if (overlay == *it)
 			{
 				overlay->OnDetach();
-				m_Layers.Remove(it);
+				m_Layers.Remove(it - m_Layers.begin());
 				break;
 			}
 		}

@@ -94,7 +94,6 @@ namespace Editor
 
 		if (Engine::Input::GetKeyPressed(Engine::KeyCode::SPACE) && Engine::Input::GetKeyDown(Engine::KeyCode::CONTROL))
 			m_ContentPanel.SetActive(!m_ContentPanel.IsActive());
-
 	}
 
 	void EditorLayer::OnRender()
@@ -298,7 +297,6 @@ namespace Editor
 	void EditorLayer::DrawCustomGizmo()
 	{
 		// draw grid lines
-		Engine::LineRenderer::BeginScene(m_EditorCamera);
 		{
 			Math::Vector3 camPos = m_EditorCamera->GetPosition();
 
@@ -306,8 +304,8 @@ namespace Editor
 			Math::Mat4 matx =	glm::translate(Math::Mat4(1.0f), { camPos.x - fmod(camPos.x, m_GridLineOffset), 0, camPos.z })
 								* glm::rotate(Math::Mat4(1.0f), glm::radians(90.0f), { 0,1,0 });
 
-			Engine::LineRenderer::DrawLineMesh(m_GridMesh, matz);
-			Engine::LineRenderer::DrawLineMesh(m_GridMesh, matx);
+			Engine::DebugRenderer::DrawLineMesh(m_GridMesh, matz);
+			Engine::DebugRenderer::DrawLineMesh(m_GridMesh, matx);
 		}
 
 		// draw camera frustum
@@ -320,45 +318,13 @@ namespace Editor
 				bounds.m_Min = { -1,-1,-1 };
 				bounds.m_Max = { 1, 1, 1 };
 			}
-			Math::Vector3 min = bounds.m_Min;
-			Math::Vector3 max = bounds.m_Max;
 
-			auto& tc = selected.GetTransform();
-
+			Engine::TransformComponent& tc = selected.GetTransform();
 			const Math::Mat4& transform = tc.GetTransform();
-			Math::Vector4 ltn = Math::Vector4{ min.x, max.y, min.z, 1 };
-			Math::Vector4 ltf = Math::Vector4{ min.x, max.y, max.z, 1 };
 
-			Math::Vector4 rtn = Math::Vector4{ max.x, max.y, min.z, 1 };
-			Math::Vector4 rtf = Math::Vector4{ max.x, max.y, max.z, 1 };
+			Engine::DebugRenderer::DrawWireBox(bounds.Center(), bounds.HalfExtent(), { 1,1,1,1 }, transform, false);
 
-			Math::Vector4 lbn = Math::Vector4{ min.x, min.y, min.z, 1 };
-			Math::Vector4 lbf = Math::Vector4{ min.x, min.y, max.z, 1 };
-
-			Math::Vector4 rbn = Math::Vector4{ max.x, min.y, min.z, 1 };
-			Math::Vector4 rbf = Math::Vector4{ max.x, min.y, max.z, 1 };
-
-			Engine::LineMesh mesh;
-			mesh.m_Vertices = {
-				{ltn, {1,1,1,1}}, // 0
-				{rtn, {1,1,1,1}}, // 1
-				{rbn, {1,1,1,1}}, // 2
-				{lbn, {1,1,1,1}}, // 3
-				{ltf, {1,1,1,1}}, // 4
-				{rtf, {1,1,1,1}}, // 5
-				{rbf, {1,1,1,1}}, // 6
-				{lbf, {1,1,1,1}}, // 7
-			};
-
-			mesh.m_Indices = {
-				0,4, 1,5, 2,6, 3,7,
-				0,1, 1,2, 2,3, 3,0, // near clipping plane
-				4,5, 5,6, 6,7, 7,4  // far clipping plane
-			};
-
-			Engine::LineRenderer::DrawLineMesh(mesh, transform);
 		}
-		Engine::LineRenderer::EndScene();
 	}
 
 	void EditorLayer::UI_Viewport()

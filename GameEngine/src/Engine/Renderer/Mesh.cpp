@@ -10,6 +10,9 @@ namespace Engine
 
 	void Mesh::SetVertices(const void* vertices, uint32 count)
 	{
+		if (count == 0)
+			return;
+
 		if (m_VertexBuffer)
 		{
 			if (count != m_VertexBuffer->GetResource()->GetCount())
@@ -22,6 +25,9 @@ namespace Engine
 
 	void Mesh::SetIndices(const uint32* data, uint32 count)
 	{
+		if (count == 0)
+			return;
+
 		if (m_IndexBuffer)
 		{
 			if (count != m_IndexBuffer->GetResource()->GetCount())

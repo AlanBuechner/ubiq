@@ -2,7 +2,7 @@
 #include "SkyboxNode.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
-#include "Engine/Renderer/Abstractions/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 #include "Engine/Renderer/Camera.h"
 
 #include "Engine/Core/MeshBuilder.h"
@@ -51,7 +51,7 @@ namespace Game
 
 		if (scene.m_Skybox)
 		{
-			Engine::Ref<Engine::ShaderPass> pass = m_SkyboxShader->GetPass("main");
+			Engine::Ref<Engine::GraphicsShaderPass> pass = m_SkyboxShader->GetGraphicsPass("main");
 			m_CommandList->SetShader(pass);
 			m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), scene.m_MainCamera->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
 			m_CommandList->SetTexture(pass->GetUniformLocation("texture"), scene.m_Skybox);

@@ -43,7 +43,10 @@ namespace Engine
 
 		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color) override;
 
-		virtual void SetShader(Ref<ShaderPass> shader) override;
+		void InitalizeDescriptorTables(Ref<ShaderPass> shader);
+		virtual void SetShader(Ref<GraphicsShaderPass> shader) override;
+		virtual void SetShader(Ref<ComputeShaderPass> shader) override;
+		virtual void SetShader(Ref<WorkGraphShaderPass> shader) override;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) override;
 		virtual void SetRootConstant(uint32 index, uint32 data) override;
@@ -54,13 +57,17 @@ namespace Engine
 
 		virtual void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ) override;
 
+		virtual void DisbatchGraph(uint32 numRecords) override;
+		virtual void DisbatchGraph(Ref<StructuredBuffer> buffer) override;
+		virtual void DisbatchGraph(void* data, uint32 stride, uint32 count) override;
+
 		virtual void AwaitUAV(GPUResource* uav) override;
 
 		virtual void Close() override;
 
 		Utils::Vector<ResourceStateObject>& GetPendingTransitions() override { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
 		std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() override { return m_Frames[GetLastFrameIndex()].resourceStates; }
-		ID3D12GraphicsCommandList4* GetCommandList() { return m_CommandList; }
+		ID3D12GraphicsCommandList10* GetCommandList() { return m_CommandList; }
 
 	private:
 		Utils::Vector<ResourceStateObject>& GetCurrentPendingTransitions() { return m_Frames[m_CurrentFrame].pendingTransitions; }
@@ -84,11 +91,11 @@ namespace Engine
 		};
 
 		uint32 m_CurrentFrame = 0;
-		ID3D12GraphicsCommandList4* m_CommandList;
+		ID3D12GraphicsCommandList10* m_CommandList;
 		Utils::Vector<RecordFrame> m_Frames;
 
 		ID3D12CommandAllocator* m_PrependAllocator;
-		ID3D12GraphicsCommandList4* m_PrependList;
+		ID3D12GraphicsCommandList10* m_PrependList;
 
 		friend class DirectX12CommandQueue;
 	};

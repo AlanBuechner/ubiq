@@ -35,6 +35,7 @@ namespace Engine
 		virtual ~Camera() = default;
 
 		const Math::Mat4& GetProjectionMatrix() const { return m_CameraData.ProjectionMatrix; }
+		const Math::Mat4& GetViewProjectionMatrix() const { return m_CameraData.VPMatrix; }
 		const Ref<ConstantBuffer> GetCameraBuffer() const { return m_CameraDataBuffer; }
 		void UpdateCameraBuffer() { m_CameraDataBuffer->SetData(&m_CameraData); }
 		const CameraData& GetCameraData() { return m_CameraData; }

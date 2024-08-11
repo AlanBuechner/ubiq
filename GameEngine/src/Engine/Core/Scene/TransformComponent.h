@@ -12,14 +12,6 @@
 
 #include "Utils/Vector.h"
 
-#include "Engine/Renderer/Mesh.h"
-#include "Engine/Renderer/Abstractions/Resources/Texture.h"
-#include "Engine/Renderer/Abstractions/Resources/Buffer.h"
-#include "Engine/Renderer/Abstractions/Shader.h"
-#include "Engine/Renderer/Material.h"
-
-#include "Engine/Core/MeshBuilder.h"
-
 class TransformSerializer;
 
 namespace Engine

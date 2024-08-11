@@ -13,7 +13,7 @@ namespace Game
 		for (uint32 i = 0; i < m_CollapsedModelTree.Count(); i++)
 		{
 			MeshEntry& entry = m_CollapsedModelTree[i];
-			Owner.GetScene()->GetSceneRendererAs<SceneRenderer>()->RemoveObject(entry.m_Object);
+			if (entry.m_Object) entry.m_Object->DestroySelf();
 		}
 	}
 
@@ -33,7 +33,10 @@ namespace Game
 
 		// remove old model
 		for (uint32 i = 0; i < m_CollapsedModelTree.Count(); i++)
-			Owner.GetScene()->GetSceneRendererAs<SceneRenderer>()->RemoveObject(m_CollapsedModelTree[i].m_Object);
+		{
+			MeshEntry& entry = m_CollapsedModelTree[i];
+			if (entry.m_Object) entry.m_Object->DestroySelf();
+		}
 		m_CollapsedModelTree.Clear();
 
 		if (model)
@@ -58,8 +61,8 @@ namespace Game
 
 			if (mat)
 			{
-				Owner.GetScene()->GetSceneRendererAs<SceneRenderer>()->RemoveObject(entry.m_Object);
-				entry.m_Object = Owner.GetScene()->GetSceneRendererAs<SceneRenderer>()->Submit(entry.m_Mesh, mat, Owner.GetTransform().GetTransform());
+				if (entry.m_Object) entry.m_Object->DestroySelf();
+				entry.m_Object = Owner.GetScene()->GetSceneRendererAs<SceneRenderer>()->GetMainPass().Submit(entry.m_Mesh, mat, Owner.GetTransform().GetTransform());
 			}
 		}
 

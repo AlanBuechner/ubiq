@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "GBufferPassNode.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
-#include "Engine/Renderer/Abstractions/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 #include "Engine/Renderer/Camera.h"
 
 #include "RenderGraph.h"
@@ -27,7 +27,7 @@ namespace Game
 		// render all objects
 		for (auto& cmd : scene.m_DrawCommands)
 		{
-			Engine::Ref<Engine::ShaderPass> pass = cmd.m_Shader->GetPass("depth");
+			Engine::Ref<Engine::GraphicsShaderPass> pass = cmd.m_Shader->GetGraphicsPass("depth");
 			if (pass)
 			{
 				m_CommandList->SetShader(pass);

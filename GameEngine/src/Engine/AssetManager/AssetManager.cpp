@@ -168,7 +168,7 @@ namespace Engine
 			{
 				UUID id = GetAssetUUIDFromPath(asset);
 				m_AssetPaths[id] = asset;
-				foundMetas.Remove(metai);
+				foundMetas.Remove(metai - foundMetas.begin());
 			}
 			else
 			{

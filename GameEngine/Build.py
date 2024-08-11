@@ -44,6 +44,7 @@ includes = [
 	f"{includeDirs['Reflection']}",
 	f"{includeDirs['ProjectManager']}",
 	f"{includeDirs['Utilities']}",
+	f"{includeDirs['Agility']}",
 ]
 
 sysIncludes = [
@@ -68,8 +69,23 @@ dependancys = [
 
 links = [
 	f"{libs['Assimp']}",
-	f"{libs['dxc']}",
+	#f"{libs['dxc']}",
 	f"{libs['pix']}",
+]
+
+dlls = [
+	{
+		"folder" : "D3D12",
+		"files" : [
+			f"{vendorDirs['Agility']}/build/native/bin/x64/D3D12Core.dll",
+			f"{vendorDirs['Agility']}/build/native/bin/x64/d3d12SDKLayers.dll",
+		]
+	},
+	f"{vendorDirs['dxc']}/bin/x64/dxil.dll",
+	f"{vendorDirs['dxc']}/bin/x64/dxcompiler.dll",
+	f"{vendorDirs['Assimp']}/assimp-vc140-mt.dll",
+	f"{vendorDirs['pix']}/bin/x64/WinPixEventRuntime.dll",
+	f"{projDir}/zlibd.dll",
 ]
 
 def GetProject():
@@ -84,6 +100,7 @@ def GetProject():
 	proj.sysIncludes = sysIncludes
 	proj.defines = defines
 	proj.links = links
+	proj.dlls = dlls
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
 	proj.intDir = GetIntDir(projName)

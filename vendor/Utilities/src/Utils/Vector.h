@@ -41,7 +41,8 @@ namespace Utils
 		void Remove(Type* iter);
 
 		void Reserve(uint32 capacity);
-		void Resize(uint32 size, const Type& value = {});
+		void Resize(uint32 count);
+		void Resize(uint32 count, const Type& value);
 		void Clear();
 
 		constexpr uint32 ElementSize() const;
@@ -133,12 +134,11 @@ namespace Utils
 
 		if (m_Array)
 		{
-			if constexpr (UseNew) { delete[] m_Array; }
-			else
-			{
-				if constexpr (UseDestructor) { for (Type* t = m_Array, *end = m_Array + m_Count; t != end; ++t) { t->~Type(); } }
-				free(m_Array);
+			if constexpr (UseDestructor) {
+				for (uint32 i = 0; i < m_Count; i++)
+					(m_Array + i)->~Type();
 			}
+			free(m_Array);
 		}
 
 		m_Array = nullptr;
@@ -160,7 +160,11 @@ namespace Utils
 
 	template<class Type> inline void Vector<Type>::Pop()
 	{
-		if (m_Count) { --m_Count; }
+		if (m_Count) {
+			if constexpr (UseDestructor)
+				(m_Array + m_Count - 1)->~Type();
+			--m_Count;
+		}
 	}
 
 	template<class Type> inline Type& Vector<Type>::Insert(uint32 index, const Type& value)
@@ -183,7 +187,8 @@ namespace Utils
 #if defined(DEBUG)
 		//TODO: Assert index in bounds
 #endif
-		MoveValue(m_Array + index, std::move(m_Array[--m_Count]));
+		MoveValue(m_Array + index, std::move(m_Array[m_Count]));
+		Pop();
 	}
 
 	template<class Type> inline void Vector<Type>::Remove(Type* iter)
@@ -194,7 +199,8 @@ namespace Utils
 		//TODO: Assert index in bounds
 #endif
 
-		MoveValue(m_Array + index, std::move(m_Array[--m_Count]));
+		MoveValue(m_Array + index, std::move(m_Array[m_Count]));
+		Pop();
 	}
 	
 	template<class Type> inline void Vector<Type>::Reserve(uint32 capacity)
@@ -203,35 +209,52 @@ namespace Utils
 
 		if (m_Array)
 		{
+			// create new array
 			Type* temp = m_Array;
-			if constexpr (UseNew) { m_Array = new Type[capacity]; }
-			else { m_Array = (Type*)malloc(capacity * sizeof(Type)); }
+			m_Array = (Type*)malloc(capacity * sizeof(Type));
 
-			MoveValues(m_Array, temp, m_Capacity);
+			// move data from old array to new array
+			MoveValues(m_Array, temp, m_Count);
 
-			if constexpr (UseNew) { delete[] temp; }
-			else
-			{
-				if constexpr (UseDestructor) { for (Type* t = m_Array, *end = m_Array + m_Count; t != end; ++t) { t->~Type(); } }
-				free(temp);
+			// destroy old array
+			if constexpr (UseDestructor) {
+				for (uint32 i = 0; i < m_Count; i++)
+					(temp + i)->~Type();
 			}
-			
+			free(temp);
 		}
 		else
 		{
-			if constexpr (UseNew) { m_Array = new Type[capacity]; }
-			else { m_Array = (Type*)malloc(capacity * sizeof(Type)); }
+			m_Array = (Type*)malloc(capacity * sizeof(Type));
 		}
 
 		m_Capacity = capacity;
 	}
 
-	template<class Type> inline void Vector<Type>::Resize(uint32 count, const Type& value)
+
+	template<class Type>
+	inline void Utils::Vector<Type>::Resize(uint32 count)
+	{
+		// call default constructor when no value is given
+		if (count > m_Capacity)
+		{
+			Reserve(count);
+			for (uint32 i = m_Count; i < count; i++)
+				new(m_Array + i) Type();
+		}
+
+		m_Count = count;
+	}
+
+
+	template<class Type> 
+	inline void Vector<Type>::Resize(uint32 count, const Type& value)
 	{
 		if (count > m_Capacity) 
 		{
-			Reserve(count); 
-			for (Type* t = m_Array + m_Count, *end = m_Array + count; t != end; ++t) { CopyValue(t, value); }
+			Reserve(count);
+			for (uint32 i = m_Count; i < count; i++) 
+				CopyValue(m_Array+i, value);
 		}
 
 		m_Count = count;
@@ -426,23 +449,19 @@ namespace Utils
 	template <class Type>
 	inline Type* Vector<Type>::MoveValues(Type* dst, Type* src, uint32_t count)
 	{
-		if (dst > src && dst < src + count) //Reverse Copy
+		if (dst > src && dst < src + count) //Reverse Copy only if ranges overlap
 		{
 			Type* rDst = dst + count - 1;
 			Type* rSrc = src + count - 1;
 
 			//TODO: look into unrolling
 			for (uint32_t i = 0; i < count; ++i)
-			{
 				MoveValue(rDst--, std::move(*rSrc--));
-			}
 		}
 		else
 		{
 			for (uint32_t i = 0; i < count; ++i)
-			{
 				MoveValue(dst++, std::move(*src++));
-			}
 		}
 
 		return dst;

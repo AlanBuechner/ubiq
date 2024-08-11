@@ -1,7 +1,12 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Engine/AssetManager/AssetManager.h"
-#include "Resources/FrameBuffer.h"
+
+#include "ShaderPass.h"
+#include "GraphicsShaderPass.h"
+#include "ComputeShaderPass.h"
+#include "WorkGraphShaderPass.h"
+
 #include <string>
 #include <Engine/Math/Math.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -17,43 +22,14 @@ namespace Engine
 
 namespace Engine
 {
-
-	class ShaderPass
-	{
-	public:
-		struct Uniform
-		{
-			std::string name;
-			enum Type {
-				Float, Int, Uint,
-				Float2, Int2, Uint2,
-				Float3, Int3, Uint3,
-				Float4, Int4, Uint4,
-				Mat2, Mat3, Mat4
-			} type;
-		};
-
-	public:
-		virtual ~ShaderPass() {};
-
-		virtual Utils::Vector<ShaderParameter> GetReflectionData() const = 0;
-
-		static Ref<ShaderPass> Create(Ref<ShaderSorce> src, const std::string& passName);
-
-		virtual uint32 GetUniformLocation(const std::string& name) const = 0;
-
-		bool IsComputeShader() { return m_ComputeShader; }
-
-	protected:
-		bool m_ComputeShader = false;
-	};
-
 	class Shader : public Asset
 	{
 	public:
 		Shader(const std::string& src, const fs::path& file);
 
-		Ref<ShaderPass> GetPass(const std::string& passName);
+		Ref<GraphicsShaderPass> GetGraphicsPass(const std::string& passName);
+		Ref<ComputeShaderPass> GetComputePass(const std::string& passName);
+		Ref<WorkGraphShaderPass> GetWorkGraphPass(const std::string& passName);
 		Utils::Vector<MaterialParameter>& GetParams();
 
 		static Ref<Shader> Create(const fs::path& file);
@@ -61,7 +37,9 @@ namespace Engine
 		static Ref<Shader> CreateFromSrc(const std::string& src, const fs::path& file = "");
 
 	private:
-		std::unordered_map<std::string, Ref<ShaderPass>> m_Passes;
+		std::unordered_map<std::string, Ref<GraphicsShaderPass>> m_GraphicsPasses;
+		std::unordered_map<std::string, Ref<ComputeShaderPass>> m_ComputePasses;
+		std::unordered_map<std::string, Ref<WorkGraphShaderPass>> m_WorkGraphPasses;
 		Utils::Vector<MaterialParameter> m_Params;
 	};
 }

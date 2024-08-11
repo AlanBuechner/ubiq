@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "MainPassNode.h"
 #include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/Abstractions/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
@@ -23,7 +23,7 @@ namespace Game
 
 		for (auto& cmd : scene.m_DrawCommands)
 		{
-			Engine::Ref<Engine::ShaderPass> pass = cmd.m_Shader->GetPass(m_PassName);
+			Engine::Ref<Engine::GraphicsShaderPass> pass = cmd.m_Shader->GetGraphicsPass(m_PassName);
 			if (pass)
 			{
 				m_CommandList->SetShader(pass);

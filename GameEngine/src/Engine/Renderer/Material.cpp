@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Material.h"
 #include "Renderer.h"
-#include "Abstractions/ShaderCompiler.h"
+#include "Shaders/ShaderCompiler.h"
 #include "Abstractions/Resources/Texture.h"
 #include "Abstractions/Resources/ConstantBuffer.h"
 #include "Engine/Core/Application.h"
@@ -56,20 +56,20 @@ namespace Engine
 				void* location = mat->m_Data->GetDatalocation(p.name);
 				if (f.contains(p.name))
 				{
-					if (p.type == MaterialParameter::TextureID)
+					if (p.type == MaterialParameterType::TextureID)
 					{
 						mat->m_ReferensedTextures.Push(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
 						uint32 descLoc = mat->m_ReferensedTextures.Back()->GetSRVDescriptor()->GetIndex();
 						*(uint32*)location = descLoc; // set asset value
 					}
-					else if (p.type == MaterialParameter::Float)
+					else if (p.type == MaterialParameterType::Float)
 						*(float*)location = f[p.name].get<float>();
-					else if (p.type == MaterialParameter::Bool)
+					else if (p.type == MaterialParameterType::Bool)
 						*(BOOL*)location = f[p.name].get<bool>();
 				}
 				else
 				{
-					if (p.type == MaterialParameter::TextureID)
+					if (p.type == MaterialParameterType::TextureID)
 					{
 						if (p.defaultValue == "white")
 							*(uint32*)location = Renderer::GetWhiteTexture()->GetSRVDescriptor()->GetIndex();
@@ -80,11 +80,11 @@ namespace Engine
 						else
 							*(uint32*)location = Renderer::GetWhiteTexture()->GetSRVDescriptor()->GetIndex();
 					}
-					else if (p.type == MaterialParameter::Float)
+					else if (p.type == MaterialParameterType::Float)
 					{
 						*(float*)location = std::stof(p.defaultValue);
 					}
-					else if (p.type == MaterialParameter::Bool)
+					else if (p.type == MaterialParameterType::Bool)
 					{
 						if (p.defaultValue == "true")
 							*(BOOL*)location = TRUE;

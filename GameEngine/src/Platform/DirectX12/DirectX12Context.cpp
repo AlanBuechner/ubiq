@@ -3,6 +3,9 @@
 #include "Resources/DirectX12ResourceManager.h"
 #include "DX.h"
 
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 614; }
+extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = u8".\\D3D12\\"; }
+
 namespace Engine
 {
 	DirectX12Context::DirectX12Context()
@@ -28,7 +31,7 @@ namespace Engine
 		GetAdapterDesctiption(&desc);
 
 		wrl::ComPtr<ID3D12Device> device = CreateDevice(m_MaxFeatureLevel);
-		CORE_ASSERT_HRESULT(device->QueryInterface(IID_PPV_ARGS(m_Device.GetAddressOf())), "Could Not Get Device 2");
+		CORE_ASSERT_HRESULT(device->QueryInterface(IID_PPV_ARGS(m_Device.GetAddressOf())), "Could Not Get Device 14");
 
 		//DXGI_QUERY_VIDEO_MEMORY_INFO memInfo;
 		//CORE_ASSERT(SetAdapterVideoMemoryReservation(MEM_GiB(1)), "Failed to reserve memory");
@@ -105,7 +108,7 @@ namespace Engine
 			D3D_FEATURE_LEVEL_11_1,
 			D3D_FEATURE_LEVEL_12_0,
 			D3D_FEATURE_LEVEL_12_1,
-			//D3D_FEATURE_LEVEL(0xc200), // 12_2
+			D3D_FEATURE_LEVEL_12_2
 		};
 
 		D3D12_FEATURE_DATA_FEATURE_LEVELS flds{0};

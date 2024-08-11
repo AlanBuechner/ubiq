@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "PostProcess.h"
-#include "Engine/Renderer/Abstractions/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 
 
 namespace Game

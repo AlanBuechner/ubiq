@@ -31,12 +31,12 @@ namespace Game
 	{
 		Engine::GPUTimer::BeginEvent(commandList, "Depth Of Field");
 
-		Engine::Ref<Engine::ShaderPass> coc = m_DepthOfFieldShader->GetPass("CoC");
-		Engine::Ref<Engine::ShaderPass> expandcoc = m_DepthOfFieldShader->GetPass("expandCoC");
-		Engine::Ref<Engine::ShaderPass> blurcoc = m_DepthOfFieldShader->GetPass("blurCoC");
-		Engine::Ref<Engine::ShaderPass> bokehBlur = m_DepthOfFieldShader->GetPass("bokehBlur");
-		Engine::Ref<Engine::ShaderPass> farBokehBlur = m_DepthOfFieldShader->GetPass("farBokehBlur");
-		Engine::Ref<Engine::ShaderPass> composit = m_DepthOfFieldShader->GetPass("composit");
+		Engine::Ref<Engine::GraphicsShaderPass> coc = m_DepthOfFieldShader->GetGraphicsPass("CoC");
+		Engine::Ref<Engine::GraphicsShaderPass> expandcoc = m_DepthOfFieldShader->GetGraphicsPass("expandCoC");
+		Engine::Ref<Engine::GraphicsShaderPass> blurcoc = m_DepthOfFieldShader->GetGraphicsPass("blurCoC");
+		Engine::Ref<Engine::GraphicsShaderPass> bokehBlur = m_DepthOfFieldShader->GetGraphicsPass("bokehBlur");
+		Engine::Ref<Engine::GraphicsShaderPass> farBokehBlur = m_DepthOfFieldShader->GetGraphicsPass("farBokehBlur");
+		Engine::Ref<Engine::GraphicsShaderPass> composit = m_DepthOfFieldShader->GetGraphicsPass("composit");
 
 		Engine::GPUTimer::BeginEvent(commandList, "COC");
 		Engine::GPUTimer::BeginEvent(commandList, "Calculate COC");

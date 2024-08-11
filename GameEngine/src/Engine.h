@@ -21,11 +21,11 @@
 // Renderers
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Renderer2D.h"
-#include "Engine/Renderer/LineRenderer.h"
+#include "Engine/Renderer/DebugRenderer.h"
 
 #include "Engine/Renderer/Mesh.h"
 // abstractions
-#include "Engine/Renderer/Abstractions/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 #include "Engine/Renderer/Abstractions/CommandList.h"
 #include "Engine/Renderer/Abstractions/CommandQueue.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"

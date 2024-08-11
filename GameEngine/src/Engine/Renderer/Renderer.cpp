@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "Renderer.h"
-#include "Abstractions/Shader.h"
+#include "Shaders/Shader.h"
 #include "Camera.h"
 #include "Renderer2D.h"
-#include "LineRenderer.h"
+#include "DebugRenderer.h"
 #include "Abstractions/Resources/ResourceManager.h"
 #include "Engine/Core/MeshBuilder.h"
 #include "Abstractions/GPUProfiler.h"
@@ -50,7 +50,7 @@ namespace Engine
 		// copy command queue
 
 		Renderer2D::Init();
-		LineRenderer::Init();
+		DebugRenderer::Init();
 
 		s_CopyFlag.Clear();
 		s_RenderFlag.Clear();
@@ -107,7 +107,7 @@ namespace Engine
 
 		s_RenderThread.join();
 		Renderer2D::Destroy();
-		LineRenderer::Destroy();
+		DebugRenderer::Destroy();
 
 		s_MainCommandList = nullptr;
 		s_MainCommandQueue = nullptr;
@@ -149,7 +149,7 @@ namespace Engine
 	void Renderer::Build(Ref<CommandList> commandList)
 	{
 		Renderer2D::Build(commandList);
-		LineRenderer::Build(commandList);
+		DebugRenderer::Build(commandList);
 	}
 
 	void Renderer::Render()

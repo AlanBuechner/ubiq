@@ -13,7 +13,7 @@ namespace Game
 
 	void ToneMapping::RecordCommands(Engine::Ref<Engine::CommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
 	{
-		Engine::Ref<Engine::ShaderPass> pass = m_ToneMappingShader->GetPass("HillACES");
+		Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("HillACES");
 		//Engine::Ref<Engine::ShaderPass> pass = m_ToneMappingShader->GetPass("NarkowiczACES");
 		//Engine::Ref<Engine::ShaderPass> pass = m_ToneMappingShader->GetPass("Uncharted");
 

@@ -39,7 +39,7 @@ namespace Engine
 		Renderer::Build(commandList);
 		commandList->Present(framBuffer); // present the render target
 
-		Engine::Ref<Engine::ShaderPass> blitPass = Engine::Renderer::GetBlitShader()->GetPass("BlitRaster");
+		Engine::Ref<Engine::GraphicsShaderPass> blitPass = Engine::Renderer::GetBlitShader()->GetGraphicsPass("BlitRaster");
 		Ref<RenderTarget2D> screen = Application::Get().GetWindow().GetSwapChain()->GetCurrentRenderTarget();
 		commandList->SetRenderTarget(screen);
 		commandList->SetShader(blitPass);

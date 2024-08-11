@@ -4,7 +4,9 @@
 
 #include "DirectX12CommandList.h"
 #include "DirectX12Context.h"
-#include "DirectX12Shader.h"
+#include "Shaders/DirectX12GraphicsShaderPass.h"
+#include "Shaders/DirectX12ComputeShaderPass.h"
+#include "Shaders/DirectX12WorkGraphShaderPass.h"
 #include "Resources/DirectX12Buffer.h"
 #include "Resources/DirectX12ConstantBuffer.h"
 #include "Resources/DirectX12StructuredBuffer.h"
@@ -257,9 +259,9 @@ namespace Engine
 		// get render target information
 		uint32 numRenderTargets = buffer->GetAttachments().Count() - (size_t)m_RenderTarget->HasDepthAttachment();
 		Utils::Vector<ResourceStateObject> resourceStateValidation;
-		Utils::Vector<uint64> rendertargetHandles(numRenderTargets, {});
-		Utils::Vector<D3D12_VIEWPORT> viewports(numRenderTargets, {});
-		Utils::Vector<D3D12_RECT> rects(numRenderTargets, {});
+		Utils::Vector<uint64> rendertargetHandles(numRenderTargets);
+		Utils::Vector<D3D12_VIEWPORT> viewports(numRenderTargets);
+		Utils::Vector<D3D12_RECT> rects(numRenderTargets);
 		uint64 depthHandle = 0;
 
 		for (uint32 i = 0; i < buffer->GetAttachments().Count(); i++)
@@ -325,49 +327,20 @@ namespace Engine
 			m_CommandList->ClearRenderTargetView(handle, (float*)&color, 0, nullptr);
 	}
 
-	void DirectX12CommandList::SetShader(Ref<ShaderPass> shader)
+	void DirectX12CommandList::InitalizeDescriptorTables(Ref<ShaderPass> shader)
 	{
-		bool compute = shader->IsComputeShader();
-
-		if (!compute && !m_RenderTarget)
-		{
-			CORE_ERROR("Can not set shader without rendertarget");
-			return;
-		}
-
-		Ref<DirectX12Shader> dxShader = std::dynamic_pointer_cast<DirectX12Shader>(shader);
-		m_CommandList->SetPipelineState(dxShader->GetPipelineState(m_RenderTarget).Get());
-		if(compute)
-			m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature().Get());
-		else
-		{
-			D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
-			switch (dxShader->GetTopologyType())
-			{
-			case ShaderConfig::Triangle:
-				top = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
-			case ShaderConfig::Line:
-				top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
-			case ShaderConfig::Point:
-				top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
-			}
-
-			m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature().Get());
-			m_CommandList->IASetPrimitiveTopology(top);
-		}
-
-		Utils::Vector<ShaderParameter> reflectionData = shader->GetReflectionData();
-		for (uint32 i = 0; i < reflectionData.Count(); i++)
+		std::vector<ShaderParameter> reflectionData = shader->GetReflectionData();
+		for (uint32 i = 0; i < reflectionData.size(); i++)
 		{
 			ShaderParameter& p = reflectionData[i];
-			if (p.type == ShaderParameter::PerameterType::DescriptorTable && p.count > 1)
+			if (p.type == PerameterType::DescriptorTable && p.count > 1)
 			{
 				switch (p.descType)
 				{
-				case ShaderParameter::DescriptorType::CBV:
-				case ShaderParameter::DescriptorType::SRV:
-				case ShaderParameter::DescriptorType::UAV:
-					if(compute)
+				case DescriptorType::CBV:
+				case DescriptorType::SRV:
+				case DescriptorType::UAV:
+					if(shader->IsComputeShader())
 						m_CommandList->SetComputeRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
 					else
 						m_CommandList->SetGraphicsRootDescriptorTable(p.rootIndex, DirectX12ResourceManager::s_SRVHeap->GetGPUHeapStart());
@@ -377,9 +350,62 @@ namespace Engine
 				}
 			}
 		}
+	}
+
+	void DirectX12CommandList::SetShader(Ref<GraphicsShaderPass> shader)
+	{
+
+		if (!m_RenderTarget)
+		{
+			CORE_ERROR("Can not set shader without rendertarget");
+			return;
+		}
+
+		Ref<DirectX12GraphicsShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12GraphicsShaderPass>(shader);
+		m_CommandList->SetPipelineState(dxShader->GetPipelineState(m_RenderTarget));
+
+		D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+		switch (dxShader->GetTopologyType())
+		{
+		case Topology::Triangle:	top = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
+		case Topology::Line:		top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
+		case Topology::Point:		top = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
+		}
+
+		m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature());
+		m_CommandList->IASetPrimitiveTopology(top);
+
+		InitalizeDescriptorTables(shader);
 
 		m_BoundShader = shader;
+	}
 
+	void DirectX12CommandList::SetShader(Ref<ComputeShaderPass> shader)
+	{
+		Ref<DirectX12ComputeShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12ComputeShaderPass>(shader);
+		m_CommandList->SetPipelineState(dxShader->GetPipelineState());
+		m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature());
+
+		InitalizeDescriptorTables(shader);
+
+		m_BoundShader = shader;
+	}
+
+	void DirectX12CommandList::SetShader(Ref<WorkGraphShaderPass> shader)
+	{
+		Ref<DirectX12WorkGraphShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12WorkGraphShaderPass>(shader);
+
+		m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature());
+
+		D3D12_SET_PROGRAM_DESC setProg = {};
+		setProg.Type = D3D12_PROGRAM_TYPE_WORK_GRAPH;
+		setProg.WorkGraph.ProgramIdentifier = dxShader->GetIdentifier();
+		setProg.WorkGraph.Flags = D3D12_SET_WORK_GRAPH_FLAG_INITIALIZE;
+		setProg.WorkGraph.BackingMemory = dxShader->GetBackingMemory();
+		m_CommandList->SetProgram(&setProg);
+
+		InitalizeDescriptorTables(shader);
+		m_BoundShader = shader;
 	}
 
 	void DirectX12CommandList::SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer)
@@ -488,6 +514,38 @@ namespace Engine
 	void DirectX12CommandList::Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ)
 	{
 		m_CommandList->Dispatch(threadGroupsX, threadGroupsY, threadGrouptsZ);
+	}
+
+	void DirectX12CommandList::DisbatchGraph(uint32 numRecords)
+	{
+		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
+		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_CPU_INPUT;
+		DSDesc.NodeCPUInput.EntrypointIndex = 0; // just one entrypoint in this graph
+		DSDesc.NodeCPUInput.NumRecords = numRecords;
+		DSDesc.NodeCPUInput.RecordStrideInBytes = 0;
+		DSDesc.NodeCPUInput.pRecords = nullptr;
+		m_CommandList->DispatchGraph(&DSDesc);
+	}
+
+	void DirectX12CommandList::DisbatchGraph(Ref<StructuredBuffer> buffer)
+	{
+		DirectX12StructuredBufferResource* res = (DirectX12StructuredBufferResource*)buffer->GetResource();
+
+		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
+		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_GPU_INPUT;
+		DSDesc.NodeGPUInput = res->GetBuffer()->GetGPUVirtualAddress();
+		m_CommandList->DispatchGraph(&DSDesc);
+	}
+
+	void DirectX12CommandList::DisbatchGraph(void* data, uint32 stride, uint32 count)
+	{
+		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
+		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_CPU_INPUT;
+		DSDesc.NodeCPUInput.EntrypointIndex = 0; // just one entrypoint in this graph
+		DSDesc.NodeCPUInput.NumRecords = count;
+		DSDesc.NodeCPUInput.RecordStrideInBytes = stride;
+		DSDesc.NodeCPUInput.pRecords = data;
+		m_CommandList->DispatchGraph(&DSDesc);
 	}
 
 	void DirectX12CommandList::AwaitUAV(GPUResource* uav)

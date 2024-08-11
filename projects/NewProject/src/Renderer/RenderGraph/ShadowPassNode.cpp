@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ShadowPassNode.h"
 #include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/Abstractions/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 #include "Renderer/Lighting/DirectionalLight.h"
 #include "Engine/Renderer/Renderer.h"
 
@@ -69,7 +69,7 @@ namespace Game
 					// for each object in the scene
 					for (auto& cmd : scene.m_DrawCommands)
 					{
-						Engine::Ref<Engine::ShaderPass> pass = cmd.m_Shader->GetPass("directionalShadowMap");
+						Engine::Ref<Engine::GraphicsShaderPass> pass = cmd.m_Shader->GetGraphicsPass("directionalShadowMap");
 						if (pass)
 						{
 							m_CommandList->SetShader(pass);
