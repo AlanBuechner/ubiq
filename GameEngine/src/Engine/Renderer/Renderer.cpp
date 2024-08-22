@@ -158,7 +158,6 @@ namespace Engine
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		Ref<ResourceManager> resourceManager = s_Context->GetResourceManager();
 		ResourceDeletionPool* deletionPool = resourceManager->CreateNewDeletionPool();
-		GPUProfiler::TriggerGPUCapture();
 		static int frame = 0;
 		while (Application::Get().IsRunning())
 		{
