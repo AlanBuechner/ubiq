@@ -71,7 +71,10 @@ namespace Game
 
 	Utils::Vector<Engine::AABB> StaticModelRendererComponent::GenVolumes()
 	{
-		return m_Model->GetVolumes();
+		if (m_Model)
+			return m_Model->GetVolumes();
+		else
+			return {};
 	}
 
 }
