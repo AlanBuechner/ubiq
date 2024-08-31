@@ -34,13 +34,19 @@ namespace Utils
 
 		Type& Push(const Type& value);
 		Type& Push(Type&& value) noexcept;
+		template <class... Parameters>
+		Type& Emplace(Parameters&&... parameters) noexcept;
 		void Pop();
+		void Pop(Type& value);
 
 		Type& Insert(uint32 index, const Type& value);
+		Type& Insert(uint32 index, Type&& value);
 
 		//TODO: These are swap and pop, make that more obvious
 		void Remove(uint32 index);
+		void Remove(uint32 index, Type& value);
 		void Remove(Type* iter);
+		void Remove(Type* iter, Type& value);
 
 		void Reserve(uint32 capacity);
 		void Resize(uint32 count);
@@ -79,9 +85,9 @@ namespace Utils
 		Type* end();
 
 	private:
-		Type* CopyValue(Type* dst, const Type& value);
-		Type* MoveValue(Type* dst, Type&& value) noexcept;
-		Type* CopyValues(Type* dst, Type* src, uint32_t count);
+		template <class... Parameters>
+		Type& Emplace_Internal(Type* dst, Parameters&&... parameters) noexcept;
+		Type* CopyValues(Type* dst, const Type* src, uint32_t count);
 		Type* MoveValues(Type* dst, Type* src, uint32_t count);
 
 	private:
@@ -94,6 +100,7 @@ namespace Utils
 
 	template<class Type> inline Vector<Type>::Vector(const Vector<Type>& other) : m_Count{ other.m_Count }
 	{
+		static_assert(std::is_copy_constructible_v<Type>, "Type Must Be Copyable!");
 		Reserve(m_Count);
 		CopyValues(m_Array, other.m_Array, m_Count);
 	}
@@ -109,19 +116,16 @@ namespace Utils
 
 	template<class Type> inline Vector<Type>::Vector(uint32 count, const Type& value) : m_Count{ count }
 	{
+		static_assert(std::is_copy_constructible_v<Type>, "Type Must Be Copyable!");
 		Reserve(m_Count);
-		for (Type* t = m_Array, *end = m_Array + m_Count; t != end; ++t) { CopyValue(t, value); }
+		for (Type* it = m_Array, *end = m_Array + m_Count; it != end; ++it) { Emplace_Internal(it, value); }
 	}
 
 	template<class Type> inline Vector<Type>::Vector(std::initializer_list<Type> list) : m_Count{ (uint32)list.size() }
 	{
+		static_assert(std::is_copy_constructible_v<Type>, "Type Must Be Copyable!");
 		Reserve(m_Count);
-
-		Type* arr = m_Array;
-		for (const Type* it = list.begin(); it != list.end(); ++it, ++arr)
-		{
-			CopyValue(arr, *it);
-		}
+		CopyValues(m_Array, list.begin(), m_Count);
 	}
 
 	template<class Type> inline Vector<Type>::~Vector()
@@ -147,16 +151,26 @@ namespace Utils
 
 	template<class Type> inline Type& Vector<Type>::Push(const Type& value)
 	{
+		static_assert(std::is_copy_constructible_v<Type>, "Type Must Be Copyable!");
 		if (m_Count == m_Capacity) { Reserve((m_Capacity + 1) * 2); }
 
-		return *CopyValue(m_Array + m_Count++, value);
+		return Emplace_Internal(m_Array + m_Count++, value);
 	}
 
 	template<class Type> inline Type& Vector<Type>::Push(Type&& value) noexcept
 	{
 		if (m_Count == m_Capacity) { Reserve((m_Capacity + 1) * 2); }
 
-		return *MoveValue(m_Array + m_Count++, std::move(value));
+		return Emplace_Internal(m_Array + m_Count++, std::move(value));
+	}
+
+	template<class Type>
+	template <class... Parameters>
+	inline Type& Vector<Type>::Emplace(Parameters&&... parameters) noexcept
+	{
+		if (m_Count == m_Capacity) { Reserve((m_Capacity + 1) * 2); }
+
+		return Emplace_Internal(m_Array + m_Count++, std::forward<Parameters>(parameters)...);
 	}
 
 	template<class Type> inline void Vector<Type>::Pop()
@@ -168,40 +182,77 @@ namespace Utils
 		}
 	}
 
+	template<class Type>
+	inline void Vector<Type>::Pop(Type& value)
+	{
+		if (m_Count)
+		{
+			Emplace_Internal(&value, std::move(m_Array[--m_Count]));
+		}
+	}
+
 	template<class Type> inline Type& Vector<Type>::Insert(uint32 index, const Type& value)
 	{
+		static_assert(std::is_copy_constructible_v<Type>, "Type Must Be Copyable!");
 #if defined(DEBUG)
 		//TODO: Assert index in bounds
 #endif
-
-		if (m_Count == 0 || index == m_Count) { return Push(value); }
-
 		if (m_Count == m_Capacity) { Reserve((m_Capacity + 1) * 2); }
 
 		MoveValues(m_Array + index + 1, m_Array + index, (m_Count - index));
 		++m_Count;
-		return *CopyValue(m_Array + index, value);
+		return Emplace_Internal(m_Array + index, value);
+	}
+
+	template<class Type> inline Type& Vector<Type>::Insert(uint32 index, Type&& value)
+	{
+#if defined(DEBUG)
+		//TODO: Assert index in bounds
+#endif
+		if (m_Count == m_Capacity) { Reserve((m_Capacity + 1) * 2); }
+
+		MoveValues(m_Array + index + 1, m_Array + index, (m_Count - index));
+		++m_Count;
+		return Emplace_Internal(m_Array + index, std::move(value));
 	}
 
 	template<class Type> inline void Vector<Type>::Remove(uint32 index)
 	{
+		if constexpr (std::is_destructible_v<Type>) { (m_Array + index)->~Type(); }
 #if defined(DEBUG)
 		//TODO: Assert index in bounds
 #endif
-		MoveValue(m_Array + index, std::move(m_Array[m_Count]));
-		Pop();
+		Emplace_Internal(m_Array + index, std::move(m_Array[--m_Count]));
+	}
+
+	template<class Type> inline void Vector<Type>::Remove(uint32 index, Type& value)
+	{
+#if defined(DEBUG)
+		//TODO: Assert index in bounds
+#endif
+		Emplace_Internal(value, std::move(m_Array[index]));
+		Emplace_Internal(m_Array + index, std::move(m_Array[--m_Count]));
 	}
 
 	template<class Type> inline void Vector<Type>::Remove(Type* iter)
 	{
-		uint32 index = iter - m_Array;
-
 #if defined(DEBUG)
 		//TODO: Assert index in bounds
 #endif
+		uint32 index = iter - m_Array;
+		if constexpr (std::is_destructible_v<Type>) { (m_Array + index)->~Type(); }
 
-		MoveValue(m_Array + index, std::move(m_Array[m_Count]));
-		Pop();
+		Emplace_Internal(m_Array + index, std::move(m_Array[--m_Count]));
+	}
+
+	template<class Type> inline void Vector<Type>::Remove(Type* iter, Type& value)
+	{
+#if defined(DEBUG)
+		//TODO: Assert index in bounds
+#endif
+		uint32 index = iter - m_Array;
+		Emplace_Internal(value, std::move(m_Array[index]));
+		Emplace_Internal(m_Array + index, std::move(m_Array[--m_Count]));
 	}
 	
 	template<class Type> inline void Vector<Type>::Reserve(uint32 capacity)
@@ -215,13 +266,9 @@ namespace Utils
 			m_Array = (Type*)malloc(capacity * sizeof(Type));
 
 			// move data from old array to new array
+			// move takes care of destruction
 			MoveValues(m_Array, temp, m_Count);
 
-			// destroy old array
-			if constexpr (UseDestructor) {
-				for (uint32 i = 0; i < m_Count; i++)
-					(temp + i)->~Type();
-			}
 			free(temp);
 		}
 		else
@@ -240,8 +287,13 @@ namespace Utils
 		if (count > m_Capacity)
 		{
 			Reserve(count);
-			for (uint32 i = m_Count; i < count; i++)
-				new(m_Array + i) Type();
+
+			if constexpr (std::is_default_constructible_v<Type>)
+			{
+				for (uint32 i = m_Count; i < count; i++)
+					new (m_Array + i) Type();
+			}
+			
 		}
 
 		m_Count = count;
@@ -251,11 +303,13 @@ namespace Utils
 	template<class Type> 
 	inline void Vector<Type>::Resize(uint32 count, const Type& value)
 	{
+		static_assert(std::is_copy_constructible_v<Type>, "Type Must Be Copyable!");
+
 		if (count > m_Capacity) 
 		{
 			Reserve(count);
 			for (uint32 i = m_Count; i < count; i++) 
-				CopyValue(m_Array+i, value);
+				Emplace_Internal(m_Array + i, value);
 		}
 
 		m_Count = count;
@@ -312,10 +366,13 @@ namespace Utils
 
 	template<class Type> inline Vector<Type>& Vector<Type>::operator=(const Vector& other)
 	{
+		static_assert(std::is_copy_constructible_v<Type>, "Type Must Be Copyable!");
 		Destroy();
 
-		Resize(other.m_Count);
-		CopyValues(m_Array, other.m_Array, m_Capacity);
+		Reserve(other.m_Count);
+		m_Count = other.m_Count;
+
+		CopyValues(m_Array, other.m_Array, m_Count);
 
 		return *this;
 	}
@@ -394,88 +451,74 @@ namespace Utils
 
 	template<class Type> inline Type* Vector<Type>::end() { return m_Array + m_Count; }
 
-	template <class Type>
-	inline Type* Vector<Type>::CopyValue(Type* dst, const Type& value)
+	template<class Type>
+	template <class... Parameters>
+	inline Type& Vector<Type>::Emplace_Internal(Type* dst, Parameters&&... parameters) noexcept
 	{
-		if constexpr (std::is_copy_constructible_v<Type>)
-		{
-			new (dst) Type(value);
-		}
-		else if constexpr (std::is_copy_assignable_v<Type>)
-		{
-			*dst = value;
-		}
-		else
-		{
-			memcpy(dst, &value, sizeof(Type));
-		}
-
-		return dst;
+		return *(new (dst) Type(std::forward<Parameters>(parameters)...));
 	}
 
 	template <class Type>
-	inline Type* Vector<Type>::MoveValue(Type* dst, Type&& value) noexcept
+	inline Type* Vector<Type>::CopyValues(Type* dst, const Type* src, uint32_t count)
 	{
-		if constexpr (std::is_move_constructible_v<Type>)
+		if constexpr (std::is_class_v<Type> || std::is_union_v<Type>) //Only emplace non primitive types
 		{
-			new (dst) Type(std::move(value));
-		}
-		else if constexpr (std::is_move_assignable_v<Type>)
-		{
-			*dst = std::move(value);
+			if (dst > src && dst < src + count) //Reverse Copy if dst would overrite src
+			{
+				Type* rDst = dst + count - 1;
+				const Type* rSrc = src + count - 1;
+
+				//TODO: look into unrolling
+				for (uint32_t i = 0; i < count; ++i)
+					Emplace_Internal(rDst--, *rSrc--);
+			}
+			else
+			{
+				for (uint32_t i = 0; i < count; ++i)
+					Emplace_Internal(dst++, *src++);
+			}
+
+			return dst;
 		}
 		else
 		{
-			memcpy(dst, &value, sizeof(Type));
-			if constexpr (std::is_destructible_v<Type>) { value.~Type(); }
+			return (Type*)memcpy(dst, src, sizeof(Type) * count);
 		}
-
-		return dst;
-	}
-
-	template <class Type>
-	inline Type* Vector<Type>::CopyValues(Type* dst, Type* src, uint32_t count)
-	{
-		if (dst > src && dst < src + count) //Reverse Copy
-		{
-			Type* rDst = dst + count - 1;
-			Type* rSrc = src + count - 1;
-
-			//TODO: look into unrolling
-			for (uint32_t i = 0; i < count; ++i)
-			{
-				CopyValue(rDst--, *rSrc--);
-			}
-		}
-		else
-		{
-			for (uint32_t i = 0; i < count; ++i)
-			{
-				CopyValue(dst++, *src++);
-			}
-		}
-
-		return dst;
 	}
 
 	template <class Type>
 	inline Type* Vector<Type>::MoveValues(Type* dst, Type* src, uint32_t count)
 	{
-		if (dst > src && dst < src + count) //Reverse Copy only if ranges overlap
+		if constexpr (std::is_class_v<Type> || std::is_union_v<Type>) //Only emplace non primitive types
 		{
-			Type* rDst = dst + count - 1;
-			Type* rSrc = src + count - 1;
+			if (dst > src && dst < src + count) //Reverse Copy if dst would overrite src
+			{
+				Type* rDst = dst + count - 1;
+				Type* rSrc = src + count - 1;
 
-			//TODO: look into unrolling
-			for (uint32_t i = 0; i < count; ++i)
-				MoveValue(rDst--, std::move(*rSrc--));
+				//TODO: look into unrolling
+				for (uint32_t i = 0; i < count; ++i)
+				{
+					Emplace_Internal(rDst--, std::move(*rSrc));
+					if (!std::is_move_constructible_v<Type> && std::is_destructible_v<Type>) { rSrc->~Type(); }
+					--rSrc;
+				}
+			}
+			else
+			{
+				for (uint32_t i = 0; i < count; ++i)
+				{
+					Emplace_Internal(dst++, std::move(*src));
+					if (!std::is_move_constructible_v<Type> && std::is_destructible_v<Type>) { src->~Type(); }
+					++src;
+				}
+			}
+
+			return dst;
 		}
 		else
 		{
-			for (uint32_t i = 0; i < count; ++i)
-				MoveValue(dst++, std::move(*src++));
+			return (Type*)memcpy(dst, src, sizeof(Type) * count);
 		}
-
-		return dst;
 	}
 }
