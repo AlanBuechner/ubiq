@@ -97,10 +97,6 @@ namespace Engine {
 			CREATE_PROFILE_SCOPEI("Frame");
 			Time::UpdateDeltaTime();
 
-			//Engine::Instrumentor::Get().RecordData(false);
-
-			//CORE_INFO("{0}", Time::GetFPS());
-
 			Window::HandleEvents();
 			Input::UpdateKeyState(); // update the key stats
 			SendInputBuffer(); // sent the input buffer through the layer stack
@@ -146,8 +142,6 @@ namespace Engine {
 
 			// clean assets
 			m_AssetManager.Clean();
-
-			//Engine::Instrumentor::Get().RecordData(true);
 		}
 		Renderer::WaitForSwap(); // wait for last frame to finish
 	}

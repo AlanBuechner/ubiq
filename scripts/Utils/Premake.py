@@ -16,8 +16,9 @@ def AddProject(code, projectkey, projectvalue, group, indent):
 
 
 def GenerateSolution():
+	gameName = os.path.basename(Config.gameProject)
 	code = f"""
-workspace "UbiqEngine"
+workspace "{gameName}"
 	architecture "x64"
 	startproject "{Config.gameProject}"
 
