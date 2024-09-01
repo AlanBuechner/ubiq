@@ -10,7 +10,7 @@ namespace Engine
 }
 
 struct FBVectorHash {
-	std::size_t operator()(const std::vector<Engine::TextureFormat>& c) const {
+	std::size_t operator()(const Utils::Vector<Engine::TextureFormat>& c) const {
 		std::hash<uint32> hasher;
 		size_t seed = 0;
 		for (Engine::TextureFormat i : c) {
@@ -47,13 +47,13 @@ namespace Engine
 				return false;
 			}
 		} m_Blobs;
-		ID3D12PipelineState* CreatePiplineState(const std::vector<TextureFormat>& formats);
+		ID3D12PipelineState* CreatePiplineState(const Utils::Vector<TextureFormat>& formats);
 
 
 	private:
-		std::unordered_map<std::vector<TextureFormat>, ID3D12PipelineState*, FBVectorHash> m_PiplineStates;
+		std::unordered_map<Utils::Vector<TextureFormat>, ID3D12PipelineState*, FBVectorHash> m_PiplineStates;
 
-		std::vector<ShaderInputElement> m_InputElements;
+		Utils::Vector<ShaderInputElement> m_InputElements;
 
 		ID3D12RootSignature* m_Sig;
 	};

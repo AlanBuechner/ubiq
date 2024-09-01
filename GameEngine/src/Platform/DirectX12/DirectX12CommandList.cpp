@@ -329,8 +329,8 @@ namespace Engine
 
 	void DirectX12CommandList::InitalizeDescriptorTables(Ref<ShaderPass> shader)
 	{
-		std::vector<ShaderParameter> reflectionData = shader->GetReflectionData();
-		for (uint32 i = 0; i < reflectionData.size(); i++)
+		Utils::Vector<ShaderParameter> reflectionData = shader->GetReflectionData();
+		for (uint32 i = 0; i < reflectionData.Count(); i++)
 		{
 			ShaderParameter& p = reflectionData[i];
 			if (p.type == PerameterType::DescriptorTable && p.count > 1)

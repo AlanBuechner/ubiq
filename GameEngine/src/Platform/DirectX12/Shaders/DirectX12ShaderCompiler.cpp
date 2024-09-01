@@ -193,7 +193,7 @@ namespace Engine
 		return blobs;
 	}
 
-	void DirectX12ShaderCompiler::GetShaderParameters(ShaderBlobs& blobs, SectionInfo& section, std::vector<Engine::ShaderParameter>& params, ShaderType type)
+	void DirectX12ShaderCompiler::GetShaderParameters(ShaderBlobs& blobs, SectionInfo& section, Utils::Vector<Engine::ShaderParameter>& params, ShaderType type)
 	{
 		if (!blobs.reflection)
 			return;
@@ -210,7 +210,7 @@ namespace Engine
 		reflection->GetDesc(&reflectionDesc);
 
 		// bound resources
-		params.reserve(reflectionDesc.BoundResources);
+		params.Reserve(reflectionDesc.BoundResources);
 		for (uint32 srvIndex = 0; srvIndex < reflectionDesc.BoundResources; srvIndex++)
 		{
 			D3D12_SHADER_INPUT_BIND_DESC bindDesc;
@@ -219,7 +219,7 @@ namespace Engine
 		}
 	}
 
-	void DirectX12ShaderCompiler::GetLibraryParameters(ShaderBlobs& blobs, SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type)
+	void DirectX12ShaderCompiler::GetLibraryParameters(ShaderBlobs& blobs, SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
 	{
 		if (!blobs.reflection)
 			return;
@@ -251,7 +251,7 @@ namespace Engine
 		}
 	}
 
-	void DirectX12ShaderCompiler::GetInputLayout(ShaderBlobs& blobs, std::vector<ShaderInputElement>& inputElements)
+	void DirectX12ShaderCompiler::GetInputLayout(ShaderBlobs& blobs, Utils::Vector<ShaderInputElement>& inputElements)
 	{
 		if (!blobs.reflection)
 			return;
@@ -267,7 +267,7 @@ namespace Engine
 		D3D12_SHADER_DESC reflectionDesc;
 		reflection->GetDesc(&reflectionDesc);
 
-		inputElements.reserve(reflectionDesc.InputParameters);
+		inputElements.Reserve(reflectionDesc.InputParameters);
 		for (uint32 ipIndex = 0; ipIndex < reflectionDesc.InputParameters; ipIndex++)
 		{
 			D3D12_SIGNATURE_PARAMETER_DESC inputParam;
@@ -277,34 +277,34 @@ namespace Engine
 			element.semanticName = inputParam.SemanticName;
 			element.semanticIndex = inputParam.SemanticIndex;
 			element.format = GetFormatFromDesc(inputParam);
-			inputElements.push_back(element);
+			inputElements.Push(element);
 		}
 
 	}
 
-	ID3D12RootSignature* DirectX12ShaderCompiler::GenRootSignature(std::vector<ShaderParameter>& params)
+	ID3D12RootSignature* DirectX12ShaderCompiler::GenRootSignature(Utils::Vector<ShaderParameter>& params)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		D3D12_VERSIONED_ROOT_SIGNATURE_DESC rsd;
 		rsd.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
 		// create root parameters
-		std::vector<D3D12_ROOT_PARAMETER1> rootParams;
-		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers;
+		Utils::Vector<D3D12_ROOT_PARAMETER1> rootParams;
+		Utils::Vector<D3D12_STATIC_SAMPLER_DESC> samplers;
 
 		uint32 numDescriptorTables = 0;
-		for (uint32 i = 0; i < params.size(); i++)
+		for (uint32 i = 0; i < params.Count(); i++)
 			if (params[i].type == PerameterType::DescriptorTable) numDescriptorTables++;
 
 		uint32 currentDescriptor = 0;
-		std::vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRanges(numDescriptorTables);
+		Utils::Vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRanges(numDescriptorTables);
 
 		for (ShaderParameter& rd : params)
 		{
 			if (rd.type != PerameterType::StaticSampler)
 			{
 				// populate root index
-				rd.rootIndex = (uint32)rootParams.size();
+				rd.rootIndex = (uint32)rootParams.Count();
 
 				// root parameters
 				D3D12_ROOT_PARAMETER1 param;
@@ -352,7 +352,7 @@ namespace Engine
 					currentDescriptor++;
 				}
 
-				rootParams.push_back(param);
+				rootParams.Push(param);
 
 			}
 			else
@@ -373,16 +373,16 @@ namespace Engine
 
 				ssd.ShaderRegister = rd.reg;
 				ssd.RegisterSpace = rd.space;
-				samplers.push_back(ssd);
+				samplers.Push(ssd);
 			}
 		}
 
 		D3D12_ROOT_SIGNATURE_DESC1 desc{};
 		desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-		desc.NumParameters = (uint32)rootParams.size();
-		desc.pParameters = rootParams.data();
-		desc.NumStaticSamplers = (uint32)samplers.size();
-		desc.pStaticSamplers = samplers.data();
+		desc.NumParameters = (uint32)rootParams.Count();
+		desc.pParameters = rootParams.Data();
+		desc.NumStaticSamplers = (uint32)samplers.Count();
+		desc.pStaticSamplers = samplers.Data();
 
 		rsd.Desc_1_1 = desc;
 
@@ -407,7 +407,7 @@ namespace Engine
 		return sig;
 	}
 
-	void DirectX12ShaderCompiler::AddParameter(D3D12_SHADER_INPUT_BIND_DESC bindDesc, SectionInfo& section, std::vector<ShaderParameter>& params, ShaderType type)
+	void DirectX12ShaderCompiler::AddParameter(D3D12_SHADER_INPUT_BIND_DESC bindDesc, SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
 	{
 		ShaderParameter data;
 		data.shader = type;
@@ -469,13 +469,13 @@ namespace Engine
 			break;
 		}
 
-		for (uint32 i = 0; i < params.size(); i++)
+		for (uint32 i = 0; i < params.Count(); i++)
 		{
 			if (params[i] == data)
 				return;
 		}
 
-		params.push_back(data);
+		params.Push(data);
 	}
 
 }

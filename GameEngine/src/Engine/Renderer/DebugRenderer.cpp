@@ -21,8 +21,8 @@ namespace Engine
 		Ref<GraphicsShaderPass> m_Pass;
 		Ref<Mesh> m_Mesh;
 
-		std::vector<DebugVertex> Vertices;
-		std::vector<uint32> Indices;
+		Utils::Vector<DebugVertex> Vertices;
+		Utils::Vector<uint32> Indices;
 	};
 
 	struct DebugRendererData
@@ -88,12 +88,12 @@ namespace Engine
 		for (uint32 i = 0; i < s_DebugData.NumPasses; i++) 
 		{
 			Pass* pass = s_DebugData.Passes[i];
-			std::vector<DebugVertex>& verts = pass->Vertices;
-			std::vector<uint32>& indices = pass->Indices;
-			if (!verts.empty())
+			Utils::Vector<DebugVertex>& verts = pass->Vertices;
+			Utils::Vector<uint32>& indices = pass->Indices;
+			if (!verts.Empty())
 			{
-				pass->m_Mesh->SetVertices(verts.data(), (uint32)verts.size());
-				pass->m_Mesh->SetIndices(indices.data(), (uint32)indices.size());
+				pass->m_Mesh->SetVertices(verts.Data(), (uint32)verts.Count());
+				pass->m_Mesh->SetIndices(indices.Data(), (uint32)indices.Count());
 			}
 		}
 	}
@@ -111,18 +111,18 @@ namespace Engine
 		for (uint32 i = 0; i < s_DebugData.NumPasses; i++)
 		{
 			Pass* pass = s_DebugData.Passes[i];
-			std::vector<DebugVertex>& verts = pass->Vertices;
-			std::vector<uint32>& indices = pass->Indices;
+			Utils::Vector<DebugVertex>& verts = pass->Vertices;
+			Utils::Vector<uint32>& indices = pass->Indices;
 
-			if (!verts.empty())
+			if (!verts.Empty())
 			{
 				commandList->SetShader(pass->m_Pass);
 				commandList->SetConstantBuffer(0, s_DebugData.Camera);
 				commandList->DrawMesh(pass->m_Mesh);
 			}
 
-			verts.clear();
-			indices.clear();
+			verts.Clear();
+			indices.Clear();
 		}
 	}
 
@@ -133,14 +133,14 @@ namespace Engine
 
 		Pass& pass = depthTest ? s_DebugData.DepthTestLinesPass : s_DebugData.LinesPass;
 
-		uint32 baseVertexIndex = (uint32)pass.Vertices.size();
-		pass.Indices.push_back(baseVertexIndex);
-		pass.Indices.push_back(baseVertexIndex + 1);
+		uint32 baseVertexIndex = (uint32)pass.Vertices.Count();
+		pass.Indices.Push(baseVertexIndex);
+		pass.Indices.Push(baseVertexIndex + 1);
 
 		vert.Position = transform * Math::Vector4(p1, 1.0f);
-		pass.Vertices.push_back(vert); 
+		pass.Vertices.Push(vert); 
 		vert.Position = transform * Math::Vector4(p2, 1.0f);
-		pass.Vertices.push_back(vert);
+		pass.Vertices.Push(vert);
 	}
 
 	void DebugRenderer::DrawLineMesh(DebugMesh& mesh, const Math::Mat4& transform, bool depthTest)
@@ -218,16 +218,16 @@ namespace Engine
 
 	void DebugRenderer::DrawMesh(const DebugMesh& mesh, const Math::Mat4& transform, Pass& pass)
 	{
-		uint32 baseVertexIndex = (uint32)pass.Vertices.size();
+		uint32 baseVertexIndex = (uint32)pass.Vertices.Count();
 		for (uint32 i = 0; i < mesh.m_Vertices.Count(); i++)
 		{
 			DebugVertex vert = mesh.m_Vertices[i];
 			vert.Position = transform * Math::Vector4(vert.Position, 1.0f);
-			pass.Vertices.push_back(vert);
+			pass.Vertices.Push(vert);
 		}
 
 		for (uint32 i = 0; i < mesh.m_Indices.Count(); i++)
-			pass.Indices.push_back(baseVertexIndex + mesh.m_Indices[i]);
+			pass.Indices.Push(baseVertexIndex + mesh.m_Indices[i]);
 	}
 
 }

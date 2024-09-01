@@ -15,13 +15,13 @@ namespace Engine
 
 	public:
 		virtual ~ShaderPass() {};
-		inline std::vector<ShaderParameter> GetReflectionData() { return m_ReflectionData; };
+		inline Utils::Vector<ShaderParameter> GetReflectionData() { return m_ReflectionData; };
 		uint32 GetUniformLocation(const std::string& name);
 		bool IsComputeShader() { return m_ComputeShader; }
 
 	protected:
 		std::unordered_map<std::string, uint32> m_UniformLocations;
-		std::vector<ShaderParameter> m_ReflectionData;
+		Utils::Vector<ShaderParameter> m_ReflectionData;
 		bool m_ComputeShader;
 
 		Ref<ShaderSorce> m_Src;
