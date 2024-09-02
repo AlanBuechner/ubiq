@@ -18,7 +18,7 @@ namespace Engine
 		inline UUID GetAssetID() { return m_AssetID; }
 
 	private:
-		UUID m_AssetID = 0;
+		UUID m_AssetID = 0; // 0 means that it was created programmability or was an embeded asset
 
 		friend AssetManager;
 	};
@@ -26,6 +26,7 @@ namespace Engine
 	class AssetManager
 	{
 	private:
+		std::unordered_map<fs::path, Ref<Asset>> m_CashedEmbededAssets;
 		std::unordered_map<UUID, Ref<Asset>> m_CashedAssets;
 		std::unordered_map<UUID, fs::path> m_AssetPaths;
 
@@ -86,6 +87,30 @@ namespace Engine
 			return GetAsset<T>(GetAssetUUIDFromPath(path));
 		}
 
+		template<class T>
+		Ref<T> GetEmbededAsset(const fs::path& path)
+		{
+			Ref<Asset> asset;
+
+			const auto AssetLocation = m_CashedEmbededAssets.find(path);
+			if (AssetLocation != m_CashedEmbededAssets.end())
+				asset = AssetLocation->second;
+			else
+			{
+				fs::path resourcePath = GetEmbededFolder() / path;
+				if (!fs::exists(resourcePath))
+					return nullptr;
+
+				Ref<T> asset = T::Create(resourcePath.string());
+				asset->m_AssetID = 0; // 0 is for a embeded asset
+				auto data = std::make_pair(path, asset);
+				m_CashedEmbededAssets.insert(data);
+				return asset;
+			}
+
+			return std::static_pointer_cast<T>(asset);
+		}
+
 		inline fs::path GetAssetPath(UUID id) { return m_AssetPaths[id]; }
 
 		fs::path GetRelitiveAssetPath(UUID id);
@@ -94,6 +119,8 @@ namespace Engine
 		void OpenAsset(const fs::path& path);
 
 		fs::path FindAssetDirectory(const fs::path& assetPath);
+
+		fs::path GetEmbededFolder();
 
 	private:
 		void UpdateDirectory(const fs::path& dir);

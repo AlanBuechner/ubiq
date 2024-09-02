@@ -1,6 +1,0 @@
-#include "../src/Resource.h"
-
-BLOOM SHADER "Bloom.hlsl"
-BLOOMCOMPUTE SHADER "Bloom_Compute.hlsl"
-DEPTHOFFIELD SHADER "DepthOfField.hlsl"
-TONEMAPPING SHADER "ToneMapping.hlsl"

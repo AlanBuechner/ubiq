@@ -71,25 +71,6 @@ namespace Engine
 		return CreateFromSrc(str, file);
 	}
 
-	Ref<Shader> Shader::CreateFromEmbeded(uint32 id, const fs::path& file)
-	{
-		uint32 size = 0;
-		byte* data = nullptr;
-
-		if (GetEmbededResource(SHADER, id, data, size))
-		{
-			std::string src;
-			src.assign((char*)data, size);
-
-			return CreateFromSrc(src, file);
-		}
-		else
-		{
-			CORE_ERROR("Could not load shader from embeded: \"{0}\"", file.string());
-			return nullptr;
-		}
-	}
-
 	Ref<Shader> Shader::CreateFromSrc(const std::string& src, const fs::path& file /*= ""*/)
 	{
 		return CreateRef<Shader>(src, file);

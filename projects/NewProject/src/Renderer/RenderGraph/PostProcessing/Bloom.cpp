@@ -2,6 +2,7 @@
 #include "Bloom.h"
 #include "Resource.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
+#include "Engine/Core/Application.h"
 
 namespace Game
 {
@@ -11,9 +12,9 @@ namespace Game
 
 
 #ifdef USE_BLOOM_COMPUTE
-			m_BloomShader = Engine::Shader::CreateFromEmbeded(BLOOMCOMPUTE, "Bloom_Compute.hlsl");
+		m_BloomShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(BLOOMCOMPUTE);
 #else
-			m_BloomShader = Engine::Shader::CreateFromEmbeded(BLOOM, "Bloom.hlsl");
+		m_BloomShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(BLOOM);
 #endif
 	}
 

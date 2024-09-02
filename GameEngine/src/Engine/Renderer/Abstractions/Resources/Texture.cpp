@@ -170,18 +170,6 @@ namespace Engine
 		CORE_ASSERT(path != "", "Path must be given");
 		TextureFile* file = TextureFile::LoadFile(path);
 		//if(file->channels == 3) // no 3 component texture format exists
-			file->ConvertToChannels(4);
-
-		Ref<Texture2D> texture = Create(file->width, file->height, file->GetTextureFormat());
-		texture->SetData(file->data);
-		delete file;
-		return texture;
-	}
-
-	Ref<Texture2D> Texture2D::CreateFromEmbeded(uint32 id)
-	{
-		TextureFile* file = TextureFile::LoadFromEmbeded(id);
-		//if(file->channels == 3) // no 3 component texture format exists
 		file->ConvertToChannels(4);
 
 		Ref<Texture2D> texture = Create(file->width, file->height, file->GetTextureFormat());
@@ -434,33 +422,6 @@ namespace Engine
 		CORE_ASSERT(texture->data, "Failed to load image \"{0}\"", file.string());
 
 		return texture;
-	}
-
-	TextureFile* TextureFile::LoadFromEmbeded(uint32 id)
-	{
-		uint32 size = 0;
-		byte* data = nullptr;
-
-		if (GetEmbededResource(TEXTURE, id, data, size))
-		{
-			TextureFile* texture = new TextureFile();
-			int width, height, channels;
-			int reqChannels = 0;
-
-			texture->HDR = false;
-			texture->data = stbi_load_from_memory(data, size, &width, &height, &channels, 0);
-
-			texture->width = width;
-			texture->height = height;
-			texture->channels = channels;
-
-			return texture;
-		}
-		else
-		{
-			CORE_ERROR("Could not load texture from embeded: \"{0}\"", id);
-			return nullptr;
-		}
 	}
 
 	uint32 FixMipLevels(uint32 mips, uint32 width, uint32 height)

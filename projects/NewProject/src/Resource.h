@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../../GameEngine/src/EngineResource.h"
-
-#define BLOOM 249
-#define BLOOMCOMPUTE 248
-#define DEPTHOFFIELD 247
-#define TONEMAPPING 246
+// shaders
+#define BLOOM			"Game/Bloom.hlsl"
+#define BLOOMCOMPUTE	"Game/Bloom_Compute.hlsl"
+#define DEPTHOFFIELD	"Game/DepthOfField.hlsl"
+#define TONEMAPPING		"Game/ToneMapping.hlsl"

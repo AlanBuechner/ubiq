@@ -2,13 +2,14 @@
 #include "ToneMapping.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 #include "Resource.h"
+#include "Engine/Core/Application.h"
 
 namespace Game
 {
 
 	void ToneMapping::Init(const PostProcessInput& input, SceneData& scene)
 	{
-		m_ToneMappingShader = Engine::Shader::CreateFromEmbeded(TONEMAPPING, "ToneMapping.hlsl");
+		m_ToneMappingShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(TONEMAPPING);
 	}
 
 	void ToneMapping::RecordCommands(Engine::Ref<Engine::CommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)

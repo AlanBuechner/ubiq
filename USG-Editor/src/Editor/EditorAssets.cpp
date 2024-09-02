@@ -1,5 +1,6 @@
 #include "EditorAssets.h"
 #include "Resource.h"
+#include "Engine/AssetManager/AssetManager.h"
 
 // textures
 Engine::Ref<Engine::Texture2D> Editor::EditorAssets::s_DefaultFileIcon;
@@ -25,19 +26,20 @@ namespace Editor
 	{
 		CORE_INFO("Loading Editor Assets");
 		// Textures
-		s_DefaultFileIcon =		Engine::Texture2D::CreateFromEmbeded(DEFULTFILEICON);
-		s_ShaderFileIcon =		Engine::Texture2D::CreateFromEmbeded(SHADERFILEICON);
-		s_SceneFileIcon =		Engine::Texture2D::CreateFromEmbeded(SCENEFILEICON);
-		s_ImageFileIcon =		Engine::Texture2D::CreateFromEmbeded(IMAGEFILEICON);
-		s_FolderIcon =			Engine::Texture2D::CreateFromEmbeded(FOLDERICON);
-		s_BackIcon =			Engine::Texture2D::CreateFromEmbeded(BACKICON);
+		fs::path p = "";
+		s_DefaultFileIcon =		Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(DEFULTFILEICON);
+		s_ShaderFileIcon =		Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(SHADERFILEICON);
+		s_SceneFileIcon =		Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(SCENEFILEICON);
+		s_ImageFileIcon =		Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(IMAGEFILEICON);
+		s_FolderIcon =			Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(FOLDERICON);
+		s_BackIcon =			Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(BACKICON);
 
-		s_NoTextureIcon =		Engine::Texture2D::CreateFromEmbeded(NOTEXTUREICON);
+		s_NoTextureIcon =		Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(NOTEXTUREICON);
 
-		s_PlayButton =			Engine::Texture2D::CreateFromEmbeded(PLAYBUTTON);
-		s_StopButton =			Engine::Texture2D::CreateFromEmbeded(STOPBUTTON);
+		s_PlayButton =			Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(PLAYBUTTON);
+		s_StopButton =			Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(STOPBUTTON);
 
-		s_CameraIcon =			Engine::Texture2D::CreateFromEmbeded(CAMERAICON);
+		s_CameraIcon =			Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Texture2D>(CAMERAICON);
 
 		// shaders
 	}

@@ -33,7 +33,6 @@ namespace Engine
 		std::vector<MaterialParameter>& GetParams();
 
 		static Ref<Shader> Create(const fs::path& file);
-		static Ref<Shader> CreateFromEmbeded(uint32 id, const fs::path& file);
 		static Ref<Shader> CreateFromSrc(const std::string& src, const fs::path& file = "");
 
 	private:

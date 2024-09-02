@@ -21,6 +21,7 @@ namespace Engine
 	{
 		//m_DirectoryWatchThread.detach();
 		m_CashedAssets.clear();
+		m_CashedEmbededAssets.clear();
 	}
 
 	void AssetManager::Clean()
@@ -144,6 +145,16 @@ namespace Engine
 		}
 
 		return "";
+	}
+
+	fs::path AssetManager::GetEmbededFolder()
+	{
+		wchar_t p[MAX_PATH] = { 0 };
+		GetModuleFileNameW(NULL, p, MAX_PATH);
+		fs::path path(p);
+		path = path.parent_path();
+		path /= "embeded";
+		return path;
 	}
 
 	void AssetManager::UpdateDirectory(const fs::path& dir)

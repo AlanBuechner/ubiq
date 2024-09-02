@@ -94,7 +94,7 @@ namespace Engine
 
 		s_ScreenMesh = meshBuilder.mesh;
 
-		s_BlitShader = Shader::CreateFromEmbeded(BLIT, "Blit.hlsl");
+		s_BlitShader = Application::Get().GetAssetManager().GetEmbededAsset<Shader>(BLITSHADER);
 	}
 
 	void Renderer::Destroy()

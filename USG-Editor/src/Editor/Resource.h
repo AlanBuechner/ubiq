@@ -1,13 +1,11 @@
-#include "../GameEngine/src/EngineResource.h"
-
 // textures
-#define BACKICON 245
-#define CAMERAICON 244
-#define DEFULTFILEICON 243
-#define FOLDERICON 242
-#define IMAGEFILEICON 241
-#define NOTEXTUREICON 240
-#define PLAYBUTTON 239
-#define SCENEFILEICON 238
-#define SHADERFILEICON 237
-#define STOPBUTTON 236
+#define BACKICON		"Editor/BackIcon.png"
+#define CAMERAICON		"Editor/CameraIcon.png"
+#define DEFULTFILEICON	"Editor/DefaultFileIcon.png"
+#define FOLDERICON		"Editor/FolderIcon.png"
+#define IMAGEFILEICON	"Editor/ImageFileIcon.png"
+#define NOTEXTUREICON	"Editor/NoTextureIcon.png"
+#define PLAYBUTTON		"Editor/PlayButton.png"
+#define SCENEFILEICON	"Editor/SceneFileIcon.png"
+#define SHADERFILEICON	"Editor/ShaderFileIcon.png"
+#define STOPBUTTON		"Editor/StopButton.png"

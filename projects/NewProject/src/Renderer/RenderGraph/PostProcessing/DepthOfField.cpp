@@ -2,6 +2,7 @@
 #include "DepthOfField.h"
 #include "Engine/Renderer/Camera.h"
 #include "Resource.h"
+#include "Engine/Core/Application.h"
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
@@ -10,7 +11,7 @@ namespace Game
 
 	void DepthOfField::Init(const PostProcessInput& input, SceneData& scene)
 	{
-		m_DepthOfFieldShader = Engine::Shader::CreateFromEmbeded(DEPTHOFFIELD, "DepthOfField.hlsl");
+		m_DepthOfFieldShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(DEPTHOFFIELD);
 
 		m_Scene = &scene;
 

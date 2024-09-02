@@ -5,6 +5,7 @@ import concurrent.futures
 from enum import Enum
 import math
 import shutil
+import distutils
 import Config
 
 from scripts.Utils.Utils import *
@@ -392,6 +393,9 @@ class ProjectEnviernment:
 			buildName = os.path.basename(self.projectDirectory)
 		return self.binDir + "/" + buildName + ext
 
+	def GetEmbeded(self):
+		return os.path.join(self.projectDirectory, "embeded")
+
 	def Build(self):
 		projName = os.path.basename(self.projectDirectory)
 		idir = self.intDir
@@ -403,9 +407,10 @@ class ProjectEnviernment:
 			os.makedirs(bdir)
 
 		# build resource files
-		resourceBuildStatus = BuildResources(self.resources, self.dependancys, self.projectDirectory, idir)
-		if(resourceBuildStatus > 0): # faild to build resources
-			return 1
+		resourceBuildStatus = True
+		#resourceBuildStatus = BuildResources(self.resources, self.dependancys, self.projectDirectory, idir)
+		#if(resourceBuildStatus > 0): # faild to build resources
+		#	return 1
 
 		# build pch
 		# TODO
@@ -438,12 +443,14 @@ class ProjectEnviernment:
 		if(linkStatus > 0):
 			return 1
 
-		# copy dlls
+		# Get final output project
 		outProj = None
 		if(Config.project != ""):
 			outProj = Config.buildScripts[Config.project]["module"].GetProject()
 		else:
 			outProj = self
+
+		# copy dlls
 		for dll in self.dlls:
 			if(isinstance(dll, dict)):
 				folder = outProj.binDir + "/" + dll["folder"]
@@ -456,4 +463,8 @@ class ProjectEnviernment:
 				dllName = os.path.basename(dll)
 				shutil.copy(dll, outProj.binDir + "/" + dllName)
 
+		# copy embeded resources
+		resourceFolder = self.GetEmbeded()
+		if(os.path.exists(resourceFolder)):
+			distutils.dir_util.copy_tree(resourceFolder, outProj.binDir + "/embeded", update=1)
 		return 0

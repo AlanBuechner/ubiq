@@ -122,7 +122,6 @@ namespace Engine
 		static Ref<Texture2D> Create(uint32 width, uint32 height, TextureFormat format);
 		static Ref<Texture2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
 		static Ref<Texture2D> Create(const fs::path& path = "");
-		static Ref<Texture2D> CreateFromEmbeded(uint32 id);
 
 		static bool ValidExtension(const fs::path& ext);
 
@@ -209,7 +208,6 @@ namespace Engine
 		void ConvertToChannels(uint8 numChannels);
 
 		static TextureFile* LoadFile(const fs::path& file);
-		static TextureFile* LoadFromEmbeded(uint32 id);
 	};
 
 	uint32 FixMipLevels(uint32 mips, uint32 width, uint32 height);

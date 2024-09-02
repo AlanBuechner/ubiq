@@ -51,7 +51,7 @@ namespace Engine
 	{
 		s_DebugData.Camera = ConstantBuffer::Create(sizeof(Math::Mat4));
 
-		s_DebugData.DebugShader = Shader::CreateFromEmbeded(LINE, "LineShader.hlsl");
+		s_DebugData.DebugShader = Application::Get().GetAssetManager().GetEmbededAsset<Shader>(DEBUGSHADER);
 
 		// init depth test line pass
 		s_DebugData.DepthTestLinesPass.m_Pass = s_DebugData.DebugShader->GetGraphicsPass("DepthTestLinePass");
