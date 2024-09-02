@@ -238,7 +238,7 @@ namespace Editor
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		m_LoadedScene = file;
-		Engine::Ref<Engine::Scene> scene = Engine::Scene::Create(file);
+		Engine::Ref<Engine::Scene> scene = Engine::Application::Get().GetAssetManager().GetAsset<Engine::Scene>(file);
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_Game->SwitchScene(scene);
 		m_HierarchyPanel.SetContext(m_Game->GetScene());

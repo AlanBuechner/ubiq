@@ -31,7 +31,7 @@ namespace Engine
 
 
 
-	class Scene
+	class Scene : public Asset
 	{
 	public:
 		Scene(SceneScriptBase* script = nullptr);
