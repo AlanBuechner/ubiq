@@ -1,9 +1,16 @@
 #pragma once
 
 #include "Event.h"
-#include "Engine/Core/Input/InputControler.h"
 
-namespace Engine {
+namespace Engine 
+{
+
+	enum class MouseMoveBindMode
+	{
+		CurserPosition,
+		DeltaPosition,
+		ScrollWheel
+	};
 
 	class ENGINE_API MouseMovedEvent : public Event
 	{

@@ -5,7 +5,6 @@
 namespace Engine
 {
 	class Event;
-	class InputControlerManeger;
 }
 
 namespace Engine 
@@ -25,13 +24,12 @@ namespace Engine
 		virtual void OnUpdate() {}
 		virtual void OnRender() {}
 		virtual void OnImGuiRender() {}
-		virtual void OnEvent(Event* event);
+		virtual void OnEvent(Event* event) {}
 
 		inline const std::string& GetName() const { return m_DebugName; }
 
 	protected:
 
-		Ref<InputControlerManeger> m_InputManeger;
 
 		std::string m_DebugName;
 

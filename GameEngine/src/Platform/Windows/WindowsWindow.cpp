@@ -3,7 +3,6 @@
 #include "Engine/Core/Application.h"
 #include "Engine/Util/Performance.h"
 
-#include "Engine/Core/Input/InputControler.h"
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/MouseEvent.h"
 #include "Engine/Events/KeyEvent.h"
@@ -301,7 +300,7 @@ namespace Engine
 		{
 			if (m_Data.EventCallback == nullptr) break;
 			POINTS pt = MAKEPOINTS(lParam);
-			m_Data.EventCallback(new MouseMovedEvent(MOUSE_POSITON, pt.x, pt.y));
+			m_Data.EventCallback(new MouseMovedEvent(MouseMoveBindMode::CurserPosition, pt.x, pt.y));
 			//Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
 			//MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y); // creates new mouse moved event
 			//m_Data.EventCallback(*deltaMousePostionEvent);
@@ -340,7 +339,7 @@ namespace Engine
 			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, &raw, &size, sizeof(RAWINPUTHEADER));
 
 			if (raw.header.dwType == RIM_TYPEMOUSE && (raw.data.mouse.lLastX != 0 || raw.data.mouse.lLastY != 0)) {
-				MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)raw.data.mouse.lLastX, (float)raw.data.mouse.lLastY); // creates new mouse moved event
+				MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MouseMoveBindMode::DeltaPosition, (float)raw.data.mouse.lLastX, (float)raw.data.mouse.lLastY); // creates new mouse moved event
 				m_Data.EventCallback(deltaMousePostionEvent);
 			}
 			break;
