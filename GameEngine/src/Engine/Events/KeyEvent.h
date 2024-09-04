@@ -4,7 +4,7 @@
 
 namespace Engine {
 
-	class ENGINE_API KeyEvent : public Event
+	class  KeyEvent : public Event
 	{
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
@@ -17,7 +17,7 @@ namespace Engine {
 		int m_KeyCode;
 	};
 
-	class ENGINE_API KeyPressedEvent : public KeyEvent
+	class  KeyPressedEvent : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(int keycode)
@@ -33,7 +33,7 @@ namespace Engine {
 		EVENT_CLASS_TYPE(KeyPressed)
 	};
 
-	class ENGINE_API KeyReleasedEvent : public KeyEvent
+	class  KeyReleasedEvent : public KeyEvent
 	{
 	public:
 		KeyReleasedEvent(int keycode)
@@ -49,7 +49,7 @@ namespace Engine {
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
 
-	class ENGINE_API KeyTypedEvent : public KeyEvent
+	class  KeyTypedEvent : public KeyEvent
 	{
 	public:
 		KeyTypedEvent(int keycode)
@@ -65,7 +65,7 @@ namespace Engine {
 		EVENT_CLASS_TYPE(KeyTyped)
 	};
 
-	class ENGINE_API KeyRepeatEvent : public KeyEvent
+	class  KeyRepeatEvent : public KeyEvent
 	{
 	public:
 		KeyRepeatEvent(int keycode, int repeatCount)
@@ -85,7 +85,7 @@ namespace Engine {
 		int m_RepeatCount;
 	};
 
-	class ENGINE_API KeyDownEvent : public KeyEvent
+	class  KeyDownEvent : public KeyEvent
 	{
 	public:
 		KeyDownEvent(int keycode)

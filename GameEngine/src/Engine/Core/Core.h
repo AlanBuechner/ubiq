@@ -35,20 +35,6 @@
 	#error "Unknown Platform!"
 #endif
 
-#ifdef PLATFORM_WINDOWS
-	#ifdef DYNAMIC_LINK
-		#ifdef BUILD_DLL
-			#define ENGINE_API __declspec(dllexport)
-		#else
-			#define ENGINE_API __declspec(dllimport)
-		#endif // BUILD_DLL
-	#else
-		#define ENGINE_API
-	#endif
-#else
-	#error Platform not saported
-#endif
-
 #ifdef ENABLE_ASSERTS
 	#define ASSERT(x, ...) {if(!(x)) {DEBUG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
 	#define CORE_ASSERT(x, msg, ...) {if(!(x)) {CORE_ERROR((std::string("Assertion Failed: ") + (msg)).c_str(), __VA_ARGS__); __debugbreak();}}

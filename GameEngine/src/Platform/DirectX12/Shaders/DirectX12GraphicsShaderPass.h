@@ -22,7 +22,7 @@ struct FBVectorHash {
 
 namespace Engine
 {
-	class ENGINE_API DirectX12GraphicsShaderPass : public GraphicsShaderPass
+	class DirectX12GraphicsShaderPass : public GraphicsShaderPass
 	{
 	public:
 		DirectX12GraphicsShaderPass(Ref<ShaderSorce> src, const std::string& passName);

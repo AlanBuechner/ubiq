@@ -28,7 +28,7 @@ namespace Engine
 
 namespace Engine
 {
-	class ENGINE_API KeyCode
+	class  KeyCode
 	{
 	public:
 		KeyCode();
@@ -202,7 +202,7 @@ namespace Engine
 		static KeyCode* s_Instance;
 	};
 
-	class ENGINE_API Input
+	class  Input
 	{
 		friend Application;
 

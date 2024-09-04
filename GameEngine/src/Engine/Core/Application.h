@@ -24,7 +24,7 @@ Engine::Application* CreateApplication();
 
 namespace Engine
 {
-	class ENGINE_API Application
+	class  Application
 	{
 	public:
 		Application(const std::string& name = "");

@@ -10,7 +10,7 @@ namespace Engine
 namespace Engine 
 {
 
-	class ENGINE_API Layer
+	class  Layer
 	{
 	protected:
 		typedef Engine::Layer Super;

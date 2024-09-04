@@ -225,7 +225,7 @@ namespace Engine
 		Level m_Level = Trace;
 	};
 
-	class ENGINE_API Log
+	class  Log
 	{
 	public:
 		static void Init();
