@@ -215,6 +215,7 @@ namespace Editor
 		Super::OnEvent(e);
 
 		m_EditorCamera->OnEvent(e);
+		m_Game->OnEvent(e);
 
 		Engine::EventDispatcher dispacher(e);
 		dispacher.Dispatch<Engine::KeyPressedEvent>(BIND_EVENT_FN(&EditorLayer::OnKeyPressed));

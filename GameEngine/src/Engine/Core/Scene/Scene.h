@@ -13,6 +13,7 @@ namespace Engine
 	class Entity;
 	class Camera;
 	class SceneScriptBase;
+	class SceneSystem;
 }
 
 namespace Engine
@@ -51,17 +52,42 @@ namespace Engine
 		uint32 GetViewportHeight() { return m_ViewportHeight; }
 		bool DidCameraChange() { return m_CameraChanged; }
 
+		// -------------------------------- ECS -------------------------------- //
+		SceneRegistry& GetRegistry() { return m_Registry; }
 		template<class T>
 		T* GetSceneStatic()
 		{
 			return m_Registry.GetSceneStatic<T>();
 		}
+		// -------------------------------- ECS -------------------------------- //
 
+
+		// -------------------------------- Rendering -------------------------------- //
 		template<class T>
 		Ref<T> GetSceneRendererAs() { return std::dynamic_pointer_cast<T>(m_SceneRenderer); }
-		SceneRegistry& GetRegistry() { return m_Registry; }
-		SceneScriptBase* GetSceneScript() { return m_SceneScript; }
 		Ref<SceneRenderer> GetSceneRenderer() { return m_SceneRenderer; }
+		// -------------------------------- Rendering -------------------------------- //
+
+
+		// -------------------------------- Systems -------------------------------- //
+		template<class T> 
+		T* GetSceneSystem() {
+			return (T*)GetSceneSystem(T::GetStaticClass());
+		}
+		SceneSystem* GetSceneSystem(const Reflect::Class& systemClass) { return m_SystemsMap[systemClass.GetTypeID()]; }
+		const std::vector<SceneSystem*>& GetSceneSystems() const { return m_Systems; }
+
+		template<class T>
+		T* CreateSceneSystem() { return (T*)CreateSceneSystem(T::GetStaticClass()); }
+		SceneSystem* CreateSceneSystem(const Reflect::Class& systemClass);
+		std::vector<SceneSystem*> CreateSceneSystems(const std::vector<const Reflect::Class*>& systemClasses);
+
+		template<class T>
+		void RemoveSceneSystem() { RemoveSceneSystem(T::GetStaticClass()); }
+		void RemoveSceneSystem(const Reflect::Class& systemClass);
+		// -------------------------------- Systems -------------------------------- //
+
+		SceneScriptBase* GetSceneScript() { return m_SceneScript; }
 
 		template<class T, typename ...Args>
 		void AddUpdateEvent(Args... args) { 
@@ -78,6 +104,8 @@ namespace Engine
 		uint32 m_ViewportWidth = 0;
 		uint32 m_ViewportHeight = 0;
 		SceneRegistry m_Registry;
+		std::vector<SceneSystem*> m_Systems;
+		std::unordered_map<uint64, SceneSystem*> m_SystemsMap;
 		SceneScriptBase* m_SceneScript;
 
 		Ref<SceneRenderer> m_SceneRenderer;

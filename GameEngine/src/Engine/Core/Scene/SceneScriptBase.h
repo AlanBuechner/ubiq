@@ -5,6 +5,7 @@ namespace Engine
 {
 	class Scene;
 	class SceneRenderer;
+	class Event;
 }
 
 namespace Engine
@@ -14,8 +15,11 @@ namespace Engine
 	public:
 		virtual void OnUpdate() {};
 
-		virtual void OnScenePreLoad() {};
+		virtual void OnEvent(Event* e) {};
+
+		virtual void OnScenePreLoad() = 0;
 		virtual void OnSceneLoad() {};
+		virtual void GenerateUpdateEvents() = 0;
 
 		static SceneScriptBase* GetDefultSceneScriptInstance();
 

@@ -1,6 +1,7 @@
 #include "DefaultSceneScript.h"
 #include "Engine/Core/Scene/TransformComponent.h"
 #include "Renderer/SceneRenderer/SceneRenderer.h"
+#include "Input/InputSystem.h"
 
 namespace Game
 {
@@ -10,16 +11,33 @@ namespace Game
 
 	}
 
+	void DefaultSceneScript::OnEvent(Engine::Event* e)
+	{
+#if !defined(EDITOR)
+		
+#endif
+	}
+
 	void DefaultSceneScript::OnScenePreLoad()
 	{
 		SetSceneRenderer(SceneRenderer::Create());
 
-		m_Scene->AddUpdateEvent<Engine::ComponentUpdateEvent<Engine::TransformComponent>>("UpdateHierarchyGlobalTransform");
-		m_Scene->AddUpdateEvent<Engine::SceneUpdateEvent>("OnPreRender");
+		std::vector<const Reflect::Class*> systems
+		{
+			&InputSystem::GetStaticClass()
+		};
+
+		m_Scene->CreateSceneSystems(systems);
 	}
 
 	void DefaultSceneScript::OnSceneLoad()
 	{
+	}
+
+	void DefaultSceneScript::GenerateUpdateEvents()
+	{
+		m_Scene->AddUpdateEvent<Engine::ComponentUpdateEvent<Engine::TransformComponent>>("UpdateHierarchyGlobalTransform");
+		m_Scene->AddUpdateEvent<Engine::SceneUpdateEvent>("OnPreRender");
 	}
 
 }

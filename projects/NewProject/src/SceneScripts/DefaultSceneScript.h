@@ -13,8 +13,12 @@ namespace Game
 	public:
 		virtual void OnUpdate() override;
 
+		virtual void OnEvent(Engine::Event* e) override;
+
 		virtual void OnScenePreLoad() override;
 		virtual void OnSceneLoad() override;
+
+		virtual void GenerateUpdateEvents() override;
 
 	private:
 	};

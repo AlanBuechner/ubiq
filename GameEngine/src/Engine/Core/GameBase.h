@@ -24,6 +24,8 @@ namespace Engine
 
 		void SwitchScene(Ref<Scene> scene);
 
+		virtual void OnEvent(Event* e) = 0;
+
 		virtual void OnUpdate(Ref<Camera> overideCamera = nullptr) = 0;
 		virtual void OnRender() = 0;
 

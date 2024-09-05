@@ -18,6 +18,11 @@ namespace Game
 			m_DefaultCamera->SetOrientation({ Math::Radians(180 - 25), Math::Radians(25) });
 		}
 
+		virtual void OnEvent(Engine::Event* e)
+		{
+			m_Scene->GetSceneScript()->OnEvent(e);
+		}
+
 		virtual void OnUpdate(Engine::Ref<Engine::Camera> overideCamera) override
 		{
 			CREATE_PROFILE_FUNCTIONI();
