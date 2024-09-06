@@ -14,7 +14,7 @@ namespace Game
 	void DefaultSceneScript::OnEvent(Engine::Event* e)
 	{
 #if !defined(EDITOR)
-		
+		m_Scene->GetSceneSystem<InputSystem>()->OnEvent(e);
 #endif
 	}
 
