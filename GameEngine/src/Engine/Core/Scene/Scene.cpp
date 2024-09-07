@@ -117,9 +117,8 @@ namespace Engine
 		m_Systems.push_back(system);
 		m_SystemsMap[systemClass.GetTypeID()] = system;
 		system->OnAttatch();
-		// regenerate update events
-		m_UpdateEvents.clear();
-		m_SceneScript->GenerateUpdateEvents();
+
+		RegenerateUpdateEvents();
 		return system;
 	}
 
@@ -142,9 +141,7 @@ namespace Engine
 			system->OnAttatch();
 		}
 
-		// regenerate update events
-		m_UpdateEvents.clear();
-		m_SceneScript->GenerateUpdateEvents();
+		RegenerateUpdateEvents();
 		return systems;
 	}
 
@@ -158,6 +155,12 @@ namespace Engine
 		m_Systems.erase(std::remove(m_Systems.begin(), m_Systems.end(), system), m_Systems.end());
 
 		delete system;
+	}
+
+	void Scene::RegenerateUpdateEvents()
+	{
+		m_UpdateEvents.clear();
+		m_SceneScript->GenerateUpdateEvents();
 	}
 
 	Ref<Scene> Scene::Create()

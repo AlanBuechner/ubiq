@@ -35,9 +35,11 @@ namespace Editor
 
 		void NewScene();
 		void DefaultScene();
-		void LoadScene(const std::string& file);
+		void LoadScene(const fs::path& file);
 
 		ContentBrowserPanel& GetContantBrowser() { return m_ContentPanel; }
+
+		bool IsPlaying() { return m_Playing; }
 
 	private:
 		void OpenScene();
@@ -73,6 +75,8 @@ namespace Editor
 		ContentBrowserPanel m_ContentPanel;
 
 		Engine::GameBase* m_Game;
+
+		bool m_Playing = false;
 
 		fs::path m_DropPath;
 		fs::path m_EditorDirectory;

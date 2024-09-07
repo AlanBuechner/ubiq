@@ -78,22 +78,24 @@ namespace Editor
 			m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		}
 
-		m_EditorCamera->OnUpdate();
-
 		// update scene
-		DrawCustomGizmo();
-		m_Game->OnUpdate(m_EditorCamera);
-
-		if (Engine::Input::GetMouseButtonPressed(Engine::KeyCode::LEFT_MOUSE) && !Engine::Input::GetKeyDown(Engine::KeyCode::ALT) && !ImGuizmo::IsOver())
+		if (!m_Playing)
 		{
-			bool inWindow;
-			Engine::Entity entity = GetEntityAtMousePosition(inWindow);
-			if (inWindow)
-				m_HierarchyPanel.SelectEntity(entity);
+			m_EditorCamera->OnUpdate();
+			if (Engine::Input::GetMouseButtonPressed(Engine::KeyCode::LEFT_MOUSE) && !Engine::Input::GetKeyDown(Engine::KeyCode::ALT) && !ImGuizmo::IsOver())
+			{
+				bool inWindow;
+				Engine::Entity entity = GetEntityAtMousePosition(inWindow);
+				if (inWindow)
+					m_HierarchyPanel.SelectEntity(entity);
+			}
+
+			if (Engine::Input::GetKeyPressed(Engine::KeyCode::SPACE) && Engine::Input::GetKeyDown(Engine::KeyCode::CONTROL))
+				m_ContentPanel.SetActive(!m_ContentPanel.IsActive());
 		}
 
-		if (Engine::Input::GetKeyPressed(Engine::KeyCode::SPACE) && Engine::Input::GetKeyDown(Engine::KeyCode::CONTROL))
-			m_ContentPanel.SetActive(!m_ContentPanel.IsActive());
+		m_Game->OnUpdate(m_Playing ? nullptr : m_EditorCamera);
+		DrawCustomGizmo();
 	}
 
 	void EditorLayer::OnRender()
@@ -192,10 +194,17 @@ namespace Editor
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::MenuItem("Play"))
+				fs::path tempScenePath = fs::current_path() / "temp/tempScene.ubiq";
+				if (ImGui::MenuItem(m_Playing ? "Stop" : "Play"))
 				{
-					std::string cmd = std::string("\"Build.bat\" -fb -r -c Release -a x86_64 -p Runtime -g ") + fs::current_path().string();
-					system(cmd.c_str());
+					// save scene to temp file
+					if (m_Playing == false)
+					{
+						Engine::SceneSerializer serializer(m_Game->GetScene());
+						serializer.Serialize(tempScenePath);
+					}
+					m_Playing = !m_Playing;
+					LoadScene(tempScenePath);
 				}
 
 				ImGui::EndMenuBar();
@@ -235,11 +244,12 @@ namespace Editor
 		m_HierarchyPanel.SetContext(m_Game->GetScene());
 	}
 
-	void EditorLayer::LoadScene(const std::string& file)
+	void EditorLayer::LoadScene(const fs::path& file)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		m_LoadedScene = file;
-		Engine::Ref<Engine::Scene> scene = Engine::Application::Get().GetAssetManager().GetAsset<Engine::Scene>(file);
+		//Engine::Ref<Engine::Scene> scene = Engine::Application::Get().GetAssetManager().GetAsset<Engine::Scene>(file);
+		Engine::Ref<Engine::Scene> scene = Engine::Scene::Create(file);
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_Game->SwitchScene(scene);
 		m_HierarchyPanel.SetContext(m_Game->GetScene());

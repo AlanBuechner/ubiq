@@ -5,6 +5,7 @@ bin-int/
 GameEngine/generated
 USG-Editor/generated
 projects/NewProject/generated
+temp/
 __pycache__
 
 vendor/dxc

@@ -89,6 +89,8 @@ namespace Engine
 
 		SceneScriptBase* GetSceneScript() { return m_SceneScript; }
 
+		void RegenerateUpdateEvents();
+
 		template<class T, typename ...Args>
 		void AddUpdateEvent(Args... args) { 
 			T* event = new T(std::forward<Args>(args)...);

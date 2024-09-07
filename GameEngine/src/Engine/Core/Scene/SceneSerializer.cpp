@@ -20,7 +20,7 @@ namespace Engine
 	{
 	}
 
-	void SceneSerializer::Serialize(const std::string& filepath)
+	void SceneSerializer::Serialize(const fs::path& filepath)
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -62,17 +62,19 @@ namespace Engine
 
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
+
+		fs::create_directories(filepath.parent_path());
 		std::ofstream fout(filepath);
 		fout << out.c_str();
 	}
 
-	void SceneSerializer::SerializeRuntime(const std::string& filepath)
+	void SceneSerializer::SerializeRuntime(const fs::path& filepath)
 	{
 		// not implemented
 		CORE_ASSERT(false, "not implemented");
 	}
 
-	bool SceneSerializer::Deserialize(const std::string& filepath)
+	bool SceneSerializer::Deserialize(const fs::path& filepath)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		std::ifstream stream(filepath);
@@ -158,7 +160,7 @@ namespace Engine
 		return true;
 	}
 
-	bool SceneSerializer::DeserializeRuntime(const std::string& filepath)
+	bool SceneSerializer::DeserializeRuntime(const fs::path& filepath)
 	{
 		// not implemented
 		CORE_ASSERT(false, "not implemented");
