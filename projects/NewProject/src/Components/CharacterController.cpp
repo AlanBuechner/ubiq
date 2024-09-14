@@ -16,7 +16,8 @@ namespace Game
 
 	void CharacterController::OnInput(InputState& state)
 	{
-		DEBUG_INFO("hello world");
+		if(state.GetKeyPressed(Engine::KeyCode::W))
+			DEBUG_INFO("hello world");
 	}
 
 }
