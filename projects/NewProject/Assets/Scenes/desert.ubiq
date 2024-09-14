@@ -33,6 +33,7 @@ Entities:
           OrthographicSize: 10
           OrthographicNear: -1
           OrthographicFar: 1
+      - Component: Game::CharacterController
   - Entity: 14785401870932044183
     Name: NanoSuit
     Components:

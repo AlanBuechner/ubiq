@@ -168,4 +168,34 @@ namespace Engine
 		const Reflect::Function* m_Func;
 		std::string m_FuncName;
 	};
+
+	template<typename T>
+	class SceneSystemUpdateEvent : public UpdateEvent
+	{
+	public:
+		SceneSystemUpdateEvent(const std::string& funcName) :
+			m_FuncName(funcName)
+		{}
+
+		virtual void Setup(Scene* scene) override {
+			const Reflect::Class& systemClass = T::GetStaticClass();
+			m_System = scene->GetSceneSystem(systemClass);
+			if (systemClass.HasFunction(m_FuncName))
+				m_Func = &systemClass.GetFunction(m_FuncName);
+		}
+
+		virtual void Update() override {
+			if (m_Func && m_System) {
+				CREATE_PROFILE_SCOPEI(m_FuncName);
+				m_Func->Invoke(m_System, {});
+			}
+		}
+
+
+	private:
+		SceneSystem* m_System;
+		const Reflect::Function* m_Func;
+		std::string m_FuncName;
+	};
+
 }

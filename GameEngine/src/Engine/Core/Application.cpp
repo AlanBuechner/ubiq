@@ -177,8 +177,6 @@ namespace Engine {
 			dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMouseMoved, Input::s_Instance));
 		}
 
-		Input::GetUpdatedEventList(m_InputBuffer);
-
 		for (Event** i = m_InputBuffer.begin(); i != m_InputBuffer.end(); ++i)
 		{
 			for (Layer** it = m_LayerStack.end(); it != m_LayerStack.begin(); )

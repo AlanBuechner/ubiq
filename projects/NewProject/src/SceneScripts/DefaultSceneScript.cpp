@@ -3,6 +3,16 @@
 #include "Renderer/SceneRenderer/SceneRenderer.h"
 #include "Input/InputSystem.h"
 
+#if defined(EDITOR)
+#include "Editor/EditorLayer.h"
+#endif
+
+#if defined(EDITOR)
+#define IS_PLAYING if (Editor::EditorLayer::Get()->IsPlaying())
+#else
+#define IS_PLAYING
+#endif
+
 namespace Game
 {
 
@@ -13,9 +23,9 @@ namespace Game
 
 	void DefaultSceneScript::OnEvent(Engine::Event* e)
 	{
-#if !defined(EDITOR)
-		m_Scene->GetSceneSystem<InputSystem>()->OnEvent(e);
-#endif
+		IS_PLAYING {
+			m_InputSystem->OnEvent(e);
+		}
 	}
 
 	void DefaultSceneScript::OnScenePreLoad()
@@ -28,6 +38,8 @@ namespace Game
 		};
 
 		m_Scene->CreateSceneSystems(systems);
+
+		m_InputSystem = m_Scene->GetSceneSystem<InputSystem>();
 	}
 
 	void DefaultSceneScript::OnSceneLoad()
@@ -36,6 +48,9 @@ namespace Game
 
 	void DefaultSceneScript::GenerateUpdateEvents()
 	{
+		IS_PLAYING{
+			m_Scene->AddUpdateEvent<Engine::SceneSystemUpdateEvent<InputSystem>>("HandleEvents");
+		}
 		m_Scene->AddUpdateEvent<Engine::ComponentUpdateEvent<Engine::TransformComponent>>("UpdateHierarchyGlobalTransform");
 		m_Scene->AddUpdateEvent<Engine::SceneUpdateEvent>("OnPreRender");
 	}

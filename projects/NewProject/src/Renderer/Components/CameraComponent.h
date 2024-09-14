@@ -1,8 +1,5 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Engine/Renderer/Material.h"
-#include "Engine/Renderer/Mesh.h"
-#include "Engine/Renderer/SceneRenderer.h"
 #include "Engine/Core/Scene/Components.h"
 #include "Engine/Core/Scene/SceneCamera.h"
 

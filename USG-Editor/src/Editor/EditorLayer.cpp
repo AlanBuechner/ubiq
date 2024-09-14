@@ -82,7 +82,7 @@ namespace Editor
 		if (!m_Playing)
 		{
 			m_EditorCamera->OnUpdate();
-			if (Engine::Input::GetMouseButtonPressed(Engine::KeyCode::LEFT_MOUSE) && !Engine::Input::GetKeyDown(Engine::KeyCode::ALT) && !ImGuizmo::IsOver())
+			if (Engine::Input::GetMouseButtonPressed(Engine::MouseCode::LEFT_MOUSE) && !Engine::Input::GetKeyDown(Engine::KeyCode::ALT) && !ImGuizmo::IsOver())
 			{
 				bool inWindow;
 				Engine::Entity entity = GetEntityAtMousePosition(inWindow);
@@ -259,7 +259,7 @@ namespace Editor
 	{
 		bool controlPressed = Engine::Input::GetKeyDown(Engine::KeyCode::CONTROL);
 		bool shiftPressed = Engine::Input::GetKeyDown(Engine::KeyCode::SHIFT);
-		bool rightClick = Engine::Input::GetMouseButtonDown(Engine::KeyCode::RIGHT_MOUSE);
+		bool rightClick = Engine::Input::GetMouseButtonDown(Engine::MouseCode::RIGHT_MOUSE);
 
 		if (!rightClick)
 		{

@@ -82,9 +82,9 @@ namespace Engine
 		bool alt = Input::GetKeyDown(KeyCode::ALT);
 		bool shift = Input::GetKeyDown(KeyCode::SHIFT);
 
-		bool rMouse = Input::GetMouseButtonDown(KeyCode::RIGHT_MOUSE);
-		bool lMouse = Input::GetMouseButtonDown(KeyCode::LEFT_MOUSE);
-		bool mMouse = Input::GetMouseButtonDown(KeyCode::MIDDLE_MOUSE);
+		bool rMouse = Input::GetMouseButtonDown(MouseCode::RIGHT_MOUSE);
+		bool lMouse = Input::GetMouseButtonDown(MouseCode::LEFT_MOUSE);
+		bool mMouse = Input::GetMouseButtonDown(MouseCode::MIDDLE_MOUSE);
 
 		bool wKey = Input::GetKeyDown(KeyCode::W);
 		bool aKey = Input::GetKeyDown(KeyCode::A);
