@@ -29,6 +29,7 @@ namespace Engine
 	{
 		m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
 		m_CameraData.ProjectionMatrix = Math::Perspective(Math::Radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
+		m_CameraData.InvProjection = Math::Inverse(m_CameraData.ProjectionMatrix);
 		m_CameraData.VPMatrix = m_CameraData.ProjectionMatrix * m_CameraData.ViewMatrix;
 	}
 

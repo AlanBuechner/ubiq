@@ -88,7 +88,7 @@ namespace Engine
 
 		iterator end()
 		{
-			return iterator(m_Pool, (uint32)m_Pool->GetUsedSlots().Count());
+			return iterator(m_Pool, (uint32)m_Pool->GetUsedSlots().size());
 		}
 
 	private:

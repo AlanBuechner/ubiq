@@ -5,7 +5,7 @@
 #include <map>
 #include "Engine/Core/Application.h"
 #include "Engine/Math/Math.h"
-#include "Utils/Vector.h"
+
 
 namespace Engine
 {
@@ -72,8 +72,8 @@ namespace Engine
 		KeyState m_KeyStates[Engine::KeyCode::LAST];
 		KeyState m_MouseStates[3];
 
-		Utils::Vector<KeyCode> m_ToUpdate;
-		Utils::Vector<MouseCode> m_ToUpdateMouse;
+		std::vector<KeyCode> m_ToUpdate;
+		std::vector<MouseCode> m_ToUpdateMouse;
 
 		Math::Vector2 m_MousePosition;
 		Math::Vector2 m_PreviousMousePosition;

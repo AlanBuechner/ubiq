@@ -43,6 +43,11 @@ namespace Math
 		return glm::mix(q1, q2, a);
 	}
 
+	Quaternion Abs(const Quaternion& q)
+	{
+		return q.w < 0.0 ? -q : q;
+	}
+
 	Quaternion Normalize(const Quaternion& q)
 	{
 		return glm::normalize(q);

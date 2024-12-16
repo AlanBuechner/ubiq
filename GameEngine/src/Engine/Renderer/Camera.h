@@ -19,9 +19,6 @@ namespace Engine
 			Math::Vector3 Rotation;
 		};
 
-	protected:
-		typedef Engine::Camera Super;
-
 	public:
 		Camera() {
 			m_CameraDataBuffer = ConstantBuffer::Create(sizeof(CameraData));
@@ -34,6 +31,7 @@ namespace Engine
 
 		virtual ~Camera() = default;
 
+		const Math::Mat4& GetViewMatrix() const { return m_CameraData.ViewMatrix; }
 		const Math::Mat4& GetProjectionMatrix() const { return m_CameraData.ProjectionMatrix; }
 		const Math::Mat4& GetViewProjectionMatrix() const { return m_CameraData.VPMatrix; }
 		const Ref<ConstantBuffer> GetCameraBuffer() const { return m_CameraDataBuffer; }

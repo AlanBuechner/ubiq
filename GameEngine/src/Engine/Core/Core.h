@@ -4,6 +4,8 @@
 #include "Engine/Util/Utils.h"
 #include "Engine/Math/Math.h"
 #include "Reflection.h"
+#include "Utils/Common.h"
+#include "Utils/Types.h"
 
 #define ENABLE_ASSERTS
 
@@ -83,15 +85,5 @@ namespace Engine
 
 	using byte = unsigned char;
 }
-
-using uint8 = uint8_t;
-using uint16 = uint16_t;
-using uint32 = uint32_t;
-using uint64 = uint64_t;
-
-using int8 = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
 
 namespace fs = std::filesystem;

@@ -18,9 +18,9 @@ namespace Game
 	public:
 		struct Node
 		{
-			Utils::Vector<Engine::MeshBuilder> m_MeshBuilders;
-			Utils::Vector<std::string> m_Names;
-			Utils::Vector<Node> m_Children;
+			std::vector<Engine::MeshBuilder> m_MeshBuilders;
+			std::vector<std::string> m_Names;
+			std::vector<Node> m_Children;
 			Math::Mat4 m_Transform;
 		};
 
@@ -30,9 +30,9 @@ namespace Game
 		void BakeMesh();
 
 		Node& GetRoot() { return m_Root; }
-		Utils::Vector<Engine::Ref<Engine::Mesh>>& GetBakedMeshes() { return m_BakedMeshes; }
-		Utils::Vector<std::string>& GetNames() { return m_Names; }
-		Utils::Vector<Engine::AABB>& GetVolumes() { return m_Volumes; }
+		std::vector<Engine::Ref<Engine::Mesh>>& GetBakedMeshes() { return m_BakedMeshes; }
+		std::vector<std::string>& GetNames() { return m_Names; }
+		std::vector<Engine::AABB>& GetVolumes() { return m_Volumes; }
 
 		static Engine::Ref<Model> Create(const fs::path& path);
 
@@ -46,9 +46,9 @@ namespace Game
 
 		Node m_Root;
 
-		Utils::Vector<Engine::Ref<Engine::Mesh>> m_BakedMeshes;
-		Utils::Vector<Engine::AABB> m_Volumes;
-		Utils::Vector<std::string> m_Names;
+		std::vector<Engine::Ref<Engine::Mesh>> m_BakedMeshes;
+		std::vector<Engine::AABB> m_Volumes;
+		std::vector<std::string> m_Names;
 	};
 
 }

@@ -15,6 +15,8 @@
 
 #include <filesystem>
 
+#include "Utils/Common.h"
+
 namespace Editor
 {
 	SceneHierarchyPanel::SceneHierarchyPanel(const Engine::Ref<Engine::Scene>& context)
@@ -28,18 +30,18 @@ namespace Editor
 		m_Selected = Engine::Entity::null;
 	}
 
-	void SceneHierarchyPanel::OnImGuiRender()
+	void DISABLE_OPS SceneHierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Hierarchy");
 
-		Utils::Vector<Engine::Entity> rootEntitys;
-		m_Context->GetRegistry().EachEntity([&](auto entityID) {
+		std::vector<Engine::Entity> rootEntitys;
+		m_Context->GetRegistry().EachEntity([&](auto entityID) DISABLE_OPS{
 			Engine::Entity entity{ entityID, m_Context.get() };
 			if (entity.GetTransform().GetParent() == Engine::Entity::null)
-				rootEntitys.Push(entity);
+				rootEntitys.push_back(entity);
 		});
 
-		for (uint32 i = 0; i < rootEntitys.Count(); i++)
+		for (uint32 i = 0; i < rootEntitys.size(); i++)
 			DrawEntityNode(rootEntitys[i]);
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -140,7 +142,7 @@ if(!m_Selected.HasComponent<component>()){\
 	{
 		auto& children = entity.GetTransform().GetChildren();
 		ImGuiTreeNodeFlags flags = ( m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
-			(children.Empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow) |
+			(children.empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow) |
 			ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool open = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity, flags, entity.GetName().c_str());
@@ -182,7 +184,7 @@ if(!m_Selected.HasComponent<component>()){\
 
 		if (open)
 		{
-			for (uint32_t i = 0; i < children.Count(); i++)
+			for (uint32_t i = 0; i < children.size(); i++)
 			{
 				Engine::Entity child = children[i];
 				DrawEntityNode(child);
@@ -209,7 +211,7 @@ if(!m_Selected.HasComponent<component>()){\
 		if (ImGui::InputText("Name", buffer, sizeof(buffer)))
 			name = std::string(buffer);
 		
-		Utils::Vector<Engine::Component*> components = entity.GetComponents();
+		std::vector<Engine::Component*> components = entity.GetComponents();
 		for (Engine::Component* comp : components)
 		{
 			ImVec2 contentRegion = ImGui::GetContentRegionAvail();

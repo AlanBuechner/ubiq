@@ -3,7 +3,7 @@
 #include "SceneRegistry.h"
 
 #include "Engine/Core/UUID.h"
-#include "Utils/Vector.h"
+
 
 namespace Engine
 {
@@ -35,9 +35,18 @@ namespace Engine
 		template<typename T>
 		T* AddComponent()
 		{
-			CORE_ASSERT(!HasComponent<T>(), "Entity alredy has component");
 			T* component = m_Scene->m_Registry.AddComponent<T>(m_EntityID, m_Scene);
+			CORE_ASSERT(component, "Entity alredy has component");
 			return component;
+		}
+
+		template<typename T>
+		T* GetOrAddComponent()
+		{
+			T* comp = GetComponent<T>();
+			if(comp == nullptr)
+				comp = m_Scene->m_Registry.AddComponent<T>(m_EntityID, m_Scene);
+			return comp;
 		}
 
 		template<typename T>
@@ -54,15 +63,17 @@ namespace Engine
 		operator uint32() const { return (uint32)m_EntityID; }
 
 		UUID GetUUID();
-		std::string& GetName();
+		std::string& GetName() const;
 		TransformComponent& GetTransform();
 
 		Entity GetParent();
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
-		const Utils::Vector<Entity>& GetChildren();
+		const std::vector<Entity>& GetChildren();
 		void SetParentToRoot();
-		Utils::Vector<Component*> GetComponents();
+		std::vector<Component*> GetComponents();
+
+		Entity FindChiledWithName(const std::string& name);
 
 		void DirtyAABB();
 		void DirtyVolume();

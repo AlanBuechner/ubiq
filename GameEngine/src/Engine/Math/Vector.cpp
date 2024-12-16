@@ -84,6 +84,11 @@ namespace Math
 		return glm::cross(v1, v2);
 	}
 
+	float Cross(const Vector2& v1, const Vector2& v2)
+	{
+		return (v1.x * v2.y) - (v2.x * v1.y);
+	}
+
 	Vector2 Degrees(Vector2 rad)
 	{
 		return { Degrees(rad.x), Degrees(rad.y) };
@@ -92,6 +97,16 @@ namespace Math
 	Vector2 Radians(Vector2 deg)
 	{
 		return { Radians(deg.x), Radians(deg.y) };
+	}
+
+	Vector3 Degrees(Vector3 rad)
+	{
+		return { Degrees(rad.x), Degrees(rad.y), Degrees(rad.z) };
+	}
+
+	Vector3 Radians(Vector3 deg)
+	{
+		return { Radians(deg.x), Radians(deg.y), Radians(deg.z) };
 	}
 
 	Vector2 Normalized(const Vector2& v)
@@ -126,17 +141,17 @@ namespace Math
 
 	Vector2 Lerp(const Vector2& v1, const Vector2& v2, float a)
 	{
-		return (v1 * a) + v2 * (1.f - a);
+		return glm::mix(v1, v2, a);
 	}
 
 	Vector3 Lerp(const Vector3& v1, const Vector3& v2, float a)
 	{
-		return (v1 * a) + v2 * (1.f - a);
+		return glm::mix(v1, v2, a);
 	}
 
 	Vector4 Lerp(const Vector4& v1, const Vector4& v2, float a)
 	{
-		return (v1 * a) + v2 * (1.f - a);
+		return glm::mix(v1, v2, a);
 	}
 
 	Math::Vector3 SphericalToCartesian(Vector2 rot)

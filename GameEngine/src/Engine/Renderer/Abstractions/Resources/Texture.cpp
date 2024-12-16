@@ -185,14 +185,14 @@ namespace Engine
 
 
 
-	RWTexture2D::RWTexture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor) :
-		Texture2D(width, height, mips, format, clearColor, TextureType::RWTexture), m_Owner(nullptr)
+	RWTexture2D::RWTexture2D(Texture2DResource* resource, Texture2DSRVDescriptorHandle* srv, RenderTarget2D* owner) :
+		Texture2D(resource, srv), m_Owner(owner)
 	{
 		GenerateUAVDescriptors();
 	}
 
-	RWTexture2D::RWTexture2D(Texture2DResource* resource, Texture2DSRVDescriptorHandle* srv, RenderTarget2D* owner) :
-		Texture2D(resource, srv), m_Owner(owner)
+	RWTexture2D::RWTexture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor) :
+		Texture2D(width, height, mips, format, clearColor, TextureType::RWTexture), m_Owner(nullptr)
 	{
 		GenerateUAVDescriptors();
 	}

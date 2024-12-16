@@ -34,9 +34,9 @@ namespace Editor
 		for (uint32 i = 0; i <= m_GridLines; i++)
 		{
 			float posz = (m_GridLineOffset * i) - m_GridExtent;
-			m_GridMesh.m_Vertices.push_back({ { -m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
-			m_GridMesh.m_Vertices.push_back({ { 0				,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, m_GridColor.w - (m_GridColor.w * (abs(posz) / m_GridExtent)) } });
-			m_GridMesh.m_Vertices.push_back({ { m_GridExtent	,0 , posz }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
+			m_GridMesh.m_Vertices.push_back({ { -m_GridExtent	,0 , posz, 1 }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
+			m_GridMesh.m_Vertices.push_back({ { 0				,0 , posz, 1 }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, m_GridColor.w - (m_GridColor.w * (abs(posz) / m_GridExtent)) } });
+			m_GridMesh.m_Vertices.push_back({ { m_GridExtent	,0 , posz, 1 }, { m_GridColor.x, m_GridColor.y, m_GridColor.z, 0.0f } });
 
 			m_GridMesh.m_Indices.push_back((i * 3) + 0);
 			m_GridMesh.m_Indices.push_back((i * 3) + 1);
@@ -56,7 +56,7 @@ namespace Editor
 		DefaultScene();
 
 		m_EditorCamera = Engine::CreateRef<Engine::EditorCamera>();
-		m_EditorCamera->SetOrientation({ Math::Radians(180-25), Math::Radians(25) });
+		m_EditorCamera->SetOrientation({ Math::Radians(360-25), Math::Radians(25) });
 	}
 
 	void EditorLayer::OnDetach()
@@ -319,23 +319,10 @@ namespace Editor
 			Engine::DebugRenderer::DrawLineMesh(m_GridMesh, matx);
 		}
 
+		m_Game->DrawGizmos();
+
 		// draw camera frustum
-		Engine::Entity selected = m_HierarchyPanel.GetSelectedEntity();
-		if (selected)
-		{
-			Engine::AABB bounds = selected.GetLocalAABB();
-			if (!bounds.Valid())
-			{
-				bounds.m_Min = { -1,-1,-1 };
-				bounds.m_Max = { 1, 1, 1 };
-			}
-
-			Engine::TransformComponent& tc = selected.GetTransform();
-			const Math::Mat4& transform = tc.GetTransform();
-
-			Engine::DebugRenderer::DrawWireBox(bounds.Center(), bounds.HalfExtent(), { 1,1,1,1 }, transform, false);
-
-		}
+		
 	}
 
 	void EditorLayer::UI_Viewport()

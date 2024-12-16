@@ -133,6 +133,7 @@ namespace Engine
 	{
 		TextureID,
 		Float,
+		Float4,
 		Bool
 	};
 
@@ -184,6 +185,7 @@ namespace Engine
 		BlendMode blendMode = BlendMode::Blend;
 		CullMode cullMode = CullMode::Back;
 		DepthTest depthTest = DepthTest::LessOrEqual;
+		bool enableConservativeRasterization = false;
 	};
 
 	struct ComputePassConfig
@@ -290,5 +292,6 @@ namespace Engine
 		static BlendMode ParseBlendMode(Ref<Variable> var);
 		static CullMode ParseCullMode(Ref<Variable> var);
 		static DepthTest ParseDepthTest(Ref<Variable> var);
+		static bool ParseConservativeRasterization(Ref<Variable> var);
 	};
 }

@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Utils/Vector.h"
 #include <memory>
 #include <typeinfo>
 #include <bitset>
@@ -44,7 +43,7 @@ namespace Engine
 
 		ComponentType GetTypeID() { return m_TypeID; }
 		uint64 GetComponentSize() { return m_ComponentSize; }
-		Utils::Vector<uint32>& GetUsedSlots() { return m_UsedSlots; }
+		std::vector<uint32>& GetUsedSlots() { return m_UsedSlots; }
 
 		void EachEntity(EachEntityFunc func);
 
@@ -64,9 +63,9 @@ namespace Engine
 		const uint64 m_ComponentSize;
 		const bool m_SceneStatic;
 
-		Utils::Vector<uint32> m_EntityComponentMapping; // index is the entity value is the component location
-		Utils::Vector<uint32> m_FreeSlots;
-		Utils::Vector<uint32> m_UsedSlots;
+		std::vector<uint32> m_EntityComponentMapping; // index is the entity value is the component location
+		std::vector<uint32> m_FreeSlots;
+		std::vector<uint32> m_UsedSlots;
 
 		uint32 m_NumComponents = 0;
 		std::vector<ComponentPoolPage> m_Pages;

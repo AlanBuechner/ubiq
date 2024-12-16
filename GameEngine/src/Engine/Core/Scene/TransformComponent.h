@@ -10,8 +10,6 @@
 #include "Engine/Renderer/Camera.h"
 #include "SceneCamera.h"
 
-#include "Utils/Vector.h"
-
 class TransformSerializer;
 
 namespace Engine
@@ -49,7 +47,7 @@ namespace Engine
 
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
-		const Utils::Vector<Entity>& GetChildren() const { return Children; }
+		const std::vector<Entity>& GetChildren() const { return Children; }
 		void SetParentToRoot();
 
 		Entity GetOwner() { return Owner; }
@@ -64,11 +62,11 @@ namespace Engine
 
 	private:
 		PROPERTY(set=SetPosition) Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
-		PROPERTY(set=SetRotation) Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
+		PROPERTY(set=SetRotation, Degrees) Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
 		PROPERTY(set=SetScale) Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
 
-		Entity Parent;
-		Utils::Vector<Entity> Children;
+		Entity Parent = Entity::null;
+		std::vector<Entity> Children;
 
 		bool m_Dirty = true;
 		Math::Mat4 ChashedGloableTransform = Math::Mat4(1.0f);

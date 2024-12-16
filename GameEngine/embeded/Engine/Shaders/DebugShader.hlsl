@@ -34,7 +34,7 @@ passes = {
 
 struct VS_Input
 {
-	float3 position : POSITION;
+	float4 position : POSITION;
 	float4 color : COLOR;
 };
 
@@ -66,7 +66,7 @@ cbuffer Camera
 VS_Output main(VS_Input input)
 {
 	VS_Output output;
-	output.position = mul(ViewPorjection, float4(input.position, 1));
+	output.position = mul(ViewPorjection, input.position);
 	output.color = input.color;
 	return output;
 }

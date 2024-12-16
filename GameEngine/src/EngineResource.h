@@ -1,7 +1,7 @@
 // shaders
-#define BLITSHADER		"Engine/Blit.hlsl"
-#define DEBUGSHADER		"Engine/DebugShader.hlsl"
-#define TEXTURESHADER	"Engine/TextureShader.hlsl"
+#define BLITSHADER		"Engine/Shaders/Blit.hlsl"
+#define DEBUGSHADER		"Engine/Shaders/DebugShader.hlsl"
+#define TEXTURESHADER	"Engine/Shaders/TextureShader.hlsl"
 
 
 // textures

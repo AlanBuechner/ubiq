@@ -132,23 +132,23 @@ namespace Engine
 		const std::wstring typeStrings[] = { L"vs_6_5", L"ps_6_5", L"cs_6_5", L"lib_6_8"};
 		std::wstring profile = typeStrings[(int)log2((int)type)]; // take the log2 of the type enum to convert from bit mask to index
 
-		Utils::Vector<LPCWSTR> args;
-		args.Push(file.c_str());
+		std::vector<LPCWSTR> args;
+		args.push_back(file.c_str());
 		if (type != ShaderType::WorkGraph)
 		{
-			args.Push(L"-E");
-			args.Push(L"main");
+			args.push_back(L"-E");
+			args.push_back(L"main");
 		}
-		args.Push(L"-T"); 
-		args.Push(profile.c_str());
-		args.Push(DXC_ARG_ALL_RESOURCES_BOUND);
+		args.push_back(L"-T");
+		args.push_back(profile.c_str());
+		args.push_back(DXC_ARG_ALL_RESOURCES_BOUND);
 #ifdef DEBUG
-		args.Push(DXC_ARG_SKIP_OPTIMIZATIONS);
+		args.push_back(DXC_ARG_SKIP_OPTIMIZATIONS);
 #else
-		args.Push(DXC_ARG_OPTIMIZATION_LEVEL3);
+		args.push_back(DXC_ARG_OPTIMIZATION_LEVEL3);
 #endif // DEBUG
-		args.Push(DXC_ARG_DEBUG);
-		args.Push(L"-Qembed_debug"); // embed debug information
+		args.push_back(DXC_ARG_DEBUG);
+		args.push_back(L"-Qembed_debug"); // embed debug information
 
 		DxcBuffer buffer;
 		buffer.Encoding = DXC_CP_ACP;
@@ -156,7 +156,7 @@ namespace Engine
 		buffer.Size = code.size();
 
 		wrl::ComPtr<IDxcResult> result;
-		if (FAILED(m_Compiler->Compile(&buffer, args.Data(), args.Count(), m_IncludeHandler.Get(), IID_PPV_ARGS(result.GetAddressOf()))))
+		if (FAILED(m_Compiler->Compile(&buffer, args.data(), args.size(), m_IncludeHandler.Get(), IID_PPV_ARGS(result.GetAddressOf()))))
 		{
 			CORE_ERROR("Failed to compile shader");
 			return {};
@@ -367,6 +367,7 @@ namespace Engine
 				ssd.AddressW = GetWrapMode(WrapMode::Clamp);
 
 				ssd.Filter = GetFilter(attrib.Min, attrib.Mag);
+				ssd.MaxAnisotropy = 16;
 
 				ssd.MinLOD = 0;
 				ssd.MaxLOD = 10;
@@ -418,7 +419,7 @@ namespace Engine
 		if (data.count == 0)
 			data.count = -1;
 
-		if (bindDesc.BindCount > 1 || bindDesc.Type == D3D_SIT_TEXTURE || bindDesc.Type == D3D_SIT_UAV_RWTYPED || bindDesc.Type == D3D_SIT_STRUCTURED)
+		if (bindDesc.BindCount > 1 || bindDesc.Type == D3D_SIT_TEXTURE || bindDesc.Type == D3D_SIT_UAV_RWTYPED || bindDesc.Type == D3D_SIT_STRUCTURED || bindDesc.Type == D3D_SIT_UAV_RWSTRUCTURED)
 			data.type = PerameterType::DescriptorTable;
 		else
 		{
@@ -461,8 +462,11 @@ namespace Engine
 		switch (bindDesc.Type)
 		{
 		case D3D_SIT_CBUFFER:		data.descType = DescriptorType::CBV; break;
+
 		case D3D_SIT_STRUCTURED:
 		case D3D_SIT_TEXTURE:		data.descType = DescriptorType::SRV; break;
+
+		case D3D_SIT_UAV_RWSTRUCTURED:
 		case D3D_SIT_UAV_RWTYPED:	data.descType = DescriptorType::UAV; break;
 		case D3D_SIT_SAMPLER:		data.descType = DescriptorType::Sampler; break;
 		default:

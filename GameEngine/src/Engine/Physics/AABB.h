@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Math/Math.h"
-#include "Utils/Vector.h"
+
 
 #include "Plain.h"
 
@@ -24,6 +24,6 @@ namespace Engine
 
 		PlainVolume GetPlainVolume();
 
-		static AABB GetExtents(Utils::Vector<AABB> aabbs);
+		static AABB GetExtents(std::vector<AABB> aabbs);
 	};
 }

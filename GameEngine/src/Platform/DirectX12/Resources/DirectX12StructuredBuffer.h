@@ -10,7 +10,7 @@ namespace Engine
 	class DirectX12StructuredBufferResource : public StructuredBufferResource
 	{
 	public:
-		DirectX12StructuredBufferResource(uint32 stride, uint32 count);
+		DirectX12StructuredBufferResource(uint32 count, uint32 stride, ParentType parantType);
 		virtual ~DirectX12StructuredBufferResource() override;
 
 		ID3D12Resource* GetBuffer() { return m_Buffer; }

@@ -49,6 +49,7 @@ namespace Engine
 		virtual void SetShader(Ref<WorkGraphShaderPass> shader) override;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) override;
+		virtual void SetRWStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer) override;
 		virtual void SetRootConstant(uint32 index, uint32 data) override;
 		virtual void SetTexture(uint32 index, Ref<Texture2D> texture) override;
 		virtual void SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav) override;
@@ -62,6 +63,7 @@ namespace Engine
 		virtual void DisbatchGraph(void* data, uint32 stride, uint32 count) override;
 
 		virtual void AwaitUAV(GPUResource* uav) override;
+		virtual void AwaitUAVs(std::vector<GPUResource*> uavs) override;
 
 		virtual void Close() override;
 

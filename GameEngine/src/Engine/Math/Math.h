@@ -47,6 +47,8 @@ namespace Math
 	float Max(float x, float y);
 	float Mod(float x, float y);
 
+	float Lerp(float a, float b, float t);
+
 	// Random
 	float Perlin(float p);
 	float Perlin(const Vector2& p);

@@ -15,7 +15,7 @@ namespace Game
 
 	void Model::CollapseNode(Node& node, Math::Mat4 parentTransform)
 	{
-		for (uint32 i = 0; i < node.m_MeshBuilders.Count(); i++)
+		for (uint32 i = 0; i < node.m_MeshBuilders.size(); i++)
 		{
 			Engine::AABB aabb;
 			Engine::MeshBuilder builder(node.m_MeshBuilders[i]);
@@ -26,9 +26,9 @@ namespace Game
 			}
 
 			builder.Apply();
-			m_BakedMeshes.Push(builder.mesh);
-			m_Volumes.Push(aabb);
-			m_Names.Push(node.m_Names[i]);
+			m_BakedMeshes.push_back(builder.mesh);
+			m_Volumes.push_back(aabb);
+			m_Names.push_back(node.m_Names[i]);
 		}
 
 		for (Node& child : node.m_Children)
@@ -71,8 +71,8 @@ namespace Game
 			t.a4, t.b4, t.c4, t.d4
 		);
 
-		model.m_MeshBuilders.Resize(node->mNumMeshes);
-		model.m_Names.Resize(node->mNumMeshes);
+		model.m_MeshBuilders.resize(node->mNumMeshes);
+		model.m_Names.resize(node->mNumMeshes);
 		for (uint32 i = 0; i < node->mNumMeshes; i++)
 		{
 			model.m_Names[i] = scene->mMeshes[node->mMeshes[i]]->mName.C_Str();
@@ -102,7 +102,7 @@ namespace Game
 			meshBuilder.Apply();
 		}
 
-		model.m_Children.Resize(node->mNumChildren);
+		model.m_Children.resize(node->mNumChildren);
 		for (uint32 i = 0; i < node->mNumChildren; i++)
 		{
 			Model::Node& child = model.m_Children[i];

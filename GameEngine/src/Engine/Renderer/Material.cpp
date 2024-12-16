@@ -30,6 +30,33 @@ namespace Engine
 	}
 
 
+	MaterialParameter* MaterialData::GetParam(const std::string& name)
+	{
+		for (uint32 i = 0; i < m_Params.size(); i++)
+		{
+			if (m_Params[i].name == name)
+				return &m_Params[i];
+		}
+		return nullptr;
+	}
+
+	void Material::SetTexture(const std::string& name, Ref<Texture2D> texture)
+	{
+		if (texture == nullptr)
+			return;
+
+		MaterialParameter* param = m_Data->GetParam(name);
+		if (param->type == MaterialParameterType::TextureID)
+		{
+			void* location = m_Data->GetDatalocation(name);
+			m_ReferensedTextures[name] = texture;
+			uint32 descLoc = texture->GetSRVDescriptor()->GetIndex();
+			*(uint32*)location = descLoc; // set asset value
+		}
+
+
+	}
+
 	void Material::Apply()
 	{
 		m_Buffer->SetData(m_Data->GetData());
@@ -48,54 +75,47 @@ namespace Engine
 			AssetManager& assetManager = Application::Get().GetAssetManager();
 
 			CORE_ASSERT(f.contains("shader"), "Material does not have a shader");
-			mat->shader = assetManager.GetAsset<Shader>(f["shader"].get<fs::path>());
-			mat->m_Data = CreateRef<MaterialData>(mat->shader->GetParams());
+			mat->m_Shader = assetManager.GetAsset<Shader>(f["shader"].get<fs::path>());
+			mat->DefultInitalize();
 
-			for (auto& p : mat->shader->GetParams())
+			for (auto& p : mat->m_Shader->GetParams())
 			{
 				void* location = mat->m_Data->GetDatalocation(p.name);
 				if (f.contains(p.name))
 				{
 					if (p.type == MaterialParameterType::TextureID)
-					{
-						mat->m_ReferensedTextures.push_back(assetManager.GetAsset<Texture2D>(f[p.name])); // get asset
-						uint32 descLoc = mat->m_ReferensedTextures.back()->GetSRVDescriptor()->GetIndex();
-						*(uint32*)location = descLoc; // set asset value
-					}
+						mat->SetTexture(p.name, assetManager.GetAsset<Texture2D>(f[p.name]));
 					else if (p.type == MaterialParameterType::Float)
 						*(float*)location = f[p.name].get<float>();
+					else if (p.type == MaterialParameterType::Float4)
+					{
+						std::vector<float> data;
+						f[p.name].get_to(data);
+
+						uint32 i = 0;
+						for (; i < std::min(data.size(), (size_t)4); i++)
+							((float*)location)[i] = data[i];
+
+						// fill any missing data with 0
+						for (; i < 4; i++)
+							((float*)location)[i] = 0;
+					}
 					else if (p.type == MaterialParameterType::Bool)
 						*(BOOL*)location = f[p.name].get<bool>();
 				}
-				else
-				{
-					if (p.type == MaterialParameterType::TextureID)
-					{
-						if (p.defaultValue == "white")
-							*(uint32*)location = Renderer::GetWhiteTexture()->GetSRVDescriptor()->GetIndex();
-						else if (p.defaultValue == "black")
-							*(uint32*)location = Renderer::GetBlackTexture()->GetSRVDescriptor()->GetIndex();
-						else if (p.defaultValue == "normal")
-							*(uint32*)location = Renderer::GetNormalTexture()->GetSRVDescriptor()->GetIndex();
-						else
-							*(uint32*)location = Renderer::GetWhiteTexture()->GetSRVDescriptor()->GetIndex();
-					}
-					else if (p.type == MaterialParameterType::Float)
-					{
-						*(float*)location = std::stof(p.defaultValue);
-					}
-					else if (p.type == MaterialParameterType::Bool)
-					{
-						if (p.defaultValue == "true")
-							*(BOOL*)location = TRUE;
-						else
-							*(BOOL*)location = FALSE;
-					}
-				}
 			}
 		}
+		mat->Apply();
 
-		mat->m_Buffer = ConstantBuffer::Create(mat->m_Data->GetSize());
+		return mat;
+	}
+
+	Engine::Ref<Material> Material::Create(Ref<Shader> shader)
+	{
+		Ref<Material> mat = CreateRef<Material>();
+		mat->m_Shader = shader;
+
+		mat->DefultInitalize();
 		mat->Apply();
 
 		return mat;
@@ -104,6 +124,40 @@ namespace Engine
 	bool Material::ValidExtention(const fs::path& ext)
 	{
 		return (ext == ".mat");
+	}
+
+	void Material::DefultInitalize()
+	{
+		m_Data = CreateRef<MaterialData>(m_Shader->GetParams());
+		m_Buffer = ConstantBuffer::Create(m_Data->GetSize());
+		for (auto& p : m_Shader->GetParams())
+		{
+			void* location = m_Data->GetDatalocation(p.name);
+
+			if (p.type == MaterialParameterType::TextureID)
+			{
+				if (p.defaultValue == "white")
+					*(uint32*)location = Renderer::GetWhiteTexture()->GetSRVDescriptor()->GetIndex();
+				else if (p.defaultValue == "black")
+					*(uint32*)location = Renderer::GetBlackTexture()->GetSRVDescriptor()->GetIndex();
+				else if (p.defaultValue == "normal")
+					*(uint32*)location = Renderer::GetNormalTexture()->GetSRVDescriptor()->GetIndex();
+				else
+					*(uint32*)location = Renderer::GetWhiteTexture()->GetSRVDescriptor()->GetIndex();
+			}
+			else if (p.type == MaterialParameterType::Float)
+			{
+				*(float*)location = std::stof(p.defaultValue);
+			}
+			else if (p.type == MaterialParameterType::Bool)
+			{
+				if (p.defaultValue == "true")
+					*(BOOL*)location = TRUE;
+				else
+					*(BOOL*)location = FALSE;
+			}
+		}
+
 	}
 
 }

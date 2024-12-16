@@ -76,11 +76,11 @@ namespace Editor
 
 		ImGui::BeginChild("FolderView", { ImGui::GetContentRegionAvail().x, height });
 		fs::path dir = m_CurrentDirectory;
-		Utils::Vector<fs::path> directories;
+		std::vector<fs::path> directories;
 		while (dir.has_parent_path())
-			directories.Push(dir = dir.parent_path());
+			directories.push_back(dir = dir.parent_path());
 
-		for (int i = (int)directories.Count() - 1; i >= 0; i--)
+		for (int i = (int)directories.size() - 1; i >= 0; i--)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0,0 });
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 2,2 });

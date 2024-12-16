@@ -11,7 +11,7 @@ namespace Game
 	DirectionalLight::CascadedShadowMaps::CascadedShadowMaps(Engine::Ref<Engine::Camera> camera) :
 		m_Camera(camera)
 	{
-		Utils::Vector<CascadeData> cascadeData;
+		std::vector<CascadeData> cascadeData;
 
 		float nearPlan = 0.1f;
 		float size = m_BaseFactor;
@@ -29,7 +29,7 @@ namespace Game
 
 			//m_ShadowMapsTemp[i] = RWTexture2D::Create(width, height, 1, TextureFormat::RGBA16_UNORM);
 
-			cascadeData.Push(
+			cascadeData.push_back(
 				CascadeData{
 					m_Cameras[i]->GetCameraBuffer()->GetCBVDescriptor()->GetIndex(),
 					m_ShadowMaps[i]->GetAttachment(0)->GetSRVDescriptor()->GetIndex(),
@@ -42,7 +42,7 @@ namespace Game
 		}
 
 		m_CameraIndeces = Engine::StructuredBuffer::Create(sizeof(CascadeData), s_NumShadowMaps);
-		m_CameraIndeces->SetData(cascadeData.Data(), s_NumShadowMaps);
+		m_CameraIndeces->SetData(cascadeData.data(), s_NumShadowMaps);
 	}
 
 	void DirectionalLight::CascadedShadowMaps::UpdateMaps(Math::Vector3 dir)

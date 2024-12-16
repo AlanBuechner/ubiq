@@ -24,7 +24,7 @@ namespace Engine
 
 	UUID Entity::GetUUID() { return m_Scene->m_Registry.GetEntityData(m_EntityID).ID; }
 
-	std::string& Entity::GetName()
+	std::string& Entity::GetName() const
 	{
 		return m_Scene->m_Registry.GetEntityData(m_EntityID).name;
 	}
@@ -51,7 +51,7 @@ namespace Engine
 		GetTransform().RemoveChild(child);
 	}
 
-	const Utils::Vector<Entity>& Entity::GetChildren()
+	const std::vector<Entity>& Entity::GetChildren()
 	{
 		return GetTransform().GetChildren();
 	}
@@ -61,14 +61,25 @@ namespace Engine
 		GetTransform().SetParentToRoot();
 	}
 
-	Utils::Vector<Component*> Entity::GetComponents()
+	std::vector<Component*> Entity::GetComponents()
 	{
 		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
-		Utils::Vector<Component*> components(data.m_Components.size(), {});
-		for (uint32 i = 0; i < components.Count(); i++)
+		std::vector<Component*> components(data.m_Components.size(), {});
+		for (uint32 i = 0; i < components.size(); i++)
 			components[i] = (Component*)(data.m_Components[i].m_Pool->GetComponentRaw(data.m_Components[i].m_ComponentLoc));
 
 		return components;
+	}
+
+	Entity Entity::FindChiledWithName(const std::string& name)
+	{
+		TransformComponent& transform = GetTransform();
+		for (uint32 i = 0; i < transform.GetChildren().size(); i++)
+		{
+			if (transform.GetChildren()[i].GetName() == name)
+				return transform.GetChildren()[i];
+		}
+		return Entity::null;
 	}
 
 	void Entity::DirtyAABB()
@@ -89,12 +100,12 @@ namespace Engine
 		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
 		if (data.dirtyAABB)
 		{
-			Utils::Vector<AABB> aabbs;
+			std::vector<AABB> aabbs;
 			for (Component* component : GetComponents())
 			{
-				Utils::Vector<AABB> componentVolumes = component->GetVolumes();
+				std::vector<AABB> componentVolumes = component->GetVolumes();
 				for (AABB aabb : componentVolumes)
-					aabbs.Push(aabb);
+					aabbs.push_back(aabb);
 			}
 
 			data.aabb = AABB::GetExtents(aabbs);

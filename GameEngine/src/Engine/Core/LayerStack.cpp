@@ -15,25 +15,25 @@ namespace Engine {
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		m_Layers.Insert(m_LayerInsertIndex, layer);
+		m_Layers.insert(m_Layers.begin() + m_LayerInsertIndex, layer);
 		m_LayerInsertIndex++;
 		layer->OnAttach();
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay)
 	{
-		m_Layers.Push(overlay);
+		m_Layers.push_back(overlay);
 		overlay->OnAttach();
 	}
 
 	void LayerStack::PopLayer(Layer* layer)
 	{
-		for (Layer** it = m_Layers.begin(); it != m_Layers.end(); ++it)
+		for (auto it = m_Layers.begin(); it != m_Layers.end(); ++it)
 		{
 			if (layer == *it)
 			{
 				layer->OnDetach();
-				m_Layers.Remove(it - m_Layers.begin());
+				m_Layers.erase(it);
 				m_LayerInsertIndex--;
 				break;
 			}
@@ -42,12 +42,12 @@ namespace Engine {
 
 	void LayerStack::PopOverlay(Layer* overlay)
 	{
-		for (Layer** it = m_Layers.begin(); it != m_Layers.end(); ++it)
+		for (auto it = m_Layers.begin(); it != m_Layers.end(); ++it)
 		{
 			if (overlay == *it)
 			{
 				overlay->OnDetach();
-				m_Layers.Remove(it - m_Layers.begin());
+				m_Layers.erase(it);
 				break;
 			}
 		}
@@ -60,7 +60,7 @@ namespace Engine {
 			layer->OnDetach();
 			delete layer;
 		}
-		m_Layers.Clear();
+		m_Layers.clear();
 	}
 
 }

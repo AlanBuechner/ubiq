@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ShaderCompiler.h"
+#include "Engine/Core/Application.h"
 #include <fstream>
 
 namespace Engine
@@ -81,6 +82,7 @@ namespace Engine
 		case MaterialParameterType::TextureID:	return 4;
 		case MaterialParameterType::Bool:		return 4;
 		case MaterialParameterType::Float:		return 4;
+		case MaterialParameterType::Float4:		return 4*4;
 		default:								return 4;
 		}
 	}
@@ -145,6 +147,9 @@ namespace Engine
 
 		if(fs::exists(fs::path("Assets") / file))
 			return fs::path("Assets") / file;
+
+		fs::path p = Application::Get().GetAssetManager().GetEmbededFolder() / file;
+		if (fs::exists(p)) return p;
 
 		return fs::path("");
 	}
@@ -302,6 +307,7 @@ namespace Engine
 							else if (var->name == "cullMode")	rpass.cullMode = ParseCullMode(var);
 							else if (var->name == "depthTest")	rpass.depthTest = ParseDepthTest(var);
 							else if (var->name == "topology")	rpass.topology = ParseTopology(var);
+							else if (var->name == "conservativeRasterization")	rpass.enableConservativeRasterization = ParseConservativeRasterization(var);
 						}
 						config.graphicsPasses.push_back(rpass);
 					}
@@ -334,6 +340,7 @@ namespace Engine
 					MaterialParameterType type = MaterialParameterType::TextureID;
 					if (param->value->string == "textureID")	type = MaterialParameterType::TextureID;
 					else if (param->value->string == "float")	type = MaterialParameterType::Float;
+					else if (param->value->string == "float4")	type = MaterialParameterType::Float4;
 					else if (param->value->string == "bool")	type = MaterialParameterType::Bool;
 
 					std::string defaultValue = "";
@@ -363,6 +370,7 @@ namespace Engine
 			{
 			case MaterialParameterType::TextureID:	ss << "uint";	break;
 			case MaterialParameterType::Float:		ss << "float";	break;
+			case MaterialParameterType::Float4:		ss << "float4";	break;
 			case MaterialParameterType::Bool:		ss << "bool";	break;
 			}
 
@@ -484,6 +492,13 @@ namespace Engine
 		else if (var->value->string == "greaterOrEqual")	return DepthTest::GreaterOrEqual;
 		else if (var->value->string == "none")				return DepthTest::None;
 		return DepthTest::None;
+	}
+
+	bool ShaderCompiler::ParseConservativeRasterization(Ref<Variable> var)
+	{
+		if (var->value->string == "true")					return true;
+		else if (var->value->string == "false")				return false;
+		return false;
 	}
 
 }

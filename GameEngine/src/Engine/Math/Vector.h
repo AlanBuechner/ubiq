@@ -21,10 +21,14 @@ namespace Math
 	float Dot(const Vector3& v1, const Vector3& v2);
 	float Dot(const Vector4& v1, const Vector4& v2);
 
+	float Cross(const Vector2& v1, const Vector2& v2);
 	Vector3 Cross(const Vector3& v1, const Vector3& v2);
 
 	Vector2 Degrees(Vector2 rad);
 	Vector2 Radians(Vector2 deg);
+
+	Vector3 Degrees(Vector3 rad);
+	Vector3 Radians(Vector3 deg);
 
 	Vector2 Normalized(const Vector2& v);
 	Vector3 Normalized(const Vector3& v);

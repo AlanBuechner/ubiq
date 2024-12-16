@@ -88,6 +88,7 @@ namespace Engine
 		virtual void SetShader(Ref<WorkGraphShaderPass> shader) = 0;
 		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) = 0;
 		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) = 0;
+		virtual void SetRWStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer) = 0;
 		virtual void SetRootConstant(uint32 index, uint32 data) = 0;
 		template<typename T>
 		void SetRootConstant(uint32 index, T data) { SetRootConstant(index, *(uint32*)&data); }
@@ -103,10 +104,11 @@ namespace Engine
 		virtual void DisbatchGraph(Ref<StructuredBuffer> buffer) = 0;
 		virtual void DisbatchGraph(void* data, uint32 stride, uint32 count) = 0;
 		template<typename T>
-		void DisbatchGraph(const Utils::Vector<T>& data) { DisbatchGraph((void*)data.Data(), data.ElementSize(), data.Count()); }
+		void DisbatchGraph(const std::vector<T>& data) { DisbatchGraph((void*)data.Data(), data.ElementSize(), data.Count()); }
 
 		// mis
 		virtual void AwaitUAV(GPUResource* uav) = 0;
+		virtual void AwaitUAVs(std::vector<GPUResource*> uavs) = 0;
 
 		virtual void Close() = 0;
 

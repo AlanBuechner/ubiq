@@ -15,7 +15,6 @@ namespace Engine
 
 	void RenderGraphNode::Build()
 	{
-
 		if (!m_Built)
 		{
 			for (auto de : m_Dependincys)

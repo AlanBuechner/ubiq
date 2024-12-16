@@ -19,28 +19,37 @@ namespace Engine
 		return ChashedGloableTransform;
 	}
 
+	
 	void TransformComponent::AddChild(Entity child)
 	{
 		TransformComponent& tc = child.GetTransform();
-		if (tc.Parent != Owner)
-		{
-			if (tc.Parent)
-				tc.Parent.GetTransform().RemoveChild(child);
+		if (tc.Owner == Owner)
+			return;
 
-			tc.Parent = Owner;
-			Children.Push(child);
-			tc.Dirty();
+		Entity p = Parent;
+		while (p.GetScene() != nullptr)
+		{
+			if (p == tc.Owner)
+				return;
+			p = p.GetParent();
 		}
+
+		if (tc.Parent)
+			tc.Parent.GetTransform().RemoveChild(child);
+
+		tc.Parent = Owner;
+		Children.push_back(child);
+		tc.Dirty();
 	}
 
 	void TransformComponent::RemoveChild(Entity child)
 	{
-		for (uint32_t i = 0; i < Children.Count(); i++)
+		for (uint32_t i = 0; i < Children.size(); i++)
 		{
 			if (Children[i] == child)
 			{
-				std::swap(Children[i], Children.Back());
-				Children.Pop();
+				std::swap(Children[i], Children.back());
+				Children.pop_back();
 				return;
 			}
 		}
@@ -59,7 +68,7 @@ namespace Engine
 	{
 		m_Dirty = true;
 		Owner.DirtyVolume();
-		for (uint32 i = 0; i < Children.Count(); i++)
+		for (uint32 i = 0; i < Children.size(); i++)
 			Children[i].GetTransform().Dirty();
 	}
 
@@ -72,13 +81,13 @@ namespace Engine
 				TransformComponent& parentTransform = Parent.GetTransform();
 				if (parentTransform.m_Dirty)
 					parentTransform.UpdateHierarchyGlobalTransform();
-				ChashedGloableTransform = GetTransform() * parentTransform.GetTransform();
+				ChashedGloableTransform = parentTransform.GetGlobalTransform() * GetTransform();
 			}
 			else
 				ChashedGloableTransform = GetTransform();
 
 			// iterate over all components on entity
-			Utils::Vector<Component*> components = Owner.GetComponents();
+			std::vector<Component*> components = Owner.GetComponents();
 			for (Component* comp : components)
 				comp->OnTransformChange(ChashedGloableTransform);
 

@@ -79,7 +79,7 @@ namespace Engine {
 
 	void Application::OnEvent(Event* e)
 	{
-		m_InputBuffer.Push(e);
+		m_InputBuffer.push_back(e);
 	}
 
 	void Application::Run()
@@ -163,7 +163,7 @@ namespace Engine {
 
 	void Application::SendInputBuffer()
 	{
-		if (m_InputBuffer.Empty()) return;
+		if (m_InputBuffer.empty()) return;
 
 		for (Event* i : m_InputBuffer)
 		{
@@ -177,7 +177,7 @@ namespace Engine {
 			dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMouseMoved, Input::s_Instance));
 		}
 
-		for (Event** i = m_InputBuffer.begin(); i != m_InputBuffer.end(); ++i)
+		for (Event** i = &*m_InputBuffer.begin(); i != &*m_InputBuffer.end(); ++i)
 		{
 			for (Layer** it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 			{
@@ -188,7 +188,7 @@ namespace Engine {
 			delete *i;
 		}
 
-		m_InputBuffer.Clear();
+		m_InputBuffer.clear();
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent* e)

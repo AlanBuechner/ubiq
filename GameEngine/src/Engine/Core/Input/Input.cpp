@@ -14,7 +14,7 @@ namespace Engine
 		if (m_KeyStates[keycode] != Down)
 		{
 			SetKeyState(keycode, Pressed);
-			m_ToUpdate.Push(keycode);
+			m_ToUpdate.push_back(keycode);
 		}
 		return false; 
 	}
@@ -30,7 +30,7 @@ namespace Engine
 	{
 		int button = e->GetMouseButton();
 		SetMouseButtonState(button, Pressed);
-		m_ToUpdateMouse.Push(button);
+		m_ToUpdateMouse.push_back(button);
 		return false;
 	}
 
@@ -38,7 +38,7 @@ namespace Engine
 	{
 		int button = e->GetMouseButton();
 		SetMouseButtonState(button, Released);
-		m_ToUpdateMouse.Push(button);
+		m_ToUpdateMouse.push_back(button);
 		return false;
 	}
 
@@ -64,7 +64,7 @@ namespace Engine
 				SetKeyState(i, KeyState::Up);
 			}
 		}
-		m_ToUpdate.Clear();
+		m_ToUpdate.clear();
 
 		// mouse
 		for (int i : m_ToUpdateMouse)
@@ -79,7 +79,7 @@ namespace Engine
 				SetMouseButtonState(i, KeyState::Up);
 			}
 		}
-		m_ToUpdateMouse.Clear();
+		m_ToUpdateMouse.clear();
 		m_PreviousMousePosition = m_MousePosition;
 	}
 

@@ -3,7 +3,7 @@
 namespace Engine
 {
 
-	Utils::Vector<AABB> Component::GetVolumes()
+	std::vector<AABB> Component::GetVolumes()
 	{
 		if (m_DirtyVolumes)
 		{

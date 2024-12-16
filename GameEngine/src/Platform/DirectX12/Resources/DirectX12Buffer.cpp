@@ -4,64 +4,15 @@
 #include "Platform/DirectX12/DirectX12Context.h"
 #include "Platform/DirectX12/DirectX12CommandList.h"
 #include "DirectX12ResourceManager.h"
+#include "DirectX12StructuredBuffer.h"
 
 namespace Engine
 {
 	// VertexBuffer -------------------------------------------------------------------------------------
 
-	DirectX12VertexBufferResource::DirectX12VertexBufferResource(uint32 count, uint32 stride)
+	void DirectX12VertexBufferView::Bind(StructuredBufferResource* resource)
 	{
-		m_DefultState = ResourceState::ShaderResource;
-		m_Count = count;
-		m_Stride = stride;
-
-		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-
-		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(count * m_Stride);
-
-		context->GetDevice()->CreateCommittedResource(
-			&props, // a default heap
-			D3D12_HEAP_FLAG_NONE, // no flags
-			&resDesc, // resource description for a buffer
-			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
-			nullptr, // optimized clear value must be null for this type of resource
-			IID_PPV_ARGS(&m_Buffer)
-		);
-	}
-
-	DirectX12VertexBufferResource::~DirectX12VertexBufferResource()
-	{
-		m_Buffer->Release();
-		m_Buffer = nullptr;
-	}
-
-	void DirectX12VertexBufferResource::SetData(const void* data)
-	{
-		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-
-		context->GetDX12ResourceManager()->UploadBuffer(this, data, m_Count * m_Stride, m_DefultState);
-	}
-
-	uint32 DirectX12VertexBufferResource::GetState(ResourceState state)
-	{
-		switch (state)
-		{
-		case ResourceState::ShaderResource:
-			return D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-		case ResourceState::CopySource:
-			return D3D12_RESOURCE_STATE_COPY_SOURCE;
-		case ResourceState::CopyDestination:
-			return D3D12_RESOURCE_STATE_COPY_DEST;
-		default: return D3D12_RESOURCE_STATE_COMMON;
-		}
-	}
-
-
-
-	void DirectX12VertexBufferView::Bind(VertexBufferResource* resource)
-	{
-		DirectX12VertexBufferResource* dxResource = (DirectX12VertexBufferResource*)resource;
+		DirectX12StructuredBufferResource* dxResource = (DirectX12StructuredBufferResource*)resource;
 		m_View.BufferLocation = dxResource->GetBuffer()->GetGPUVirtualAddress();
 		m_View.StrideInBytes = dxResource->GetStride();
 		m_View.SizeInBytes = dxResource->GetCount() * dxResource->GetStride();
@@ -76,58 +27,9 @@ namespace Engine
 
 	// IndexBuffer ---------------------------------------------------------------------------------------
 
-	DirectX12IndexBufferResource::DirectX12IndexBufferResource(uint32 count)
+	void DirectX12IndexBufferView::Bind(StructuredBufferResource* resource)
 	{
-		m_DefultState = ResourceState::ShaderResource;
-		m_Count = count;
-
-		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-
-		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(count * sizeof(uint32));
-
-		context->GetDevice()->CreateCommittedResource(
-			&props, // a default heap
-			D3D12_HEAP_FLAG_NONE, // no flags
-			&resDesc, // resource description for a buffer
-			D3D12_RESOURCE_STATE_INDEX_BUFFER,
-			nullptr, // optimized clear value must be null for this type of resource
-			IID_PPV_ARGS(&m_Buffer)
-		);
-	}
-
-	DirectX12IndexBufferResource::~DirectX12IndexBufferResource()
-	{
-		m_Buffer->Release();
-		m_Buffer = nullptr;
-	}
-
-	void DirectX12IndexBufferResource::SetData(const void* data)
-	{
-		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-
-		context->GetDX12ResourceManager()->UploadBuffer(this, data, m_Count * sizeof(uint32), m_DefultState);
-	}
-
-	uint32 DirectX12IndexBufferResource::GetState(ResourceState state)
-	{
-		switch (state)
-		{
-		case ResourceState::ShaderResource:
-			return D3D12_RESOURCE_STATE_INDEX_BUFFER;
-		case ResourceState::CopySource:
-			return D3D12_RESOURCE_STATE_COPY_SOURCE;
-		case ResourceState::CopyDestination:
-			return D3D12_RESOURCE_STATE_COPY_DEST;
-		default: return D3D12_RESOURCE_STATE_COMMON;
-		}
-	}
-
-
-
-	void DirectX12IndexBufferView::Bind(IndexBufferResource* resource)
-	{
-		DirectX12IndexBufferResource* dxResource = (DirectX12IndexBufferResource*)resource;
+		DirectX12StructuredBufferResource* dxResource = (DirectX12StructuredBufferResource*)resource;
 		m_View.BufferLocation = dxResource->GetBuffer()->GetGPUVirtualAddress();
 		m_View.SizeInBytes = dxResource->GetCount() * sizeof(uint32);
 		m_View.Format = DXGI_FORMAT_R32_UINT;

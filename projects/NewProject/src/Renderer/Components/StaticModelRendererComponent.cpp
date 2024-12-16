@@ -10,7 +10,7 @@ namespace Game
 	// mesh component
 	void StaticModelRendererComponent::OnComponentRemoved()
 	{
-		for (uint32 i = 0; i < m_CollapsedModelTree.Count(); i++)
+		for (uint32 i = 0; i < m_CollapsedModelTree.size(); i++)
 		{
 			MeshEntry& entry = m_CollapsedModelTree[i];
 			if (entry.m_Object) entry.m_Object->DestroySelf();
@@ -19,7 +19,7 @@ namespace Game
 
 	void StaticModelRendererComponent::OnTransformChange(const Math::Mat4& transform)
 	{
-		for (uint32 i = 0; i < m_CollapsedModelTree.Count(); i++)
+		for (uint32 i = 0; i < m_CollapsedModelTree.size(); i++)
 		{
 			MeshEntry& entry = m_CollapsedModelTree[i];
 			if(entry.m_Object)
@@ -32,18 +32,18 @@ namespace Game
 		m_Model = model;
 
 		// remove old model
-		for (uint32 i = 0; i < m_CollapsedModelTree.Count(); i++)
+		for (uint32 i = 0; i < m_CollapsedModelTree.size(); i++)
 		{
 			MeshEntry& entry = m_CollapsedModelTree[i];
 			if (entry.m_Object) entry.m_Object->DestroySelf();
 		}
-		m_CollapsedModelTree.Clear();
+		m_CollapsedModelTree.clear();
 
 		if (model)
 		{
-			for (uint32 i = 0; i < model->GetBakedMeshes().Count(); i++)
+			for (uint32 i = 0; i < model->GetBakedMeshes().size(); i++)
 			{
-				m_CollapsedModelTree.Push({
+				m_CollapsedModelTree.push_back({
 					model->GetNames()[i],
 					model->GetBakedMeshes()[i],
 				});
@@ -53,7 +53,7 @@ namespace Game
 
 	void StaticModelRendererComponent::Invalidate()
 	{
-		for (uint32 i = 0; i < m_CollapsedModelTree.Count(); i++)
+		for (uint32 i = 0; i < m_CollapsedModelTree.size(); i++)
 		{
 			MeshEntry& entry = m_CollapsedModelTree[i];
 			Engine::Ref<Engine::Material> mat = Engine::Renderer::GetDefultMaterial();
@@ -69,7 +69,7 @@ namespace Game
 		DirtyVolume();
 	}
 
-	Utils::Vector<Engine::AABB> StaticModelRendererComponent::GenVolumes()
+	std::vector<Engine::AABB> StaticModelRendererComponent::GenVolumes()
 	{
 		return m_Model->GetVolumes();
 	}
@@ -97,7 +97,7 @@ namespace Game
 			component.Invalidate();
 		}
 
-		for (uint32_t i = 0; i < component.GetMeshes().Count(); i++)
+		for (uint32_t i = 0; i < component.GetMeshes().size(); i++)
 		{
 			auto& entry = component.GetMeshes()[i];
 			if (Editor::PropertysPanel::DrawMaterialControl(entry.m_Name, entry.m_Material))
@@ -122,7 +122,7 @@ namespace Game
 			if (meshRenderer.GetModel())
 				out << YAML::Key << "Model" << YAML::Value << meshRenderer.GetModel()->GetAssetID();
 
-			if (!meshRenderer.GetMeshes().Empty())
+			if (!meshRenderer.GetMeshes().empty())
 			{
 				out << YAML::Key << "Materials";
 				out << YAML::BeginMap;

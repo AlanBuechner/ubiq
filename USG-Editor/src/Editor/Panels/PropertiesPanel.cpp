@@ -300,13 +300,21 @@ namespace Editor
 		}
 		if (mat)
 		{
-			fs::path path = Engine::Application::Get().GetAssetManager().GetRelitiveAssetPath(mat->GetAssetID());
-			if (ImGui::Button(path.string().c_str()))
-				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
+			Engine::UUID assetID = mat->GetAssetID();
+			if (assetID == 0)
+			{
+				ImGui::Button("Material not associated with file");
+			}
+			else
+			{
+				fs::path path = Engine::Application::Get().GetAssetManager().GetRelitiveAssetPath(mat->GetAssetID());
+				if (ImGui::Button(path.string().c_str()))
+					EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
+			}
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Clear")) {
-			mat = Engine::Ref<Engine::Material>();
+			mat = nullptr;
 			changed = true;
 		}
 
@@ -353,44 +361,56 @@ namespace Editor
 
 	ADD_EXPOSE_PROP_FUNC(float) {
 		float* data = (float*)voidData;
-		if (prop && prop->HasAttribute("set"))
+		float vec = *data;
+
+		if (prop && prop->HasFlag("Degrees")) vec = Math::Degrees(vec);
+		bool changed = PropertysPanel::DrawFloatControl(prop->GetName(), vec);
+		if (prop && prop->HasFlag("Degrees")) vec = Math::Radians(vec);
+
+		if (changed)
 		{
-			float val = *data;
-			bool changed = PropertysPanel::DrawFloatControl(prop->GetName(), val);
-			if (changed)
-				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &val });
-			return changed;
+			if (prop && prop->HasAttribute("set"))
+				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &vec });
+			else
+				*data = vec;
 		}
-		else
-			return PropertysPanel::DrawFloatControl(prop->GetName(), *data);
+		return changed;
 	});
 
 	ADD_EXPOSE_PROP_FUNC(Math::Vector2) {
 		Math::Vector2* data = (Math::Vector2*)voidData;
-		if (prop && prop->HasAttribute("set"))
+		Math::Vector2 vec = *data;
+
+		if (prop && prop->HasFlag("Degrees")) vec = Math::Degrees(vec);
+		bool changed = PropertysPanel::DrawVec2Control(prop->GetName(), vec);
+		if (prop && prop->HasFlag("Degrees")) vec = Math::Radians(vec);
+
+		if (changed)
 		{
-			Math::Vector2 vec = *data;
-			bool changed = PropertysPanel::DrawVec2Control(prop->GetName(), vec);
-			if (changed)
+			if (prop && prop->HasAttribute("set"))
 				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &vec });
-			return changed;
+			else
+				*data = vec;
 		}
-		else
-			return PropertysPanel::DrawVec2Control(prop->GetName(), *data);
+		return changed;
 	});
 
 	ADD_EXPOSE_PROP_FUNC(Math::Vector3) {
 		Math::Vector3* data = (Math::Vector3*)voidData; 
-		if (prop && prop->HasAttribute("set"))
+		Math::Vector3 vec = *data;
+
+		if (prop && prop->HasFlag("Degrees")) vec = Math::Degrees(vec);
+		bool changed = PropertysPanel::DrawVec3Control(prop->GetName(), vec);
+		if (prop && prop->HasFlag("Degrees")) vec = Math::Radians(vec);
+
+		if (changed)
 		{
-			Math::Vector3 vec = *data;
-			bool changed = PropertysPanel::DrawVec3Control(prop->GetName(), vec);
-			if (changed)
+			if (prop && prop->HasAttribute("set"))
 				prop->GetClass().GetFunction(prop->GetAttribute("set").GetValue()).Invoke(object, { &vec });
-			return changed;
+			else
+				*data = vec;
 		}
-		else
-			return PropertysPanel::DrawVec3Control(prop->GetName(), *data);
+		return changed;
 	});
 
 	ADD_EXPOSE_PROP_FUNC(Engine::Ref<Engine::Texture2D>) {

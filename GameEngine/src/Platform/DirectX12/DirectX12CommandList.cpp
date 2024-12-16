@@ -19,6 +19,8 @@
 #include "Engine/Util/Performance.h"
 #include "Engine/Renderer/Mesh.h"
 
+#include "Utils/Common.h"
+
 namespace Engine
 {
 	static inline D3D12_RESOURCE_BARRIER TransitionResource(
@@ -354,7 +356,6 @@ namespace Engine
 
 	void DirectX12CommandList::SetShader(Ref<GraphicsShaderPass> shader)
 	{
-
 		if (!m_RenderTarget)
 		{
 			CORE_ERROR("Can not set shader without rendertarget");
@@ -428,6 +429,20 @@ namespace Engine
 
 		DirectX12StructuredBufferSRVDescriptorHandle* srv = (DirectX12StructuredBufferSRVDescriptorHandle*)buffer->GetSRVDescriptor();
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srv->GetHandle().gpu;
+		if (m_BoundShader->IsComputeShader())
+			m_CommandList->SetComputeRootDescriptorTable(index, gpuHandle);
+		else
+			m_CommandList->SetGraphicsRootDescriptorTable(index, gpuHandle);
+	}
+
+	void DirectX12CommandList::SetRWStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer)
+	{
+		if (index == UINT32_MAX || buffer == nullptr)
+			return;
+
+		DirectX12StructuredBufferUAVDescriptorHandle* uav = (DirectX12StructuredBufferUAVDescriptorHandle*)buffer->GetUAVDescriptor();
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = uav->GetHandle().gpu;
+
 		if (m_BoundShader->IsComputeShader())
 			m_CommandList->SetComputeRootDescriptorTable(index, gpuHandle);
 		else
@@ -552,6 +567,18 @@ namespace Engine
 	{
 		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)uav->GetGPUResourcePointer());
 		m_CommandList->ResourceBarrier(1, &barrier);
+	}
+
+	void DirectX12CommandList::AwaitUAVs(std::vector<GPUResource*> uavs)
+	{
+		if (uavs.size() == 0)
+			return;
+
+		std::vector<CD3DX12_RESOURCE_BARRIER> barriers;
+		barriers.resize(uavs.size());
+		for (uint32 i = 0; i < uavs.size(); i++)
+			barriers[i] = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)uavs[i]->GetGPUResourcePointer());
+		m_CommandList->ResourceBarrier(barriers.size(), barriers.data());
 	}
 
 	void DirectX12CommandList::Close()

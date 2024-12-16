@@ -1,7 +1,8 @@
 #pragma once
+#include "Engine/Core/Core.h"
 #include "Engine/Math/Math.h"
 #include "Ray.h"
-#include "Utils/Vector.h"
+
 
 namespace Engine
 {
@@ -19,7 +20,7 @@ namespace Engine
 	class PlainVolume
 	{
 	public:
-		Utils::Vector<Plain> m_Plains;
+		std::vector<Plain> m_Plains;
 
 		bool TestRay(const Ray& ray, RayHit& outHit);
 

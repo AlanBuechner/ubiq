@@ -80,7 +80,7 @@ namespace Game
 		// find the correct shader
 		for (auto& shaderDawSection : m_ShaderDrawSection)
 		{
-			if (material->shader == shaderDawSection.m_Shader)
+			if (material->GetShader() == shaderDawSection.m_Shader)
 			{
 				// find the correct mesh for the shader
 				for (auto& renderObject : shaderDawSection)
@@ -98,7 +98,7 @@ namespace Game
 		// add new shader
 		m_ShaderDrawSection.push_back({});
 		ShaderDrawSection& sec = m_ShaderDrawSection.back();
-		sec.m_Shader = material->shader;
+		sec.m_Shader = material->GetShader();
 		return sec.AddObject(mesh, material, transform);
 
 	}

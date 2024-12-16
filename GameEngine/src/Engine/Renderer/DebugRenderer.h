@@ -12,7 +12,7 @@ namespace Engine
 {
 	struct DebugVertex
 	{
-		Math::Vector3 Position;
+		Math::Vector4 Position;
 		Math::Vector4 Color;
 	};
 
@@ -48,6 +48,9 @@ namespace Engine
 
 		static void DrawBox(const Math::Mat4& transform, Math::Vector4 color, bool depthTest = true);
 		static void DrawBox(Math::Vector3 center, Math::Vector3 halfExtent, Math::Vector4 color, const Math::Mat4& transform = Math::Mat4(1.0f), bool depthTest = true);
+
+
+		static void DrawFrustom(const Math::Mat4& vp, Math::Vector4 color, bool depthTest = true);
 
 	private:
 		static void DrawMesh(const DebugMesh& mesh, const Math::Mat4& transform, class Pass& pass);

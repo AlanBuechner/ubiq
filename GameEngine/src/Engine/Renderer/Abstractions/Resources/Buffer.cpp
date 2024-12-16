@@ -9,34 +9,8 @@ namespace Engine
 
 	// VertexBuffer -------------------------------------------------------------------------------------
 
-	VertexBufferResource::~VertexBufferResource() {}
 
-	VertexBufferResource* VertexBufferResource::Create(uint32 count, uint32 stride)
-	{
-		switch (Renderer::GetAPI())
-		{
-		case RendererAPI::DirectX12:
-			return new DirectX12VertexBufferResource(count, stride);
-		default: return nullptr;
-		}
-	}
-
-	bool VertexBufferResource::SupportState(ResourceState state)
-	{
-		switch (state)
-		{
-		case ResourceState::ShaderResource:
-		case ResourceState::CopySource:
-		case ResourceState::CopyDestination:
-			return true;
-		default: return false;
-		}
-	}
-
-
-
-
-	VertexBufferView* VertexBufferView::Create(VertexBufferResource* resource)
+	VertexBufferView* VertexBufferView::Create(StructuredBufferResource* resource)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -52,70 +26,56 @@ namespace Engine
 
 
 
-	VertexBuffer::VertexBuffer(uint32 count, uint32 stride)
+	VertexBuffer::VertexBuffer(uint32 count, uint32 stride, bool RWCapable) :
+		StructuredBuffer(count, stride, StructuredBufferResource::ParentType::VertexBuffer)
 	{
-		m_Resource = VertexBufferResource::Create(count, stride);
 		m_View = VertexBufferView::Create(m_Resource);
+		if(RWCapable)
+			m_RWStructuredBuffer = CreateRef<RWStructuredBuffer>(m_Resource, m_SRVDescriptor, this);
 	}
 
 	VertexBuffer::~VertexBuffer()
 	{
-		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
 		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
+		m_View = nullptr;
+
+		m_RWStructuredBuffer.reset();
 	}
 
 	void VertexBuffer::Resize(uint32 count)
 	{
-		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
 		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
 
-		m_Resource = VertexBufferResource::Create(count, m_Resource->GetStride());
+		StructuredBuffer::Resize(count);
+
 		m_View = VertexBufferView::Create(m_Resource);
+
+		if (m_RWStructuredBuffer)
+		{
+			m_RWStructuredBuffer->m_Resource = m_Resource;
+			m_RWStructuredBuffer->m_SRVDescriptor = m_SRVDescriptor;
+			m_RWStructuredBuffer->GenerateUAVDescriptor();
+		}
 	}
 
-	Ref<VertexBuffer> VertexBuffer::Create(uint32 count, uint32 stride)
+	Ref<VertexBuffer> VertexBuffer::Create(uint32 count, uint32 stride, bool RWCapable)
 	{
-		return CreateRef<VertexBuffer>(count, stride);
+		return CreateRef<VertexBuffer>(count, stride, RWCapable);
 	}
 
-	Ref<VertexBuffer> VertexBuffer::Create(const void* vertices, uint32 count, uint32 stride)
+	Ref<VertexBuffer> VertexBuffer::Create(const void* vertices, uint32 count, uint32 stride, bool RWCapable)
 	{
-		Ref<VertexBuffer> buffer = Create(count, stride);
-		buffer->SetData(vertices);
+		Ref<VertexBuffer> buffer = Create(count, stride, RWCapable);
+		buffer->SetData(vertices, count);
 		return buffer;
 	}
 
 
 	// IndexBuffer ---------------------------------------------------------------------------------------
 
-	IndexBufferResource::~IndexBufferResource() {}
-
-	IndexBufferResource* IndexBufferResource::Create(uint32 count)
-	{
-		switch (Renderer::GetAPI())
-		{
-		case RendererAPI::DirectX12:
-			return new DirectX12IndexBufferResource(count);
-		default: return nullptr;
-		}
-	}
-
-	bool IndexBufferResource::SupportState(ResourceState state)
-	{
-		switch (state)
-		{
-		case ResourceState::ShaderResource:
-		case ResourceState::CopySource:
-		case ResourceState::CopyDestination:
-			return true;
-		default: return false;
-		}
-	}
 
 
-
-
-	IndexBufferView* IndexBufferView::Create(IndexBufferResource* resource)
+	IndexBufferView* IndexBufferView::Create(StructuredBufferResource* resource)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -131,36 +91,47 @@ namespace Engine
 
 
 
-	IndexBuffer::IndexBuffer(uint32 count)
+	IndexBuffer::IndexBuffer(uint32 count, bool RWCapable) :
+		StructuredBuffer(count, sizeof(uint32), StructuredBufferResource::ParentType::IndexBuffer)
 	{
-		m_Resource = IndexBufferResource::Create(count);
 		m_View = IndexBufferView::Create(m_Resource);
+
+		if (RWCapable)
+			m_RWStructuredBuffer = CreateRef<RWStructuredBuffer>(m_Resource, m_SRVDescriptor, this);
 	}
 
 	IndexBuffer::~IndexBuffer()
 	{
-		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
 		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
+		m_View = nullptr;
+
+		m_RWStructuredBuffer.reset();
 	}
 
 	void IndexBuffer::Resize(uint32 count)
 	{
-		Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_Resource);
 		Renderer::GetContext()->GetResourceManager()->ScheduleHandleDeletion(m_View);
 
-		m_Resource = IndexBufferResource::Create(count);
+		StructuredBuffer::Resize(count);
 		m_View = IndexBufferView::Create(m_Resource);
+
+		if (m_RWStructuredBuffer)
+		{
+			m_RWStructuredBuffer->m_Resource = m_Resource;
+			m_RWStructuredBuffer->m_SRVDescriptor = m_SRVDescriptor;
+			m_RWStructuredBuffer->GenerateUAVDescriptor();
+		}
 	}
 
-	Ref<IndexBuffer> IndexBuffer::Create(uint32 count)
+	Ref<IndexBuffer> IndexBuffer::Create(uint32 count, bool RWCapable)
 	{
-		return CreateRef<IndexBuffer>(count);
+		return CreateRef<IndexBuffer>(count, RWCapable);
 	}
 
-	Ref<IndexBuffer> IndexBuffer::Create(const void* vertices, uint32 count)
+	Ref<IndexBuffer> IndexBuffer::Create(const void* vertices, uint32 count, bool RWCapable)
 	{
-		Ref<IndexBuffer> buffer = Create(count);
-		buffer->SetData(vertices);
+		Ref<IndexBuffer> buffer = Create(count, RWCapable);
+		buffer->SetData(vertices, count);
 		return buffer;
 	}
 }

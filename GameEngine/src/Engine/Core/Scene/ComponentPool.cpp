@@ -43,13 +43,13 @@ namespace Engine
 	uint32 ComponentPool::Allocate(uint64 entity)
 	{
 		// allocate more room for the entity's list
-		if (m_SceneStatic && m_EntityComponentMapping.Count() >= 1)
+		if (m_SceneStatic && m_EntityComponentMapping.size() >= 1)
 			return UINT32_MAX;
 
-		if (m_EntityComponentMapping.Count() <= entity)
-			m_EntityComponentMapping.Resize(entity + 1);
+		if (m_EntityComponentMapping.size() <= entity)
+			m_EntityComponentMapping.resize(entity + 1);
 
-		if (m_FreeSlots.Empty())
+		if (m_FreeSlots.empty())
 		{
 			// resize
 			m_Pages.push_back(ComponentPoolPage(m_ComponentSize));
@@ -59,14 +59,14 @@ namespace Engine
 
 			for (int64 i = newCount - 1; i >= oldCount; i--)
 			{
-				m_FreeSlots.Push(i);
+				m_FreeSlots.push_back(i);
 				GetPageForIndex(i).SetEntry(GetIndexInPage(i), false);
 			}
 		}
 
-		uint32 componentIndex = m_FreeSlots.Back();
-		m_FreeSlots.Pop();
-		m_UsedSlots.Push(componentIndex);
+		uint32 componentIndex = m_FreeSlots.back();
+		m_FreeSlots.pop_back();
+		m_UsedSlots.push_back(componentIndex);
 		GetPageForIndex(componentIndex).SetEntry(GetIndexInPage(componentIndex), true);
 
 		m_EntityComponentMapping[entity] = componentIndex;
@@ -76,18 +76,18 @@ namespace Engine
 	void ComponentPool::Free(uint64 entity)
 	{
 		uint32 componentIndex = m_EntityComponentMapping[entity];
-		m_FreeSlots.Push(componentIndex);
+		m_FreeSlots.push_back(componentIndex);
 
 		m_ReflectionClass.DestroyInstance(GetComponentRaw(componentIndex), false);
 		GetPageForIndex(componentIndex).SetEntry(GetIndexInPage(componentIndex), false);
 
 		// remove entity from used list
-		for (uint32 i = 0; i < m_UsedSlots.Count(); i++)
+		for (uint32 i = 0; i < m_UsedSlots.size(); i++)
 		{
 			if (m_UsedSlots[i] == componentIndex)
 			{
-				m_UsedSlots[i] = m_UsedSlots.Back();
-				m_UsedSlots.Pop();
+				m_UsedSlots[i] = m_UsedSlots.back();
+				m_UsedSlots.pop_back();
 			}
 		}
 	}

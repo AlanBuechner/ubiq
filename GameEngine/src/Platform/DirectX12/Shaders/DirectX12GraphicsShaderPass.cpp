@@ -166,7 +166,7 @@ namespace Engine
 		desc.RasterizerState.MultisampleEnable = FALSE;
 		desc.RasterizerState.AntialiasedLineEnable = FALSE;
 		desc.RasterizerState.ForcedSampleCount = 0;
-		desc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+		desc.RasterizerState.ConservativeRaster = m_PassConfig.enableConservativeRasterization ? D3D12_CONSERVATIVE_RASTERIZATION_MODE_ON : D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
 		desc.BlendState.AlphaToCoverageEnable = FALSE;
 		desc.BlendState.IndependentBlendEnable = FALSE;

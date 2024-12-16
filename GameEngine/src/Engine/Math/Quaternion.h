@@ -13,6 +13,7 @@ namespace Math
 	float Dot(const Quaternion& q1, const Quaternion& q2);
 	Vector3 EulerAngles(const Quaternion& q);
 	Quaternion Mix(const Quaternion& q1, const Quaternion& q2, float a);
+	Quaternion Abs(const Quaternion& q);
 	Quaternion Normalize(const Quaternion& q);
 	Quaternion Rotate(const Quaternion& q, float angle, const Vector3& axis);
 	float Pitch(const Quaternion& q);

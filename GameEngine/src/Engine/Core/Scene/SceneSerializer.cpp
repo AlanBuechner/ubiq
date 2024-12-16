@@ -81,79 +81,97 @@ namespace Engine
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
 
-		YAML::Node data = YAML::Load(strStream.str());
-		if (!data["Scene"])
-			return false;
+		YAML::Node data;
+		{
+			CREATE_PROFILE_SCOPEI("Load YAML file");
+			data = YAML::Load(strStream.str());
+			if (!data["Scene"])
+				return false;
+		}
 
 		std::string sceneName = data["Scene"].as<std::string>();
 		auto entities = data["Entities"];
 		if (entities)
 		{
-			// load each entity and its components
-			for (auto entity : entities)
 			{
-				uint64 uuid = entity["Entity"].as<uint64>();
-
-				std::string name;
-				name = entity["Name"].as<std::string>();
-
-				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
-
-				auto components = entity["Components"];
-				for (auto component : components)
+				CREATE_PROFILE_SCOPEI("create entities and components");
+				// load each entity and its components
+				for (auto entity : entities)
 				{
-					std::string componentName = component["Component"].as<std::string>();
-					const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
-					if (componentClass == nullptr)
-					{
-						CORE_ERROR("Could not find reflection data for class {0}", componentName);
-						break;
-					}
+					uint64 uuid = entity["Entity"].as<uint64>();
 
-					if (componentClass)
-						deserializedEntity.GetScene()->GetRegistry().AddComponent(deserializedEntity, m_Scene.get(), *componentClass);
+					std::string name;
+					name = entity["Name"].as<std::string>();
+
+					CREATE_PROFILE_SCOPEI("Creating Entity " + name);
+
+					Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
+
+					auto components = entity["Components"];
+					for (auto component : components)
+					{
+						std::string componentName = component["Component"].as<std::string>();
+						CREATE_PROFILE_SCOPEI("Creating Component " + componentName);
+						const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
+						if (componentClass == nullptr)
+						{
+							CORE_ERROR("Could not find reflection data for class {0}", componentName);
+							break;
+						}
+
+						if (componentClass)
+							deserializedEntity.GetScene()->GetRegistry().AddComponent(deserializedEntity, m_Scene.get(), *componentClass);
+					}
 				}
 			}
 
-			// load entity components
-			for (auto entity : entities)
 			{
-				Entity deserializedEntity = m_Scene->GetEntityWithUUID(entity["Entity"].as<uint64>());
-				auto components = entity["Components"];
-				for (auto component : components)
+				CREATE_PROFILE_SCOPEI("Load Components");
+				// load entity components
+				for (auto entity : entities)
 				{
-					std::string componentName = component["Component"].as<std::string>();
-					const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
-					if (componentClass == nullptr)
+					Entity deserializedEntity = m_Scene->GetEntityWithUUID(entity["Entity"].as<uint64>());
+					CREATE_PROFILE_SCOPEI("Deserializing Entity " + entity["Name"].as<std::string>());
+					auto components = entity["Components"];
+					for (auto component : components)
 					{
-						CORE_ERROR("Could not find reflection data for class {0}", componentName);
-						break;
-					}
+						std::string componentName = component["Component"].as<std::string>();
+						CREATE_PROFILE_SCOPEI("Deserializing Component " + componentName);
+						const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
+						if (componentClass == nullptr)
+						{
+							CORE_ERROR("Could not find reflection data for class {0}", componentName);
+							break;
+						}
 
-					auto func = s_ComponentSerializers.find(componentClass->GetTypeID());
-					if (func != s_ComponentSerializers.end())
-						func->second->Deserialize(deserializedEntity, component);
+						auto func = s_ComponentSerializers.find(componentClass->GetTypeID());
+						if (func != s_ComponentSerializers.end())
+							func->second->Deserialize(deserializedEntity, component);
+					}
 				}
 			}
 
-			// patch components
-			for (auto entity : entities)
 			{
-				Entity deserializedEntity = m_Scene->GetEntityWithUUID(entity["Entity"].as<uint64>());
-				auto components = entity["Components"];
-				for (auto component : components)
+				CREATE_PROFILE_SCOPEI("Patch Components");
+				// patch components
+				for (auto entity : entities)
 				{
-					std::string componentName = component["Component"].as<std::string>();
-					const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
-					if (componentClass == nullptr)
+					Entity deserializedEntity = m_Scene->GetEntityWithUUID(entity["Entity"].as<uint64>());
+					auto components = entity["Components"];
+					for (auto component : components)
 					{
-						CORE_ERROR("Could not find reflection data for class {0}", componentName);
-						break;
-					}
+						std::string componentName = component["Component"].as<std::string>();
+						const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
+						if (componentClass == nullptr)
+						{
+							CORE_ERROR("Could not find reflection data for class {0}", componentName);
+							break;
+						}
 
-					auto func = s_ComponentSerializers.find(componentClass->GetTypeID());
-					if (func != s_ComponentSerializers.end())
-						func->second->Patch(deserializedEntity);
+						auto func = s_ComponentSerializers.find(componentClass->GetTypeID());
+						if (func != s_ComponentSerializers.end())
+							func->second->Patch(deserializedEntity);
+					}
 				}
 			}
 		}
@@ -183,7 +201,7 @@ class TransformSerializer : public Engine::ComponentSerializer
 		if (transform.GetParent())
 			out << YAML::Key << "Parent" << YAML::Value << (uint64)transform.GetParent().GetUUID();
 
-		if (transform.GetChildren().Count() > 0)
+		if (transform.GetChildren().size() > 0)
 		{
 			YAML::Node children;
 			for (auto c : transform.GetChildren())
@@ -195,9 +213,6 @@ class TransformSerializer : public Engine::ComponentSerializer
 	virtual void Deserialize(Engine::Entity entity, YAML::Node data) override
 	{
 		auto& tc = *entity.GetComponent<Engine::TransformComponent>();
-
-		tc.Owner = entity;
-		tc.Parent = Engine::Entity::null;
 
 		tc.SetPosition(data["Position"].as<Math::Vector3>());
 		tc.SetRotation(data["Rotation"].as<Math::Vector3>());

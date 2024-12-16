@@ -88,7 +88,7 @@ namespace Engine
 		for (auto& child : entity.GetTransform().GetChildren())
 			DestroyEntity(child);
 
-		Utils::Vector<Component*> components = entity.GetComponents();
+		std::vector<Component*> components = entity.GetComponents();
 		for (Component* comp : components)
 			comp->OnComponentRemoved();
 
@@ -169,7 +169,7 @@ namespace Engine
 		Window& window = Application::Get().GetWindow();
 		scene->OnViewportResize(window.GetWidth(), window.GetHeight());
 		scene->GetSceneScript()->OnSceneLoad();
-		scene->GetSceneScript()->GenerateUpdateEvents();
+		scene->RegenerateUpdateEvents();
 		return scene;
 	}
 
@@ -181,7 +181,7 @@ namespace Engine
 		Window& window = Application::Get().GetWindow();
 		scene->OnViewportResize(window.GetWidth(), window.GetHeight());
 		scene->GetSceneScript()->OnSceneLoad();
-		scene->GetSceneScript()->GenerateUpdateEvents();
+		scene->RegenerateUpdateEvents();
 		return scene;
 	}
 

@@ -59,6 +59,7 @@ namespace Engine
 
 			m_CameraData.ProjectionMatrix = Math::Ortho(orthLeft, orthRight, orthBottom, orthTop, m_OrthgraphicNear, m_OrthgraphicFar);
 		}
+		m_CameraData.InvProjection = Math::Inverse(m_CameraData.ProjectionMatrix);
 	}
 
 }

@@ -7,6 +7,7 @@ namespace Engine
 	{
 		Unknown,
 		Common,
+		PiplineInput,
 		ShaderResource,
 		UnorderedResource,
 		RenderTarget,

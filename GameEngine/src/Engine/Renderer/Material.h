@@ -19,6 +19,7 @@ namespace Engine
 		MaterialData(std::vector<MaterialParameter>& params);
 
 		std::vector<MaterialParameter>& GetParams() { return m_Params; }
+		MaterialParameter* GetParam(const std::string& name);
 		void* GetDatalocation(const std::string& name) { return m_DataLocations[name]; }
 		uint32 GetSize() { return m_Size; }
 		const void* GetData() { return m_Data; }
@@ -35,18 +36,26 @@ namespace Engine
 	class Material : public Asset
 	{
 	public:
-		Ref<Shader> shader;
 
 		inline void* GetData(const std::string& name) { return m_Data->GetDatalocation(name); }
 
-		void Apply();
 		Ref<ConstantBuffer> GetBuffer() { return m_Buffer; }
+		Ref<Shader> GetShader() { return m_Shader; }
+
+		void SetTexture(const std::string& name, Ref<Texture2D> texture);
+
+		void Apply();
 
 		static Ref<Material> Create(const fs::path& path = "");
+		static Ref<Material> Create(Ref<Shader> shader);
 		static bool ValidExtention(const fs::path& ext);
 
 	private:
-		std::vector<Ref<Texture2D>> m_ReferensedTextures;
+		void DefultInitalize();
+
+	private:
+		Ref<Shader> m_Shader;
+		std::unordered_map<std::string, Ref<Texture2D>> m_ReferensedTextures;
 
 		Ref<MaterialData> m_Data;
 

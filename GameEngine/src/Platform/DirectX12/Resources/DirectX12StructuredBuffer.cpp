@@ -6,16 +6,21 @@
 namespace Engine
 {
 
-	DirectX12StructuredBufferResource::DirectX12StructuredBufferResource(uint32 stride, uint32 count)
+	DirectX12StructuredBufferResource::DirectX12StructuredBufferResource(uint32 count, uint32 stride, ParentType parentType)
 	{
-		m_DefultState = ResourceState::ShaderResource;
-		m_Stride = stride;
+		if (parentType == StructuredBufferResource::ParentType::StructuredBuffer)
+			m_DefultState = ResourceState::ShaderResource;
+		else
+			m_DefultState = ResourceState::PiplineInput;
 		m_Count = count;
+		m_Stride = stride;
+		m_ParentType = parentType;
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(m_Stride * count);
+		resDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
 		context->GetDevice()->CreateCommittedResource(
 			&props,
@@ -53,6 +58,17 @@ namespace Engine
 			return D3D12_RESOURCE_STATE_COPY_SOURCE;
 		case ResourceState::CopyDestination:
 			return D3D12_RESOURCE_STATE_COPY_DEST;
+		case ResourceState::PiplineInput:
+		{
+			switch (m_ParentType)
+			{
+			case StructuredBufferResource::ParentType::VertexBuffer:
+				return D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+			case StructuredBufferResource::ParentType::IndexBuffer:
+				return D3D12_RESOURCE_STATE_INDEX_BUFFER;
+			default: return D3D12_RESOURCE_STATE_COMMON;
+			}
+		}
 		default: return D3D12_RESOURCE_STATE_COMMON;
 		}
 	}
@@ -86,7 +102,18 @@ namespace Engine
 
 	void DirectX12StructuredBufferUAVDescriptorHandle::Bind(StructuredBufferResource* resource)
 	{
-		// TODO
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		DirectX12StructuredBufferResource* dxResource = (DirectX12StructuredBufferResource*)resource;
+
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+		uavDesc.Buffer.FirstElement = 0;
+		uavDesc.Buffer.NumElements = dxResource->GetCount();
+		uavDesc.Buffer.StructureByteStride = dxResource->GetStride();
+		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+
+		context->GetDevice()->CreateUnorderedAccessView(dxResource->GetBuffer(), nullptr, &uavDesc, m_UAVHandle.cpu);
 	}
 
 }

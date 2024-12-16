@@ -9,7 +9,6 @@
 #include "Engine/imGui/ImGuiLayer.h"
 
 #include "ProjectManager/Project.h"
-#include "Utils/Vector.h"
 
 namespace Engine
 {
@@ -62,7 +61,7 @@ namespace Engine
 		bool OnWindowResize(WindowResizeEvent* e);
 
 		Ref<Window> m_Window;
-		Utils::Vector<Event*> m_InputBuffer;
+		std::vector<Event*> m_InputBuffer;
 		bool m_Running = true;
 		bool m_Minimized = false;
 

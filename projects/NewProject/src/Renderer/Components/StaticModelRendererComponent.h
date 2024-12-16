@@ -38,16 +38,16 @@ namespace Game
 		void SetModel(Engine::Ref<Model> model);
 		Engine::Ref<Model> GetModel() { return m_Model; }
 
-		Utils::Vector<MeshEntry>& GetMeshes() { return m_CollapsedModelTree; }
+		std::vector<MeshEntry>& GetMeshes() { return m_CollapsedModelTree; }
 
 		void Invalidate();
 
 	protected:
-		virtual Utils::Vector<Engine::AABB> GenVolumes() override;
+		virtual std::vector<Engine::AABB> GenVolumes() override;
 
 	private:
 		PROPERTY(HideInInspector) Engine::Ref<Model> m_Model;
-		Utils::Vector<MeshEntry> m_CollapsedModelTree;
+		std::vector<MeshEntry> m_CollapsedModelTree;
 		Engine::Ref<Engine::SceneRenderer> m_SceneRenderer;
 	};
 }

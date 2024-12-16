@@ -37,6 +37,7 @@ namespace Editor
 		void DefaultScene();
 		void LoadScene(const fs::path& file);
 
+		SceneHierarchyPanel& GetSceneHierarchyPanel() { return m_HierarchyPanel; }
 		ContentBrowserPanel& GetContantBrowser() { return m_ContentPanel; }
 
 		bool IsPlaying() { return m_Playing; }

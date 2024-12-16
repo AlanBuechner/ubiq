@@ -85,6 +85,7 @@ namespace Engine
 
 	void DebugRenderer::EndScene()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		for (uint32 i = 0; i < s_DebugData.NumPasses; i++) 
 		{
 			Pass* pass = s_DebugData.Passes[i];
@@ -153,14 +154,14 @@ namespace Engine
 	{
 		Engine::DebugMesh mesh;
 		mesh.m_Vertices = {
-			{{-1,  1, -1}, color}, // 0
-			{{ 1,  1, -1}, color}, // 1
-			{{ 1, -1, -1}, color}, // 2
-			{{-1, -1, -1}, color}, // 3
-			{{-1,  1,  1}, color}, // 4
-			{{ 1,  1,  1}, color}, // 5
-			{{ 1, -1,  1}, color}, // 6
-			{{-1, -1,  1}, color}, // 7
+			{{-1,  1, -1, 1}, color}, // 0
+			{{ 1,  1, -1, 1}, color}, // 1
+			{{ 1, -1, -1, 1}, color}, // 2
+			{{-1, -1, -1, 1}, color}, // 3
+			{{-1,  1,  1, 1}, color}, // 4
+			{{ 1,  1,  1, 1}, color}, // 5
+			{{ 1, -1,  1, 1}, color}, // 6
+			{{-1, -1,  1, 1}, color}, // 7
 		};
 
 		mesh.m_Indices = {
@@ -187,14 +188,14 @@ namespace Engine
 	{
 		DebugMesh mesh;
 		mesh.m_Vertices = {
-			{{-1,  1, -1}, color}, // 0
-			{{ 1,  1, -1}, color}, // 1
-			{{ 1, -1, -1}, color}, // 2
-			{{-1, -1, -1}, color}, // 3
-			{{-1,  1,  1}, color}, // 4
-			{{ 1,  1,  1}, color}, // 5
-			{{ 1, -1,  1}, color}, // 6
-			{{-1, -1,  1}, color}, // 7
+			{{-1,  1, -1, 1}, color}, // 0
+			{{ 1,  1, -1, 1}, color}, // 1
+			{{ 1, -1, -1, 1}, color}, // 2
+			{{-1, -1, -1, 1}, color}, // 3
+			{{-1,  1,  1, 1}, color}, // 4
+			{{ 1,  1,  1, 1}, color}, // 5
+			{{ 1, -1,  1, 1}, color}, // 6
+			{{-1, -1,  1, 1}, color}, // 7
 		};
 
 		mesh.m_Indices = {
@@ -216,13 +217,37 @@ namespace Engine
 	}
 
 
+	void DebugRenderer::DrawFrustom(const Math::Mat4& vp, Math::Vector4 color, bool depthTest /*= true*/)
+	{
+		Engine::DebugMesh mesh;
+		mesh.m_Vertices = {
+			{{-1,  1,  0, 1}, color}, // 0
+			{{ 1,  1,  0, 1}, color}, // 1
+			{{ 1, -1,  0, 1}, color}, // 2
+			{{-1, -1,  0, 1}, color}, // 3
+			{{-1,  1,  1, 1}, color}, // 4
+			{{ 1,  1,  1, 1}, color}, // 5
+			{{ 1, -1,  1, 1}, color}, // 6
+			{{-1, -1,  1, 1}, color}, // 7
+		};
+
+		mesh.m_Indices = {
+			0,4, 1,5, 2,6, 3,7,
+			0,1, 1,2, 2,3, 3,0,
+			4,5, 5,6, 6,7, 7,4
+		};
+
+		DrawLineMesh(mesh, Math::Inverse(vp), depthTest);
+	}
+
 	void DebugRenderer::DrawMesh(const DebugMesh& mesh, const Math::Mat4& transform, Pass& pass)
 	{
 		uint32 baseVertexIndex = (uint32)pass.Vertices.size();
 		for (uint32 i = 0; i < mesh.m_Vertices.size(); i++)
 		{
 			DebugVertex vert = mesh.m_Vertices[i];
-			vert.Position = transform * Math::Vector4(vert.Position, 1.0f);
+			vert.Position = transform * vert.Position;
+			vert.Position = vert.Position / vert.Position.w;
 			pass.Vertices.push_back(vert);
 		}
 

@@ -136,6 +136,11 @@ namespace Math
 		return glm::mod(x, y);
 	}
 
+	float Lerp(float a, float b, float t)
+	{
+		return glm::mix(a, b, t);
+	}
+
 	// Random
 	float Perlin(float p)
 	{
