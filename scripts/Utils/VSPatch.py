@@ -41,4 +41,32 @@ def PatchVSXProj(script):
 				options = ET.SubElement(child, f"{xmlns}AdditionalOptions")
 			options.text = "/std:c++17"
 
-	tree.write(file);
+	tree.write(file)
+
+def GenVSXprojUser(script):
+	proj = script["module"].GetProject()
+	projName = os.path.basename(proj.projectDirectory)
+	file = proj.projectDirectory + "/" + projName + ".vcxproj.user"
+
+	print(f"generating {projName} VS project user file")
+
+	with open(file, "w") as f:
+
+		f.write(f"""<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommand>{proj.projectDirectory}\\bin\\$(Configuration)-windows-x86_64\\USG-Editor\\USG-Editor.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
+    <LocalDebuggerCommand>{proj.projectDirectory}\\bin\\$(Configuration)-windows-x86_64\\USG-Editor\\USG-Editor.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommand>{proj.projectDirectory}\\bin\\$(Configuration)-windows-x86_64\\USG-Editor\\USG-Editor.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+</Project>
+		""")
+
+

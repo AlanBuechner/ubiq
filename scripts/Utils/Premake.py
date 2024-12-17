@@ -127,8 +127,11 @@ def GenerateProjects():
 	for script in Config.buildScripts.values():
 		GenerateProject(script)
 
-	GenerateProject(Config.buildScripts[Config.gameProject], code)
+	projScript = Config.buildScripts[Config.gameProject]
+	GenerateProject(projScript, code)
 	subprocess.run(["vendor\premake\premake5.exe", "vs2022"], cwd=Config.gameProject)
 
 	for script in Config.buildScripts.values():
 		PatchVSXProj(script)
+
+	GenVSXprojUser(projScript)

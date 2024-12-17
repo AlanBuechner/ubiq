@@ -31,17 +31,6 @@ Run `Setup.bat` to download all dependances.
 
 Goto `projects/NewProject` and run `GenerateProjects.bat` to generate visual studio project files.
 
-
-<ins>**4. Doing what premake can not:**</ins>
-
-Unfortunently premake does not generate NMake project files for visual studio properly. As a result you will need to manualy finish what premake started.
-
-In the properties for `NewProject` in the `Debugging` tab paset `{your project location}\bin\Release-windows-x86_64\USG-Editor\USG-Editor.exe` for the release configuration and do the same for debug and dist but replace Release with Debug and Dist in the file path
-
-Any time you run `GenerateProjects.bat` for you will need to redo this step. 
-
-Engine project files are shared between game projects so running `GenerateProjects.bat` or making any manual edits the the vistual studio project files will be reflected across all game projects
-
 ## Aditional Notes
 
 When you go to build the game do not press `Ctl+B` the custom build script will automaticly handle building all the dependances so this will just cause each project to be built multiple times. Insted right click on the project and click build.
