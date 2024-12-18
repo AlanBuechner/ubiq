@@ -18,8 +18,8 @@ namespace Engine
 
 	struct DebugMesh
 	{
-		std::vector<DebugVertex> m_Vertices;
-		std::vector<uint32> m_Indices;
+		Utils::Vector<DebugVertex> m_Vertices;
+		Utils::Vector<uint32> m_Indices;
 	};
 
 	class DebugRenderer

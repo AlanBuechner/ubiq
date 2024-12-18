@@ -38,24 +38,24 @@ namespace Engine
 	bool PlainVolume::TestRay(const Ray& ray, RayHit& outHit)
 	{
 		uint32 numFaceingPlains = 0;
-		std::vector<RayHit> hits(m_Plains.size());
+		Utils::Vector<RayHit> hits(m_Plains.Count());
 		for (Plain& plain : m_Plains)
 		{
 			RayHit hit;
 			if (plain.TestRay(ray, hit))
-				hits.push_back(hit);
+				hits.Push(hit);
 
 			if (Math::Dot(plain.m_Normal, ray.m_Origin - plain.m_Center) > 0) numFaceingPlains++;
 		}
 
-		if (hits.empty()) return false;
+		if (hits.Empty()) return false;
 
-		std::vector<RayHit> sortedHits;
-		while (!hits.empty())
+		Utils::Vector<RayHit> sortedHits;
+		while (!hits.Empty())
 		{
 			uint32 closestIndex = 0;
 			float closestDistance = FLT_MAX;
-			for (uint32 i = 0; i < hits.size(); i++)
+			for (uint32 i = 0; i < hits.Count(	); i++)
 			{
 				if (hits[i].m_Distance < closestDistance)
 				{
@@ -64,8 +64,8 @@ namespace Engine
 				}
 			}
 
-			sortedHits.push_back(hits[closestIndex]);
-			hits.erase(hits.begin() + closestIndex);
+			sortedHits.Push(hits[closestIndex]);
+			hits.Remove(closestIndex);
 		}
 
 

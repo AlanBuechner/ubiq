@@ -69,9 +69,9 @@ namespace Engine
 		Entity GetParent();
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
-		const std::vector<Entity>& GetChildren();
+		const Utils::Vector<Entity>& GetChildren();
 		void SetParentToRoot();
-		std::vector<Component*> GetComponents();
+		Utils::Vector<Component*> GetComponents();
 
 		Entity FindChiledWithName(const std::string& name);
 

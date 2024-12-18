@@ -24,15 +24,15 @@ namespace Engine
 		TMeshBuilder() = default;
 		TMeshBuilder(const TMeshBuilder<V>& other);
 
-		std::vector<V> vertices;
-		std::vector<uint32> indices;
+		Utils::Vector<V> vertices;
+		Utils::Vector<uint32> indices;
 
 		Ref<Mesh> mesh = Mesh::Create(sizeof(V));
 
 		void Apply()
 		{
-			mesh->SetVertices(vertices.data(), (uint32)vertices.size());
-			mesh->SetIndices(indices.data(), (uint32)indices.size());
+			mesh->SetVertices(vertices.Data(), (uint32)vertices.Count());
+			mesh->SetIndices(indices.Data(), (uint32)indices.Count());
 		}
 	};
 

@@ -48,7 +48,7 @@ namespace Engine
 		void SignalRecording() { m_RecordFlag.Signal(); }
 		virtual void InternalClose() = 0;
 
-		virtual void Transition(std::vector<ResourceTransitionObject> transitions) = 0;
+		virtual void Transition(Utils::Vector<ResourceTransitionObject> transitions) = 0;
 
 	public:
 
@@ -58,7 +58,7 @@ namespace Engine
 		void Present() { Present(nullptr); }
 		virtual void Present(Ref<FrameBuffer> fb) = 0;
 
-		virtual void ValidateStates(std::vector<ResourceStateObject> resources) = 0;
+		virtual void ValidateStates(Utils::Vector<ResourceStateObject> resources) = 0;
 		void ValidateState(ResourceStateObject resource) { ValidateStates({ resource }); }
 		void ValidateState(GPUResource* resource, ResourceState state) { ValidateStates({ { resource, state } }); }
 
@@ -104,15 +104,15 @@ namespace Engine
 		virtual void DisbatchGraph(Ref<StructuredBuffer> buffer) = 0;
 		virtual void DisbatchGraph(void* data, uint32 stride, uint32 count) = 0;
 		template<typename T>
-		void DisbatchGraph(const std::vector<T>& data) { DisbatchGraph((void*)data.Data(), data.ElementSize(), data.Count()); }
+		void DisbatchGraph(const Utils::Vector<T>& data) { DisbatchGraph((void*)data.Data(), data.ElementSize(), data.Count()); }
 
 		// mis
 		virtual void AwaitUAV(GPUResource* uav) = 0;
-		virtual void AwaitUAVs(std::vector<GPUResource*> uavs) = 0;
+		virtual void AwaitUAVs(Utils::Vector<GPUResource*> uavs) = 0;
 
 		virtual void Close() = 0;
 
-		virtual std::vector<ResourceStateObject>& GetPendingTransitions() = 0;
+		virtual Utils::Vector<ResourceStateObject>& GetPendingTransitions() = 0;
 		virtual std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() = 0;
 
 		static Ref<CommandList> Create(CommandListType type = CommandListType::Direct);

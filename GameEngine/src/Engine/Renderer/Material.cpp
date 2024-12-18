@@ -11,7 +11,7 @@
 namespace Engine
 {
 
-	MaterialData::MaterialData(std::vector<MaterialParameter>& params) :
+	MaterialData::MaterialData(Utils::Vector<MaterialParameter>& params) :
 		m_Params(params)
 	{
 		// calculate size of buffer
@@ -32,7 +32,7 @@ namespace Engine
 
 	MaterialParameter* MaterialData::GetParam(const std::string& name)
 	{
-		for (uint32 i = 0; i < m_Params.size(); i++)
+		for (uint32 i = 0; i < m_Params.Count(); i++)
 		{
 			if (m_Params[i].name == name)
 				return &m_Params[i];

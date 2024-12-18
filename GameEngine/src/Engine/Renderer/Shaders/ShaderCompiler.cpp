@@ -8,12 +8,12 @@ namespace Engine
 #pragma region Utilitis
 
 
-	std::vector<std::string> Tokenize(const std::string& line)
+	Utils::Vector<std::string> Tokenize(const std::string& line)
 	{
 		const char delimiters[] = { ' ', '	', '\r', '\n' };
 		const char reservedTokens[] = { "={};\"()," };
 
-		std::vector<std::string> tokens;
+		Utils::Vector<std::string> tokens;
 
 		bool lastCharReserved = false;
 		std::string token;
@@ -57,7 +57,7 @@ namespace Engine
 			{
 				if (!token.empty())
 				{
-					tokens.push_back(token);
+					tokens.Push(token);
 					token.clear();
 				}
 				if (!delimiter)
@@ -69,7 +69,7 @@ namespace Engine
 		}
 
 		if (!token.empty())
-			tokens.push_back(token); // add the last token
+			tokens.Push(token); // add the last token
 
 		return tokens;
 	}
@@ -164,9 +164,9 @@ namespace Engine
 		std::string line;
 		while (getline(src, line))
 		{
-			std::vector<std::string> tokens = Tokenize(line);
+			Utils::Vector<std::string> tokens = Tokenize(line);
 
-			if (!tokens.empty() && tokens[0] == "#section")
+			if (!tokens.Empty() && tokens[0] == "#section")
 				currSS = &ss[tokens[1]];
 			else
 				*currSS << line << '\n';
@@ -207,13 +207,13 @@ namespace Engine
 			if (line.rfind("//", line.find_first_not_of(delims)) == 0)
 				continue;
 
-			std::vector<std::string> tokens = Tokenize(line);
-			if (!tokens.empty())
+			Utils::Vector<std::string> tokens = Tokenize(line);
+			if (!tokens.Empty())
 			{
 
 				if (tokens[0] == "#include")
 				{
-					CORE_ASSERT(tokens.size() == 4 && tokens[1] == "\"" && tokens[3] == "\"", "failed to include header on line \"{0}\"", line);
+					CORE_ASSERT(tokens.Count() == 4 && tokens[1] == "\"" && tokens[3] == "\"", "failed to include header on line \"{0}\"", line);
 					fs::path headerPath = FindFilePath(tokens[2], fileLocation);
 
 					// load header
@@ -228,7 +228,7 @@ namespace Engine
 					// 0			 1	  2 3			 4 5 6 7 8 9   10 11  12 13
 					// StaticSampler name = StaticSampler( U , V , Min ,  Mag )  ;
 
-					CORE_ASSERT(tokens.size() == 14, "error on line \"{0}\"", line);
+					CORE_ASSERT(tokens.Count() == 14, "error on line \"{0}\"", line);
 
 					std::string& name = tokens[1];
 					CORE_ASSERT(tokens[2] == "=", "expected \"=\"");
@@ -268,14 +268,14 @@ namespace Engine
 		ShaderConfig config{};
 		std::istringstream iss(code);
 
-		std::vector<std::string> tokens = Tokenize(code);
+		Utils::Vector<std::string> tokens = Tokenize(code);
 		std::queue<std::string> tokenQueue;
-		for (uint32 i = 0; i < tokens.size(); i++)
+		for (uint32 i = 0; i < tokens.Count(); i++)
 			tokenQueue.push(tokens[i]);
 		
-		std::vector<Ref<Variable>> vars;
+		Utils::Vector<Ref<Variable>> vars;
 		while (!tokenQueue.empty())
-			vars.push_back(Variable::Build(tokenQueue));
+			vars.Push(Variable::Build(tokenQueue));
 		Topology baseTopo = Topology::Triangle;
 
 		for (Ref<Variable> var : vars)
@@ -309,7 +309,7 @@ namespace Engine
 							else if (var->name == "topology")	rpass.topology = ParseTopology(var);
 							else if (var->name == "conservativeRasterization")	rpass.enableConservativeRasterization = ParseConservativeRasterization(var);
 						}
-						config.graphicsPasses.push_back(rpass);
+						config.graphicsPasses.Push(rpass);
 					}
 					if (isCompute)
 					{
@@ -319,7 +319,7 @@ namespace Engine
 						{
 							if (var->name == "CS")	rpass.cs = var->value->string;
 						}
-						config.computePasses.push_back(rpass);
+						config.computePasses.Push(rpass);
 					}
 					if (isWorkGraph)
 					{
@@ -329,7 +329,7 @@ namespace Engine
 						{
 							if (var->name == "WG")	rpass.wg = var->value->string;
 						}
-						config.workGraphPasses.push_back(rpass);
+						config.workGraphPasses.Push(rpass);
 					}
 				}
 			}
@@ -344,10 +344,10 @@ namespace Engine
 					else if (param->value->string == "bool")	type = MaterialParameterType::Bool;
 
 					std::string defaultValue = "";
-					if (param->value->paramters.size() > 0)
+					if (param->value->paramters.Count() > 0)
 						defaultValue = param->value->paramters[0];
 
-					config.params.push_back({ param->name, type, defaultValue }); 
+					config.params.Push({ param->name, type, defaultValue }); 
 				}
 			}
 		}
@@ -355,9 +355,9 @@ namespace Engine
 		return config;
 	}
 
-	std::string ShaderCompiler::GenerateMaterialStruct(std::vector<MaterialParameter>& params)
+	std::string ShaderCompiler::GenerateMaterialStruct(Utils::Vector<MaterialParameter>& params)
 	{
-		if (params.empty())
+		if (params.Empty())
 			return "";
 
 		std::stringstream ss;
@@ -423,7 +423,7 @@ namespace Engine
 			tokenQueue.pop(); // remove the "("
 			while (tokenQueue.front() != ")")
 			{
-				val->paramters.push_back(tokenQueue.front());
+				val->paramters.Push(tokenQueue.front());
 				tokenQueue.pop(); // remove the parameter
 				if (tokenQueue.front() == ",")
 					tokenQueue.pop(); // remove the ","
@@ -451,7 +451,7 @@ namespace Engine
 
 		while (tokenQueue.front() != "}")
 		{
-			object->values.push_back(Variable::Build(tokenQueue));
+			object->values.Push(Variable::Build(tokenQueue));
 		}
 
 		tokenQueue.pop(); // remove '}'

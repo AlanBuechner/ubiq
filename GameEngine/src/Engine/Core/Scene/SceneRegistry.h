@@ -31,7 +31,7 @@ namespace Engine
 			ComponentPool* m_Pool;
 			uint32 m_ComponentLoc;
 		};
-		std::vector<ComponentRef> m_Components;
+		Utils::Vector<ComponentRef> m_Components;
 
 		void RemoveComponentReferance(ComponentPool* pool);
 	};
@@ -47,10 +47,10 @@ namespace Engine
 
 		~SceneRegistry();
 
-		using iterator = std::vector<EntityType>::iterator;
+		using Iterator = Utils::Vector<EntityType>::Iterator;
 
-		iterator begin() { return m_UsedEntitys.begin(); }
-		iterator end() { return m_UsedEntitys.end(); }
+		Iterator begin() { return m_UsedEntitys.begin(); }
+		Iterator end() { return m_UsedEntitys.end(); }
 
 		EntityType CreateEntity();
 		EntityType CreateEntity(UUID id, const std::string& name);
@@ -92,9 +92,9 @@ namespace Engine
 		void EachPool(EachComponentFunc func);
 
 	private:
-		std::vector<EntityData> m_Entitys;
-		std::vector<EntityType> m_FreeEntitys;
-		std::vector<EntityType> m_UsedEntitys;
+		Utils::Vector<EntityData> m_Entitys;
+		Utils::Vector<EntityType> m_FreeEntitys;
+		Utils::Vector<EntityType> m_UsedEntitys;
 
 		std::unordered_map<ComponentType, ComponentPool*> m_Pools;
 	};

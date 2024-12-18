@@ -61,7 +61,7 @@ namespace Engine
 		bool OnWindowResize(WindowResizeEvent* e);
 
 		Ref<Window> m_Window;
-		std::vector<Event*> m_InputBuffer;
+		Utils::Vector<Event*> m_InputBuffer;
 		bool m_Running = true;
 		bool m_Minimized = false;
 

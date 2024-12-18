@@ -204,11 +204,11 @@ namespace Engine
 
 	struct ShaderConfig
 	{
-		std::vector<GraphicsPassConfig> graphicsPasses;
-		std::vector<ComputePassConfig> computePasses;
-		std::vector<WorkGraphPassConfig> workGraphPasses;
+		Utils::Vector<GraphicsPassConfig> graphicsPasses;
+		Utils::Vector<ComputePassConfig> computePasses;
+		Utils::Vector<WorkGraphPassConfig> workGraphPasses;
 
-		std::vector<MaterialParameter> params;
+		Utils::Vector<MaterialParameter> params;
 
 		std::unordered_map<std::string, void*> m_DataLocations;
 
@@ -251,7 +251,7 @@ namespace Engine
 		static Ref<ShaderSorce> LoadFromSrc(std::istream& src, const fs::path& file = "");
 		static void PreProcess(std::string& src, SectionInfo& section, const fs::path& fileLocation);
 		static ShaderConfig CompileConfig(const std::string& code);
-		static std::string GenerateMaterialStruct(std::vector<MaterialParameter>& params);
+		static std::string GenerateMaterialStruct(Utils::Vector<MaterialParameter>& params);
 
 	private:
 		
@@ -273,7 +273,7 @@ namespace Engine
 			bool isString;
 
 			std::string string;
-			std::vector<std::string> paramters;
+			Utils::Vector<std::string> paramters;
 			Ref<Object> object;
 
 			static Ref<Value> Build(std::queue<std::string>& tokenQueue);
@@ -281,7 +281,7 @@ namespace Engine
 
 		struct Object
 		{
-			std::vector<Ref<Variable>> values;
+			Utils::Vector<Ref<Variable>> values;
 			bool HasVariable(const std::string& name);
 
 			static Ref<Object> Build(std::queue<std::string>& tokenQueue);

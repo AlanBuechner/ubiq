@@ -34,7 +34,7 @@ namespace Engine
 	Scene::~Scene()
 	{
 		m_SceneRenderer = nullptr;
-		for (uint32 i = 0; i < m_UpdateEvents.size(); i++)
+		for (uint32 i = 0; i < m_UpdateEvents.Count(); i++)
 			delete m_UpdateEvents[i];
 	}
 
@@ -47,7 +47,7 @@ namespace Engine
 
 		m_SceneScript->OnUpdate();
 
-		for (uint32 i = 0; i < m_UpdateEvents.size(); i++)
+		for (uint32 i = 0; i < m_UpdateEvents.Count(); i++)
 			m_UpdateEvents[i]->Update();
 		
 		// render 3d models
@@ -88,7 +88,7 @@ namespace Engine
 		for (auto& child : entity.GetTransform().GetChildren())
 			DestroyEntity(child);
 
-		std::vector<Component*> components = entity.GetComponents();
+		Utils::Vector<Component*> components = entity.GetComponents();
 		for (Component* comp : components)
 			comp->OnComponentRemoved();
 
@@ -114,7 +114,7 @@ namespace Engine
 			return nullptr;
 		}
 		SceneSystem* system = (SceneSystem*)systemClass.CreateInstance();
-		m_Systems.push_back(system);
+		m_Systems.Push(system);
 		m_SystemsMap[systemClass.GetTypeID()] = system;
 		system->OnAttatch();
 
@@ -122,10 +122,10 @@ namespace Engine
 		return system;
 	}
 
-	std::vector<SceneSystem*> Scene::CreateSceneSystems(const std::vector<const Reflect::Class*>& systemClasses)
+	Utils::Vector<SceneSystem*> Scene::CreateSceneSystems(const Utils::Vector<const Reflect::Class*>& systemClasses)
 	{
-		std::vector<SceneSystem*> systems;
-		systems.reserve(systemClasses.size());
+		Utils::Vector<SceneSystem*> systems;
+		systems.Reserve(systemClasses.Count());
 		for (const Reflect::Class* systemClass : systemClasses)
 		{
 			if (m_SystemsMap[systemClass->GetTypeID()] != nullptr)
@@ -135,8 +135,8 @@ namespace Engine
 			}
 
 			SceneSystem* system = (SceneSystem*)systemClass->CreateInstance();
-			m_Systems.push_back(system);
-			systems.push_back(system);
+			m_Systems.Push(system);
+			systems.Push(system);
 			m_SystemsMap[systemClass->GetTypeID()] = system;
 			system->OnAttatch();
 		}
@@ -152,14 +152,14 @@ namespace Engine
 		system->OnDetatch();
 
 		m_SystemsMap.erase(systemEntry);
-		m_Systems.erase(std::remove(m_Systems.begin(), m_Systems.end(), system), m_Systems.end());
+		m_Systems.RemoveRange(std::remove(m_Systems.begin(), m_Systems.end(), system), m_Systems.end());
 
 		delete system;
 	}
 
 	void Scene::RegenerateUpdateEvents()
 	{
-		m_UpdateEvents.clear();
+		m_UpdateEvents.Clear();
 		m_SceneScript->GenerateUpdateEvents();
 	}
 
@@ -211,8 +211,8 @@ namespace Engine
 		{
 			if (componentClass->HasFunction(m_FuncName))
 			{
-				m_Pools.push_back(scene->GetRegistry().GetOrCreateCompnentPool(*componentClass));
-				m_Funcs.push_back(&componentClass->GetFunction(m_FuncName));
+				m_Pools.Push(scene->GetRegistry().GetOrCreateCompnentPool(*componentClass));
+				m_Funcs.Push(&componentClass->GetFunction(m_FuncName));
 			}
 		}
 	}
@@ -220,7 +220,7 @@ namespace Engine
 	void SceneUpdateEvent::Update()
 	{
 		CREATE_PROFILE_SCOPEI(m_FuncName);
-		for (uint32 i = 0; i < m_Pools.size(); i++)
+		for (uint32 i = 0; i < m_Pools.Count(); i++)
 		{
 			ComponentPool* pool = m_Pools[i];
 			const Reflect::Function* func = m_Funcs[i];

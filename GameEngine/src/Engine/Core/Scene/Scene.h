@@ -75,12 +75,12 @@ namespace Engine
 			return (T*)GetSceneSystem(T::GetStaticClass());
 		}
 		SceneSystem* GetSceneSystem(const Reflect::Class& systemClass) { return m_SystemsMap[systemClass.GetTypeID()]; }
-		const std::vector<SceneSystem*>& GetSceneSystems() const { return m_Systems; }
+		const Utils::Vector<SceneSystem*>& GetSceneSystems() const { return m_Systems; }
 
 		template<class T>
 		T* CreateSceneSystem() { return (T*)CreateSceneSystem(T::GetStaticClass()); }
 		SceneSystem* CreateSceneSystem(const Reflect::Class& systemClass);
-		std::vector<SceneSystem*> CreateSceneSystems(const std::vector<const Reflect::Class*>& systemClasses);
+		Utils::Vector<SceneSystem*> CreateSceneSystems(const Utils::Vector<const Reflect::Class*>& systemClasses);
 
 		template<class T>
 		void RemoveSceneSystem() { RemoveSceneSystem(T::GetStaticClass()); }
@@ -106,13 +106,13 @@ namespace Engine
 		uint32 m_ViewportWidth = 0;
 		uint32 m_ViewportHeight = 0;
 		SceneRegistry m_Registry;
-		std::vector<SceneSystem*> m_Systems;
+		Utils::Vector<SceneSystem*> m_Systems;
 		std::unordered_map<uint64, SceneSystem*> m_SystemsMap;
 		SceneScriptBase* m_SceneScript;
 
 		Ref<SceneRenderer> m_SceneRenderer;
 
-		std::vector<UpdateEvent*> m_UpdateEvents;
+		Utils::Vector<UpdateEvent*> m_UpdateEvents;
 
 		bool m_CameraChanged = false;
 
@@ -133,8 +133,8 @@ namespace Engine
 		virtual void Update() override;
 
 	private:
-		std::vector<ComponentPool*> m_Pools;
-		std::vector<const Reflect::Function*> m_Funcs;
+		Utils::Vector<ComponentPool*> m_Pools;
+		Utils::Vector<const Reflect::Function*> m_Funcs;
 		std::string m_FuncName;
 	};
 

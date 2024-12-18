@@ -30,7 +30,7 @@ namespace Engine
 		Ref<GraphicsShaderPass> GetGraphicsPass(const std::string& passName);
 		Ref<ComputeShaderPass> GetComputePass(const std::string& passName);
 		Ref<WorkGraphShaderPass> GetWorkGraphPass(const std::string& passName);
-		std::vector<MaterialParameter>& GetParams();
+		Utils::Vector<MaterialParameter>& GetParams();
 
 		static Ref<Shader> Create(const fs::path& file);
 		static Ref<Shader> CreateFromSrc(const std::string& src, const fs::path& file = "");
@@ -39,6 +39,6 @@ namespace Engine
 		std::unordered_map<std::string, Ref<GraphicsShaderPass>> m_GraphicsPasses;
 		std::unordered_map<std::string, Ref<ComputeShaderPass>> m_ComputePasses;
 		std::unordered_map<std::string, Ref<WorkGraphShaderPass>> m_WorkGraphPasses;
-		std::vector<MaterialParameter> m_Params;
+		Utils::Vector<MaterialParameter> m_Params;
 	};
 }

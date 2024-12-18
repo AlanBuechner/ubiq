@@ -65,18 +65,18 @@ namespace Engine
 		return std::string();
 	}
 
-	std::vector<std::string> GetCommandLineArguments()
+	Utils::Vector<std::string> GetCommandLineArguments()
 	{
 		LPWSTR cmd = GetCommandLineW();
 
 		int numArgs;
 		LPWSTR* args = CommandLineToArgvW(cmd, &numArgs);
 
-		std::vector<std::string> argList;
+		Utils::Vector<std::string> argList;
 		for (uint32 i = 0; i < numArgs; i++)
 		{
 			std::wstring arg(args[i]);
-			argList.push_back(Engine::GetStr(arg));
+			argList.Push(Engine::GetStr(arg));
 		}
 
 		LocalFree(args);

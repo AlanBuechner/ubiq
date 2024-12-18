@@ -26,9 +26,9 @@ namespace Engine
 		void Present() { Present(nullptr); }
 		virtual void Present(Ref<FrameBuffer> fb) override;
 
-		virtual void Transition(std::vector<ResourceTransitionObject> transitions) override;
+		virtual void Transition(Utils::Vector<ResourceTransitionObject> transitions) override;
 
-		virtual void ValidateStates(std::vector<ResourceStateObject> resources) override;
+		virtual void ValidateStates(Utils::Vector<ResourceStateObject> resources) override;
 
 
 		// copying
@@ -63,16 +63,16 @@ namespace Engine
 		virtual void DisbatchGraph(void* data, uint32 stride, uint32 count) override;
 
 		virtual void AwaitUAV(GPUResource* uav) override;
-		virtual void AwaitUAVs(std::vector<GPUResource*> uavs) override;
+		virtual void AwaitUAVs(Utils::Vector<GPUResource*> uavs) override;
 
 		virtual void Close() override;
 
-		std::vector<ResourceStateObject>& GetPendingTransitions() override { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
+		Utils::Vector<ResourceStateObject>& GetPendingTransitions() override { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
 		std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() override { return m_Frames[GetLastFrameIndex()].resourceStates; }
 		ID3D12GraphicsCommandList10* GetCommandList() { return m_CommandList; }
 
 	private:
-		std::vector<ResourceStateObject>& GetCurrentPendingTransitions() { return m_Frames[m_CurrentFrame].pendingTransitions; }
+		Utils::Vector<ResourceStateObject>& GetCurrentPendingTransitions() { return m_Frames[m_CurrentFrame].pendingTransitions; }
 		ID3D12CommandList* GetPrependCommandList() { return m_PrependList; }
 
 		bool RecordPrependCommands();
@@ -81,20 +81,20 @@ namespace Engine
 		ID3D12CommandAllocator* GetAllocator() { return m_Frames[m_CurrentFrame].commandAllocator; }
 		std::unordered_map<GPUResource*, ResourceState>& GetResourceStates() { return m_Frames[m_CurrentFrame].resourceStates; }
 
-		uint32 GetLastFrameIndex() { return (m_CurrentFrame - 1) % m_Frames.size(); }
+		uint32 GetLastFrameIndex() { return (m_CurrentFrame - 1) % m_Frames.Count(); }
 
 	private:
 
 		struct RecordFrame
 		{
 			ID3D12CommandAllocator* commandAllocator;
-			std::vector<ResourceStateObject> pendingTransitions;
+			Utils::Vector<ResourceStateObject> pendingTransitions;
 			std::unordered_map<GPUResource*, ResourceState> resourceStates;
 		};
 
 		uint32 m_CurrentFrame = 0;
 		ID3D12GraphicsCommandList10* m_CommandList;
-		std::vector<RecordFrame> m_Frames;
+		Utils::Vector<RecordFrame> m_Frames;
 
 		ID3D12CommandAllocator* m_PrependAllocator;
 		ID3D12GraphicsCommandList10* m_PrependList;

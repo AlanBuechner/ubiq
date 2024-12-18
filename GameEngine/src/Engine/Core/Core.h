@@ -6,6 +6,7 @@
 #include "Reflection.h"
 #include "Utils/Common.h"
 #include "Utils/Types.h"
+#include "Utils/Vector.h"
 
 #define ENABLE_ASSERTS
 

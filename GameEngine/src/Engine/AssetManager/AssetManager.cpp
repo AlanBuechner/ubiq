@@ -35,22 +35,22 @@ namespace Engine
 			{
 				// clear assets
 				std::unordered_map<UUID, Ref<Asset>>& assets = pool->second.m_CashedAssets;
-				std::vector<std::unordered_map<UUID, Ref<Asset>>::iterator> unusedAssets;
+				Utils::Vector<std::unordered_map<UUID, Ref<Asset>>::iterator> unusedAssets;
 				for (std::unordered_map<UUID, Ref<Asset>>::iterator asset = assets.begin(); asset != assets.end(); asset++)
 				{
 					if (asset->second.use_count() == 1)
-						unusedAssets.push_back(asset);
+						unusedAssets.Push(asset);
 				}
 				for (auto& asset : unusedAssets)
 					assets.erase(asset);
 
-				// clear embeded assets
+				// clear embedded assets
 				std::unordered_map<fs::path, Ref<Asset>>& embededAssets = pool->second.m_CashedEmbededAssets;
-				std::vector<std::unordered_map<fs::path, Ref<Asset>>::iterator> unusedEmbededAssets;
+				Utils::Vector<std::unordered_map<fs::path, Ref<Asset>>::iterator> unusedEmbededAssets;
 				for (std::unordered_map<fs::path, Ref<Asset>>::iterator asset = embededAssets.begin(); asset != embededAssets.end(); asset++)
 				{
 					if (asset->second.use_count() == 1)
-						unusedEmbededAssets.push_back(asset);
+						unusedEmbededAssets.Push(asset);
 				}
 				for (auto& asset : unusedEmbededAssets)
 					embededAssets.erase(asset);
@@ -62,17 +62,17 @@ namespace Engine
 
 	void AssetManager::AddAssetDirectory(const fs::path& directory)
 	{
-		m_AssetDirectories.push_back(directory);
+		m_AssetDirectories.Push(directory);
 		UpdateDirectory(directory);
 	}
 
 	void AssetManager::RemoveAssetDirectory(const fs::path& directory)
 	{
-		for (int index = 0;index < m_AssetDirectories.size(); index++)
+		for (int index = 0;index < m_AssetDirectories.Count(); index++)
 		{
 			if (directory == m_AssetDirectories[index])
 			{
-				m_AssetDirectories.erase(m_AssetDirectories.begin() + index);
+				m_AssetDirectories.Remove(index);
 				for (auto& a : m_AssetPaths)
 				{
 					std::string rel = fs::relative(a.second, directory).string();
@@ -101,7 +101,7 @@ namespace Engine
 		{
 			// directory
 			// find all assets int directory
-			std::vector<fs::path> foundAssets, foundMetas;
+			Utils::Vector<fs::path> foundAssets, foundMetas;
 			ProcessDirectory(assetPath, foundAssets, foundMetas);
 			// remove assets from list
 			for (const fs::path& asset : foundAssets)
@@ -183,7 +183,7 @@ namespace Engine
 
 		CORE_INFO("starting directory update");
 		// get all assets in filesystem
-		std::vector<fs::path> foundAssets, foundMetas;
+		Utils::Vector<fs::path> foundAssets, foundMetas;
 		ProcessDirectory(absDir, foundAssets, foundMetas);
 
 		// match files with meta files
@@ -194,7 +194,7 @@ namespace Engine
 			{
 				UUID id = GetAssetUUIDFromPath(asset);
 				m_AssetPaths[id] = asset;
-				foundMetas.erase(metai);
+				foundMetas.Remove(metai);
 			}
 			else
 			{
@@ -243,16 +243,16 @@ namespace Engine
 			UpdateDirectory(newPath);
 	}
 
-	void AssetManager::ProcessDirectory(const fs::path& directory, std::vector<fs::path>& foundAssets, std::vector<fs::path>& foundMetas)
+	void AssetManager::ProcessDirectory(const fs::path& directory, Utils::Vector<fs::path>& foundAssets, Utils::Vector<fs::path>& foundMetas)
 	{
 		for (auto& p : fs::directory_iterator(directory))
 		{
 			if (p.is_directory())
 				ProcessDirectory(p.path(), foundAssets, foundMetas);
 			else if (p.path().extension().string() != ".meta")
-				foundAssets.push_back(p.path());
+				foundAssets.Push(p.path());
 			else if (p.path().extension().string() == ".meta")
-				foundMetas.push_back(p.path());
+				foundMetas.Push	(p.path());
 		}
 	}
 

@@ -27,7 +27,7 @@ namespace Engine {
 		Layer** begin() { return &*m_Layers.begin(); }
 		Layer** end() { return &*m_Layers.end(); }
 	private:
-		std::vector<Layer*> m_Layers;
+		Utils::Vector<Layer*> m_Layers;
 		unsigned int m_LayerInsertIndex = 0;
 	};
 

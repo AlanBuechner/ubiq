@@ -24,6 +24,6 @@ namespace Engine
 
 		PlainVolume GetPlainVolume();
 
-		static AABB GetExtents(std::vector<AABB> aabbs);
+		static AABB GetExtents(Utils::Vector<AABB> aabbs);
 	};
 }

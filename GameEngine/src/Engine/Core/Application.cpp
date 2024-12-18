@@ -79,7 +79,7 @@ namespace Engine {
 
 	void Application::OnEvent(Event* e)
 	{
-		m_InputBuffer.push_back(e);
+		m_InputBuffer.Push(e);
 	}
 
 	void Application::Run()
@@ -163,7 +163,7 @@ namespace Engine {
 
 	void Application::SendInputBuffer()
 	{
-		if (m_InputBuffer.empty()) return;
+		if (m_InputBuffer.Empty()) return;
 
 		for (Event* i : m_InputBuffer)
 		{
@@ -188,7 +188,7 @@ namespace Engine {
 			delete *i;
 		}
 
-		m_InputBuffer.clear();
+		m_InputBuffer.Clear();
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent* e)

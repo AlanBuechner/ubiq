@@ -142,7 +142,7 @@ if(!m_Selected.HasComponent<component>()){\
 	{
 		auto& children = entity.GetTransform().GetChildren();
 		ImGuiTreeNodeFlags flags = ( m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
-			(children.empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow) |
+			(children.Empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow) |
 			ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool open = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity, flags, entity.GetName().c_str());
@@ -184,7 +184,7 @@ if(!m_Selected.HasComponent<component>()){\
 
 		if (open)
 		{
-			for (uint32_t i = 0; i < children.size(); i++)
+			for (uint32_t i = 0; i < children.Count(); i++)
 			{
 				Engine::Entity child = children[i];
 				DrawEntityNode(child);
@@ -211,7 +211,7 @@ if(!m_Selected.HasComponent<component>()){\
 		if (ImGui::InputText("Name", buffer, sizeof(buffer)))
 			name = std::string(buffer);
 		
-		std::vector<Engine::Component*> components = entity.GetComponents();
+		Utils::Vector<Engine::Component*> components = entity.GetComponents();
 		for (Engine::Component* comp : components)
 		{
 			ImVec2 contentRegion = ImGui::GetContentRegionAvail();

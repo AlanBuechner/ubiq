@@ -34,7 +34,7 @@ namespace Engine
 		std::unordered_map<uint64, AssetPool> m_CashedAssetPools;
 		std::unordered_map<UUID, fs::path> m_AssetPaths;
 
-		std::vector<fs::path> m_AssetDirectories;
+		Utils::Vector<fs::path> m_AssetDirectories;
 
 		std::thread m_DirectoryWatchThread;
 
@@ -51,7 +51,7 @@ namespace Engine
 
 		void AddAssetDirectory(const fs::path& directory);
 		void RemoveAssetDirectory(const fs::path& directory);
-		inline const std::vector<fs::path>& GetAssetDirectories() { return m_AssetDirectories; }
+		inline const Utils::Vector<fs::path>& GetAssetDirectories() { return m_AssetDirectories; }
 
 		void DeleteAsset(const fs::path& assetPath);
 		void RenameAsset(const fs::path& oldPath, const fs::path& newName);
@@ -136,7 +136,7 @@ namespace Engine
 		fs::path GetValidName(const fs::path& name);
 		void ChangePath(const fs::path& oldPath, const fs::path& newPath);
 
-		void ProcessDirectory(const fs::path& directory, std::vector<fs::path>& foundAssets, std::vector<fs::path>& foundMetas);
+		void ProcessDirectory(const fs::path& directory, Utils::Vector<fs::path>& foundAssets, Utils::Vector<fs::path>& foundMetas);
 
 		static void WatchDirectory(AssetManager* assetManager);
 	};

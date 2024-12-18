@@ -77,7 +77,7 @@ namespace Engine
 		static void AddWindow(Ref<Window> window);
 
 	private:
-		static std::vector<Ref<Window>> s_Windows;
+		static Utils::Vector<Ref<Window>> s_Windows;
 
 		friend Window;
 	};

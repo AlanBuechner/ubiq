@@ -20,15 +20,15 @@ namespace Engine
 		virtual void OnTransformChange(const Math::Mat4& transform) {}
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
 
-		std::vector<AABB> GetVolumes();
+		Utils::Vector<AABB> GetVolumes();
 
 	protected:
 		void DirtyVolume() { m_DirtyVolumes = true; }
-		virtual std::vector<AABB> GenVolumes() { return std::vector<AABB>(); }
+		virtual Utils::Vector<AABB> GenVolumes() { return Utils::Vector<AABB>(); }
 
 	private:
 		bool m_DirtyVolumes = true;
-		std::vector<AABB> m_Volumes;
+		Utils::Vector<AABB> m_Volumes;
 	};
 
 }

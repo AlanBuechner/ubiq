@@ -20,7 +20,7 @@ namespace Engine
 	class PlainVolume
 	{
 	public:
-		std::vector<Plain> m_Plains;
+		Utils::Vector<Plain> m_Plains;
 
 		bool TestRay(const Ray& ray, RayHit& outHit);
 

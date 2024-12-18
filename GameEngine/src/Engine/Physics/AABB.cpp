@@ -51,8 +51,8 @@ namespace Engine
 
 	PlainVolume AABB::GetPlainVolume()
 	{
-		std::vector<Plain> plains;
-		plains.resize(6);
+		Utils::Vector<Plain> plains;
+		plains.Resize(6);
 
 		plains[0] = Plain{ m_Min, {-1,0,0} };
 		plains[1] = Plain{ m_Min, {0,-1,0} };
@@ -64,9 +64,9 @@ namespace Engine
 		return PlainVolume{ plains };
 	}
 
-	AABB AABB::GetExtents(std::vector<AABB> aabbs)
+	AABB AABB::GetExtents(Utils::Vector<AABB> aabbs)
 	{
-		if (aabbs.empty())
+		if (aabbs.Empty())
 			return AABB();
 
 		Math::Vector3 min = { FLT_MAX, FLT_MAX, FLT_MAX };

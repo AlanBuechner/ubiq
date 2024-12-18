@@ -153,7 +153,7 @@ namespace Engine
 		void GenerateUAVDescriptors();
 
 	protected:
-		std::vector<Texture2DUAVDescriptorHandle*> m_UAVDescriptors;
+		Utils::Vector<Texture2DUAVDescriptorHandle*> m_UAVDescriptors;
 		class RenderTarget2D* m_Owner;
 
 		friend class RenderTarget2D;
