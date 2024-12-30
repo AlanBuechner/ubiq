@@ -7,6 +7,7 @@ namespace Engine
 		switch (format)
 		{
 		case TextureFormat::DEPTH24STENCIL8:
+		case TextureFormat::Depth:
 			return true;
 		default: return false;
 		}
@@ -72,6 +73,7 @@ namespace Engine
 
 
 		case TextureFormat::DEPTH24STENCIL8:	return 4;
+		case TextureFormat::Depth:				return 4;
 		default: return 0;
 		}
 		

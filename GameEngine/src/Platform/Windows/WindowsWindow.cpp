@@ -306,6 +306,13 @@ namespace Engine
 			//m_Data.EventCallback(*deltaMousePostionEvent);
 			break;
 		}
+		case WM_MOUSEWHEEL: // scroll wheel
+		{
+			if(m_Data.EventCallback == nullptr) break;
+			float delta = GET_WHEEL_DELTA_WPARAM(wParam);
+			m_Data.EventCallback(new MouseScrolledEvent(MouseMoveBindMode::ScrollWheel, 0, delta));
+			break;
+		}
 
 		case WM_LBUTTONDOWN: // left mouse down
 			if (m_Data.EventCallback == nullptr) break;

@@ -35,6 +35,14 @@ workspace "{gameName}"
 	code += "group \"\"\n"
 	for key, value in Config.p.items():
 		code = AddProject(code, key, value, "", 0)
+	code += "group \"Modules\"\n"
+	gameProj = Config.buildScripts[Config.gameProject]
+	if(hasattr(gameProj["module"], "GetModules")):
+		for m in gameProj["module"].GetModules():
+			if(not os.path.isabs(m)):
+				m = os.path.join(gameProj["folder"], m).replace("\\", "/")
+			code += f"\tinclude \"{m}\"\n"
+		code += "group \"\"\n"
 
 	if(Config.gameProject == None):
 		f = open("premake5.lua", "w")

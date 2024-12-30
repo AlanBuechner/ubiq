@@ -32,7 +32,7 @@ namespace Game
 	{
 		SetSceneRenderer(SceneRenderer::Create());
 
-		std::vector<const Reflect::Class*> systems
+		Utils::Vector<const Reflect::Class*> systems
 		{
 			&InputSystem::GetStaticClass()
 		};

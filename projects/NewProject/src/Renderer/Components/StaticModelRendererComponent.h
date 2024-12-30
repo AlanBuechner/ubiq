@@ -43,7 +43,7 @@ namespace Game
 		void Invalidate();
 
 	protected:
-		virtual std::vector<Engine::AABB> GenVolumes() override;
+		virtual Utils::Vector<Engine::AABB> GenVolumes() override;
 
 	private:
 		PROPERTY(HideInInspector) Engine::Ref<Model> m_Model;

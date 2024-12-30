@@ -64,6 +64,7 @@ namespace Engine
 
 
 		case TextureFormat::DEPTH24STENCIL8:	return DXGI_FORMAT_D24_UNORM_S8_UINT;
+		case TextureFormat::Depth:	return DXGI_FORMAT_D32_FLOAT;
 		default: return DXGI_FORMAT_UNKNOWN;
 		}
 		
@@ -77,6 +78,7 @@ namespace Engine
 		switch (format)
 		{
 		case TextureFormat::DEPTH24STENCIL8:	return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		case TextureFormat::Depth:	return DXGI_FORMAT_R32_FLOAT;
 		default: return GetDXGITextureFormat(format);
 		}
 	}

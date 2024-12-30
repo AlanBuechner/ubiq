@@ -27,21 +27,12 @@ includes = [
 	projDir,
 	f"src",
 	f"{includeDirs['vendor']}",
-	f"{includeDirs['ImGui']}",
 	f"{includeDirs['glm']}",
 	f"{includeDirs['stb_image']}",
-	f"{includeDirs['yaml']}",
-	f"{includeDirs['ImGuizmo']}",
-	f"{includeDirs['Assimp']}",
-	f"{includeDirs['json']}",
-	f"{includeDirs['dxc']}",
-	f"{includeDirs['pix']}",
-	f"{includeDirs['ProjectManager']}",
 	f"{includeDirs['Reflection']}",
 	f"{includeDirs['Utilities']}",
 	f"{location}/GameEngine/src",
 	f"{location}/GameEngine/embeded",
-	f"{projDir}/modules",
 ]
 if(inEditor):
 	includes.append(f"{location}/USG-Editor/src")
@@ -58,15 +49,9 @@ defines = [
 if(inEditor):
 	defines.append("EDITOR")
 
-dependancys = [
-	"TestModule",
-]
+dependancys = []
 
 links = []
-
-modules = [
-	"modules/TestModule"
-]
 
 def GetProject():
 	proj = BuildUtils.ProjectEnviernment()
@@ -91,5 +76,4 @@ def GetProject():
 	return proj
 
 
-def GetModules():
-	return modules
+

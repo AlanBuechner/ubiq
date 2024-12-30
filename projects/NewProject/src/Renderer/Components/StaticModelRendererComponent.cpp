@@ -69,7 +69,7 @@ namespace Game
 		DirtyVolume();
 	}
 
-	std::vector<Engine::AABB> StaticModelRendererComponent::GenVolumes()
+	Utils::Vector<Engine::AABB> StaticModelRendererComponent::GenVolumes()
 	{
 		return m_Model->GetVolumes();
 	}

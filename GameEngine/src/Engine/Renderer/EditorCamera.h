@@ -72,5 +72,6 @@ namespace Engine
 		float m_Pitch = 0, m_Yaw = 0;
 
 		float m_ViewportWidth = 1280, m_ViewportHeight = 720;
+		float m_SpeedMultiplyer = 1.0f;
 	};
 }

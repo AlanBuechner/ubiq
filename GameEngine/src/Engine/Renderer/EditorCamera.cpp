@@ -14,7 +14,7 @@ namespace Engine
 {
 
 	EditorCamera::EditorCamera() :
-		EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f)
+		EditorCamera(45.0f, 1.778f, 0.1f, 1000.0f)
 	{}
 
 	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip):
@@ -107,6 +107,8 @@ namespace Engine
 		if (shift)
 			speed = runSpeed;
 
+		speed *= m_SpeedMultiplyer;
+
 		if (rMouse && !alt) {
 			if (wKey) MoveFB(speed);
 			if (sKey) MoveFB(-speed);
@@ -118,9 +120,7 @@ namespace Engine
 			if (qKey) MoveUD(-speed);
 		}
 
-
 		UpdateView();
-
 		UpdateCameraBuffer();
 	}
 
@@ -132,9 +132,17 @@ namespace Engine
 
 	bool EditorCamera::OnMouseScroll(MouseScrolledEvent* e)
 	{
-		float delta = e->GetYOffset() * 0.1f;
-		MouseZoom(delta);
-		UpdateView();
+		if (Input::GetMouseButtonDown(MouseCode::RIGHT_MOUSE))
+		{
+			m_SpeedMultiplyer += e->GetYOffset() * 0.001f * m_SpeedMultiplyer;
+			m_SpeedMultiplyer = Math::Max(0.00001f, m_SpeedMultiplyer);
+		}
+		else
+		{
+			float delta = e->GetYOffset() * 0.1f;
+			MouseZoom(delta);
+			UpdateView();
+		}
 		return false;
 	}
 

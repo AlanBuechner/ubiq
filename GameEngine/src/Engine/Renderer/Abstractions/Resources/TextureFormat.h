@@ -60,7 +60,7 @@ namespace Engine
 		// Depth/Stencil (only used for frame buffers)
 		DEPTH24STENCIL8,
 
-		Depth = DEPTH24STENCIL8
+		Depth,
 	};
 	bool IsTextureFormatDepthStencil(TextureFormat format);
 	uint32 GetTextureFormatStride(TextureFormat format);

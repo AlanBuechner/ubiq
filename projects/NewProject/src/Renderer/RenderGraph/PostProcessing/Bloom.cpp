@@ -124,7 +124,7 @@ namespace Game
 			}
 
 			{ // validate that all sum textures are render targets
-				std::vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
+				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
 				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);
@@ -167,7 +167,7 @@ namespace Game
 			commandList->DrawMesh(screenMesh);
 
 			{ // validate that all sum textures are render targets
-				std::vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
+				Utils::Vector<Engine::ResourceStateObject> transitions(m_GaussianSumTextures.size());
 				for (uint32 i = 0; i < m_GaussianSumTextures.size(); i++)
 					transitions[i] = { m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
 				commandList->ValidateStates(transitions);

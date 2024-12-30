@@ -69,7 +69,6 @@ dependancys = [
 
 links = [
 	f"{libs['Assimp']}",
-	#f"{libs['dxc']}",
 	f"{libs['pix']}",
 ]
 

@@ -39,8 +39,8 @@ parser.add_argument('-gs', action='store_true', help='generate project files') #
 parser.add_argument('-r', action='store_true', help='run the project') # run
 parser.add_argument('-b', action='store_true', help='build the project') # build
 parser.add_argument('-fb', action='store_true', help='build the full project') # full build
-parser.add_argument('-rebuild', action='store_true', help='rebuild the project') # full build
-parser.add_argument('-clean', action='store_true', help='clean the project') # full build
+parser.add_argument('-rebuild', action='store_true', help='rebuild the project') # rebuild the project
+parser.add_argument('-clean', action='store_true', help='clean the project') # clean build files
 parser.add_argument('--BuildTools', action='store_true', help='build tools') # build tools
 parser.add_argument('-g', type=str, help='path to game project') # generate project files
 parser.add_argument('-p', type=str, help='the project to build') # project
@@ -117,7 +117,7 @@ elif(shouldBuild):
 	result = subprocess.run(a)
 
 # --------------------- Load Project Scritps --------------------- #
-for proj in Config.projects:
+def LoadProject(proj):
 	projName = os.path.basename(proj)
 	spec=importlib.util.spec_from_file_location(projName, proj+"/Build.py")
 	module = importlib.util.module_from_spec(spec)
@@ -127,6 +127,21 @@ for proj in Config.projects:
 		"built" : False,
 		"folder" : proj
 	}
+
+# load projecst
+for proj in Config.projects:
+	LoadProject(proj)
+
+# load game modules
+if(Config.gameProject != None):
+	gameProj = Config.buildScripts[Config.gameProject]
+	if(hasattr(gameProj["module"], "GetModules")):
+		for m in gameProj["module"].GetModules():
+			if(not os.path.isabs(m)):
+				m = os.path.join(gameProj["folder"], m).replace("\\", "/")
+			Config.projects.append(m)
+			LoadProject(m)
+	
 
 # --------------------- Generate Project Files --------------------- #
 if(args.gs):

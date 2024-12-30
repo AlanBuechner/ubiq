@@ -56,13 +56,9 @@ namespace Engine
 		{
 			int state = GetKeyState(i);
 			if (state == KeyState::Pressed)
-			{
 				SetKeyState(i, KeyState::Down);
-			}
 			else if (state == KeyState::Released)
-			{
 				SetKeyState(i, KeyState::Up);
-			}
 		}
 		m_ToUpdate.Clear();
 
@@ -71,13 +67,9 @@ namespace Engine
 		{
 			int state = GetMouseButtonState(i);
 			if (state == KeyState::Pressed)
-			{
 				SetMouseButtonState(i, KeyState::Down);
-			}
 			else if (state == KeyState::Released)
-			{
 				SetMouseButtonState(i, KeyState::Up);
-			}
 		}
 		m_ToUpdateMouse.Clear();
 		m_PreviousMousePosition = m_MousePosition;

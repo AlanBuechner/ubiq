@@ -4,6 +4,8 @@
 #include "Renderer/Components/CameraComponent.h"
 #include "Renderer/SceneRenderer/SceneRenderer.h"
 #include "SceneScripts/DefaultSceneScript.h"
+#include "TestModule/src/TestModule.h"
+
 
 LINK_REFLECTION_DATA(NewProject)
 
@@ -16,6 +18,7 @@ namespace Game
 		{
 			m_DefaultCamera = Engine::CreateRef<Engine::EditorCamera>();
 			m_DefaultCamera->SetOrientation({ Math::Radians(180 - 25), Math::Radians(25) });
+			TestModule::TestModule();
 		}
 
 		virtual void OnEvent(Engine::Event* e)
