@@ -276,7 +276,7 @@ namespace Engine
 		return pWnd->HandleEvent(hWnd, msg, wParam, lParam); // call handle event for that window
 	}
 
-	LRESULT WindowsWindow::HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	LRESULT DISABLE_OPS WindowsWindow::HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (msg)
 		{

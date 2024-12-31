@@ -57,7 +57,7 @@ namespace Engine
 		KeyState GetMouseButtonStateImpl(MouseCode button) { return m_MouseStates[button]; }
 
 		void SetKeyState(KeyCode key, KeyState state) { m_KeyStates[key] = state; }
-		void SetMouseButtonState(KeyCode button, KeyState state) { m_MouseStates[button] = state; }
+		void SetMouseButtonState(MouseCode button, KeyState state) { m_MouseStates[button] = state; }
 		bool OnKeyPressed(KeyPressedEvent* e);
 		bool OnKeyReleased(KeyReleasedEvent* e);
 		bool OnMousePressed(MouseButtonPressedEvent* e);
@@ -69,8 +69,8 @@ namespace Engine
 	private:
 		static Input* s_Instance;
 
-		KeyState m_KeyStates[Engine::KeyCode::LAST];
-		KeyState m_MouseStates[3];
+		KeyState m_KeyStates[Engine::KeyCode::SIZE];
+		KeyState m_MouseStates[Engine::MouseCode::SIZE];
 
 		Utils::Vector<KeyCode> m_ToUpdate;
 		Utils::Vector<MouseCode> m_ToUpdateMouse;

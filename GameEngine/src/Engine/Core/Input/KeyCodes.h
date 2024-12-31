@@ -300,6 +300,7 @@ namespace Engine
 
 			MENU = KEYCODE_MENU,
 			LAST = KEYCODE_LAST,
+			SIZE
 		};
 
 		KeyCode() : code(0) {}
@@ -318,7 +319,9 @@ namespace Engine
 		{
 			LEFT_MOUSE = MOUSE_LBUTTON,
 			RIGHT_MOUSE = MOUSE_RBUTTON,
-			MIDDLE_MOUSE = MOUSE_MBUTTON
+			MIDDLE_MOUSE = MOUSE_MBUTTON,
+			LAST = MIDDLE_MOUSE,
+			SIZE
 		};
 
 		MouseCode() : code(0) {}
