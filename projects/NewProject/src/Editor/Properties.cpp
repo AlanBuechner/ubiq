@@ -35,7 +35,7 @@ namespace Game
 		{
 			fs::path path = Engine::Application::Get().GetAssetManager().GetRelitiveAssetPath(mesh->GetAssetID());
 			if (ImGui::Button(path.string().c_str()))
-				Editor::EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
+				Editor::EditorLayer::Get()->GetPanel<Editor::ContentBrowserPanel>()->SelectAsset(path);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Clear")) {

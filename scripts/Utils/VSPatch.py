@@ -29,14 +29,19 @@ def PatchVSXProj(script):
 			defines = child.find(f"{xmlns}NMakePreprocessorDefinitions")
 			if(not defines):
 				defines = ET.SubElement(child, f"{xmlns}NMakePreprocessorDefinitions")
-			defines.text = "STRIP_CLANG"
+			
+			# add defines
+			defines.text = "STRIP_CLANG;"
+			for d in proj.vsDefines:
+				defines.text += f"{d};"
 
-			incs = child.find(f"{xmlns}AdditionalOptions")
+			# add include paths
+			incs = child.find(f"{xmlns}NMakeIncludeSearchPath")
 			if(not incs):
 				incs = ET.SubElement(child, f"{xmlns}NMakeIncludeSearchPath")
 			incs.text = includes
 
-			options = child.find(f"{xmlns}NMakeIncludeSearchPath")
+			options = child.find(f"{xmlns}AdditionalOptions")
 			if(not options):
 				options = ET.SubElement(child, f"{xmlns}AdditionalOptions")
 			options.text = "/std:c++17"

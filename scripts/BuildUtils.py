@@ -377,6 +377,7 @@ class ProjectEnviernment:
 		self.includes = []
 		self.sysIncludes = []
 		self.defines = []
+		self.vsDefines = []
 		self.links = []
 		self.dlls = []
 		self.dependancys = []

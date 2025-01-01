@@ -1,4 +1,5 @@
 #include "CharacterController.h"
+#include "Input/InputSystem.h"
 
 namespace Game
 {

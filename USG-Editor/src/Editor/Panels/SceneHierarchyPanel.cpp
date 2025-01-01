@@ -1,41 +1,77 @@
 #include "SceneHierarchyPanel.h"
-#include "Engine/AssetManager/AssetManager.h"
-#include "Editor/EditorAssets.h"
-#include "Editor/EditorLayer.h"
-#include "Engine/Core/UUID.h"
-
-#include "Engine/Core/Scene/TransformComponent.h"
-
 #include "PropertiesPanel.h"
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
+#include "Engine/AssetManager/AssetManager.h"
+#include "Engine/Core/Scene/TransformComponent.h"
+#include "Engine/Core/UUID.h"
+
+#include "Editor/EditorAssets.h"
+#include "Editor/EditorLayer.h"
+#include "Utils/Common.h"
 
 #include <glm/gtc/type_ptr.hpp>
-
 #include <filesystem>
-
-#include "Utils/Common.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <ImGuizmo/ImGuizmo.h>
 
 namespace Editor
 {
-	SceneHierarchyPanel::SceneHierarchyPanel(const Engine::Ref<Engine::Scene>& context)
+	SceneHierarchyPanel::SceneHierarchyPanel(Engine::Ref<Engine::Scene> context)
 	{
-		SetContext(context);
+		OnSceneChange(context);
 	}
 
-	void SceneHierarchyPanel::SetContext(const Engine::Ref<Engine::Scene>& context)
+	void SceneHierarchyPanel::OnSceneChange(Engine::Ref<Engine::Scene> context)
 	{
 		m_Context = context;
 		m_Selected = Engine::Entity::null;
 	}
 
-	void DISABLE_OPS SceneHierarchyPanel::OnImGuiRender()
+	void SceneHierarchyPanel::OnScreenClick(Math::Vector2 pos)
+	{
+		pos.y = 1 - pos.y;
+
+		Engine::GameBase* game = Engine::GameBase::Get();
+		Engine::Ref<Engine::EditorCamera> editorCamera = Editor::EditorLayer::Get()->GetEditorCamera();
+
+		Engine::Ray ray;
+		ray.m_Origin = editorCamera->GetPosition();
+		Math::Vector4 ndc = Math::Vector4(pos * 2.0f - 1.0f, 1, 1);
+		Math::Vector4 worldSpace = Math::Inverse(editorCamera->GetViewProjection()) * ndc;
+		worldSpace = worldSpace / worldSpace.w;
+		ray.m_Direction = Math::Vector3(worldSpace) - editorCamera->GetPosition();
+
+		Engine::Entity hitEntity;
+		float closestHit = FLT_MAX;
+
+		game->GetScene()->GetRegistry().EachEntity([&](Engine::EntityType et) {
+			Engine::Entity e{ et, game->GetScene().get() };
+			Engine::AABB aabb = e.GetLocalAABB();
+			if (aabb.m_Min != aabb.m_Max)
+			{
+				Engine::PlainVolume volume = e.GetPlainVolume();
+				Engine::RayHit hit;
+				if (volume.TestRay(ray, hit))
+				{
+					if (hit.m_Distance < closestHit)
+					{
+						closestHit = hit.m_Distance;
+						hitEntity = e;
+					}
+				}
+			}
+		});
+
+		SelectEntity(hitEntity);
+	}
+
+	void SceneHierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Hierarchy");
 
 		std::vector<Engine::Entity> rootEntitys;
-		m_Context->GetRegistry().EachEntity([&](auto entityID) DISABLE_OPS{
+		m_Context->GetRegistry().EachEntity([&](auto entityID) {
 			Engine::Entity entity{ entityID, m_Context.get() };
 			if (entity.GetTransform().GetParent() == Engine::Entity::null)
 				rootEntitys.push_back(entity);
@@ -82,20 +118,6 @@ namespace Editor
 
 			if (ImGui::BeginPopup("AddComponent"))
 			{
-#define ADD_COMPONENT(name, component)\
-if(!m_Selected.HasComponent<component>()){\
-	if (ImGui::MenuItem(#name)){\
-		m_Selected.AddComponent<component>();\
-		ImGui::CloseCurrentPopup();\
-	}\
-}
-				//ADD_COMPONENT(Camera, CameraComponent);
-				//ADD_COMPONENT(Directional Light, DirectionalLightComponent);
-				//ADD_COMPONENT(Static Model Renderer, StaticModelRendererComponent);
-				//ADD_COMPONENT(Skybox, SkyboxComponent);
-
-#undef ADD_COMPONENT
-
 				std::vector<const Reflect::Class*> components = Reflect::Registry::GetRegistry()->GetGroup("Component");
 				for (const Reflect::Class* componetClass : components)
 				{
@@ -114,6 +136,89 @@ if(!m_Selected.HasComponent<component>()){\
 		}
 		ImGui::End();
 	}
+
+	void SceneHierarchyPanel::OnDrawGizmos()
+	{
+		Engine::Entity selected = GetSelectedEntity();
+		if (selected)
+		{
+			// TODO : Fix for child entity's
+			// Gizmo's
+			if (m_GizmoType != -1)
+			{
+				// camera editor
+				Engine::Ref<Engine::EditorCamera> editorCamera = EditorLayer::Get()->GetEditorCamera();
+				const Math::Mat4& cameraProjection = editorCamera->GetProjectionMatrix();
+				Math::Mat4 cameraView = editorCamera->GetViewMatrix();
+				
+				// transform
+				auto& tc = selected.GetTransform(); // get the transform component
+				Math::Mat4 transform = tc.GetGlobalTransform(); // get the transform matrix
+				Math::Vector3 OldPosition, OldRotation, OldScale;
+				Math::DecomposeTransform(transform, OldPosition, OldRotation, OldScale);
+
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetDrawlist();
+
+				float windowWidth = (float)ImGui::GetWindowWidth();
+				float windowHeight = (float)ImGui::GetWindowHeight();
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+					(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
+
+				if (ImGuizmo::IsUsing())
+				{
+					Math::Vector3 position, rotation, scale;
+					Math::DecomposeTransform(transform, position, rotation, scale);
+				
+					tc.Translate(position - OldPosition);
+					tc.Rotate(rotation - OldRotation);
+					tc.Scale(scale - OldScale);
+				}
+			}
+		}
+	}
+
+
+	void SceneHierarchyPanel::OnEvent(Engine::Event* e)
+	{
+		Engine::EventDispatcher dispacher(e);
+		dispacher.Dispatch<Engine::KeyPressedEvent>(BIND_EVENT_FN(&SceneHierarchyPanel::OnKeyPressed));
+	}
+
+	bool SceneHierarchyPanel::OnKeyPressed(Engine::KeyPressedEvent* e)
+	{
+		bool controlPressed = Engine::Input::GetKeyDown(Engine::KeyCode::CONTROL);
+		bool shiftPressed = Engine::Input::GetKeyDown(Engine::KeyCode::SHIFT);
+		bool rightClick = Engine::Input::GetMouseButtonDown(Engine::MouseCode::RIGHT_MOUSE);
+
+		if (!rightClick)
+		{
+			// imguizmo keyboard shortcuts
+			switch (e->GetKeyCode())
+			{
+			case Engine::KeyCode::Q:
+				m_GizmoType = -1;
+				break;
+			case Engine::KeyCode::G:
+			case Engine::KeyCode::T:
+				m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			case Engine::KeyCode::S:
+				m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				break;
+			case Engine::KeyCode::R:
+				m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+				break;
+			default:
+				break;
+			}
+		}
+
+		return true;
+	}
+
 
 	void SceneHierarchyPanel::SelectEntity(Engine::Entity e)
 	{ 
@@ -256,22 +361,5 @@ if(!m_Selected.HasComponent<component>()){\
 				entity.RemoveComponent(comp);
 		}
 	}
-
-	/*ADD_EXPOSE_PROP_FUNC(TransformComponent) {
-		bool changed = false;
-		TransformComponent& tc = *(TransformComponent*)voidData;
-		Math::Vector3 posiiton = tc.GetPosition();
-		if (changed |= PropertysPanel::DrawVec3Control("Position", posiiton, 0.0f))
-			tc.SetPosition(posiiton);
-
-		Math::Vector3 rotation = glm::degrees(tc.GetRotation());
-		if (changed |= PropertysPanel::DrawVec3Control("Rotation", rotation, 0.0f))
-			tc.SetRotation(glm::radians(rotation));
-
-		Math::Vector3 scale = tc.GetScale();
-		if (changed |= PropertysPanel::DrawVec3Control("Scale", scale, 1.0f))
-			tc.SetScale(scale);
-		return changed;
-	});*/
 
 }

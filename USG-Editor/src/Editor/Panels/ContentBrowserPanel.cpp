@@ -18,6 +18,16 @@ namespace Editor
 		m_RootDirectory(s_AssetsDirectory), m_CurrentDirectory(s_AssetsDirectory)
 	{
 		m_OpenFolders[m_RootDirectory] = true;
+		SetDirectory(Engine::Application::Get().GetProject().GetAssetsDirectory());
+	}
+
+	void ContentBrowserPanel::OnUpdate()
+	{
+		if (!EditorLayer::Get()->IsPlaying())
+		{
+			if (Engine::Input::GetKeyPressed(Engine::KeyCode::SPACE) && Engine::Input::GetKeyDown(Engine::KeyCode::CONTROL))
+				SetActive(!IsActive());
+		}
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()

@@ -268,7 +268,7 @@ namespace Editor
 		{
 			fs::path path = Engine::Application::Get().GetAssetManager().GetRelitiveAssetPath(texture->GetAssetID());
 			if (ImGui::Button(path.string().c_str()))
-				EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
+				EditorLayer::Get()->GetPanel<ContentBrowserPanel>()->SelectAsset(path);
 			
 		}
 		if (ImGui::Button("Clear")) {
@@ -309,7 +309,7 @@ namespace Editor
 			{
 				fs::path path = Engine::Application::Get().GetAssetManager().GetRelitiveAssetPath(mat->GetAssetID());
 				if (ImGui::Button(path.string().c_str()))
-					EditorLayer::Get()->GetContantBrowser().SelectAsset(path);
+					EditorLayer::Get()->GetPanel<ContentBrowserPanel>()->SelectAsset(path);
 			}
 		}
 		ImGui::SameLine();

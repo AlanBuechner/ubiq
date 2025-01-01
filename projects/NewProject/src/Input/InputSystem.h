@@ -77,6 +77,7 @@ namespace Game
 	public:
 		REFLECTED_BODY(Game::InputSystem);
 
+	public:
 		virtual void OnAttatch() override;
 		void OnEvent(Engine::Event* e);
 

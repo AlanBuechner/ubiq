@@ -37,8 +37,10 @@ namespace Editor
 		void DefaultScene();
 		void LoadScene(const fs::path& file);
 
-		SceneHierarchyPanel& GetSceneHierarchyPanel() { return m_HierarchyPanel; }
-		ContentBrowserPanel& GetContantBrowser() { return m_ContentPanel; }
+		Engine::Ref<Engine::EditorCamera> GetEditorCamera() { return m_EditorCamera; }
+
+		template<class T>
+		Engine::Ref<T> GetPanel();
 
 		bool IsPlaying() { return m_Playing; }
 
@@ -51,35 +53,48 @@ namespace Editor
 
 		void DrawCustomGizmo();
 
+		void DockSpace();
 		void UI_Viewport();
 
-		Engine::Entity GetEntityAtMousePosition(bool& inWindow);
+		bool GetMousePositionInViewport(Math::Vector2& pos);
 
 	private:
+		// grid
 		const Math::Vector4 m_GridColor = { 0.5f,0.5f,0.5f,1 };
 		const float m_GridExtent = 40.0f;
 		const uint32 m_GridLines = 80;
 		const float m_GridLineOffset = m_GridExtent * 2 / m_GridLines;
 		Engine::DebugMesh m_GridMesh;
 
+		// editor
 		Engine::Ref<Engine::EditorCamera> m_EditorCamera;
-
 		fs::path m_LoadedScene;
+		bool m_Playing = false;
+		Utils::Vector<Engine::Ref<EditorPanel>> m_Panels;
 
+		// viewport
 		Math::Vector2 m_ViewPortSize;
-
 		Math::Vector2 m_ViewportBounds[2];
 
-		int m_GizmoType = -1;
-
-		SceneHierarchyPanel m_HierarchyPanel;
-		ContentBrowserPanel m_ContentPanel;
-
+		// game
 		Engine::GameBase* m_Game;
 
-		bool m_Playing = false;
-
+		// extra
 		fs::path m_DropPath;
 		fs::path m_EditorDirectory;
 	};
+
+
+
+	template<class T>
+	Engine::Ref<T> Editor::EditorLayer::GetPanel()
+	{
+		for (uint32 i = 0; i < m_Panels.Count(); i++)
+		{
+			if (m_Panels[i]->GetClass().GetTypeID() == T::GetStaticClass().GetTypeID())
+				return std::dynamic_pointer_cast<T>(m_Panels[i]);
+		}
+		return nullptr;
+	}
+
 }

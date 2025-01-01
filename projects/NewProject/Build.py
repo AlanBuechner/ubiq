@@ -57,6 +57,9 @@ defines = [
 ]
 if(inEditor):
 	defines.append("EDITOR")
+vsDefines = [
+	"EDITOR"
+]
 
 dependancys = [
 	"TestModule",
@@ -79,6 +82,7 @@ def GetProject():
 	proj.includes = includes
 	proj.sysIncludes = sysIncludes
 	proj.defines = defines
+	proj.vsDefines = vsDefines
 	proj.links = links
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY

@@ -1,5 +1,7 @@
 #pragma once
 #include <Engine.h>
+#include "EditorPanel.h"
+
 
 #include <map>
 #include <imgui/imgui.h>
@@ -7,12 +9,16 @@
 
 namespace Editor
 {
-	class ContentBrowserPanel
+	CLASS(GROUP == EditorPanel) ContentBrowserPanel : public EditorPanel
 	{
+	public:
+		REFLECTED_BODY(Editor::ContentBrowserPanel)
+
 	public:
 		ContentBrowserPanel();
 
-		void OnImGuiRender();
+		virtual void OnUpdate() override;
+		virtual void OnImGuiRender() override;
 
 		void SelectAsset(fs::path path);
 		void SetDirectory(const fs::path& path);
