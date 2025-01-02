@@ -19,8 +19,6 @@ namespace Engine
 	class Application;
 }
 
-Engine::Application* CreateApplication();
-
 namespace Engine
 {
 	class  Application

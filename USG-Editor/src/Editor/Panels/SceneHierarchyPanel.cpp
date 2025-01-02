@@ -17,11 +17,6 @@
 
 namespace Editor
 {
-	SceneHierarchyPanel::SceneHierarchyPanel(Engine::Ref<Engine::Scene> context)
-	{
-		OnSceneChange(context);
-	}
-
 	void SceneHierarchyPanel::OnSceneChange(Engine::Ref<Engine::Scene> context)
 	{
 		m_Context = context;
@@ -35,6 +30,7 @@ namespace Editor
 		Engine::GameBase* game = Engine::GameBase::Get();
 		Engine::Ref<Engine::EditorCamera> editorCamera = Editor::EditorLayer::Get()->GetEditorCamera();
 
+		// calculate ray
 		Engine::Ray ray;
 		ray.m_Origin = editorCamera->GetPosition();
 		Math::Vector4 ndc = Math::Vector4(pos * 2.0f - 1.0f, 1, 1);
@@ -42,6 +38,7 @@ namespace Editor
 		worldSpace = worldSpace / worldSpace.w;
 		ray.m_Direction = Math::Vector3(worldSpace) - editorCamera->GetPosition();
 
+		// find closest entity
 		Engine::Entity hitEntity;
 		float closestHit = FLT_MAX;
 
@@ -64,120 +61,6 @@ namespace Editor
 		});
 
 		SelectEntity(hitEntity);
-	}
-
-	void SceneHierarchyPanel::OnImGuiRender()
-	{
-		ImGui::Begin("Hierarchy");
-
-		std::vector<Engine::Entity> rootEntitys;
-		m_Context->GetRegistry().EachEntity([&](auto entityID) {
-			Engine::Entity entity{ entityID, m_Context.get() };
-			if (entity.GetTransform().GetParent() == Engine::Entity::null)
-				rootEntitys.push_back(entity);
-		});
-
-		for (uint32 i = 0; i < rootEntitys.size(); i++)
-			DrawEntityNode(rootEntitys[i]);
-
-		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-			m_Selected = Engine::Entity::null;
-
-		// right click on blank space
-		if (ImGui::BeginPopupContextWindow(0, 1, false))
-		{
-			CreateNewEntity();
-			ImGui::EndPopup();
-		}
-
-		ImRect windowRect = {ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax()};
-		if (ImGui::BeginDragDropTargetCustom(windowRect, ImGui::GetWindowDockID()))
-		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY"))
-			{
-				Engine::Entity dropedEntity = *(Engine::Entity*)payload->Data;
-				dropedEntity.GetTransform().SetParentToRoot();
-			}
-			ImGui::EndDragDropTarget();
-		}
-
-		ImGui::End();
-
-
-
-		ImGui::Begin("Properties");
-
-		if (m_Selected)
-		{
-			DrawComponents(m_Selected);
-
-			if (ImGui::Button("Add Component"))
-			{
-				ImGui::OpenPopup("AddComponent");
-			}
-
-			if (ImGui::BeginPopup("AddComponent"))
-			{
-				std::vector<const Reflect::Class*> components = Reflect::Registry::GetRegistry()->GetGroup("Component");
-				for (const Reflect::Class* componetClass : components)
-				{
-					if (!m_Selected.GetScene()->GetRegistry().HasComponent(m_Selected, *componetClass))
-					{
-						if (ImGui::MenuItem(componetClass->GetName().c_str()))
-						{
-							m_Selected.GetScene()->GetRegistry().AddComponent(m_Selected, m_Selected.GetScene(), *componetClass);
-							ImGui::CloseCurrentPopup();
-						}
-					}
-				}
-
-				ImGui::EndPopup();
-			}
-		}
-		ImGui::End();
-	}
-
-	void SceneHierarchyPanel::OnDrawGizmos()
-	{
-		Engine::Entity selected = GetSelectedEntity();
-		if (selected)
-		{
-			// TODO : Fix for child entity's
-			// Gizmo's
-			if (m_GizmoType != -1)
-			{
-				// camera editor
-				Engine::Ref<Engine::EditorCamera> editorCamera = EditorLayer::Get()->GetEditorCamera();
-				const Math::Mat4& cameraProjection = editorCamera->GetProjectionMatrix();
-				Math::Mat4 cameraView = editorCamera->GetViewMatrix();
-				
-				// transform
-				auto& tc = selected.GetTransform(); // get the transform component
-				Math::Mat4 transform = tc.GetGlobalTransform(); // get the transform matrix
-				Math::Vector3 OldPosition, OldRotation, OldScale;
-				Math::DecomposeTransform(transform, OldPosition, OldRotation, OldScale);
-
-				ImGuizmo::SetOrthographic(false);
-				ImGuizmo::SetDrawlist();
-
-				float windowWidth = (float)ImGui::GetWindowWidth();
-				float windowHeight = (float)ImGui::GetWindowHeight();
-				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-
-				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-					(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
-
-				if (ImGuizmo::IsUsing())
-				{
-					Math::Vector3 position, rotation, scale;
-					Math::DecomposeTransform(transform, position, rotation, scale);
-				
-					tc.Translate(position - OldPosition);
-					tc.Rotate(rotation - OldRotation);
-					tc.Scale(scale - OldScale);
-				}
-			}
-		}
 	}
 
 
@@ -219,33 +102,136 @@ namespace Editor
 		return true;
 	}
 
+	void SceneHierarchyPanel::OnImGuiRender()
+	{
+		ImGui::Begin("Hierarchy");
 
-	void SceneHierarchyPanel::SelectEntity(Engine::Entity e)
-	{ 
-		m_Selected = e;
+		// get all root entities
+		Utils::Vector<Engine::Entity> rootEntities;
+		m_Context->GetRegistry().EachEntity([&](auto entityID) {
+			Engine::Entity entity{ entityID, m_Context.get() };
+			if (entity.GetTransform().GetParent() == Engine::Entity::null)
+				rootEntities.Push(entity);
+		});
+
+		// draw all root entities
+		for (uint32 i = 0; i < rootEntities.Count(); i++)
+			DrawEntityNode(rootEntities[i]);
+
+		// clear selected entity when clicking on empty
+		if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
+			m_Selected = Engine::Entity::null;
+
+		// right click on blank space
+		if (ImGui::BeginPopupContextWindow(0, ImGuiMouseButton_Right, false))
+		{
+			DrawCreateNewEntity();
+			ImGui::EndPopup();
+		}
+
+		// drag and drop to clear entity parent
+		ImRect windowRect = { ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax() };
+		if (ImGui::BeginDragDropTargetCustom(windowRect, ImGui::GetWindowDockID()))
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY"))
+			{
+				Engine::Entity dropedEntity = *(Engine::Entity*)payload->Data;
+				dropedEntity.GetTransform().SetParentToRoot();
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		ImGui::End();
+
+
+
+		ImGui::Begin("Properties");
+
+		// draw selected entities components
+		if (m_Selected)
+		{
+			DrawComponents(m_Selected);
+
+			if (ImGui::Button("Add Component"))
+				ImGui::OpenPopup("AddComponent");
+
+			if (ImGui::BeginPopup("AddComponent"))
+			{
+				std::vector<const Reflect::Class*> components = Reflect::Registry::GetRegistry()->GetGroup("Component");
+				for (const Reflect::Class* componetClass : components)
+				{
+					if (!m_Selected.GetScene()->GetRegistry().HasComponent(m_Selected, *componetClass))
+					{
+						if (ImGui::MenuItem(componetClass->GetName().c_str()))
+						{
+							m_Selected.GetScene()->GetRegistry().AddComponent(m_Selected, m_Selected.GetScene(), *componetClass);
+							ImGui::CloseCurrentPopup();
+						}
+					}
+				}
+
+				ImGui::EndPopup();
+			}
+		}
+		ImGui::End();
 	}
 
-	void SceneHierarchyPanel::CreateNewEntity(Engine::Entity parent)
+	void SceneHierarchyPanel::OnDrawGizmos()
 	{
-		bool entityAdded = false;
-		Engine::Entity createdEntity;
+		Engine::Entity selected = GetSelectedEntity();
+		if (selected)
+		{
+			// TODO : Fix for child entity's
+			// Gizmo's
+			if (m_GizmoType != -1)
+			{
+				// get editor camera transform
+				Engine::Ref<Engine::EditorCamera> editorCamera = EditorLayer::Get()->GetEditorCamera();
+				const Math::Mat4& cameraProjection = editorCamera->GetProjectionMatrix();
+				const Math::Mat4& cameraView = editorCamera->GetViewMatrix();
+
+				// get position rotation and scale from global transform
+				auto& tc = selected.GetTransform(); // get the transform component
+				Math::Mat4 transform = tc.GetGlobalTransform(); // get the transform matrix
+				Math::Vector3 OldPosition, OldRotation, OldScale;
+				Math::DecomposeTransform(transform, OldPosition, OldRotation, OldScale);
+
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetDrawlist();
+
+				float windowWidth = (float)ImGui::GetWindowWidth();
+				float windowHeight = (float)ImGui::GetWindowHeight();
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+					(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
+
+				if (ImGuizmo::IsUsing())
+				{
+					Math::Vector3 position, rotation, scale;
+					Math::DecomposeTransform(transform, position, rotation, scale);
+
+					tc.Translate(position - OldPosition);
+					tc.Rotate(rotation - OldRotation);
+					tc.Scale(scale - OldScale);
+				}
+			}
+		}
+	}
+
+	void SceneHierarchyPanel::DrawCreateNewEntity(Engine::Entity parent)
+	{
 		if (ImGui::MenuItem("Create Empty Entity"))
 		{
-			createdEntity = m_Context->CreateEntity("Empty Entity");
-			entityAdded = true;
+			Engine::Entity createdEntity = m_Context->CreateEntity("Empty Entity");
+			if (parent)
+				parent.GetTransform().AddChild(createdEntity);
 		}
-
-		if (entityAdded && parent)
-		{
-			auto& tc = parent.GetTransform();
-			tc.AddChild(createdEntity);
-		}
-		
 	}
 
 	void SceneHierarchyPanel::DrawEntityNode(Engine::Entity entity)
 	{
-		auto& children = entity.GetTransform().GetChildren();
+		const Utils::Vector<Engine::Entity>& children = entity.GetTransform().GetChildren();
 		ImGuiTreeNodeFlags flags = ( m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
 			(children.Empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow) |
 			ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -281,7 +267,7 @@ namespace Editor
 			
 			if (ImGui::BeginMenu("Create"))
 			{
-				CreateNewEntity(entity);
+				DrawCreateNewEntity(entity);
 				ImGui::EndMenu();
 			}
 			ImGui::EndPopup();
@@ -307,7 +293,6 @@ namespace Editor
 
 	void SceneHierarchyPanel::DrawComponents(Engine::Entity entity)
 	{
-
 		auto& name = entity.GetName();
 
 		char buffer[256];
