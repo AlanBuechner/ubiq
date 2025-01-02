@@ -16,17 +16,21 @@ namespace Editor
 		virtual void OnSceneChange(Engine::Ref<Engine::Scene> context) override;
 		virtual void OnScreenClick(Math::Vector2 pos) override;
 
+		virtual void OnEvent(Engine::Event* e) override;
+
+		// draw
+		virtual void OnImGuiRender() override;
+		virtual void OnDrawGizmos() override;
+
+		// selected entity
 		Engine::Entity GetSelectedEntity() const { return m_Selected; }
 		void SelectEntity(Engine::Entity e) { m_Selected = e; }
 
 	private:
 		// events
-		virtual void OnEvent(Engine::Event* e) override;
 		bool OnKeyPressed(Engine::KeyPressedEvent* e);
 
 		// draw
-		virtual void OnImGuiRender() override;
-		virtual void OnDrawGizmos() override;
 		void DrawCreateNewEntity(Engine::Entity parent = Engine::Entity());
 		void DrawEntityNode(Engine::Entity entity);
 		void DrawComponents(Engine::Entity entity);
