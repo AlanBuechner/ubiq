@@ -1,4 +1,5 @@
 #include "PropertiesPanel.h"
+#include "ContentBrowserPanel.h"
 #include "Editor/EditorLayer.h"
 #include "Editor/EditorAssets.h"
 #include <imgui/imgui.h>

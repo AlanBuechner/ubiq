@@ -3,8 +3,7 @@
 #include <Engine.h>
 #include <Engine/Math/Math.h>
 
-#include "Panels/SceneHierarchyPanel.h"
-#include "Panels/ContentBrowserPanel.h"
+#include "Editor/Panels/EditorPanel.h"
 
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/SceneRenderer.h"
@@ -28,10 +27,9 @@ namespace Editor
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
 
+		virtual void OnImGuiRender() override;
 		virtual void OnUpdate() override;
 		virtual void OnRender() override;
-		virtual void OnImGuiRender() override;
-		virtual void OnEvent(Engine::Event* event) override;
 
 		void NewScene();
 		void DefaultScene();
@@ -45,27 +43,21 @@ namespace Editor
 		bool IsPlaying() { return m_Playing; }
 
 	private:
-		void OpenScene();
-		void SaveScene();
-		void SaveSceneAs();
-
-		bool OnKeyPressed(Engine::KeyPressedEvent* e);
-
-		void DrawCustomGizmo();
-
-		void DockSpace();
-		void UI_Viewport();
+		// draw ui
+		void DrawViewport();
 
 		bool GetMousePositionInViewport(Math::Vector2& pos);
 
-	private:
-		// grid
-		const Math::Vector4 m_GridColor = { 0.5f,0.5f,0.5f,1 };
-		const float m_GridExtent = 40.0f;
-		const uint32 m_GridLines = 80;
-		const float m_GridLineOffset = m_GridExtent * 2 / m_GridLines;
-		Engine::DebugMesh m_GridMesh;
+		// dialogs
+		void OpenSceneDialog();
+		void SaveSceneDialog();
+		void SaveSceneAsDialog();
 
+		// events
+		virtual void OnEvent(Engine::Event* event) override;
+		bool OnKeyPressed(Engine::KeyPressedEvent* e);
+
+	private:
 		// editor
 		Engine::Ref<Engine::EditorCamera> m_EditorCamera;
 		fs::path m_LoadedScene;

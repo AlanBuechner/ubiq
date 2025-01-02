@@ -1,6 +1,7 @@
 #include "Properties.h"
 
 #if defined(EDITOR)
+#include "Editor/Panels/ContentBrowserPanel.h"
 #include "Editor/Panels/PropertiesPanel.h"
 #include "Editor/EditorLayer.h"
 
