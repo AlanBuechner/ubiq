@@ -22,12 +22,12 @@ namespace Editor
 
 
 		typedef std::function<bool(void*, void*, uint64, const Reflect::Property*)> ExposePropertyFunc;
-		static std::unordered_map<uint64, ExposePropertyFunc> s_ExposePropertyFunctions;
+		static std::unordered_map<uint64, ExposePropertyFunc>& GetExposePropertyFunctions();
 		class AddExposePropertyFunc
 		{
 		public:
 			AddExposePropertyFunc(uint64 typeID, ExposePropertyFunc func) {
-				s_ExposePropertyFunctions.emplace(typeID, func);
+				GetExposePropertyFunctions().emplace(typeID, func);
 			}
 		};
 #define ADD_EXPOSE_PROP_FUNC(type) static Editor::PropertysPanel::AddExposePropertyFunc CAT(Draw,__LINE__)(typeid(type).hash_code(), [](void* voidData, void* object, uint64 typeID, const Reflect::Property* prop)

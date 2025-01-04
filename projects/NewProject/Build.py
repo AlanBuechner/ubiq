@@ -9,7 +9,7 @@ import inspect
 projDir = os.path.dirname(inspect.getfile(lambda: None)).replace("\\", "/")
 projName = os.path.basename(projDir)
 
-inEditor = Config.project == "USG-Editor"
+inEditor = True #Config.project == "USG-Editor"
 
 sources = [
 	f"src/**.cpp",
@@ -43,8 +43,6 @@ includes = [
 	f"{location}/GameEngine/embeded",
 	f"{projDir}/modules",
 ]
-if(inEditor):
-	includes.append(f"{location}/USG-Editor/src")
 
 sysIncludes = []
 sysIncludes.extend(GetSysIncludes())
@@ -55,8 +53,7 @@ defines = [
 	"UNICODE",
 	"_CRT_SECURE_NO_WARNINGS",
 ]
-if(inEditor):
-	defines.append("EDITOR")
+
 vsDefines = [
 	"EDITOR"
 ]
@@ -68,8 +65,14 @@ dependancys = [
 links = []
 
 modules = [
-	"modules/TestModule"
+	"modules/TestModule",
+	f"{location}/EditorModule",
 ]
+
+if(inEditor):
+	defines.append("EDITOR")
+	includes.append(f"{location}/EditorModule/src")
+	dependancys.append("EditorModule")
 
 def GetProject():
 	proj = BuildUtils.ProjectEnviernment()

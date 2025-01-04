@@ -20,7 +20,7 @@ namespace Editor
 
 	public:
 		EditorLayer();
-		~EditorLayer() = default;
+		~EditorLayer();
 
 		static EditorLayer* Get() { return s_Instance; }
 

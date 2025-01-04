@@ -7,6 +7,8 @@
 
 LINK_REFLECTION_DATA(Runtime)
 
+extern Engine::Layer* GetEditorLayer();
+
 namespace Engine
 {
 	class Runtime : public Application
@@ -17,23 +19,27 @@ namespace Engine
 			Application("USG Editor")
 		{
 			auto timer = CREATE_PROFILEI();
-			timer.Start("Runtime Layer");
-			PushLayer(new RuntimeLayer()); // set the editor layer
+			timer.Start("Create Layer");
+
+			Engine::Layer* editorLayer = GetEditorLayer();
+			m_InEditer = editorLayer != nullptr;
+			if(editorLayer != nullptr)
+				PushLayer(editorLayer); // set the editor layer
+			else
+				PushLayer(new RuntimeLayer()); // set the runtime layer
 			GenLayerStack();
 
 			timer.End();
 		}
 
 		~Runtime()
-		{
-
-		}
+		{}
 
 	};
+}
 
-	Application* CreateApplication()
-	{
-		CREATE_PROFILE_FUNCTIONI();
-		return new Runtime();
-	}
+Engine::Application* CreateApplication()
+{
+	CREATE_PROFILE_FUNCTIONI();
+	return new Engine::Runtime();
 }

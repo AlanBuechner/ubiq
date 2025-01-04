@@ -1,4 +1,4 @@
-# USG-Editor build script
+# test project build script
 
 import scripts.BuildUtils as BuildUtils
 from scripts.Utils.Utils import *
@@ -8,9 +8,6 @@ import time
 import inspect
 projDir = os.path.dirname(inspect.getfile(lambda: None)).replace("\\", "/")
 projName = os.path.basename(projDir)
-
-pchHeader = f"{location}/src/pch.h"
-pchSource = f"{location}/src/pch.cpp"
 
 sources = [
 	f"src/**.cpp",
@@ -44,9 +41,7 @@ includes = [
 	f"{location}/GameEngine/embeded",
 ]
 
-sysIncludes = [
-
-]
+sysIncludes = []
 sysIncludes.extend(GetSysIncludes())
 
 defines = [
@@ -54,27 +49,18 @@ defines = [
 	"_UNICODE",
 	"UNICODE",
 	"_CRT_SECURE_NO_WARNINGS",
+	"EDITOR",
 ]
 
-dependancys = [
-	"GameEngine",
-]
-if(Config.gameProject != None):
-	dependancys.append(os.path.basename(Config.gameProject))
+dependancys = []
 
-links = [
-	"kernel32.lib",
-	"user32.lib",
-	"comdlg32.lib",
-	"shell32.lib",
-]
+links = []
 
 def GetProject():
-
 	proj = BuildUtils.ProjectEnviernment()
 	proj.projectDirectory = projDir
-	proj.pchSource = pchSource
-	proj.pchHeader = pchHeader
+	proj.pchSource = ""
+	proj.pchHeader = ""
 	proj.sources = sources
 	proj.resources = resources
 	proj.headers = headers
@@ -83,8 +69,11 @@ def GetProject():
 	proj.defines = defines
 	proj.links = links
 	proj.dependancys = dependancys
-	proj.buildType = BuildUtils.BuildType.EXECUTABLE
+	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
+	proj.intDir = GetIntDir(projName)
+	proj.binDir = GetBinDir(projName)
 	proj.genReflection = True
-	proj.intDir = GetIntDir(projName, Config.gameProject)
-	proj.binDir = GetBinDir(projName, Config.gameProject)
 	return proj
+
+
+

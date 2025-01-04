@@ -322,12 +322,12 @@ namespace Editor
 		return changed;
 	}
 
-	bool PropertysPanel::DrawPropertyControl(void* object, uint64 typeID, const Reflect::Property* prop)
+	bool DISABLE_OPS PropertysPanel::DrawPropertyControl(void* object, uint64 typeID, const Reflect::Property* prop)
 	{
 		bool changed = false;
 		void* propLoc = prop ? (void*)((uint64)object + prop->GetOffset()) : object;
-		auto func = PropertysPanel::s_ExposePropertyFunctions.find(typeID);
-		if (func != PropertysPanel::s_ExposePropertyFunctions.end())
+		auto func = PropertysPanel::GetExposePropertyFunctions().find(typeID);
+		if (func != PropertysPanel::GetExposePropertyFunctions().end())
 			changed = func->second(propLoc, object, typeID, prop);
 		else if (prop)
 			CORE_WARN("Could not draw controll for prperty {0} of type {1}", prop->GetName(), prop->GetTypeID());
@@ -344,7 +344,11 @@ namespace Editor
 		return changed;
 	}
 
-	std::unordered_map<uint64, PropertysPanel::ExposePropertyFunc> PropertysPanel::s_ExposePropertyFunctions;
+	std::unordered_map<uint64, Editor::PropertysPanel::ExposePropertyFunc>& PropertysPanel::GetExposePropertyFunctions()
+	{
+		static std::unordered_map<uint64, ExposePropertyFunc> s_ExposePropertyFunctions;
+		return s_ExposePropertyFunctions;
+	}
 
 	ADD_EXPOSE_PROP_FUNC(bool) {
 		bool* data = (bool*)voidData;

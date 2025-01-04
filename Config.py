@@ -12,7 +12,7 @@ p = {
 		"Reflection" : "vendor/Reflection",
 		"Utilities" : "vendor/Utilities",
 	},
-	"USG-Editor" : "USG-Editor",
+	#"USG-Editor" : "USG-Editor",
 	"Runtime" : "Runtime",
 	"GameEngine" : "GameEngine",
 }

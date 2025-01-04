@@ -16,6 +16,14 @@
 #include <ImGuizmo/ImGuizmo.h>
 #include <memory>
 
+LINK_REFLECTION_DATA(EditorModule)
+
+Engine::Layer* GetEditorLayer()
+{
+	return new Editor::EditorLayer();
+}
+
+
 Editor::EditorLayer* Editor::EditorLayer::s_Instance = nullptr;
 
 namespace Editor
@@ -27,11 +35,17 @@ namespace Editor
 		if (s_Instance == nullptr)
 			s_Instance = this;
 
+		EditorAssets::Init();
 		m_ViewPortSize = { Engine::Application::Get().GetWindow().GetWidth(), Engine::Application::Get().GetWindow().GetHeight() };
 
 		m_Panels.Push(Engine::CreateRef<SceneHierarchyPanel>());
 		m_Panels.Push(Engine::CreateRef<ContentBrowserPanel>());
 		m_Panels.Push(Engine::CreateRef<GridGizmosPanel>());
+	}
+
+	EditorLayer::~EditorLayer()
+	{
+		EditorAssets::Destroy();
 	}
 
 	void EditorLayer::OnAttach()
