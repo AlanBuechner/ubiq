@@ -1,7 +1,6 @@
 #include <Reflection.h>
 #include <Engine.h>
 #include "RuntimeLayer.h"
-#include <Engine/Core/EntryPoint.h>
 #include <Engine/Util/PlatformUtils.h>
 #include <Engine/Core/GameBase.h>
 

@@ -49,8 +49,8 @@ namespace Engine
 					out << YAML::BeginMap;
 					out << YAML::Key << "Component" << YAML::Value << componentClass.GetSname();
 
-					auto func = s_ComponentSerializers.find(componentClass.GetTypeID());
-					if (func != s_ComponentSerializers.end())
+					auto func = GetComponentSerializerFunctions().find(componentClass.GetTypeID());
+					if (func != GetComponentSerializerFunctions().end())
 						func->second->Serialize(entity, out);
 
 					out << YAML::EndMap;
@@ -144,8 +144,8 @@ namespace Engine
 							break;
 						}
 
-						auto func = s_ComponentSerializers.find(componentClass->GetTypeID());
-						if (func != s_ComponentSerializers.end())
+						auto func = GetComponentSerializerFunctions().find(componentClass->GetTypeID());
+						if (func != GetComponentSerializerFunctions().end())
 							func->second->Deserialize(deserializedEntity, component);
 					}
 				}
@@ -168,8 +168,8 @@ namespace Engine
 							break;
 						}
 
-						auto func = s_ComponentSerializers.find(componentClass->GetTypeID());
-						if (func != s_ComponentSerializers.end())
+						auto func = GetComponentSerializerFunctions().find(componentClass->GetTypeID());
+						if (func != GetComponentSerializerFunctions().end())
 							func->second->Patch(deserializedEntity);
 					}
 				}
@@ -185,7 +185,12 @@ namespace Engine
 		return false;
 	}
 
-	std::unordered_map<uint64, ComponentSerializer*> SceneSerializer::s_ComponentSerializers;
+	std::unordered_map<uint64, ComponentSerializer*>& SceneSerializer::GetComponentSerializerFunctions()
+	{
+		static std::unordered_map<uint64, ComponentSerializer*> s_ComponentSerializers;
+		return s_ComponentSerializers;
+	}
+
 }
 
 class TransformSerializer : public Engine::ComponentSerializer

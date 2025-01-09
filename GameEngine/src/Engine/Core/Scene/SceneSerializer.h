@@ -30,12 +30,12 @@ namespace Engine
 		Ref<Scene> m_Scene;
 
 	public:
-		static std::unordered_map<uint64, ComponentSerializer*> s_ComponentSerializers;
+		static std::unordered_map<uint64, ComponentSerializer*>& GetComponentSerializerFunctions();
 		class AddComponentSerializer
 		{
 		public:
 			AddComponentSerializer(uint64 typeID, ComponentSerializer* serializer) {
-				s_ComponentSerializers.emplace(typeID, serializer);
+				GetComponentSerializerFunctions().emplace(typeID, serializer);
 			}
 		};
 #define ADD_COMPONENT_SERIALIZER(type, serializer) static Engine::SceneSerializer::AddComponentSerializer CAT(serialize,__LINE__)(typeid(type).hash_code(), new serializer());

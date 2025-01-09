@@ -322,7 +322,7 @@ namespace Editor
 		return changed;
 	}
 
-	bool DISABLE_OPS PropertysPanel::DrawPropertyControl(void* object, uint64 typeID, const Reflect::Property* prop)
+	bool PropertysPanel::DrawPropertyControl(void* object, uint64 typeID, const Reflect::Property* prop)
 	{
 		bool changed = false;
 		void* propLoc = prop ? (void*)((uint64)object + prop->GetOffset()) : object;

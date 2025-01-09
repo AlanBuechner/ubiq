@@ -9,7 +9,7 @@ import inspect
 projDir = os.path.dirname(inspect.getfile(lambda: None)).replace("\\", "/")
 projName = os.path.basename(projDir)
 
-inEditor = True #Config.project == "USG-Editor"
+inEditor = True
 
 sources = [
 	f"src/**.cpp",
