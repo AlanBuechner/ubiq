@@ -1,16 +1,15 @@
 #include <Reflection.h>
 #include <Engine.h>
+#include <Engine/Core/EntryPoint.h>
 #include "RuntimeLayer.h"
 #include <Engine/Util/PlatformUtils.h>
 #include <Engine/Core/GameBase.h>
 
-LINK_REFLECTION_DATA(Runtime)
-
 extern Engine::Layer* GetEditorLayer();
 
-namespace Engine
+namespace Game
 {
-	class Runtime : public Application
+	class Runtime : public Engine::Application
 	{
 	public:
 
@@ -40,5 +39,5 @@ namespace Engine
 Engine::Application* CreateApplication()
 {
 	CREATE_PROFILE_FUNCTIONI();
-	return new Engine::Runtime();
+	return new Game::Runtime();
 }

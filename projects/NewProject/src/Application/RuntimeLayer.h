@@ -8,9 +8,9 @@
 #include "ProjectManager/Project.h"
 #include "Engine/Core/GameBase.h"
 
-namespace Engine
+namespace Game
 {
-	class RuntimeLayer : public Layer
+	class RuntimeLayer : public Engine::Layer
 	{
 	public:
 		RuntimeLayer();
@@ -21,10 +21,10 @@ namespace Engine
 		virtual void OnUpdate() override;
 		virtual void OnRender() override;
 		virtual void OnImGuiRender() override;
-		virtual void OnEvent(Event* event) override;
+		virtual void OnEvent(Engine::Event* event) override;
 
 	private:
 
-		GameBase* m_Game;
+		Engine::GameBase* m_Game;
 	};
 }

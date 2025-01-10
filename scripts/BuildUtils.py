@@ -270,7 +270,7 @@ def BuildResources(resources, dependancys, projDir, intDir):
 		return -1
 	includes = []
 	for d in dependancys:
-		includes.append(Config.location + "/" + FindProject(d) + "/embeded")
+		includes.append(os.path.join(FindProjectPath(d), "/embeded"))
 	buildActions = []
 
 	for file in files:

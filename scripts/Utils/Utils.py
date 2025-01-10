@@ -55,7 +55,7 @@ def GetTarget():
 		if(Config.system == "windows"):
 			return "x86_64-pc-windows-msvc"
 
-def FindProject(projName):
+def FindProjectPath(projName):
 	for proj in Config.projects:
 		if(proj.endswith(projName)):
 			return proj
@@ -63,5 +63,5 @@ def FindProject(projName):
 	return ""
 
 def GetProject(projName):
-	projName = FindProject(projName)
-	return Config.buildScripts[projName]
+	projPath = FindProjectPath(projName)
+	return Config.buildScripts[projPath]

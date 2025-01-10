@@ -1,4 +1,4 @@
-# test project build script
+# test module build script
 
 import scripts.BuildUtils as BuildUtils
 from scripts.Utils.Utils import *
@@ -70,8 +70,8 @@ def GetProject():
 	buildLoc = "/Runtime"
 	if(inEditor):
 		buildLoc = "/Editor"
-	proj.intDir = GetIntDir(projName, Config.gameProject) + buildLoc
-	proj.binDir = GetBinDir(projName, Config.gameProject) + buildLoc
+	proj.intDir = GetIntDir(projName, Config.project) + buildLoc
+	proj.binDir = GetBinDir(projName, Config.project) + buildLoc
 	proj.genReflection = True
 	return proj
 

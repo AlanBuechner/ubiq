@@ -1,3 +1,3 @@
 @echo off
-call Build.bat -gs -g %~dp0 -p Runtime
+call Build.bat -gs -p %~dp0
 PAUSE

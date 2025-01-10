@@ -1,6 +1,5 @@
 import os
 location = os.path.dirname(__file__).replace("\\", "/")
-vulkanSDK = os.getenv("VULKAN_SDK")
 
 projects = [] # will be populated later
 buildScripts = {} # will be populated later
@@ -12,8 +11,6 @@ p = {
 		"Reflection" : "vendor/Reflection",
 		"Utilities" : "vendor/Utilities",
 	},
-	#"USG-Editor" : "USG-Editor",
-	"Runtime" : "Runtime",
 	"GameEngine" : "GameEngine",
 }
 tools = [
@@ -21,7 +18,6 @@ tools = [
 ]
 
 project = ""
-gameProject = None
 
 configurations = [
 	"Debug",
@@ -47,8 +43,6 @@ toolsBinDir = "bin/tools/{projName}"
 toolsIntDir = "bin-int/tools/{projName}" 
 
 cppVersion = "c++17"
-
-openMP = True
 
 compiler = f"{location}/vendor/Compiler/bin/clang-cl.exe"
 

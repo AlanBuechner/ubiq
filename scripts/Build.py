@@ -21,11 +21,14 @@ import scripts.Utils.Premake as Premake
 
 # --------------------- Setup Projects --------------------- #
 def CollapseProject(projectkey, projectvalue):
+	# check if value is a dict or a string
 	if(isinstance(projectvalue, dict)):
+		# add projects recursivly
 		for key, value in projectvalue.items():
 			CollapseProject(key, value)
 	else:
-		Config.projects.append(projectvalue)
+		# append project path
+		Config.projects.append(os.path.join(Config.location, projectvalue))
 
 # collapse p dictinary into a list of projects
 for key, value in Config.p.items():
@@ -42,7 +45,6 @@ parser.add_argument('-fb', action='store_true', help='build the full project') #
 parser.add_argument('-rebuild', action='store_true', help='rebuild the project') # rebuild the project
 parser.add_argument('-clean', action='store_true', help='clean the project') # clean build files
 parser.add_argument('--BuildTools', action='store_true', help='build tools') # build tools
-parser.add_argument('-g', type=str, help='path to game project') # generate project files
 parser.add_argument('-p', type=str, help='the project to build') # project
 parser.add_argument('-c', type=str, help='the configuration (Release, Debug, Dist)') # configuration
 parser.add_argument('-a', type=str, help='the architecture (x64)') # architecture
@@ -56,12 +58,6 @@ fullbuild = args.fb
 clean = args.clean or args.rebuild
 if(fullbuild):
 	shouldBuild = True
-
-# get the project
-if(args.p != None):
-	Config.project = FindProject(args.p)
-	if(Config.project == ""):
-		exit(1)
 
 def checkArg(arg, options):
 	for option in options:
@@ -96,13 +92,13 @@ if(args.s != None):
 	else:
 		Config.system = s
 
-# get the game project
-if(args.g != None):
-	Config.gameProject = args.g.replace("\\", "/")
-	if(Config.gameProject[-1] == "/"):
-		Config.gameProject = Config.gameProject[:-1]
-	Config.gameProject = os.path.abspath(Config.gameProject).replace("\\", "/")
-	Config.projects.append(Config.gameProject)
+# get the project
+if(args.p != None):
+	Config.project = args.p.replace("\\", "/")
+	if(Config.project[-1] == "/"):
+		Config.project = Config.project[:-1]
+	Config.project = os.path.abspath(Config.project).replace("\\", "/")
+	Config.projects.append(Config.project)
 
 
 # --------------------- Build Tools --------------------- #
@@ -118,6 +114,7 @@ elif(shouldBuild):
 
 # --------------------- Load Project Scritps --------------------- #
 def LoadProject(proj):
+	# load project scritps
 	projName = os.path.basename(proj)
 	spec=importlib.util.spec_from_file_location(projName, proj+"/Build.py")
 	module = importlib.util.module_from_spec(spec)
@@ -128,20 +125,27 @@ def LoadProject(proj):
 		"folder" : proj
 	}
 
-# load projecst
+	# load project modules
+	if(hasattr(module, "GetModules")):
+		for m in module.GetModules():
+			# get abspath of module
+			modulePath = m
+			if(not os.path.isabs(modulePath)):
+				modulePath = os.path.join(proj, modulePath).replace("\\", "/")
+			# check if module exists
+			if(modulePath in Config.projects):
+				continue
+			Config.projects.append(modulePath) # append new project
+			LoadProject(modulePath) # load new project
+
+
+
+
+# load project
 for proj in Config.projects:
 	LoadProject(proj)
 
-# load game modules
-if(Config.gameProject != None):
-	gameProj = Config.buildScripts[Config.gameProject]
-	if(hasattr(gameProj["module"], "GetModules")):
-		for m in gameProj["module"].GetModules():
-			if(not os.path.isabs(m)):
-				m = os.path.join(gameProj["folder"], m).replace("\\", "/")
-			Config.projects.append(m)
-			LoadProject(m)
-	
+
 
 # --------------------- Generate Project Files --------------------- #
 if(args.gs):
@@ -170,7 +174,7 @@ def BuildProject(proj):
 	# build projects depandancies if full build is enabled
 	if(fullbuild):
 		for d in Config.buildScripts[proj]["module"].GetProject().dependancys:
-			BuildProject(FindProject(d))
+			BuildProject(FindProjectPath(d))
 
 	# build project
 	buildMsg = f"=============== Building: {proj},   {Config.configuration} {Config.architecture} ==============="
@@ -205,7 +209,7 @@ def RunProject(projName):
 	proj = GetProject(projName)
 	projdata = GetProject(projName)["module"].GetProject()
 	output = projdata.GetOutput()
-	cwd = Config.gameProject
+	cwd = Config.project
 	os.startfile(output, cwd = cwd)
 
 if(shouldRun):

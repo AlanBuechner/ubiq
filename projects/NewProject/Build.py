@@ -60,9 +60,15 @@ vsDefines = [
 
 dependancys = [
 	"TestModule",
+	"GameEngine",
 ]
 
-links = []
+links = [
+	"kernel32.lib",
+	"user32.lib",
+	"comdlg32.lib",
+	"shell32.lib",
+]
 
 modules = [
 	"modules/TestModule",
@@ -88,12 +94,12 @@ def GetProject():
 	proj.vsDefines = vsDefines
 	proj.links = links
 	proj.dependancys = dependancys
-	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
+	proj.buildType = BuildUtils.BuildType.EXECUTABLE
 	buildLoc = "/Runtime"
 	if(inEditor):
 		buildLoc = "/Editor"
-	proj.intDir = GetIntDir(projName, Config.gameProject) + buildLoc
-	proj.binDir = GetBinDir(projName, Config.gameProject) + buildLoc
+	proj.intDir = GetIntDir(projName, projDir) + buildLoc
+	proj.binDir = GetBinDir(projName, projDir) + buildLoc
 	proj.genReflection = True
 	return proj
 

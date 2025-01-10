@@ -16,38 +16,42 @@ def AddProject(code, projectkey, projectvalue, group, indent):
 
 
 def GenerateSolution():
-	gameName = os.path.basename(Config.gameProject)
+	gameName = os.path.basename(Config.project)
 	code = f"""
 workspace "{gameName}"
 	architecture "x64"
-	startproject "{Config.gameProject}"
+	startproject "{Config.project}"
 
 	configurations
 	{{
 """
+	# configurations
 	for c in Config.configurations:
 		code += f"\t\t\"{c}\",\n"
 	code += "\t}\n\n"
 
+	# ---- add include groups ---- #
+	# tools group
 	code += "group \"Tools\"\n"
 	for t in Config.tools:
 		code += f"\tinclude \"{Config.location}/{t}\"\n"
 	code += "group \"\"\n"
+
+	# groups defined in Config
 	for key, value in Config.p.items():
 		code = AddProject(code, key, value, "", 0)
-	code += "group \"Modules\"\n"
-	gameProj = Config.buildScripts[Config.gameProject]
-	if(hasattr(gameProj["module"], "GetModules")):
-		for m in gameProj["module"].GetModules():
-			if(not os.path.isabs(m)):
-				m = os.path.join(gameProj["folder"], m).replace("\\", "/")
-			code += f"\tinclude \"{m}\"\n"
-		code += "group \"\"\n"
 
-	if(Config.gameProject == None):
-		f = open("premake5.lua", "w")
-		f.write(code)
-		f.close()
+	# modules
+	code += "group \"Modules\"\n"
+	for scriptName in Config.buildScripts:
+		script = Config.buildScripts[scriptName]
+		if(hasattr(script["module"], "GetModules")):
+			for m in script["module"].GetModules():
+				if(not os.path.isabs(m)):
+					m = os.path.join(script["folder"], m).replace("\\", "/")
+				code += f"\tinclude \"{m}\"\n"
+			code += "group \"\"\n"
+
 	return code
 
 def GenerateProject(script, code = ""):
@@ -56,7 +60,7 @@ def GenerateProject(script, code = ""):
 	idir = proj.intDir
 	bdir = proj.binDir
 
-	gameName = os.path.basename(Config.gameProject)
+	gameName = os.path.basename(Config.project)
 	if(projName == gameName):
 				code += f"""
 project "{projName}"
@@ -66,15 +70,15 @@ project "{projName}"
 	objdir ("{idir}")
 
 	buildcommands {{
-		"\\"Build.bat\\" -fb -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.project} -g {Config.gameProject}"
+		"\\"Build.bat\\" -fb -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.project}"
 	}}
 
 	rebuildcommands  {{
-		"\\"Build.bat\\" -rebuild -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.project} -g {Config.gameProject}"
+		"\\"Build.bat\\" -rebuild -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.project}"
 	}}
 
 	cleancommands  {{
-		"\\"Build.bat\\"  -clean -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.project} -g {Config.gameProject}"
+		"\\"Build.bat\\"  -clean -c %{{cfg.buildcfg}} -a %{{cfg.architecture}} -p {Config.project}"
 	}}
 
 	files
@@ -135,11 +139,11 @@ def GenerateProjects():
 	for script in Config.buildScripts.values():
 		GenerateProject(script)
 
-	projScript = Config.buildScripts[Config.gameProject]
+	projScript = Config.buildScripts[Config.project]
 	GenerateProject(projScript, code)
-	subprocess.run(["vendor\premake\premake5.exe", "vs2022"], cwd=Config.gameProject)
+	subprocess.run(["vendor\premake\premake5.exe", "vs2022"], cwd=Config.project)
 
 	for script in Config.buildScripts.values():
 		PatchVSXProj(script)
+		GenVSXprojUser(script)
 
-	GenVSXprojUser(projScript)
