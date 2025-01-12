@@ -58,7 +58,7 @@ namespace Engine {
 
 	Application::~Application()
 	{
-		m_LayerStack.RemoveAllLayers();
+		m_LayerStack.Destroy();
 		m_AssetManager.Destroy();
 		m_Window.reset();
 		WindowManager::Destroy();
@@ -84,10 +84,6 @@ namespace Engine {
 
 	void Application::Run()
 	{
-		//const Reflect::Class& c = Reflect::Registry::GetRegistry()->GetClass("Engine::TransformComponent");
-
-		//CORE_INFO("{0}", c.GetName());
-
 		CREATE_PROFILE_FUNCTIONI();
 		InstrumentationTimer timer = CREATE_PROFILEI();
 		CORE_INFO("Runing Application");
@@ -95,6 +91,9 @@ namespace Engine {
 		while (m_Running)
 		{
 			CREATE_PROFILE_SCOPEI("Frame");
+
+			m_LayerStack.UpdateLayerChanges();
+
 			Time::UpdateDeltaTime();
 
 			Window::HandleEvents();

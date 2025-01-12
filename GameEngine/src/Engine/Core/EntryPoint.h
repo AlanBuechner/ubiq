@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 	Engine::Instrumentor::Get().RecordData(true);
 	Engine::Instrumentor::Get().BeginSession("Startup", "startup.json");
 	Engine::Instrumentor::Get().RegisterThread("Main", 0);
-	auto app = CreateApplication();
+	Engine::Application* app = CreateApplication();
 	Engine::Instrumentor::Get().EndSession();
 	Engine::Instrumentor::Get().BeginSession("Runtime", "runtime.json");
 	app->Run();

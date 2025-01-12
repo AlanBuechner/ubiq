@@ -28,10 +28,11 @@ namespace Engine
 
 		inline const std::string& GetName() const { return m_DebugName; }
 
+		inline bool IsLayerStackOwner() { return m_IsLayerStackOwner; }
+
 	protected:
 
-
 		std::string m_DebugName;
-
+		bool m_IsLayerStackOwner = true;
 	};
 }

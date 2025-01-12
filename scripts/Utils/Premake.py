@@ -50,7 +50,7 @@ workspace "{gameName}"
 				if(not os.path.isabs(m)):
 					m = os.path.join(script["folder"], m).replace("\\", "/")
 				code += f"\tinclude \"{m}\"\n"
-			code += "group \"\"\n"
+	code += "group \"\"\n"
 
 	return code
 

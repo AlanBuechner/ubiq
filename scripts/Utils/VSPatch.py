@@ -60,24 +60,44 @@ def GenVSXprojUser(script):
 		f.write(f"""<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommand>Build.bat</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(ProjectDir)\\bin\\$(Configuration)-windows-x86_64\\{projName}\\{projName}.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-r -c $(Configuration) -a x86_64 -p $(ProjectDir)</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
-    <LocalDebuggerCommand>Build.bat</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(ProjectDir)\\bin\\$(Configuration)-windows-x86_64\\{projName}\\{projName}.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-r -c $(Configuration) -a x86_64 -p $(ProjectDir)</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommand>Build.bat</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(ProjectDir)\\bin\\$(Configuration)-windows-x86_64\\{projName}\\{projName}.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-r -c $(Configuration) -a x86_64 -p $(ProjectDir)</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
 </Project>
 		""")
+
+#		f.write(f"""<?xml version="1.0" encoding="utf-8"?>
+#<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+#  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+#    <LocalDebuggerCommand>Build.bat</LocalDebuggerCommand>
+#    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+#    <LocalDebuggerCommandArguments>-r -c $(Configuration) -a x86_64 -p $(ProjectDir)</LocalDebuggerCommandArguments>
+#  </PropertyGroup>
+#  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
+#    <LocalDebuggerCommand>Build.bat</LocalDebuggerCommand>
+#    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+#    <LocalDebuggerCommandArguments>-r -c $(Configuration) -a x86_64 -p $(ProjectDir)</LocalDebuggerCommandArguments>
+#  </PropertyGroup>
+#  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+#    <LocalDebuggerCommand>Build.bat</LocalDebuggerCommand>
+#    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+#    <LocalDebuggerCommandArguments>-r -c $(Configuration) -a x86_64 -p $(ProjectDir)</LocalDebuggerCommandArguments>
+#  </PropertyGroup>
+#  <PropertyGroup>
+#    <ShowAllFiles>true</ShowAllFiles>
+#  </PropertyGroup>
+#</Project>
+#		""")
 
 

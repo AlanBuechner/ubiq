@@ -56,6 +56,7 @@ namespace Engine
 
 	void Scene::OnViewportResize(uint32 width, uint32 height)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
 

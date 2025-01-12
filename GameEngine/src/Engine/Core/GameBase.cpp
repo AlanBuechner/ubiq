@@ -21,6 +21,7 @@ namespace Engine
 
 	void GameBase::SwitchScene(Ref<Scene> scene)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		OnSceneSwitch(scene);
 		m_Scene = scene;
 	}

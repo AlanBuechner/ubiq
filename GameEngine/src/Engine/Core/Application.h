@@ -26,6 +26,9 @@ namespace Engine
 	public:
 		Application(const std::string& name = "");
 		virtual ~Application();
+		inline static Application& Get() { return *s_Instance; }
+		template<class T>
+		inline static T& GetAs() { return *(T*)s_Instance; }
 
 		void Run();
 
@@ -36,12 +39,11 @@ namespace Engine
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
-		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
-
 		inline static bool InEditer() { return s_Instance->m_InEditer; }
-		inline static Application& Get() { return *s_Instance; }
-		inline Window& GetWindow() { return *m_Window;  }
 
+		inline Window& GetWindow() { return *m_Window;  }
+		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+		inline LayerStack& GetLayerStack() { return m_LayerStack; }
 		inline AssetManager& GetAssetManager() { return m_AssetManager; }
 
 		inline ProjectManager::Project& GetProject() { return m_CurrentProject; }
@@ -65,6 +67,8 @@ namespace Engine
 
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
+		Utils::Vector<Layer*> m_NewLayers;
+
 
 		AssetManager m_AssetManager;
 
