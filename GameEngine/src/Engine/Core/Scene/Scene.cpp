@@ -22,6 +22,7 @@ namespace Engine
 	Scene::Scene(SceneScriptBase* script) :
 		m_SceneScript(script)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		if (script == nullptr)
 			m_SceneScript = SceneScriptBase::GetDefultSceneScriptInstance();
 		else
@@ -57,6 +58,9 @@ namespace Engine
 	void Scene::OnViewportResize(uint32 width, uint32 height)
 	{
 		CREATE_PROFILE_FUNCTIONI();
+		if (width == m_ViewportWidth && height == m_ViewportHeight)
+			return;
+
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
 
@@ -109,6 +113,7 @@ namespace Engine
 
 	SceneSystem* Scene::CreateSceneSystem(const Reflect::Class& systemClass)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		if (m_SystemsMap[systemClass.GetTypeID()] != nullptr)
 		{
 			CORE_WARN("can not create sceen system of type {0} system alreaty exists", systemClass.GetSname());
@@ -125,6 +130,7 @@ namespace Engine
 
 	Utils::Vector<SceneSystem*> Scene::CreateSceneSystems(const Utils::Vector<const Reflect::Class*>& systemClasses)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		Utils::Vector<SceneSystem*> systems;
 		systems.Reserve(systemClasses.Count());
 		for (const Reflect::Class* systemClass : systemClasses)
@@ -148,6 +154,7 @@ namespace Engine
 
 	void Scene::RemoveSceneSystem(const Reflect::Class& systemClass)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		auto systemEntry = m_SystemsMap.find(systemClass.GetTypeID());
 		SceneSystem* system = systemEntry->second;
 		system->OnDetatch();
@@ -160,12 +167,14 @@ namespace Engine
 
 	void Scene::RegenerateUpdateEvents()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		m_UpdateEvents.Clear();
 		m_SceneScript->GenerateUpdateEvents();
 	}
 
 	Ref<Scene> Scene::Create()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		Ref<Scene> scene = CreateRef<Scene>(SceneScriptBase::GetDefultSceneScriptInstance());
 		Window& window = Application::Get().GetWindow();
 		scene->OnViewportResize(window.GetWidth(), window.GetHeight());
@@ -176,6 +185,7 @@ namespace Engine
 
 	Ref<Scene> Scene::Create(const fs::path& file)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		Ref<Scene> scene = CreateRef<Scene>(SceneScriptBase::GetDefultSceneScriptInstance());
 		SceneSerializer serializer(scene);
 		serializer.Deserialize(file.string());
@@ -188,6 +198,7 @@ namespace Engine
 
 	Ref<Scene> Scene::CreateDefault()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		fs::path defaultSceneFile = Application::Get().GetAssetManager().GetAssetPath(Application::Get().GetProject().GetDefaultSceneID());
 		return Create(defaultSceneFile);
 	}
