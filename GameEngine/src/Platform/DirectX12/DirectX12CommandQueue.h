@@ -26,6 +26,6 @@ namespace Engine
 		uint32 m_SignalCount = 0;
 		D3D12_COMMAND_LIST_TYPE m_Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-		InstrumentationTimer m_Timer = CREATE_PROFILEI();
+		Profiler::InstrumentationTimer m_Timer = CREATE_PROFILEI();
 	};
 }

@@ -92,7 +92,7 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
-		InstrumentationTimer timer = CREATE_PROFILEI();
+		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
 		std::lock_guard g(m_UploadMutex);
 
 		timer.Start("Record commands");

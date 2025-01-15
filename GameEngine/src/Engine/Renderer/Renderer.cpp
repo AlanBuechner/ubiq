@@ -14,7 +14,7 @@ Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
 Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
 Engine::Ref<Engine::CommandList> Engine::Renderer::s_MainCommandList;
 Engine::RendererAPI Engine::Renderer::s_Api = Engine::RendererAPI::DirectX12;
-Engine::InstrumentationTimer Engine::Renderer::s_Timer = CREATE_PROFILEI();
+Profiler::InstrumentationTimer Engine::Renderer::s_Timer = CREATE_PROFILEI();
 
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_WhiteTexture;
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_BlackTexture;
@@ -154,8 +154,8 @@ namespace Engine
 
 	void Renderer::Render()
 	{
-		Instrumentor::Get().RegisterThread("Render", 1);
-		InstrumentationTimer timer = CREATE_PROFILEI();
+		Profiler::Instrumentor::Get().RegisterThread("Render", 1);
+		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
 		Ref<ResourceManager> resourceManager = s_Context->GetResourceManager();
 		ResourceDeletionPool* deletionPool = resourceManager->CreateNewDeletionPool();
 		static int frame = 0;

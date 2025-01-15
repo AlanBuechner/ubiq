@@ -398,7 +398,7 @@ namespace Engine
 
 	TextureFile* TextureFile::LoadFile(const fs::path& file)
 	{
-		CREATE_PROFILE_FUNCTION();
+		CREATE_PROFILE_FUNCTIONI();
 
 		TextureFile* texture = new TextureFile();
 		int width, height, channels;

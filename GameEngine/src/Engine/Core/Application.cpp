@@ -85,7 +85,7 @@ namespace Engine {
 	void Application::Run()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		InstrumentationTimer timer = CREATE_PROFILEI();
+		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
 		CORE_INFO("Runing Application");
 		
 		while (m_Running)
@@ -109,7 +109,6 @@ namespace Engine {
 				m_ImGuiLayer->Begin();
 				for (Layer* layer : m_LayerStack)
 					layer->OnImGuiRender();
-				Performance::Render();
 				m_ImGuiLayer->End();
 				timer.End();
 			}

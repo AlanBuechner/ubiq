@@ -73,7 +73,7 @@ namespace Engine
 
 		static RendererAPI s_Api;
 
-		static InstrumentationTimer s_Timer;
+		static Profiler::InstrumentationTimer s_Timer;
 
 		static std::thread s_RenderThread;
 

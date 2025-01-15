@@ -8,14 +8,21 @@
 #include <string>
 #include <mutex>
 
-namespace Engine
+namespace Profiler
 {
 	struct ProfileResult
 	{
 		const char* name;
-		long long start, end;
+		double start, end;
 		uint32 ThreadID;
 		uint32 ProccessID;
+	};
+
+	struct Event
+	{
+		std::string name;
+		uint32 threadID;
+		double time;
 	};
 
 	struct InstrumentationSession
@@ -23,12 +30,13 @@ namespace Engine
 		std::string Name;
 	};
 
+	// ---------------------- Instrumentor ---------------------- //
 	class Instrumentor
 	{
 	private:
 		InstrumentationSession* m_CurrentSession;
 		std::ofstream m_OutputStream;
-		int m_ProfileCount;
+		uint64 m_ProfileCount;
 		bool m_RecordData;
 		
 		std::mutex m_Mutex;
@@ -36,36 +44,112 @@ namespace Engine
 		struct ThreadData
 		{
 			std::string name;
-			uint32 order;
+			uint32 order = UINT32_MAX;
 		};
 
 		std::unordered_map<uint32, ThreadData> m_RegisteredThreads;
 
 	public:
 		Instrumentor(bool record = false)
-			: m_CurrentSession(nullptr), m_ProfileCount(0), m_RecordData(record)
-		{
-		}
+			: m_CurrentSession(nullptr), m_RecordData(record)
+		{}
+
+		void RecordData(bool record) { m_RecordData = record; }
 
 		void BeginSession(const std::string& name, const std::string& filepath = "results.json");
-
 		void EndSession();
 
 		void WriteProfile(const ProfileResult& result);
 
-		void InstantEvent(const std::string& name);
-
-		void WriteHeader();
-
-		void WriteFooter();
-
-		void RecordData(bool record);
 
 		void RegisterThread(const std::string& name, uint32 order);
-		void WriteThread(uint32 threadID, const std::string& name, uint32 order);
+		void WriteThread(const std::string& name, uint32 threadID, uint32 order);
 
 		static Instrumentor& Get();
 	};
+
+
+#pragma region InstrumentationTimers
+
+	class InstrumentationTimer
+	{
+	public:
+		InstrumentationTimer()
+		{}
+
+		//void Start(const std::string& name)
+		//{
+		//	if (m_TimerRunning)
+		//	{
+		//		CORE_WARN("Cant start instrumentation timer already running");
+		//		return;
+		//	}
+		//	m_Name = name;
+		//	Instrumentor::Get().WriteStartEvent(GetEvent());
+		//	m_TimerRunning = true;
+		//}
+		//
+		//void End()
+		//{
+		//	if (!m_TimerRunning)
+		//	{
+		//		CORE_WARN("Cant stop instrumentation timer already stoped");
+		//		return;
+		//	}
+		//	Instrumentor::Get().WriteEndEvent(GetEvent());
+		//	m_TimerRunning = false;
+		//}
+		//
+		//Event GetEvent()
+		//{
+		//	Event e;
+		//	e.name = m_Name;
+		//	e.threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
+		//	e.time = Time::GetTime();
+		//	return e;
+		//}
+
+		void Start(const std::string& name, uint32 pid = 0)
+		{
+			m_Name = name;
+			m_Start = Time::GetTime();
+		}
+
+		void End()
+		{
+			m_End = Time::GetTime();
+			m_Elapsed = m_End - m_Start;
+
+			double start = (double)(m_Start * 1000000.0f);
+			double end = (double)(m_End * 1000000.0f);
+			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
+			ProfileResult result = { m_Name.c_str(), start, end, threadID, 0 };
+			
+			Instrumentor::Get().WriteProfile(result);
+		}
+
+	private:
+		double m_Start, m_End;
+		double m_Elapsed;
+		bool m_TimerRunning = false;
+		std::string m_Name;
+	};
+
+	class InstrumentationTimerScoped : protected InstrumentationTimer
+	{
+	public:
+		InstrumentationTimerScoped(const std::string& name)
+		{ Start(name); }
+
+		~InstrumentationTimerScoped()
+		{ End(); }
+	};
+
+#pragma endregion
+
+
+
+#pragma region Timers
 
 	template<typename Fn>
 	class Timer
@@ -73,7 +157,7 @@ namespace Engine
 	public:
 		Timer(Fn&& func) :
 			m_Func(func)
-		{	
+		{
 		}
 
 		void Start(const std::string& name, uint32 pid = 0)
@@ -88,8 +172,8 @@ namespace Engine
 			m_End = Time::GetTime();
 			m_Elapsed = m_End - m_Start;
 
-			long long start = (long long)(m_Start * 1000000.0f);
-			long long end = (long long)(m_End * 1000000.0f);
+			double start = (double)(m_Start * 1000000.0f);
+			double end = (double)(m_End * 1000000.0f);
 			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
 			ProfileResult result = { m_Name.c_str(), start, end, threadID, m_PID };
 			m_Func(result);
@@ -127,167 +211,31 @@ namespace Engine
 		Fn m_Func;
 	};
 
-	class InstrumentationTimer
-	{
-	public:
-		InstrumentationTimer()
-		{
-
-		}
-
-		void Start(const std::string& name, uint32 pid = 0)
-		{
-			m_Name = name;
-			m_Start = Time::GetTime();
-			m_PID = pid;
-		}
-
-		void End()
-		{
-			m_End = Time::GetTime();
-			m_Elapsed = m_End - m_Start;
-
-			long long start = (long long)(m_Start * 1000000.0f);
-			long long end = (long long)(m_End * 1000000.0f);
-			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.c_str(), start, end, threadID, m_PID };
-
-			Instrumentor::Get().WriteProfile(result);
-		}
-
-		double GetSeconds()
-		{
-			return m_Elapsed;
-		}
-
-		double GetMilliseconds()
-		{
-			return m_Elapsed * 1000.0f;
-		}
-
-		double GetMicroseconds()
-		{
-			return m_Elapsed * 1000000.0f;
-		}
-
-		void PrintTime()
-		{
-			DEBUG_INFO("{0} : {1}", GetMilliseconds(), m_Name);
-		}
-	private:
-		double m_Start;
-		double m_End;
-
-		double m_Elapsed;
-
-		uint32 m_PID;
-
-		std::string m_Name;
-	};
-
 	template<typename Fn>
-	class TimerScoped
+	class TimerScoped : public Timer<Fn>
 	{
 	public:
 		TimerScoped(const std::string& name, Fn&& func, uint32 pid = 0) :
-			m_Func(func), m_Name(name)
+			Timer(func)
 		{
-			m_Start = Time::GetTime();
-			m_PID = pid;
+			Timer::Start(name, pid);
 		}
 
 		~TimerScoped()
 		{
-			m_End = Time::GetTime();
-			m_Elapsed = m_End - m_Start;
-
-			long long start = m_Start * 1000000.0f;
-			long long end = m_End * 1000000.0f;
-			uint32 threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.c_str(), start, end, threadID, m_PID };
-			m_Func(result);
+			End();
 		}
-
-		double GetMilliseconds()
-		{
-			return m_Elapsed * 1000.0f;
-		}
-	private:
-		double m_Start;
-		double m_End;
-
-		double m_Elapsed;
-
-		uint32 m_PID;
-
-		const std::string m_Name;
-
-		Fn m_Func;
 	};
 
-	class InstrumentationTimerScoped
-	{
-	public:
-		InstrumentationTimerScoped(const std::string& name, uint32 pid = 0) :
-			m_Name(name)
-		{
-			m_Start = Time::GetTime();
-			m_PID = pid;
-		}
+#pragma endregion
 
-		~InstrumentationTimerScoped()
-		{
-			m_End = Time::GetTime();
-			m_Elapsed = m_End - m_Start;
 
-			long long start = (long long)(m_Start * 1000000.0f);
-			long long end = (long long)(m_End * 1000000.0f);
-			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.c_str(), start, end, threadID };
-			
-			Instrumentor::Get().WriteProfile(result);
-		}
-
-		double GetMilliseconds()
-		{
-			return m_Elapsed * 1000.0f;
-		}
-	private:
-		double m_Start;
-		double m_End;
-
-		double m_Elapsed;
-
-		uint32 m_PID;
-
-		const std::string m_Name;
-	};
-
-	class Performance
-	{
-	public:
-		Performance()
-		{
-
-		}
-
-		static void PushResult(ProfileResult result)
-		{
-			m_ProfileResults.Push(result);
-		}
-
-		static void Render();
-
-	private:
-		static Utils::Vector<ProfileResult> m_ProfileResults;
-		
-	};
 }
 
-#define CREATE_PROFILE() Engine::Timer([&](Engine::ProfileResult profileResult) { Engine::Performance::PushResult(profileResult); });
-#define CREATE_PROFILE_SCOPE(name) Engine::TimerScoped timer##__LINE__(name, [&](Engine::ProfileResult profileResult) { Engine::Performance::PushResult(profileResult); });
+#define CREATE_PROFILE() Profiler::Timer([&](Profiler::ProfileResult profileResult)
+#define CREATE_PROFILE_SCOPE(name) Profiler::TimerScoped timer##__LINE__(name, [&](Profiler::ProfileResult profileResult)
 #define CREATE_PROFILE_FUNCTION() CREATE_PROFILE_SCOPE(__FUNCSIG__)
 
-#define CREATE_PROFILEI() Engine::InstrumentationTimer();
-#define CREATE_PROFILE_SCOPEI(name) Engine::InstrumentationTimerScoped timer##__LINE__(name);
+#define CREATE_PROFILEI() Profiler::InstrumentationTimer();
+#define CREATE_PROFILE_SCOPEI(name) Profiler::InstrumentationTimerScoped timer##__LINE__(name);
 #define CREATE_PROFILE_FUNCTIONI() CREATE_PROFILE_SCOPEI(__FUNCSIG__)
