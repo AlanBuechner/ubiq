@@ -18,13 +18,6 @@ namespace Profiler
 		uint32 ProccessID;
 	};
 
-	struct Event
-	{
-		std::string name;
-		uint32 threadID;
-		double time;
-	};
-
 	struct InstrumentationSession
 	{
 		std::string Name;
@@ -76,38 +69,6 @@ namespace Profiler
 	public:
 		InstrumentationTimer()
 		{}
-
-		//void Start(const std::string& name)
-		//{
-		//	if (m_TimerRunning)
-		//	{
-		//		CORE_WARN("Cant start instrumentation timer already running");
-		//		return;
-		//	}
-		//	m_Name = name;
-		//	Instrumentor::Get().WriteStartEvent(GetEvent());
-		//	m_TimerRunning = true;
-		//}
-		//
-		//void End()
-		//{
-		//	if (!m_TimerRunning)
-		//	{
-		//		CORE_WARN("Cant stop instrumentation timer already stoped");
-		//		return;
-		//	}
-		//	Instrumentor::Get().WriteEndEvent(GetEvent());
-		//	m_TimerRunning = false;
-		//}
-		//
-		//Event GetEvent()
-		//{
-		//	Event e;
-		//	e.name = m_Name;
-		//	e.threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
-		//	e.time = Time::GetTime();
-		//	return e;
-		//}
 
 		void Start(const std::string& name, uint32 pid = 0)
 		{
