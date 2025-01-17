@@ -62,7 +62,7 @@ namespace Engine
 		m_Buffer->SetData(m_Data->GetData());
 	}
 
-	Ref<Material> Material::Create(const fs::path& path)
+	Ref<Material> DISABLE_OPS Material::Create(const fs::path& path)
 	{
 		Ref<Material> mat = CreateRef<Material>();
 
@@ -73,11 +73,37 @@ namespace Engine
 			ifs >> f;
 
 			AssetManager& assetManager = Application::Get().GetAssetManager();
+			ProjectManager::Project& project = Engine::Application::Get().GetProject();
 
+			// get shader
 			CORE_ASSERT(f.contains("shader"), "Material does not have a shader");
-			mat->m_Shader = assetManager.GetAsset<Shader>(f["shader"].get<fs::path>());
+			auto& node = f["shader"];
+			if (node.is_string())
+			{
+				std::string path = node.get<std::string>();
+				mat->m_Shader = assetManager.GetEmbededAsset<Shader>(path);
+				if (mat->GetShader() == nullptr) // check if getting as embedded was successful
+				{
+					fs::path paths[] = {
+						assetManager.GetAssetDirectory() / path,
+						project.GetRootDirectory() / path
+					};
+					for (const fs::path& fullPath : paths)
+					{
+						if(fs::exists(fullPath))
+							mat->m_Shader = assetManager.GetAsset<Shader>(fullPath);
+					}
+				}
+			}
+			else
+				mat->m_Shader = assetManager.GetAsset<Shader>((Engine::UUID)node.get<uint64>()); // get asset from uuid
+			if (mat->m_Shader == nullptr)
+				return nullptr;
+			
+			// initialize material
 			mat->DefultInitalize();
 
+			// set shader data
 			for (auto& p : mat->m_Shader->GetParams())
 			{
 				void* location = mat->m_Data->GetDatalocation(p.name);

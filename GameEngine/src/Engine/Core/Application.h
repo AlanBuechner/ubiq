@@ -30,6 +30,8 @@ namespace Engine
 		template<class T>
 		inline static T& GetAs() { return *(T*)s_Instance; }
 
+		void LoadProject(const fs::path& folder = "");
+
 		void Run();
 
 		void Close();
@@ -68,7 +70,6 @@ namespace Engine
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
 		Utils::Vector<Layer*> m_NewLayers;
-
 
 		AssetManager m_AssetManager;
 

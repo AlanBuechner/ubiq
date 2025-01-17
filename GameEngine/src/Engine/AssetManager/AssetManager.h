@@ -34,7 +34,7 @@ namespace Engine
 		std::unordered_map<uint64, AssetPool> m_CashedAssetPools;
 		std::unordered_map<UUID, fs::path> m_AssetPaths;
 
-		Utils::Vector<fs::path> m_AssetDirectories;
+		fs::path m_AssetDirectory;
 
 		std::thread m_DirectoryWatchThread;
 
@@ -49,9 +49,8 @@ namespace Engine
 
 		void Clean();
 
-		void AddAssetDirectory(const fs::path& directory);
-		void RemoveAssetDirectory(const fs::path& directory);
-		inline const Utils::Vector<fs::path>& GetAssetDirectories() { return m_AssetDirectories; }
+		void SetAssetDirectory(const fs::path& directory);
+		inline const fs::path& GetAssetDirectory() { return m_AssetDirectory; }
 
 		void DeleteAsset(const fs::path& assetPath);
 		void RenameAsset(const fs::path& oldPath, const fs::path& newName);
@@ -60,7 +59,7 @@ namespace Engine
 		UUID GetAssetUUIDFromPath(const fs::path& metaFile);
 
 		template<class T>
-		Ref<T> GetAsset(UUID assetID)
+		Ref<T> DISABLE_OPS GetAsset(UUID assetID)
 		{
 			Ref<Asset> asset;
 
@@ -126,7 +125,7 @@ namespace Engine
 		void OpenAsset(UUID id);
 		void OpenAsset(const fs::path& path);
 
-		fs::path FindAssetDirectory(const fs::path& assetPath);
+		fs::path GetFullAssetPath(const fs::path& assetPath);
 
 		fs::path GetEmbededFolder();
 

@@ -35,9 +35,6 @@ namespace Engine {
 		CORE_ASSERT(!s_Instance, "Application Instance already exists!!!");
 		s_Instance = this;
 
-		CORE_INFO("Loading project file");
-		m_CurrentProject = ProjectManager::Project("Project.ubiqproj");
-			
 		Renderer::Init();
 
 		timer.Start("Create Window");
@@ -49,11 +46,8 @@ namespace Engine {
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
 		timer.End();
 
-		m_AssetManager.Init();
-
-		CORE_INFO("Configuring Project");
-		m_AssetManager.AddAssetDirectory(m_CurrentProject.GetAssetsDirectory());
-		Renderer::SetDefultMaterial(m_AssetManager.GetAsset<Material>(m_CurrentProject.GetDefultMaterialID()));
+		LoadProject();
+		
 	}
 
 	Application::~Application()
@@ -80,6 +74,20 @@ namespace Engine {
 	void Application::OnEvent(Event* e)
 	{
 		m_InputBuffer.Push(e);
+	}
+
+	void DISABLE_OPS Application::LoadProject(const fs::path& folder)
+	{
+		// clear asset manager before switching
+		m_AssetManager.Destroy();
+		m_AssetManager.Init();
+
+		CORE_INFO("Loading project file");
+		m_CurrentProject = ProjectManager::Project(folder / "Project.ubiqproj");
+
+		CORE_INFO("Configuring Project");
+		m_AssetManager.SetAssetDirectory(m_CurrentProject.GetAssetsDirectory());
+		Renderer::SetDefultMaterial(m_AssetManager.GetAsset<Material>(m_CurrentProject.GetDefultMaterialID()));
 	}
 
 	void Application::Run()

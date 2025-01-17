@@ -21,6 +21,7 @@ namespace Engine
 	{
 		//m_DirectoryWatchThread.detach();
 		m_CashedAssetPools.clear();
+		m_AssetPaths.clear();
 	}
 
 	void AssetManager::Clean()
@@ -60,30 +61,10 @@ namespace Engine
 		}
 	}
 
-	void AssetManager::AddAssetDirectory(const fs::path& directory)
+	void AssetManager::SetAssetDirectory(const fs::path& directory)
 	{
-		m_AssetDirectories.Push(directory);
+		m_AssetDirectory = directory;
 		UpdateDirectory(directory);
-	}
-
-	void AssetManager::RemoveAssetDirectory(const fs::path& directory)
-	{
-		for (int index = 0;index < m_AssetDirectories.Count(); index++)
-		{
-			if (directory == m_AssetDirectories[index])
-			{
-				m_AssetDirectories.Remove(index);
-				for (auto& a : m_AssetPaths)
-				{
-					std::string rel = fs::relative(a.second, directory).string();
-					if (rel[0] != '.' && rel[1] != '.')
-					{
-						m_AssetPaths.erase(a.first);
-					}
-				}
-				break;
-			}
-		}
 	}
 
 	void AssetManager::DeleteAsset(const fs::path& assetPath)
@@ -108,7 +89,7 @@ namespace Engine
 				m_AssetPaths.erase(GetAssetUUIDFromPath(asset));
 
 			// update asset directory
-			UpdateDirectory(FindAssetDirectory(assetPath));
+			UpdateDirectory(m_AssetDirectory);
 
 			fs::remove_all(assetPath);
 		}
@@ -150,16 +131,11 @@ namespace Engine
 #endif
 	}
 
-	fs::path AssetManager::FindAssetDirectory(const fs::path& assetPath)
+	fs::path AssetManager::GetFullAssetPath(const fs::path& assetPath)
 	{
-		for (auto dir : m_AssetDirectories)
-		{
-			fs::path rel = fs::relative(assetPath, dir);
-			if (!rel.empty() && rel.native()[0] != '.') // check if sub path
-				return dir;
-		}
-
-		return "";
+		if (assetPath.is_absolute())
+			return assetPath;
+		return m_AssetDirectory / assetPath;
 	}
 
 	fs::path AssetManager::GetEmbededFolder()

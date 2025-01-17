@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Win.h"
 
 #include "Engine/Util/PlatformUtils.h"
 #include "Engine/Util/Utils.h"
@@ -8,6 +9,7 @@
 
 #include <shlwapi.h>
 #include <shellapi.h>
+#include <shlobj.h>
 
 namespace Engine
 {
@@ -25,7 +27,7 @@ namespace Engine
 	std::string FileDialogs::OpenFile(const char* filter)
 	{
 		OPENFILENAMEA ofn;
-		CHAR szFile[260] = { 0 };
+		CHAR szFile[MAX_PATH] = { 0 };
 
 		ZeroMemory(&ofn, sizeof(OPENFILENAME));
 		ofn.lStructSize = sizeof(OPENFILENAME);
@@ -47,7 +49,7 @@ namespace Engine
 	std::string FileDialogs::SaveFile(const char* filter)
 	{
 		OPENFILENAMEA ofn;
-		CHAR szFile[260] = { 0 };
+		CHAR szFile[MAX_PATH] = { 0 };
 
 		ZeroMemory(&ofn, sizeof(OPENFILENAME));
 		ofn.lStructSize = sizeof(OPENFILENAME);
@@ -64,6 +66,55 @@ namespace Engine
 
 		return std::string();
 	}
+
+
+	static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
+	{
+
+		if (uMsg == BFFM_INITIALIZED)
+		{
+			std::string tmp = (const char*)lpData;
+			std::cout << "path: " << tmp << std::endl;
+			SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
+		}
+
+		return 0;
+	}
+
+	std::string FileDialogs::OpenFolder(std::string savedPath)
+	{
+		CHAR szFile[MAX_PATH] = { 0 };
+
+		std::wstring wsavedPath(savedPath.begin(), savedPath.end());
+		const wchar_t* pathParam = wsavedPath.c_str();
+
+		BROWSEINFO bi = { 0 };
+		bi.lpszTitle = L"Browse for folder...";
+		bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+		bi.lpfn = BrowseCallbackProc;
+		bi.lParam = (LPARAM)pathParam;
+
+		LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
+
+		if (pidl != 0)
+		{
+			//get the name of the folder and put it in path
+			SHGetPathFromIDListA(pidl, szFile);
+
+			//free memory used
+			IMalloc* imalloc = 0;
+			if (SUCCEEDED(SHGetMalloc(&imalloc)))
+			{
+				imalloc->Free(pidl);
+				imalloc->Release();
+			}
+
+			return szFile;
+		}
+
+		return "";
+	}
+
 
 	Utils::Vector<std::string> GetCommandLineArguments()
 	{
