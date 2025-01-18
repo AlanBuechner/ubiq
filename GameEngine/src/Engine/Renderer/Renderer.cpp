@@ -10,6 +10,8 @@
 
 #include "EngineResource.h"
 
+#include "Engine/Core/Application.h"
+
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
 Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
 Engine::Ref<Engine::CommandList> Engine::Renderer::s_MainCommandList;

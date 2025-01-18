@@ -1,5 +1,6 @@
 #include "SceneScriptBase.h"
 #include "Scene.h"
+#include "Engine/Core/Application.h"
 
 namespace Engine
 {

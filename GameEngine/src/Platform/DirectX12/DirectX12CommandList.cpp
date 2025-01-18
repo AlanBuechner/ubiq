@@ -16,7 +16,7 @@
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
-#include "Engine/Util/Performance.h"
+#include "Utils/Performance.h"
 #include "Engine/Renderer/Mesh.h"
 
 #include "Utils/Common.h"

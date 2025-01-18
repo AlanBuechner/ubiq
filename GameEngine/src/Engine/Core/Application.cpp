@@ -14,8 +14,6 @@
 #include "Engine/Renderer/Abstractions/Resources/ResourceManager.h"
 #include "Engine/Renderer/DebugRenderer.h"
 
-#include "Engine/Util/Performance.h"
-
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 #include "Engine/Core/Scene/Components.h"

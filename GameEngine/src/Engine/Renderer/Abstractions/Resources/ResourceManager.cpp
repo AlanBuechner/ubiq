@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ResourceManager.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Util/Performance.h"
+#include "Utils/Performance.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 #if defined(PLATFORM_WINDOWS)

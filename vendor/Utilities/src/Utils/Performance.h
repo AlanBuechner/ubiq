@@ -3,10 +3,11 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include "Engine/Core/Logging/Log.h"
-#include "Engine/Core/Time.h"
 #include <string>
 #include <mutex>
+#include <unordered_map>
+#include "Types.h"
+#include "Time.h"
 
 namespace Profiler
 {

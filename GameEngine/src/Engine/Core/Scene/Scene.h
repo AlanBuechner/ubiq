@@ -1,12 +1,13 @@
 #pragma once
-#include "Engine/Core/Time.h"
+#include "Utils/Time.h"
 
-#include "Engine/Renderer/Abstractions/Resources/Texture.h"
 #include "Engine/Core/UUID.h"
 
 #include "Engine/Renderer/SceneRenderer.h"
 #include "SceneRegistry.h"
 #include "ComponentPool.h"
+
+#include "Engine/AssetManager/AssetManager.h"
 
 namespace Engine
 {

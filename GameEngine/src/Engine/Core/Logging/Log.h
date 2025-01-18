@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Engine/Core/Core.h"
+#include "Utils/Types.h"
+#include "Utils/Vector.h"
 #include "iostream"
 #include <ctime>
 #include <memory>
@@ -230,12 +231,12 @@ namespace Engine
 	public:
 		static void Init();
 
-		inline static Ref<Logger>& GetCoreLogger() { return s_CoreLogger; }
-		inline static Ref<Logger>& GetClientLogger() { return s_ClientLogger; }
+		inline static Logger* GetCoreLogger() { return s_CoreLogger; }
+		inline static Logger* GetClientLogger() { return s_ClientLogger; }
 
 	private:
-		static Ref<Logger> s_CoreLogger;
-		static Ref<Logger> s_ClientLogger;
+		static Logger* s_CoreLogger;
+		static Logger* s_ClientLogger;
 
 	};
 }

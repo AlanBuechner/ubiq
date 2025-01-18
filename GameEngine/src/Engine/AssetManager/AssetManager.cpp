@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "AssetManager.h"
 #include "Engine/Core/Application.h"
-#include "Engine/Util/Utils.h"
-#include "Engine/Core/Time.h"
-#include "Engine/Util/Performance.h"
+#include "Utils/Utils.h"
+#include "Utils/Time.h"
+#include "Utils/Performance.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include "Platform/Windows/Win.h"

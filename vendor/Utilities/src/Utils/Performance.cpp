@@ -1,6 +1,5 @@
-#include "pch.h"
 #include "Performance.h"
-#include "imgui.h"
+#include <algorithm>
 
 namespace Profiler
 {

@@ -1,11 +1,10 @@
-#include "pch.h"
 #include "Time.h"
 #include <chrono>
 
-double Engine::Time::s_DeltaTime = 0.0f;
-double Engine::Time::s_LastFrameTime = Engine::Time::GetTime();
+double Utils::Time::s_DeltaTime = 0.0f;
+double Utils::Time::s_LastFrameTime = Utils::Time::GetTime();
 
-namespace Engine
+namespace Utils
 {
 	using namespace std::chrono;
 

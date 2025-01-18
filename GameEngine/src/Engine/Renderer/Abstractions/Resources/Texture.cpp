@@ -3,7 +3,7 @@
 #include "stb_image.h"
 
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Util/PlatformUtils.h"
+#include "Engine/PlatformUtils/PlatformUtils.h"
 #include "EngineResource.h"
 
 #if defined(PLATFORM_WINDOWS)

@@ -13,7 +13,8 @@
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Core/Scene/TransformComponent.h"
 #include "SceneSerializer.h"
-
+#include "Engine/Core/Window.h"
+#include "Engine/Core/Application.h"
 
 #include "glm/glm.hpp"
 

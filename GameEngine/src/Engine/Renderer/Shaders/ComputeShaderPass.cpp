@@ -1,5 +1,6 @@
 #include "ComputeShaderPass.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Core/Logging/Log.h"
 
 #if defined(PLATFORM_WINDOWS)
 #include "Platform/DirectX12/Shaders/DirectX12ComputeShaderPass.h"

@@ -2,6 +2,7 @@
 #include "Core.h"
 #include "Logging/Log.h"
 #include "Scene/Scene.h"
+#include "Engine/Events/Event.h"
 
 namespace Engine
 {

@@ -1,12 +1,9 @@
 #pragma once
-#include "Engine/Core/Application.h"
 
-namespace Engine
+namespace Utils
 {
 	class Time
 	{
-		friend Application;
-
 	public:
 		Time() {}
 
@@ -18,7 +15,6 @@ namespace Engine
 
 		static double GetTime();
 
-	private:
 		static void UpdateDeltaTime();
 
 	protected:
@@ -27,4 +23,4 @@ namespace Engine
 	};
 }
 
-typedef Engine::Time Time;
+typedef Utils::Time Time;

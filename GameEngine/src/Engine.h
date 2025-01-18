@@ -9,8 +9,8 @@
 #include "Engine/Core/Application.h"
 #include "Engine/Core/Layer.h"
 #include "Engine/Core/Logging/Log.h"
-#include "Engine/Core/Time.h"
-#include "Engine/Util/Utils.h"
+#include "Utils/Time.h"
+#include "Utils/Utils.h"
 
 // Input
 #include "Engine/Core/Input/Input.h"

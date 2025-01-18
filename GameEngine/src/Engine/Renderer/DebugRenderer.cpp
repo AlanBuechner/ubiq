@@ -13,6 +13,7 @@
 #include "EngineResource.h"
 
 #include "Utils/Common.h"
+#include "Engine/Core/Application.h"
 
 namespace Engine
 {

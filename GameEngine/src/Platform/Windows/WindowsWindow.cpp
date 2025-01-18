@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "WindowsWindow.h"
 #include "Engine/Core/Application.h"
-#include "Engine/Util/Performance.h"
+#include "Utils/Performance.h"
 
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/MouseEvent.h"
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Core/Input/Input.h"
 
-#include "Engine/Util/Utils.h"
+#include "Utils/Utils.h"
 
 #include <dwmapi.h>
 #include <uxtheme.h>

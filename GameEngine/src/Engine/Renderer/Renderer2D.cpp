@@ -10,10 +10,12 @@
 #include "Engine/Core/Scene/Entity.h"
 #include "Engine/Core/Scene/Components.h"
 
-#include "Engine/Util/Performance.h"
+#include "Utils/Performance.h"
 
 #include "EngineResource.h"
 #include "Engine/Renderer/Mesh.h"
+
+#include "Engine/Core/Application.h"
 
 namespace Engine
 {

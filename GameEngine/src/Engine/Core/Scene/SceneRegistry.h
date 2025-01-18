@@ -1,10 +1,8 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Engine/Core/UUID.h"
-//#include "Components.h"
 #include "ComponentPool.h"
 #include "ComponentView.h"
-#include "Engine/Util/Performance.h"
 #include <vector>
 #include <unordered_map>
 #include <type_traits>

@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Engine/Util/Performance.h"
 #include <iostream>
 #include <memory>
 

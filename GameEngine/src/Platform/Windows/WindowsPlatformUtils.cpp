@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Win.h"
 
-#include "Engine/Util/PlatformUtils.h"
-#include "Engine/Util/Utils.h"
+#include "Engine/PlatformUtils/PlatformUtils.h"
+#include "Utils/Utils.h"
 #include "Engine/Core/Application.h"
 
 #include <commdlg.h>

@@ -5,7 +5,7 @@
 #include "GraphicsShaderPass.h"
 #include "ComputeShaderPass.h"
 
-#include "Engine/Util/PlatformUtils.h"
+#include "Engine/PlatformUtils/PlatformUtils.h"
 #include "EngineResource.h"
 
 #include <fstream>

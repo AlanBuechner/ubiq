@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "Log.h"
 
-Engine::Ref<Engine::Logger> Engine::Log::s_CoreLogger;
-Engine::Ref<Engine::Logger> Engine::Log::s_ClientLogger;
+
+Engine::Logger* Engine::Log::s_CoreLogger;
+Engine::Logger* Engine::Log::s_ClientLogger;
 
 namespace Engine
 {
@@ -126,7 +127,7 @@ namespace Engine
 
 	void Log::Init()
 	{
-		s_CoreLogger = CreateRef<Logger>("[%t] ENGINE: %m");
-		s_ClientLogger = CreateRef<Logger>("[%t] APP: %m");
+		s_CoreLogger = new Logger("[%t] ENGINE: %m");
+		s_ClientLogger = new Logger("[%t] APP: %m");
 	}
 }

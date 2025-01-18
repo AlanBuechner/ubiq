@@ -1,12 +1,14 @@
 #pragma once
 #include <memory>
 #include <filesystem>
-#include "Engine/Util/Utils.h"
 #include "Engine/Math/Math.h"
 #include "Reflection.h"
 #include "Utils/Common.h"
+#include "Utils/Utils.h"
 #include "Utils/Types.h"
 #include "Utils/Vector.h"
+#include "Utils/Performance.h"
+#include "Engine/Core/Logging/Log.h"
 
 #define ENABLE_ASSERTS
 
@@ -83,8 +85,6 @@ namespace Engine
 
 	template<typename T>
 	using Weak = std::weak_ptr<T>;
-
-	using byte = unsigned char;
 }
 
 namespace fs = std::filesystem;

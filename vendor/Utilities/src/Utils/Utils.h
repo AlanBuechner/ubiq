@@ -2,6 +2,7 @@
 #include <wchar.h>
 #include <cstring>
 #include <stdlib.h>
+#include <string>
 
 namespace Engine
 {
