@@ -30,27 +30,6 @@ namespace Engine
 		return isNumber;
 	}
 
-	std::string* ObjectDescription::TryGetAsString()
-	{
-		if (m_Type != Type::String)
-			return nullptr;
-		return &m_String;
-	}
-
-	Utils::Vector<Engine::ObjectDescription>* ObjectDescription::TryGetAsObjectArray()
-	{
-		if (m_Type != Type::Array)
-			return nullptr;
-		return &m_Vector;
-	}
-
-	std::unordered_map<std::string, Engine::ObjectDescription>* ObjectDescription::TryGetAsDescriptionMap()
-	{
-		if (m_Type != Type::Object)
-			return nullptr;
-		return &m_Enteries;
-	}
-
 
 
 }

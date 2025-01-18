@@ -178,9 +178,9 @@ namespace Profiler
 	{
 	public:
 		TimerScoped(const std::string& name, Fn&& func, uint32 pid = 0) :
-			Timer(func)
+			Timer<Fn>(func)
 		{
-			Timer::Start(name, pid);
+			Timer<Fn>::Start(name, pid);
 		}
 
 		~TimerScoped()

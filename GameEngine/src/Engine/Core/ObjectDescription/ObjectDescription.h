@@ -22,7 +22,11 @@ namespace Engine
 		};
 
 	public:
+		ObjectDescription() = default;
 		ObjectDescription(Type type);
+		ObjectDescription(const ObjectDescription& other) = default;
+		ObjectDescription& operator=(const ObjectDescription& other) = default;
+		ObjectDescription(ObjectDescription&& other) = default;
 
 		bool IsNumber(bool* isFloat = nullptr) const;
 		Type GetType() const { return m_Type; }
@@ -33,9 +37,9 @@ namespace Engine
 		template<typename T>
 		bool TryGet(T& data) const;
 
-		std::string* TryGetAsString();
-		Utils::Vector<ObjectDescription>* TryGetAsObjectArray();
-		std::unordered_map<std::string, ObjectDescription>* TryGetAsDescriptionMap();
+		std::string& GetAsString() { return m_String; };
+		Utils::Vector<ObjectDescription>& GetAsObjectArray() { return m_Vector; }
+		std::unordered_map<std::string, ObjectDescription>& GetAsDescriptionMap() { return m_Enteries; }
 
 		const std::string& GetAsString() const { return m_String; }
 		const Utils::Vector<ObjectDescription>& GetAsObjectArray() const { return m_Vector; }
@@ -43,6 +47,12 @@ namespace Engine
 
 		template<typename T>
 		static ObjectDescription CreateFrom(const T& data);
+
+		ObjectDescription& operator[](uint32 i) { return m_Vector[i]; }
+		ObjectDescription& operator[](const std::string& i) { return m_Enteries[i]; }
+
+		const ObjectDescription& operator[](uint32 i) const { return m_Vector[i]; }
+		const ObjectDescription& operator[](const std::string& i) const { return m_Enteries.at(i); }
 
 	private:
 		Type m_Type;
@@ -82,10 +92,11 @@ namespace Engine
 	template<>
 	struct Convert<std::string>
 	{
+	public:
 		static ObjectDescription Encode(const std::string& str)
 		{
 			ObjectDescription description(ObjectDescription::Type::String);
-			*description.TryGetAsString() = str;
+			description.GetAsString() = str;
 			return description;
 		}
 
@@ -102,9 +113,10 @@ namespace Engine
 #define NumConverter(type, func, f)\
 	template<>\
 	struct Convert<type>{\
+	public:\
 		static ObjectDescription Encode(type val){\
 			ObjectDescription description(ObjectDescription::Type::String);\
-			*description.TryGetAsString() = std::to_string(val);\
+			description.GetAsString() = std::to_string(val);\
 			return description;\
 		}\
 		static bool Decode(type& out, const ObjectDescription& in){\
@@ -141,10 +153,11 @@ namespace Engine
 	template<typename T>
 	class Convert<Utils::Vector<T>>
 	{
+	public:
 		static ObjectDescription Encode(const Utils::Vector<T>& vec)
 		{
 			ObjectDescription description(ObjectDescription::Type::Array);
-			Utils::Vector<ObjectDescription>& vector = *description.TryGetAsObjectArray();
+			Utils::Vector<ObjectDescription>& vector = description.GetAsObjectArray();
 			vector.Resize(vec.Count());
 			for (uint32 i = 0; i < vec.Count(); i++)
 				vector[i] = ObjectDescription::CreateFrom<T>(vec[i]);

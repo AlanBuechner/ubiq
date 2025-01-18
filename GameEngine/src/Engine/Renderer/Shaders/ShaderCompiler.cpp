@@ -263,92 +263,95 @@ namespace Engine
 		}
 	}
 
-	ShaderConfig ShaderCompiler::CompileConfig(const std::string& code)
+	ShaderConfig DISABLE_OPS ShaderCompiler::CompileConfig(const std::string& code)
 	{
 		ShaderConfig config{};
 		std::istringstream iss(code);
 
+		// get token queue
 		Utils::Vector<std::string> tokens = Tokenize(code);
 		std::queue<std::string> tokenQueue;
+		tokenQueue.push("{");
 		for (uint32 i = 0; i < tokens.Count(); i++)
 			tokenQueue.push(tokens[i]);
-		
-		Utils::Vector<Ref<Variable>> vars;
-		while (!tokenQueue.empty())
-			vars.Push(Variable::Build(tokenQueue));
+		tokenQueue.push("}");
+
+		// load description
+		ObjectDescription description = BuildObject(tokenQueue);
+
+		// load base topology
 		Topology baseTopo = Topology::Triangle;
+		if (HasEntery(description, "topology"))
+			baseTopo = ParseTopology(description["topology"]);
 
-		for (Ref<Variable> var : vars)
+		// load passes
+		if (HasEntery(description, "passes"))
 		{
-			if (var->name == "topology")
-				baseTopo = ParseTopology(var);
-			else if (var->name == "passes")
+			for (auto [passName, pass] : description["passes"].GetAsDescriptionMap())
 			{
-				for (Ref<Variable> pass : var->value->object->values)
+				bool hasGeo = HasEntery(pass, "VS") || HasEntery(pass, "MS");
+				bool hasPixel = HasEntery(pass, "PS");
+				bool isGraphics = hasGeo && hasPixel;
+				bool isCompute = HasEntery(pass, "CS");
+				bool isWorkGraph = HasEntery(pass, "WG");
+
+				if (isGraphics)
 				{
-					Ref<Object> obj = pass->value->object;
-
-					bool hasGeo = obj->HasVariable("VS") || obj->HasVariable("MS");
-					bool hasPixel = obj->HasVariable("PS");
-					bool isGraphics = hasGeo && hasPixel;
-					bool isCompute = obj->HasVariable("CS");
-					bool isWorkGraph = obj->HasVariable("WG");
-
-					if (isGraphics)
+					// graphics pass config
+					GraphicsPassConfig rpass;
+					rpass.passName = passName;
+					rpass.topology = baseTopo;
+					for (auto [param, val] : pass.GetAsDescriptionMap())
 					{
-						GraphicsPassConfig rpass;
-						rpass.passName = pass->name;
-						rpass.topology = baseTopo;
-						for (Ref<Variable> var : pass->value->object->values)
-						{
-							if (var->name == "VS")				rpass.vs = var->value->string;
-							else if (var->name == "PS")			rpass.ps = var->value->string;
-							else if (var->name == "blendMode")	rpass.blendMode = ParseBlendMode(var);
-							else if (var->name == "cullMode")	rpass.cullMode = ParseCullMode(var);
-							else if (var->name == "depthTest")	rpass.depthTest = ParseDepthTest(var);
-							else if (var->name == "topology")	rpass.topology = ParseTopology(var);
-							else if (var->name == "conservativeRasterization")	rpass.enableConservativeRasterization = ParseConservativeRasterization(var);
-						}
-						config.graphicsPasses.Push(rpass);
+						if		(param == "VS")				rpass.vs = val.GetAsString();
+						else if (param == "PS")				rpass.ps = val.GetAsString();
+						else if (param == "blendMode")		rpass.blendMode = ParseBlendMode(val);
+						else if (param == "cullMode")		rpass.cullMode = ParseCullMode(val);
+						else if (param == "depthTest")		rpass.depthTest = ParseDepthTest(val);
+						else if (param == "topology")		rpass.topology = ParseTopology(val);
+						else if (param == "conservativeRasterization")	rpass.enableConservativeRasterization = ParseConservativeRasterization(val);
 					}
-					if (isCompute)
-					{
-						ComputePassConfig rpass;
-						rpass.passName = pass->name;
-						for (Ref<Variable> var : pass->value->object->values)
-						{
-							if (var->name == "CS")	rpass.cs = var->value->string;
-						}
-						config.computePasses.Push(rpass);
-					}
-					if (isWorkGraph)
-					{
-						WorkGraphPassConfig rpass;
-						rpass.passName = pass->name;
-						for (Ref<Variable> var : pass->value->object->values)
-						{
-							if (var->name == "WG")	rpass.wg = var->value->string;
-						}
-						config.workGraphPasses.Push(rpass);
-					}
+					config.graphicsPasses.Push(rpass);
+				}
+				if (isCompute)
+				{
+					// compute pass config
+					ComputePassConfig rpass;
+					rpass.passName = passName;
+					for (auto [param, val] : pass.GetAsDescriptionMap())
+						if (param == "CS")	rpass.cs = val.GetAsString();
+					config.computePasses.Push(rpass);
+				}
+				if (isWorkGraph)
+				{
+					// work graph config
+					WorkGraphPassConfig rpass;
+					rpass.passName = passName;
+					for (auto [param, val] : pass.GetAsDescriptionMap())
+						if (param == "WG")	rpass.wg = val.GetAsString();
+					config.workGraphPasses.Push(rpass);
 				}
 			}
-			else if (var->name == "material")
+		}
+
+		// load material
+		if (HasEntery(description, "material"))
+		{
+			for (auto [param, val] : description["material"].GetAsDescriptionMap())
 			{
-				for (Ref<Variable> param : var->value->object->values)
-				{
-					MaterialParameterType type = MaterialParameterType::TextureID;
-					if (param->value->string == "textureID")	type = MaterialParameterType::TextureID;
-					else if (param->value->string == "float")	type = MaterialParameterType::Float;
-					else if (param->value->string == "float4")	type = MaterialParameterType::Float4;
-					else if (param->value->string == "bool")	type = MaterialParameterType::Bool;
+				MaterialParameterType type = MaterialParameterType::TextureID;
+				const std::string& typeName = val["value"].GetAsString();
+				if (typeName == "textureID")	type = MaterialParameterType::TextureID;
+				else if (typeName == "float")		type = MaterialParameterType::Float;
+				else if (typeName == "float4")		type = MaterialParameterType::Float4;
+				else if (typeName == "bool")		type = MaterialParameterType::Bool;
 
-					std::string defaultValue = "";
-					if (param->value->paramters.Count() > 0)
-						defaultValue = param->value->paramters[0];
+				Utils::Vector<std::string> params = val["params"].Get<Utils::Vector<std::string>>();
+				std::string defaultValue = "";
+				if (params.Count() > 0)
+					defaultValue = params[0];
 
-					config.params.Push({ param->name, type, defaultValue }); 
-				}
+				config.params.Push({ param, type, defaultValue });
 			}
 		}
 
@@ -381,123 +384,123 @@ namespace Engine
 		return ss.str();
 	}
 
-	Ref<ShaderCompiler::Variable> ShaderCompiler::Variable::Build(std::queue<std::string>& tokenQueue)
+	ObjectDescription DISABLE_OPS ShaderCompiler::BuildObject(std::queue<std::string>& tokenQueue)
 	{
-		Ref<Variable> var = CreateRef<Variable>();
-		var->name = tokenQueue.front();
-		tokenQueue.pop();
-
-		CORE_ASSERT(tokenQueue.front() == "=", "Invalid token expected '='");
-		tokenQueue.pop(); // remove '='
-
-		var->value = Value::Build(tokenQueue);
-		CORE_ASSERT(tokenQueue.front() == ";", "Incalid token expected ';'");
-		tokenQueue.pop();
-
-		return var;
-	}
-
-	Ref<ShaderCompiler::Value> ShaderCompiler::Value::Build(std::queue<std::string>& tokenQueue)
-	{
-		Ref<Value> val = CreateRef<Value>();
-		val->isObject = tokenQueue.front() == "{";
-		val->isString = tokenQueue.front() == "\"";
-
-		if (val->isObject)
-			val->object = Object::Build(tokenQueue);
-		else if (val->isString)
+		if (tokenQueue.front() == "{") // build object
 		{
-			tokenQueue.pop(); // remove first "
-			val->string = tokenQueue.front();
-			tokenQueue.pop(); // remove value
-			tokenQueue.pop(); // remove last "
-		}
-		else
-		{
-			val->string = tokenQueue.front();
-			tokenQueue.pop(); // remove value
-		}
+			tokenQueue.pop(); // remove '{'
 
-		if (tokenQueue.front() == "(")
-		{
-			tokenQueue.pop(); // remove the "("
-			while (tokenQueue.front() != ")")
+			ObjectDescription description(ObjectDescription::Type::Object);
+			while (tokenQueue.front() != "}")
 			{
-				val->paramters.Push(tokenQueue.front());
-				tokenQueue.pop(); // remove the parameter
-				if (tokenQueue.front() == ",")
-					tokenQueue.pop(); // remove the ","
+				std::string name = tokenQueue.front(); // get name
+				tokenQueue.pop(); // remove name
+				CORE_ASSERT(tokenQueue.front() == "=", "Invalid token expected '='");
+				tokenQueue.pop(); // remove '='
+
+				description[name] = BuildObject(tokenQueue);
+
+				CORE_ASSERT(tokenQueue.front() == ";", "Incalid token expected ';'");
+				tokenQueue.pop();
 			}
-			tokenQueue.pop(); // remove the ")"
+			tokenQueue.pop(); // remove '}'
+
+			return description;
 		}
-
-		return val;
-	}
-
-	bool ShaderCompiler::Object::HasVariable(const std::string& name)
-	{
-		return std::find_if(values.begin(), values.end(), 
-			[&name](Ref<Variable> var) {
-				return var->name == name; 
-			}) != values.end();
-	}
-
-	Ref<ShaderCompiler::Object> ShaderCompiler::Object::Build(std::queue<std::string>& tokenQueue)
-	{
-		Ref<Object> object = CreateRef<Object>();
-
-		CORE_ASSERT(tokenQueue.front() == "{", "Invalid token expected '{'");
-		tokenQueue.pop(); // remove '{'
-
-		while (tokenQueue.front() != "}")
+		else // value
 		{
-			object->values.Push(Variable::Build(tokenQueue));
+			// get value
+			std::string value = tokenQueue.front();
+			tokenQueue.pop();
+
+			// get params
+			if (tokenQueue.front() == "(")
+			{
+				// load params
+				Utils::Vector<std::string> params;
+				tokenQueue.pop(); // remove the "("
+				while (tokenQueue.front() != ")")
+				{
+					params.Push(tokenQueue.front());
+					tokenQueue.pop(); // remove the parameter
+					if (tokenQueue.front() == ",")
+						tokenQueue.pop(); // remove the ","
+				}
+				tokenQueue.pop(); // remove the ")"
+
+				// create object description
+				ObjectDescription description(ObjectDescription::Type::Object);
+				description["value"] = ObjectDescription::CreateFrom(value);
+				description["params"] = ObjectDescription::CreateFrom(params);
+				return description;
+			}
+			else
+				return ObjectDescription::CreateFrom(value);
 		}
-
-		tokenQueue.pop(); // remove '}'
-
-		return object;
 	}
 
-	Topology ShaderCompiler::ParseTopology(Ref<Variable> var)
+	bool ShaderCompiler::HasEntery(const ObjectDescription& desc, const std::string& name)
 	{
-		if (var->value->string == "triangle")	return Topology::Triangle;
-		else if (var->value->string == "line")	return Topology::Line;
-		else if (var->value->string == "point")	return Topology::Point;
+		CORE_ASSERT(desc.GetType() == ObjectDescription::Type::Object, "Description is not of type object");
+
+		const std::unordered_map<std::string, ObjectDescription> enteries = desc.GetAsDescriptionMap();
+		return enteries.find(name) != enteries.end();
+	}
+
+	Topology ShaderCompiler::ParseTopology(const ObjectDescription& var)
+	{
+		CORE_ASSERT(var.GetType() == ObjectDescription::Type::String, "Description is not of type string");
+
+		const std::string& str = var.GetAsString();
+		if		(str == "triangle")	return Topology::Triangle;
+		else if (str == "line")		return Topology::Line;
+		else if (str == "point")	return Topology::Point;
 		return Topology::Triangle;
 	}
 
 
-	BlendMode ShaderCompiler::ParseBlendMode(Ref<Variable> var)
+	BlendMode ShaderCompiler::ParseBlendMode(const ObjectDescription& var)
 	{
-		if (var->value->string == "blend")		return BlendMode::Blend;
-		else if (var->value->string == "add")	return BlendMode::Add;
-		else if (var->value->string == "none")	return BlendMode::None;
+		CORE_ASSERT(var.GetType() == ObjectDescription::Type::String, "Description is not of type string");
+
+		const std::string& str = var.GetAsString();
+		if (str == "blend")	return BlendMode::Blend;
+		else if (str == "add")		return BlendMode::Add;
+		else if (str == "none")		return BlendMode::None;
 		return BlendMode::None;
 	}
 
-	CullMode ShaderCompiler::ParseCullMode(Ref<Variable> var)
+	CullMode ShaderCompiler::ParseCullMode(const ObjectDescription& var)
 	{
-		if (var->value->string == "back")		return CullMode::Back;
-		else if (var->value->string == "front")	return CullMode::Front;
-		else if (var->value->string == "none")	return CullMode::None;
+		CORE_ASSERT(var.GetType() == ObjectDescription::Type::String, "Description is not of type string");
+
+		const std::string& str = var.GetAsString();
+		if		(str == "back")		return CullMode::Back;
+		else if (str == "front")	return CullMode::Front;
+		else if (str == "none")		return CullMode::None;
 		return CullMode::None;
 	}
 
-	DepthTest ShaderCompiler::ParseDepthTest(Ref<Variable> var)
+	DepthTest ShaderCompiler::ParseDepthTest(const ObjectDescription& var)
 	{
-		if (var->value->string == "less")					return DepthTest::Less;
-		else if (var->value->string == "lessOrEqual")		return DepthTest::LessOrEqual;
-		else if (var->value->string == "greater")			return DepthTest::Greater;
-		else if (var->value->string == "greaterOrEqual")	return DepthTest::GreaterOrEqual;
-		else if (var->value->string == "none")				return DepthTest::None;
+		CORE_ASSERT(var.GetType() == ObjectDescription::Type::String, "Description is not of type string");
+
+		const std::string& str = var.GetAsString();
+		if		(str == "less")				return DepthTest::Less;
+		else if (str == "lessOrEqual")		return DepthTest::LessOrEqual;
+		else if (str == "greater")			return DepthTest::Greater;
+		else if (str == "greaterOrEqual")	return DepthTest::GreaterOrEqual;
+		else if (str == "none")				return DepthTest::None;
 		return DepthTest::None;
 	}
 
-	bool ShaderCompiler::ParseConservativeRasterization(Ref<Variable> var)
+	bool ShaderCompiler::ParseConservativeRasterization(const ObjectDescription& var)
 	{
-		if (var->value->string == "true")					return true;
-		else if (var->value->string == "false")				return false;
+		CORE_ASSERT(var.GetType() == ObjectDescription::Type::String, "Description is not of type string");
+
+		const std::string& str = var.GetAsString();
+		if		(str == "true")		return true;
+		else if (str == "false")	return false;
 		return false;
 	}
 

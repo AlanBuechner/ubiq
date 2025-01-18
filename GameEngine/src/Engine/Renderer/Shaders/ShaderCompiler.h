@@ -256,43 +256,13 @@ namespace Engine
 
 	private:
 		
-		struct Variable;
-		struct Value;
-		struct Object;
+		static ObjectDescription BuildObject(std::queue<std::string>& tokenQueue);
 
-		struct Variable 
-		{
-			std::string name;
-			Ref<Value> value;
-
-			static Ref<Variable> Build(std::queue<std::string>& tokenQueue);
-		};
-
-		struct Value
-		{
-			bool isObject;
-			bool isString;
-
-			std::string string;
-			Utils::Vector<std::string> paramters;
-			Ref<Object> object;
-
-			static Ref<Value> Build(std::queue<std::string>& tokenQueue);
-		};
-
-		struct Object
-		{
-			Utils::Vector<Ref<Variable>> values;
-			bool HasVariable(const std::string& name);
-
-			static Ref<Object> Build(std::queue<std::string>& tokenQueue);
-		};
-		
-
-		static Topology ParseTopology(Ref<Variable> var);
-		static BlendMode ParseBlendMode(Ref<Variable> var);
-		static CullMode ParseCullMode(Ref<Variable> var);
-		static DepthTest ParseDepthTest(Ref<Variable> var);
-		static bool ParseConservativeRasterization(Ref<Variable> var);
+		static bool HasEntery(const ObjectDescription& desc, const std::string& name);
+		static Topology ParseTopology(const ObjectDescription& var);
+		static BlendMode ParseBlendMode(const ObjectDescription& var);
+		static CullMode ParseCullMode(const ObjectDescription& var);
+		static DepthTest ParseDepthTest(const ObjectDescription& var);
+		static bool ParseConservativeRasterization(const ObjectDescription& var);
 	};
 }
