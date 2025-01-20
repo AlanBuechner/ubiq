@@ -7,8 +7,30 @@ namespace Engine
 {
 	class ObjectDescription;
 
+	class ConverterBase
+	{
+	public:
+		virtual void EncodeObj() {}
+		virtual void DecodeObj() {}
+
+	public:
+		static void GetConverterMap() {};
+
+		static std::unordered_map<uint64, ConverterBase*>& GetObjectConverterFunctions();
+		class AddObjectConverter
+		{
+		public:
+			AddObjectConverter(uint64 typeID, ConverterBase* converter) {
+				GetObjectConverterFunctions().emplace(typeID, converter);
+			}
+		};
+#define ADD_OBJECT_CONVERTER(type, converter) static Engine::ConverterBase::AddObjectConverter CAT(converter,__LINE__)(typeid(type).hash_code(), new converter());
+		
+	};
+
 	template<typename T>
-	struct Convert;
+	struct Convert : public ConverterBase
+	{};
 
 	// --------------------------------- Object Description --------------------------------- //
 	class ObjectDescription
@@ -19,6 +41,10 @@ namespace Engine
 			String,
 			Array,
 			Object,
+			Uint,
+			Sint,
+			Float,
+			Bool,
 		};
 
 	public:
@@ -28,7 +54,15 @@ namespace Engine
 		ObjectDescription& operator=(const ObjectDescription& other) = default;
 		ObjectDescription(ObjectDescription&& other) = default;
 
-		bool IsNumber(bool* isFloat = nullptr) const;
+		bool IsString() const { return m_Type == Type::String; }
+		bool IsArray() const { return m_Type == Type::Array; }
+		bool IsObject() const { return m_Type == Type::Object; }
+		bool IsUint() const { return m_Type == Type::Uint; }
+		bool IsSint() const { return m_Type == Type::Sint; }
+		bool IsInt() const { return IsUint() || IsSint(); }
+		bool IsFloat() const { return m_Type == Type::Float; }
+		bool IsNumber() const { return IsInt() || IsFloat(); }
+		bool IsBool() const { return m_Type == Type::Bool; }
 		Type GetType() const { return m_Type; }
 
 		template<typename T>
@@ -40,10 +74,18 @@ namespace Engine
 		std::string& GetAsString() { return m_String; };
 		Utils::Vector<ObjectDescription>& GetAsObjectArray() { return m_Vector; }
 		std::unordered_map<std::string, ObjectDescription>& GetAsDescriptionMap() { return m_Enteries; }
+		uint64& GetAsUint() { return m_Uint; }
+		int64& GetAsInt() { return m_Sint; }
+		double& GetAsFloat() { return m_Float; }
+		bool& GetAsBool() { return m_Bool; }
 
 		const std::string& GetAsString() const { return m_String; }
 		const Utils::Vector<ObjectDescription>& GetAsObjectArray() const { return m_Vector; }
 		const std::unordered_map<std::string, ObjectDescription>& GetAsDescriptionMap() const { return m_Enteries; }
+		const uint64 GetAsUint() const { return m_Uint; }
+		const int64 GetAsInt() const { return m_Sint; }
+		const double GetAsFloat() const { return m_Float; }
+		const bool GetAsBool() const { return m_Bool; }
 
 		template<typename T>
 		static ObjectDescription CreateFrom(const T& data);
@@ -54,9 +96,17 @@ namespace Engine
 		const ObjectDescription& operator[](uint32 i) const { return m_Vector[i]; }
 		const ObjectDescription& operator[](const std::string& i) const { return m_Enteries.at(i); }
 
+		bool HasEntery(const std::string& key);
+
 	private:
 		Type m_Type;
-
+		union
+		{
+			uint64 m_Uint;
+			int64 m_Sint;
+			double m_Float;
+			bool m_Bool;
+		};
 		std::string m_String;
 		Utils::Vector<ObjectDescription> m_Vector;
 		std::unordered_map<std::string, ObjectDescription> m_Enteries;
@@ -110,45 +160,63 @@ namespace Engine
 		}
 	};
 
-#define NumConverter(type, func, f)\
+
+#define NumConverter(ctype, type, func)\
 	template<>\
-	struct Convert<type>{\
+	struct Convert<ctype>{\
 	public:\
-		static ObjectDescription Encode(type val){\
-			ObjectDescription description(ObjectDescription::Type::String);\
-			description.GetAsString() = std::to_string(val);\
+		static ObjectDescription Encode(ctype val){\
+			ObjectDescription description(ObjectDescription::Type::type);\
+			description.func() = val;\
 			return description;\
 		}\
-		static bool Decode(type& out, const ObjectDescription& in){\
-			if (in.GetType() != ObjectDescription::Type::String)\
-				return false;\
-			bool isFloat;\
-			if (!in.IsNumber(&isFloat) || (f ? !isFloat : isFloat))\
-				return false;\
-			out = std::func(in.GetAsString());\
+		static bool Decode(ctype& out, const ObjectDescription& in){\
+			if(!in.IsNumber()) return false;\
+			else if(in.IsFloat()) out = in.GetAsFloat();\
+			else if(in.IsUint()) out = in.GetAsUint();\
+			else if(in.IsSint()) out = in.GetAsInt();\
 			return true;\
 		}\
 	};
 
-#define IntConverter(type) NumConverter(type, stoi, false)
+#define UIntConverter(type) NumConverter(type, Uint, GetAsUint)
+#define IntConverter(type) NumConverter(type, Sint, GetAsInt)
+#define FloatConverter(type) NumConverter(type, Float, GetAsFloat)
 
-	// int
-	IntConverter(uint8);
-	IntConverter(uint16);
-	IntConverter(uint32);
-	IntConverter(uint64);
+	UIntConverter(uint8);
+	UIntConverter(uint16);
+	UIntConverter(uint32);
+	UIntConverter(uint64);
 
 	IntConverter(int8);
 	IntConverter(int16);
 	IntConverter(int32);
 	IntConverter(int64);
 
-	// float
-	NumConverter(float, stof, true)
-	NumConverter(double, stod, true)
+	FloatConverter(float);
+	FloatConverter(double);
 
+#undef FloatConverter
 #undef IntConverter
-#undef NumConverter
+#undef UIntConverter
+
+	template<>
+		struct Convert<bool> {
+		public:
+			static ObjectDescription Encode(bool val) {
+				ObjectDescription description(ObjectDescription::Type::Bool);
+				description.GetAsBool() = val; 
+				return description; 
+		}
+		static bool Decode(bool& out, const ObjectDescription& in) {
+			if (!in.IsBool() || !in.IsNumber()) return false;
+			else if (in.IsBool()) out = in.GetAsBool();
+			else if (in.IsFloat()) out = in.GetAsFloat();
+			else if (in.IsUint()) out = in.GetAsUint();
+			else if (in.IsSint()) out = in.GetAsInt();
+			return true;
+		}
+	};
 
 	template<typename T>
 	class Convert<Utils::Vector<T>>

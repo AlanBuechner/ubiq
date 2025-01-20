@@ -1,36 +1,25 @@
 #include "ObjectDescription.h"
+#include "Engine/Core/Core.h"
 
 namespace Engine
 {
+	std::unordered_map<uint64, ConverterBase*>& ConverterBase::GetObjectConverterFunctions()
+	{
+		static std::unordered_map<uint64, ConverterBase*> converterFunctions;
+		return converterFunctions;
+	}
+
+
 
 	ObjectDescription::ObjectDescription(Type type) :
 		m_Type(type)
 	{}
 
-	bool ObjectDescription::IsNumber(bool* isFloat) const
+	bool ObjectDescription::HasEntery(const std::string& key)
 	{
-		if (m_Type != Type::String)
-			return false;
-
-		std::string::const_iterator it = m_String.begin();
-		int dotCount = 0;
-		while (it != m_String.end())
-		{
-			if (!std::isdigit(*it))
-			{
-				bool isDot = *it == '.';
-				dotCount += isDot;
-				if (!isDot || dotCount > 1) break;
-			}
-			++it;
-		}
-		bool isNumber = !m_String.empty() && it == m_String.end();
-		if (isNumber && isFloat != nullptr)
-			*isFloat = dotCount == 1;
-		return isNumber;
+		CORE_ASSERT(m_Type == ObjectDescription::Type::Object, "Description is not of type object");
+		return m_Enteries.find(key) != m_Enteries.end();
 	}
-
-
 
 }
 

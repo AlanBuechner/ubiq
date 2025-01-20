@@ -7,6 +7,7 @@
 #include "Engine/Core/Application.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include "Engine/Core/ObjectDescription/JsonObjectDescription.h"
 
 namespace Engine
 {
@@ -72,15 +73,17 @@ namespace Engine
 			nlohmann::json f;
 			ifs >> f;
 
+			ObjectDescription desc = LoadObjectDescriptionFromJson(f);
+
 			AssetManager& assetManager = Application::Get().GetAssetManager();
 			ProjectManager::Project& project = Engine::Application::Get().GetProject();
 
 			// get shader
-			CORE_ASSERT(f.contains("shader"), "Material does not have a shader");
-			auto& node = f["shader"];
-			if (node.is_string())
+			CORE_ASSERT(desc.HasEntery("shader"), "Material does not have a shader");
+			auto& node = desc["shader"];
+			if (node.IsString())
 			{
-				std::string path = node.get<std::string>();
+				std::string path = node.Get<std::string>();
 				mat->m_Shader = assetManager.GetEmbededAsset<Shader>(path);
 				if (mat->GetShader() == nullptr) // check if getting as embedded was successful
 				{
@@ -95,8 +98,8 @@ namespace Engine
 					}
 				}
 			}
-			else
-				mat->m_Shader = assetManager.GetAsset<Shader>((Engine::UUID)node.get<uint64>()); // get asset from uuid
+			else if(desc.IsInt())
+				mat->m_Shader = assetManager.GetAsset<Shader>((Engine::UUID)node.Get<uint64>()); // get asset from uuid
 			if (mat->m_Shader == nullptr)
 				return nullptr;
 			
@@ -107,19 +110,19 @@ namespace Engine
 			for (auto& p : mat->m_Shader->GetParams())
 			{
 				void* location = mat->m_Data->GetDatalocation(p.name);
-				if (f.contains(p.name))
+				if (desc.HasEntery(p.name))
 				{
-					if (p.type == MaterialParameterType::TextureID)
-						mat->SetTexture(p.name, assetManager.GetAsset<Texture2D>(f[p.name]));
-					else if (p.type == MaterialParameterType::Float)
-						*(float*)location = f[p.name].get<float>();
-					else if (p.type == MaterialParameterType::Float4)
+					auto& fp = desc[p.name];
+					if (p.type == MaterialParameterType::TextureID && fp.IsInt())
+						mat->SetTexture(p.name, assetManager.GetAsset<Texture2D>(fp.Get<uint64>()));
+					else if (p.type == MaterialParameterType::Float && fp.IsFloat())
+						*(float*)location = fp.Get<float>();
+					else if (p.type == MaterialParameterType::Float4 && fp.IsArray())
 					{
-						std::vector<float> data;
-						f[p.name].get_to(data);
+						Utils::Vector<float> data = fp.Get<Utils::Vector<float>>();
 
 						uint32 i = 0;
-						for (; i < std::min(data.size(), (size_t)4); i++)
+						for (; i < std::min(data.Count(), (uint32)4); i++)
 							((float*)location)[i] = data[i];
 
 						// fill any missing data with 0
@@ -127,7 +130,7 @@ namespace Engine
 							((float*)location)[i] = 0;
 					}
 					else if (p.type == MaterialParameterType::Bool)
-						*(BOOL*)location = f[p.name].get<bool>();
+						*(BOOL*)location = fp.Get<bool>();
 				}
 			}
 		}

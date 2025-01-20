@@ -281,19 +281,19 @@ namespace Engine
 
 		// load base topology
 		Topology baseTopo = Topology::Triangle;
-		if (HasEntery(description, "topology"))
+		if (description.HasEntery("topology"))
 			baseTopo = ParseTopology(description["topology"]);
 
 		// load passes
-		if (HasEntery(description, "passes"))
+		if (description.HasEntery("passes"))
 		{
 			for (auto [passName, pass] : description["passes"].GetAsDescriptionMap())
 			{
-				bool hasGeo = HasEntery(pass, "VS") || HasEntery(pass, "MS");
-				bool hasPixel = HasEntery(pass, "PS");
+				bool hasGeo = pass.HasEntery("VS") || pass.HasEntery("MS");
+				bool hasPixel = pass.HasEntery("PS");
 				bool isGraphics = hasGeo && hasPixel;
-				bool isCompute = HasEntery(pass, "CS");
-				bool isWorkGraph = HasEntery(pass, "WG");
+				bool isCompute = pass.HasEntery("CS");
+				bool isWorkGraph = pass.HasEntery("WG");
 
 				if (isGraphics)
 				{
@@ -335,7 +335,7 @@ namespace Engine
 		}
 
 		// load material
-		if (HasEntery(description, "material"))
+		if (description.HasEntery("material"))
 		{
 			for (auto [param, val] : description["material"].GetAsDescriptionMap())
 			{
@@ -437,14 +437,6 @@ namespace Engine
 			else
 				return ObjectDescription::CreateFrom(value);
 		}
-	}
-
-	bool ShaderCompiler::HasEntery(const ObjectDescription& desc, const std::string& name)
-	{
-		CORE_ASSERT(desc.GetType() == ObjectDescription::Type::Object, "Description is not of type object");
-
-		const std::unordered_map<std::string, ObjectDescription> enteries = desc.GetAsDescriptionMap();
-		return enteries.find(name) != enteries.end();
 	}
 
 	Topology ShaderCompiler::ParseTopology(const ObjectDescription& var)

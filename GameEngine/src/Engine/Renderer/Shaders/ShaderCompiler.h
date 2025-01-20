@@ -258,7 +258,6 @@ namespace Engine
 		
 		static ObjectDescription BuildObject(std::queue<std::string>& tokenQueue);
 
-		static bool HasEntery(const ObjectDescription& desc, const std::string& name);
 		static Topology ParseTopology(const ObjectDescription& var);
 		static BlendMode ParseBlendMode(const ObjectDescription& var);
 		static CullMode ParseCullMode(const ObjectDescription& var);
