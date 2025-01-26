@@ -1,16 +1,16 @@
 #include "pch.h"
+#include "Utils/Performance.h"
 #include "Entity.h"
 #include "SceneSerializer.h"
 
 #include "Components.h"
-#include "TransformComponent.h"
-
-#include <fstream>
-
-#include "Utils/Performance.h"
 
 #include "Engine/Core/ObjectDescription/ObjectDescription.h"
 #include "Engine/Core/ObjectDescription/YAMLObjectDescription.h"
+
+#include <yaml-cpp/yaml.h>
+#include <fstream>
+
 
 namespace Engine
 {
@@ -131,12 +131,6 @@ namespace Engine
 		// not implemented
 		CORE_ASSERT(false, "not implemented");
 		return false;
-	}
-
-	std::unordered_map<uint64, ComponentSerializer*>& SceneSerializer::GetComponentSerializerFunctions()
-	{
-		static std::unordered_map<uint64, ComponentSerializer*> s_ComponentSerializers;
-		return s_ComponentSerializers;
 	}
 
 }

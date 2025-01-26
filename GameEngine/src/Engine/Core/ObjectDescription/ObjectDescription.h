@@ -81,7 +81,7 @@ namespace Engine
 		Type m_Type;
 		union
 		{
-			uint64 m_Uint;
+			uint64 m_Uint = 0;
 			int64 m_Sint;
 			double m_Float;
 			bool m_Bool;
@@ -255,7 +255,7 @@ namespace Engine
 			return description; 
 		}
 		static bool Decode(bool& out, const ObjectDescription& in) {
-			if (!in.IsBool() || !in.IsNumber()) return false;
+			if (!in.IsBool() && !in.IsNumber()) return false;
 			else if (in.IsBool()) out = in.GetAsBool();
 			else if (in.IsFloat()) out = in.GetAsFloat();
 			else if (in.IsUint()) out = in.GetAsUint();
