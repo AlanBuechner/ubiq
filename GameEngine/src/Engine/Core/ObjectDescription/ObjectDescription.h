@@ -2,36 +2,10 @@
 #include <string>
 #include <unordered_map>
 #include "Utils/Vector.h"
+#include "Engine/Core/Core.h"
 
 namespace Engine
 {
-	class ObjectDescription;
-
-	class ConverterBase
-	{
-	public:
-		virtual void EncodeObj() {}
-		virtual void DecodeObj() {}
-
-	public:
-		static void GetConverterMap() {};
-
-		static std::unordered_map<uint64, ConverterBase*>& GetObjectConverterFunctions();
-		class AddObjectConverter
-		{
-		public:
-			AddObjectConverter(uint64 typeID, ConverterBase* converter) {
-				GetObjectConverterFunctions().emplace(typeID, converter);
-			}
-		};
-#define ADD_OBJECT_CONVERTER(type, converter) static Engine::ConverterBase::AddObjectConverter CAT(converter,__LINE__)(typeid(type).hash_code(), new converter());
-		
-	};
-
-	template<typename T>
-	struct Convert : public ConverterBase
-	{};
-
 	// --------------------------------- Object Description --------------------------------- //
 	class ObjectDescription
 	{
@@ -53,6 +27,8 @@ namespace Engine
 		ObjectDescription(const ObjectDescription& other) = default;
 		ObjectDescription& operator=(const ObjectDescription& other) = default;
 		ObjectDescription(ObjectDescription&& other) = default;
+
+		ObjectDescription& SetType(Type type);
 
 		bool IsString() const { return m_Type == Type::String; }
 		bool IsArray() const { return m_Type == Type::Array; }
@@ -96,7 +72,10 @@ namespace Engine
 		const ObjectDescription& operator[](uint32 i) const { return m_Vector[i]; }
 		const ObjectDescription& operator[](const std::string& i) const { return m_Enteries.at(i); }
 
-		bool HasEntery(const std::string& key);
+		template<typename T>
+		void Push(const T& value);
+
+		bool HasEntery(const std::string& key) const;
 
 	private:
 		Type m_Type;
@@ -111,6 +90,37 @@ namespace Engine
 		Utils::Vector<ObjectDescription> m_Vector;
 		std::unordered_map<std::string, ObjectDescription> m_Enteries;
 	};
+
+	// --------------------------------- Converter Base --------------------------------- //
+
+	struct ConverterBase
+	{
+		virtual ObjectDescription EncodeObj(void* data) = 0;
+		virtual bool DecodeObj(void* data, const ObjectDescription& desc) = 0;
+
+		static std::unordered_map<uint64, ConverterBase*>& GetObjectConverterFunctions();
+		class AddObjectConverter
+		{
+		public:
+			AddObjectConverter(uint64 typeID, ConverterBase* converter) {
+				GetObjectConverterFunctions().emplace(typeID, converter);
+			}
+		};
+	};
+
+	template<typename T>
+	struct Convert : public ConverterBase
+	{
+		virtual ObjectDescription EncodeObj(void* data) override = 0;
+		virtual bool DecodeObj(void* data, const ObjectDescription& desc) override = 0;
+	};
+
+#define CONVERTER_BASE(type)\
+	virtual ObjectDescription EncodeObj(void* data) { return Encode(*(type*)data); }\
+	virtual bool DecodeObj(void* data, const ObjectDescription& desc) { return Decode(*(type*)data, desc); }
+
+#define ADD_OBJECT_CONVERTER(type) static Engine::ConverterBase::AddObjectConverter CAT(converter,__LINE__) (typeid(type).hash_code(), (Engine::ConverterBase*)new Engine::Convert<type>());
+
 
 
 	// --------------------------------- Function Definitions --------------------------------- //
@@ -138,11 +148,19 @@ namespace Engine
 		return converter.Encode(data);
 	}
 
+	template<typename T>
+	void ObjectDescription::Push(const T& value)
+	{
+		GetAsObjectArray().Push(ObjectDescription::CreateFrom(value));
+	}
+
+
 	// --------------------------------- Converters --------------------------------- //
+	// string
 	template<>
 	struct Convert<std::string>
 	{
-	public:
+		CONVERTER_BASE(std::string);
 		static ObjectDescription Encode(const std::string& str)
 		{
 			ObjectDescription description(ObjectDescription::Type::String);
@@ -160,11 +178,11 @@ namespace Engine
 		}
 	};
 
-
+	// numbers
 #define NumConverter(ctype, type, func)\
 	template<>\
 	struct Convert<ctype>{\
-	public:\
+		CONVERTER_BASE(ctype);\
 		static ObjectDescription Encode(ctype val){\
 			ObjectDescription description(ObjectDescription::Type::type);\
 			description.func() = val;\
@@ -200,13 +218,41 @@ namespace Engine
 #undef IntConverter
 #undef UIntConverter
 
+#define VectorConverter(num)\
+	template<>\
+	struct Convert<CAT(Math::Vector,num)>{\
+		CONVERTER_BASE(CAT(Math::Vector,num));\
+		static ObjectDescription Encode(const CAT(Math::Vector,num)& val){\
+			ObjectDescription desc(ObjectDescription::Type::Array);\
+			desc.GetAsObjectArray().Reserve(num);\
+			for (uint8 i = 0; i < num; i++)\
+				desc.Push(val[i]);\
+			return desc;\
+		}\
+		static bool Decode(CAT(Math::Vector, num)& out, const ObjectDescription& in){\
+			if (!in.IsArray()) return false;\
+			for (uint8 i = 0; i < Math::Min(num, in.GetAsObjectArray().Count()); i++)\
+				out[i] = in[i].Get<float>();\
+			return true;\
+		}\
+	};
+
+	VectorConverter(2);
+	VectorConverter(3);
+	VectorConverter(4);
+
+#undef VectorConverter
+
+
+	// bool
 	template<>
-		struct Convert<bool> {
-		public:
-			static ObjectDescription Encode(bool val) {
-				ObjectDescription description(ObjectDescription::Type::Bool);
-				description.GetAsBool() = val; 
-				return description; 
+	struct Convert<bool>
+	{
+		CONVERTER_BASE(bool);
+		static ObjectDescription Encode(bool val) {
+			ObjectDescription description(ObjectDescription::Type::Bool);
+			description.GetAsBool() = val; 
+			return description; 
 		}
 		static bool Decode(bool& out, const ObjectDescription& in) {
 			if (!in.IsBool() || !in.IsNumber()) return false;
@@ -218,10 +264,13 @@ namespace Engine
 		}
 	};
 
+
+
+	// Vector
 	template<typename T>
-	class Convert<Utils::Vector<T>>
+	struct Convert<Utils::Vector<T>>
 	{
-	public:
+		CONVERTER_BASE(Utils::Vector<T>);
 		static ObjectDescription Encode(const Utils::Vector<T>& vec)
 		{
 			ObjectDescription description(ObjectDescription::Type::Array);

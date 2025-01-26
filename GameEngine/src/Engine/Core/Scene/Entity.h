@@ -3,6 +3,7 @@
 #include "SceneRegistry.h"
 
 #include "Engine/Core/UUID.h"
+#include "Engine/Core/ObjectDescription/ObjectDescription.h"
 
 
 namespace Engine
@@ -21,13 +22,13 @@ namespace Engine
 		Entity(const Entity& other) = default;
 
 		template<typename T>
-		bool HasComponent()
+		bool HasComponent() const
 		{
 			return m_Scene->m_Registry.HasComponent<T>(m_EntityID);
 		}
 
 		template<typename T>
-		T* GetComponent()
+		T* GetComponent() const
 		{
 			return m_Scene->m_Registry.GetComponent<T>(m_EntityID);
 		}
@@ -61,17 +62,19 @@ namespace Engine
 		operator bool() const { return m_EntityID != NullEntity && m_Scene != nullptr; }
 		operator EntityType() const { return m_EntityID; }
 		operator uint32() const { return (uint32)m_EntityID; }
+		bool operator == (const Entity& other) const { return m_EntityID == other.m_EntityID && m_Scene == other.m_Scene; }
+		bool operator != (const Entity& other) const { return !(*this == other); }
 
-		UUID GetUUID();
+		UUID GetUUID() const;
 		std::string& GetName() const;
-		TransformComponent& GetTransform();
+		TransformComponent& GetTransform() const;
 
 		Entity GetParent();
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
-		const Utils::Vector<Entity>& GetChildren();
+		const Utils::Vector<Entity>& GetChildren() const;
 		void SetParentToRoot();
-		Utils::Vector<Component*> GetComponents();
+		Utils::Vector<Component*> GetComponents() const;
 
 		Entity FindChiledWithName(const std::string& name);
 
@@ -83,8 +86,7 @@ namespace Engine
 
 		Scene* GetScene() { return m_Scene; }
 
-		bool operator == (const Entity& other) const { return m_EntityID == other.m_EntityID && m_Scene == other.m_Scene; }
-		bool operator != (const Entity& other) const { return !(*this == other); }
+		ObjectDescription CreateObjectDescription() const;
 
 		static Entity null;
 
@@ -92,4 +94,5 @@ namespace Engine
 		EntityType m_EntityID = { NullEntity };
 		Scene* m_Scene = nullptr;
 	};
+
 }

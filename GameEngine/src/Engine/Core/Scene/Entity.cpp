@@ -22,14 +22,20 @@ namespace Engine
 		}
 	}
 
-	UUID Entity::GetUUID() { return m_Scene->m_Registry.GetEntityData(m_EntityID).ID; }
+	UUID Entity::GetUUID() const
+	{
+		if (*this)
+			return m_Scene->m_Registry.GetEntityData(m_EntityID).ID;
+		else
+			return 0;
+	}
 
 	std::string& Entity::GetName() const
 	{
 		return m_Scene->m_Registry.GetEntityData(m_EntityID).name;
 	}
 
-	TransformComponent& Entity::GetTransform()
+	TransformComponent& Entity::GetTransform() const
 	{
 		TransformComponent* comp = GetComponent<TransformComponent>();
 		CORE_ASSERT(comp != nullptr, "entety does not have transform");
@@ -51,7 +57,7 @@ namespace Engine
 		GetTransform().RemoveChild(child);
 	}
 
-	const Utils::Vector<Entity>& Entity::GetChildren()
+	const Utils::Vector<Entity>& Entity::GetChildren() const
 	{
 		return GetTransform().GetChildren();
 	}
@@ -61,7 +67,7 @@ namespace Engine
 		GetTransform().SetParentToRoot();
 	}
 
-	Utils::Vector<Component*> Entity::GetComponents()
+	Utils::Vector<Component*> Entity::GetComponents() const
 	{
 		EntityData& data = m_Scene->m_Registry.GetEntityData(m_EntityID);
 		Utils::Vector<Component*> components(data.m_Components.Count(), {});
@@ -129,6 +135,50 @@ namespace Engine
 		}
 
 		return data.volume;
+	}
+
+
+
+
+	// ------------------- Converter ------------------- //
+	template<>
+	struct Convert<Entity>
+	{
+		CONVERTER_BASE(Entity);
+		static ObjectDescription Encode(const Entity& entity)
+		{
+			ObjectDescription entityDesc = ObjectDescription(ObjectDescription::Type::Object);
+
+			entityDesc["Entity"] = ObjectDescription::CreateFrom((uint64)entity.GetUUID());
+			entityDesc["Name"] = ObjectDescription::CreateFrom(entity.GetName());
+
+			// serialize each component
+			ObjectDescription& comps = entityDesc["Components"].SetType(ObjectDescription::Type::Array);
+			comps.GetAsObjectArray().Reserve(entity.GetComponents().Count());
+			for (Component* comp : entity.GetComponents())
+			{
+				const Reflect::Class& componentClass = comp->GetClass();
+
+				auto funcs = ConverterBase::GetObjectConverterFunctions().find(componentClass.GetTypeID());
+				if (funcs != ConverterBase::GetObjectConverterFunctions().end())
+				{
+					comps.GetAsObjectArray().Push(funcs->second->EncodeObj(comp));
+					comps.GetAsObjectArray().Back().GetAsDescriptionMap()["Component"] = ObjectDescription::CreateFrom(componentClass.GetSname());
+				}
+			}
+			return entityDesc;
+		}
+
+		static bool Decode(Entity& entity, const ObjectDescription& data)
+		{
+			CORE_ERROR("Can not deserealize entity wihout scene please use scene serializer");
+			return false;
+		}
+	};
+	ADD_OBJECT_CONVERTER(Entity);
+	ObjectDescription Entity::CreateObjectDescription() const
+	{
+		return Convert<Entity>::Encode(*this);
 	}
 
 }

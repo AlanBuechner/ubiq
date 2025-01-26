@@ -52,7 +52,7 @@ namespace ProjectManager
 
 		uint64_t m_DefaultMaterialID = 0;
 		std::string m_DefaultSceneScriptName = "";
-		uint64_t m_DefaultScene;
+		uint64_t m_DefaultScene = 0;
 	};
 }
 

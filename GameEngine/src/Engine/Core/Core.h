@@ -41,11 +41,17 @@
 #endif
 
 #ifdef ENABLE_ASSERTS
-	#define ASSERT(x, ...) {if(!(x)) {DEBUG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
-	#define CORE_ASSERT(x, msg, ...) {if(!(x)) {CORE_ERROR((std::string("Assertion Failed: ") + (msg)).c_str(), __VA_ARGS__); __debugbreak();}}
+	#define CORE_ASSERT_FUNC(x, func, msg, ...) {if(!(x)) {CORE_ERROR((std::string("Assertion Failed: ") + (msg)).c_str(), __VA_ARGS__); func;}}
+	#define CORE_ASSERT(x, msg, ...) CORE_ASSERT_FUNC(x, __debugbreak(), msg, __VA_ARGS__)
+	#define CORE_ASSERT_BREAK(x, msg, ...) CORE_ASSERT_FUNC(x, break, msg, __VA_ARGS__)
+	#define CORE_ASSERT_CONTINUE(x, msg, ...) CORE_ASSERT_FUNC(x, continue, msg, __VA_ARGS__)
+	#define CORE_ASSERT_RETURN(x, msg, ...) CORE_ASSERT_FUNC(x, return, msg, __VA_ARGS__)
 #else
-	#define ASSERT(x, ...)
-	#define CORE_ASSERT(x, ...)
+	#define CORE_ASSERT_FUNC(...)
+	#define CORE_ASSERT(...)
+	#define CORE_ASSERT_BREAK(...)
+	#define CORE_ASSERT_CONTINUE(...)
+	#define CORE_ASSERT_RETURN(...)
 #endif // ENABLE_ASSERTS
 
 

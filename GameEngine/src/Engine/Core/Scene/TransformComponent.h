@@ -10,12 +10,8 @@
 #include "Engine/Renderer/Camera.h"
 #include "SceneCamera.h"
 
-class TransformSerializer;
-
 namespace Engine
 {
-	typedef TransformComponent TCOMP;
-
 	CLASS(GROUP = Component, DontRemove) TransformComponent : public Component
 	{
 	public:
@@ -49,21 +45,23 @@ namespace Engine
 		void RemoveChild(Entity child);
 		const Utils::Vector<Entity>& GetChildren() const { return Children; }
 		void SetParentToRoot();
+		void SetParent(Entity parent);
+		void SetParent(UUID uuid);
 
-		Entity GetOwner() { return Owner; }
-		Entity GetParent() { return Parent; }
+		Entity GetOwner() const { return Owner; }
+		Entity GetParent() const { return Parent; }
 
 		bool IsDirty() { return m_Dirty; }
 
 	public:
 		void Dirty();
-		FUNCTION() 
+		FUNCTION()
 		void UpdateHierarchyGlobalTransform();
 
 	private:
-		PROPERTY(set=SetPosition) Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
-		PROPERTY(set=SetRotation, Degrees) Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
-		PROPERTY(set=SetScale) Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
+		PROPERTY(set = SetPosition) Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
+		PROPERTY(set = SetRotation, Degrees) Math::Vector3 m_Rotation = { 0.0f, 0.0f, 0.0f };
+		PROPERTY(set = SetScale) Math::Vector3 m_Scale = { 1.0f, 1.0f, 1.0f };
 
 		Entity Parent = Entity::null;
 		Utils::Vector<Entity> Children;
@@ -72,6 +70,5 @@ namespace Engine
 		Math::Mat4 ChashedGloableTransform = Math::Mat4(1.0f);
 
 		friend class Scene;
-		friend TransformSerializer;
 	};
 }

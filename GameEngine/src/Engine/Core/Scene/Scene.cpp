@@ -200,7 +200,10 @@ namespace Engine
 	Ref<Scene> Scene::CreateDefault()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		fs::path defaultSceneFile = Application::Get().GetAssetManager().GetAssetPath(Application::Get().GetProject().GetDefaultSceneID());
+		uint64 defaultSceneID = Application::Get().GetProject().GetDefaultSceneID();
+		if (defaultSceneID == 0) // create empty scene if no default scene is given
+			return Create();
+		fs::path defaultSceneFile = Application::Get().GetAssetManager().GetAssetPath(defaultSceneID);
 		return Create(defaultSceneFile);
 	}
 

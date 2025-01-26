@@ -64,6 +64,22 @@ namespace Engine
 		}
 	}
 
+	void TransformComponent::SetParent(Entity parent)
+	{
+		if (parent)
+			parent.AddChild(GetOwner());
+		else
+			SetParentToRoot();
+	}
+
+	void TransformComponent::SetParent(UUID uuid)
+	{
+		if (uuid == 0)
+			SetParentToRoot();
+		else
+			SetParent(GetOwner().GetScene()->GetEntityWithUUID(uuid));
+	}
+
 	void TransformComponent::Dirty()
 	{
 		m_Dirty = true;
@@ -94,4 +110,34 @@ namespace Engine
 			m_Dirty = false;
 		}
 	}
+
+	// ------------------- Converter ------------------- //
+	template<>
+	struct Convert<TransformComponent>
+	{
+		CONVERTER_BASE(TransformComponent);
+		static ObjectDescription Encode(const TransformComponent& val)
+		{
+			ObjectDescription desc(ObjectDescription::Type::Object);
+			desc["Position"] = ObjectDescription::CreateFrom(val.GetPosition());
+			desc["Rotation"] = ObjectDescription::CreateFrom(val.GetRotation());
+			desc["Scale"] = ObjectDescription::CreateFrom(val.GetScale());
+
+			desc["Parent"] = ObjectDescription::CreateFrom((uint64)val.GetParent().GetUUID());
+
+			return desc;
+		}
+
+		static bool Decode(TransformComponent& tc, const ObjectDescription& data)
+		{
+			tc.SetPosition(data["Position"].Get<Math::Vector3>());
+			tc.SetRotation(data["Rotation"].Get<Math::Vector3>());
+			tc.SetScale(data["Scale"].Get<Math::Vector3>());
+
+			tc.SetParent(data["Parent"].Get<uint64>());
+
+			return true;
+		}
+	};
+	ADD_OBJECT_CONVERTER(TransformComponent);
 }

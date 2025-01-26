@@ -6,6 +6,7 @@
 #include "Entity.h"
 
 #include "Reflection.h"
+#include "Engine/Core/ObjectDescription/ObjectDescription.h"
 
 namespace Engine
 {
