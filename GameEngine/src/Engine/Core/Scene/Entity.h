@@ -87,6 +87,7 @@ namespace Engine
 		Scene* GetScene() { return m_Scene; }
 
 		ObjectDescription CreateObjectDescription() const;
+		void LoadComponentFromDescription(const ObjectDescription& desc);
 
 		static Entity null;
 

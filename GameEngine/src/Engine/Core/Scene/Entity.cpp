@@ -176,9 +176,15 @@ namespace Engine
 		}
 	};
 	ADD_OBJECT_CONVERTER(Entity);
+
 	ObjectDescription Entity::CreateObjectDescription() const
 	{
 		return Convert<Entity>::Encode(*this);
+	}
+
+	void Entity::LoadComponentFromDescription(const ObjectDescription& desc)
+	{
+		// TODO
 	}
 
 }

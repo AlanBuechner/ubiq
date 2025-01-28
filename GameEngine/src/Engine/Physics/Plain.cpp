@@ -38,7 +38,8 @@ namespace Engine
 	bool PlainVolume::TestRay(const Ray& ray, RayHit& outHit)
 	{
 		uint32 numFaceingPlains = 0;
-		Utils::Vector<RayHit> hits(m_Plains.Count());
+		Utils::Vector<RayHit> hits;
+		hits.Reserve(m_Plains.Count());
 		for (Plain& plain : m_Plains)
 		{
 			RayHit hit;
