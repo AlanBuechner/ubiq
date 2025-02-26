@@ -6,7 +6,6 @@
 #include "Abstractions/Resources/InstanceBuffer.h"
 #include "Shaders/Shader.h"
 #include "Camera.h"
-#include "EditorCamera.h"
 #include "Engine/Core/Scene/Entity.h"
 #include "Engine/Core/Scene/Components.h"
 
@@ -95,12 +94,6 @@ namespace Engine
 	void Renderer2D::BeginScene(const Camera& camera, const Math::Mat4& transform)
 	{
 		Math::Mat4 viewProj = camera.GetProjectionMatrix() * Math::Inverse(transform);
-		s_Data.Camera->SetData(&viewProj);
-	}
-
-	void Renderer2D::BeginScene(Ref<EditorCamera> camera)
-	{
-		Math::Mat4 viewProj = camera->GetViewProjection();
 		s_Data.Camera->SetData(&viewProj);
 	}
 

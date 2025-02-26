@@ -276,7 +276,7 @@ namespace Engine
 		return pWnd->HandleEvent(hWnd, msg, wParam, lParam); // call handle event for that window
 	}
 
-	LRESULT DISABLE_OPS WindowsWindow::HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	LRESULT WindowsWindow::HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (msg)
 		{
@@ -301,9 +301,9 @@ namespace Engine
 			if (m_Data.EventCallback == nullptr) break;
 			POINTS pt = MAKEPOINTS(lParam);
 			m_Data.EventCallback(new MouseMovedEvent(MouseMoveBindMode::CurserPosition, pt.x, pt.y));
-			//Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
-			//MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MOUSE_DELTA, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y); // creates new mouse moved event
-			//m_Data.EventCallback(*deltaMousePostionEvent);
+			Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
+			MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MouseMoveBindMode::DeltaPosition, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y);
+			m_Data.EventCallback(deltaMousePostionEvent);
 			break;
 		}
 		case WM_MOUSEWHEEL: // scroll wheel

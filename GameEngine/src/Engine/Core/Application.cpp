@@ -51,6 +51,7 @@ namespace Engine {
 	Application::~Application()
 	{
 		m_LayerStack.Destroy();
+		OnExit();
 		m_AssetManager.Destroy();
 		m_Window.reset();
 		WindowManager::Destroy();
@@ -74,7 +75,7 @@ namespace Engine {
 		m_InputBuffer.Push(e);
 	}
 
-	void DISABLE_OPS Application::LoadProject(const fs::path& folder)
+	void Application::LoadProject(const fs::path& folder)
 	{
 		// clear asset manager before switching
 		m_AssetManager.Destroy();
@@ -88,7 +89,7 @@ namespace Engine {
 		Renderer::SetDefultMaterial(m_AssetManager.GetAsset<Material>(m_CurrentProject.GetDefultMaterialID()));
 	}
 
-	void Application::Run()
+	void DISABLE_OPS Application::Run()
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
@@ -167,8 +168,6 @@ namespace Engine {
 
 	void Application::SendInputBuffer()
 	{
-		if (m_InputBuffer.Empty()) return;
-
 		for (Event* i : m_InputBuffer)
 		{
 			EventDispatcher dispatcher(i);
@@ -180,6 +179,13 @@ namespace Engine {
 			dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMouseReleased, Input::s_Instance));
 			dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN_EXTERN(&Input::OnMouseMoved, Input::s_Instance));
 		}
+
+		for (uint32 k = 0; k < Engine::KeyCode::SIZE; k += 1)
+		{
+			if (Input::GetKeyPressed(k) || Input::GetKeyDown(k))
+				m_InputBuffer.Push(new KeyDownEvent(k));
+		}
+
 
 		for (Event** i = &*m_InputBuffer.begin(); i != &*m_InputBuffer.end(); ++i)
 		{

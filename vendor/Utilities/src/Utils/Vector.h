@@ -60,6 +60,8 @@ namespace Utils
 		uint32 Find(const Type& val) const;
 		uint32 FindIf(Predicate predicate) const;
 
+		bool Contains(const Type& val) const { return Find(val) != Count(); }
+
 		constexpr uint32 ElementSize() const;
 		uint32 SizeInBytes() const;
 		uint32 Count() const;

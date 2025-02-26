@@ -31,7 +31,7 @@ headers = [
 includes = [
 	projDir,
 	f"src",
-	f"vendor",
+	f"{includeDirs['vendor']}",
 	f"{includeDirs['ImGui']}",
 	f"{includeDirs['glm']}",
 	f"{includeDirs['stb_image']}",

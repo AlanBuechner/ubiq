@@ -10,6 +10,7 @@ namespace Engine
 		static void ConstrainToWindow(Ref<Window> window);
 		static void Visibility(bool v);
 
+		static void SetLockPos(int x, int y);
 		static void Lock(bool lock);
 
 		static void Update();

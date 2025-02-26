@@ -55,6 +55,7 @@ namespace Engine
 	protected:
 		bool m_InEditer = false;
 		void GenLayerStack();
+		virtual void OnExit() {}; // let the application delete layers after they are removed from the layer stack
 
 	private:
 		void SendInputBuffer();

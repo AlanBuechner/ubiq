@@ -10,7 +10,6 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/DebugRenderer.h"
-#include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Core/Scene/TransformComponent.h"
 #include "SceneSerializer.h"
 #include "Engine/Core/Window.h"

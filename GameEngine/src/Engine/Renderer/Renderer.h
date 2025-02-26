@@ -5,8 +5,6 @@
 
 #include "Material.h"
 
-#include "EditorCamera.h"
-
 #include "Utils/Performance.h"
 
 #include "Engine/Core/Flag.h"

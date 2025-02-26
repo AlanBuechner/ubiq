@@ -2,10 +2,10 @@
 
 #include "Engine/Core/Core.h"
 #include "KeyCodes.h"
-#include <map>
 #include "Engine/Core/Application.h"
 #include "Engine/Math/Math.h"
 
+#include <map>
 
 namespace Engine
 {
@@ -29,8 +29,11 @@ namespace Engine
 	class  Input
 	{
 		friend Application;
+		friend class Cursor;
 
 	public:
+
+		Input();
 
 		// keyboard
 		inline static KeyState GetKeyState(KeyCode keycode) { return s_Instance->GetKeyStateImpl(keycode); }
@@ -65,6 +68,8 @@ namespace Engine
 		bool OnMouseMoved(MouseMovedEvent* e);
 		static void UpdateKeyState() { s_Instance->UpdateKeyStateImpl(); }
 		void UpdateKeyStateImpl();
+
+		inline static void SetMousePosition(Math::Vector2 pos) { s_Instance->m_PreviousMousePosition = pos; s_Instance->m_MousePosition = pos; }
 
 	private:
 		static Input* s_Instance;

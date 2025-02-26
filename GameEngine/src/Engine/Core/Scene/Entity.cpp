@@ -2,6 +2,7 @@
 #include "Entity.h"
 #include "Components.h"
 #include "TransformComponent.h"
+#include "SceneSerializer.h"
 
 Engine::Entity Engine::Entity::null = Engine::Entity();
 
@@ -156,16 +157,8 @@ namespace Engine
 			ObjectDescription& comps = entityDesc["Components"].SetType(ObjectDescription::Type::Array);
 			comps.GetAsObjectArray().Reserve(entity.GetComponents().Count());
 			for (Component* comp : entity.GetComponents())
-			{
-				const Reflect::Class& componentClass = comp->GetClass();
+				comps.GetAsObjectArray().Push(SceneSerializer::GetComponentObjectDescription(comp));
 
-				auto funcs = ConverterBase::GetObjectConverterFunctions().find(componentClass.GetTypeID());
-				if (funcs != ConverterBase::GetObjectConverterFunctions().end())
-				{
-					comps.GetAsObjectArray().Push(funcs->second->EncodeObj(comp));
-					comps.GetAsObjectArray().Back().GetAsDescriptionMap()["Component"] = ObjectDescription::CreateFrom(componentClass.GetSname());
-				}
-			}
 			return entityDesc;
 		}
 
@@ -184,7 +177,24 @@ namespace Engine
 
 	void Entity::LoadComponentFromDescription(const ObjectDescription& desc)
 	{
-		// TODO
+		const std::string& componentName = desc["Component"].GetAsString();
+		const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
+		CORE_ASSERT_RETURN(componentClass != nullptr, "Could not find reflection data for class { 0 }", componentName);
+
+		void* compData = m_Scene->GetRegistry().AddComponent(m_EntityID, m_Scene, *componentClass);
+		if(compData == nullptr)
+			compData = GetScene()->GetRegistry().GetComponent(m_EntityID, *componentClass);
+
+		// deserialize component
+		auto funcs = ConverterBase::GetObjectConverterFunctions().find(componentClass->GetTypeID());
+		if (funcs != ConverterBase::GetObjectConverterFunctions().end()) {
+			bool success = funcs->second->DecodeObj(compData, desc);
+			CORE_ASSERT(success, "Failed to load component {0}", componentName);
+		}
+		else
+		{
+			// TODO : deserialize component with reflection
+		}
 	}
 
 }

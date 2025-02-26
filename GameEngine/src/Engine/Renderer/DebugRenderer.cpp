@@ -7,13 +7,13 @@
 #include "Abstractions/Resources/InstanceBuffer.h"
 #include "Abstractions/CommandList.h"
 #include "Camera.h"
-#include "EditorCamera.h"
 #include "Mesh.h"
 
 #include "EngineResource.h"
 
 #include "Utils/Common.h"
 #include "Engine/Core/Application.h"
+#include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 namespace Engine
 {
@@ -109,7 +109,7 @@ namespace Engine
 
 	void DebugRenderer::Build(Ref<CommandList> commandList)
 	{
-
+		Engine::GPUTimer::BeginEvent(commandList, "Debug Renderer");
 		for (uint32 i = 0; i < s_DebugData.NumPasses; i++)
 		{
 			Pass* pass = s_DebugData.Passes[i];
@@ -126,6 +126,7 @@ namespace Engine
 			verts.Clear();
 			indices.Clear();
 		}
+		Engine::GPUTimer::EndEvent(commandList);
 	}
 
 	void DebugRenderer::DrawLine(Math::Vector3 p1, Math::Vector3 p2, Math::Vector4 color, const Math::Mat4& transform, bool depthTest)

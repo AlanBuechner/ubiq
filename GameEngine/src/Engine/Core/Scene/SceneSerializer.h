@@ -1,5 +1,11 @@
 #pragma once
 #include "Scene.h"
+#include "Engine/Core/ObjectDescription/ObjectDescription.h"
+
+namespace Engine
+{
+	class Component;
+}
 
 namespace Engine
 {
@@ -13,6 +19,8 @@ namespace Engine
 
 		bool Deserialize(const fs::path& filepath);
 		bool DeserializeRuntime(const fs::path& filepath);
+
+		static ObjectDescription GetComponentObjectDescription(Component* comp);
 
 	private:
 		Ref<Scene> m_Scene;

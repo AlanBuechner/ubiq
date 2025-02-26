@@ -99,28 +99,7 @@ namespace Engine
 
 				// deserialize components
 				for (auto component : entity["Components"].GetAsObjectArray())
-				{
-					const std::string& componentName = component["Component"].GetAsString();
-					CREATE_PROFILE_SCOPEI("Deserializing Component " + componentName);
-
-					// get component reflection data
-					const Reflect::Class* componentClass = Reflect::Registry::GetRegistry()->GetClass(componentName);
-					CORE_ASSERT_CONTINUE(componentClass != nullptr, "Could not find reflection data for class { 0 }", componentName);
-
-					// add component
-					void* compData = deserializedEntity.GetScene()->GetRegistry().GetComponent(deserializedEntity, *componentClass);
-
-					// deserialize component
-					auto funcs = ConverterBase::GetObjectConverterFunctions().find(componentClass->GetTypeID());
-					if (funcs != ConverterBase::GetObjectConverterFunctions().end()){
-						bool success = funcs->second->DecodeObj(compData, component);
-						CORE_ASSERT(success, "Failed to load component {0}", componentName);
-					}
-					else
-					{
-						// TODO : deserialize component with reflection
-					}
-				}
+					deserializedEntity.LoadComponentFromDescription(component);
 			}
 		}
 		return true;
@@ -131,6 +110,21 @@ namespace Engine
 		// not implemented
 		CORE_ASSERT(false, "not implemented");
 		return false;
+	}
+
+	ObjectDescription SceneSerializer::GetComponentObjectDescription(Component* comp)
+	{
+		ObjectDescription desc;
+		const Reflect::Class& componentClass = comp->GetClass();
+
+		auto funcs = ConverterBase::GetObjectConverterFunctions().find(componentClass.GetTypeID());
+		if (funcs != ConverterBase::GetObjectConverterFunctions().end())
+		{
+			desc = funcs->second->EncodeObj(comp);
+			desc.GetAsDescriptionMap()["Component"] = ObjectDescription::CreateFrom(componentClass.GetSname());
+		}
+
+		return desc;
 	}
 
 }

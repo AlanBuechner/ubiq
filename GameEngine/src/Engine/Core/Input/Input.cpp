@@ -8,6 +8,15 @@ Engine::Input* Engine::Input::s_Instance = new Input;
 namespace Engine
 {
 
+	Input::Input()
+	{
+		for (uint32 i = 0; i < KeyCode::SIZE; i++)
+			m_KeyStates[i] = Up;
+		for (uint32 i = 0; i < MouseCode::SIZE; i++)
+			m_MouseStates[i] = Up;
+	}
+
+
 	bool Input::OnKeyPressed(KeyPressedEvent* e)
 	{ 
 		int keycode = e->GetKeyCode();
@@ -74,7 +83,6 @@ namespace Engine
 		m_ToUpdateMouse.Clear();
 		m_PreviousMousePosition = m_MousePosition;
 	}
-
 
 	KeyState Input::GetKeyStateImpl(KeyCode keycode)
 	{
