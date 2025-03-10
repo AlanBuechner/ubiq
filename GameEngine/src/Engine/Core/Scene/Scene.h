@@ -39,7 +39,7 @@ namespace Engine
 		Scene(SceneScriptBase* script = nullptr);
 		~Scene();
 
-		void OnUpdate(Ref<Camera> camera);
+		void OnUpdate();
 		void OnViewportResize(uint32 width, uint32 height);
 
 		Entity CreateEntity(const std::string& name = "");
@@ -51,7 +51,6 @@ namespace Engine
 
 		uint32 GetViewportWidth() { return m_ViewportWidth; }
 		uint32 GetViewportHeight() { return m_ViewportHeight; }
-		bool DidCameraChange() { return m_CameraChanged; }
 
 		// -------------------------------- ECS -------------------------------- //
 		SceneRegistry& GetRegistry() { return m_Registry; }

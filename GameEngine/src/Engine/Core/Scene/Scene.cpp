@@ -39,13 +39,9 @@ namespace Engine
 			delete m_UpdateEvents[i];
 	}
 
-	void Scene::OnUpdate(Ref<Camera> camera)
+	void Scene::OnUpdate()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		m_CameraChanged = m_SceneRenderer->GetMainCamera() != camera;
-		if(m_CameraChanged)
-			m_SceneRenderer->SetMainCamera(camera);
-
 		m_SceneScript->OnUpdate();
 
 		for (uint32 i = 0; i < m_UpdateEvents.Count(); i++)

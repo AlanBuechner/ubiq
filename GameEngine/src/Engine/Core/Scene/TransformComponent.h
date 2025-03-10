@@ -40,6 +40,7 @@ namespace Engine
 
 		Math::Mat4 GetTransform() const;
 		Math::Mat4 GetGlobalTransform();
+		void SetGlobalTransformFromMatrix(Math::Mat4 transform);
 
 		void AddChild(Entity child);
 		void RemoveChild(Entity child);
