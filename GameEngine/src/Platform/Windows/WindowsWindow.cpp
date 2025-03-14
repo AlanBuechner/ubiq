@@ -300,17 +300,15 @@ namespace Engine
 		{
 			if (m_Data.EventCallback == nullptr) break;
 			POINTS pt = MAKEPOINTS(lParam);
-			m_Data.EventCallback(new MouseMovedEvent(MouseMoveBindMode::CurserPosition, pt.x, pt.y));
 			Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
-			MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MouseMoveBindMode::DeltaPosition, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y);
-			m_Data.EventCallback(deltaMousePostionEvent);
+			m_Data.EventCallback(new MouseMovedEvent(pt.x, pt.y, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y));
 			break;
 		}
 		case WM_MOUSEWHEEL: // scroll wheel
 		{
 			if(m_Data.EventCallback == nullptr) break;
 			float delta = GET_WHEEL_DELTA_WPARAM(wParam);
-			m_Data.EventCallback(new MouseScrolledEvent(MouseMoveBindMode::ScrollWheel, 0, delta));
+			m_Data.EventCallback(new MouseScrolledEvent(0, delta));
 			break;
 		}
 
@@ -346,8 +344,8 @@ namespace Engine
 			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, &raw, &size, sizeof(RAWINPUTHEADER));
 
 			if (raw.header.dwType == RIM_TYPEMOUSE && (raw.data.mouse.lLastX != 0 || raw.data.mouse.lLastY != 0)) {
-				MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MouseMoveBindMode::DeltaPosition, (float)raw.data.mouse.lLastX, (float)raw.data.mouse.lLastY); // creates new mouse moved event
-				m_Data.EventCallback(deltaMousePostionEvent);
+				//MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MouseMoveBindMode::DeltaPosition, (float)raw.data.mouse.lLastX, (float)raw.data.mouse.lLastY); // creates new mouse moved event
+				//m_Data.EventCallback(deltaMousePostionEvent);
 			}
 			break;
 		}

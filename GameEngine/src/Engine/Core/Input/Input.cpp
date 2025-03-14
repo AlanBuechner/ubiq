@@ -53,8 +53,7 @@ namespace Engine
 
 	bool Input::OnMouseMoved(MouseMovedEvent* e)
 	{
-		if(e->GetMouseBindMode() == MouseMoveBindMode::CurserPosition)
-			m_MousePosition = { e->GetX(), e->GetY() };
+		m_MousePosition = { e->GetX(), e->GetY() };
 		return false;
 	}
 

@@ -6,6 +6,14 @@ namespace Engine
 
 	bool Plain::TestRay(const Ray& ray, RayHit& outHit)
 	{
+		bool res = TestLine(ray, outHit);
+		if (outHit.m_Distance < 0)
+			return false;
+		return res;
+	}
+
+	bool Plain::TestLine(const Ray& ray, RayHit& outHit)
+	{
 		Math::Vector3 dir = Math::Normalized(ray.m_Direction);
 
 		float s = Math::Dot(m_Normal, dir);
@@ -17,9 +25,6 @@ namespace Engine
 		float d = Math::Dot(m_Normal, m_Center);
 		// Compute the X value for the directed line ray intersecting the plane
 		float x = (d - Math::Dot(m_Normal, ray.m_Origin)) / Math::Dot(m_Normal, dir);
-
-		if (x < 0)
-			return false;
 
 		// output contact point
 		outHit.m_HitPoint = ray.m_Origin + dir * x; //Make sure your ray vector is normalized

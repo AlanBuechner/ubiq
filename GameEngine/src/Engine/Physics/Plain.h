@@ -13,6 +13,7 @@ namespace Engine
 		Math::Vector3 m_Normal;
 
 		bool TestRay(const Ray& ray, RayHit& outHit);
+		bool TestLine(const Ray& ray, RayHit& outHit);
 
 		void Transform(const Math::Mat4& transform);
 	};
