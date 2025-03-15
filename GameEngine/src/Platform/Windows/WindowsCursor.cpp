@@ -64,22 +64,22 @@ namespace Engine
 		s_IsWrap = wrap;
 	}
 
-	Math::Vector2 Cursor::WrapMouse(Math::Vector2 mousePos)
+	Math::Vector2 DISABLE_OPS Cursor::WrapMouse(Math::Vector2 mousePos)
 	{
 		if (!s_IsWrap)
 			return mousePos;
 
 		// x
 		if (mousePos.x <= s_WrapBox.min.x)
-			mousePos.x = s_WrapBox.max.x + (mousePos.x - s_WrapBox.min.x);
+			mousePos.x = s_WrapBox.max.x + (mousePos.x - s_WrapBox.min.x) - 1;
 		if (mousePos.x >= s_WrapBox.max.x)
-			mousePos.x = s_WrapBox.min.x + (mousePos.x - s_WrapBox.max.x);
+			mousePos.x = s_WrapBox.min.x + (mousePos.x - s_WrapBox.max.x) + 1;
 
 		// y
 		if (mousePos.y <= s_WrapBox.min.y)
-			mousePos.y = s_WrapBox.max.y + (mousePos.y - s_WrapBox.min.y);
+			mousePos.y = s_WrapBox.max.y + (mousePos.y - s_WrapBox.min.y) - 1;
 		if (mousePos.y >= s_WrapBox.max.y)
-			mousePos.y = s_WrapBox.min.y + (mousePos.y - s_WrapBox.max.y);
+			mousePos.y = s_WrapBox.min.y + (mousePos.y - s_WrapBox.max.y) + 1;
 
 		return mousePos;
 	}

@@ -330,7 +330,7 @@ namespace Engine
 
 				// set system mouse position
 				POINT point = { (LONG)mousePos.x, (LONG)mousePos.y };
-				//ScreenToClient(window, &point);
+				ClientToScreen(window, &point);
 				SetCursorPos(point.x, point.y);
 			}
 
