@@ -65,26 +65,6 @@ namespace Engine {
 		EVENT_CLASS_TYPE(KeyTyped)
 	};
 
-	class  KeyRepeatEvent : public KeyEvent
-	{
-	public:
-		KeyRepeatEvent(int keycode, int repeatCount)
-			: KeyEvent(keycode), m_RepeatCount(repeatCount) {}
-
-		inline int GetRepeatCount() const { return m_RepeatCount; }
-
-		std::string ToString() const override
-		{
-			std::stringstream ss;
-			ss << "KeyRepeatEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
-			return ss.str();
-		}
-
-		EVENT_CLASS_TYPE(KeyRepeat)
-	private:
-		int m_RepeatCount;
-	};
-
 	class  KeyDownEvent : public KeyEvent
 	{
 	public:

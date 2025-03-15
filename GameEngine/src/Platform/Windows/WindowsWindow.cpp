@@ -293,7 +293,8 @@ namespace Engine
 			m_Data.EventCallback(new KeyReleasedEvent(static_cast<unsigned char>(wParam)));
 			break;
 		case WM_CHAR:
-			// TODO
+			if(m_Data.EventCallback == nullptr) break;
+			m_Data.EventCallback(new KeyTypedEvent(static_cast<unsigned char>(wParam)));
 			break;
 
 			// mouse
