@@ -14,6 +14,14 @@ namespace Engine
 	static POINT s_CursorLockPoint;
 	static bool s_IsLocked;
 
+	struct WrapBox
+	{
+		POINT min;
+		POINT max;
+	};
+	static WrapBox s_WrapBox;
+	static bool s_IsWrap;
+
 	void Cursor::ConstrainToWindow(Ref<Window> window)
 	{
 		HWND hWnd = (HWND)window->GetNativeWindow();
@@ -33,6 +41,50 @@ namespace Engine
 			visible = v;
 		}
 	}
+
+
+
+	void Cursor::SetWrapBox(int minx, int miny, int maxx, int maxy, bool screenToClient)
+	{
+		s_WrapBox.min.x = minx;
+		s_WrapBox.min.y = miny;
+		s_WrapBox.max.x = maxx;
+		s_WrapBox.max.y = maxy;
+
+		if (screenToClient)
+		{
+			HWND window = (HWND)Engine::Application::Get().GetWindow().GetNativeWindow();
+			ScreenToClient(window, &s_WrapBox.min);
+			ScreenToClient(window, &s_WrapBox.max);
+		}
+	}
+
+	void Cursor::Wrap(bool wrap)
+	{
+		s_IsWrap = wrap;
+	}
+
+	Math::Vector2 Cursor::WrapMouse(Math::Vector2 mousePos)
+	{
+		if (!s_IsWrap)
+			return mousePos;
+
+		// x
+		if (mousePos.x <= s_WrapBox.min.x)
+			mousePos.x = s_WrapBox.max.x + (mousePos.x - s_WrapBox.min.x);
+		if (mousePos.x >= s_WrapBox.max.x)
+			mousePos.x = s_WrapBox.min.x + (mousePos.x - s_WrapBox.max.x);
+
+		// y
+		if (mousePos.y <= s_WrapBox.min.y)
+			mousePos.y = s_WrapBox.max.y + (mousePos.y - s_WrapBox.min.y);
+		if (mousePos.y >= s_WrapBox.max.y)
+			mousePos.y = s_WrapBox.min.y + (mousePos.y - s_WrapBox.max.y);
+
+		return mousePos;
+	}
+
+
 
 
 	void Cursor::SetLockPos(int x, int y)

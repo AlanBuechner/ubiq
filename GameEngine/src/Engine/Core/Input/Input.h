@@ -30,6 +30,7 @@ namespace Engine
 	{
 		friend Application;
 		friend class Cursor;
+		friend class WindowsWindow;
 
 	public:
 
@@ -70,6 +71,7 @@ namespace Engine
 		void UpdateKeyStateImpl();
 
 		inline static void SetMousePosition(Math::Vector2 pos) { s_Instance->m_PreviousMousePosition = pos; s_Instance->m_MousePosition = pos; }
+		inline static void SetPrevMousePosition(Math::Vector2 pos) { s_Instance->m_PreviousMousePosition = pos; }
 
 	private:
 		static Input* s_Instance;

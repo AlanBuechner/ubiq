@@ -7,6 +7,7 @@
 #include "Engine/Events/MouseEvent.h"
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Core/Input/Input.h"
+#include "Engine/Core/Cursor.h"
 
 #include "Utils/Utils.h"
 
@@ -296,12 +297,47 @@ namespace Engine
 			break;
 
 			// mouse
+		case WM_MOUSELEAVE:
 		case WM_MOUSEMOVE: // mouse move
 		{
 			if (m_Data.EventCallback == nullptr) break;
-			POINTS pt = MAKEPOINTS(lParam);
-			Math::Vector2 PrevMousePos = Input::GetPreviousMousePosition();
-			m_Data.EventCallback(new MouseMovedEvent(pt.x, pt.y, (float)pt.x - PrevMousePos.x, (float)pt.y - PrevMousePos.y));
+
+			HWND window = (HWND)Engine::Application::Get().GetWindow().GetNativeWindow();
+
+			POINT pt;
+			if (msg == WM_MOUSEMOVE)
+			{
+				POINTS pts = MAKEPOINTS(lParam);
+				pt.x = pts.x;
+				pt.y = pts.y;
+			}
+			else if (WM_MOUSELEAVE)
+			{
+				GetCursorPos(&pt);
+				ClientToScreen(window, &pt);
+			}
+
+			Math::Vector2 prevMousePos = Input::GetPreviousMousePosition();
+			Math::Vector2 mousePos = { pt.x, pt.y };
+			Math::Vector2 mouseDelta = mousePos - prevMousePos;
+
+			// check if new mouse position is in wrap box
+			Math::Vector2 newMousePos = Cursor::WrapMouse(mousePos);
+			if (newMousePos != mousePos)
+			{
+				// update mouse position TODO
+				mousePos = newMousePos;
+
+				// set system mouse position
+				POINT point = { (LONG)mousePos.x, (LONG)mousePos.y };
+				//ScreenToClient(window, &point);
+				SetCursorPos(point.x, point.y);
+			}
+
+			// update prev mouse position
+			Input::SetPrevMousePosition(mousePos);
+
+			m_Data.EventCallback(new MouseMovedEvent(pt.x, pt.y, mouseDelta.x, mouseDelta.y));
 			break;
 		}
 		case WM_MOUSEWHEEL: // scroll wheel

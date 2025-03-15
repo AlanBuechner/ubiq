@@ -80,7 +80,6 @@ namespace Engine
 				SetMouseButtonState(i, KeyState::Up);
 		}
 		m_ToUpdateMouse.Clear();
-		m_PreviousMousePosition = m_MousePosition;
 	}
 
 	KeyState Input::GetKeyStateImpl(KeyCode keycode)
