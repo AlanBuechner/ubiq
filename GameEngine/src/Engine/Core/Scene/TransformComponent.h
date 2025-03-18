@@ -48,6 +48,7 @@ namespace Engine
 		void SetParentToRoot();
 		void SetParent(Entity parent);
 		void SetParent(UUID uuid);
+		void DisallowNoneUniformScale(bool val) { m_DisallowNonUniformScale = val; Dirty(); }
 
 		Entity GetOwner() const { return Owner; }
 		Entity GetParent() const { return Parent; }
@@ -55,6 +56,9 @@ namespace Engine
 		bool IsDirty() { return m_Dirty; }
 
 	public:
+
+		void FixScale();
+
 		void Dirty();
 		FUNCTION()
 		void UpdateHierarchyGlobalTransform();
@@ -66,6 +70,8 @@ namespace Engine
 
 		Entity Parent = Entity::null;
 		Utils::Vector<Entity> Children;
+
+		bool m_DisallowNonUniformScale = false;
 
 		bool m_Dirty = true;
 		Math::Mat4 ChashedGloableTransform = Math::Mat4(1.0f);
