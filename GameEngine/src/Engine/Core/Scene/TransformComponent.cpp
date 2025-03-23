@@ -80,19 +80,8 @@ namespace Engine
 			SetParent(GetOwner().GetScene()->GetEntityWithUUID(uuid));
 	}
 
-	void TransformComponent::FixScale()
-	{
-		if (!m_DisallowNonUniformScale)
-			return;
-
-		float maxScale = Math::Max(m_Scale.x, Math::Max(m_Scale.y, m_Scale.z));
-		m_Scale = { maxScale, maxScale, maxScale };
-	}
-
 	void TransformComponent::Dirty()
 	{
-		FixScale(); // any time the transform is dirtied make sure the scale is set correctly
-
 		m_Dirty = true;
 		Owner.DirtyVolume();
 		for (uint32 i = 0; i < Children.Count(); i++)
