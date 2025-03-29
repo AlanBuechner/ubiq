@@ -51,12 +51,14 @@ namespace Engine
 
 		if (m_FreeSlots.Empty())
 		{
-			// resize
+			// create new page
 			m_Pages.Push(ComponentPoolPage(m_ComponentSize));
 
+			// get old and updated count for number of component slots
 			uint32 oldCount = m_NumComponents;
 			uint32 newCount = m_NumComponents + PoolSize;
 
+			// add all new component slots to free slots list and set them to unused
 			for (int64 i = newCount - 1; i >= oldCount; i--)
 			{
 				m_FreeSlots.Push(i);
@@ -69,6 +71,8 @@ namespace Engine
 		GetPageForIndex(componentIndex).SetEntry(GetIndexInPage(componentIndex), true);
 
 		m_EntityComponentMapping[entity] = componentIndex;
+
+		m_NumComponents++;
 		return componentIndex;
 	}
 
@@ -76,6 +80,7 @@ namespace Engine
 	{
 		uint32 componentIndex = m_EntityComponentMapping[entity];
 		m_FreeSlots.Push(componentIndex);
+		m_NumComponents--;
 
 		m_ReflectionClass.DestroyInstance(GetComponentRaw(componentIndex), false);
 		GetPageForIndex(componentIndex).SetEntry(GetIndexInPage(componentIndex), false);

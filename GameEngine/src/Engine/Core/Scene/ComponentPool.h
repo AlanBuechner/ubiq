@@ -44,6 +44,7 @@ namespace Engine
 		ComponentType GetTypeID() { return m_TypeID; }
 		uint64 GetComponentSize() { return m_ComponentSize; }
 		Utils::Vector<uint32>& GetUsedSlots() { return m_UsedSlots; }
+		uint32 GetNumComponents() { return m_NumComponents; }
 
 		void EachEntity(EachEntityFunc func);
 

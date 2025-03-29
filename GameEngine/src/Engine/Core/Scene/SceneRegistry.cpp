@@ -106,6 +106,9 @@ namespace Engine
 		ComponentPool* pool = m_Pools[componentID];
 		if (pool == nullptr) return nullptr;
 
+		if (pool->GetNumComponents() == 0)
+			return nullptr;
+
 		return pool->GetComponentRaw(0);
 	}
 
