@@ -176,7 +176,7 @@ namespace Utils
 	}
 
 	template<class Type> inline void Vector<Type>::Remove(uint32 index) { Base::erase(Base::begin() + index); }
-	template<class Type> inline void Vector<Type>::Remove(Type* pos) { Base::erase(pos); }
+	template<class Type> inline void Vector<Type>::Remove(Type* pos) { Base::erase(std::remove(Base::begin(), Base::end(), pos), Base::end()); }
 	template<class Type> inline void Vector<Type>::Remove(Vector<Type>::Iterator pos) { Base::erase(pos); }
 	template<class Type> inline void Vector<Type>::Remove(Vector<Type>::ConstIterator pos) { Base::erase(pos); }
 
