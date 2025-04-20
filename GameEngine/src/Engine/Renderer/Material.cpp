@@ -63,7 +63,7 @@ namespace Engine
 		m_Buffer->SetData(m_Data->GetData());
 	}
 
-	Ref<Material> DISABLE_OPS Material::Create(const fs::path& path)
+	Ref<Material> Material::Create(const fs::path& path)
 	{
 		Ref<Material> mat = CreateRef<Material>();
 

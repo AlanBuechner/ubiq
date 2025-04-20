@@ -58,7 +58,7 @@ struct PS_Output
 
 #section vertex
 
-cbuffer Camera
+cbuffer u_Camera
 {
 	float4x4 ViewPorjection;
 };
@@ -77,8 +77,8 @@ VS_Output main(VS_Input input)
 
 #section pixel
 
-Texture2D<float4> textures[] : register(space0);
-StaticSampler textureSampler = StaticSampler(repeat, repeat, linear, liner);
+Texture2D<float4> u_Textures[] : register(space0);
+StaticSampler s_TextureSampler = StaticSampler(repeat, repeat, linear, liner);
 
 PS_Output main(PS_Input input)
 {

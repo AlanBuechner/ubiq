@@ -59,7 +59,7 @@ namespace Engine
 		UUID GetAssetUUIDFromPath(const fs::path& metaFile);
 
 		template<class T>
-		Ref<T> DISABLE_OPS GetAsset(UUID assetID)
+		Ref<T> GetAsset(UUID assetID)
 		{
 			Ref<Asset> asset;
 

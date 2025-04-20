@@ -11,7 +11,7 @@ namespace Engine
 	Utils::Vector<std::string> Tokenize(const std::string& line)
 	{
 		const char delimiters[] = { ' ', '	', '\r', '\n' };
-		const char reservedTokens[] = { "={};\"()," };
+		const char reservedTokens[] = { "={};\"(),<>" };
 
 		Utils::Vector<std::string> tokens;
 
@@ -253,7 +253,36 @@ namespace Engine
 
 					section.m_Samplers[name] = info;
 
-					section.m_SectionCode << "sampler " << name << ";";
+					section.m_SectionCode << "sampler " << name << ";\n";
+				}
+				else if (tokens[0] == "RootConstant")
+				{
+					// 0			1 2    3 4    5 6-?(op)
+					// RootConstant < type > name : register ;
+					
+					CORE_ASSERT(tokens.Count() >= 6, "error on line \"{0}\"", line);
+
+					CORE_ASSERT(tokens[1] == "<", "expected \"<\"");
+					std::string& type = tokens[2];
+					CORE_ASSERT(tokens[3] == ">", "expected \">\"");
+					std::string& name = tokens[4];
+					std::string registerCode = "";
+					if (tokens[5] == ":")
+					{
+						uint32 i = 6;
+						while (i < tokens.Count() && tokens[i] != ";")
+							registerCode += tokens[i++];
+						CORE_ASSERT(i != tokens.Count(), "expected \";\"");
+					}
+					else
+						CORE_ASSERT(tokens[5] == ";", "expected \";\"");
+
+					section.m_RootConstants.insert(name);
+
+					section.m_SectionCode << "cbuffer " << name;
+					if (registerCode != "")
+						section.m_SectionCode << " : " << registerCode;
+					section.m_SectionCode << " { " << type << " " << name << "; };\n";
 				}
 				else
 				{
@@ -263,7 +292,7 @@ namespace Engine
 		}
 	}
 
-	ShaderConfig DISABLE_OPS ShaderCompiler::CompileConfig(const std::string& code)
+	ShaderConfig ShaderCompiler::CompileConfig(const std::string& code)
 	{
 		ShaderConfig config{};
 		std::istringstream iss(code);
@@ -384,7 +413,7 @@ namespace Engine
 		return ss.str();
 	}
 
-	ObjectDescription DISABLE_OPS ShaderCompiler::BuildObject(std::queue<std::string>& tokenQueue)
+	ObjectDescription ShaderCompiler::BuildObject(std::queue<std::string>& tokenQueue)
 	{
 		if (tokenQueue.front() == "{") // build object
 		{

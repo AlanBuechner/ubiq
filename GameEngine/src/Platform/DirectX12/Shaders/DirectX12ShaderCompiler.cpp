@@ -282,25 +282,67 @@ namespace Engine
 
 	}
 
-	ID3D12RootSignature* DirectX12ShaderCompiler::GenRootSignature(Utils::Vector<ShaderParameter>& params)
+	ID3D12RootSignature* DISABLE_OPS DirectX12ShaderCompiler::GenRootSignature(Utils::Vector<ShaderParameter>& params)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		D3D12_VERSIONED_ROOT_SIGNATURE_DESC rsd;
 		rsd.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
+
 		// create root parameters
 		Utils::Vector<D3D12_ROOT_PARAMETER1> rootParams;
 		Utils::Vector<D3D12_STATIC_SAMPLER_DESC> samplers;
 
+		// find number of descriptor tables
 		uint32 numDescriptorTables = 0;
 		for (uint32 i = 0; i < params.Count(); i++)
 			if (params[i].type == PerameterType::DescriptorTable) numDescriptorTables++;
 
+		// track descriptor ranges for descriptor tables
 		uint32 currentDescriptor = 0;
 		Utils::Vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRanges(numDescriptorTables);
 
-		for (ShaderParameter& rd : params)
+		// find all shared shader parameters
+		std::unordered_set<std::string> sharedParamNames;
+		Utils::Vector<uint32> paramsToSkip;
+		for (uint32 i = 0; i < params.Count() - 1; i++)
 		{
+			// get current param
+			ShaderParameter& param = params[i];
+
+			// find shared
+			bool isShared = false;
+			for (uint32 j = i + 1; j < params.Count(); j++)
+			{
+				// skip automatically bound parameters
+				if(param.type == PerameterType::DescriptorTable || param.type == PerameterType::StaticSampler)
+					continue;
+
+				ShaderParameter& sharedParam = params[j];
+				if (param.name == sharedParam.name)
+				{
+					CORE_ASSERT(param.reg == sharedParam.reg, "Shared shader parameters need the same binding");
+					CORE_ASSERT(param.space == sharedParam.space, "Shared shader parameters need the same binding");
+
+					paramsToSkip.Push(j);
+					isShared = true;
+				}
+			}
+
+			if (isShared)
+				sharedParamNames.insert(param.name);
+		}
+
+		// get root parameters
+		for (uint32 i = 0; i < params.Count(); i++)
+		{
+			// get current param
+			ShaderParameter& rd = params[i];
+
+			// check if param needs to be skipped
+			if(paramsToSkip.Contains(i))
+				continue;
+
 			if (rd.type != PerameterType::StaticSampler)
 			{
 				// populate root index
@@ -308,7 +350,13 @@ namespace Engine
 
 				// root parameters
 				D3D12_ROOT_PARAMETER1 param;
-				param.ShaderVisibility = GetShaderVisibilityFlag(rd.shader);
+
+				// check if param is shared
+				if (sharedParamNames.find(rd.name) != sharedParamNames.end())
+					param.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+				else
+					param.ShaderVisibility = GetShaderVisibilityFlag(rd.shader);
+
 				if (rd.type == PerameterType::Constants)
 				{
 					param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
@@ -353,7 +401,6 @@ namespace Engine
 				}
 
 				rootParams.Push(param);
-
 			}
 			else
 			{
@@ -415,12 +462,19 @@ namespace Engine
 		data.name = bindDesc.Name;
 		data.reg = bindDesc.BindPoint;
 		data.space = bindDesc.Space;
-		data.count = bindDesc.BindCount;
-		if (data.count == 0)
-			data.count = -1;
+		data.count = 0; // default value
 
-		if (bindDesc.BindCount > 1 || bindDesc.Type == D3D_SIT_TEXTURE || bindDesc.Type == D3D_SIT_UAV_RWTYPED || bindDesc.Type == D3D_SIT_STRUCTURED || bindDesc.Type == D3D_SIT_UAV_RWSTRUCTURED)
+		if (bindDesc.BindCount > 1 ||
+			bindDesc.Type == D3D_SIT_TEXTURE ||
+			bindDesc.Type == D3D_SIT_UAV_RWTYPED ||
+			bindDesc.Type == D3D_SIT_STRUCTURED ||
+			bindDesc.Type == D3D_SIT_UAV_RWSTRUCTURED)
+		{
 			data.type = PerameterType::DescriptorTable;
+			data.count = bindDesc.BindCount;
+			if (data.count == 0)
+				data.count = -1;
+		}
 		else
 		{
 			if (bindDesc.Type == D3D_SIT_SAMPLER)
@@ -431,29 +485,17 @@ namespace Engine
 					data.samplerAttribs = section.m_Samplers[data.name];
 				else
 				{
-					data.samplerAttribs.U = WrapMode::Repeat;
-					data.samplerAttribs.V = WrapMode::Repeat;
-					if (data.name.rfind("A_", 0) == 0)
-					{
-						data.samplerAttribs.Min = MinMagFilter::Anisotropic;
-						data.samplerAttribs.Mag = MinMagFilter::Anisotropic;
-					}
-					else if (data.name.rfind("P_", 0) == 0)
-					{
-						data.samplerAttribs.Min = MinMagFilter::Point;
-						data.samplerAttribs.Mag = MinMagFilter::Point;
-					}
-					else
-					{
-						data.samplerAttribs.Min = MinMagFilter::Anisotropic;
-						data.samplerAttribs.Mag = MinMagFilter::Anisotropic;
-					}
+					// TODO : non static sampler
 				}
 			}
 			else
 			{
-				if (data.name.rfind("RC_", 0) == 0)
+
+				if (section.m_RootConstants.find(data.name) != section.m_RootConstants.end())
+				{
 					data.type = PerameterType::Constants;
+					data.count = 1;
+				}
 				else
 					data.type = PerameterType::Descriptor;
 			}

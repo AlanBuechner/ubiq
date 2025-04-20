@@ -365,8 +365,8 @@ namespace Engine
 				Ref<Shader> blit = Renderer::GetBlitShader();
 				Ref<ComputeShaderPass> blitPass = blit->GetComputePass("Blit");
 				m_TextureCopyCommandList->SetShader(blitPass);
-				m_TextureCopyCommandList->SetRWTexture(blitPass->GetUniformLocation("SrcTexture"), lastMip);
-				m_TextureCopyCommandList->SetRWTexture(blitPass->GetUniformLocation("DstTexture"), nextMip);
+				m_TextureCopyCommandList->SetRWTexture(blitPass->GetUniformLocation("u_SrcTexture"), lastMip);
+				m_TextureCopyCommandList->SetRWTexture(blitPass->GetUniformLocation("u_DstTexture"), nextMip);
 				m_TextureCopyCommandList->Dispatch(std::max(nextMip->m_Width / 8, 1u) + 1, std::max(nextMip->m_Height / 8, 1u) + 1, 1);
 
 				m_TextureCopyCommandList->AwaitUAV(mipTexture.mipTexture->GetResource());

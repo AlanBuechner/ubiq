@@ -83,6 +83,7 @@ namespace Engine
 	void TransformComponent::Dirty()
 	{
 		m_Dirty = true;
+		m_DirtyThisFrame = true;
 		Owner.DirtyVolume();
 		for (uint32 i = 0; i < Children.Count(); i++)
 			Children[i].GetTransform().Dirty();
@@ -102,12 +103,20 @@ namespace Engine
 			else
 				ChashedGloableTransform = GetTransform();
 
+			m_Dirty = false;
+		}
+	}
+
+	void TransformComponent::UpdateTransformEvent()
+	{
+		if (m_DirtyThisFrame)
+		{
+			UpdateHierarchyGlobalTransform();
+
 			// iterate over all components on entity
 			Utils::Vector<Component*> components = Owner.GetComponents();
 			for (Component* comp : components)
 				comp->OnTransformChange(ChashedGloableTransform);
-
-			m_Dirty = false;
 		}
 	}
 

@@ -33,9 +33,9 @@ namespace Engine
 		wrl::ComPtr<ID3D12Device> device = CreateDevice(m_MaxFeatureLevel);
 		CORE_ASSERT_HRESULT(device->QueryInterface(IID_PPV_ARGS(m_Device.GetAddressOf())), "Could Not Get Device 14");
 
-		//DXGI_QUERY_VIDEO_MEMORY_INFO memInfo;
-		//CORE_ASSERT(SetAdapterVideoMemoryReservation(MEM_GiB(1)), "Failed to reserve memory");
-		//GetAdapterVideoMemory(&memInfo);
+		DXGI_QUERY_VIDEO_MEMORY_INFO memInfo;
+		CORE_ASSERT(SetAdapterVideoMemoryReservation(MEM_GiB(1)), "Failed to reserve memory");
+		GetAdapterVideoMemory(&memInfo);
 
 		//HMONITOR monitor = MonitorFromPoint({0,0}, MONITOR_DEFAULTTOPRIMARY);
 		//m_Output = GetMonitorOutput(monitor);
@@ -43,8 +43,8 @@ namespace Engine
 		//m_Format = SelectFormat();
 
 #if defined(DEBUG)
-		//DirectX12Debug::GetInstance()->ReportLiveObjects();
 		DirectX12Debug::GetInstance()->InitInfoQueue(m_Device);
+		//DirectX12Debug::GetInstance()->ReportLiveObjects();
 #endif
 
 		m_ResoruceManager = CreateRef<DirectX12ResourceManager>();

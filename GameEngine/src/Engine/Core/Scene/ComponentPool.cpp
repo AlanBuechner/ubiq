@@ -43,7 +43,7 @@ namespace Engine
 	uint32 ComponentPool::Allocate(uint64 entity)
 	{
 		// allocate more room for the entity's list
-		if (m_SceneStatic && m_EntityComponentMapping.Count() >= 1)
+		if (m_SceneStatic && m_NumComponents >= 1)
 			return UINT32_MAX;
 
 		if (m_EntityComponentMapping.Count() <= entity)

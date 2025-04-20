@@ -40,10 +40,8 @@ struct PS_Output
 	float4 color : SV_TARGET0;
 };
 
-
-
-
-
+#define COMPUTE_SIZE 128
+static const uint s_CashSize = COMPUTE_SIZE + 2 + 2;
 
 
 #section vertex
@@ -60,13 +58,13 @@ VS_Output main(VS_Input input)
 
 #section BlitRaster
 
-Texture2D<float4> src;
-StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
+Texture2D<float4> u_Src;
+StaticSampler s_TextureSampler = StaticSampler(clamp, clamp, linear, linear);
 
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
-	output.color = src.Sample(textureSampler, input.uv);
+	output.color = u_Src.Sample(s_TextureSampler, input.uv);
 	return output;
 }
 
@@ -74,8 +72,8 @@ PS_Output main(PS_Input input)
 
 #section Blit
 
-RWTexture2D<float4> SrcTexture;
-RWTexture2D<float4> DstTexture;
+RWTexture2D<float4> u_SrcTexture;
+RWTexture2D<float4> u_DstTexture;
 
 void SampleTexture(uint2 pixel, inout float4 color, uint2 texelSize)
 {
@@ -84,14 +82,14 @@ void SampleTexture(uint2 pixel, inout float4 color, uint2 texelSize)
 	//if (pixel.y >= texelSize.y)
 	//	pixel.y = texelSize.y - 1;
 
-	color += SrcTexture[pixel];
+	color += u_SrcTexture[pixel];
 }
 
 [numthreads(8, 8, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
 	uint2 destTexelSize;
-	DstTexture.GetDimensions(destTexelSize.x, destTexelSize.y);
+	u_DstTexture.GetDimensions(destTexelSize.x, destTexelSize.y);
 	if (DTid.x < destTexelSize.x && DTid.y < destTexelSize.y)
 	{
 		uint2 texcoords = 2 * DTid.xy;
@@ -103,7 +101,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
 		SampleTexture(texcoords + uint2(1, 1), color, destTexelSize);
 
 		//Write the final color into the destination texture.
-		DstTexture[DTid.xy] = color / 4.0;
+		u_DstTexture[DTid.xy] = color / 4.0;
 	}
 }
 
@@ -112,56 +110,50 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
 #section BlurX
 
-#define computeSize 128
+groupshared float4 g_Cash[s_CashSize];
 
-static const uint cashSize = computeSize+2+2;
-groupshared float4 gs_cash[cashSize];
+RWTexture2D<float4> u_SrcTexture;
+RWTexture2D<float4> u_DstTexture;
 
-RWTexture2D<float4> SrcTexture;
-RWTexture2D<float4> DstTexture;
-
-[numthreads(computeSize, 1, 1)]
+[numthreads(COMPUTE_SIZE, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID, uint3 GTid : SV_GroupThreadID, uint3 Gid : SV_GroupID)
 {
 	
 	if(GTid.x < 4)
-		gs_cash[GTid.x] = SrcTexture[DTid.xy];
-	gs_cash[GTid.x+4] = SrcTexture[DTid.xy + uint2(4,0)];
+		g_Cash[GTid.x] = u_SrcTexture[DTid.xy];
+	g_Cash[GTid.x + 4] = u_SrcTexture[DTid.xy + uint2(4, 0)];
 	
 	GroupMemoryBarrierWithGroupSync();
 
 	float4 color = float4(0, 0, 0, 0);
 	for(uint i = 0; i < 5; i++)
-		color += gs_cash[GTid.x + i];
+		color += g_Cash[GTid.x + i];
 
-	DstTexture[DTid.xy] = color / 5.0;
+	u_DstTexture[DTid.xy] = color / 5.0;
 }
 
 
 #section BlurY
 
-#define computeSize 128
+groupshared float4 g_Cash[s_CashSize];
 
-static const uint cashSize = computeSize+2+2;
-groupshared float4 gs_cash[cashSize];
+RWTexture2D<float4> u_SrcTexture;
+RWTexture2D<float4> u_DstTexture;
 
-RWTexture2D<float4> SrcTexture;
-RWTexture2D<float4> DstTexture;
-
-[numthreads(1, computeSize, 1)]
+[numthreads(1, COMPUTE_SIZE, 1)]
 void main(uint3 DTid : SV_DispatchThreadID, uint3 GTid : SV_GroupThreadID, uint3 Gid : SV_GroupID)
 {
 
 	if(GTid.x < 4)
-		gs_cash[GTid.y] = SrcTexture[DTid.xy];
-	gs_cash[GTid.y+4] = SrcTexture[DTid.xy + uint2(0,4)];
+		g_Cash[GTid.y] = u_SrcTexture[DTid.xy];
+	g_Cash[GTid.y + 4] = u_SrcTexture[DTid.xy + uint2(0, 4)];
 	
 	GroupMemoryBarrierWithGroupSync();
 
 	float4 color = float4(0, 0, 0, 0);
 	for(uint i = 0; i < 5; i++)
-		color += gs_cash[GTid.y + i];
+		color += g_Cash[GTid.y + i];
 
-	DstTexture[DTid.xy] = color / 5.0;
+	u_DstTexture[DTid.xy] = color / 5.0;
 
 }

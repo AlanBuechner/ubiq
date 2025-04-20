@@ -222,6 +222,7 @@ namespace Engine
 	{
 		std::stringstream m_SectionCode;
 		std::unordered_map<std::string, SamplerInfo> m_Samplers;
+		std::unordered_set<std::string> m_RootConstants;
 
 		SectionInfo() = default;
 		SectionInfo(const SectionInfo& other) { *this = other; }
@@ -232,6 +233,7 @@ namespace Engine
 			{
 				m_SectionCode << other.m_SectionCode.str();
 				m_Samplers = other.m_Samplers;
+				m_RootConstants = other.m_RootConstants;
 			}
 			return *this;
 		}

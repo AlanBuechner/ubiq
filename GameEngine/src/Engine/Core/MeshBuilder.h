@@ -3,8 +3,6 @@
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Math/Math.h"
 
-#include <vector>
-
 namespace Engine
 {
 	struct RendererVertex

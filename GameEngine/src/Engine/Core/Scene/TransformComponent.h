@@ -53,12 +53,14 @@ namespace Engine
 		Entity GetParent() const { return Parent; }
 
 		bool IsDirty() { return m_Dirty; }
+		bool WasDirtyThisFrame() { return m_DirtyThisFrame; }
 
 	public:
 
 		void Dirty();
-		FUNCTION()
 		void UpdateHierarchyGlobalTransform();
+		FUNCTION()
+		void UpdateTransformEvent();
 
 	private:
 		PROPERTY(set = SetPosition) Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };
@@ -69,6 +71,7 @@ namespace Engine
 		Utils::Vector<Entity> Children;
 
 		bool m_Dirty = true;
+		bool m_DirtyThisFrame = true;
 		Math::Mat4 ChashedGloableTransform = Math::Mat4(1.0f);
 
 		friend class Scene;

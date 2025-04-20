@@ -185,7 +185,7 @@ namespace Utils
 	template<class Type> void Vector<Type>::RemoveRange(Vector<Type>::Iterator start, Vector<Type>::Iterator end) { Base::erase(start, end); }
 	template<class Type> void Vector<Type>::RemoveRange(Vector<Type>::ConstIterator start, Vector<Type>::ConstIterator end) { Base::erase(start, end); }
 
-	template<class Type> inline void Vector<Type>::SwapAndPop(uint32 index) { std::swap(data()[index], back()); Base::pop_back(); }
+	template<class Type> inline void Vector<Type>::SwapAndPop(uint32 index) { Base::data()[index] = std::move(Base::back()); Base::pop_back(); }
 	template<class Type> inline void Vector<Type>::SwapAndPop(Type* pos) { SwapAndPop(Base::begin() - pos); }
 	template<class Type> inline void Vector<Type>::SwapAndPop(Vector<Type>::Iterator pos) { SwapAndPop(Base::begin()-pos); }
 	template<class Type> inline void Vector<Type>::SwapAndPop(Vector<Type>::ConstIterator pos) { SwapAndPop(Base::begin() - pos); }
@@ -199,7 +199,7 @@ namespace Utils
 	{
 		for (uint32 i = 0; i < Base::size(); i++)
 		{
-			if (data()[i] == val)
+			if (Base::data()[i] == val)
 				return i;
 		}
 		return Base::size();
@@ -209,13 +209,13 @@ namespace Utils
 	{
 		for (uint32 i = 0; i < Base::size(); i++)
 		{
-			if (predicate(data()[i]))
+			if (predicate(Base::data()[i]))
 				return i;
 		}
 		return Base::size();
 	}
 
-	template<class Type> inline void Vector<Type>::Clear() { clear(); }
+	template<class Type> inline void Vector<Type>::Clear() { Base::clear(); }
 	template<class Type> inline constexpr uint32 Vector<Type>::ElementSize() const { return sizeof(Type); }
 	template<class Type> inline uint32 Vector<Type>::SizeInBytes() const { return Base::size() * sizeof(Type); }
 	template<class Type> inline uint32 Vector<Type>::Count() const { return Base::size(); }
@@ -272,9 +272,9 @@ namespace Utils
 	template<class Type> inline const	Type& Vector<Type>::Back() const	{ return Base::back(); }
 	template<class Type> inline			Type& Vector<Type>::Back()			{ return Base::back(); }
 
-	template<class Type> inline	Vector<Type>::ConstIterator Vector<Type>::begin() const	{ return Base::begin(); }
-	template<class Type> inline	Vector<Type>::Iterator Vector<Type>::begin()			{ return Base::begin(); }
+	template<class Type> inline	typename Vector<Type>::ConstIterator Vector<Type>::begin() const	{ return Base::begin(); }
+	template<class Type> inline	typename Vector<Type>::Iterator Vector<Type>::begin()			{ return Base::begin(); }
 
-	template<class Type> inline	Vector<Type>::ConstIterator Vector<Type>::end() const	{ return Base::end(); }
-	template<class Type> inline Vector<Type>::Iterator Vector<Type>::end()				{ return Base::end(); }
+	template<class Type> inline typename Vector<Type>::ConstIterator Vector<Type>::end() const	{ return Base::end(); }
+	template<class Type> inline typename Vector<Type>::Iterator Vector<Type>::end()				{ return Base::end(); }
 }

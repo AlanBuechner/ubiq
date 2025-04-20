@@ -27,6 +27,9 @@ namespace Engine
 		Ref<FrameBuffer> GetRenderTarget() { return m_RenderGraph->GetRenderTarget(); }
 		Ref<Camera> GetMainCamera() { return m_MainCamera; }
 		void SetMainCamera(Ref<Camera> camera) { m_MainCamera = camera; }
+		void AddCamera(Ref<Camera> camera) { m_Cameras.Push(camera); }
+		void RemoveCamera(Ref<Camera> camera) { m_Cameras.Remove(m_Cameras.Find(camera)); }
+		const Utils::Vector<Ref<Camera>>& GetCameras() { return m_Cameras; }
 
 		virtual void OnViewportResize(uint32 width, uint32 height) {};
 		virtual void UpdateBuffers() {};
@@ -36,6 +39,7 @@ namespace Engine
 
 	protected:
 		Ref<Camera> m_MainCamera;
+		Utils::Vector<Ref<Camera>> m_Cameras;
 		Ref<RenderGraph> m_RenderGraph;
 	};
 }

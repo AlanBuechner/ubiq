@@ -89,7 +89,7 @@ namespace Engine {
 		Renderer::SetDefultMaterial(m_AssetManager.GetAsset<Material>(m_CurrentProject.GetDefultMaterialID()));
 	}
 
-	void DISABLE_OPS Application::Run()
+	void Application::Run()
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();

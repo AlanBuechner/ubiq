@@ -42,7 +42,7 @@ struct PS_Output
 
 #section vertex
 
-cbuffer Camera
+cbuffer u_Camera
 {
 	float4x4 ViewPorjection;
 };
@@ -59,13 +59,13 @@ VS_Output main(VS_Input input)
 
 #section pixel
 
-Texture2D<float4> textures[];
-sampler s;
+Texture2D<float4> u_Textures[];
+StaticSampler s_TextureSampler = StaticSampler(clamp, clamp, linear, linear);
 
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
-	float4 color = textures[input.textureID].Sample(s, input.uv) * input.color;
+	float4 color = u_Textures[input.textureID].Sample(s_TextureSampler, input.uv) * input.color;
 	if (color.a == 0.0)
 		discard;
 	output.color = color;

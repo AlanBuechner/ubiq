@@ -64,7 +64,7 @@ namespace Engine
 		s_IsWrap = wrap;
 	}
 
-	Math::Vector2 DISABLE_OPS Cursor::WrapMouse(Math::Vector2 mousePos)
+	Math::Vector2 Cursor::WrapMouse(Math::Vector2 mousePos)
 	{
 		if (!s_IsWrap)
 			return mousePos;
