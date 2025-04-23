@@ -40,6 +40,7 @@ namespace Engine
 		{
 			IDxcBlob* vs;
 			IDxcBlob* ps;
+			IDxcBlob* gs = nullptr;
 
 			operator bool()
 			{

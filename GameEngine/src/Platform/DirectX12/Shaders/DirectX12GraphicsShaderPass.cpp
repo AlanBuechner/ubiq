@@ -71,12 +71,12 @@ namespace Engine
 
 
 		{ // Vertex Shader
-			SectionInfo vsi = m_Src->m_Sections[m_PassConfig.vs];
+			SectionInfo& vsi = m_Src->m_Sections[m_PassConfig.vs];
 			const std::string& vsc = vsi.m_SectionCode.str();
 			if (!vsc.empty())
 			{
 				ShaderBlobs vs = DirectX12ShaderCompiler::Get().Compile(vsc, m_Src->file, ShaderType::Vertex);
-				if (!vs.object) return;
+				CORE_ASSERT(vs.object, "Failed to compile vertex shader");
 				m_Blobs.vs = vs.object;
 				DirectX12ShaderCompiler::Get().GetShaderParameters(vs, vsi, m_ReflectionData, ShaderType::Vertex);
 				DirectX12ShaderCompiler::Get().GetInputLayout(vs, m_InputElements);
@@ -84,14 +84,28 @@ namespace Engine
 		}
 
 		{ // Pixel Shader
-			SectionInfo psi = m_Src->m_Sections[m_PassConfig.ps];
+			SectionInfo& psi = m_Src->m_Sections[m_PassConfig.ps];
 			const std::string& psc = psi.m_SectionCode.str();
 			if (!psc.empty())
 			{
 				ShaderBlobs ps = DirectX12ShaderCompiler::Get().Compile(psc, m_Src->file, ShaderType::Pixel);
-				if (!ps.object) return;
+				CORE_ASSERT(ps.object, "Failed to compile pixel shader");
 				m_Blobs.ps = ps.object;
 				DirectX12ShaderCompiler::Get().GetShaderParameters(ps, psi, m_ReflectionData, ShaderType::Pixel);
+			}
+		}
+
+		// Geometry Shader
+		if (!m_PassConfig.gs.empty())
+		{
+			SectionInfo& gsi = m_Src->m_Sections[m_PassConfig.gs];
+			const std::string gsc = gsi.m_SectionCode.str();
+			if (!gsc.empty())
+			{
+				ShaderBlobs gs = DirectX12ShaderCompiler::Get().Compile(gsc, m_Src->file, ShaderType::Geometry);
+				CORE_ASSERT(gs.object, "Failed to compile geometry shader");
+				m_Blobs.gs = gs.object;
+				DirectX12ShaderCompiler::Get().GetShaderParameters(gs, gsi, m_ReflectionData, ShaderType::Geometry);
 			}
 		}
 
@@ -138,6 +152,8 @@ namespace Engine
 		// set shader byte code
 		desc.VS = { m_Blobs.vs->GetBufferPointer(), m_Blobs.vs->GetBufferSize() };
 		desc.PS = { m_Blobs.ps->GetBufferPointer(), m_Blobs.ps->GetBufferSize() };
+		if(m_Blobs.gs != nullptr)
+			desc.GS = { m_Blobs.gs->GetBufferPointer(), m_Blobs.gs->GetBufferSize() };
 
 		// set topology
 		switch (m_PassConfig.topology)

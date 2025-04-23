@@ -46,6 +46,8 @@ D3D12_SHADER_VISIBILITY GetShaderVisibilityFlag(Engine::ShaderType type)
 		return D3D12_SHADER_VISIBILITY_VERTEX;
 	case Engine::ShaderType::Pixel:
 		return D3D12_SHADER_VISIBILITY_PIXEL;
+	case Engine::ShaderType::Geometry:
+		return D3D12_SHADER_VISIBILITY_GEOMETRY;
 	case Engine::ShaderType::Compute:
 	default:
 		return D3D12_SHADER_VISIBILITY_ALL;
@@ -129,8 +131,9 @@ namespace Engine
 
 	ShaderBlobs DirectX12ShaderCompiler::Compile(const std::string& code, const fs::path& file, ShaderType type)
 	{
-		const std::wstring typeStrings[] = { L"vs_6_5", L"ps_6_5", L"cs_6_5", L"lib_6_8"};
-		std::wstring profile = typeStrings[(int)log2((int)type)]; // take the log2 of the type enum to convert from bit mask to index
+		const std::wstring typeStrings[] = { L"vs_6_5", L"ps_6_5", L"gs_6_5", L"cs_6_5", L"lib_6_8" };
+		const std::wstring& profile = typeStrings[(int)type]; // take the log2 of the type enum to convert from bit mask to index
+		//std::wstring profile = typeStrings[(int)log2((int)type)]; // take the log2 of the type enum to convert from bit mask to index
 
 		Utils::Vector<LPCWSTR> args;
 		args.Push(file.c_str());
@@ -193,7 +196,7 @@ namespace Engine
 		return blobs;
 	}
 
-	void DirectX12ShaderCompiler::GetShaderParameters(ShaderBlobs& blobs, SectionInfo& section, Utils::Vector<Engine::ShaderParameter>& params, ShaderType type)
+	void DirectX12ShaderCompiler::GetShaderParameters(const ShaderBlobs& blobs, const SectionInfo& section, Utils::Vector<Engine::ShaderParameter>& params, ShaderType type)
 	{
 		if (!blobs.reflection)
 			return;
@@ -219,7 +222,7 @@ namespace Engine
 		}
 	}
 
-	void DirectX12ShaderCompiler::GetLibraryParameters(ShaderBlobs& blobs, SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
+	void DirectX12ShaderCompiler::GetLibraryParameters(const ShaderBlobs& blobs, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
 	{
 		if (!blobs.reflection)
 			return;
@@ -251,7 +254,7 @@ namespace Engine
 		}
 	}
 
-	void DirectX12ShaderCompiler::GetInputLayout(ShaderBlobs& blobs, Utils::Vector<ShaderInputElement>& inputElements)
+	void DirectX12ShaderCompiler::GetInputLayout(const ShaderBlobs& blobs, Utils::Vector<ShaderInputElement>& inputElements)
 	{
 		if (!blobs.reflection)
 			return;
@@ -282,7 +285,7 @@ namespace Engine
 
 	}
 
-	ID3D12RootSignature* DISABLE_OPS DirectX12ShaderCompiler::GenRootSignature(Utils::Vector<ShaderParameter>& params)
+	ID3D12RootSignature* DirectX12ShaderCompiler::GenRootSignature(Utils::Vector<ShaderParameter>& params)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -455,7 +458,7 @@ namespace Engine
 		return sig;
 	}
 
-	void DirectX12ShaderCompiler::AddParameter(D3D12_SHADER_INPUT_BIND_DESC bindDesc, SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
+	void DirectX12ShaderCompiler::AddParameter(D3D12_SHADER_INPUT_BIND_DESC bindDesc, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
 	{
 		ShaderParameter data;
 		data.shader = type;
@@ -482,7 +485,7 @@ namespace Engine
 				data.type = PerameterType::StaticSampler;
 
 				if (section.m_Samplers.find(data.name) != section.m_Samplers.end())
-					data.samplerAttribs = section.m_Samplers[data.name];
+					data.samplerAttribs = section.m_Samplers.at(data.name);
 				else
 				{
 					// TODO : non static sampler

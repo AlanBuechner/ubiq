@@ -318,22 +318,24 @@ namespace Engine
 		{
 			for (auto [passName, pass] : description["passes"].GetAsDescriptionMap())
 			{
-				bool hasGeo = pass.HasEntery("VS") || pass.HasEntery("MS");
+				bool hasVert = pass.HasEntery("VS");
 				bool hasPixel = pass.HasEntery("PS");
-				bool isGraphics = hasGeo && hasPixel;
+				bool isGraphics = hasVert && hasPixel;
 				bool isCompute = pass.HasEntery("CS");
 				bool isWorkGraph = pass.HasEntery("WG");
 
 				if (isGraphics)
 				{
+
 					// graphics pass config
 					GraphicsPassConfig rpass;
 					rpass.passName = passName;
 					rpass.topology = baseTopo;
 					for (auto [param, val] : pass.GetAsDescriptionMap())
 					{
-						if		(param == "VS")				rpass.vs = val.GetAsString();
+						if (param == "VS")					rpass.vs = val.GetAsString();
 						else if (param == "PS")				rpass.ps = val.GetAsString();
+						else if (param == "GS")				rpass.gs = val.GetAsString();
 						else if (param == "blendMode")		rpass.blendMode = ParseBlendMode(val);
 						else if (param == "cullMode")		rpass.cullMode = ParseCullMode(val);
 						else if (param == "depthTest")		rpass.depthTest = ParseDepthTest(val);

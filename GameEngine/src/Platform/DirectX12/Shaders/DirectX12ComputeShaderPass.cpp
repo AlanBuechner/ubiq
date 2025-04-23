@@ -20,12 +20,12 @@ namespace Engine
 
 	void DirectX12ComputeShaderPass::Init()
 	{
-		SectionInfo csi = m_Src->m_Sections[m_PassConfig.cs];
+		SectionInfo& csi = m_Src->m_Sections[m_PassConfig.cs];
 		const std::string& csc = csi.m_SectionCode.str();
 		if (!csc.empty())
 		{
 			ShaderBlobs cs = DirectX12ShaderCompiler::Get().Compile(csc, m_Src->file, ShaderType::Compute);
-			if (!cs.object) return;
+			CORE_ASSERT(cs.object, "Failed to compile compute shader");
 			m_Blobs.cs = cs.object;
 			DirectX12ShaderCompiler::Get().GetShaderParameters(cs, csi, m_ReflectionData, ShaderType::Compute);
 		}

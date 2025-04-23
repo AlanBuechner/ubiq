@@ -9,7 +9,12 @@ namespace Engine
 	// shader type
 	enum class ShaderType
 	{
-		None = -1, Vertex = BIT(0), Pixel = BIT(1), Compute = BIT(2), WorkGraph = BIT(3)
+		None = -1,
+		Vertex = 0,
+		Pixel = 1,
+		Geometry = 2,
+		Compute = 3,
+		WorkGraph = 4
 	};
 
 	/* ---------------------------- sampler info ---------------------------- */
@@ -182,6 +187,7 @@ namespace Engine
 		std::string passName;
 		std::string vs; // vertex shader section name
 		std::string ps; // pixel shader section name
+		std::string gs = ""; // geometry shader section name
 		Topology topology;
 		BlendMode blendMode = BlendMode::Blend;
 		CullMode cullMode = CullMode::Back;
