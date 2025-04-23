@@ -154,12 +154,14 @@ namespace Engine
 		return fs::path("");
 	}
 
+
+	thread_local std::unordered_map<std::string, std::stringstream> tl_SectionCode;
+
 	Ref<ShaderSorce> ShaderCompiler::LoadFromSrc(std::istream& src, const fs::path& file)
 	{
 		Ref<ShaderSorce> source = CreateRef<ShaderSorce>();
 
-		std::unordered_map<std::string, std::stringstream> ss;
-		std::stringstream* currSS = &ss["config"];
+		std::stringstream* currSS = &tl_SectionCode["config"];
 
 		std::string line;
 		while (getline(src, line))
@@ -167,20 +169,20 @@ namespace Engine
 			Utils::Vector<std::string> tokens = Tokenize(line);
 
 			if (!tokens.Empty() && tokens[0] == "#section")
-				currSS = &ss[tokens[1]];
+				currSS = &tl_SectionCode[tokens[1]];
 			else
 				*currSS << line << '\n';
 		}
 
-		std::string configSection = ss["config"].str();
+		std::string configSection = tl_SectionCode["config"].str();
 		source->config = CompileConfig(configSection);
 
 		std::string materialCode = GenerateMaterialStruct(source->config.params);
 
 		SectionInfo commonSection;
-		std::string commonSrc = materialCode + ss["common"].str();
+		std::string commonSrc = materialCode + tl_SectionCode["common"].str();
 		PreProcess(commonSrc, commonSection, file);
-		for (auto& sectionSource : ss)
+		for (auto& sectionSource : tl_SectionCode)
 		{
 			if (sectionSource.first != "config" && sectionSource.first != "common")
 			{
@@ -210,11 +212,15 @@ namespace Engine
 			Utils::Vector<std::string> tokens = Tokenize(line);
 			if (!tokens.Empty())
 			{
-
 				if (tokens[0] == "#include")
 				{
-					CORE_ASSERT(tokens.Count() == 4 && tokens[1] == "\"" && tokens[3] == "\"", "failed to include header on line \"{0}\"", line);
+					// 0		1 2    3
+					// #include " file "
+
+					CORE_ASSERT(tokens.Count() == 4, "failed to include header on line \"{0}\"", line);
+					CORE_ASSERT(tokens[1] == "\"", "failed to include header on line \"{0}\"", line);
 					fs::path headerPath = FindFilePath(tokens[2], fileLocation);
+					CORE_ASSERT(tokens[3] == "\"", "failed to include header on line \"{0}\"", line);
 
 					// load header
 					std::ifstream ifs(headerPath);
@@ -222,6 +228,22 @@ namespace Engine
 
 					// process header
 					PreProcess(headerCode, section, headerPath);
+				}
+				else if (tokens[0] == "#include_section")
+				{
+					// 0				1 2       3
+					// #include_section " section "
+
+					CORE_ASSERT(tokens.Count() == 4, "failed to include header on line \"{0}\"", line);
+					CORE_ASSERT(tokens[1] == "\"", "failed to include header on line \"{0}\"", line);
+					std::string& sectionName = tokens[2];
+					CORE_ASSERT(tokens[3] == "\"", "failed to include header on line \"{0}\"", line);
+
+					// get section code
+					std::string sectionCode = (&tl_SectionCode[sectionName])->str();
+
+					// process section
+					PreProcess(sectionCode, section, fileLocation);
 				}
 				else if (tokens[0] == "StaticSampler")
 				{
