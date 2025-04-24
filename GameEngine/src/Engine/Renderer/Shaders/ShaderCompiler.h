@@ -255,10 +255,16 @@ namespace Engine
 
 	class ShaderCompiler
 	{
+		struct ComiplerContext
+		{
+			fs::path m_File = "";
+			std::unordered_map<std::string, std::stringstream> m_Sections;
+		};
+
 	public:
 		static fs::path FindFilePath(const fs::path& file, const fs::path& parent);
 		static Ref<ShaderSorce> LoadFromSrc(std::istream& src, const fs::path& file = "");
-		static void PreProcess(std::string& src, SectionInfo& section, const fs::path& fileLocation);
+		static void PreProcess(std::string& src, SectionInfo& section, const ComiplerContext& context, const fs::path& filePath);
 		static ShaderConfig CompileConfig(const std::string& code);
 		static std::string GenerateMaterialStruct(Utils::Vector<MaterialParameter>& params);
 

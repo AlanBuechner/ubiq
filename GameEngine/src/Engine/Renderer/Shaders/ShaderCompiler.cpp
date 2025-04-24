@@ -155,50 +155,62 @@ namespace Engine
 	}
 
 
-	thread_local std::unordered_map<std::string, std::stringstream> tl_SectionCode;
-
 	Ref<ShaderSorce> ShaderCompiler::LoadFromSrc(std::istream& src, const fs::path& file)
 	{
+		// create shader source
 		Ref<ShaderSorce> source = CreateRef<ShaderSorce>();
+		source->file = file;
 
-		std::stringstream* currSS = &tl_SectionCode["config"];
+		// create context
+		ComiplerContext context;
+		context.m_File = file;
 
+		// get current context (default is config)
+		std::stringstream* currSS = &context.m_Sections["config"];
+
+		// parse sections
 		std::string line;
 		while (getline(src, line))
 		{
 			Utils::Vector<std::string> tokens = Tokenize(line);
 
 			if (!tokens.Empty() && tokens[0] == "#section")
-				currSS = &tl_SectionCode[tokens[1]];
+				currSS = &context.m_Sections[tokens[1]];
 			else
 				*currSS << line << '\n';
 		}
 
-		std::string configSection = tl_SectionCode["config"].str();
+		// get and compile config section
+		std::string configSection = context.m_Sections["config"].str();
 		source->config = CompileConfig(configSection);
 
+		// generate material source code
 		std::string materialCode = GenerateMaterialStruct(source->config.params);
 
+		// get and process common section
 		SectionInfo commonSection;
-		std::string commonSrc = materialCode + tl_SectionCode["common"].str();
-		PreProcess(commonSrc, commonSection, file);
-		for (auto& sectionSource : tl_SectionCode)
+		std::string commonSrc = materialCode + context.m_Sections["common"].str();
+		PreProcess(commonSrc, commonSection, context, context.m_File);
+
+		// process each section
+		for (auto& sectionSource : context.m_Sections)
 		{
 			if (sectionSource.first != "config" && sectionSource.first != "common")
 			{
+				// use common section as starting point
 				SectionInfo section = commonSection;
+				
+				// get and process section code
 				std::string sectionSrc = sectionSource.second.str();
-				PreProcess(sectionSrc, section, file);
+				PreProcess(sectionSrc, section, context, context.m_File);
 				source->m_Sections[sectionSource.first] = section;
 			}
 		}
 
-		source->file = file;
-
 		return source;
 	}
 
-	void ShaderCompiler::PreProcess(std::string& src, SectionInfo& section, const fs::path& fileLocation)
+	void ShaderCompiler::PreProcess(std::string& src, SectionInfo& section, const ComiplerContext& context, const fs::path& filePath)
 	{
 		std::stringstream ss(src);
 
@@ -219,7 +231,7 @@ namespace Engine
 
 					CORE_ASSERT(tokens.Count() == 4, "failed to include header on line \"{0}\"", line);
 					CORE_ASSERT(tokens[1] == "\"", "failed to include header on line \"{0}\"", line);
-					fs::path headerPath = FindFilePath(tokens[2], fileLocation);
+					fs::path headerPath = FindFilePath(tokens[2], filePath);
 					CORE_ASSERT(tokens[3] == "\"", "failed to include header on line \"{0}\"", line);
 
 					// load header
@@ -227,7 +239,7 @@ namespace Engine
 					std::string headerCode((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
 					// process header
-					PreProcess(headerCode, section, headerPath);
+					PreProcess(headerCode, section, context, headerPath);
 				}
 				else if (tokens[0] == "#include_section")
 				{
@@ -240,10 +252,10 @@ namespace Engine
 					CORE_ASSERT(tokens[3] == "\"", "failed to include header on line \"{0}\"", line);
 
 					// get section code
-					std::string sectionCode = (&tl_SectionCode[sectionName])->str();
+					std::string sectionCode = (&context.m_Sections.at(sectionName))->str();
 
 					// process section
-					PreProcess(sectionCode, section, fileLocation);
+					PreProcess(sectionCode, section, context, filePath);
 				}
 				else if (tokens[0] == "StaticSampler")
 				{
