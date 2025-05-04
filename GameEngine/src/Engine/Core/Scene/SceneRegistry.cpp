@@ -89,9 +89,7 @@ namespace Engine
 
 	void SceneRegistry::RemoveComponent(EntityType entity, const Reflect::Class& componentClass)
 	{
-		ComponentType componentID = componentClass.GetTypeID();
-
-		ComponentPool* pool = m_Pools[componentID];
+		ComponentPool* pool = TryGetComponentPool(componentClass);
 		if (pool == nullptr) return;
 
 		pool->Free(entity);
@@ -101,9 +99,7 @@ namespace Engine
 
 	void* SceneRegistry::GetSceneStatic(const Reflect::Class& componentClass)
 	{
-		ComponentType componentID = componentClass.GetTypeID();
-
-		ComponentPool* pool = m_Pools[componentID];
+		ComponentPool* pool = TryGetComponentPool(componentClass);
 		if (pool == nullptr) return nullptr;
 
 		if (pool->GetNumComponents() == 0)
@@ -141,6 +137,15 @@ namespace Engine
 		if (pool == nullptr)
 			pool = m_Pools[componentID] = new ComponentPool(componentClass);
 		return pool;
+	}
+
+	ComponentPool* SceneRegistry::TryGetComponentPool(const Reflect::Class& componentClass)
+	{
+		ComponentType componentID = componentClass.GetTypeID();
+		auto pool = m_Pools.find(componentID);
+		if (pool == m_Pools.end())
+			return nullptr;
+		return pool->second;
 	}
 
 	void SceneRegistry::EachEntity(EachEntityFunc func)

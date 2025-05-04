@@ -20,9 +20,6 @@ namespace Engine
 			Compute = 2,
 		};
 
-		void PrependSubmit(Ref<CommandList> commandList);
-		void PrependSubmit(Utils::Vector<Ref<CommandList>> commandLists);
-
 		void Submit(Ref<CommandList> commandList);
 		void Submit(Utils::Vector<Ref<CommandList>> commandLists);
 

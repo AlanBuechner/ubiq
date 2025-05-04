@@ -84,7 +84,11 @@ namespace Engine
 		ComponentPool* GetComponentPool() { return GetOrCreateCompnentPool<T>(); }
 		template<class T>
 		ComponentPool* GetOrCreateCompnentPool() { return GetOrCreateCompnentPool(T::GetStaticClass()); }
-		ComponentPool* GetOrCreateCompnentPool(const Reflect::Class& reflectedClass);
+		ComponentPool* GetOrCreateCompnentPool(const Reflect::Class& componentClass);
+
+		template<class T>
+		ComponentPool* TryGetComponentPool() { return TryGetComponentPool(T::GetStaticClass()); }
+		ComponentPool* TryGetComponentPool(const Reflect::Class& componentClass);
 
 		void EachEntity(EachEntityFunc func);
 		void EachPool(EachComponentFunc func);

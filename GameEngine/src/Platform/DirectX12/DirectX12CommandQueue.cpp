@@ -34,6 +34,14 @@ namespace Engine
 		// create fence and set initial value to 1 to indicate it is not currently executing
 		CORE_ASSERT_HRESULT(context->GetDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence)),
 			"Faild to Create Fence");
+
+		m_EventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS); // create event for command queue completion
+	}
+
+	DirectX12CommandQueue::~DirectX12CommandQueue()
+	{
+		m_CommandQueue->Release();
+		m_Fence->Release();
 	}
 
 	void DirectX12CommandQueue::Build()
@@ -73,7 +81,6 @@ namespace Engine
 	{
 		m_Fence->SetEventOnCompletion(m_SignalCount, m_EventHandle); // call event when fence val has been reached
 		WaitForSingleObject(m_EventHandle, INFINITE); // wait for event to be triggered
-		m_EventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS); // create event for command queue completion
 		m_SignalCount = 0;
 		m_Fence->Signal(0);
 	}

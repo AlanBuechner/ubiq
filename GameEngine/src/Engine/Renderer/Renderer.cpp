@@ -101,18 +101,18 @@ namespace Engine
 
 	void Renderer::Destroy()
 	{
-		s_WhiteTexture = nullptr;
-		s_BlackTexture = nullptr;
-		s_NormalTexture = nullptr;
-		s_ScreenMesh = nullptr;
-		s_DefultMaterial = nullptr;
+		s_WhiteTexture.reset();
+		s_BlackTexture.reset();
+		s_NormalTexture.reset();
+		s_ScreenMesh.reset();
+		s_DefultMaterial.reset();
 
 		s_RenderThread.join();
 		Renderer2D::Destroy();
 		DebugRenderer::Destroy();
 
-		s_MainCommandList = nullptr;
-		s_MainCommandQueue = nullptr;
+		s_MainCommandList.reset();
+		s_MainCommandQueue.reset();
 
 		s_Context.reset(); // destroy context before atexit
 	}
@@ -167,7 +167,7 @@ namespace Engine
 			s_CopyFlag.Wait();
 			timer.Start("Copy");
 			GPUProfiler::StartFrame();
-			resourceManager->UploadData();
+			UploadPool* pool = resourceManager->UploadData();
 			timer.End();
 			s_CopyFlag.Clear();
 
@@ -175,7 +175,7 @@ namespace Engine
 			s_RenderFlag.Wait();
 			//CORE_INFO("{0}", frame);
 			timer.Start("Render");
-			s_MainCommandQueue->PrependSubmit(resourceManager->GetUploadCommandLists());
+			s_MainCommandQueue->Submit(resourceManager->GetUploadCommandLists());
 			s_MainCommandQueue->Submit(s_MainCommandList);
 			s_MainCommandQueue->Build();
 #if defined(RELEASE)
@@ -199,7 +199,7 @@ namespace Engine
 			WindowManager::UpdateWindows();
 
 			// prepare for next frame
-			resourceManager->Clean();
+			delete pool;
 			deletionPool->Clear();
 			deletionPool = resourceManager->CreateNewDeletionPool();
 			s_SwapFlag.Signal();

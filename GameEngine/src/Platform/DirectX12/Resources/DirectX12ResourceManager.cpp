@@ -29,9 +29,8 @@ namespace Engine
 
 	DirectX12ResourceManager::~DirectX12ResourceManager()
 	{
-		// needs to be destroyed before the deletion pool
-		for (UploadPage* page : m_UploadPages)
-			delete page;
+		// upload pool needs to be destroyed before the deletion pool
+		delete m_UploadPool;
 
 		delete m_DeletionPool; // needs to be destroyed before the heaps
 

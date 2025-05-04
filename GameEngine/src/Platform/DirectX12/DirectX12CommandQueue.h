@@ -10,6 +10,7 @@ namespace Engine
 	{
 	public:
 		DirectX12CommandQueue(Type type);
+		~DirectX12CommandQueue();
 
 		virtual void Build() override;
 		virtual void Execute() override;

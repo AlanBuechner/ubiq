@@ -209,6 +209,11 @@ namespace Engine {
 
 	bool Application::OnWindowResize(WindowResizeEvent* e)
 	{
+		Renderer::WaitForRender();
+		Renderer::WaitForSwap();
+
+		m_Window->GetSwapChain()->Resize(e->GetWidth(), e->GetHeight());
+
 		if (e->GetWidth() == 0 || e->GetHeight() == 0)
 			m_Minimized = true;
 		else

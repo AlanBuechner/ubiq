@@ -14,6 +14,16 @@
 namespace Engine
 {
 
+	class ResourceDeletionPool
+	{
+	public:
+		~ResourceDeletionPool();
+		void Clear();
+
+		Utils::Vector<GPUResource*> m_Resources;
+		Utils::Vector<Descriptor*> m_Descriptors;
+	};
+
 	class UploadPage
 	{
 	public:
@@ -31,16 +41,6 @@ namespace Engine
 		uint32 m_UsedMemory = 0;
 		void* m_MemWrightPointer = nullptr;
 		void* m_BasePointer = nullptr;
-	};
-
-	class ResourceDeletionPool
-	{
-	public:
-		~ResourceDeletionPool();
-		void Clear();
-
-		Utils::Vector<GPUResource*> m_Resources;
-		Utils::Vector<Descriptor*> m_Descriptors;
 	};
 
 	struct UploadBufferData
@@ -64,6 +64,29 @@ namespace Engine
 		TextureFormat format;
 	};
 
+	class UploadPool
+	{
+	public:
+		~UploadPool();
+
+		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state);
+		void CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state);
+
+		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format);
+
+		void RecordBufferCommands(Ref<CommandList> commandList);
+		void RecordTextureCommands(Ref<CommandList> commandList);
+
+		std::mutex& GetUploadMutex() { return m_UploadMutex; }
+
+	private:
+		Utils::Vector<UploadPage*> m_UploadPages;
+
+		std::queue<UploadBufferData> m_BufferUploadQueue;
+		std::queue<UploadTextureData> m_TextureUploadQueue;
+		std::mutex m_UploadMutex;
+	};
+
 	class ResourceManager
 	{
 	public:
@@ -72,14 +95,16 @@ namespace Engine
 
 		ResourceDeletionPool* CreateNewDeletionPool();
 
-		void UploadData();
-		void Clean();
+		// records upload commands and create new upload pool
+		// returns upload pool to be cached until commandlists have been executed
+		UploadPool* UploadData();
 
-		void UploadBuffer(GPUResource* dest, const void* data, uint32 size, ResourceState state);
-		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state);
-		void CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state);
+		void UploadBuffer(GPUResource* dest, const void* data, uint32 size, ResourceState state) { UploadBufferRegion(dest, 0, data, size, state); }
+		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state) { m_UploadPool->UploadBufferRegion(dest, offset, data, size, state); }
+		void CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state) { m_UploadPool->CopyBuffer(dest, src, size, state); }
 
-		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format);
+		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format)
+			{ m_UploadPool->UploadTexture(dest, src, width, height, numMips, state, format); }
 
 		Utils::Vector<Ref<CommandList>> GetUploadCommandLists() { return { m_BufferCopyCommandList, m_TextureCopyCommandList }; }
 
@@ -87,20 +112,13 @@ namespace Engine
 		void ScheduleHandleDeletion(Descriptor* descriptor) { m_DeletionPool->m_Descriptors.Push(descriptor); }
 		
 	private:
-		void RecordBufferCommands();
-		void RecordTextureCommands();
 
 	protected:
 		ResourceDeletionPool* m_DeletionPool;
-		Utils::Vector<UploadPage*> m_UploadPages;
-
-		std::mutex m_UploadMutex;
+		UploadPool* m_UploadPool;
 
 		Ref<CommandList> m_BufferCopyCommandList;
 		Ref<CommandList> m_TextureCopyCommandList;
-
-		std::queue<UploadBufferData> m_BufferUploadQueue;
-		std::queue<UploadTextureData> m_TextureUploadQueue;
 
 	};
 }

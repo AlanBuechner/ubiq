@@ -11,18 +11,6 @@
 namespace Engine
 {
 
-	void CommandQueue::PrependSubmit(Ref<CommandList> commandList)
-	{
-		m_Commands.Insert(m_Commands.begin(), commandList);
-	}
-
-	void CommandQueue::PrependSubmit(Utils::Vector<Ref<CommandList>> commandLists)
-	{
-		m_Commands.Reserve(commandLists.Count());
-		for (uint32 i = 0; i < commandLists.Count(); i++)
-			m_Commands.Insert(m_Commands.begin(), commandLists[i]);
-	}
-
 	void CommandQueue::Submit(Ref<CommandList> commandList)
 	{
 		m_Commands.Push(commandList);

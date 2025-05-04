@@ -416,7 +416,7 @@ namespace Engine
 
 			if (m_Data.EventCallback == nullptr) break;
 			m_Data.EventCallback(new WindowResizeEvent(m_Data.Width, m_Data.Height));
-			m_SwapChain->Resize(m_Data.Width, m_Data.Height);
+			//m_SwapChain->Resize(m_Data.Width, m_Data.Height);
 			break;
 		}
 		case WM_KILLFOCUS: // window remove focuses event

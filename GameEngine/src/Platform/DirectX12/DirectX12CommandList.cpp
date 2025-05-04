@@ -187,6 +187,27 @@ namespace Engine
 		m_CommandList->CopyResource((ID3D12Resource*)dest->GetGPUResourcePointer(), (ID3D12Resource*)src->GetGPUResourcePointer());
 	}
 
+	void DirectX12CommandList::UploadBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size)
+	{
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+		wrl::ComPtr<ID3D12Device14> device = context->GetDevice();
+
+		ID3D12Resource* destResource = (ID3D12Resource*)dest->GetGPUResourcePointer();
+		ID3D12Resource* srcResource = (ID3D12Resource*)src->GetGPUResourcePointer();
+
+		auto destDesc = destResource->GetDesc();
+		auto srcDesc = srcResource->GetDesc();
+
+		D3D12_PLACED_SUBRESOURCE_FOOTPRINT layout;
+		uint32 numRows;
+		uint64 rowStride;
+		uint64 requiredSize = 0;
+		device->GetCopyableFootprints(&destDesc, 0, 1, srcOffset, &layout, &numRows, &rowStride, &requiredSize);
+
+		m_CommandList->CopyBufferRegion(destResource, destOffset, srcResource, layout.Offset, size);
+
+	}
+
 	void DirectX12CommandList::UploadTexture(GPUResource* dest, UploadTextureResource* src)
 	{
 		D3D12_TEXTURE_COPY_LOCATION srcLocation = {};

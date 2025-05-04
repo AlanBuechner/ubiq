@@ -72,59 +72,17 @@ namespace Engine
 		m_Descriptors.Clear();
 	}
 
-	ResourceManager::ResourceManager()
+	UploadPool::~UploadPool()
 	{
-		m_DeletionPool = new ResourceDeletionPool();
-	}
-
-	ResourceManager::~ResourceManager()
-	{}
-
-
-	ResourceDeletionPool* ResourceManager::CreateNewDeletionPool()
-	{
-		ResourceDeletionPool* pool = m_DeletionPool;
-		m_DeletionPool = new ResourceDeletionPool();
-		return pool;
-	}
-
-	void ResourceManager::UploadData()
-	{
-		CREATE_PROFILE_FUNCTIONI();
-
-		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
-		std::lock_guard g(m_UploadMutex);
-
-		timer.Start("Record commands");
-		RecordBufferCommands();
-		RecordTextureCommands();
-		timer.End();
-
-		//m_CommandQueue->Submit(m_BufferCopyCommandList);
-		//m_CommandQueue->Submit(m_TextureCopyCommandList);
-		//m_CommandQueue->Build();
-		//m_CommandQueue->Execute();
-		//m_CommandQueue->Await();
-
-	}
-
-	void ResourceManager::Clean()
-	{
-		// clear upload pages
 		for (uint32 i = 0; i < m_UploadPages.Count(); i++)
 			m_UploadPages[i]->Clear();
 	}
 
-	void ResourceManager::UploadBuffer(GPUResource* dest, const void* data, uint32 size, ResourceState state)
-	{
-		UploadBufferRegion(dest, 0, data, size, state);
-	}
-
-	void ResourceManager::UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state)
+	void UploadPool::UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state)
 	{
 		if (dest == nullptr)
 		{
-			CORE_ERROR("atempting to upload data with null resource");
+			CORE_ERROR("attempting to upload data with null resource");
 			__debugbreak();
 			return;
 		}
@@ -162,11 +120,11 @@ namespace Engine
 		m_BufferUploadQueue.push(uploadData);
 	}
 
-	void ResourceManager::CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state)
+	void UploadPool::CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state)
 	{
 		if (dest == nullptr || src == nullptr)
 		{
-			CORE_ERROR("atempting to upload data with null resource");
+			CORE_ERROR("attempting to upload data with null resource");
 			__debugbreak();
 			return;
 		}
@@ -183,12 +141,12 @@ namespace Engine
 		m_BufferUploadQueue.push(uploadData);
 	}
 
-	void ResourceManager::UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format)
+	void UploadPool::UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format)
 	{
 
 		if (dest == nullptr || src == nullptr)
 		{
-			CORE_ERROR("atempting to upload data with null resource");
+			CORE_ERROR("attempting to upload data with null resource");
 			__debugbreak();
 			return;
 		}
@@ -206,7 +164,7 @@ namespace Engine
 		m_TextureUploadQueue.push(uploadData);
 	}
 
-	void ResourceManager::RecordBufferCommands()
+	void UploadPool::RecordBufferCommands(Ref<CommandList> commandlist)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
@@ -241,13 +199,13 @@ namespace Engine
 
 		// record commands
 
-		m_BufferCopyCommandList->StartRecording(); // start recording 
-		GPUTimer::BeginEvent(m_BufferCopyCommandList, "Buffer Upload");
-		m_BufferCopyCommandList->ValidateStates(startb); // transition resources to copy dest
+		commandlist->StartRecording(); // start recording 
+		GPUTimer::BeginEvent(commandlist, "Buffer Upload");
+		commandlist->ValidateStates(startb); // transition resources to copy dest
 
 		for (uint32 i = 0; i < numBufferCopys; i++)
 		{
-			m_BufferCopyCommandList->CopyBuffer(
+			commandlist->CopyBuffer(
 				bufferCopys[i].destResource,
 				bufferCopys[i].destOffset,
 				bufferCopys[i].uploadResource,
@@ -256,13 +214,13 @@ namespace Engine
 			);
 		}
 
-		m_BufferCopyCommandList->ValidateStates(endb); // transition resources back to original state
-		GPUTimer::EndEvent(m_BufferCopyCommandList);
-		m_BufferCopyCommandList->Close();
+		commandlist->ValidateStates(endb); // transition resources back to original state
+		GPUTimer::EndEvent(commandlist);
+		commandlist->Close();
 
 	}
 
-	void ResourceManager::RecordTextureCommands()
+	void UploadPool::RecordTextureCommands(Ref<CommandList> commandlist)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		// structs
@@ -331,20 +289,20 @@ namespace Engine
 
 
 		// start recording 
-		m_TextureCopyCommandList->StartRecording(); // start recording
-		GPUTimer::BeginEvent(m_TextureCopyCommandList, "Texture Upload");
-		m_TextureCopyCommandList->ValidateStates(startb); // transition resources to copy
+		commandlist->StartRecording(); // start recording
+		GPUTimer::BeginEvent(commandlist, "Texture Upload");
+		commandlist->ValidateStates(startb); // transition resources to copy
 
-		GPUTimer::BeginEvent(m_TextureCopyCommandList, "Upload Textures");
+		GPUTimer::BeginEvent(commandlist, "Upload Textures");
 		// copy textures to final texture or mip texture
 		for (uint32 i = 0; i < textureUploads.Count(); i++)
 		{
 			TextureUploadInfo& info = textureUploads[i];
-			m_TextureCopyCommandList->UploadTexture(info.dest, info.src);
+			commandlist->UploadTexture(info.dest, info.src);
 		}
-		GPUTimer::EndEvent(m_TextureCopyCommandList);
+		GPUTimer::EndEvent(commandlist);
 
-		m_TextureCopyCommandList->ValidateStates(endb); // transition resources back to original state
+		commandlist->ValidateStates(endb); // transition resources back to original state
 
 
 		// generate mip maps
@@ -352,7 +310,7 @@ namespace Engine
 		Utils::Vector<ResourceStateObject> textureBarrier;
 		Utils::Vector<TextureCopyInfo> mipCopys;
 
-		GPUTimer::BeginEvent(m_TextureCopyCommandList, "Generate Mips");
+		GPUTimer::BeginEvent(commandlist, "Generate Mips");
 
 		for (auto& mipTexture : mipTextures)
 		{
@@ -364,12 +322,12 @@ namespace Engine
 				// blit the last mip level onto the current mip level
 				Ref<Shader> blit = Renderer::GetBlitShader();
 				Ref<ComputeShaderPass> blitPass = blit->GetComputePass("Blit");
-				m_TextureCopyCommandList->SetShader(blitPass);
-				m_TextureCopyCommandList->SetRWTexture(blitPass->GetUniformLocation("u_SrcTexture"), lastMip);
-				m_TextureCopyCommandList->SetRWTexture(blitPass->GetUniformLocation("u_DstTexture"), nextMip);
-				m_TextureCopyCommandList->Dispatch(std::max(nextMip->m_Width / 8, 1u) + 1, std::max(nextMip->m_Height / 8, 1u) + 1, 1);
+				commandlist->SetShader(blitPass);
+				commandlist->SetRWTexture(blitPass->GetUniformLocation("u_SrcTexture"), lastMip);
+				commandlist->SetRWTexture(blitPass->GetUniformLocation("u_DstTexture"), nextMip);
+				commandlist->Dispatch(std::max(nextMip->m_Width / 8, 1u) + 1, std::max(nextMip->m_Height / 8, 1u) + 1, 1);
 
-				m_TextureCopyCommandList->AwaitUAV(mipTexture.mipTexture->GetResource());
+				commandlist->AwaitUAV(mipTexture.mipTexture->GetResource());
 			}
 
 
@@ -381,17 +339,51 @@ namespace Engine
 			mipCopys.Push({ mipTexture.texture, mipTexture.mipTexture->GetResource() });
 		}
 
-		GPUTimer::EndEvent(m_TextureCopyCommandList);
-		GPUTimer::BeginEvent(m_TextureCopyCommandList, "Copy Mip Textures");
+		GPUTimer::EndEvent(commandlist);
+		GPUTimer::BeginEvent(commandlist, "Copy Mip Textures");
 
 		// copy from mip textures to final texture
-		m_TextureCopyCommandList->ValidateStates(mipBarrier); // transition mips to copy src
+		commandlist->ValidateStates(mipBarrier); // transition mips to copy src
 		for (uint32 i = 0; i < mipCopys.Count(); i++)
-			m_TextureCopyCommandList->CopyResource(mipCopys[i].dest, mipCopys[i].src);
-		m_TextureCopyCommandList->ValidateStates(textureBarrier); // transition resources back to original state
-		GPUTimer::EndEvent(m_TextureCopyCommandList);
-		GPUTimer::EndEvent(m_TextureCopyCommandList);
-		m_TextureCopyCommandList->Close();
+			commandlist->CopyResource(mipCopys[i].dest, mipCopys[i].src);
+		commandlist->ValidateStates(textureBarrier); // transition resources back to original state
+		GPUTimer::EndEvent(commandlist);
+		GPUTimer::EndEvent(commandlist);
+		commandlist->Close();
 	}
 
+	ResourceManager::ResourceManager()
+	{
+		m_UploadPool = new UploadPool();
+		m_DeletionPool = new ResourceDeletionPool();
+	}
+
+	ResourceManager::~ResourceManager()
+	{}
+
+
+	ResourceDeletionPool* ResourceManager::CreateNewDeletionPool()
+	{
+		ResourceDeletionPool* pool = m_DeletionPool;
+		m_DeletionPool = new ResourceDeletionPool();
+		return pool;
+	}
+
+	UploadPool* ResourceManager::UploadData()
+	{
+		CREATE_PROFILE_FUNCTIONI();
+
+		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
+		std::lock_guard g(m_UploadPool->GetUploadMutex());
+
+		UploadPool* pool = m_UploadPool;
+		m_UploadPool = new UploadPool();
+
+		timer.Start("Record commands");
+		pool->RecordBufferCommands(m_BufferCopyCommandList);
+		pool->RecordTextureCommands(m_TextureCopyCommandList);
+		timer.End();
+
+		return pool;
+	}
 }

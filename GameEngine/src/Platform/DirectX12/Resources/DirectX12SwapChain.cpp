@@ -101,8 +101,9 @@ namespace Engine
 			((DirectX12Texture2DResource*)m_Buffers[i]->m_Resource)->GetBuffer()->Release();
 
 		// Resize swap chain
-		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_Buffers.Count(), width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH),
-			"Faild to Resize the swapchain");
+		UINT resizeFlags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+		CORE_ASSERT_HRESULT(m_SwapChain->ResizeBuffers((uint32)m_Buffers.Count(), width, height, DXGI_FORMAT_UNKNOWN, resizeFlags),
+			"Failed to Resize the Swapchain");
 
 		// Recreate buffer
 		GetFrameBuffers(width, height);
@@ -143,7 +144,7 @@ namespace Engine
 
 	void DirectX12SwapChain::CleanUp()
 	{
-		//SwapBuffers();
+		SwapBuffers();
 	}
 
 	void DirectX12SwapChain::GetFrameBuffers(uint32 width, uint32 height)
@@ -153,17 +154,19 @@ namespace Engine
 		for (unsigned int i = 0; i < m_Buffers.Count(); i++)
 		{
 			Ref<RenderTarget2D> renderTarget = m_Buffers[i];
-			context->GetResourceManager()->ScheduleResourceDeletion(renderTarget->m_Resource);
 
-			// Get buffer
+			// delete old resource and descriptors
+			context->GetResourceManager()->ScheduleResourceDeletion(renderTarget->m_Resource);
+			context->GetResourceManager()->ScheduleHandleDeletion(renderTarget->GetSRVDescriptor());
+			context->GetResourceManager()->ScheduleHandleDeletion(renderTarget->GetRTVDSVDescriptor());
+
+
+			// Get new buffer resource
 			ID3D12Resource* res = nullptr;
 			CORE_ASSERT_HRESULT(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&res)), "Failed to Get Frame Buffer");
 			renderTarget->m_Resource = new DirectX12Texture2DResource(width, height, TextureFormat::RGBA8_UNORM, res);
 
-			// create new handle
-			
-			context->GetResourceManager()->ScheduleHandleDeletion(renderTarget->GetSRVDescriptor());
-			context->GetResourceManager()->ScheduleHandleDeletion(renderTarget->GetRTVDSVDescriptor());
+			// create new handles
 			renderTarget->m_SRVDescriptor = Texture2DSRVDescriptorHandle::Create(renderTarget->m_Resource);
 			renderTarget->m_RTVDSVDescriptor = Texture2DRTVDSVDescriptorHandle::Create(renderTarget->m_Resource);
 
