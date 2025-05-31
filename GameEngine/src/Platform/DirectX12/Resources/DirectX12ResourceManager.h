@@ -27,7 +27,7 @@ namespace Engine
 	public:
 
 		DirectX12ResourceManager();
-		~DirectX12ResourceManager();
+		virtual ~DirectX12ResourceManager() override;
 
 	};
 }

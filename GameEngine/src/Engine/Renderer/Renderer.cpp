@@ -159,7 +159,6 @@ namespace Engine
 		Profiler::Instrumentor::Get().RegisterThread("Render", 1);
 		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
 		Ref<ResourceManager> resourceManager = s_Context->GetResourceManager();
-		ResourceDeletionPool* deletionPool = resourceManager->CreateNewDeletionPool();
 		static int frame = 0;
 		while (Application::Get().IsRunning())
 		{
@@ -167,9 +166,12 @@ namespace Engine
 			s_CopyFlag.Wait();
 			timer.Start("Copy");
 			GPUProfiler::StartFrame();
-			UploadPool* pool = resourceManager->UploadData();
+			UploadPool* cachedUploadPool = resourceManager->UploadDataAndSwapPools();
 			timer.End();
 			s_CopyFlag.Clear();
+
+			// swap deletion pool
+			ResourceDeletionPool* cachedDeletionPool = resourceManager->SwapDeletionPools();
 
 			// rendering commands
 			s_RenderFlag.Wait();
@@ -199,13 +201,14 @@ namespace Engine
 			WindowManager::UpdateWindows();
 
 			// prepare for next frame
-			delete pool;
-			deletionPool->Clear();
-			deletionPool = resourceManager->CreateNewDeletionPool();
+			delete cachedUploadPool;
+			delete cachedDeletionPool;
+			
 			s_SwapFlag.Signal();
 
 			frame++;
 		}
+		
 	}
 
 }

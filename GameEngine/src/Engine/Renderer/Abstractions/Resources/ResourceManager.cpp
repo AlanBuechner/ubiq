@@ -359,17 +359,22 @@ namespace Engine
 	}
 
 	ResourceManager::~ResourceManager()
-	{}
-
-
-	ResourceDeletionPool* ResourceManager::CreateNewDeletionPool()
 	{
-		ResourceDeletionPool* pool = m_DeletionPool;
-		m_DeletionPool = new ResourceDeletionPool();
-		return pool;
+		delete m_UploadPool;// needs to be destroyed before the heaps
+		delete m_DeletionPool; // needs to be destroyed before the heaps
+
+		m_UploadPool = nullptr;
+		m_DeletionPool = nullptr;
 	}
 
-	UploadPool* ResourceManager::UploadData()
+	ResourceDeletionPool* ResourceManager::SwapDeletionPools()
+	{
+		ResourceDeletionPool* oldPool = m_DeletionPool;
+		m_DeletionPool = new ResourceDeletionPool();
+		return oldPool;
+	}
+
+	UploadPool* ResourceManager::UploadDataAndSwapPools()
 	{
 		CREATE_PROFILE_FUNCTIONI();
 

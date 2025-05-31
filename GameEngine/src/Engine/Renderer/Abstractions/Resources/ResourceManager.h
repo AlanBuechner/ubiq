@@ -91,13 +91,14 @@ namespace Engine
 	{
 	public:
 		ResourceManager();
-		~ResourceManager();
+		virtual ~ResourceManager();
 
-		ResourceDeletionPool* CreateNewDeletionPool();
+		ResourceDeletionPool* GetDeletionPool() { return m_DeletionPool; }
+		ResourceDeletionPool* SwapDeletionPools();
 
 		// records upload commands and create new upload pool
 		// returns upload pool to be cached until commandlists have been executed
-		UploadPool* UploadData();
+		UploadPool* UploadDataAndSwapPools();
 
 		void UploadBuffer(GPUResource* dest, const void* data, uint32 size, ResourceState state) { UploadBufferRegion(dest, 0, data, size, state); }
 		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state) { m_UploadPool->UploadBufferRegion(dest, offset, data, size, state); }

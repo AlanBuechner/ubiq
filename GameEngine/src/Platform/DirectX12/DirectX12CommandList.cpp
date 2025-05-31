@@ -334,7 +334,7 @@ namespace Engine
 	{
 		if (m_Type == CommandList::Bundle)
 		{
-			CORE_WARN("Command bundle can not clear render tartets. command will be ignored");
+			CORE_WARN("Command bundle can not clear render targets. command will be ignored");
 			return;
 		}
 
@@ -379,7 +379,7 @@ namespace Engine
 	{
 		if (!m_RenderTarget)
 		{
-			CORE_ERROR("Can not set shader without rendertarget");
+			CORE_ERROR("Can not set shader without render target");
 			return;
 		}
 

@@ -29,11 +29,6 @@ namespace Engine
 
 	DirectX12ResourceManager::~DirectX12ResourceManager()
 	{
-		// upload pool needs to be destroyed before the deletion pool
-		delete m_UploadPool;
-
-		delete m_DeletionPool; // needs to be destroyed before the heaps
-
 		s_SRVHeap.reset();
 		s_RTVHeap.reset();
 		s_DSVHeap.reset();
