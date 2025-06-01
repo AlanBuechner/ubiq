@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Log.h"
 
+#include "Engine/Core/Core.h"
 
 Engine::Logger* Engine::Log::s_CoreLogger;
 Engine::Logger* Engine::Log::s_ClientLogger;
@@ -106,23 +107,12 @@ namespace Engine
 
 	void Logger::SetConsoleColor(Level level)
 	{
-		switch (level)
-		{
-		case Engine::Logger::Trace:
-			//std::cout << "\x1B[37m";
-			break;
-		case Engine::Logger::Info:
-			std::cout << "\x1B[32m";
-			break;
-		case Engine::Logger::Warn:
-			std::cout << "\x1B[33m";
-			break;
-		case Engine::Logger::Error:
-			std::cout << "\x1B[31m";
-			break;
-		default:
-			break;
-		}
+#if defined(PLATFORM_WINDOWS)
+		// map log levels to colors [white, green, yellow, red]
+		uint32 colorCodes[] = { 15, 10, 14, 12 };
+		static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, colorCodes[(uint32)level]);
+#endif
 	}
 
 	void Log::Init()

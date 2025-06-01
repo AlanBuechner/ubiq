@@ -205,6 +205,7 @@ namespace Engine
 					}
 				}
 				std::cout << std::endl;
+				SetConsoleColor(Level::Trace); // reset console window color
 
 			}
 		}
