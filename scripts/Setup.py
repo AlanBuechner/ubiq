@@ -20,134 +20,61 @@ def DoesFolderExist(relPath):
 def DoesFileExist(relPath):
 	return os.path.exists(os.path.join(os.getcwd(), relPath))
 
-def UnzipAndDelete(zip, folder):
+def UnzipAndDelete(zip, folder, filelist=None):
 	with zipfile.ZipFile(zip, 'r') as zip_ref:
-		zip_ref.extractall(folder)
+		if filelist == None:
+			zip_ref.extractall(folder)
+		else:
+			for f in filelist:
+				zip_ref.extract(f, folder)
 	os.remove(zip)
+
+def DownloadZip(name, folder, url, filelist=None, requestFunc=None):
+	if not DoesFolderExist(folder):
+		print("Installing {name}".format(name=name))
+		os.makedirs(folder)
+		zipLocation = folder + "/temp.zip"
+
+		try:
+			if requestFunc != None:
+				url = requestFunc(url)
+			urllib.request.urlretrieve(url, zipLocation)
+			UnzipAndDelete(zipLocation, folder, filelist)
+		except Exception as e:
+			print(e)
+			print("Failed to install the {name}".format(name=name))
+			os.rmdir(folder)
+		else:
+			print("Finished installing the {name}".format(name=name))
+	else:
+		print("{name} already installed. To reinstall the {name} delete the folder \"{folder}\"".format(name=name, folder=folder))
 
 os.chdir("../")
 
-dxcInstallLocation = "vendor/dxc"
-pixInstallLocation = "vendor/pix"
-agilityInstallLocation = "vendor/Agility"
-compilerInstallLocation = "vendor/Compiler"
-premakeInstallLocation = "vendor/premake"
-
 # install dxc
-if not DoesFolderExist(dxcInstallLocation):
-	print("installing DXC")
-	os.makedirs(dxcInstallLocation)
-	zipLocation = dxcInstallLocation + "/dxc.zip"
-
-	jsonURL = "https://api.github.com/repos/microsoft/DirectXShaderCompiler/releases/latest"
+def DXC_ResolveURL(url):
 	latestURL = ""
-	try:
-		with urllib.request.urlopen(jsonURL) as url:
-			data = json.load(url)
-			pattern = re.compile("dxc.*.zip")
-			for asset in data["assets"]:
-				if pattern.match(asset["name"]):
-					latestURL = asset["browser_download_url"]
-					break
-		urllib.request.urlretrieve(latestURL, zipLocation)
-		UnzipAndDelete(zipLocation, dxcInstallLocation)
-	except:
-		print("Failed to install DXC")
-		os.rmdir(dxcInstallLocation)
-	else:
-		print("Finished installing DXC")
-else:
-	print("DXC already installed. To reinstall DXC delete the folder \"{dxc}\"".format(dxc=dxcInstallLocation))
-	
-
-print()
-
+	with urllib.request.urlopen(url) as url:
+		data = json.load(url)
+		pattern = re.compile("dxc.*.zip")
+		for asset in data["assets"]:
+			if pattern.match(asset["name"]):
+				latestURL = asset["browser_download_url"]
+				break
+	return latestURL
+DownloadZip("DXC", "vendor/dxc", "https://api.github.com/repos/microsoft/DirectXShaderCompiler/releases/latest", None, DXC_ResolveURL)
 
 # install pix
-if not DoesFolderExist(pixInstallLocation):
-	print("Installing PIX")
-	os.makedirs(pixInstallLocation)
-	zipLocation = pixInstallLocation + "/pix.zip"
-
-	try:
-		urllib.request.urlretrieve("https://www.nuget.org/api/v2/package/WinPixEventRuntime/1.0.220810001", zipLocation)
-		UnzipAndDelete(zipLocation, pixInstallLocation)
-	except Exception as e:
-		print(e)
-		print("Failed to install PIX")
-		os.rmdir(pixInstallLocation)
-	else:
-		print("Finished installing PIX")
-else:
-	print("PIX already installed. To reinstall PIX delete the folder \"{pix}\"".format(pix=pixInstallLocation))
-
-
-print()
-
+DownloadZip("PIX", "vendor/pix", "https://www.nuget.org/api/v2/package/WinPixEventRuntime/1.0.220810001")
 
 # install Agility
-if not DoesFolderExist(agilityInstallLocation):
-	print("Installing Agility")
-	os.makedirs(agilityInstallLocation)
-	zipLocation = agilityInstallLocation + "/Agility.zip"
-
-	try:
-		urllib.request.urlretrieve("https://www.nuget.org/api/v2/package/Microsoft.Direct3D.D3D12/1.614.0", zipLocation)
-		UnzipAndDelete(zipLocation, agilityInstallLocation)
-	except Exception as e:
-		print(e)
-		print("Failed to install Agility")
-		os.rmdir(agilityInstallLocation)
-	else:
-		print("Finished installing Agility")
-else:
-	print("Agility already installed. To reinstall Agility delete the folder \"{agility}\"".format(agility=agilityInstallLocation))
-
-
-print()
+DownloadZip("Agility", "vendor/Agility", "https://www.nuget.org/api/v2/package/Microsoft.Direct3D.D3D12/1.614.0")
 
 # install compiler
-if not DoesFolderExist(compilerInstallLocation):
-	print("Installing Compiler")
-	os.makedirs(compilerInstallLocation)
-	zipLocation = compilerInstallLocation + "/Compiler.zip"
-
-	try:
-		urllib.request.urlretrieve("https://github.com/AlanBuechner/Socrates/releases/download/v0.0.1-alpha/Socrates.zip", zipLocation)
-		UnzipAndDelete(zipLocation, compilerInstallLocation)
-	except Exception as e:
-		print(e)
-		print("Failed to install the compiler")
-		os.rmdir(compilerInstallLocation)
-	else:
-		print("Finished installing the compiler")
-else:
-	print("Compiler already installed. To reinstall the Compiler delete the folder \"{comp}\"".format(comp=compilerInstallLocation))
-
-
-print()
-
+DownloadZip("Compiler", "vendor/Compiler", "https://github.com/AlanBuechner/Socrates/releases/download/v0.0.1-alpha/Socrates.zip")
 
 # install premake
-premakeEXE = premakeInstallLocation+"/premake5.exe"
-if not DoesFileExist(premakeEXE):
-	print("Installing Premake")
-	os.makedirs(premakeInstallLocation)
-	zipLocation = premakeInstallLocation + "/premake.zip"
+DownloadZip("Premake", "vendor/premake", "https://github.com/premake/premake-core/releases/download/v5.0.0-beta1/premake-5.0.0-beta1-windows.zip", ["premake5.exe"])
 
-	try:
-		urllib.request.urlretrieve("https://github.com/premake/premake-core/releases/download/v5.0.0-beta1/premake-5.0.0-beta1-windows.zip", zipLocation)
-		with zipfile.ZipFile(zipLocation, 'r') as zip_ref:
-			zip_ref.extract("premake5.exe", premakeInstallLocation)
-		os.remove(zipLocation)
-	except Exception as e:
-		print(e)
-		print("Failed to install Premake")
-	else:
-		print("Finished installing Premake")
-else:
-	print("Premake already installed. To reinstall Premake delete \"{pre}\"".format(pre=premakeEXE))
-
-
-print()
-
+# install tracy profiler
+DownloadZip("Tracy Profiler", "tools/TracyProfiler", "https://github.com/wolfpld/tracy/releases/download/v0.12.0/windows-0.12.0.zip")

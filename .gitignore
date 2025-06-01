@@ -14,6 +14,7 @@ vendor/Agility
 vendor/Compiler
 vendor/python
 vendor/premake
+tools/TracyProfiler
 
 dxcompiler.dll
 dxil.dll
