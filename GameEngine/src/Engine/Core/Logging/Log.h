@@ -2,12 +2,13 @@
 
 #include "Utils/Types.h"
 #include "Utils/Vector.h"
-#include "iostream"
+#include <iostream>
 #include <ctime>
 #include <memory>
 #include <utility>
 #include <charconv>
 #include <type_traits>
+#include <sstream>
 
 
 namespace Engine
@@ -68,7 +69,8 @@ namespace Engine
 				UINT8, UINT16, UINT32, UINT64,
 				INT8, INT16, INT32, INT64,
 				FLOAT32, FLOAT64,
-				CHAR, CHARPTR, STRING,
+				CHAR, CHARPTR, STRING, STRING_VIEW,
+				BOOL,
 			} type;
 
 			void* data;
@@ -114,6 +116,9 @@ namespace Engine
 
 				CHECK_TYPE(char, CHAR);
 				CHECK_TYPE(std::string, STRING);
+				CHECK_TYPE(std::string_view, STRING_VIEW);
+
+				CHECK_TYPE(bool, BOOL);
 
 				if constexpr (is_char_ptr<T>::value)
 					return TemplateElement(CHARPTR, (void*)data);
@@ -124,9 +129,9 @@ namespace Engine
 				return TemplateElement(INT32, (void*)&data);
 			}
 
-			void PrintValue()
+			void PrintValue(std::stringstream& ss)
 			{
-#define PRINT_NUMBER(t1, t2) case Engine::Logger::TemplateElement::t1: std::cout << std::to_string(*(t2*)data);break;
+#define PRINT_NUMBER(t1, t2) case Engine::Logger::TemplateElement::t1: ss << std::to_string(*(t2*)data);break;
 				switch (type)
 				{
 					PRINT_NUMBER(UINT8, uint8);
@@ -143,18 +148,22 @@ namespace Engine
 					PRINT_NUMBER(FLOAT64, double);
 
 				case Engine::Logger::TemplateElement::CHAR:
-					std::cout << *(char*)data; break;
+					ss << *(char*)data; break;
 				case Engine::Logger::TemplateElement::CHARPTR:
-					std::cout << (char*)data; break;
+					ss << (char*)data; break;
 				case Engine::Logger::TemplateElement::STRING:
-					std::cout << *(std::string*)data; break;
+					ss << *(std::string*)data; break;
+				case Engine::Logger::TemplateElement::STRING_VIEW:
+					ss << *(std::string_view*)data; break;
+				case Engine::Logger::TemplateElement::BOOL:
+					ss << (*(bool*)data ? "True" : "False"); break;
 				}
 #undef PRINT_NUMBER
 			}
 		};
 
 		template<typename... Args>
-		void LogMessage(const char* msg, const Args&... args)
+		void LogMessage(std::stringstream& ss, const char* msg, const Args&... args)
 		{
 			Utils::Vector<TemplateElement> templateElements;
 			templateElements.Reserve(sizeof...(args));
@@ -166,15 +175,15 @@ namespace Engine
 				for (MessageToken token : tokens)
 				{
 					if (token.m_Type == MessageToken::String)
-						std::cout << token.m_String;
+						ss << token.m_String;
 					else if (token.m_Type == MessageToken::Param)
 					{
 						if (token.m_ParamIndex >= templateElements.Count())
 						{
-							std::cout << "invalid param index \"" << std::to_string(token.m_ParamIndex) << "\"" << std::endl;
+							ss << std::string("{invalid param index \"" + std::to_string(token.m_ParamIndex) + "\"}");
 							return;
 						}
-						templateElements[token.m_ParamIndex].PrintValue();
+						templateElements[token.m_ParamIndex].PrintValue(ss);
 					}
 				}
 			}
@@ -185,26 +194,26 @@ namespace Engine
 		{
 			if (level >= m_Level)
 			{
-				SetConsoleColor(level);
-
+				std::stringstream ss;
 				for (PatternToken token : m_PatternTokens)
 				{
 					switch (token.m_Type)
 					{
 					case PatternToken::String:
-						std::cout << token.m_String;
+						ss << token.m_String;
 						break;
 					case PatternToken::Message:
-						LogMessage(msg, args...);
+						LogMessage(ss, msg, args...);
 						break;
 					case PatternToken::Time:
 						time_t now = time(0);
 						tm* ltm = localtime(&now);
-						std::cout << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec;
+						ss << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec;
 						break;
 					}
 				}
-				std::cout << std::endl;
+				SetConsoleColor(level);
+				std::cout << ss.str() << std::endl;
 				SetConsoleColor(Level::Trace); // reset console window color
 
 			}
