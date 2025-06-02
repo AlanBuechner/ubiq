@@ -41,15 +41,16 @@ namespace Profiler
 	{
 	public:
 		void Start(const tracy::SourceLocationData* sourceLocationData);
-
 		void End();
+
+		void Anotate(const std::string& anotation);
 
 	private:
 		tracy::ScopedZone* m_ScopedZone = nullptr;
 		bool m_TimerRunning = false;
 	};
 
-	class InstrumentationTimerScoped : protected InstrumentationTimer
+	class InstrumentationTimerScoped : public InstrumentationTimer
 	{
 	public:
 		InstrumentationTimerScoped(const tracy::SourceLocationData* sourceLocationData)
@@ -65,10 +66,11 @@ namespace Profiler
 
 #define SOURCE_LOC_NAME TracyConcat(__tracy_source_location,TracyLine)
 #define CREATE_SOURCE_LOC(name) static constexpr tracy::SourceLocationData SOURCE_LOC_NAME { name, __FUNCTION__,  __FILE__, (uint32_t)TracyLine, 0 };
-#define CREATE_SOURCE_LOC_DYNAMIC(name) tracy::SourceLocationData SOURCE_LOC_NAME { std::string(name).c_str(), __FUNCTION__,  __FILE__, (uint32_t)TracyLine, 0 };
-#define CREATE_PROFILE_SCOPEI(name) CREATE_SOURCE_LOC(name); Profiler::InstrumentationTimerScoped __timer##__LINE__(&SOURCE_LOC_NAME);
-#define CREATE_PROFILE_SCOPEI_DYNAMIC(name) CREATE_SOURCE_LOC_DYNAMIC(name); Profiler::InstrumentationTimerScoped __timer##__LINE__(&SOURCE_LOC_NAME);
+#define CREATE_PROFILE_SCOPEI(name) CREATE_SOURCE_LOC(name); Profiler::InstrumentationTimerScoped __timer(&SOURCE_LOC_NAME);
 #define CREATE_PROFILE_FUNCTIONI() CREATE_PROFILE_SCOPEI(__FUNCSIG__)
+
+#define ANOTATE_PROFILEI(name, anotation) name.Anotate(anotation);
+#define ANOTATE_PROFILEI(anotation) __timer.Anotate(anotation);
 
 #define CREATE_PROFILEI() Profiler::InstrumentationTimer();
 #define START_PROFILEI(profiler, name) CREATE_SOURCE_LOC(name); profiler.Start(&SOURCE_LOC_NAME);

@@ -31,6 +31,7 @@ namespace Engine
 
 	void* UploadPage::Map(const void* data, uint32 size)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		// if the amount of memory requested to upload is greater than the amount of available space return nullptr 
 		if ((m_Size - m_UsedMemory) < size)
 			return nullptr;
@@ -80,6 +81,7 @@ namespace Engine
 
 	void UploadPool::UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		if (dest == nullptr)
 		{
 			CORE_ERROR("attempting to upload data with null resource");
@@ -103,6 +105,7 @@ namespace Engine
 
 		if (loc == nullptr)
 		{
+			CREATE_PROFILE_SCOPEI("Create new upload page");
 			m_UploadPages.Push(new UploadPage(size * 2)); // create new page double the size needed
 			page = m_UploadPages.Back();
 			loc = page->Map(data, size);

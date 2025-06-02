@@ -78,7 +78,8 @@ namespace Engine
 			{
 				// create entity
 				const std::string& name = entity["Name"].GetAsString();
-				CREATE_PROFILE_SCOPEI_DYNAMIC("Creating Entity " + name);
+				CREATE_PROFILE_SCOPEI("Creating Entity");
+				ANOTATE_PROFILEI(name);
 				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(entity["Entity"].Get<uint64>(), name);
 
 				for (auto component : entity["Components"].GetAsObjectArray())

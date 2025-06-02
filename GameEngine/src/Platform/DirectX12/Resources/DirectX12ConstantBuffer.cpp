@@ -43,6 +43,7 @@ namespace Engine
 
 	void DirectX12ConstantBufferResource::SetData(const void* data)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		context->GetDX12ResourceManager()->UploadBuffer(this, data, m_Size, m_DefultState);
 	}

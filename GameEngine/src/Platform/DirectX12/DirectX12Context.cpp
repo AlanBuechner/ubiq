@@ -100,7 +100,7 @@ namespace Engine
 			adapter = m_Adapter;
 
 		wrl::ComPtr<ID3D12Device> device;
-		CORE_ASSERT_HRESULT(D3D12CreateDevice(m_Adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(device.GetAddressOf())),
+		CORE_ASSERT_HRESULT(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(device.GetAddressOf())),
 			"Failed to create temp Device");
 
 		D3D_FEATURE_LEVEL reqArray[] = {

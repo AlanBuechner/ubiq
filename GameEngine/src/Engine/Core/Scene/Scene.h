@@ -135,7 +135,7 @@ namespace Engine
 	private:
 		Utils::Vector<ComponentPool*> m_Pools;
 		Utils::Vector<const Reflect::Function*> m_Funcs;
-		std::string m_FuncName;
+		const std::string m_FuncName;
 	};
 
 	template<typename T>
@@ -156,7 +156,8 @@ namespace Engine
 		virtual void Update() override {
 			if (m_Func)
 			{
-				CREATE_PROFILE_SCOPEI_DYNAMIC(m_FuncName);
+				CREATE_PROFILE_SCOPEI("Component Update Event");
+				ANOTATE_PROFILEI(m_FuncName);
 				m_Pool->EachEntity([this](void* component) {
 					m_Func->Invoke(component, {});
 				});
@@ -166,7 +167,7 @@ namespace Engine
 	private:
 		ComponentPool* m_Pool;
 		const Reflect::Function* m_Func;
-		std::string m_FuncName;
+		const std::string m_FuncName;
 	};
 
 	template<typename T>
@@ -186,7 +187,8 @@ namespace Engine
 
 		virtual void Update() override {
 			if (m_Func && m_System) {
-				CREATE_PROFILE_SCOPEI(m_FuncName);
+				CREATE_PROFILE_SCOPEI("Scene Subsystem Update Event");
+				ANOTATE_PROFILEI(m_FuncName);
 				m_Func->Invoke(m_System, {});
 			}
 		}

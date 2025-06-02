@@ -32,6 +32,11 @@ namespace Profiler
 		m_ScopedZone = nullptr;
 	}
 
+	void InstrumentationTimer::Anotate(const std::string& anotation)
+	{
+		m_ScopedZone->Text(anotation.c_str(), anotation.size());
+	}
+
 }
 
 

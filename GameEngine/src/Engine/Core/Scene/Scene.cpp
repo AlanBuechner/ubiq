@@ -230,7 +230,8 @@ namespace Engine
 
 	void SceneUpdateEvent::Update()
 	{
-		CREATE_PROFILE_SCOPEI_DYNAMIC(m_FuncName);
+		CREATE_PROFILE_SCOPEI("Scene Update Event");
+		ANOTATE_PROFILEI(m_FuncName);
 		for (uint32 i = 0; i < m_Pools.Count(); i++)
 		{
 			ComponentPool* pool = m_Pools[i];
