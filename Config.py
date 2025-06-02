@@ -10,6 +10,7 @@ p = {
 		"ProjectManager" : "vendor/ProjectManager",
 		"Reflection" : "vendor/Reflection",
 		"Utilities" : "vendor/Utilities",
+		"tracy" : "vendor/tracy",
 	},
 	"GameEngine" : "GameEngine",
 }
@@ -58,6 +59,7 @@ vendorDirs = {
 	"dxc"				: f"{location}/vendor/dxc",
 	"pix"				: f"{location}/vendor/pix",
 	"Agility"			: f"{location}/vendor/Agility",
+	"tracy"				: f"{location}/vendor/tracy",
 	
 	# nont-third party
 	"ProjectManager"	: f"{location}/vendor/ProjectManager",
@@ -78,6 +80,7 @@ includeDirs = {
 	"dxc"				: f"{vendorDirs['dxc']}/inc",
 	"pix"				: f"{vendorDirs['pix']}/include",
 	"Agility"			: f"{vendorDirs['Agility']}/build/native/include",
+	"tracy"				: f"{vendorDirs['tracy']}/public/",
 
 	# non-thrid party
 	"ProjectManager"	: f"{vendorDirs['ProjectManager']}/src",

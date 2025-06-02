@@ -1,3 +1,6 @@
 [submodule "GameEngine/vendor/json"]
 	path = GameEngine/vendor/json
 	url = https://github.com/AlanBuechner/json
+[submodule "vendor/tracy"]
+	path = vendor/tracy
+	url = https://github.com/AlanBuechner/tracy

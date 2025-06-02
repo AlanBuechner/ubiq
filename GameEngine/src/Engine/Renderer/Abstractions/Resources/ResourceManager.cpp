@@ -378,16 +378,17 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
-		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
 		std::lock_guard g(m_UploadPool->GetUploadMutex());
 
 		UploadPool* pool = m_UploadPool;
 		m_UploadPool = new UploadPool();
 
-		timer.Start("Record commands");
-		pool->RecordBufferCommands(m_BufferCopyCommandList);
-		pool->RecordTextureCommands(m_TextureCopyCommandList);
-		timer.End();
+		{
+			CREATE_PROFILE_SCOPEI("Record commands");
+			pool->RecordBufferCommands(m_BufferCopyCommandList);
+			pool->RecordTextureCommands(m_TextureCopyCommandList);
+
+		}
 
 		return pool;
 	}

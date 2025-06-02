@@ -35,17 +35,14 @@ namespace Engine {
 
 		Renderer::Init();
 
-		timer.Start("Create Window");
+		START_PROFILEI(timer, "Create Window");
 		Window::Init();
 		m_Window = Window::Create({ name, 1280, 720, true, false }); // create a window
 		GPUProfiler::SetTragetWindow(m_Window->GetNativeWindow());
-		timer.End();
-		timer.Start("set event callback");
 		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
-		timer.End();
+		END_PROFILEI(timer);
 
 		LoadProject();
-		
 	}
 
 	Application::~Application()
@@ -93,7 +90,7 @@ namespace Engine {
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
-		CORE_INFO("Runing Application");
+		CORE_INFO("Running Application");
 		
 		while (m_Running)
 		{
@@ -112,19 +109,19 @@ namespace Engine {
 			if (m_InEditer)
 			{
 				// render imgui layer
-				timer.Start("ImGui Render");
+				START_PROFILEI(timer, "ImGui Render");
 				m_ImGuiLayer->Begin();
 				for (Layer* layer : m_LayerStack)
 					layer->OnImGuiRender();
 				m_ImGuiLayer->End();
-				timer.End();
+				END_PROFILEI(timer);
 			}
 
 			// update the layer stack
-			timer.Start("Update Layers");
+			START_PROFILEI(timer, "Update Layers");
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
-			timer.End();
+			END_PROFILEI(timer);
 
 			// begin rendering
 			DebugRenderer::EndScene();
@@ -132,10 +129,10 @@ namespace Engine {
 
 			if (!m_Minimized)
 			{
-				timer.Start("Render Layers");
+				START_PROFILEI(timer, "Render Layers");
 				for (Layer* layer : m_LayerStack)
 					layer->OnRender();
-				timer.End();
+				END_PROFILEI(timer);
 			}
 
 			if (m_InEditer)

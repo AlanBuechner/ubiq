@@ -9,55 +9,27 @@
 #include "Types.h"
 #include "Time.h"
 
+#define TRACY_ENABLE
+#include "tracy/Tracy.hpp"
+
 namespace Profiler
 {
-	struct ProfileResult
-	{
-		const char* name;
-		double start, end;
-		uint32 ThreadID;
-		uint32 ProccessID;
-	};
-
-	struct InstrumentationSession
-	{
-		std::string Name;
-	};
 
 	// ---------------------- Instrumentor ---------------------- //
 	class Instrumentor
 	{
 	private:
-		InstrumentationSession* m_CurrentSession;
-		std::ofstream m_OutputStream;
-		uint64 m_ProfileCount;
+		std::string m_CurrentSessionName;
 		bool m_RecordData;
-		
-		std::mutex m_Mutex;
-
-		struct ThreadData
-		{
-			std::string name;
-			uint32 order = UINT32_MAX;
-		};
-
-		std::unordered_map<uint32, ThreadData> m_RegisteredThreads;
 
 	public:
 		Instrumentor(bool record = false)
-			: m_CurrentSession(nullptr), m_RecordData(record)
+			: m_CurrentSessionName(""), m_RecordData(record)
 		{}
 
 		void RecordData(bool record) { m_RecordData = record; }
 
-		void BeginSession(const std::string& name, const std::string& filepath = "results.json");
-		void EndSession();
-
-		void WriteProfile(const ProfileResult& result);
-
-
 		void RegisterThread(const std::string& name, uint32 order);
-		void WriteThread(const std::string& name, uint32 threadID, uint32 order);
 
 		static Instrumentor& Get();
 	};
@@ -68,40 +40,20 @@ namespace Profiler
 	class InstrumentationTimer
 	{
 	public:
-		InstrumentationTimer()
-		{}
+		void Start(const tracy::SourceLocationData* sourceLocationData);
 
-		void Start(const std::string& name, uint32 pid = 0)
-		{
-			m_Name = name;
-			m_Start = Time::GetTime();
-		}
-
-		void End()
-		{
-			m_End = Time::GetTime();
-			m_Elapsed = m_End - m_Start;
-
-			double start = (double)(m_Start * 1000000.0f);
-			double end = (double)(m_End * 1000000.0f);
-			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.c_str(), start, end, threadID, 0 };
-			
-			Instrumentor::Get().WriteProfile(result);
-		}
+		void End();
 
 	private:
-		double m_Start, m_End;
-		double m_Elapsed;
+		tracy::ScopedZone* m_ScopedZone = nullptr;
 		bool m_TimerRunning = false;
-		std::string m_Name;
 	};
 
 	class InstrumentationTimerScoped : protected InstrumentationTimer
 	{
 	public:
-		InstrumentationTimerScoped(const std::string& name)
-		{ Start(name); }
+		InstrumentationTimerScoped(const tracy::SourceLocationData* sourceLocationData)
+		{ Start(sourceLocationData); }
 
 		~InstrumentationTimerScoped()
 		{ End(); }
@@ -109,95 +61,15 @@ namespace Profiler
 
 #pragma endregion
 
-
-
-#pragma region Timers
-
-	template<typename Fn>
-	class Timer
-	{
-	public:
-		Timer(Fn&& func) :
-			m_Func(func)
-		{
-		}
-
-		void Start(const std::string& name, uint32 pid = 0)
-		{
-			m_Name = name;
-			m_Start = Time::GetTime();
-			m_PID = pid;
-		}
-
-		void End()
-		{
-			m_End = Time::GetTime();
-			m_Elapsed = m_End - m_Start;
-
-			double start = (double)(m_Start * 1000000.0f);
-			double end = (double)(m_End * 1000000.0f);
-			uint32 threadID = (uint32)std::hash<std::thread::id>{}(std::this_thread::get_id());
-			ProfileResult result = { m_Name.c_str(), start, end, threadID, m_PID };
-			m_Func(result);
-		}
-
-		double GetSeconds()
-		{
-			return m_Elapsed;
-		}
-
-		double GetMilliseconds()
-		{
-			return m_Elapsed * 1000.0f;
-		}
-
-		double GetMicroseconds()
-		{
-			return m_Elapsed * 1000000.0f;
-		}
-
-		void PrintTime()
-		{
-			DEBUG_INFO("{0} : {1}", GetMilliseconds(), m_Name);
-		}
-	private:
-		double m_Start;
-		double m_End;
-
-		double m_Elapsed;
-
-		uint32 m_PID;
-
-		std::string m_Name;
-
-		Fn m_Func;
-	};
-
-	template<typename Fn>
-	class TimerScoped : public Timer<Fn>
-	{
-	public:
-		TimerScoped(const std::string& name, Fn&& func, uint32 pid = 0) :
-			Timer<Fn>(func)
-		{
-			Timer<Fn>::Start(name, pid);
-		}
-
-		~TimerScoped()
-		{
-			End();
-		}
-	};
-
-#pragma endregion
-
-
 }
 
-#define CREATE_PROFILE() Profiler::Timer([&](Profiler::ProfileResult profileResult)
-#define CREATE_PROFILE_SCOPE(name) Profiler::TimerScoped timer##__LINE__(name, [&](Profiler::ProfileResult profileResult)
-#define CREATE_PROFILE_FUNCTION() CREATE_PROFILE_SCOPE(__FUNCSIG__)
+#define SOURCE_LOC_NAME TracyConcat(__tracy_source_location,TracyLine)
+#define CREATE_SOURCE_LOC(name) static constexpr tracy::SourceLocationData SOURCE_LOC_NAME { name, __FUNCTION__,  __FILE__, (uint32_t)TracyLine, 0 };
+#define CREATE_SOURCE_LOC_DYNAMIC(name) tracy::SourceLocationData SOURCE_LOC_NAME { std::string(name).c_str(), __FUNCTION__,  __FILE__, (uint32_t)TracyLine, 0 };
+#define CREATE_PROFILE_SCOPEI(name) CREATE_SOURCE_LOC(name); Profiler::InstrumentationTimerScoped __timer##__LINE__(&SOURCE_LOC_NAME);
+#define CREATE_PROFILE_SCOPEI_DYNAMIC(name) CREATE_SOURCE_LOC_DYNAMIC(name); Profiler::InstrumentationTimerScoped __timer##__LINE__(&SOURCE_LOC_NAME);
+#define CREATE_PROFILE_FUNCTIONI() CREATE_PROFILE_SCOPEI(__FUNCSIG__)
 
 #define CREATE_PROFILEI() Profiler::InstrumentationTimer();
-#define CREATE_PROFILE_SCOPEI(name) Profiler::InstrumentationTimerScoped timer##__LINE__(name);
-#define CREATE_PROFILE_FUNCTIONI() CREATE_PROFILE_SCOPEI(__FUNCSIG__)
+#define START_PROFILEI(profiler, name) CREATE_SOURCE_LOC(name); profiler.Start(&SOURCE_LOC_NAME);
+#define END_PROFILEI(profiler) profiler.End();

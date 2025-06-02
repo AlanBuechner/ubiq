@@ -156,7 +156,7 @@ namespace Engine
 		virtual void Update() override {
 			if (m_Func)
 			{
-				CREATE_PROFILE_SCOPEI(m_FuncName);
+				CREATE_PROFILE_SCOPEI_DYNAMIC(m_FuncName);
 				m_Pool->EachEntity([this](void* component) {
 					m_Func->Invoke(component, {});
 				});

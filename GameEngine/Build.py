@@ -45,11 +45,10 @@ includes = [
 	f"{includeDirs['ProjectManager']}",
 	f"{includeDirs['Utilities']}",
 	f"{includeDirs['Agility']}",
+	f"{includeDirs['tracy']}",
 ]
 
-sysIncludes = [
-
-]
+sysIncludes = []
 sysIncludes.extend(GetSysIncludes())
 
 defines = [

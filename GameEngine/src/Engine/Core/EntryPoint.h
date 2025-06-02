@@ -12,13 +12,10 @@ int main(int argc, char** argv)
 	Engine::Log::Init();
 
 	Profiler::Instrumentor::Get().RecordData(true);
-	Profiler::Instrumentor::Get().BeginSession("Startup", "startup.json");
 	Profiler::Instrumentor::Get().RegisterThread("Main", 0);
 	Engine::Application* app = CreateApplication();
-	Profiler::Instrumentor::Get().EndSession();
-	Profiler::Instrumentor::Get().BeginSession("Runtime", "runtime.json");
+
 	app->Run();
-	Profiler::Instrumentor::Get().EndSession();
 	delete app;
 }
 

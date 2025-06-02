@@ -164,11 +164,11 @@ namespace Engine
 		{
 			// copy commands
 			s_CopyFlag.Wait();
-			timer.Start("Copy");
+			START_PROFILEI(timer, "Copy");
 			GPUProfiler::StartFrame();
 			UploadPool* cachedUploadPool = resourceManager->UploadDataAndSwapPools();
-			timer.End();
 			s_CopyFlag.Clear();
+			END_PROFILEI(timer);
 
 			// swap deletion pool
 			ResourceDeletionPool* cachedDeletionPool = resourceManager->SwapDeletionPools();
@@ -176,7 +176,7 @@ namespace Engine
 			// rendering commands
 			s_RenderFlag.Wait();
 			//CORE_INFO("{0}", frame);
-			timer.Start("Render");
+			START_PROFILEI(timer, "Render");
 			s_MainCommandQueue->Submit(resourceManager->GetUploadCommandLists());
 			s_MainCommandQueue->Submit(s_MainCommandList);
 			s_MainCommandQueue->Build();
@@ -195,7 +195,7 @@ namespace Engine
 			s_MainCommandQueue->Await();
 			s_RenderFlag.Clear();
 			GPUProfiler::EndFrame();
-			timer.End();
+			END_PROFILEI(timer);
 			
 			// swap buffers
 			WindowManager::UpdateWindows();
