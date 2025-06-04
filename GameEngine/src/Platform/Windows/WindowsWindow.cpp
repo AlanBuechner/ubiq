@@ -63,6 +63,7 @@ namespace Engine
 
 	void Window::HandleEvents()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		MSG msg;
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&msg);
@@ -247,6 +248,7 @@ namespace Engine
 
 	LRESULT WINAPI WindowsWindow::HandleEventSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		// send events to imgui
 		if (Application::InEditer())
 			ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
@@ -279,6 +281,7 @@ namespace Engine
 
 	LRESULT WindowsWindow::HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		switch (msg)
 		{
 			// keyboard events

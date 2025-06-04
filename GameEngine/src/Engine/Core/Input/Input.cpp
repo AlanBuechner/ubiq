@@ -59,6 +59,7 @@ namespace Engine
 
 	void Input::UpdateKeyStateImpl()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		// keyboard
 		for (int i : m_ToUpdate)
 		{

@@ -131,6 +131,7 @@ namespace Engine
 
 	ShaderBlobs DirectX12ShaderCompiler::Compile(const std::string& code, const fs::path& file, ShaderType type)
 	{
+		CREATE_PROFILE_SCOPEI("Compile Shader");
 		const std::wstring typeStrings[] = { L"vs_6_5", L"ps_6_5", L"gs_6_5", L"cs_6_5", L"lib_6_8" };
 		const std::wstring& profile = typeStrings[(int)type]; // take the log2 of the type enum to convert from bit mask to index
 		//std::wstring profile = typeStrings[(int)log2((int)type)]; // take the log2 of the type enum to convert from bit mask to index
@@ -198,6 +199,7 @@ namespace Engine
 
 	void DirectX12ShaderCompiler::GetShaderParameters(const ShaderBlobs& blobs, const SectionInfo& section, Utils::Vector<Engine::ShaderParameter>& params, ShaderType type)
 	{
+		CREATE_PROFILE_SCOPEI("Get Shader Parameters");
 		if (!blobs.reflection)
 			return;
 
@@ -224,6 +226,7 @@ namespace Engine
 
 	void DirectX12ShaderCompiler::GetLibraryParameters(const ShaderBlobs& blobs, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
 	{
+		CREATE_PROFILE_SCOPEI("Get Library Parameters");
 		if (!blobs.reflection)
 			return;
 
@@ -256,6 +259,7 @@ namespace Engine
 
 	void DirectX12ShaderCompiler::GetInputLayout(const ShaderBlobs& blobs, Utils::Vector<ShaderInputElement>& inputElements)
 	{
+		CREATE_PROFILE_SCOPEI("Get Input Layout");
 		if (!blobs.reflection)
 			return;
 
@@ -287,6 +291,7 @@ namespace Engine
 
 	ID3D12RootSignature* DirectX12ShaderCompiler::GenRootSignature(Utils::Vector<ShaderParameter>& params)
 	{
+		CREATE_PROFILE_SCOPEI("Generate Root Signature");
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		D3D12_VERSIONED_ROOT_SIGNATURE_DESC rsd;
@@ -460,6 +465,8 @@ namespace Engine
 
 	void DirectX12ShaderCompiler::AddParameter(D3D12_SHADER_INPUT_BIND_DESC bindDesc, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
 	{
+		CREATE_PROFILE_SCOPEI("Add Parameter");
+		ANOTATE_PROFILEI("Parameter Name: " + std::string(bindDesc.Name));
 		ShaderParameter data;
 		data.shader = type;
 		data.name = bindDesc.Name;

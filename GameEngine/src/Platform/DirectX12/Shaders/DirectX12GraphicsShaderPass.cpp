@@ -68,9 +68,10 @@ namespace Engine
 
 	void DirectX12GraphicsShaderPass::Init()
 	{
-
+		CREATE_PROFILE_SCOPEI("Create Graphics Pass");
 
 		{ // Vertex Shader
+			CREATE_PROFILE_SCOPEI("Compile Vertex Shader");
 			SectionInfo& vsi = m_Src->m_Sections[m_PassConfig.vs];
 			const std::string& vsc = vsi.m_SectionCode.str();
 			if (!vsc.empty())
@@ -84,6 +85,7 @@ namespace Engine
 		}
 
 		{ // Pixel Shader
+			CREATE_PROFILE_SCOPEI("Compile Pixel Shader");
 			SectionInfo& psi = m_Src->m_Sections[m_PassConfig.ps];
 			const std::string& psc = psi.m_SectionCode.str();
 			if (!psc.empty())
@@ -98,6 +100,7 @@ namespace Engine
 		// Geometry Shader
 		if (!m_PassConfig.gs.empty())
 		{
+			CREATE_PROFILE_SCOPEI("Compile Geometry Shader");
 			SectionInfo& gsi = m_Src->m_Sections[m_PassConfig.gs];
 			const std::string gsc = gsi.m_SectionCode.str();
 			if (!gsc.empty())
@@ -122,6 +125,7 @@ namespace Engine
 
 	ID3D12PipelineState* DirectX12GraphicsShaderPass::CreatePiplineState(const Utils::Vector<TextureFormat>& formats)
 	{
+		CREATE_PROFILE_SCOPEI("Create Graphics PSO");
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		ID3D12PipelineState* state;

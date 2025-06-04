@@ -60,6 +60,7 @@ namespace Engine
 
 	void Material::Apply()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		m_Buffer->SetData(m_Data->GetData());
 	}
 
@@ -141,6 +142,8 @@ namespace Engine
 
 	Engine::Ref<Material> Material::Create(Ref<Shader> shader)
 	{
+		CREATE_PROFILE_FUNCTIONI();
+		ANOTATE_PROFILEI("Shader ID: " + std::to_string(shader->GetAssetID()));
 		Ref<Material> mat = CreateRef<Material>();
 		mat->m_Shader = shader;
 
@@ -157,6 +160,7 @@ namespace Engine
 
 	void Material::DefultInitalize()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		m_Data = CreateRef<MaterialData>(m_Shader->GetParams());
 		m_Buffer = ConstantBuffer::Create(m_Data->GetSize());
 		for (auto& p : m_Shader->GetParams())

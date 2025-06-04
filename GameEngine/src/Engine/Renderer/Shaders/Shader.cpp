@@ -16,6 +16,8 @@ namespace Engine
 
 	Shader::Shader(const std::string& code, const fs::path& file)
 	{
+		CREATE_PROFILE_FUNCTIONI();
+		ANOTATE_PROFILEI("File: " + file.string());
 		std::stringstream is(code);
 		Ref<ShaderSorce> src = ShaderCompiler::LoadFromSrc(is, file);
 

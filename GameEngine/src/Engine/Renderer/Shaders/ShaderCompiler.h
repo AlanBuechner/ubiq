@@ -226,6 +226,7 @@ namespace Engine
 
 	struct SectionInfo
 	{
+		std::string m_SectionName;
 		std::stringstream m_SectionCode;
 		std::unordered_map<std::string, SamplerInfo> m_Samplers;
 		std::unordered_set<std::string> m_RootConstants;

@@ -165,6 +165,7 @@ namespace Engine {
 
 	void Application::SendInputBuffer()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		for (Event* i : m_InputBuffer)
 		{
 			EventDispatcher dispatcher(i);

@@ -157,6 +157,7 @@ namespace Engine
 
 	Ref<ShaderSorce> ShaderCompiler::LoadFromSrc(std::istream& src, const fs::path& file)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		// create shader source
 		Ref<ShaderSorce> source = CreateRef<ShaderSorce>();
 		source->file = file;
@@ -167,17 +168,19 @@ namespace Engine
 
 		// get current context (default is config)
 		std::stringstream* currSS = &context.m_Sections["config"];
-
-		// parse sections
-		std::string line;
-		while (getline(src, line))
 		{
-			Utils::Vector<std::string> tokens = Tokenize(line);
+			CREATE_PROFILE_SCOPEI("Parse Sections");
+			// parse sections
+			std::string line;
+			while (getline(src, line))
+			{
+				Utils::Vector<std::string> tokens = Tokenize(line);
 
-			if (!tokens.Empty() && tokens[0] == "#section")
-				currSS = &context.m_Sections[tokens[1]];
-			else
-				*currSS << line << '\n';
+				if (!tokens.Empty() && tokens[0] == "#section")
+					currSS = &context.m_Sections[tokens[1]];
+				else
+					*currSS << line << '\n';
+			}
 		}
 
 		// get and compile config section
@@ -189,6 +192,7 @@ namespace Engine
 
 		// get and process common section
 		SectionInfo commonSection;
+		commonSection.m_SectionName = "common";
 		std::string commonSrc = materialCode + context.m_Sections["common"].str();
 		PreProcess(commonSrc, commonSection, context, context.m_File);
 
@@ -199,6 +203,7 @@ namespace Engine
 			{
 				// use common section as starting point
 				SectionInfo section = commonSection;
+				commonSection.m_SectionName = sectionSource.first;
 				
 				// get and process section code
 				std::string sectionSrc = sectionSource.second.str();
@@ -212,6 +217,9 @@ namespace Engine
 
 	void ShaderCompiler::PreProcess(std::string& src, SectionInfo& section, const ComiplerContext& context, const fs::path& filePath)
 	{
+		CREATE_PROFILE_FUNCTIONI();
+		ANOTATE_PROFILEI("File Path: " + filePath.string());
+		ANOTATE_PROFILEI("Section Name: " + section.m_SectionName);
 		std::stringstream ss(src);
 
 		std::string line;
@@ -328,6 +336,7 @@ namespace Engine
 
 	ShaderConfig ShaderCompiler::CompileConfig(const std::string& code)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		ShaderConfig config{};
 		std::istringstream iss(code);
 
@@ -425,6 +434,7 @@ namespace Engine
 
 	std::string ShaderCompiler::GenerateMaterialStruct(Utils::Vector<MaterialParameter>& params)
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		if (params.Empty())
 			return "";
 

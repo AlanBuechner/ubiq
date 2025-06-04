@@ -105,6 +105,7 @@ namespace Engine
 
 	void Cursor::Update()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		if (s_IsLocked)
 		{
 			HWND window = (HWND)Engine::Application::Get().GetWindow().GetNativeWindow();

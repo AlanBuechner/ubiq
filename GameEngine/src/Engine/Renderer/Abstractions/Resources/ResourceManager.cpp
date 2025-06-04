@@ -15,6 +15,8 @@ namespace Engine
 	UploadPage::UploadPage(uint32 size) :
 		m_Size(size), m_UsedMemory(0)
 	{
+		CREATE_PROFILE_SCOPEI("Create Upload Buffer");
+		ANOTATE_PROFILEI("Size: " + std::to_string(size));
 		m_UploadBuffer = UploadBufferResource::Create(size);
 		m_BasePointer = m_UploadBuffer->Map();
 		m_MemWrightPointer = m_BasePointer;
@@ -34,7 +36,10 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		// if the amount of memory requested to upload is greater than the amount of available space return nullptr 
 		if ((m_Size - m_UsedMemory) < size)
+		{
+			ANOTATE_PROFILEI("Page map failed");
 			return nullptr;
+		}
 
 		void* loc = m_MemWrightPointer;
 		memcpy(loc, data, size);
@@ -82,6 +87,8 @@ namespace Engine
 	void UploadPool::UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state)
 	{
 		CREATE_PROFILE_FUNCTIONI();
+		ANOTATE_PROFILEI("Upload Size: " + std::to_string(size));
+
 		if (dest == nullptr)
 		{
 			CORE_ERROR("attempting to upload data with null resource");
@@ -105,7 +112,6 @@ namespace Engine
 
 		if (loc == nullptr)
 		{
-			CREATE_PROFILE_SCOPEI("Create new upload page");
 			m_UploadPages.Push(new UploadPage(size * 2)); // create new page double the size needed
 			page = m_UploadPages.Back();
 			loc = page->Map(data, size);

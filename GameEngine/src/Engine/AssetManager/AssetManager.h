@@ -61,6 +61,8 @@ namespace Engine
 		template<class T>
 		Ref<T> GetAsset(UUID assetID)
 		{
+			CREATE_PROFILE_FUNCTIONI();
+			ANOTATE_PROFILEI("AssetID: " + std::to_string(assetID));
 			Ref<Asset> asset;
 
 			AssetPool& pool = m_CashedAssetPools[typeid(T).hash_code()];
@@ -89,12 +91,16 @@ namespace Engine
 		template<class T>
 		Ref<T> GetAsset(const fs::path& path)
 		{
+			CREATE_PROFILE_FUNCTIONI();
+			ANOTATE_PROFILEI(path.string());
 			return GetAsset<T>(GetAssetUUIDFromPath(path));
 		}
 
 		template<class T>
 		Ref<T> GetEmbededAsset(const fs::path& path)
 		{
+			CREATE_PROFILE_FUNCTIONI();
+			ANOTATE_PROFILEI(path.string());
 			Ref<Asset> asset;
 
 			AssetPool& pool = m_CashedAssetPools[typeid(T).hash_code()];

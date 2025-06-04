@@ -2,7 +2,7 @@
 #include "Engine/Core/Core.h"
 #include "Resources/FrameBuffer.h"
 #include "Resources/ResourceState.h"
-#include "Engine/Core/Flag.h"
+#include "Engine/Core/Threading/Flag.h"
 #include "Resources/UploadBuffer.h"
 
 namespace Engine

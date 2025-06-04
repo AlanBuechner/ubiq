@@ -62,6 +62,7 @@ namespace Engine {
 
 	void LayerStack::UpdateLayerChanges()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		// remove layers
 		for (Layer* layer : m_LayersToRemove)
 		{

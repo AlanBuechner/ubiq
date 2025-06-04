@@ -8,7 +8,6 @@ namespace Engine
 {
 	DirectX12UploadBufferResource::DirectX12UploadBufferResource(uint32 size)
 	{
-		CREATE_PROFILE_FUNCTIONI();
 		m_DefultState = ResourceState::CopySource;
 		m_Size = size;
 
