@@ -171,6 +171,15 @@ namespace Engine
 		m_TextureUploadQueue.push(uploadData);
 	}
 
+	void UploadPool::RecoredUploadCommands(Ref<CommandList> commandList)
+	{
+		CREATE_PROFILE_SCOPEI("Record Upload Commands");
+		commandList->StartRecording();
+		RecordBufferCommands(commandList);
+		RecordTextureCommands(commandList);
+		commandList->Close();
+	}
+
 	void UploadPool::RecordBufferCommands(Ref<CommandList> commandlist)
 	{
 		CREATE_PROFILE_FUNCTIONI();
@@ -206,7 +215,6 @@ namespace Engine
 
 		// record commands
 
-		commandlist->StartRecording(); // start recording 
 		GPUTimer::BeginEvent(commandlist, "Buffer Upload");
 		commandlist->ValidateStates(startb); // transition resources to copy dest
 
@@ -223,7 +231,6 @@ namespace Engine
 
 		commandlist->ValidateStates(endb); // transition resources back to original state
 		GPUTimer::EndEvent(commandlist);
-		commandlist->Close();
 
 	}
 
@@ -296,7 +303,6 @@ namespace Engine
 
 
 		// start recording 
-		commandlist->StartRecording(); // start recording
 		GPUTimer::BeginEvent(commandlist, "Texture Upload");
 		commandlist->ValidateStates(startb); // transition resources to copy
 
@@ -356,7 +362,6 @@ namespace Engine
 		commandlist->ValidateStates(textureBarrier); // transition resources back to original state
 		GPUTimer::EndEvent(commandlist);
 		GPUTimer::EndEvent(commandlist);
-		commandlist->Close();
 	}
 
 	ResourceManager::ResourceManager()
@@ -381,7 +386,7 @@ namespace Engine
 		return oldPool;
 	}
 
-	UploadPool* ResourceManager::UploadDataAndSwapPools()
+	UploadPool* ResourceManager::SwapPools()
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
@@ -389,13 +394,6 @@ namespace Engine
 
 		UploadPool* pool = m_UploadPool;
 		m_UploadPool = new UploadPool();
-
-		{
-			CREATE_PROFILE_SCOPEI("Record commands");
-			pool->RecordBufferCommands(m_BufferCopyCommandList);
-			pool->RecordTextureCommands(m_TextureCopyCommandList);
-
-		}
 
 		return pool;
 	}

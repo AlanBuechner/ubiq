@@ -74,6 +74,8 @@ namespace Engine
 
 		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format);
 
+		void RecoredUploadCommands(Ref<CommandList> commandList);
+
 		void RecordBufferCommands(Ref<CommandList> commandList);
 		void RecordTextureCommands(Ref<CommandList> commandList);
 
@@ -98,7 +100,7 @@ namespace Engine
 
 		// records upload commands and create new upload pool
 		// returns upload pool to be cached until commandlists have been executed
-		UploadPool* UploadDataAndSwapPools();
+		UploadPool* SwapPools();
 
 		void UploadBuffer(GPUResource* dest, const void* data, uint32 size, ResourceState state) { UploadBufferRegion(dest, 0, data, size, state); }
 		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state) { m_UploadPool->UploadBufferRegion(dest, offset, data, size, state); }
@@ -106,8 +108,6 @@ namespace Engine
 
 		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format)
 			{ m_UploadPool->UploadTexture(dest, src, width, height, numMips, state, format); }
-
-		Utils::Vector<Ref<CommandList>> GetUploadCommandLists() { return { m_BufferCopyCommandList, m_TextureCopyCommandList }; }
 
 		void ScheduleResourceDeletion(GPUResource* resource) { m_DeletionPool->m_Resources.Push(resource); }
 		void ScheduleHandleDeletion(Descriptor* descriptor) { m_DeletionPool->m_Descriptors.Push(descriptor); }
@@ -117,9 +117,6 @@ namespace Engine
 	protected:
 		ResourceDeletionPool* m_DeletionPool;
 		UploadPool* m_UploadPool;
-
-		Ref<CommandList> m_BufferCopyCommandList;
-		Ref<CommandList> m_TextureCopyCommandList;
 
 	};
 }

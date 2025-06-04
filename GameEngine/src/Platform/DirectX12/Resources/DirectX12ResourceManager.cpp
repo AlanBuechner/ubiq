@@ -21,10 +21,6 @@ namespace Engine
 		s_RTVHeap = std::make_shared<DirectX12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, false);
 		s_DSVHeap = std::make_shared<DirectX12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, false);
 		s_SamplerHeap = std::make_shared<DirectX12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, true);
-
-		//m_CommandQueue = std::dynamic_pointer_cast<DirectX12CommandQueue>(CommandQueue::Create(CommandQueue::Type::Direct));
-		m_BufferCopyCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandList::Direct));
-		m_TextureCopyCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandList::Direct));
 	}
 
 	DirectX12ResourceManager::~DirectX12ResourceManager()

@@ -15,6 +15,7 @@
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
 Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
 Engine::Ref<Engine::CommandList> Engine::Renderer::s_MainCommandList;
+Engine::Ref<Engine::CommandList> Engine::Renderer::s_UploadCommandList;
 Engine::RendererAPI Engine::Renderer::s_Api = Engine::RendererAPI::DirectX12;
 Profiler::InstrumentationTimer Engine::Renderer::s_Timer = CREATE_PROFILEI();
 
@@ -44,6 +45,7 @@ namespace Engine
 		// graphics command queue
 		s_MainCommandQueue = CommandQueue::Create(CommandQueue::Type::Direct);
 		s_MainCommandList = CommandList::Create(CommandList::Direct);
+		s_UploadCommandList = CommandList::Create(CommandList::Direct);
 
 		// copy command queue
 
@@ -140,27 +142,23 @@ namespace Engine
 	void Renderer::Render()
 	{
 		CREATE_PROFILE_SCOPEI("Render Frame");
-		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
 		Ref<ResourceManager> resourceManager = s_Context->GetResourceManager();
 
 		// swap deletion pool
 		ResourceDeletionPool* cachedDeletionPool = resourceManager->SwapDeletionPools();
+		UploadPool* cachedUploadPool = resourceManager->SwapPools();
 
 		// copy commands
-		START_PROFILEI(timer, "Copy");
-		UploadPool* cachedUploadPool = resourceManager->UploadDataAndSwapPools();
-		END_PROFILEI(timer);
+		cachedUploadPool->RecoredUploadCommands(s_UploadCommandList);
 
 		// rendering commands
-		START_PROFILEI(timer, "Render");
 		GPUProfiler::StartFrame();
-		s_MainCommandQueue->Submit(resourceManager->GetUploadCommandLists());
+		s_MainCommandQueue->Submit(s_UploadCommandList);
 		s_MainCommandQueue->Submit(s_MainCommandList);
 		s_MainCommandQueue->Build();
 		s_MainCommandQueue->Execute();
 		s_MainCommandQueue->Await();
 		GPUProfiler::EndFrame();
-		END_PROFILEI(timer);
 
 		// swap buffers
 		WindowManager::UpdateWindows();
