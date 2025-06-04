@@ -8,7 +8,7 @@
 #include "Utils/Performance.h"
 
 #include "Engine/Core/Threading/Flag.h"
-#include <thread>
+#include "Engine/Core/Threading/JobSystem.h"
 
 namespace Engine
 {
@@ -35,7 +35,6 @@ namespace Engine
 		static void BeginFrame();
 		static void EndFrame();
 		static void WaitForRender();
-		static void WaitForSwap();
 
 		static void Build(Ref<CommandList> commandList);
 
@@ -73,11 +72,7 @@ namespace Engine
 
 		static Profiler::InstrumentationTimer s_Timer;
 
-		static std::thread s_RenderThread;
-
-		static Flag s_RenderFlag;
-		static Flag s_SwapFlag;
-		static Flag s_CopyFlag;
+		static NamedJobThread* s_RenderThread;
 
 		static Ref<Texture2D> s_WhiteTexture;
 		static Ref<Texture2D> s_BlackTexture;

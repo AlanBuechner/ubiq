@@ -13,11 +13,13 @@ namespace Engine
 
 	void CommandQueue::Submit(Ref<CommandList> commandList)
 	{
+		CREATE_PROFILE_SCOPEI("Submit Command List");
 		m_Commands.Push(commandList);
 	}
 
 	void CommandQueue::Submit(Utils::Vector<Ref<CommandList>> commandLists)
 	{
+		CREATE_PROFILE_SCOPEI("Submit Command Lists");
 		m_Commands.Reserve(commandLists.Count());
 		for(uint32 i = 0; i < commandLists.Count(); i++)
 			m_Commands.Push(commandLists[i]);

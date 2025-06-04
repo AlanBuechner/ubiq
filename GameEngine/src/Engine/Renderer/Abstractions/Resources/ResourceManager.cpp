@@ -27,8 +27,6 @@ namespace Engine
 	{
 		m_UploadBuffer->UnMap();
 		delete m_UploadBuffer;
-		if(Renderer::GetContext())
-			Renderer::GetContext()->GetResourceManager()->ScheduleResourceDeletion(m_UploadBuffer);
 	}
 
 	void* UploadPage::Map(const void* data, uint32 size)

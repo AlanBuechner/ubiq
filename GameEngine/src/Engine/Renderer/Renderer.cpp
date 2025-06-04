@@ -26,11 +26,7 @@ Engine::Ref<Engine::Shader> Engine::Renderer::s_BlitShader;
 
 Engine::Ref<Engine::Material> Engine::Renderer::s_DefultMaterial;
 
-std::thread Engine::Renderer::s_RenderThread;
-
-Engine::Flag Engine::Renderer::s_RenderFlag;
-Engine::Flag Engine::Renderer::s_SwapFlag;
-Engine::Flag Engine::Renderer::s_CopyFlag;
+Engine::NamedJobThread* Engine::Renderer::s_RenderThread;
 
 namespace Engine
 {
@@ -54,10 +50,7 @@ namespace Engine
 		Renderer2D::Init();
 		DebugRenderer::Init();
 
-		s_CopyFlag.Clear();
-		s_RenderFlag.Clear();
-		s_SwapFlag.Signal();
-		s_RenderThread = std::thread(&Renderer::Render);
+		s_RenderThread = JobSystem::AddNamedJob("Render Thread", &Renderer::Render);
 
 		uint32 textureData;
 
@@ -107,7 +100,7 @@ namespace Engine
 		s_ScreenMesh.reset();
 		s_DefultMaterial.reset();
 
-		s_RenderThread.join();
+		s_RenderThread->Wait();
 		Renderer2D::Destroy();
 		DebugRenderer::Destroy();
 
@@ -120,8 +113,6 @@ namespace Engine
 	void Renderer::BeginFrame()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		s_CopyFlag.Wait(false);
-		s_CopyFlag.Signal();
 		
 		Renderer::GetMainCommandList()->StartRecording();
 		GPUTimer::BeginEvent(s_MainCommandList, "MainCommandList");
@@ -130,22 +121,14 @@ namespace Engine
 	void Renderer::EndFrame()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		WaitForRender();
-		WaitForSwap();
 		GPUTimer::EndEvent(s_MainCommandList);
 		GetMainCommandList()->Close();
-		s_RenderFlag.Signal();
-		s_SwapFlag.Clear();
+		s_RenderThread->Invoke();
 	}
 
 	void Renderer::WaitForRender()
 	{
-		s_RenderFlag.Wait(false);
-	}
-
-	void Renderer::WaitForSwap()
-	{
-		s_SwapFlag.Wait();
+		s_RenderThread->Wait();
 	}
 
 	void Renderer::Build(Ref<CommandList> commandList)
@@ -156,59 +139,35 @@ namespace Engine
 
 	void Renderer::Render()
 	{
-		Profiler::Instrumentor::Get().RegisterThread("Render", 1);
+		CREATE_PROFILE_SCOPEI("Render Frame");
 		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
 		Ref<ResourceManager> resourceManager = s_Context->GetResourceManager();
-		static int frame = 0;
-		while (Application::Get().IsRunning())
-		{
-			// copy commands
-			s_CopyFlag.Wait();
-			START_PROFILEI(timer, "Copy");
-			GPUProfiler::StartFrame();
-			UploadPool* cachedUploadPool = resourceManager->UploadDataAndSwapPools();
-			s_CopyFlag.Clear();
-			END_PROFILEI(timer);
 
-			// swap deletion pool
-			ResourceDeletionPool* cachedDeletionPool = resourceManager->SwapDeletionPools();
+		// swap deletion pool
+		ResourceDeletionPool* cachedDeletionPool = resourceManager->SwapDeletionPools();
 
-			// rendering commands
-			s_RenderFlag.Wait();
-			//CORE_INFO("{0}", frame);
-			START_PROFILEI(timer, "Render");
-			s_MainCommandQueue->Submit(resourceManager->GetUploadCommandLists());
-			s_MainCommandQueue->Submit(s_MainCommandList);
-			s_MainCommandQueue->Build();
-#if defined(RELEASE)
-			try 
-			{
-				s_MainCommandQueue->Execute();
-			}
-			catch (...)
-			{
-				CORE_ERROR("Failed To Render the Scene");
-			}
-#else
-			s_MainCommandQueue->Execute();
-#endif
-			s_MainCommandQueue->Await();
-			s_RenderFlag.Clear();
-			GPUProfiler::EndFrame();
-			END_PROFILEI(timer);
-			
-			// swap buffers
-			WindowManager::UpdateWindows();
+		// copy commands
+		START_PROFILEI(timer, "Copy");
+		UploadPool* cachedUploadPool = resourceManager->UploadDataAndSwapPools();
+		END_PROFILEI(timer);
 
-			// prepare for next frame
-			delete cachedUploadPool;
-			delete cachedDeletionPool;
-			
-			s_SwapFlag.Signal();
+		// rendering commands
+		START_PROFILEI(timer, "Render");
+		GPUProfiler::StartFrame();
+		s_MainCommandQueue->Submit(resourceManager->GetUploadCommandLists());
+		s_MainCommandQueue->Submit(s_MainCommandList);
+		s_MainCommandQueue->Build();
+		s_MainCommandQueue->Execute();
+		s_MainCommandQueue->Await();
+		GPUProfiler::EndFrame();
+		END_PROFILEI(timer);
 
-			frame++;
-		}
-		
+		// swap buffers
+		WindowManager::UpdateWindows();
+
+		// prepare for next frame
+		delete cachedUploadPool;
+		delete cachedDeletionPool;
 	}
 
 }

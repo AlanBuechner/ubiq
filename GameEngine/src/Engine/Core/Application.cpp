@@ -145,7 +145,7 @@ namespace Engine {
 			// clean assets
 			m_AssetManager.Clean();
 		}
-		Renderer::WaitForSwap(); // wait for last frame to finish
+		Renderer::WaitForRender();
 	}
 
 	void Application::Close()
@@ -208,7 +208,6 @@ namespace Engine {
 	bool Application::OnWindowResize(WindowResizeEvent* e)
 	{
 		Renderer::WaitForRender();
-		Renderer::WaitForSwap();
 
 		m_Window->GetSwapChain()->Resize(e->GetWidth(), e->GetHeight());
 

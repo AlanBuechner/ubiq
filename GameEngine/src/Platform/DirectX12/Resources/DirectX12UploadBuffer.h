@@ -14,7 +14,6 @@ namespace Engine
 		virtual void* Map() override;
 		virtual void UnMap() override;
 
-
 		ID3D12Resource* GetBuffer() { return m_Buffer; }
 
 	protected:

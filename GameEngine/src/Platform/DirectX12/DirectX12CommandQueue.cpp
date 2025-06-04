@@ -46,6 +46,7 @@ namespace Engine
 
 	void DirectX12CommandQueue::Build()
 	{
+		CREATE_PROFILE_SCOPEI("Build Command Lists");
 		m_DXCommandLists.Reserve(m_Commands.Count());
 		for (uint32 i = 0; i < m_Commands.Count(); i++)
 		{
@@ -79,6 +80,7 @@ namespace Engine
 
 	void DirectX12CommandQueue::Await()
 	{
+		CREATE_PROFILE_SCOPEI("Wait For GPU");
 		m_Fence->SetEventOnCompletion(m_SignalCount, m_EventHandle); // call event when fence val has been reached
 		WaitForSingleObject(m_EventHandle, INFINITE); // wait for event to be triggered
 		m_SignalCount = 0;
