@@ -11,8 +11,13 @@ namespace Engine
 	class WindowsWindow : public Window
 	{
 	public:
-		WindowsWindow(const WindowProps& props);
 		virtual ~WindowsWindow();
+
+		virtual void Setup(const WindowProps& props) override;
+
+		virtual void Close() override { m_RequestClose = true; }
+
+		virtual void HandleEvents() override;
 
 		virtual void OnUpdate() override; // updates the window
 
@@ -20,7 +25,6 @@ namespace Engine
 		inline virtual unsigned int GetHeight() const override { return m_Data.Height; } // get the hight of the window
 
 		// Window attributes
-		inline virtual void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 		virtual void SetVSync(bool enabled) override; // enables v-sync
 		virtual bool IsVSync() const override; // returns wither or not v-sync is enabled
 
@@ -41,10 +45,6 @@ namespace Engine
 		
 		virtual Ref<SwapChain> GetSwapChain() const override { return m_SwapChain; }
 
-
-	protected:
-		virtual void Destroy() override; // closes the window
-
 	private:
 		static LRESULT WINAPI HandleEventSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam); // handles setting up events
 		static LRESULT WINAPI HandleEventThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam); // sends events to the corresponding window to be handled
@@ -60,12 +60,12 @@ namespace Engine
 			uint32 Width, Height; // windows width and hight
 			bool FullScreen, Maximized, Minimized;
 			bool VSync; // v-sync
-
-			EventCallbackFn EventCallback;
 		};
 
 		WINDOWPLACEMENT m_wpPrev = { sizeof(m_wpPrev) };
 		WindowData m_Data;
+
+		bool m_RequestClose = false;
 
 		struct {
 			RECT close;

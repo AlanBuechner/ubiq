@@ -37,9 +37,9 @@ namespace Engine {
 
 		START_PROFILEI(timer, "Create Window");
 		Window::Init();
+		Window::SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
 		m_Window = Window::Create({ name, 1280, 720, true, false }); // create a window
 		GPUProfiler::SetTragetWindow(m_Window->GetNativeWindow());
-		m_Window->SetEventCallback(BIND_EVENT_FN(&Application::OnEvent)); // set the event call back
 		END_PROFILEI(timer);
 
 		LoadProject();
@@ -69,6 +69,7 @@ namespace Engine {
 
 	void Application::OnEvent(Event* e)
 	{
+		std::lock_guard g(m_InputBufferMutex);
 		m_InputBuffer.Push(e);
 	}
 
@@ -100,7 +101,7 @@ namespace Engine {
 
 			Time::UpdateDeltaTime();
 
-			Window::HandleEvents();
+			//Window::HandleEvents();
 			Input::UpdateKeyState(); // update the key stats
 			SendInputBuffer(); // sent the input buffer through the layer stack
 			Cursor::Update();
@@ -165,8 +166,14 @@ namespace Engine {
 
 	void Application::SendInputBuffer()
 	{
+		// copy input event buffer
+		m_InputBufferMutex.lock();
+		Utils::Vector<Event*> events = m_InputBuffer;
+		m_InputBuffer.Clear();
+		m_InputBufferMutex.unlock();
+
 		CREATE_PROFILE_FUNCTIONI();
-		for (Event* i : m_InputBuffer)
+		for (Event* i : events)
 		{
 			EventDispatcher dispatcher(i);
 			dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(&Application::OnWindowClose));
@@ -181,11 +188,11 @@ namespace Engine {
 		for (uint32 k = 0; k < Engine::KeyCode::SIZE; k += 1)
 		{
 			if (Input::GetKeyPressed(k) || Input::GetKeyDown(k))
-				m_InputBuffer.Push(new KeyDownEvent(k));
+				events.Push(new KeyDownEvent(k));
 		}
 
 
-		for (Event** i = &*m_InputBuffer.begin(); i != &*m_InputBuffer.end(); ++i)
+		for (Event** i = &*events.begin(); i != &*events.end(); ++i)
 		{
 			for (Layer** it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 			{
@@ -196,7 +203,7 @@ namespace Engine {
 			delete *i;
 		}
 
-		m_InputBuffer.Clear();
+		
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent* e)

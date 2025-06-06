@@ -65,6 +65,7 @@ namespace Engine
 
 		Ref<Window> m_Window;
 		Utils::Vector<Event*> m_InputBuffer;
+		std::mutex m_InputBufferMutex;
 		bool m_Running = true;
 		bool m_Minimized = false;
 

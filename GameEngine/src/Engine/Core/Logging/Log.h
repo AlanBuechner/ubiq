@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utils/Common.h"
 #include "Utils/Types.h"
 #include "Utils/Vector.h"
 #include <iostream>
@@ -9,7 +10,6 @@
 #include <charconv>
 #include <type_traits>
 #include <sstream>
-
 
 namespace Engine
 {
@@ -213,7 +213,11 @@ namespace Engine
 					}
 				}
 				SetConsoleColor(level);
-				std::cout << ss.str() << std::endl;
+				std::string msg = ss.str();
+				std::cout << msg << std::endl;
+
+				uint32 tracyColors[] = { 0xffffff, 0x34eb40, 0xdeeb34, 0xeb3434 };
+				TracyMessageC(msg.c_str(), msg.size(), tracyColors[(uint32)level]);
 				SetConsoleColor(Level::Trace); // reset console window color
 
 			}

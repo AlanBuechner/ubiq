@@ -1,6 +1,7 @@
 // https://gist.github.com/TheCherno/31f135eea6ee729ab5f26a6908eb3a5e#file-instrumentor-h
 
 #pragma once
+#include "Common.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -8,9 +9,6 @@
 #include <unordered_map>
 #include "Types.h"
 #include "Time.h"
-
-#define TRACY_ENABLE
-#include "tracy/Tracy.hpp"
 
 namespace Profiler
 {

@@ -30,11 +30,15 @@ namespace Engine
 		using EventCallbackFn = std::function<void(Event*)>;
 
 		virtual ~Window() {}
-		virtual void Destroy() = 0;
+
+		virtual void Setup(const WindowProps& props) = 0;
+
+		virtual void Close() = 0;
 
 		static void Init();
 		static void Shutdown();
-		static void HandleEvents();
+
+		virtual void HandleEvents() = 0;
 
 		virtual void OnUpdate() = 0; // updates the window
 
@@ -42,7 +46,6 @@ namespace Engine
 		virtual uint32 GetHeight() const = 0; // gets the hight of the window
 
 		// Window attributes
-		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
@@ -63,7 +66,12 @@ namespace Engine
 
 		virtual Ref<SwapChain> GetSwapChain() const = 0;
 
+		static void SetEventCallback(const EventCallbackFn& callback) { s_EventCallback = callback; }
+
 		static Ref<Window> Create(const WindowProps& props = WindowProps()); // creates a new window
+
+	protected:
+		static EventCallbackFn s_EventCallback;
 	};
 
 	class WindowManager

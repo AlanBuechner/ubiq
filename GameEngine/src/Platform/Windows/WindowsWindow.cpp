@@ -9,6 +9,8 @@
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Core/Cursor.h"
 
+#include "Engine/Core/Threading/JobSystem.h"
+
 #include "Utils/Utils.h"
 
 #include <dwmapi.h>
@@ -52,7 +54,6 @@ namespace Engine
 		childClass.lpszClassName = TEXT("Child Window");
 		childClass.hIconSm = NULL;
 		RegisterClassEx(&childClass);
-
 	}
 
 	void Window::Shutdown()
@@ -61,17 +62,18 @@ namespace Engine
 		UnregisterClass(TEXT("Child Window"), GetModuleHandle(nullptr));
 	}
 
-	void Window::HandleEvents()
+	WindowsWindow::~WindowsWindow()
 	{
-		CREATE_PROFILE_FUNCTIONI();
-		MSG msg;
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+		if (m_Window)
+		{
+			m_SwapChain->CleanUp();
+			m_SwapChain.reset();
+			DestroyWindow(m_Window);
+			m_Window = nullptr;
 		}
 	}
 
-	WindowsWindow::WindowsWindow(const WindowProps& props)
+	void WindowsWindow::Setup(const WindowProps& props)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		auto time = CREATE_PROFILEI();
@@ -136,19 +138,17 @@ namespace Engine
 		m_SwapChain->SetVSync(m_Data.VSync);
 	}
 
-	WindowsWindow::~WindowsWindow()
+	void WindowsWindow::HandleEvents()
 	{
-		Destroy(); // closes the window
-	}
-
-	void WindowsWindow::Destroy()
-	{
-		if (m_Window)
+		while (!m_RequestClose) 
 		{
-			m_SwapChain->CleanUp();
-			m_SwapChain.reset();
-			DestroyWindow(m_Window);
-			m_Window = nullptr;
+			WaitMessage();
+			MSG msg;
+			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 		}
 	}
 
@@ -281,30 +281,30 @@ namespace Engine
 
 	LRESULT WindowsWindow::HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		CREATE_PROFILE_FUNCTIONI();
+		CREATE_PROFILE_SCOPEI("Handle Message");
 		switch (msg)
 		{
 			// keyboard events
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN: // key down
-			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new KeyPressedEvent(static_cast<unsigned char>(wParam)));
+			if (s_EventCallback == nullptr) break;
+			s_EventCallback(new KeyPressedEvent(static_cast<unsigned char>(wParam)));
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP: // key up
-			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new KeyReleasedEvent(static_cast<unsigned char>(wParam)));
+			if (s_EventCallback == nullptr) break;
+			s_EventCallback(new KeyReleasedEvent(static_cast<unsigned char>(wParam)));
 			break;
 		case WM_CHAR:
-			if(m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new KeyTypedEvent(static_cast<unsigned char>(wParam)));
+			if(s_EventCallback == nullptr) break;
+			s_EventCallback(new KeyTypedEvent(static_cast<unsigned char>(wParam)));
 			break;
 
 			// mouse
 		case WM_MOUSELEAVE:
 		case WM_MOUSEMOVE: // mouse move
 		{
-			if (m_Data.EventCallback == nullptr) break;
+			if (s_EventCallback == nullptr) break;
 
 			HWND window = (HWND)Engine::Application::Get().GetWindow().GetNativeWindow();
 
@@ -341,41 +341,41 @@ namespace Engine
 			// update prev mouse position
 			Input::SetPrevMousePosition(mousePos);
 
-			m_Data.EventCallback(new MouseMovedEvent(pt.x, pt.y, mouseDelta.x, mouseDelta.y));
+			s_EventCallback(new MouseMovedEvent(pt.x, pt.y, mouseDelta.x, mouseDelta.y));
 			break;
 		}
 		case WM_MOUSEWHEEL: // scroll wheel
 		{
-			if(m_Data.EventCallback == nullptr) break;
+			if(s_EventCallback == nullptr) break;
 			float delta = GET_WHEEL_DELTA_WPARAM(wParam);
-			m_Data.EventCallback(new MouseScrolledEvent(0, delta));
+			s_EventCallback(new MouseScrolledEvent(0, delta));
 			break;
 		}
 
 		case WM_LBUTTONDOWN: // left mouse down
-			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new MouseButtonPressedEvent(VK_LBUTTON));
+			if (s_EventCallback == nullptr) break;
+			s_EventCallback(new MouseButtonPressedEvent(VK_LBUTTON));
 			break;
 		case WM_RBUTTONDOWN: // right mouse down
-			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new MouseButtonPressedEvent(VK_RBUTTON));
+			if (s_EventCallback == nullptr) break;
+			s_EventCallback(new MouseButtonPressedEvent(VK_RBUTTON));
 			break;
 		case WM_MBUTTONDOWN: // middle mouse down
-			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new MouseButtonPressedEvent(VK_MBUTTON));
+			if (s_EventCallback == nullptr) break;
+			s_EventCallback(new MouseButtonPressedEvent(VK_MBUTTON));
 			break;
 
 		case WM_LBUTTONUP: // left moues up
-			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new MouseButtonReleasedEvent(VK_LBUTTON));
+			if (s_EventCallback == nullptr) break;
+			s_EventCallback(new MouseButtonReleasedEvent(VK_LBUTTON));
 			break;
 		case WM_RBUTTONUP: // right mouse up
-			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new MouseButtonReleasedEvent(VK_RBUTTON));
+			if (s_EventCallback == nullptr) break;
+			s_EventCallback(new MouseButtonReleasedEvent(VK_RBUTTON));
 			break;
 		case WM_MBUTTONUP: // middle mouse up
-			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new MouseButtonReleasedEvent(VK_MBUTTON));
+			if (s_EventCallback == nullptr) break;
+			s_EventCallback(new MouseButtonReleasedEvent(VK_MBUTTON));
 			break;
 		case WM_INPUT: {
 			unsigned size = 0;
@@ -385,7 +385,7 @@ namespace Engine
 
 			if (raw.header.dwType == RIM_TYPEMOUSE && (raw.data.mouse.lLastX != 0 || raw.data.mouse.lLastY != 0)) {
 				//MouseMovedEvent* deltaMousePostionEvent = new MouseMovedEvent(MouseMoveBindMode::DeltaPosition, (float)raw.data.mouse.lLastX, (float)raw.data.mouse.lLastY); // creates new mouse moved event
-				//m_Data.EventCallback(deltaMousePostionEvent);
+				//s_EventCallback(deltaMousePostionEvent);
 			}
 			break;
 		}
@@ -417,16 +417,17 @@ namespace Engine
 			m_Data.Height = HIWORD(lParam);
 			// resize swap chain
 
-			if (m_Data.EventCallback == nullptr) break;
-			m_Data.EventCallback(new WindowResizeEvent(m_Data.Width, m_Data.Height));
+			if (s_EventCallback == nullptr) break;
+			//s_EventCallback(new WindowResizeEvent(m_Data.Width, m_Data.Height));
 			//m_SwapChain->Resize(m_Data.Width, m_Data.Height);
 			break;
 		}
 		case WM_KILLFOCUS: // window remove focuses event
 			break;
 		case WM_CLOSE: // window close event
-			if (m_Data.EventCallback != nullptr)
-				m_Data.EventCallback(new WindowCloseEvent());
+			m_RequestClose = true;
+			if (s_EventCallback != nullptr)
+				s_EventCallback(new WindowCloseEvent());
 			return 0; // stop DefWindowProc from being called
 			break;
 		}
