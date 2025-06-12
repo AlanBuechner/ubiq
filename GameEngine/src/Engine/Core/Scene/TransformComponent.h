@@ -61,6 +61,8 @@ namespace Engine
 		void UpdateHierarchyGlobalTransform();
 		FUNCTION()
 		void UpdateTransformEvent();
+		FUNCTION()
+		void ClearDirtyFlag();
 
 	private:
 		PROPERTY(set = SetPosition) Math::Vector3 m_Position = { 0.0f, 0.0f, 0.0f };

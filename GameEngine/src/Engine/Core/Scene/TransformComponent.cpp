@@ -21,6 +21,20 @@ namespace Engine
 		return ChashedGloableTransform;
 	}
 
+	void TransformComponent::SetGlobalTransformFromMatrix(Math::Mat4 transform)
+	{
+		CREATE_PROFILE_FUNCTIONI();
+		Math::Mat4 localTranform = transform;
+		if (GetParent())
+		{
+			Math::Mat4 parentTransform = GetParent().GetTransform().GetGlobalTransform();
+			Math::Mat4 invParentTransform = Math::Inverse(parentTransform);
+			localTranform = invParentTransform * transform;
+		}
+
+		Math::DecomposeTransform(localTranform, m_Position, m_Rotation, m_Scale);
+		Dirty();
+	}
 	
 	void TransformComponent::AddChild(Entity child)
 	{
@@ -133,19 +147,9 @@ namespace Engine
 		}
 	}
 
-	void TransformComponent::SetGlobalTransformFromMatrix(Math::Mat4 transform)
+	void TransformComponent::ClearDirtyFlag()
 	{
-		CREATE_PROFILE_FUNCTIONI();
-		Math::Mat4 localTranform = transform;
-		if (GetParent())
-		{
-			Math::Mat4 parentTransform = GetParent().GetTransform().GetGlobalTransform();
-			Math::Mat4 invParentTransform = Math::Inverse(parentTransform);
-			localTranform = invParentTransform * transform;
-		}
-
-		Math::DecomposeTransform(localTranform, m_Position, m_Rotation, m_Scale);
-		Dirty();
+		m_DirtyThisFrame = false;
 	}
 
 	// ------------------- Converter ------------------- //
