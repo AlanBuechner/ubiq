@@ -45,12 +45,15 @@ namespace Engine
 
 	struct UploadBufferData
 	{
-		GPUResource* destResource;
-		GPUResource* uploadResource;
-		uint64 destOffset;
-		uint64 srcOffset;
-		uint32 size;
-		ResourceState state;
+		GPUResource* destResource = nullptr;
+		/* used if data is to be copied into intermediate buffer on render thread before upload. nullptr if copying from existing resource */
+		void* data = nullptr;
+		/* used if data is to be copied from existing resource. nullptr if using render thread upload buffer */
+		GPUResource* uploadResource = nullptr;
+		uint64 destOffset = 0;
+		uint64 srcOffset = 0; // 0 if using data is not nullptr
+		uint32 size = 0;
+		ResourceState state = ResourceState::Unknown;
 	};
 
 	struct UploadTextureData
@@ -69,7 +72,12 @@ namespace Engine
 	public:
 		~UploadPool();
 
-		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state);
+		void SubmitBuffer(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state = ResourceState::Unknown);
+
+		void* LockBuffer(uint32 size);
+		void UnlockBuffer(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state = ResourceState::Unknown);
+
+		void UploadBufferRegion(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state = ResourceState::Unknown);
 		void CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state);
 
 		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format);
@@ -82,9 +90,9 @@ namespace Engine
 		std::mutex& GetUploadMutex() { return m_UploadMutex; }
 
 	private:
-		Utils::Vector<UploadPage*> m_UploadPages;
+		UploadPage* m_UploadPage;
 
-		std::queue<UploadBufferData> m_BufferUploadQueue;
+		Utils::Vector<UploadBufferData> m_BufferUploadQueue; // data needs to be deleted when dequeued
 		std::queue<UploadTextureData> m_TextureUploadQueue;
 		std::mutex m_UploadMutex;
 	};
@@ -102,8 +110,8 @@ namespace Engine
 		// returns upload pool to be cached until commandlists have been executed
 		UploadPool* SwapPools();
 
-		void UploadBuffer(GPUResource* dest, const void* data, uint32 size, ResourceState state) { UploadBufferRegion(dest, 0, data, size, state); }
-		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state) { m_UploadPool->UploadBufferRegion(dest, offset, data, size, state); }
+		void UploadBuffer(GPUResource* dest, const void* data, uint32 size, ResourceState state = ResourceState::Unknown) { UploadBufferRegion(dest, 0, data, size, state); }
+		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state = ResourceState::Unknown) { m_UploadPool->UploadBufferRegion(dest, offset, data, size, state); }
 		void CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state) { m_UploadPool->CopyBuffer(dest, src, size, state); }
 
 		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format)

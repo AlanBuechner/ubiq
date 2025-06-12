@@ -78,53 +78,50 @@ namespace Engine
 
 	UploadPool::~UploadPool()
 	{
-		for (uint32 i = 0; i < m_UploadPages.Count(); i++)
-			m_UploadPages[i]->Clear();
+		delete m_UploadPage;
 	}
 
-	void UploadPool::UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state)
+	void UploadPool::SubmitBuffer(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		ANOTATE_PROFILEI("Upload Size: " + std::to_string(size));
 
-		if (dest == nullptr)
-		{
-			CORE_ERROR("attempting to upload data with null resource");
-			__debugbreak();
-			return;
-		}
+		CORE_ASSERT(data != nullptr, "Data cant not be nullptr");
+		CORE_ASSERT(size != 0, "Can not upload buffer with size of 0");
 
 		std::lock_guard g(m_UploadMutex);
 
-		UploadPage* page;
-		void* loc = nullptr;
-		for (uint32 i = 0; i < m_UploadPages.Count(); i++)
-		{
-			loc = m_UploadPages[i]->Map(data, size);
-			if (loc != nullptr)
-			{
-				page = m_UploadPages[i];
-				break;
-			}
-		}
-
-		if (loc == nullptr)
-		{
-			m_UploadPages.Push(new UploadPage(size * 2)); // create new page double the size needed
-			page = m_UploadPages.Back();
-			loc = page->Map(data, size);
-			CORE_ASSERT(loc != nullptr, "Failed to upload data");
-		}
-
 		UploadBufferData uploadData;
 		uploadData.size = size;
-		uploadData.destOffset = offset;
-		uploadData.srcOffset = page->GetOffset(loc);
+		uploadData.destOffset = destOffset;
+		uploadData.srcOffset = 0;
 		uploadData.destResource = dest;
-		uploadData.uploadResource = page->GetResource();
-		uploadData.state = state;
+		uploadData.uploadResource = nullptr;
+		uploadData.data = data;
+		if (state == ResourceState::Unknown)
+			uploadData.state = dest->GetDefultState();
+		else
+			uploadData.state = state;
 
-		m_BufferUploadQueue.push(uploadData);
+		m_BufferUploadQueue.Push(uploadData);
+	}
+
+	void* UploadPool::LockBuffer(uint32 size)
+	{
+		CORE_ASSERT(size != 0, "Can not lock upload buffer with size of 0");
+		return new byte[size]; // create new buffer
+	}
+
+	void UploadPool::UnlockBuffer(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state)
+	{
+		SubmitBuffer(dest, destOffset, dest, size, state);
+	}
+
+	void UploadPool::UploadBufferRegion(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state)
+	{
+		void* lockedBuffer = LockBuffer(size);
+		memcpy(lockedBuffer, data, size);
+		UnlockBuffer(dest, destOffset, lockedBuffer, size, state);
 	}
 
 	void UploadPool::CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state)
@@ -145,7 +142,7 @@ namespace Engine
 		uploadData.uploadResource = src;
 		uploadData.state = state;
 
-		m_BufferUploadQueue.push(uploadData);
+		m_BufferUploadQueue.Push(uploadData);
 	}
 
 	void UploadPool::UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format)
@@ -184,13 +181,25 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
+		// find needed buffer size
+		uint32 uploadBufferSize = 0;
+		for (uint32 i = 0; i < m_BufferUploadQueue.Count(); i++)
+		{
+			UploadBufferData& data = m_BufferUploadQueue[i];
+			if (data.data != nullptr)
+				uploadBufferSize += data.size;
+		}
+
+		// create new upload buffer
+		if(uploadBufferSize != 0)
+			m_UploadPage = new UploadPage(uploadBufferSize);
+
 		// data
 		Utils::Vector<ResourceStateObject> startb;
 		Utils::Vector<ResourceStateObject> endb;
 		Utils::Vector<UploadBufferData> bufferCopys;
 
-
-		uint32 numBufferCopys = (uint32)m_BufferUploadQueue.size();
+		uint32 numBufferCopys = (uint32)m_BufferUploadQueue.Count();
 		startb.Reserve(numBufferCopys);
 		endb.Reserve(numBufferCopys);
 		bufferCopys.Reserve(numBufferCopys);
@@ -198,10 +207,22 @@ namespace Engine
 		std::unordered_set<GPUResource*> m_SeenUploads;
 
 		// collect data
-		while (!m_BufferUploadQueue.empty())
+		for(uint32 i = 0; i < m_BufferUploadQueue.Count(); i++)
 		{
-			UploadBufferData& data = m_BufferUploadQueue.front();
+			UploadBufferData& data = m_BufferUploadQueue[i];
 
+			// copy data to upload resource if needed
+			if (m_UploadPage != nullptr)
+			{
+				void* dataLoc = m_UploadPage->Map(data.data, data.size); // copy data into resource
+				data.uploadResource = m_UploadPage->GetResource();
+				data.srcOffset = m_UploadPage->GetOffset(dataLoc);
+			}
+			// delete old data
+			delete data.data;
+			data.data = nullptr;
+
+			// collect resource states
 			if (m_SeenUploads.find(data.destResource) == m_SeenUploads.end())
 			{
 				startb.Push({ data.destResource, ResourceState::CopyDestination });
@@ -209,8 +230,6 @@ namespace Engine
 				m_SeenUploads.insert(data.destResource);
 			}
 			bufferCopys.Push(data);
-
-			m_BufferUploadQueue.pop();
 		}
 
 		// record commands
