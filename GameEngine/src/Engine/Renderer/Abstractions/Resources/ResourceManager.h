@@ -72,10 +72,10 @@ namespace Engine
 	public:
 		~UploadPool();
 
-		void SubmitBuffer(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state = ResourceState::Unknown);
+		void SubmitBuffer(GPUResource* dest, uint32 destOffset, void* data, uint32 size, ResourceState state = ResourceState::Unknown);
 
 		void* LockBuffer(uint32 size);
-		void UnlockBuffer(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state = ResourceState::Unknown);
+		void UnlockBuffer(GPUResource* dest, uint32 destOffset, void* data, uint32 size, ResourceState state = ResourceState::Unknown);
 
 		void UploadBufferRegion(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state = ResourceState::Unknown);
 		void CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state);
@@ -103,28 +103,18 @@ namespace Engine
 		ResourceManager();
 		virtual ~ResourceManager();
 
-		ResourceDeletionPool* GetDeletionPool() { return m_DeletionPool; }
-		ResourceDeletionPool* SwapDeletionPools();
-
-		// records upload commands and create new upload pool
-		// returns upload pool to be cached until commandlists have been executed
-		UploadPool* SwapPools();
+		ResourceDeletionPool* GetDeletionPool();
+		UploadPool* GetUploadPool();
 
 		void UploadBuffer(GPUResource* dest, const void* data, uint32 size, ResourceState state = ResourceState::Unknown) { UploadBufferRegion(dest, 0, data, size, state); }
-		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state = ResourceState::Unknown) { m_UploadPool->UploadBufferRegion(dest, offset, data, size, state); }
-		void CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state) { m_UploadPool->CopyBuffer(dest, src, size, state); }
+		void UploadBufferRegion(GPUResource* dest, uint64 offset, const void* data, uint32 size, ResourceState state = ResourceState::Unknown) 
+			{ GetUploadPool()->UploadBufferRegion(dest, offset, data, size, state); }
+		void CopyBuffer(GPUResource* dest, GPUResource* src, uint32 size, ResourceState state) { GetUploadPool()->CopyBuffer(dest, src, size, state); }
 
 		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format)
-			{ m_UploadPool->UploadTexture(dest, src, width, height, numMips, state, format); }
+			{ GetUploadPool()->UploadTexture(dest, src, width, height, numMips, state, format); }
 
-		void ScheduleResourceDeletion(GPUResource* resource) { m_DeletionPool->m_Resources.Push(resource); }
-		void ScheduleHandleDeletion(Descriptor* descriptor) { m_DeletionPool->m_Descriptors.Push(descriptor); }
-		
-	private:
-
-	protected:
-		ResourceDeletionPool* m_DeletionPool;
-		UploadPool* m_UploadPool;
-
+		void ScheduleResourceDeletion(GPUResource* resource) { GetDeletionPool()->m_Resources.Push(resource); }
+		void ScheduleHandleDeletion(Descriptor* descriptor) { GetDeletionPool()->m_Descriptors.Push(descriptor); }
 	};
 }

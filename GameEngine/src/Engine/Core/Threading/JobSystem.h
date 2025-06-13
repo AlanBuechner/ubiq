@@ -4,14 +4,16 @@
 
 namespace Engine
 {
-	typedef void (*JobFunc)();
+	typedef void (*JobFunc)(void*);
 
 	class NamedJobThread
 	{
 	public:
 		NamedJobThread(const std::string& name);
 
+		void SetData(void* data = nullptr) { m_Data = data; }
 		void Invoke() { m_Flag.WaitAndSignal(); }
+		void Invoke(void* data) { SetData(data); m_Flag.WaitAndSignal(); }
 		void Wait() { m_Flag.Wait(false); }
 		bool IsExecuting() { return m_Flag.GetFlag(); }
 		void SetFunc(JobFunc func) { m_Func = func; }
@@ -20,6 +22,7 @@ namespace Engine
 		void RunInternal();
 
 	private:
+		void* m_Data = nullptr;
 		std::string m_Name;
 		std::thread m_Thread;
 		Flag m_Flag;

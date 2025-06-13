@@ -17,6 +17,7 @@ Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
 Engine::Ref<Engine::CommandList> Engine::Renderer::s_MainCommandList;
 Engine::Ref<Engine::CommandList> Engine::Renderer::s_UploadCommandList;
 Engine::RendererAPI Engine::Renderer::s_Api = Engine::RendererAPI::DirectX12;
+Engine::Renderer::FrameContext* Engine::Renderer::s_FrameContext = nullptr;
 Profiler::InstrumentationTimer Engine::Renderer::s_Timer = CREATE_PROFILEI();
 
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_WhiteTexture;
@@ -32,9 +33,23 @@ Engine::NamedJobThread* Engine::Renderer::s_RenderThread;
 namespace Engine
 {
 
+	Renderer::FrameContext::FrameContext()
+	{
+		m_DeletionPool = new ResourceDeletionPool();
+		m_UploadPool = new UploadPool();
+	}
+
+	Renderer::FrameContext::~FrameContext()
+	{
+		delete m_DeletionPool;
+		delete m_UploadPool;
+	}
+
 	void Renderer::Init()
 	{
 		CREATE_PROFILE_FUNCTIONI();
+
+		s_FrameContext = new FrameContext();
 
 		// Init GPUProfiling
 		GPUProfiler::Init();
@@ -125,7 +140,9 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		GPUTimer::EndEvent(s_MainCommandList);
 		GetMainCommandList()->Close();
-		s_RenderThread->Invoke();
+		FrameContext* context = s_FrameContext;
+		s_FrameContext = new FrameContext();
+		s_RenderThread->Invoke(context);
 	}
 
 	void Renderer::WaitForRender()
@@ -139,17 +156,14 @@ namespace Engine
 		DebugRenderer::Build(commandList);
 	}
 
-	void Renderer::Render()
+	void Renderer::Render(void* data)
 	{
 		CREATE_PROFILE_SCOPEI("Render Frame");
+		FrameContext* frameContext = (FrameContext*)data;
 		Ref<ResourceManager> resourceManager = s_Context->GetResourceManager();
 
-		// swap deletion pool
-		ResourceDeletionPool* cachedDeletionPool = resourceManager->SwapDeletionPools();
-		UploadPool* cachedUploadPool = resourceManager->SwapPools();
-
 		// copy commands
-		cachedUploadPool->RecoredUploadCommands(s_UploadCommandList);
+		frameContext->m_UploadPool->RecoredUploadCommands(s_UploadCommandList);
 
 		// rendering commands
 		GPUProfiler::StartFrame();
@@ -164,8 +178,7 @@ namespace Engine
 		WindowManager::UpdateWindows();
 
 		// prepare for next frame
-		delete cachedUploadPool;
-		delete cachedDeletionPool;
+		delete frameContext;
 	}
 
 }

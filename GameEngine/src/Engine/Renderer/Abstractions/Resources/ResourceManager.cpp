@@ -3,6 +3,7 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Utils/Performance.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
+#include "Engine/Renderer/Renderer.h"
 
 #if defined(PLATFORM_WINDOWS)
 #include "Platform/DirectX12/Resources/DirectX12ResourceManager.h"
@@ -81,15 +82,13 @@ namespace Engine
 		delete m_UploadPage;
 	}
 
-	void UploadPool::SubmitBuffer(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state)
+	void UploadPool::SubmitBuffer(GPUResource* dest, uint32 destOffset, void* data, uint32 size, ResourceState state)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		ANOTATE_PROFILEI("Upload Size: " + std::to_string(size));
 
 		CORE_ASSERT(data != nullptr, "Data cant not be nullptr");
 		CORE_ASSERT(size != 0, "Can not upload buffer with size of 0");
-
-		std::lock_guard g(m_UploadMutex);
 
 		UploadBufferData uploadData;
 		uploadData.size = size;
@@ -103,6 +102,7 @@ namespace Engine
 		else
 			uploadData.state = state;
 
+		std::lock_guard g(m_UploadMutex);
 		m_BufferUploadQueue.Push(uploadData);
 	}
 
@@ -112,9 +112,9 @@ namespace Engine
 		return new byte[size]; // create new buffer
 	}
 
-	void UploadPool::UnlockBuffer(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state)
+	void UploadPool::UnlockBuffer(GPUResource* dest, uint32 destOffset, void* data, uint32 size, ResourceState state)
 	{
-		SubmitBuffer(dest, destOffset, dest, size, state);
+		SubmitBuffer(dest, destOffset, data, size, state);
 	}
 
 	void UploadPool::UploadBufferRegion(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state)
@@ -218,9 +218,13 @@ namespace Engine
 				data.uploadResource = m_UploadPage->GetResource();
 				data.srcOffset = m_UploadPage->GetOffset(dataLoc);
 			}
-			// delete old data
-			delete data.data;
-			data.data = nullptr;
+			// always delete old data
+			if (data.data != nullptr)
+			{
+				// delete old data
+				delete data.data;
+				data.data = nullptr;
+			}
 
 			// collect resource states
 			if (m_SeenUploads.find(data.destResource) == m_SeenUploads.end())
@@ -384,36 +388,18 @@ namespace Engine
 	}
 
 	ResourceManager::ResourceManager()
-	{
-		m_UploadPool = new UploadPool();
-		m_DeletionPool = new ResourceDeletionPool();
-	}
+	{}
 
 	ResourceManager::~ResourceManager()
-	{
-		delete m_UploadPool;// needs to be destroyed before the heaps
-		delete m_DeletionPool; // needs to be destroyed before the heaps
+	{}
 
-		m_UploadPool = nullptr;
-		m_DeletionPool = nullptr;
+	ResourceDeletionPool* ResourceManager::GetDeletionPool()
+	{
+		return Renderer::GetFrameContext()->m_DeletionPool;
 	}
 
-	ResourceDeletionPool* ResourceManager::SwapDeletionPools()
+	UploadPool* ResourceManager::GetUploadPool()
 	{
-		ResourceDeletionPool* oldPool = m_DeletionPool;
-		m_DeletionPool = new ResourceDeletionPool();
-		return oldPool;
-	}
-
-	UploadPool* ResourceManager::SwapPools()
-	{
-		CREATE_PROFILE_FUNCTIONI();
-
-		std::lock_guard g(m_UploadPool->GetUploadMutex());
-
-		UploadPool* pool = m_UploadPool;
-		m_UploadPool = new UploadPool();
-
-		return pool;
+		return Renderer::GetFrameContext()->m_UploadPool;
 	}
 }

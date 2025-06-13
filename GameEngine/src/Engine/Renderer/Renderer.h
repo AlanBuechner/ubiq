@@ -16,6 +16,9 @@ namespace Engine
 	class GraphicsShaderPass;
 	class Texture2D;
 	class Mesh;
+
+	class ResourceDeletionPool;
+	class UploadPool;
 }
 
 namespace Engine
@@ -28,6 +31,16 @@ namespace Engine
 
 	class Renderer
 	{
+	public:
+		struct FrameContext
+		{
+			FrameContext();
+			~FrameContext();
+
+			ResourceDeletionPool* m_DeletionPool;
+			UploadPool* m_UploadPool;
+		};
+
 	public:
 		static void Init();
 		static void Destroy();
@@ -60,8 +73,10 @@ namespace Engine
 		template<class T>
 		inline static Ref<T> GetMainCommandList() { return std::dynamic_pointer_cast<T>(s_MainCommandList); }
 
+		static FrameContext* GetFrameContext() { return s_FrameContext; }
+
 	private:
-		static void Render();
+		static void Render(void* frameContext);
 
 	private:
 		static Ref<GraphicsContext> s_Context;
@@ -70,6 +85,7 @@ namespace Engine
 		static Ref<CommandList> s_UploadCommandList;
 
 		static RendererAPI s_Api;
+		static FrameContext* s_FrameContext;
 
 		static Profiler::InstrumentationTimer s_Timer;
 

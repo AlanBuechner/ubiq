@@ -18,7 +18,7 @@ namespace Engine
 		{
 			m_Flag.Wait(true); // wait to be signaled
 			if(m_Func != nullptr)
-				m_Func();
+				m_Func(m_Data);
 			m_Flag.Clear(); // reset flag
 		}
 	}
