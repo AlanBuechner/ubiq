@@ -14,6 +14,9 @@ namespace Engine
 
 	InstanceBufferResource* InstanceBufferResource::Create(uint32 capacity, uint32 stride)
 	{
+		CREATE_PROFILE_SCOPEI("Create Instance Buffer Resource");
+		ANOTATE_PROFILEI(std::to_string(capacity * stride) + " bytes");
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:

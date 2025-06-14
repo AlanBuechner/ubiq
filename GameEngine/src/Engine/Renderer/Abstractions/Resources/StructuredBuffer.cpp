@@ -33,6 +33,8 @@ namespace Engine
 
 	StructuredBufferResource* StructuredBufferResource::Create(uint32 count, uint32 stride, ParentType parentType)
 	{
+		CREATE_PROFILE_SCOPEI("Create Structured Buffer Resource");
+		ANOTATE_PROFILEI(std::to_string(count * stride) + " bytes");
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:

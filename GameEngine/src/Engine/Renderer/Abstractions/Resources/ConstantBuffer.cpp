@@ -28,6 +28,8 @@ namespace Engine
 
 	ConstantBufferResource* ConstantBufferResource::Create(uint32 size)
 	{
+		CREATE_PROFILE_SCOPEI("Create Constant Buffer Resource");
+		ANOTATE_PROFILEI(std::to_string(size) + " bytes");
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
