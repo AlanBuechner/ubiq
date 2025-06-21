@@ -69,7 +69,6 @@ namespace Engine
 
 		virtual void CopyResource(GPUResource* dest, GPUResource* src) = 0;
 
-		virtual void UploadBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size) = 0;
 		virtual void UploadTexture(GPUResource* dest, UploadTextureResource* src) = 0;
 
 

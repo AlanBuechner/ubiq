@@ -54,6 +54,7 @@ namespace Utils
 		void SwapAndPop(ConstIterator pos);
 
 		void Reserve(uint32 capacity);
+		void ReserveMore(uint32 capacity);
 		void Resize(uint32 size, const Type& value = {});
 		void Clear();
 
@@ -191,6 +192,7 @@ namespace Utils
 	template<class Type> inline void Vector<Type>::SwapAndPop(Vector<Type>::ConstIterator pos) { SwapAndPop(Base::begin() - pos); }
 
 	template<class Type> inline void Vector<Type>::Reserve(uint32 capacity) { Base::reserve(capacity); }
+	template<class Type> inline void Vector<Type>::ReserveMore(uint32 capacity) { Base::reserve(Count() + capacity); }
 
 	template<class Type> inline void Vector<Type>::Resize(uint32 count, const Type& value) { Base::resize(count, value); }
 

@@ -9,6 +9,7 @@
 
 #include "Engine/Core/Threading/Flag.h"
 #include "Engine/Core/Threading/JobSystem.h"
+#include "CPUCommandList.h"
 
 namespace Engine
 {
@@ -37,6 +38,7 @@ namespace Engine
 			FrameContext();
 			~FrameContext();
 
+			Utils::Vector<CPUCommandAllocator*> m_Commands;
 			ResourceDeletionPool* m_DeletionPool;
 			UploadPool* m_UploadPool;
 		};
@@ -73,6 +75,7 @@ namespace Engine
 		template<class T>
 		inline static Ref<T> GetMainCommandList() { return std::dynamic_pointer_cast<T>(s_MainCommandList); }
 
+		static void SubmitCommandList(Ref<CPUCommandList> commandList) { GetFrameContext()->m_Commands.Push(commandList->TakeAllocator()); }
 		static FrameContext* GetFrameContext() { return s_FrameContext; }
 
 	private:

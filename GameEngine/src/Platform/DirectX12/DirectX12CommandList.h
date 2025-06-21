@@ -35,7 +35,6 @@ namespace Engine
 		virtual void CopyBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size) override;
 		virtual void CopyResource(GPUResource* dest, GPUResource* src) override;
 
-		virtual void UploadBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size) override;
 		virtual void UploadTexture(GPUResource* dest, UploadTextureResource* src) override;
 
 		// rendering

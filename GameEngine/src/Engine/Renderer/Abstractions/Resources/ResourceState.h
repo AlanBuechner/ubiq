@@ -31,8 +31,10 @@ namespace Engine
 
 	protected:
 		ResourceState m_DefultState = ResourceState::Common;
+		ResourceState m_EOFState = ResourceState::Unknown; // end of frame state
 
 		friend class DirectX12CommandList;
+		friend class CPUCommandAllocator;
 	};
 
 	using GPUResourceHandle = GPUResource* const*;

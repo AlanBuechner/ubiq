@@ -167,6 +167,14 @@ namespace Engine
 
 		// rendering commands
 		GPUProfiler::StartFrame();
+
+		CPUCommandAllocator::ResourceStateMap stateMap;
+		for (CPUCommandAllocator* commands : frameContext->m_Commands)
+		{
+			commands->PrependResourceStateCommands(stateMap);
+			commands->MergeResourceStatesInto(stateMap);
+		}
+
 		s_MainCommandQueue->Submit(s_UploadCommandList);
 		s_MainCommandQueue->Submit(s_MainCommandList);
 		s_MainCommandQueue->Build();
