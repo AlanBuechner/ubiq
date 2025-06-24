@@ -17,6 +17,8 @@ namespace Engine
 		Ref<RenderTarget2D> GetDepthAttachment() const { return HasDepthAttachment() ? m_Attachments.Back() : nullptr; }
 		const Utils::Vector<Ref<RenderTarget2D>>& GetAttachments() const { return m_Attachments; }
 
+		Utils::Vector<TextureFormat> GetFormats();
+
 		bool HasDepthAttachment() const;
 
 		static Ref<FrameBuffer> Create(const Utils::Vector<Ref<RenderTarget2D>>& spec);

@@ -20,7 +20,7 @@ namespace Engine
 	private:
 
 		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
-		virtual uint32 GetState(ResourceState state) override;
+		virtual uint32 GetGPUState(ResourceState state) override;
 
 	private:
 		ID3D12Resource* m_Buffer;

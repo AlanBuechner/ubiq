@@ -82,10 +82,10 @@ namespace Engine
 
 		void UploadTexture(GPUResource* dest, UploadTextureResource* src, uint32 width, uint32 height, uint32 numMips, ResourceState state, TextureFormat format);
 
-		void RecoredUploadCommands(Ref<CommandList> commandList);
+		void RecoredUploadCommands(Ref<CPUCommandList> commandList);
 
-		void RecordBufferCommands(Ref<CommandList> commandList);
-		void RecordTextureCommands(Ref<CommandList> commandList);
+		void RecordBufferCommands(Ref<CPUCommandList> commandList);
+		void RecordTextureCommands(Ref<CPUCommandList> commandList);
 
 		std::mutex& GetUploadMutex() { return m_UploadMutex; }
 

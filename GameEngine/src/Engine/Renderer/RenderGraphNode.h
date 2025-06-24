@@ -5,7 +5,7 @@
 
 namespace Engine
 {
-	class CommandList;
+	class CPUCommandList;
 
 	struct FrameBufferSpecification;
 }
@@ -24,8 +24,8 @@ namespace Engine
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
 		virtual void Invalidate() { m_Built = false; }
 
-		void SetCommandList(Ref<CommandList> commandList) { m_CommandList = commandList; }
-		Ref<CommandList> GetCommandList() { return m_CommandList; }
+		void SetCommandList(Ref<CPUCommandList> commandList) { m_CommandList = commandList; }
+		Ref<CPUCommandList> GetCommandList() { return m_CommandList; }
 
 		void AddDependincy(Ref<RenderGraphNode> dependency) { m_Dependincys.Push(dependency); }
 
@@ -37,7 +37,7 @@ namespace Engine
 		RenderGraph& m_Graph;
 
 		Utils::Vector<Ref<RenderGraphNode>> m_Dependincys;
-		Ref<CommandList> m_CommandList;
+		Ref<CPUCommandList> m_CommandList;
 	};
 
 	// nodes

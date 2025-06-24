@@ -25,15 +25,13 @@ namespace Engine
 		ResourceState GetDefultState() { return m_DefultState; }
 
 		virtual void* GetGPUResourcePointer() = 0;
-	protected:
 		virtual bool SupportState(ResourceState state) = 0;
-		virtual uint32 GetState(ResourceState state) = 0;
+		virtual uint32 GetGPUState(ResourceState state) = 0;
 
 	protected:
 		ResourceState m_DefultState = ResourceState::Common;
 		ResourceState m_EOFState = ResourceState::Unknown; // end of frame state
 
-		friend class DirectX12CommandList;
 		friend class CPUCommandAllocator;
 	};
 

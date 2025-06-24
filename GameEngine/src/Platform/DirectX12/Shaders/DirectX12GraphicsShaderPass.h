@@ -29,7 +29,7 @@ namespace Engine
 		virtual ~DirectX12GraphicsShaderPass();
 
 		ID3D12RootSignature* GetRootSignature() { return m_Sig; }
-		ID3D12PipelineState* GetPipelineState(Ref<FrameBuffer> target);
+		ID3D12PipelineState* GetPipelineState(const Utils::Vector<TextureFormat>& format);
 
 		Topology GetTopologyType() { return m_PassConfig.topology; }
 	private:

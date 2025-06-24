@@ -12,7 +12,6 @@ namespace Engine
 		DirectX12CommandQueue(Type type);
 		~DirectX12CommandQueue();
 
-		virtual void Build() override;
 		virtual void Execute() override;
 		virtual bool InExecution() override;
 		virtual void Await() override;
@@ -22,7 +21,6 @@ namespace Engine
 	private:
 		ID3D12CommandQueue* m_CommandQueue;
 		ID3D12Fence1* m_Fence;
-		Utils::Vector<ID3D12CommandList*> m_DXCommandLists;
 		HANDLE m_EventHandle = nullptr;
 		uint32 m_SignalCount = 0;
 		D3D12_COMMAND_LIST_TYPE m_Type = D3D12_COMMAND_LIST_TYPE_DIRECT;

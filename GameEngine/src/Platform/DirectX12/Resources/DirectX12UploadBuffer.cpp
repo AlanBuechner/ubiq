@@ -50,7 +50,7 @@ namespace Engine
 		m_MapedBasePointer = nullptr;
 	}
 
-	uint32 DirectX12UploadBufferResource::GetState(ResourceState state)
+	uint32 DirectX12UploadBufferResource::GetGPUState(ResourceState state)
 	{
 		switch (state)
 		{
@@ -130,7 +130,7 @@ namespace Engine
 		m_MapedBasePointer = nullptr;
 	}
 
-	uint32 DirectX12UploadTextureResource::GetState(ResourceState state)
+	uint32 DirectX12UploadTextureResource::GetGPUState(ResourceState state)
 	{
 		switch (state)
 		{

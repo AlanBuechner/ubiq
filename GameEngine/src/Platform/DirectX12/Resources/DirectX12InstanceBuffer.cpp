@@ -54,7 +54,7 @@ namespace Engine
 
 
 
-	uint32 DirectX12InstanceBufferResource::GetState(ResourceState state)
+	uint32 DirectX12InstanceBufferResource::GetGPUState(ResourceState state)
 	{
 		switch (state)
 		{

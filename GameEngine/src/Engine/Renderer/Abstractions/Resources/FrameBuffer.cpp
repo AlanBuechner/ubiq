@@ -17,6 +17,14 @@ namespace Engine
 			m_Attachments[i]->Resize(width, height);
 	}
 
+	Utils::Vector<TextureFormat> FrameBuffer::GetFormats()
+	{
+		Utils::Vector<TextureFormat> formats;
+		for (Ref<RenderTarget2D> rt : m_Attachments)
+			formats.Push(rt->GetResource()->GetFormat());
+		return formats;
+	}
+
 	bool FrameBuffer::HasDepthAttachment() const
 	{
 		return IsTextureFormatDepthStencil(m_Attachments.Back()->GetResource()->GetFormat());

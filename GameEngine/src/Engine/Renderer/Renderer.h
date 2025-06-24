@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Abstractions/GraphicsContext.h"
-#include "Abstractions/CommandQueue.h"
+#include "CPUCommandList.h"
 
 #include "Material.h"
 
@@ -20,6 +20,9 @@ namespace Engine
 
 	class ResourceDeletionPool;
 	class UploadPool;
+
+	class CommandList;
+	class CommandQueue;
 }
 
 namespace Engine
@@ -39,6 +42,8 @@ namespace Engine
 			~FrameContext();
 
 			Utils::Vector<CPUCommandAllocator*> m_Commands;
+			Ref<CommandList> m_IMGUICommandList;
+			Utils::Vector<Ref<CommandList>> m_CommandLists;
 			ResourceDeletionPool* m_DeletionPool;
 			UploadPool* m_UploadPool;
 		};
@@ -51,7 +56,7 @@ namespace Engine
 		static void EndFrame();
 		static void WaitForRender();
 
-		static void Build(Ref<CommandList> commandList);
+		static void Build(Ref<CPUCommandList> commandList);
 
 		static void SetDefultMaterial(Ref<Material> mat) { s_DefultMaterial = mat; }
 
@@ -71,11 +76,12 @@ namespace Engine
 		template<class T>
 		inline static Ref<T> GetMainCommandQueue() { return std::dynamic_pointer_cast<T>(GetMainCommandQueue()); }
 
-		inline static Ref<CommandList> GetMainCommandList() { return s_MainCommandList; }
+		inline static Ref<CPUCommandList> GetMainCommandList() { return s_MainCommandList; }
 		template<class T>
 		inline static Ref<T> GetMainCommandList() { return std::dynamic_pointer_cast<T>(s_MainCommandList); }
 
 		static void SubmitCommandList(Ref<CPUCommandList> commandList) { GetFrameContext()->m_Commands.Push(commandList->TakeAllocator()); }
+		static void SubmitCommandLists(Utils::Vector<Ref<CPUCommandList>> commandlists) { for (Ref<CPUCommandList> cmd : commandlists) SubmitCommandList(cmd); }
 		static FrameContext* GetFrameContext() { return s_FrameContext; }
 
 	private:
@@ -84,8 +90,8 @@ namespace Engine
 	private:
 		static Ref<GraphicsContext> s_Context;
 		static Ref<CommandQueue> s_MainCommandQueue;
-		static Ref<CommandList> s_MainCommandList;
-		static Ref<CommandList> s_UploadCommandList;
+		static Ref<CPUCommandList> s_MainCommandList;
+		static Ref<CPUCommandList> s_UploadCommandList;
 
 		static RendererAPI s_Api;
 		static FrameContext* s_FrameContext;

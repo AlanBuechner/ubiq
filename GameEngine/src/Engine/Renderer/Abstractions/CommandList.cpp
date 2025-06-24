@@ -8,41 +8,40 @@
 #include "Platform/DirectX12/DirectX12CommandList.h"
 #endif
 
+
+std::unordered_map<Engine::CommandListType, Utils::Vector<Engine::Ref<Engine::CommandList>>> Engine::CommandList::s_CommandListPools;
+std::mutex Engine::CommandList::s_GetCommandListMutex;
+
 namespace Engine
 {
-	Ref<CommandList> Engine::CommandList::Create(CommandListType type)
+	Ref<CommandList> CommandList::Create(CommandListType commandListType)
+	{
+		CREATE_PROFILE_FUNCTIONI();
+		std::lock_guard l(s_GetCommandListMutex);
+		Utils::Vector<Ref<CommandList>>& pool = s_CommandListPools[commandListType];
+
+		if (pool.Empty())
+			return CreateInternal(commandListType);
+		return pool.Pop();
+	}
+
+	void CommandList::Free(Ref<CommandList> commandList)
+	{
+		std::lock_guard l(s_GetCommandListMutex);
+		Utils::Vector<Ref<CommandList>>& pool = s_CommandListPools[commandList->m_CommandListType];
+		pool.Push(commandList);
+	}
+
+	Ref<CommandList> CommandList::CreateInternal(CommandListType commandListType)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			return CreateRef<DirectX12CommandList>(type);
+			return CreateRef<DirectX12CommandList>(commandListType);
 		default:
 			break;
 		}
 		return Ref<CommandList>();
 	}
-
-	void CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer)
-	{
-		for (uint32 i = 0; i < frameBuffer->GetAttachments().Count(); i++)
-			ClearRenderTarget(frameBuffer, i);
-	}
-
-	void CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment)
-	{
-		Math::Vector4 color = frameBuffer->GetAttachment(attachment)->GetClearColor();
-		ClearRenderTarget(frameBuffer, attachment, color);
-	}
-
-	void CommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, uint32 attachment, const Math::Vector4& color)
-	{
-		ClearRenderTarget(frameBuffer->GetAttachment(attachment), color);
-	}
-
-	void CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget)
-	{
-		ClearRenderTarget(renderTarget, renderTarget->GetClearColor());
-	}
-
 }

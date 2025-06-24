@@ -40,12 +40,13 @@ namespace Engine
 		return result;
 	}
 
-	static inline D3D12_COMMAND_LIST_TYPE GetD3D12CommandListType(CommandList::CommandListType type)
+	static inline D3D12_COMMAND_LIST_TYPE GetD3D12CommandListType(CommandListType type)
 	{
 		switch (type)
 		{
-		case Engine::CommandList::Direct: return D3D12_COMMAND_LIST_TYPE_DIRECT;
-		case Engine::CommandList::Bundle: return D3D12_COMMAND_LIST_TYPE_BUNDLE;
+		case Engine::CommandListType::Graphics: return D3D12_COMMAND_LIST_TYPE_DIRECT;
+		case Engine::CommandListType::Compute: return D3D12_COMMAND_LIST_TYPE_COMPUTE;
+		case Engine::CommandListType::Copy: return D3D12_COMMAND_LIST_TYPE_COPY;
 		}
 		return D3D12_COMMAND_LIST_TYPE_DIRECT;
 	}
@@ -54,79 +55,106 @@ namespace Engine
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		const uint32 numAllocators = 2;
-		m_Frames.Resize(numAllocators);
-		D3D12_COMMAND_LIST_TYPE type = GetD3D12CommandListType(m_Type);
-		for (uint32 i = 0; i < numAllocators; i++)
-		{
-			CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(&m_Frames[i].commandAllocator)),
+		D3D12_COMMAND_LIST_TYPE type = GetD3D12CommandListType(m_CommandListType);
+
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(&m_CommandAllocator)),
 				"Failed to Create Command List Allocator");
-			m_Frames[i].commandAllocator->SetName(L"Command Allocator");
-		}
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0, type, m_Frames[0].commandAllocator, nullptr, IID_PPV_ARGS(&m_CommandList)),
+		m_CommandAllocator->SetName(L"Command Allocator");
+		
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0, type, m_CommandAllocator, nullptr, IID_PPV_ARGS(&m_CommandList)),
 			"Failed to Create Commnd List");
 		m_CommandList->SetName(L"Command List");
 		m_CommandList->Close();
-
-		
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(&m_PrependAllocator)),
-			"Failed to Create Prepend Command List Allocator");
-		m_PrependAllocator->SetName(L"Prepend Allocator");
-		CORE_ASSERT_HRESULT(context->GetDevice()->CreateCommandList(0,type, m_PrependAllocator, nullptr, IID_PPV_ARGS(&m_PrependList)),
-			"Failed to Create Prepend Command List");
-		m_PrependList->SetName(L"Prepend Command List");
-		m_PrependList->Close();
-
-		m_RecordFlag.Signal();
-	}
-
-	void DirectX12CommandList::InternalClose()
-	{
-		// TODO
-		if (m_State != RecordState::Closed)
-		{
-			m_CommandList->Close();
-			m_State = RecordState::Closed;
-		}
 	}
 
 	void DirectX12CommandList::StartRecording()
 	{
-		m_RecordFlag.Wait();
-		m_RecordFlag.Clear();
-		m_RenderTarget = nullptr;
-		m_State = RecordState::Open;
-		wrl::ComPtr<ID3D12CommandAllocator> allocator = GetAllocator();
-		CORE_ASSERT_HRESULT(allocator->Reset(), "Failed to reset command allocator");
-		CORE_ASSERT_HRESULT(m_CommandList->Reset(allocator.Get(), nullptr), "Failed to reset command list");
+		CREATE_PROFILE_FUNCTIONI();
+		CORE_ASSERT_HRESULT(m_CommandAllocator->Reset(), "Failed to reset command allocator");
+		CORE_ASSERT_HRESULT(m_CommandList->Reset(m_CommandAllocator, nullptr), "Failed to reset command list");
 
 		ID3D12DescriptorHeap* heaps[]{ DirectX12ResourceManager::s_SRVHeap->GetHeap().Get(), DirectX12ResourceManager::s_SamplerHeap->GetHeap().Get() };
 		m_CommandList->SetDescriptorHeaps(2, heaps);
-
-		GetCurrentPendingTransitions().Clear();
-		GetResourceStates().clear();
 	}
+
+	void DirectX12CommandList::RecoredCommands(CPUCommandAllocator* commandAllocator)
+	{
+		CREATE_PROFILE_FUNCTIONI();
+		for (uint32 i = 0; i < commandAllocator->GetCommands().Count(); i++)
+		{
+			CPUCommand* cmd = commandAllocator->GetCommands()[i];
+			switch (cmd->GetCommandID())
+			{
+#define CALL_COMMAND(obj, func) case obj::GetStaticCommandID(): func(*(obj*)cmd); break
+				CALL_COMMAND(CPUResourceTransitionCommand, Transition);
+				CALL_COMMAND(CPUAwaitUAVCommand, AwaitUAVs);
+				CALL_COMMAND(CPUCopyBufferCommand, CopyBuffer);
+				CALL_COMMAND(CPUUploadTextureCommand , UploadTexture);
+				CALL_COMMAND(CPUSetViewportCommand, SetViewport);
+				CALL_COMMAND(CPUSetRenderTargetCommand, SetRenderTarget);
+				CALL_COMMAND(CPUClearRenderTargetCommand, ClearRenderTarget);
+				CALL_COMMAND(CPUSetGraphicsShaderCommand, SetShader);
+				CALL_COMMAND(CPUSetComputeShaderCommand, SetShader);
+				CALL_COMMAND(CPUSetWorkGraphShaderCommand, SetShader);
+				CALL_COMMAND(CPUSetRootConstantCommand, SetRootConstant);
+				CALL_COMMAND(CPUSetConstantBufferCommand, SetConstantBuffer);
+				CALL_COMMAND(CPUSetStructuredBufferCommand, SetStructuredBuffer);
+				CALL_COMMAND(CPUSetRWStructuredBufferCommand, SetRWStructuredBuffer);
+				CALL_COMMAND(CPUSetTextureCommand, SetTexture);
+				CALL_COMMAND(CPUSetRWTextureCommand, SetRWTexture);
+				CALL_COMMAND(CPUDrawMeshCommand, DrawMesh);
+				CALL_COMMAND(CPUDispatchCommand, Dispatch);
+				CALL_COMMAND(CPUDispatchGraphCPUDataCommand, DispatchGraph);
+				CALL_COMMAND(CPUDispatchGraphGPUDataCommand, DispatchGraph);
+#undef CALL_COMMAND
+			default:
+				break;
+			}
+		}
+	}
+
+	void DirectX12CommandList::Close()
+	{
+		CREATE_PROFILE_FUNCTIONI();
+		m_CommandList->Close();
+	}
+
+
+	void DirectX12CommandList::Transition(const Utils::Vector<ResourceTransitionObject>& transitions)
+	{
+		CPUResourceTransitionCommand cmd;
+		cmd.resourceStateTransitons = transitions;
+		Transition(cmd);
+	}
+
+	void DirectX12CommandList::SetRenderTarget(Ref<RenderTarget2D> renderTarget)
+	{
+		CPUSetRenderTargetCommand cmd;
+		cmd.renderTargetHandles.Push(renderTarget->GetRTVDSVDescriptor());
+		cmd.depthStencil = nullptr;
+		SetRenderTarget(cmd);
+	}
+
+	void DirectX12CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget, Math::Vector4 color)
+	{
+		CPUClearRenderTargetCommand cmd;
+		cmd.handle = renderTarget->GetRTVDSVDescriptor();
+		cmd.color = color;
+		cmd.isDepthStencil = false;
+		ClearRenderTarget(cmd);
+	}
+
+
 
 
 	// transitions
-
-	void DirectX12CommandList::Present(Ref<FrameBuffer> fb)
+	void DirectX12CommandList::Transition(const CPUResourceTransitionCommand& cmd)
 	{
-		if (fb == nullptr)
-			fb = m_RenderTarget;
+		const Utils::Vector<ResourceTransitionObject>& transitions = cmd.resourceStateTransitons;
 
-		Utils::Vector<ResourceStateObject> transitions(fb->GetAttachments().Count());
-		for (uint32 i = 0; i < fb->GetAttachments().Count(); i++)
-			transitions[i] = { fb->GetAttachment(i)->GetResource(), ResourceState::Common };
+		if (transitions.Count() == 0)
+			return;
 
-		ValidateStates(transitions);
-
-		if (fb == m_RenderTarget)
-			m_RenderTarget = nullptr;
-	}
-
-
-	void DirectX12CommandList::Transition(Utils::Vector<ResourceTransitionObject> transitions)
-	{
 		Utils::Vector<D3D12_RESOURCE_BARRIER> barriers;
 		barriers.Resize(transitions.Count());
 		for (uint32 i = 0; i < transitions.Count(); i++)
@@ -134,202 +162,121 @@ namespace Engine
 			ResourceState to = transitions[i].to;
 			ResourceState from = transitions[i].from;
 			GPUResource* resource = transitions[i].resource;
-			CORE_ASSERT(resource->SupportState(to), "resouce does not support state");
 			barriers[i] = TransitionResource((ID3D12Resource*)resource->GetGPUResourcePointer(), 
-				(D3D12_RESOURCE_STATES)resource->GetState(from), (D3D12_RESOURCE_STATES)resource->GetState(to));
+				(D3D12_RESOURCE_STATES)resource->GetGPUState(from), (D3D12_RESOURCE_STATES)resource->GetGPUState(to));
 		}
 
 		m_CommandList->ResourceBarrier((uint32)barriers.Count(), barriers.Data());
 	}
 
-	void DirectX12CommandList::ValidateStates(Utils::Vector<ResourceStateObject> resources)
+	// UAVs
+	void DirectX12CommandList::AwaitUAVs(const CPUAwaitUAVCommand& cmd)
 	{
-		Utils::Vector<ResourceStateObject>& pendingTransitions = GetCurrentPendingTransitions();
-		std::unordered_map<GPUResource*, ResourceState>& resourceStates = GetResourceStates();
+		if (cmd.UAVs.Count() == 0)
+			return;
 
-		Utils::Vector<ResourceTransitionObject> transitions;
-		transitions.Reserve(resources.Count());
-
-		for (ResourceStateObject& res : resources)
-		{
-			const std::unordered_map<GPUResource*, ResourceState>::iterator& foundResouce = resourceStates.find(res.resource);
-
-			if (foundResouce == resourceStates.end())
-			{
-				pendingTransitions.Push(res);
-				resourceStates[res.resource] = res.state;
-			}
-			else
-			{
-				ResourceState currState = foundResouce->second;
-				if (currState != res.state)
-				{
-					transitions.Push({ res.resource, res.state, currState });
-					resourceStates[res.resource] = res.state;
-				}
-			}
-		}
-
-		if (!transitions.Empty())
-			Transition(transitions);
+		Utils::Vector<CD3DX12_RESOURCE_BARRIER> barriers;
+		barriers.Resize(cmd.UAVs.Count());
+		for (uint32 i = 0; i < cmd.UAVs.Count(); i++)
+			barriers[i] = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)cmd.UAVs[i]->GetGPUResourcePointer());
+		m_CommandList->ResourceBarrier(barriers.Count(), barriers.Data());
 	}
 
 	// copying
-	void DirectX12CommandList::CopyBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size)
+	void DirectX12CommandList::CopyBuffer(const CPUCopyBufferCommand& cmd)
 	{
-		ID3D12Resource* destp = (ID3D12Resource*)dest->GetGPUResourcePointer();
-		ID3D12Resource* srcp = (ID3D12Resource*)src->GetGPUResourcePointer();
-		m_CommandList->CopyBufferRegion(destp, destOffset, srcp, srcOffset, size);
+		ID3D12Resource* destp = (ID3D12Resource*)cmd.dest->GetGPUResourcePointer();
+		ID3D12Resource* srcp = (ID3D12Resource*)cmd.src->GetGPUResourcePointer();
+		if (cmd.size == 0)
+			m_CommandList->CopyResource(destp, srcp);
+		else
+			m_CommandList->CopyBufferRegion(destp, cmd.destOffset, srcp, cmd.srcOffset, cmd.size);
 	}
 
-	void DirectX12CommandList::CopyResource(GPUResource* dest, GPUResource* src)
-	{
-		m_CommandList->CopyResource((ID3D12Resource*)dest->GetGPUResourcePointer(), (ID3D12Resource*)src->GetGPUResourcePointer());
-	}
-
-	void DirectX12CommandList::UploadTexture(GPUResource* dest, UploadTextureResource* src)
+	void DirectX12CommandList::UploadTexture(const CPUUploadTextureCommand& cmd)
 	{
 		D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
-		srcLocation.pResource = (ID3D12Resource*)src->GetGPUResourcePointer();
+		srcLocation.pResource = (ID3D12Resource*)cmd.src->GetGPUResourcePointer();
 		srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
 		srcLocation.PlacedFootprint.Offset = 0;
-		srcLocation.PlacedFootprint.Footprint.Format = GetDXGITextureFormat(src->GetFormat());
-		srcLocation.PlacedFootprint.Footprint.Width = src->GetWidth();
-		srcLocation.PlacedFootprint.Footprint.Height = src->GetHeight();
+		srcLocation.PlacedFootprint.Footprint.Format = GetDXGITextureFormat(cmd.src->GetFormat());
+		srcLocation.PlacedFootprint.Footprint.Width = cmd.src->GetWidth();
+		srcLocation.PlacedFootprint.Footprint.Height = cmd.src->GetHeight();
 		srcLocation.PlacedFootprint.Footprint.Depth = 1;
-		srcLocation.PlacedFootprint.Footprint.RowPitch = src->GetPitch();
+		srcLocation.PlacedFootprint.Footprint.RowPitch = cmd.src->GetPitch();
 
 		D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
-		dstLocation.pResource = (ID3D12Resource*)dest->GetGPUResourcePointer();
+		dstLocation.pResource = (ID3D12Resource*)cmd.dest->GetGPUResourcePointer();
 		dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
 		dstLocation.SubresourceIndex = 0;
 		m_CommandList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
 	}
 
-	// rendering
-
-	void DirectX12CommandList::SetRenderTarget(Ref<RenderTarget2D> renderTarget)
+	// set render targets and viewport
+	void DirectX12CommandList::SetViewport(const CPUSetViewportCommand& cmd)
 	{
-		if (m_Type == CommandList::Bundle)
-		{
-			CORE_WARN("Command bundle can not set render targets. command will be ignored");
-			return;
-		}
-
-		m_RenderTarget = FrameBuffer::Create({ renderTarget });
-
-		ValidateState(renderTarget->GetResource(), ResourceState::RenderTarget);
-
-		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)renderTarget->GetResource();
-		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)renderTarget->GetRTVDSVDescriptor();
-
-		D3D12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle = rtv->GetHandle().cpu;
-		m_CommandList->OMSetRenderTargets(1, &cpuDescriptorHandle, FALSE, nullptr);
-
-		uint32 width = res->GetWidth();
-		uint32 height = res->GetHeight();
-
 		const D3D12_VIEWPORT viewport{
-			0,0,
-			(float)width,
-			(float)height,
-			0,1
+			cmd.pos.x,
+			cmd.pos.y,
+			cmd.size.x,
+			cmd.size.y,
+			cmd.depths.x,
+			cmd.depths.y
 		};
 
 		const D3D12_RECT rect{
-			0,0,
-			(long)width,
-			(long)height
+			(long)cmd.pos.x,
+			(long)cmd.pos.y,
+			(long)cmd.size.x,
+			(long)cmd.size.y,
 		};
 
 		m_CommandList->RSSetViewports(1, &viewport);
 		m_CommandList->RSSetScissorRects(1, &rect);
 	}
 
-	void DirectX12CommandList::SetRenderTarget(Ref<FrameBuffer> buffer)
+	void DirectX12CommandList::SetRenderTarget(const CPUSetRenderTargetCommand& cmd)
 	{
-		// check if command list is a bundle
-		if (m_Type == CommandList::Bundle)
-		{
-			CORE_WARN("Command bundle can not set render targets. command will be ignored");
-			return;
-		}
-
-		// get directX 12 frame buffer
-		m_RenderTarget = buffer;
-
 		// get render target information
-		uint32 numRenderTargets = buffer->GetAttachments().Count() - (size_t)m_RenderTarget->HasDepthAttachment();
-		Utils::Vector<ResourceStateObject> resourceStateValidation;
-		Utils::Vector<uint64> rendertargetHandles(numRenderTargets);
-		Utils::Vector<D3D12_VIEWPORT> viewports(numRenderTargets);
-		Utils::Vector<D3D12_RECT> rects(numRenderTargets);
+		Utils::Vector<uint64> rendertargetHandles(cmd.renderTargetHandles.Count());
 		uint64 depthHandle = 0;
 
-		for (uint32 i = 0; i < buffer->GetAttachments().Count(); i++)
+		for (uint32 i = 0; i < cmd.renderTargetHandles.Count(); i++)
 		{
-			resourceStateValidation.Push({ buffer->GetAttachment(i)->GetResource(), ResourceState::RenderTarget });
-			DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)buffer->GetAttachment(i)->GetResource();
-			DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)buffer->GetAttachment(i)->GetRTVDSVDescriptor();
-
-
-			if (IsTextureFormatDepthStencil(buffer->GetAttachment(i)->GetResource()->GetFormat()))
-				depthHandle = rtv->GetHandle().cpu.ptr;
-			else
-			{
-				viewports[i] = {
-					0,0,
-					(float)res->GetWidth(),
-					(float)res->GetHeight(),
-					0, 1
-				};
-
-				rects[i] = {
-					0,0,
-					(long)res->GetWidth(),
-					(long)res->GetHeight()
-				};
-
-				rendertargetHandles[i] = rtv->GetHandle().cpu.ptr;
-			}
+			DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)cmd.renderTargetHandles[i];
+			rendertargetHandles[i] = rtv->GetHandle().cpu.ptr;
 		}
 
-		ValidateStates(resourceStateValidation);
+		if (cmd.depthStencil != nullptr)
+		{
+			DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)cmd.depthStencil;
+			depthHandle = rtv->GetHandle().cpu.ptr;
+		}
 
 		// set render target
 		m_CommandList->OMSetRenderTargets(
-			(uint32)numRenderTargets, 
-			(D3D12_CPU_DESCRIPTOR_HANDLE*)rendertargetHandles.Data(), 
-			FALSE, 
+			(uint32)rendertargetHandles.Count(),
+			(D3D12_CPU_DESCRIPTOR_HANDLE*)rendertargetHandles.Data(),
+			FALSE,
 			depthHandle ? (D3D12_CPU_DESCRIPTOR_HANDLE*)&depthHandle : nullptr
 		);
-
-		// set scissor and viewport
-		m_CommandList->RSSetViewports(numRenderTargets, viewports.Data());
-		m_CommandList->RSSetScissorRects(numRenderTargets, rects.Data());
 	}
 
-	void DirectX12CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color)
+	// clear render targets
+	void DirectX12CommandList::ClearRenderTarget(const CPUClearRenderTargetCommand& cmd)
 	{
-		if (m_Type == CommandList::Bundle)
-		{
-			CORE_WARN("Command bundle can not clear render targets. command will be ignored");
-			return;
-		}
-
-		DirectX12Texture2DResource* res = (DirectX12Texture2DResource*)renderTarget->GetResource();
-		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)renderTarget->GetRTVDSVDescriptor();
-
-		ValidateState({ res, ResourceState::RenderTarget });
+		DirectX12Texture2DRTVDSVDescriptorHandle* rtv = (DirectX12Texture2DRTVDSVDescriptorHandle*)cmd.handle;
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetHandle().cpu;
-		if (IsTextureFormatDepthStencil(res->GetFormat()))
-			m_CommandList->ClearDepthStencilView(handle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, color.r, (uint8)color.g, 0, nullptr);
+		if (cmd.isDepthStencil)
+			m_CommandList->ClearDepthStencilView(handle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, cmd.color.r, (uint8)cmd.color.g, 0, nullptr);
 		else
-			m_CommandList->ClearRenderTargetView(handle, (float*)&color, 0, nullptr);
+			m_CommandList->ClearRenderTargetView(handle, (float*)&cmd.color, 0, nullptr);
+
 	}
 
-	void DirectX12CommandList::InitalizeDescriptorTables(Ref<ShaderPass> shader)
+	// set shaders
+	void DirectX12CommandList::InitalizeDescriptorTables(const Ref<ShaderPass> shader)
 	{
 		Utils::Vector<ShaderParameter> reflectionData = shader->GetReflectionData();
 		for (uint32 i = 0; i < reflectionData.Count(); i++)
@@ -354,16 +301,10 @@ namespace Engine
 		}
 	}
 
-	void DirectX12CommandList::SetShader(Ref<GraphicsShaderPass> shader)
+	void DirectX12CommandList::SetShader(const CPUSetGraphicsShaderCommand& cmd)
 	{
-		if (!m_RenderTarget)
-		{
-			CORE_ERROR("Can not set shader without render target");
-			return;
-		}
-
-		Ref<DirectX12GraphicsShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12GraphicsShaderPass>(shader);
-		m_CommandList->SetPipelineState(dxShader->GetPipelineState(m_RenderTarget));
+		Ref<DirectX12GraphicsShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12GraphicsShaderPass>(cmd.shaderPass);
+		m_CommandList->SetPipelineState(dxShader->GetPipelineState(cmd.format));
 
 		D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 		switch (dxShader->GetTopologyType())
@@ -376,26 +317,21 @@ namespace Engine
 		m_CommandList->SetGraphicsRootSignature(dxShader->GetRootSignature());
 		m_CommandList->IASetPrimitiveTopology(top);
 
-		InitalizeDescriptorTables(shader);
-
-		m_BoundShader = shader;
+		InitalizeDescriptorTables(cmd.shaderPass);
 	}
 
-	void DirectX12CommandList::SetShader(Ref<ComputeShaderPass> shader)
+	void DirectX12CommandList::SetShader(const CPUSetComputeShaderCommand& cmd)
 	{
-		Ref<DirectX12ComputeShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12ComputeShaderPass>(shader);
+		Ref<DirectX12ComputeShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12ComputeShaderPass>(cmd.shaderPass);
 		m_CommandList->SetPipelineState(dxShader->GetPipelineState());
 		m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature());
 
-		InitalizeDescriptorTables(shader);
-
-		m_BoundShader = shader;
+		InitalizeDescriptorTables(cmd.shaderPass);
 	}
 
-	void DirectX12CommandList::SetShader(Ref<WorkGraphShaderPass> shader)
+	void DirectX12CommandList::SetShader(const CPUSetWorkGraphShaderCommand& cmd)
 	{
-		Ref<DirectX12WorkGraphShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12WorkGraphShaderPass>(shader);
-
+		Ref<DirectX12WorkGraphShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12WorkGraphShaderPass>(cmd.shaderPass);
 		m_CommandList->SetComputeRootSignature(dxShader->GetRootSignature());
 
 		D3D12_SET_PROGRAM_DESC setProg = {};
@@ -405,235 +341,118 @@ namespace Engine
 		setProg.WorkGraph.BackingMemory = dxShader->GetBackingMemory();
 		m_CommandList->SetProgram(&setProg);
 
-		InitalizeDescriptorTables(shader);
-		m_BoundShader = shader;
+		InitalizeDescriptorTables(cmd.shaderPass);
 	}
 
-	void DirectX12CommandList::SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer)
-	{
-		if (index == UINT32_MAX || buffer == nullptr)
-			return; // invalid bind slot
 
-		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)buffer->GetResource();
+	// set data
+	void DirectX12CommandList::SetRootConstant(const CPUSetRootConstantCommand& cmd)
+	{
+		if (cmd.isCompute)
+			m_CommandList->SetComputeRoot32BitConstant(cmd.index, cmd.data, 0);
+		else
+			m_CommandList->SetGraphicsRoot32BitConstant(cmd.index, cmd.data, 0);
+	}
+
+	void DirectX12CommandList::SetConstantBuffer(const CPUSetConstantBufferCommand& cmd)
+	{
+		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)cmd.res;
 		D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = dxResource->GetBuffer()->GetGPUVirtualAddress();
-		if (m_BoundShader->IsComputeShader())
-			m_CommandList->SetComputeRootConstantBufferView(index, gpuAddress);
+		if (cmd.isCompute)
+			m_CommandList->SetComputeRootConstantBufferView(cmd.index, gpuAddress);
 		else
-			m_CommandList->SetGraphicsRootConstantBufferView(index, gpuAddress);
+			m_CommandList->SetGraphicsRootConstantBufferView(cmd.index, gpuAddress);
 	}
 
-	void DirectX12CommandList::SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer)
+	void DirectX12CommandList::SetStructuredBuffer(const CPUSetStructuredBufferCommand& cmd)
 	{
-		if (index == UINT32_MAX || buffer == nullptr)
-			return;
-
-		DirectX12StructuredBufferSRVDescriptorHandle* srv = (DirectX12StructuredBufferSRVDescriptorHandle*)buffer->GetSRVDescriptor();
+		DirectX12StructuredBufferSRVDescriptorHandle* srv = (DirectX12StructuredBufferSRVDescriptorHandle*)cmd.handle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srv->GetHandle().gpu;
-		if (m_BoundShader->IsComputeShader())
-			m_CommandList->SetComputeRootDescriptorTable(index, gpuHandle);
+		if (cmd.isCompute)
+			m_CommandList->SetComputeRootDescriptorTable(cmd.index, gpuHandle);
 		else
-			m_CommandList->SetGraphicsRootDescriptorTable(index, gpuHandle);
+			m_CommandList->SetGraphicsRootDescriptorTable(cmd.index, gpuHandle);
 	}
 
-	void DirectX12CommandList::SetRWStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer)
+	void DirectX12CommandList::SetRWStructuredBuffer(const CPUSetRWStructuredBufferCommand& cmd)
 	{
-		if (index == UINT32_MAX || buffer == nullptr)
-			return;
-
-		DirectX12StructuredBufferUAVDescriptorHandle* uav = (DirectX12StructuredBufferUAVDescriptorHandle*)buffer->GetUAVDescriptor();
+		DirectX12StructuredBufferUAVDescriptorHandle* uav = (DirectX12StructuredBufferUAVDescriptorHandle*)cmd.handle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = uav->GetHandle().gpu;
 
-		if (m_BoundShader->IsComputeShader())
-			m_CommandList->SetComputeRootDescriptorTable(index, gpuHandle);
+		if (cmd.isCompute)
+			m_CommandList->SetComputeRootDescriptorTable(cmd.index, gpuHandle);
 		else
-			m_CommandList->SetGraphicsRootDescriptorTable(index, gpuHandle);
+			m_CommandList->SetGraphicsRootDescriptorTable(cmd.index, gpuHandle);
 	}
 
-	void DirectX12CommandList::SetRootConstant(uint32 index, uint32 data)
+	void DirectX12CommandList::SetTexture(const CPUSetTextureCommand& cmd)
 	{
-		if (index == UINT32_MAX)
-			return; // invalid bind slot
 
-		if (m_BoundShader->IsComputeShader())
-			m_CommandList->SetComputeRoot32BitConstant(index, data, 0);
-		else
-			m_CommandList->SetGraphicsRoot32BitConstant(index, data, 0);
-	}
-
-	void DirectX12CommandList::SetTexture(uint32 index, Ref<Texture2D> texture)
-	{
-		if (index == UINT32_MAX)
-			return; // invalid bind slot
-
-		ValidateState(texture->GetResource(), ResourceState::ShaderResource);
-
-		DirectX12Texture2DSRVDescriptorHandle* srv = (DirectX12Texture2DSRVDescriptorHandle*)texture->GetSRVDescriptor();
+		DirectX12Texture2DSRVDescriptorHandle* srv = (DirectX12Texture2DSRVDescriptorHandle*)cmd.handle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srv->GetHandle().gpu;
 
-		if (m_BoundShader->IsComputeShader())
-			m_CommandList->SetComputeRootDescriptorTable(index, gpuHandle);
+		if (cmd.isCompute)
+			m_CommandList->SetComputeRootDescriptorTable(cmd.index, gpuHandle);
 		else
-			m_CommandList->SetGraphicsRootDescriptorTable(index, gpuHandle);
+			m_CommandList->SetGraphicsRootDescriptorTable(cmd.index, gpuHandle);
 	}
 
-	void DirectX12CommandList::SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav)
+	void DirectX12CommandList::SetRWTexture(const CPUSetRWTextureCommand& cmd)
 	{
-		if (index == UINT32_MAX)
-			return; // invalid bind slot
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = ((DirectX12Texture2DUAVDescriptorHandle*)cmd.handle)->GetHandle().gpu;
 
-		ValidateState(uav->m_Resource, ResourceState::UnorderedResource);
-
-		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = ((DirectX12Texture2DUAVDescriptorHandle*)uav)->GetHandle().gpu;
-
-		if (m_BoundShader->IsComputeShader())
-			m_CommandList->SetComputeRootDescriptorTable(index, gpuHandle);
+		if (cmd.isCompute)
+			m_CommandList->SetComputeRootDescriptorTable(cmd.index, gpuHandle);
 		else
-			m_CommandList->SetGraphicsRootDescriptorTable(index, gpuHandle);
+			m_CommandList->SetGraphicsRootDescriptorTable(cmd.index, gpuHandle);
 	}
 
-	void DirectX12CommandList::DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, int numInstances)
+	void DirectX12CommandList::DrawMesh(const CPUDrawMeshCommand& cmd)
 	{
-		uint32 indexCount = mesh->GetIndexBuffer()->GetResource()->GetCount();
-		DirectX12VertexBufferView* vertexBufferView = (DirectX12VertexBufferView*)mesh->GetVertexBuffer()->GetView();
-		DirectX12IndexBufferView* indexBufferView = (DirectX12IndexBufferView*)mesh->GetIndexBuffer()->GetView();
+		DirectX12VertexBufferView* vertexBufferView = (DirectX12VertexBufferView*)cmd.vertexBufferView;
+		DirectX12IndexBufferView* indexBufferView = (DirectX12IndexBufferView*)cmd.indexBufferView;
 
-		if (instanceBuffer)
+		if (cmd.instanceBufferView)
 		{
-			DirectX12InstanceBufferView* instanceBufferView = (DirectX12InstanceBufferView*)instanceBuffer->GetView();
-			if (numInstances < 0)
-				numInstances = instanceBuffer->GetCount();
+			DirectX12InstanceBufferView* instanceBufferView = (DirectX12InstanceBufferView*)cmd.instanceBufferView;
 
 			D3D12_VERTEX_BUFFER_VIEW views[] = { vertexBufferView->GetView(), instanceBufferView->GetView() };
 			m_CommandList->IASetVertexBuffers(0, 2, views);
 			m_CommandList->IASetIndexBuffer(&indexBufferView->GetView());
-			m_CommandList->DrawIndexedInstanced(indexCount, numInstances, 0, 0, 0);
+			m_CommandList->DrawIndexedInstanced(cmd.numIndices, cmd.numInstances, 0, 0, 0);
 		}
 		else
 		{
 			D3D12_VERTEX_BUFFER_VIEW views[] = { vertexBufferView->GetView() };
 			m_CommandList->IASetVertexBuffers(0, 1, views);
 			m_CommandList->IASetIndexBuffer(&indexBufferView->GetView());
-			m_CommandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+			m_CommandList->DrawIndexedInstanced(cmd.numIndices, 1, 0, 0, 0);
 		}
 	}
 
-	void DirectX12CommandList::ExecuteBundle(Ref<CommandList> commandList)
+	void DirectX12CommandList::Dispatch(const CPUDispatchCommand& cmd)
 	{
-		Ref<DirectX12CommandList> dxCommandList = std::dynamic_pointer_cast<DirectX12CommandList>(commandList);
-		if (dxCommandList->m_Type != CommandList::Bundle)
-			return;
-
-		m_CommandList->ExecuteBundle(dxCommandList->GetCommandList());
+		m_CommandList->Dispatch(cmd.threadGroupsX, cmd.threadGroupsY, cmd.threadGroupsZ);
 	}
 
-	void DirectX12CommandList::Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ)
-	{
-		m_CommandList->Dispatch(threadGroupsX, threadGroupsY, threadGrouptsZ);
-	}
-
-	void DirectX12CommandList::DisbatchGraph(uint32 numRecords)
+	void DirectX12CommandList::DispatchGraph(const CPUDispatchGraphCPUDataCommand& cmd)
 	{
 		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
 		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_CPU_INPUT;
 		DSDesc.NodeCPUInput.EntrypointIndex = 0; // just one entrypoint in this graph
-		DSDesc.NodeCPUInput.NumRecords = numRecords;
-		DSDesc.NodeCPUInput.RecordStrideInBytes = 0;
-		DSDesc.NodeCPUInput.pRecords = nullptr;
+		DSDesc.NodeCPUInput.NumRecords = cmd.count;
+		DSDesc.NodeCPUInput.RecordStrideInBytes = cmd.stride;
+		DSDesc.NodeCPUInput.pRecords = cmd.data;
 		m_CommandList->DispatchGraph(&DSDesc);
 	}
 
-	void DirectX12CommandList::DisbatchGraph(Ref<StructuredBuffer> buffer)
+	void DirectX12CommandList::DispatchGraph(const CPUDispatchGraphGPUDataCommand& cmd)
 	{
-		DirectX12StructuredBufferResource* res = (DirectX12StructuredBufferResource*)buffer->GetResource();
+		DirectX12StructuredBufferResource* res = (DirectX12StructuredBufferResource*)cmd.res;
 
 		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
 		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_GPU_INPUT;
 		DSDesc.NodeGPUInput = res->GetBuffer()->GetGPUVirtualAddress();
 		m_CommandList->DispatchGraph(&DSDesc);
 	}
-
-	void DirectX12CommandList::DisbatchGraph(void* data, uint32 stride, uint32 count)
-	{
-		D3D12_DISPATCH_GRAPH_DESC DSDesc = {};
-		DSDesc.Mode = D3D12_DISPATCH_MODE_NODE_CPU_INPUT;
-		DSDesc.NodeCPUInput.EntrypointIndex = 0; // just one entrypoint in this graph
-		DSDesc.NodeCPUInput.NumRecords = count;
-		DSDesc.NodeCPUInput.RecordStrideInBytes = stride;
-		DSDesc.NodeCPUInput.pRecords = data;
-		m_CommandList->DispatchGraph(&DSDesc);
-	}
-
-	void DirectX12CommandList::AwaitUAV(GPUResource* uav)
-	{
-		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)uav->GetGPUResourcePointer());
-		m_CommandList->ResourceBarrier(1, &barrier);
-	}
-
-	void DirectX12CommandList::AwaitUAVs(Utils::Vector<GPUResource*> uavs)
-	{
-		if (uavs.Count() == 0)
-			return;
-
-		Utils::Vector<CD3DX12_RESOURCE_BARRIER> barriers;
-		barriers.Resize(uavs.Count());
-		for (uint32 i = 0; i < uavs.Count(); i++)
-			barriers[i] = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)uavs[i]->GetGPUResourcePointer());
-		m_CommandList->ResourceBarrier(barriers.Count(), barriers.Data());
-	}
-
-	void DirectX12CommandList::Close()
-	{
-		m_State = RequestClose;
-		m_RenderTarget = nullptr;
-		m_CurrentFrame = (m_CurrentFrame + 1) % m_Frames.Count();
-	}
-
-	bool DirectX12CommandList::RecordPrependCommands()
-	{
-		Utils::Vector<ResourceStateObject>& pendingTransitions = GetPendingTransitions();
-		std::unordered_map<GPUResource*, ResourceState> endingStates = GetEndingResourceStates();
-
-		// get list off all resources that need to be changed
-		Utils::Vector<D3D12_RESOURCE_BARRIER> transitions;
-		transitions.Reserve(pendingTransitions.Count());
-
-		for (uint32 i = 0; i < pendingTransitions.Count(); i++)
-		{
-			ResourceStateObject& rso = pendingTransitions[i];
-
-			GPUResource* resource = rso.resource;
-
-			ResourceState to = rso.state;
-			ResourceState from = resource->GetDefultState();
-			CORE_ASSERT(resource->SupportState(to), "resouce does not support state");
-			if (rso.resource->GetDefultState() != rso.state)
-			{
-				ID3D12Resource* gpuResourcePointer = (ID3D12Resource*)resource->GetGPUResourcePointer();
-				CORE_ASSERT(gpuResourcePointer != nullptr, "{0}", i);
-				transitions.Push(TransitionResource(gpuResourcePointer,
-					(D3D12_RESOURCE_STATES)resource->GetState(from), (D3D12_RESOURCE_STATES)resource->GetState(to)));
-			}
-		}
-
-		for (auto resState : endingStates)
-			resState.first->m_DefultState = resState.second;
-
-		if (!transitions.Empty())
-		{
-			CORE_ASSERT_HRESULT(m_PrependAllocator->Reset(), "Failed to reset prepend command allocator");
-			CORE_ASSERT_HRESULT(m_PrependList->Reset(m_PrependAllocator, nullptr), "Failed to reset prepend command list");
-
-			ID3D12DescriptorHeap* heaps[]{ DirectX12ResourceManager::s_SRVHeap->GetHeap().Get(), DirectX12ResourceManager::s_SamplerHeap->GetHeap().Get() };
-			m_PrependList->SetDescriptorHeaps(2, heaps);
-
-			m_PrependList->ResourceBarrier((uint32)transitions.Count(), transitions.Data());
-
-
-			m_PrependList->Close();
-
-			return true;
-		}
-		return false;
-	}
-
 }

@@ -35,7 +35,6 @@ namespace Engine
 		virtual void UpdateBuffers() {};
 
 		virtual void Build() {};
-		virtual void Render(Ref<CommandQueue> queue) {};
 
 	protected:
 		Ref<Camera> m_MainCamera;

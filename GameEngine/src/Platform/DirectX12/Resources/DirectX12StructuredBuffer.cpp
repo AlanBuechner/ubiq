@@ -26,7 +26,7 @@ namespace Engine
 			&props,
 			D3D12_HEAP_FLAG_NONE,
 			&resDesc,
-			(D3D12_RESOURCE_STATES)GetState(m_DefultState),
+			(D3D12_RESOURCE_STATES)GetGPUState(m_DefultState),
 			nullptr,
 			IID_PPV_ARGS(&m_Buffer)
 		);
@@ -46,7 +46,7 @@ namespace Engine
 		context->GetDX12ResourceManager()->UploadBufferRegion(this, m_Stride * start, data, m_Stride * count, m_DefultState);
 	}
 
-	uint32 DirectX12StructuredBufferResource::GetState(ResourceState state)
+	uint32 DirectX12StructuredBufferResource::GetGPUState(ResourceState state)
 	{
 		switch (state)
 		{

@@ -102,7 +102,7 @@ namespace Engine
 		s_Data.QuadInstanceBuffer->Apply();
 	}
 
-	void Renderer2D::Build(Ref<CommandList> commandList)
+	void Renderer2D::Build(Ref<CPUCommandList> commandList)
 	{
 		if (!s_Data.QuadInstanceBuffer->Empty())
 		{

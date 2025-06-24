@@ -12,29 +12,48 @@
 namespace Engine
 {
 
-	void GPUTimer::BeginEvent(Ref<CommandList> commandList, const std::string& eventName)
+	void GPUTimer::BeginEvent(CommandList* commandList, const std::string& eventName)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			DirectX12GPUProfiler::BeginEvent(std::dynamic_pointer_cast<DirectX12CommandList>(commandList), eventName);
+			DirectX12GPUProfiler::BeginEvent((DirectX12CommandList*)commandList, eventName);
 			break;
 		default:
 			break;
 		}
 	}
 
-	void GPUTimer::EndEvent(Ref<CommandList> commandList)
+	void GPUTimer::EndEvent(CommandList* commandList)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			DirectX12GPUProfiler::EndEvent(std::dynamic_pointer_cast<DirectX12CommandList>(commandList));
+			DirectX12GPUProfiler::EndEvent((DirectX12CommandList*)commandList);
 			break;
 		default:
 			break;
 		}
 	}
+
+
+	void GPUTimer::BeginEvent(Ref<CPUCommandList> commandList, const char* eventName)
+	{
+		// TODO
+	}
+
+	void GPUTimer::BeginEvent(Ref<CPUCommandList> commandList, const std::string& eventName)
+	{
+		// TODO
+	}
+
+	void GPUTimer::EndEvent(Ref<CPUCommandList> commandList)
+	{
+		// TODO
+	}
+
+
+
 
 	void GPUProfiler::Init()
 	{

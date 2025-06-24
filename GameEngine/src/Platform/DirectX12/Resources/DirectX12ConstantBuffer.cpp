@@ -28,7 +28,7 @@ namespace Engine
 			&props, // this heap will be used to upload the constant buffer data
 			D3D12_HEAP_FLAG_NONE, // no flags
 			&resDesc, // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
-			(D3D12_RESOURCE_STATES)GetState(m_DefultState), // will be data that is read from so we keep it in the generic read state
+			(D3D12_RESOURCE_STATES)GetGPUState(m_DefultState), // will be data that is read from so we keep it in the generic read state
 			nullptr, // we do not have use an optimized clear value for constant buffers
 			IID_PPV_ARGS(&m_Buffer)
 		);
@@ -48,7 +48,7 @@ namespace Engine
 		context->GetDX12ResourceManager()->UploadBuffer(this, data, m_Size, m_DefultState);
 	}
 
-	uint32 DirectX12ConstantBufferResource::GetState(ResourceState state)
+	uint32 DirectX12ConstantBufferResource::GetGPUState(ResourceState state)
 	{
 		switch (state)
 		{

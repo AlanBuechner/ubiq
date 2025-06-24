@@ -9,8 +9,8 @@ namespace Engine
 	public:
 		static void Init();
 
-		static void BeginEvent(Ref<DirectX12CommandList> commandList, const std::string& eventName);
-		static void EndEvent(Ref<DirectX12CommandList> commandList);
+		static void BeginEvent(DirectX12CommandList* commandList, const std::string& eventName);
+		static void EndEvent(DirectX12CommandList* commandList);
 
 		static void SetTargetWindow(void* nativeWindow);
 

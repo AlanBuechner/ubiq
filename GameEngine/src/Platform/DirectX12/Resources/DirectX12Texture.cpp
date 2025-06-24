@@ -58,7 +58,7 @@ namespace Engine
 				&props,
 				D3D12_HEAP_FLAG_NONE,
 				&rDesc,
-				(D3D12_RESOURCE_STATES)GetState(m_DefultState),
+				(D3D12_RESOURCE_STATES)GetGPUState(m_DefultState),
 				nullptr,
 				IID_PPV_ARGS(&m_Buffer)
 			);
@@ -102,7 +102,7 @@ namespace Engine
 		context->GetDX12ResourceManager()->UploadTexture(this, m_UploadBuffer, m_Width, m_Height, m_Mips, m_DefultState, m_Format);
 	}
 
-	uint32 DirectX12Texture2DResource::GetState(ResourceState state)
+	uint32 DirectX12Texture2DResource::GetGPUState(ResourceState state)
 	{
 		switch (state)
 		{

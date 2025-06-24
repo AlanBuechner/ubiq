@@ -14,8 +14,8 @@
 
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
 Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
-Engine::Ref<Engine::CommandList> Engine::Renderer::s_MainCommandList;
-Engine::Ref<Engine::CommandList> Engine::Renderer::s_UploadCommandList;
+Engine::Ref<Engine::CPUCommandList> Engine::Renderer::s_MainCommandList;
+Engine::Ref<Engine::CPUCommandList> Engine::Renderer::s_UploadCommandList;
 Engine::RendererAPI Engine::Renderer::s_Api = Engine::RendererAPI::DirectX12;
 Engine::Renderer::FrameContext* Engine::Renderer::s_FrameContext = nullptr;
 Profiler::InstrumentationTimer Engine::Renderer::s_Timer = CREATE_PROFILEI();
@@ -59,8 +59,8 @@ namespace Engine
 		
 		// graphics command queue
 		s_MainCommandQueue = CommandQueue::Create(CommandQueue::Type::Direct);
-		s_MainCommandList = CommandList::Create(CommandList::Direct);
-		s_UploadCommandList = CommandList::Create(CommandList::Direct);
+		s_MainCommandList = CPUCommandList::Create(CommandListType::Graphics);
+		s_UploadCommandList = CPUCommandList::Create(CommandListType::Graphics);
 
 		// copy command queue
 
@@ -131,7 +131,7 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		
-		Renderer::GetMainCommandList()->StartRecording();
+		s_MainCommandList->StartRecording();
 		GPUTimer::BeginEvent(s_MainCommandList, "MainCommandList");
 	}
 
@@ -139,7 +139,8 @@ namespace Engine
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		GPUTimer::EndEvent(s_MainCommandList);
-		GetMainCommandList()->Close();
+		s_MainCommandList->StopRecording();
+		SubmitCommandList(s_MainCommandList);
 		FrameContext* context = s_FrameContext;
 		s_FrameContext = new FrameContext();
 		s_RenderThread->Invoke(context);
@@ -150,7 +151,7 @@ namespace Engine
 		s_RenderThread->Wait();
 	}
 
-	void Renderer::Build(Ref<CommandList> commandList)
+	void Renderer::Build(Ref<CPUCommandList> commandList)
 	{
 		Renderer2D::Build(commandList);
 		DebugRenderer::Build(commandList);
@@ -164,23 +165,45 @@ namespace Engine
 
 		// copy commands
 		frameContext->m_UploadPool->RecoredUploadCommands(s_UploadCommandList);
+		frameContext->m_Commands.Insert(0u, s_UploadCommandList->TakeAllocator()); // add upload command list
 
-		// rendering commands
-		GPUProfiler::StartFrame();
-
-		CPUCommandAllocator::ResourceStateMap stateMap;
-		for (CPUCommandAllocator* commands : frameContext->m_Commands)
-		{
-			commands->PrependResourceStateCommands(stateMap);
-			commands->MergeResourceStatesInto(stateMap);
+		{ // create commands for resource state tracking
+			CREATE_PROFILE_SCOPEI("Prepare Command Lists");
+			CPUCommandAllocator::ResourceStateMap stateMap;
+			for (CPUCommandAllocator* commands : frameContext->m_Commands)
+			{
+				commands->PrependResourceStateCommands(stateMap);
+				commands->MergeResourceStatesInto(stateMap);
+			}
 		}
 
-		s_MainCommandQueue->Submit(s_UploadCommandList);
-		s_MainCommandQueue->Submit(s_MainCommandList);
-		s_MainCommandQueue->Build();
+		{ // record commands
+			CREATE_PROFILE_SCOPEI("Recored GPU Command Lists");
+			for (CPUCommandAllocator* commands : frameContext->m_Commands)
+			{
+				Ref<CommandList> commandList = CommandList::Create(CommandListType::Graphics);
+				frameContext->m_CommandLists.Push(commandList);
+
+				commandList->StartRecording();
+				commandList->RecoredCommands(commands);
+				commandList->Close();
+			}
+		}
+		
+		// move imgui command list
+		frameContext->m_CommandLists.Push(frameContext->m_IMGUICommandList);
+		frameContext->m_IMGUICommandList = nullptr;
+
+		// execute commands
+		GPUProfiler::StartFrame();
+		s_MainCommandQueue->Submit(frameContext->m_CommandLists);
 		s_MainCommandQueue->Execute();
 		s_MainCommandQueue->Await();
 		GPUProfiler::EndFrame();
+
+		// free command lists
+		for (Ref<CommandList> commandList : frameContext->m_CommandLists)
+			CommandList::Free(commandList);
 
 		// swap buffers
 		WindowManager::UpdateWindows();

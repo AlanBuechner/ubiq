@@ -147,15 +147,20 @@ namespace Engine
 
 #ifdef PLATFORM_WINDOWS
 		Ref<DirectX12SwapChain> swapChain = std::dynamic_pointer_cast<DirectX12SwapChain>(Application::Get().GetWindow().GetSwapChain());
-		Ref<DirectX12CommandList> commandList = Renderer::GetMainCommandList<DirectX12CommandList>();
+		Ref<DirectX12CommandList> commandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandListType::Graphics));
 		Ref<RenderTarget2D> rt = swapChain->GetCurrentRenderTarget();
+
+		commandList->StartRecording();
 		GPUTimer::BeginEvent(commandList, "ImGui");
-		//commandList->ValidateState({ rt->GetResource(), ResourceState::RenderTarget });
+		commandList->Transition({ { rt->GetResource(), ResourceState::RenderTarget, ResourceState::Common } }); // common -> render target
 		commandList->SetRenderTarget(rt);
 		commandList->ClearRenderTarget(rt, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList());
-		commandList->Present();
+		commandList->Transition({ { rt->GetResource(), ResourceState::Common, ResourceState::RenderTarget } }); // render target -> common
 		GPUTimer::EndEvent(commandList);
+		commandList->Close();
+
+		Renderer::GetFrameContext()->m_IMGUICommandList = commandList;
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{

@@ -48,7 +48,7 @@ namespace Engine
 		{
 			std::wstring pixPath = GetLatestWinPixGpuCapturerPath();
 			if (pixPath == L"")
-				CORE_WARN("Could not locate Pix instolation");
+				CORE_WARN("Could not locate Pix instillation");
 			else
 			{
 				CORE_INFO("Loading Pix");
@@ -58,12 +58,12 @@ namespace Engine
 		}
 	}
 
-	void DirectX12GPUProfiler::BeginEvent(Ref<DirectX12CommandList> commandList, const std::string& eventName)
+	void DirectX12GPUProfiler::BeginEvent(DirectX12CommandList* commandList, const std::string& eventName)
 	{
 		PIXBeginEvent(commandList->GetCommandList(), 0, eventName.c_str());
 	}
 
-	void DirectX12GPUProfiler::EndEvent(Ref<DirectX12CommandList> commandList)
+	void DirectX12GPUProfiler::EndEvent(DirectX12CommandList* commandList)
 	{
 		PIXEndEvent(commandList->GetCommandList());
 	}

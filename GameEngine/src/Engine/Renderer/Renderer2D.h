@@ -3,7 +3,7 @@
 #include "Engine/Math/Math.h"
 #include "Abstractions/Resources/Texture.h"
 #include "Abstractions/Resources/SubTexture.h"
-#include "Abstractions/CommandList.h"
+#include "CPUCommandList.h"
 
 namespace Engine
 {
@@ -22,7 +22,7 @@ namespace Engine
 		static void BeginScene(const Camera& camera, const Math::Mat4& transform);
 		static void EndScene();
 
-		static void Build(Ref<CommandList> commandList);
+		static void Build(Ref<CPUCommandList> commandList);
 
 		// draw colored quad
 		static void DrawQuad(const Math::Vector2& position, const Math::Vector2& size, const Math::Vector4& color, int entityID = -1);

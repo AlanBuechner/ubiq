@@ -8,8 +8,7 @@
 #include "Engine/Renderer/Abstractions/Resources/InstanceBuffer.h"
 #include "Engine/Renderer/Abstractions/Resources/ConstantBuffer.h"
 #include "Engine/Renderer/Abstractions/Resources/Texture.h"
-#include "Engine/Renderer/Abstractions/CommandList.h"
-#include "Engine/Renderer/Abstractions/CommandQueue.h"
+#include "Engine/Renderer/CPUCommandList.h"
 #include "Engine/Renderer/Shaders/Shader.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Mesh.h"
@@ -27,9 +26,9 @@ namespace Engine
 	{
 	}
 
-	void RenderGraph::Submit(Ref<CommandQueue> queue)
+	void RenderGraph::Submit()
 	{
-		queue->Submit(m_CommandLists);
+		Renderer::SubmitCommandLists(m_CommandLists);
 	}
 
 	void RenderGraph::OnViewportResize(uint32 width, uint32 height)
@@ -40,7 +39,7 @@ namespace Engine
 
 	void RenderGraph::Build()
 	{
-		for (Ref<CommandList> list : m_CommandLists)
+		for (Ref<CPUCommandList> list : m_CommandLists)
 			list->StartRecording();
 
 		for (auto& node : m_Nodes)
@@ -49,11 +48,11 @@ namespace Engine
 		for (auto& node : m_Nodes)
 			node->Build();
 
-		for (Ref<CommandList> list : m_CommandLists)
-			list->Close();
+		for (Ref<CPUCommandList> list : m_CommandLists)
+			list->StopRecording();
 	}
 
-	Engine::Ref<Engine::FrameBuffer> RenderGraph::GetRenderTarget()
+	Ref<FrameBuffer> RenderGraph::GetRenderTarget()
 	{
 		return m_OutputNode->m_Buffer;
 	}

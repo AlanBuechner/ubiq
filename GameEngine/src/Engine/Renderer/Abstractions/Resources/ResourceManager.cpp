@@ -168,16 +168,16 @@ namespace Engine
 		m_TextureUploadQueue.push(uploadData);
 	}
 
-	void UploadPool::RecoredUploadCommands(Ref<CommandList> commandList)
+	void UploadPool::RecoredUploadCommands(Ref<CPUCommandList> commandList)
 	{
 		CREATE_PROFILE_SCOPEI("Record Upload Commands");
 		commandList->StartRecording();
 		RecordBufferCommands(commandList);
 		RecordTextureCommands(commandList);
-		commandList->Close();
+		commandList->StopRecording();
 	}
 
-	void UploadPool::RecordBufferCommands(Ref<CommandList> commandlist)
+	void UploadPool::RecordBufferCommands(Ref<CPUCommandList> commandlist)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 
@@ -257,7 +257,7 @@ namespace Engine
 
 	}
 
-	void UploadPool::RecordTextureCommands(Ref<CommandList> commandlist)
+	void UploadPool::RecordTextureCommands(Ref<CPUCommandList> commandlist)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		// structs

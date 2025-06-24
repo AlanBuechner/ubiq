@@ -107,7 +107,7 @@ namespace Engine
 	}
 
 
-	void DebugRenderer::Build(Ref<CommandList> commandList)
+	void DebugRenderer::Build(Ref<CPUCommandList> commandList)
 	{
 		Engine::GPUTimer::BeginEvent(commandList, "Debug Renderer");
 		for (uint32 i = 0; i < s_DebugData.NumPasses; i++)

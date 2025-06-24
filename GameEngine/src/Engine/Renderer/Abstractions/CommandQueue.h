@@ -23,8 +23,6 @@ namespace Engine
 		void Submit(Ref<CommandList> commandList);
 		void Submit(Utils::Vector<Ref<CommandList>> commandLists);
 
-		virtual void Build() = 0;
-
 		virtual void Execute() = 0;
 		virtual bool InExecution() = 0;
 		virtual void Await() = 0;

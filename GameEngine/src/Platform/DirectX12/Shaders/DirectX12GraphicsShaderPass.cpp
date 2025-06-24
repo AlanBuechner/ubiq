@@ -40,26 +40,13 @@ namespace Engine
 		m_Sig->Release();
 	}
 
-	ID3D12PipelineState* DirectX12GraphicsShaderPass::GetPipelineState(Ref<FrameBuffer> target)
+	ID3D12PipelineState* DirectX12GraphicsShaderPass::GetPipelineState(const Utils::Vector<TextureFormat>& format)
 	{
-		Utils::Vector<TextureFormat> formates;
-
-		TextureFormat depthFormat = TextureFormat::None;
-		for (Ref<RenderTarget2D> rt : target->GetAttachments())
-		{
-			TextureFormat format = rt->GetResource()->GetFormat();
-			if (IsTextureFormatDepthStencil(format))
-				depthFormat = format;
-			else
-				formates.Push(format);
-		}
-		formates.Push(depthFormat);
-
-		auto state = m_PiplineStates.find(formates);
+		auto state = m_PiplineStates.find(format);
 		if (state == m_PiplineStates.end())
 		{
-			ID3D12PipelineState* pipline = CreatePiplineState(formates);
-			m_PiplineStates[formates] = pipline;
+			ID3D12PipelineState* pipline = CreatePiplineState(format);
+			m_PiplineStates[format] = pipline;
 			return pipline;
 		}
 

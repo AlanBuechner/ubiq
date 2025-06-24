@@ -5,7 +5,7 @@ namespace Engine
 {
 	class Camera;
 	class EditorCamera;
-	class CommandList;
+	class CPUCommandList;
 }
 
 namespace Engine
@@ -33,7 +33,7 @@ namespace Engine
 		static void EndScene();
 		static void SetCamera(const Camera& camera);
 
-		static void Build(Ref<CommandList> commandList);
+		static void Build(Ref<CPUCommandList> commandList);
 
 	public:
 		// line mesh drawing

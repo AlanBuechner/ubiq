@@ -1,7 +1,10 @@
 #include "CPUCommandList.h"
 #include "CPUCommands.h"
-#include "Abstractions/Resources/FrameBuffer.h"
 #include "Shaders/ShaderPass.h"
+#include "Shaders/GraphicsShaderPass.h"
+#include "Shaders/ComputeShaderPass.h"
+#include "Shaders/WorkGraphShaderPass.h"
+#include "Abstractions/Resources/FrameBuffer.h"
 #include "Abstractions/Resources/ConstantBuffer.h"
 #include "Abstractions/Resources/StructuredBuffer.h"
 #include "Abstractions/Resources/InstanceBuffer.h"
@@ -79,7 +82,30 @@ namespace Engine
 
 	void CPUCommandList::StopRecording()
 	{
+		
+	}
 
+	void CPUCommandList::BeginEvent(const char* eventName)
+	{
+		ASSERT_ALLOCATOR;
+		CPUBeginEventStaticCommand* cmd = new CPUBeginEventStaticCommand();
+		cmd->eventName = eventName;
+		m_CommandAllocator->SubmitCommand(cmd);
+	}
+
+	void CPUCommandList::BeginEvent(const std::string& eventName)
+	{
+		ASSERT_ALLOCATOR;
+		CPUBeginEventDynamicCommand* cmd = new CPUBeginEventDynamicCommand();
+		cmd->eventName = eventName;
+		m_CommandAllocator->SubmitCommand(cmd);
+	}
+
+	void CPUCommandList::EndEvent()
+	{
+		ASSERT_ALLOCATOR;
+		CPUEndEventCommand* cmd = new CPUEndEventCommand();
+		m_CommandAllocator->SubmitCommand(cmd);
 	}
 
 	void CPUCommandList::Present(Ref<FrameBuffer> fb)
@@ -131,6 +157,15 @@ namespace Engine
 		// create transition command
 		if (!transitions.Empty())
 			Transition(transitions);
+	}
+
+	void CPUCommandList::ValidateState(Ref<FrameBuffer> frameBuffer)
+	{
+		Utils::Vector<ResourceStateObject> transitions;
+		transitions.Reserve(frameBuffer->GetAttachments().Count());
+		for (uint32 i = 0; i < frameBuffer->GetAttachments().Count(); i++)
+			transitions.Push({ frameBuffer->GetAttachment(i)->GetResource(), ResourceState::RenderTarget });
+		ValidateStates(transitions);
 	}
 
 	void CPUCommandList::AwaitUAVs(Utils::Vector<GPUResource*> uavs)
@@ -241,12 +276,14 @@ namespace Engine
 
 	void CPUCommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer)
 	{
+		ValidateState(frameBuffer);
 		for (uint32 i = 0; i < frameBuffer->GetAttachments().Count(); i++)
 			ClearRenderTarget(frameBuffer, i);
 	}
 
 	void CPUCommandList::ClearRenderTarget(Ref<FrameBuffer> frameBuffer, const Math::Vector4& color)
 	{
+		ValidateState(frameBuffer);
 		for (uint32 i = 0; i < frameBuffer->GetAttachments().Count(); i++)
 			ClearRenderTarget(frameBuffer, i, color);
 	}
@@ -271,6 +308,8 @@ namespace Engine
 	{
 		ASSERT_ALLOCATOR;
 
+		ValidateState(renderTarget->GetResource(), ResourceState::RenderTarget);
+
 		CPUClearRenderTargetCommand* cmd = new CPUClearRenderTargetCommand();
 
 		cmd->handle = renderTarget->GetRTVDSVDescriptor();
@@ -285,7 +324,10 @@ namespace Engine
 		ASSERT_ALLOCATOR;
 		CPUSetGraphicsShaderCommand* cmd = new CPUSetGraphicsShaderCommand();
 		cmd->shaderPass = shader;
+		cmd->format = m_RenderTarget->GetFormats();
 		m_CommandAllocator->SubmitCommand(cmd);
+
+		m_BoundShader = shader;
 	}
 
 	void CPUCommandList::SetShader(Ref<ComputeShaderPass> shader)
@@ -294,6 +336,8 @@ namespace Engine
 		CPUSetComputeShaderCommand* cmd = new CPUSetComputeShaderCommand();
 		cmd->shaderPass = shader;
 		m_CommandAllocator->SubmitCommand(cmd);
+
+		m_BoundShader = shader;
 	}
 
 	void CPUCommandList::SetShader(Ref<WorkGraphShaderPass> shader)
@@ -302,11 +346,15 @@ namespace Engine
 		CPUSetWorkGraphShaderCommand* cmd = new CPUSetWorkGraphShaderCommand();
 		cmd->shaderPass = shader;
 		m_CommandAllocator->SubmitCommand(cmd);
+
+		m_BoundShader = shader;
 	}
 
 	void CPUCommandList::SetRootConstant(uint32 index, uint32 data)
 	{
+		if (index == UINT32_MAX) return;
 		ASSERT_ALLOCATOR;
+
 		CPUSetRootConstantCommand* cmd = new CPUSetRootConstantCommand();
 		cmd->index = index;
 		cmd->data = data;
@@ -316,7 +364,11 @@ namespace Engine
 
 	void CPUCommandList::SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer)
 	{
+		if (index == UINT32_MAX) return;
 		ASSERT_ALLOCATOR;
+
+		ValidateState(buffer->GetResource(), ResourceState::ShaderResource);
+
 		CPUSetConstantBufferCommand* cmd = new CPUSetConstantBufferCommand();
 		cmd->index = index;
 		cmd->res = buffer->GetResource();
@@ -326,7 +378,11 @@ namespace Engine
 
 	void CPUCommandList::SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer)
 	{
+		if (index == UINT32_MAX) return;
 		ASSERT_ALLOCATOR;
+
+		ValidateState(buffer->GetResource(), ResourceState::ShaderResource);
+
 		CPUSetStructuredBufferCommand* cmd = new CPUSetStructuredBufferCommand();
 		cmd->index = index;
 		cmd->handle = buffer->GetSRVDescriptor();
@@ -336,7 +392,11 @@ namespace Engine
 
 	void CPUCommandList::SetRWStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer)
 	{
+		if (index == UINT32_MAX) return;
 		ASSERT_ALLOCATOR;
+
+		ValidateState(buffer->GetResource(), ResourceState::UnorderedResource);
+
 		CPUSetRWStructuredBufferCommand* cmd = new CPUSetRWStructuredBufferCommand();
 		cmd->index = index;
 		cmd->handle = buffer->GetUAVDescriptor();
@@ -346,7 +406,11 @@ namespace Engine
 
 	void CPUCommandList::SetTexture(uint32 index, Ref<Texture2D> texture)
 	{
+		if (index == UINT32_MAX) return;
 		ASSERT_ALLOCATOR;
+
+		ValidateState(texture->GetResource(), ResourceState::ShaderResource);
+
 		CPUSetTextureCommand* cmd = new CPUSetTextureCommand();
 		cmd->index = index;
 		cmd->handle = texture->GetSRVDescriptor();
@@ -356,7 +420,11 @@ namespace Engine
 
 	void CPUCommandList::SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav)
 	{
+		if (index == UINT32_MAX) return;
 		ASSERT_ALLOCATOR;
+
+		ValidateState(uav->m_Resource, ResourceState::UnorderedResource);
+
 		CPUSetRWTextureCommand* cmd = new CPUSetRWTextureCommand();
 		cmd->index = index;
 		cmd->handle = uav;
@@ -372,8 +440,13 @@ namespace Engine
 	void CPUCommandList::DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, uint32 numInstances)
 	{
 		ASSERT_ALLOCATOR;
-		CPUDrawMeshCommand* cmd = new CPUDrawMeshCommand();
 
+		ValidateState(mesh->GetVertexBuffer()->GetResource(), ResourceState::PiplineInput);
+		ValidateState(mesh->GetIndexBuffer()->GetResource(), ResourceState::PiplineInput);
+		if(instanceBuffer)
+			ValidateState(instanceBuffer->GetResource(), ResourceState::PiplineInput);
+
+		CPUDrawMeshCommand* cmd = new CPUDrawMeshCommand();
 		cmd->vertexBufferView = mesh->GetVertexBuffer()->GetView();
 		cmd->indexBufferView = mesh->GetIndexBuffer()->GetView();
 		cmd->numIndices = mesh->GetIndexBuffer()->GetCount();
@@ -384,6 +457,11 @@ namespace Engine
 			cmd->numInstances = numInstances;
 			if (numInstances == UINT32_MAX)
 				cmd->numInstances = instanceBuffer->GetCount();
+		}
+		else
+		{
+			cmd->instanceBufferView = nullptr;
+			cmd->numInstances = 0;
 		}
 
 		m_CommandAllocator->SubmitCommand(cmd);
@@ -399,7 +477,7 @@ namespace Engine
 		m_CommandAllocator->SubmitCommand(cmd);
 	}
 
-	void CPUCommandList::DisbatchGraph(void* data, uint32 stride, uint32 count)
+	void CPUCommandList::DispatchGraph(void* data, uint32 stride, uint32 count)
 	{
 		ASSERT_ALLOCATOR;
 		CPUDispatchGraphCPUDataCommand* cmd = new CPUDispatchGraphCPUDataCommand();
@@ -413,7 +491,7 @@ namespace Engine
 		m_CommandAllocator->SubmitCommand(cmd);
 	}
 
-	void CPUCommandList::DisbatchGraph(Ref<StructuredBuffer> buffer)
+	void CPUCommandList::DispatchGraph(Ref<StructuredBuffer> buffer)
 	{
 		ASSERT_ALLOCATOR;
 		CPUDispatchGraphGPUDataCommand* cmd = new CPUDispatchGraphGPUDataCommand();
@@ -435,7 +513,12 @@ namespace Engine
 
 		// add transitions to command
 		for (uint32 i = 0; i < transitions.Count(); i++)
+		{
+			ResourceState to = transitions[i].to;
+			GPUResource* resource = transitions[i].resource;
+			CORE_ASSERT(resource->SupportState(to), "resouce does not support state: {0}", to);
 			cmd->resourceStateTransitons.Push(transitions[i]);
+		}
 
 		// submit command
 		m_CommandAllocator->SubmitCommand(cmd);

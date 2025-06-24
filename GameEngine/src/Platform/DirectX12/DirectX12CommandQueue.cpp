@@ -44,33 +44,24 @@ namespace Engine
 		m_Fence->Release();
 	}
 
-	void DirectX12CommandQueue::Build()
-	{
-		CREATE_PROFILE_SCOPEI("Build Command Lists");
-		m_DXCommandLists.Reserve(m_Commands.Count());
-		for (uint32 i = 0; i < m_Commands.Count(); i++)
-		{
-			Ref<DirectX12CommandList> dxCmdList = std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[i]);
-
-			if (dxCmdList->RecordPrependCommands())
-				m_DXCommandLists.Push(dxCmdList->GetPrependCommandList());
-			dxCmdList->InternalClose();
-			m_DXCommandLists.Push(dxCmdList->GetCommandList());
-		}
-	}
-
 	void DirectX12CommandQueue::Execute()
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		
-		m_CommandQueue->ExecuteCommandLists((uint32)m_DXCommandLists.Count(), m_DXCommandLists.Data());
+		Utils::Vector<ID3D12CommandList*> DXCommandLists;
+
+		DXCommandLists.Reserve(m_Commands.Count());
+		for (uint32 i = 0; i < m_Commands.Count(); i++)
+		{
+			Ref<DirectX12CommandList> dxCmdList = std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[i]);
+			DXCommandLists.Push(dxCmdList->GetCommandList());
+		}
+
+		m_CommandQueue->ExecuteCommandLists((uint32)DXCommandLists.Count(), DXCommandLists.Data());
 		m_CommandQueue->Signal(m_Fence, ++m_SignalCount); // signal fence when execution has finished
 
-		for (uint32 i = 0; i < m_Commands.Count(); i++)
-			std::dynamic_pointer_cast<DirectX12CommandList>(m_Commands[i])->SignalRecording();
-
 		m_Commands.Clear();
-		m_DXCommandLists.Clear();
+		DXCommandLists.Clear();
 	}
 
 	bool DirectX12CommandQueue::InExecution()

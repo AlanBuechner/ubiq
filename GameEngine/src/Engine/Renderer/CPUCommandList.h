@@ -7,15 +7,16 @@
 namespace Engine
 {
 
+	enum CommandListType
+	{
+		Copy,
+		Compute,
+		Graphics
+	};
+
 	class CPUCommandAllocator
 	{
 	public:
-		enum CommandListType
-		{
-			Copy,
-			Compute,
-			Graphics
-		};
 
 		using ResourceStateMap = std::unordered_map<GPUResource*, ResourceState>;
 
@@ -28,6 +29,8 @@ namespace Engine
 		
 		void SubmitCommand(CPUCommand* command) { m_Commands.Push(command); }
 		CPUCommand* PeekCommand() { return m_Commands.Back(); }
+
+		const Utils::Vector<CPUCommand*>& GetCommands() { return m_Commands; }
 
 	private:
 		Utils::Vector<CPUCommand*> m_Commands;
@@ -49,12 +52,17 @@ namespace Engine
 		void StartRecording();
 		void StopRecording();
 
+		void BeginEvent(const char* eventName);
+		void BeginEvent(const std::string& eventName);
+		void EndEvent();
+
 		// resource transitions
 		void Present() { Present(m_RenderTarget); }
 		void Present(Ref<FrameBuffer> fb);
 		void ValidateStates(const Utils::Vector<ResourceStateObject>& resources);
 		void ValidateState(ResourceStateObject resource) { ValidateStates({ resource }); }
 		void ValidateState(GPUResource* resource, ResourceState state) { ValidateStates({ { resource, state } }); }
+		void ValidateState(Ref<FrameBuffer> frameBuffer);
 
 		// UAV
 		void AwaitUAVs(Utils::Vector<GPUResource*> uavs);
@@ -102,11 +110,13 @@ namespace Engine
 		// do work
 		void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, uint32 numInstances = UINT32_MAX);
 		void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGroupsZ);
-		void DisbatchGraph(void* data, uint32 stride, uint32 count);
-		void DisbatchGraph(uint32 numRecords = 1) { DisbatchGraph(nullptr, 0, numRecords); }
+		void DispatchGraph(void* data, uint32 stride, uint32 count);
+		void DispatchGraph(uint32 numRecords = 1) { DispatchGraph(nullptr, 0, numRecords); }
 		template<typename T>
-		void DisbatchGraph(const Utils::Vector<T>& data) { DisbatchGraph((void*)data.Data(), data.ElementSize(), data.Count()); }
-		void DisbatchGraph(Ref<StructuredBuffer> buffer);
+		void DispatchGraph(const Utils::Vector<T>& data) { DispatchGraph((void*)data.Data(), data.ElementSize(), data.Count()); }
+		void DispatchGraph(Ref<StructuredBuffer> buffer);
+
+		static Ref<CPUCommandList> Create(CommandListType type = CommandListType::Graphics) { return CreateRef<CPUCommandList>(); }
 
 	private:
 

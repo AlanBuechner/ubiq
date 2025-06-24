@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-	class CommandList;
+	class CPUCommandList;
 	class DirectionalLight;
 	class Texture2D;
 	class ConstantBuffer;
@@ -30,20 +30,20 @@ namespace Engine
 		RenderGraph();
 		~RenderGraph();
 
-		void Submit(Ref<CommandQueue> queue);
+		void Submit();
 		void OnViewportResize(uint32 width, uint32 height);
 		void Build();
 
-		Engine::Ref<Engine::FrameBuffer> GetRenderTarget();
+		Ref<FrameBuffer> GetRenderTarget();
 
 		template<class T>
 		T& As() { return *(T*)this; }
 
 	protected:
-		Utils::Vector<Engine::Ref<RenderGraphNode>> m_Nodes;
+		Utils::Vector<Ref<RenderGraphNode>> m_Nodes;
 		
-		Engine::Ref<OutputNode> m_OutputNode;
+		Ref<OutputNode> m_OutputNode;
 
-		Utils::Vector<Engine::Ref<Engine::CommandList>> m_CommandLists;
+		Utils::Vector<Ref<CPUCommandList>> m_CommandLists;
 	};
 }

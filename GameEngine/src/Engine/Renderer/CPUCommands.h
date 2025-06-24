@@ -1,5 +1,6 @@
 #pragma once
 #include "Abstractions/Resources/ResourceState.h"
+#include "Abstractions/Resources/TextureFormat.h"
 #include "Utils/Hash.h"
 
 namespace Engine
@@ -47,8 +48,19 @@ namespace Engine
 
 #define CREATE_COMMAND(name) \
 	struct CPU##name : public CPUCommand { \
-		static uint32 GetStaticCommandID() {return COMPILE_TIME_CRC32_STR(#name); }\
+		static constexpr uint32 GetStaticCommandID() { return COMPILE_TIME_CRC32_STR(#name); }\
 		CPU##name() : CPUCommand(GetStaticCommandID()) {}
+
+	CREATE_COMMAND(BeginEventStaticCommand)
+		const char* eventName;
+	};
+
+	CREATE_COMMAND(BeginEventDynamicCommand)
+		std::string eventName;
+	};
+
+	CREATE_COMMAND(EndEventCommand)
+	};
 
 	CREATE_COMMAND(ResourceTransitionCommand)
 		Utils::Vector<ResourceTransitionObject> resourceStateTransitons;
@@ -56,7 +68,7 @@ namespace Engine
 
 	CREATE_COMMAND(AwaitUAVCommand)
 		Utils::Vector<GPUResource*> UAVs;
-	}; 
+	};
 	
 	CREATE_COMMAND(CopyBufferCommand)
 		GPUResource* dest;
@@ -90,6 +102,7 @@ namespace Engine
 
 	CREATE_COMMAND(SetGraphicsShaderCommand)
 		Ref<GraphicsShaderPass> shaderPass;
+		Utils::Vector<TextureFormat> format;
 	};
 
 	CREATE_COMMAND(SetComputeShaderCommand)
@@ -153,7 +166,7 @@ namespace Engine
 	CREATE_COMMAND(DispatchGraphCPUDataCommand)
 		~CPUDispatchGraphCPUDataCommand() { delete data; }
 
-		void* data; // owned by the command
+		byte* data; // owned by the command
 		uint32 stride;
 		uint32 count;
 	};

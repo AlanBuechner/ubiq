@@ -7,97 +7,68 @@ namespace Engine
 	class DirectX12CommandList : public CommandList
 	{
 	public:
-		DirectX12CommandList(CommandListType type) :
-			CommandList(type)
+		DirectX12CommandList(CommandListType commandListType) :
+			CommandList(commandListType)
 		{ Init(); }
-
-		
 
 	private:
 		void Init();
 
-	protected:
-		virtual void InternalClose() override;
-
 	public:
 		virtual void StartRecording() override;
+		virtual void RecoredCommands(CPUCommandAllocator* commandAllocator) override;
+		void Close() override;
+
+		// non command object abstractions
+		// NOTE : i am only adding abstractions for imgui
+		void Transition(const Utils::Vector<ResourceTransitionObject>& transitions);
+		void SetRenderTarget(Ref<RenderTarget2D> renderTarget);
+		void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, Math::Vector4 color);
 
 		// transitions
-		void Present() { Present(nullptr); }
-		virtual void Present(Ref<FrameBuffer> fb) override;
+		void Transition(const CPUResourceTransitionCommand& cmd);
 
-		virtual void Transition(Utils::Vector<ResourceTransitionObject> transitions) override;
-
-		virtual void ValidateStates(Utils::Vector<ResourceStateObject> resources) override;
-
+		// UAVs
+		void AwaitUAVs(const CPUAwaitUAVCommand& cmd);
 
 		// copying
-		virtual void CopyBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size) override;
-		virtual void CopyResource(GPUResource* dest, GPUResource* src) override;
+		void CopyBuffer(const CPUCopyBufferCommand& cmd);
+		void UploadTexture(const CPUUploadTextureCommand& Command);
 
-		virtual void UploadTexture(GPUResource* dest, UploadTextureResource* src) override;
+		// set render targets and viewport
+		void SetViewport(const CPUSetViewportCommand& cmd);
+		void SetRenderTarget(const CPUSetRenderTargetCommand& cmd);
 
-		// rendering
-		virtual void SetRenderTarget(Ref<RenderTarget2D> renderTarget) override;
-		virtual void SetRenderTarget(Ref<FrameBuffer> buffer) override;
+		// clear render targets
+		void ClearRenderTarget(const CPUClearRenderTargetCommand& cmd);
 
-		virtual void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, const Math::Vector4& color) override;
+		// set shaders
+		void InitalizeDescriptorTables(const Ref<ShaderPass> shader);
+		void SetShader(const CPUSetGraphicsShaderCommand& cmd);
+		void SetShader(const CPUSetComputeShaderCommand& cmd);
+		void SetShader(const CPUSetWorkGraphShaderCommand& cmd);
 
-		void InitalizeDescriptorTables(Ref<ShaderPass> shader);
-		virtual void SetShader(Ref<GraphicsShaderPass> shader) override;
-		virtual void SetShader(Ref<ComputeShaderPass> shader) override;
-		virtual void SetShader(Ref<WorkGraphShaderPass> shader) override;
-		virtual void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer) override;
-		virtual void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer) override;
-		virtual void SetRWStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer) override;
-		virtual void SetRootConstant(uint32 index, uint32 data) override;
-		virtual void SetTexture(uint32 index, Ref<Texture2D> texture) override;
-		virtual void SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav) override;
-		virtual void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, int numInstances = -1) override;
-		virtual void ExecuteBundle(Ref<CommandList> commandList) override;
+		// set data
+		void SetRootConstant(const CPUSetRootConstantCommand& cmd);
+		void SetConstantBuffer(const CPUSetConstantBufferCommand& cmd);
+		void SetStructuredBuffer(const CPUSetStructuredBufferCommand& cmd);
+		void SetRWStructuredBuffer(const CPUSetRWStructuredBufferCommand& cmd);
+		void SetTexture(const CPUSetTextureCommand& cmd);
+		void SetRWTexture(const CPUSetRWTextureCommand& cmd);
 
-		virtual void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGrouptsZ) override;
+		// do work
+		void DrawMesh(const CPUDrawMeshCommand& cmd);
+		void Dispatch(const CPUDispatchCommand& cmd);
+		void DispatchGraph(const CPUDispatchGraphCPUDataCommand& cmd);
+		void DispatchGraph(const CPUDispatchGraphGPUDataCommand& cmd);
 
-		virtual void DisbatchGraph(uint32 numRecords) override;
-		virtual void DisbatchGraph(Ref<StructuredBuffer> buffer) override;
-		virtual void DisbatchGraph(void* data, uint32 stride, uint32 count) override;
-
-		virtual void AwaitUAV(GPUResource* uav) override;
-		virtual void AwaitUAVs(Utils::Vector<GPUResource*> uavs) override;
-
-		virtual void Close() override;
-
-		Utils::Vector<ResourceStateObject>& GetPendingTransitions() override { return m_Frames[GetLastFrameIndex()].pendingTransitions; }
-		std::unordered_map<GPUResource*, ResourceState> GetEndingResourceStates() override { return m_Frames[GetLastFrameIndex()].resourceStates; }
+		ID3D12CommandAllocator* GetAllocator() { return m_CommandAllocator; }
 		ID3D12GraphicsCommandList10* GetCommandList() { return m_CommandList; }
 
 	private:
-		Utils::Vector<ResourceStateObject>& GetCurrentPendingTransitions() { return m_Frames[m_CurrentFrame].pendingTransitions; }
-		ID3D12CommandList* GetPrependCommandList() { return m_PrependList; }
 
-		bool RecordPrependCommands();
-
-	private:
-		ID3D12CommandAllocator* GetAllocator() { return m_Frames[m_CurrentFrame].commandAllocator; }
-		std::unordered_map<GPUResource*, ResourceState>& GetResourceStates() { return m_Frames[m_CurrentFrame].resourceStates; }
-
-		uint32 GetLastFrameIndex() { return (m_CurrentFrame - 1) % m_Frames.Count(); }
-
-	private:
-
-		struct RecordFrame
-		{
-			ID3D12CommandAllocator* commandAllocator;
-			Utils::Vector<ResourceStateObject> pendingTransitions;
-			std::unordered_map<GPUResource*, ResourceState> resourceStates;
-		};
-
-		uint32 m_CurrentFrame = 0;
+		ID3D12CommandAllocator* m_CommandAllocator;
 		ID3D12GraphicsCommandList10* m_CommandList;
-		Utils::Vector<RecordFrame> m_Frames;
-
-		ID3D12CommandAllocator* m_PrependAllocator;
-		ID3D12GraphicsCommandList10* m_PrependList;
 
 		friend class DirectX12CommandQueue;
 	};
