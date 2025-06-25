@@ -151,13 +151,16 @@ namespace Engine
 		Ref<RenderTarget2D> rt = swapChain->GetCurrentRenderTarget();
 
 		commandList->StartRecording();
-		GPUTimer::BeginEvent(commandList, "ImGui");
-		commandList->Transition({ { rt->GetResource(), ResourceState::RenderTarget, ResourceState::Common } }); // common -> render target
-		commandList->SetRenderTarget(rt);
-		commandList->ClearRenderTarget(rt, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList());
-		commandList->Transition({ { rt->GetResource(), ResourceState::Common, ResourceState::RenderTarget } }); // render target -> common
-		GPUTimer::EndEvent(commandList);
+		{
+			CREATE_PROFILE_SCOPEI("Recored commands");
+			GPUTimer::BeginEvent(commandList, "ImGui");
+			commandList->Transition({ { rt->GetResource(), ResourceState::RenderTarget, ResourceState::Common } }); // common -> render target
+			commandList->SetRenderTarget(rt);
+			commandList->ClearRenderTarget(rt, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList());
+			commandList->Transition({ { rt->GetResource(), ResourceState::Common, ResourceState::RenderTarget } }); // render target -> common
+			GPUTimer::EndEvent(commandList);
+		}
 		commandList->Close();
 
 		Renderer::GetFrameContext()->m_IMGUICommandList = commandList;

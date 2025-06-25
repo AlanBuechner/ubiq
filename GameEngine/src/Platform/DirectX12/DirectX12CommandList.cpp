@@ -86,6 +86,9 @@ namespace Engine
 			switch (cmd->GetCommandID())
 			{
 #define CALL_COMMAND(obj, func) case obj::GetStaticCommandID(): func(*(obj*)cmd); break
+			case CPUEndEventCommand::GetStaticCommandID(): EndEvent(); break;
+			case CPUBeginEventStaticCommand::GetStaticCommandID(): BeginEvent(((CPUBeginEventStaticCommand*)cmd)->eventName); break;
+			case CPUBeginEventDynamicCommand::GetStaticCommandID(): BeginEvent(((CPUBeginEventDynamicCommand*)cmd)->eventName.c_str()); break;
 				CALL_COMMAND(CPUResourceTransitionCommand, Transition);
 				CALL_COMMAND(CPUAwaitUAVCommand, AwaitUAVs);
 				CALL_COMMAND(CPUCopyBufferCommand, CopyBuffer);
@@ -146,6 +149,16 @@ namespace Engine
 
 
 
+
+	void DirectX12CommandList::BeginEvent(const char* eventName)
+	{
+		GPUTimer::BeginEvent(this, eventName);
+	}
+
+	void DirectX12CommandList::EndEvent()
+	{
+		GPUTimer::EndEvent(this);
+	}
 
 	// transitions
 	void DirectX12CommandList::Transition(const CPUResourceTransitionCommand& cmd)

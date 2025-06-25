@@ -25,6 +25,9 @@ namespace Engine
 		void SetRenderTarget(Ref<RenderTarget2D> renderTarget);
 		void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, Math::Vector4 color);
 
+		void BeginEvent(const char* eventName);
+		void EndEvent();
+
 		// transitions
 		void Transition(const CPUResourceTransitionCommand& cmd);
 
