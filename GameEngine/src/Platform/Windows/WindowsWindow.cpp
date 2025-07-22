@@ -189,7 +189,7 @@ namespace Engine
 		SetWindowPos(m_Window, nullptr, 0, 0, (int)width, (int)height, 0);
 	}
 
-	inline void* WindowsWindow::GetNativeWindow() const
+	void* WindowsWindow::GetNativeWindow() const
 	{
 		return m_Window;
 	}

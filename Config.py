@@ -43,7 +43,7 @@ intDir = "bin-int/{config}-{system}-{arc}/{projName}"
 toolsBinDir = "bin/tools/{projName}"
 toolsIntDir = "bin-int/tools/{projName}" 
 
-cppVersion = "c++17"
+cppVersion = "c++20"
 
 compiler = f"{location}/vendor/Compiler/bin/clang-cl.exe"
 

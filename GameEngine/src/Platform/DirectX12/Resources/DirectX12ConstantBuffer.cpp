@@ -14,14 +14,14 @@ namespace Engine
 	DirectX12ConstantBufferResource::DirectX12ConstantBufferResource(uint32 size)
 	{
 		m_DefultState = ResourceState::ShaderResource;
-
-		size = size + 256 - (size % 256); // 256 byte aligned
 		m_Size = size;
+
+		m_RealSize = size + 256 - (size % 256); // 256 byte aligned;
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
 		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
+		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(m_RealSize);
 
 		// create resource
 		HRESULT hr = context->GetDevice()->CreateCommittedResource(
@@ -76,7 +76,7 @@ namespace Engine
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
 		desc.BufferLocation = dxResource->GetBuffer()->GetGPUVirtualAddress();
-		desc.SizeInBytes = dxResource->GetSize();
+		desc.SizeInBytes = dxResource->GetRealSize();
 		context->GetDevice()->CreateConstantBufferView(&desc, m_CBVHandle.cpu);
 	}
 

@@ -14,6 +14,7 @@ namespace Engine
 		virtual ~ConstantBufferResource() = 0;
 
 		uint32 GetSize() { return m_Size; }
+		uint32 GetRealSize() { return m_RealSize; }
 
 		virtual bool SupportState(ResourceState state) override;
 
@@ -23,6 +24,7 @@ namespace Engine
 
 	protected:
 		uint32 m_Size = 0;
+		uint32 m_RealSize = 0;
 	};
 	
 	// Descriptor Handles ---------------------------------------------------------- //

@@ -36,6 +36,7 @@ namespace Engine
 {
 	struct CPUCommand
 	{
+		virtual ~CPUCommand();
 
 		inline uint32 GetCommandID() { return m_CommandID; }
 
@@ -48,6 +49,7 @@ namespace Engine
 
 #define CREATE_COMMAND(name) \
 	struct CPU##name : public CPUCommand { \
+		virtual ~CPU##name() override = default;\
 		static constexpr uint32 GetStaticCommandID() { return COMPILE_TIME_CRC32_STR(#name); }\
 		CPU##name() : CPUCommand(GetStaticCommandID()) {}
 
@@ -164,9 +166,7 @@ namespace Engine
 	};
 
 	CREATE_COMMAND(DispatchGraphCPUDataCommand)
-		~CPUDispatchGraphCPUDataCommand() { delete data; }
-
-		byte* data; // owned by the command
+		Utils::Vector<byte> data; // owned by the command
 		uint32 stride;
 		uint32 count;
 	};

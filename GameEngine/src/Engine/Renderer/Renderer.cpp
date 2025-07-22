@@ -17,7 +17,6 @@ Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
 Engine::Ref<Engine::CPUCommandList> Engine::Renderer::s_MainCommandList;
 Engine::Ref<Engine::CPUCommandList> Engine::Renderer::s_UploadCommandList;
 Engine::RendererAPI Engine::Renderer::s_Api = Engine::RendererAPI::DirectX12;
-Engine::Renderer::FrameContext* Engine::Renderer::s_FrameContext = nullptr;
 Profiler::InstrumentationTimer Engine::Renderer::s_Timer = CREATE_PROFILEI();
 
 Engine::Ref<Engine::Texture2D> Engine::Renderer::s_WhiteTexture;
@@ -28,21 +27,33 @@ Engine::Ref<Engine::Shader> Engine::Renderer::s_BlitShader;
 
 Engine::Ref<Engine::Material> Engine::Renderer::s_DefultMaterial;
 
+std::atomic<Engine::Renderer::FrameContext*> Engine::Renderer::s_FrameContext = nullptr;
 Engine::NamedJobThread* Engine::Renderer::s_RenderThread;
+Engine::NamedJobThread* Engine::Renderer::s_GPUThread;
 
 namespace Engine
 {
 
 	Renderer::FrameContext::FrameContext()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		m_DeletionPool = new ResourceDeletionPool();
 		m_UploadPool = new UploadPool();
 	}
 
 	Renderer::FrameContext::~FrameContext()
 	{
+		CREATE_PROFILE_FUNCTIONI();
+		hasBeenDeleted = true;
 		delete m_DeletionPool;
 		delete m_UploadPool;
+
+		m_DeletionPool = nullptr;
+		m_UploadPool = nullptr;
+
+		for (uint32 i = 0; i < m_Commands.Count(); i++)
+			delete m_Commands[i];
+
 	}
 
 	void Renderer::Init()
@@ -62,12 +73,16 @@ namespace Engine
 		s_MainCommandList = CPUCommandList::Create(CommandListType::Graphics);
 		s_UploadCommandList = CPUCommandList::Create(CommandListType::Graphics);
 
+		s_MainCommandList->SetName("Main Command List");
+		s_UploadCommandList->SetName("Upload Command List");
+
 		// copy command queue
 
 		Renderer2D::Init();
 		DebugRenderer::Init();
 
-		s_RenderThread = JobSystem::AddNamedJob("Render Thread", &Renderer::Render);
+		s_RenderThread = JobSystem::AddNamedJob("Render Thread", &Renderer::RenderThread);
+		s_GPUThread = JobSystem::AddNamedJob("GPU Thread", &Renderer::GPUThread);
 
 		uint32 textureData;
 
@@ -117,7 +132,7 @@ namespace Engine
 		s_ScreenMesh.reset();
 		s_DefultMaterial.reset();
 
-		s_RenderThread->Wait();
+		WaitForRender();
 		Renderer2D::Destroy();
 		DebugRenderer::Destroy();
 
@@ -141,14 +156,14 @@ namespace Engine
 		GPUTimer::EndEvent(s_MainCommandList);
 		s_MainCommandList->StopRecording();
 		SubmitCommandList(s_MainCommandList);
-		FrameContext* context = s_FrameContext;
-		s_FrameContext = new FrameContext();
+		FrameContext* context = s_FrameContext.exchange(new FrameContext());
 		s_RenderThread->Invoke(context);
 	}
 
 	void Renderer::WaitForRender()
 	{
 		s_RenderThread->Wait();
+		s_GPUThread->Wait();
 	}
 
 	void Renderer::Build(Ref<CPUCommandList> commandList)
@@ -157,11 +172,10 @@ namespace Engine
 		DebugRenderer::Build(commandList);
 	}
 
-	void Renderer::Render(void* data)
+	void Renderer::RenderThread(void* data)
 	{
 		CREATE_PROFILE_SCOPEI("Render Frame");
 		FrameContext* frameContext = (FrameContext*)data;
-		Ref<ResourceManager> resourceManager = s_Context->GetResourceManager();
 
 		// copy commands
 		frameContext->m_UploadPool->RecoredUploadCommands(s_UploadCommandList);
@@ -189,21 +203,36 @@ namespace Engine
 				commandList->Close();
 			}
 		}
-		
-		// move imgui command list
-		frameContext->m_CommandLists.Push(frameContext->m_IMGUICommandList);
-		frameContext->m_IMGUICommandList = nullptr;
+
+		if (frameContext->m_IMGUICommandList)
+			frameContext->m_CommandLists.Push(frameContext->m_IMGUICommandList);
+
+		s_GPUThread->Invoke(frameContext);
+	}
+
+	void Renderer::GPUThread(void* data)
+	{
+		CREATE_PROFILE_SCOPEI("Render Frame");
+		FrameContext* frameContext = (FrameContext*)data;
+
+		// get command lists
+		Utils::Vector<Ref<CommandList>>& commandLists = frameContext->m_CommandLists;
 
 		// execute commands
 		GPUProfiler::StartFrame();
-		s_MainCommandQueue->Submit(frameContext->m_CommandLists);
+		s_MainCommandQueue->Submit(commandLists);
 		s_MainCommandQueue->Execute();
 		s_MainCommandQueue->Await();
 		GPUProfiler::EndFrame();
 
 		// free command lists
-		for (Ref<CommandList> commandList : frameContext->m_CommandLists)
+		for (uint32 i = 0; i < commandLists.Count(); i++)
+		{
+			Ref<CommandList> commandList = commandLists[i];
 			CommandList::Free(commandList);
+			commandLists[i] = nullptr;
+		}
+		frameContext->m_IMGUICommandList = nullptr;
 
 		// swap buffers
 		WindowManager::UpdateWindows();

@@ -75,8 +75,9 @@ namespace Engine
 
 	void CPUCommandList::StartRecording()
 	{
-		delete m_CommandAllocator; // delete old allocator if it was not used
-		m_CommandAllocator = new CPUCommandAllocator();
+		if(m_CommandAllocator)
+			delete m_CommandAllocator; // delete old allocator if it was not used
+		m_CommandAllocator = new CPUCommandAllocator(m_Name);
 		m_CommandAllocator->SubmitCommand(new CPUResourceTransitionCommand()); // create transition command for resource state management
 	}
 
@@ -184,7 +185,8 @@ namespace Engine
 			cmd->UAVs.Push(uavs[i]);
 
 		// submit command
-		m_CommandAllocator->SubmitCommand(cmd);
+		if (cmd != lastCMD)
+			m_CommandAllocator->SubmitCommand(cmd);
 	}
 
 	void CPUCommandList::CopyBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size)
@@ -233,15 +235,14 @@ namespace Engine
 	void CPUCommandList::SetRenderTarget(Ref<FrameBuffer> buffer)
 	{
 		ASSERT_ALLOCATOR;
+
+		if (buffer == m_RenderTarget)
+			return;
+
 		m_RenderTarget = buffer;
 
 		// get last or create new set render target command
-		CPUSetRenderTargetCommand* cmd = nullptr;
-		CPUCommand* lastCMD = m_CommandAllocator->PeekCommand();
-		if (lastCMD->GetCommandID() == CPUSetRenderTargetCommand::GetStaticCommandID())
-			cmd = (CPUSetRenderTargetCommand*)lastCMD;
-		else
-			cmd = new CPUSetRenderTargetCommand();
+		CPUSetRenderTargetCommand* cmd = new CPUSetRenderTargetCommand();
 
 		// reset data if overwriting last command
 		cmd->depthStencil = nullptr; // always default to nullptr
@@ -485,8 +486,8 @@ namespace Engine
 		cmd->count = count;
 		if (data)
 		{
-			cmd->data = new byte[stride * count];
-			memcpy(cmd->data, data, stride * count);
+			cmd->data.Resize(count * stride);
+			memcpy(cmd->data.Data(), data, stride * count);
 		}
 		m_CommandAllocator->SubmitCommand(cmd);
 	}
@@ -521,7 +522,8 @@ namespace Engine
 		}
 
 		// submit command
-		m_CommandAllocator->SubmitCommand(cmd);
+		if(cmd != lastCMD)
+			m_CommandAllocator->SubmitCommand(cmd);
 	}
 
 #undef ASSERT_ALLOCATOR

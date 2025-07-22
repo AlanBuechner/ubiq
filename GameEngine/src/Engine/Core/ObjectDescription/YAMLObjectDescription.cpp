@@ -33,6 +33,7 @@ namespace Engine
 
 #undef TRY_DECODE
 		}
+		CORE_ASSERT(false, "Could not load yaml");
 	}
 
 	ObjectDescription LoadObjectDescriptionFromYAMLString(const std::string& str)

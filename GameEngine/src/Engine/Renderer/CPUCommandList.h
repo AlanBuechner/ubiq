@@ -21,7 +21,7 @@ namespace Engine
 		using ResourceStateMap = std::unordered_map<GPUResource*, ResourceState>;
 
 	public:
-		CPUCommandAllocator() = default;
+		CPUCommandAllocator(const std::string& name) : m_Name(name) {}
 		~CPUCommandAllocator();
 
 		void PrependResourceStateCommands(const ResourceStateMap& resourceStates);
@@ -37,6 +37,7 @@ namespace Engine
 
 		Utils::Vector<ResourceStateObject> m_PendingTransitions;
 		ResourceStateMap m_ResourceStates;
+		std::string m_Name;
 
 		friend class CPUCommandList;
 	};
@@ -46,6 +47,8 @@ namespace Engine
 	public:
 		CPUCommandList() = default;
 		~CPUCommandList();
+
+		void SetName(const std::string& name) { m_Name = name; }
 
 		CPUCommandAllocator* TakeAllocator();
 
@@ -123,9 +126,10 @@ namespace Engine
 		void Transition(const Utils::Vector<ResourceTransitionObject>& transitions);
 
 	private:
-		CPUCommandAllocator* m_CommandAllocator;
+		CPUCommandAllocator* m_CommandAllocator = nullptr;
 
-		Ref<FrameBuffer> m_RenderTarget;
-		Ref<ShaderPass> m_BoundShader;
+		Ref<FrameBuffer> m_RenderTarget = nullptr;
+		Ref<ShaderPass> m_BoundShader = nullptr;
+		std::string m_Name = "";
 	};
 }

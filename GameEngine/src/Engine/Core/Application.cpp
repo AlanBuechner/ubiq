@@ -21,6 +21,22 @@
 #include <Reflection.h>
 LINK_REFLECTION_DATA(GameEngine)
 
+
+
+// asan
+#if __has_feature(address_sanitizer) || defined(__SANITIZE_ADDRESS__)
+#ifdef __cplusplus
+extern "C"
+#endif
+const char* __asan_default_options() {
+	// Clang reports ODR Violation errors in mbedtls/library/certs.c.
+	// NEED TO REPORT THIS ISSUE
+	return "detect_odr_violation=0";
+}
+#endif
+
+
+
 Engine::Application* Engine::Application::s_Instance = nullptr;
 
 namespace Engine {

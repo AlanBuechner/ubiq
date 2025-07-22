@@ -46,6 +46,7 @@ namespace Engine
 			Utils::Vector<Ref<CommandList>> m_CommandLists;
 			ResourceDeletionPool* m_DeletionPool;
 			UploadPool* m_UploadPool;
+			bool hasBeenDeleted = false;
 		};
 
 	public:
@@ -85,7 +86,8 @@ namespace Engine
 		static FrameContext* GetFrameContext() { return s_FrameContext; }
 
 	private:
-		static void Render(void* frameContext);
+		static void RenderThread(void* frameContext);
+		static void GPUThread(void* frameContext);
 
 	private:
 		static Ref<GraphicsContext> s_Context;
@@ -94,11 +96,12 @@ namespace Engine
 		static Ref<CPUCommandList> s_UploadCommandList;
 
 		static RendererAPI s_Api;
-		static FrameContext* s_FrameContext;
 
 		static Profiler::InstrumentationTimer s_Timer;
 
+		static std::atomic<FrameContext*> s_FrameContext;
 		static NamedJobThread* s_RenderThread;
+		static NamedJobThread* s_GPUThread;
 
 		static Ref<Texture2D> s_WhiteTexture;
 		static Ref<Texture2D> s_BlackTexture;

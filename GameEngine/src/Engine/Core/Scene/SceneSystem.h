@@ -10,6 +10,9 @@ namespace Engine
 {
 	class SceneSystem : public Reflect::Reflected
 	{
+	protected:
+		virtual ~SceneSystem() {};
+
 		virtual void OnAttatch() {}
 		virtual void OnDetatch() {}
 		virtual void OnUpdate() {}

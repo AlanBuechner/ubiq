@@ -37,6 +37,7 @@ namespace Engine
 		}
 		else if (json.is_boolean())
 			return ObjectDescription::CreateFrom(json.get<bool>());
+		CORE_ASSERT(false, "Could not load json");
 	}
 
 	ObjectDescription LoadObjectDescriptionFromJsonString(const std::string& str)

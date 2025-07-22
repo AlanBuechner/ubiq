@@ -26,6 +26,7 @@ namespace Engine
 
 	UploadPage::~UploadPage()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		m_UploadBuffer->UnMap();
 		delete m_UploadBuffer;
 	}
@@ -67,6 +68,7 @@ namespace Engine
 
 	void ResourceDeletionPool::Clear()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		for (uint32 i = 0; i < m_Resources.Count(); i++)
 			delete m_Resources[i];
 
@@ -79,6 +81,7 @@ namespace Engine
 
 	UploadPool::~UploadPool()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		delete m_UploadPage;
 	}
 
@@ -119,7 +122,7 @@ namespace Engine
 
 	void UploadPool::UploadBufferRegion(GPUResource* dest, uint32 destOffset, const void* data, uint32 size, ResourceState state)
 	{
-		void* lockedBuffer = LockBuffer(size);
+		byte* lockedBuffer = (byte*)LockBuffer(size);
 		memcpy(lockedBuffer, data, size);
 		UnlockBuffer(dest, destOffset, lockedBuffer, size, state);
 	}

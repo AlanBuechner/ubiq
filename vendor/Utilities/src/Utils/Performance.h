@@ -67,7 +67,6 @@ namespace Profiler
 #define CREATE_PROFILE_SCOPEI(name) CREATE_SOURCE_LOC(name); Profiler::InstrumentationTimerScoped __timer(&SOURCE_LOC_NAME);
 #define CREATE_PROFILE_FUNCTIONI() CREATE_PROFILE_SCOPEI(__FUNCSIG__)
 
-#define ANOTATE_PROFILEI(name, anotation) name.Anotate(anotation);
 #define ANOTATE_PROFILEI(anotation) __timer.Anotate(anotation);
 
 #define CREATE_PROFILEI() Profiler::InstrumentationTimer();

@@ -3,5 +3,10 @@
 namespace Engine
 {
 
+	CPUCommand::~CPUCommand()
+	{
+
+	}
+
 }
 

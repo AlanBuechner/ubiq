@@ -3,6 +3,13 @@ import Config
 
 import os
 
+def GetLatestDir(dir):
+	dirs = []
+	for d in os.listdir(dir):
+		if(d[0].isdigit()):
+			dirs.append(d)
+	return dir + sorted(dirs)[-1]
+
 def GetBinDir(projName, root = None):
 	if(root == None):
 		root = Config.location
@@ -44,7 +51,7 @@ def ResolveFiles(filters, d):
 
 def GetSysIncludes():
 	includes = []
-	includes.append(f"{Config.location}/vendor/Compiler/lib/clang/16/include")
+	includes.append(GetLatestDir(f"{Config.location}/vendor/Compiler/lib/clang/") + "/include")
 	includes.append(f"{Config.location}/vendor/Compiler/include")
 	includes.extend(GetWindowsIncludes())
 	return includes

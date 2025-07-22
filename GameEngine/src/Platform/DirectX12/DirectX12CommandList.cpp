@@ -455,7 +455,7 @@ namespace Engine
 		DSDesc.NodeCPUInput.EntrypointIndex = 0; // just one entrypoint in this graph
 		DSDesc.NodeCPUInput.NumRecords = cmd.count;
 		DSDesc.NodeCPUInput.RecordStrideInBytes = cmd.stride;
-		DSDesc.NodeCPUInput.pRecords = cmd.data;
+		DSDesc.NodeCPUInput.pRecords = cmd.data.Data();
 		m_CommandList->DispatchGraph(&DSDesc);
 	}
 

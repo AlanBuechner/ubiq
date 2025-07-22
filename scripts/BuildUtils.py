@@ -79,8 +79,10 @@ class ObjectEnviernment:
 			args.extend(["-x", "c++"])
 			if(Config.configuration == "Debug"):
 				args.append("-O0")
+				args.append("-fsanitize=address")
+				args.append("-fno-sanitize-address-use-odr-indicator")
 			else:
-				args.append("-O2")
+				args.append("-O3")
 			args.extend(["-emit-obj"])
 			args.extend(["-triple", GetTarget()])
 			args.extend([self.sourceFile])
@@ -88,7 +90,6 @@ class ObjectEnviernment:
 			args.extend([f"-std={Config.cppVersion}"])
 			args.extend([
 				"-mincremental-linker-compatible",
-				#"--mrelax-relocations",
 				"-disable-free",
 				"-clear-ast-before-backend",
 				"-disable-llvm-verifier",
@@ -100,21 +101,30 @@ class ObjectEnviernment:
 				"-fmath-errno",
 				"-ffp-contract=on",
 				"-fno-rounding-math",
+				"-complex-range=full",
 				"-mconstructor-aliases",
 				"-funwind-tables=2",
 				"-target-cpu", "x86-64",
 				"-mllvm",
 				"-x86-asm-syntax=intel",
 				"-tune-cpu", "generic",
-				"-mllvm",
-				"-treat-scalable-fixed-error-as-warning",
 				"-D_MT",
-				"-flto-visibility-public-std",
-				"--dependent-lib=libcmt",
+				#"-D_DLL",
+				"--dependent-lib=msvcrt",
 				"--dependent-lib=oldnames",
 				"-stack-protector", "2",
 				"-fdefault-calling-conv=cdecl",
 				"-gno-column-info",
+				"-Wall",
+				"-Wno-error",
+				"-fdeprecated-macro",
+				"-fno-use-cxa-atexit",
+				"-fno-implicit-modules",
+				"-fskip-odr-check-in-gmf",
+				"-fno-caret-diagnostics",
+				"-vectorize-loops",
+				"-vectorize-slp",
+				"-faddrsig",
 				"-ffunction-sections",
 
 				# debug
@@ -143,7 +153,6 @@ class ObjectEnviernment:
 				# dependancy file
 				"-dependency-file", self.treeFile,
 				"-MT", self.treeFile,
-
 			])
 			for i in self.includeDirs:
 				args.extend(["-I", i])
@@ -334,21 +343,22 @@ def LinkObjects(intDir, dependancys, links, projDir, outputFile, buildType, need
 				links[i] = GetProject(links[i])["module"].GetProject().GetOutput()
 		args = []
 		args.extend([Config.compiler])
-		args.extend(["--driver-mode=cl"])
 		args.extend(["-target", GetTarget()])
 
 		if(buildType == BuildType.STATICLIBRARY):
 			args.extend(["-fuse-ld=llvm-lib"])
 		elif(buildType == BuildType.EXECUTABLE):
+			args.extend(["-fuse-ld=lld"])
 			args.extend(["-Zi"])
-			args.extend(["-Wl,--subsystem,console"])
+			if(Config.configuration == "Debug"):
+				args.append("-fsanitize=address")
+				args.append("-fno-sanitize-address-use-odr-indicator")
 			args.extend(ResolveFiles([f"{intDir}/**.res"], intDir))
 			intDirs = CollectIntFolders(dependancys)
 			for intd in intDirs:
 				args.extend(ResolveFiles([f"{intd}/**.res"], intd))
 
 		args.extend(["-o", outputFile])
-		args.append("-Wl,-force-load")
 		args.extend(ResolveFiles([f"{intDir}/**.obj"], intDir))
 		args.extend(links)
 		result = subprocess.run(args, cwd=projDir, capture_output=True, text=True)
@@ -450,6 +460,9 @@ class ProjectEnviernment:
 			outProj = Config.buildScripts[Config.project]["module"].GetProject()
 		else:
 			outProj = self
+
+		if(Config.configuration == "Debug" and self.buildType == BuildType.EXECUTABLE):
+			self.dlls.append(f"{Config.location}/vendor/Compiler/lib/clang/21/lib/windows/clang_rt.asan_dynamic-x86_64.dll")
 
 		# copy dlls
 		for dll in self.dlls:

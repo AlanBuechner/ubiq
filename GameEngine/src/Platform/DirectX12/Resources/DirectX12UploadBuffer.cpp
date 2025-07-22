@@ -29,6 +29,7 @@ namespace Engine
 
 	DirectX12UploadBufferResource::~DirectX12UploadBufferResource()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		if (m_MapedBasePointer != nullptr)
 			UnMap();
 		m_Buffer->Release();
@@ -45,6 +46,7 @@ namespace Engine
 
 	void DirectX12UploadBufferResource::UnMap()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		D3D12_RANGE range = { 0, 0 };
 		m_Buffer->Unmap(0, &range);
 		m_MapedBasePointer = nullptr;
