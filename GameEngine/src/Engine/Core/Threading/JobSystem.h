@@ -1,5 +1,6 @@
 #pragma once
 #include "Flag.h"
+#include "Engine/Core/Core.h"
 #include <unordered_map>
 
 namespace Engine
