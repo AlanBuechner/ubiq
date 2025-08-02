@@ -15,7 +15,6 @@ namespace Engine
 
 	ComponentPool::~ComponentPool()
 	{
-
 		for (ComponentPoolPage& page : m_Pages)
 		{
 			for (uint32 i = 0; i < PoolSize; i++)
@@ -29,7 +28,6 @@ namespace Engine
 
 	void ComponentPool::EachEntity(EachEntityFunc func)
 	{
-
 		for (ComponentPoolPage& page : m_Pages)
 		{
 			for (uint32 i = 0; i < PoolSize; i++)

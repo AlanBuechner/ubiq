@@ -112,6 +112,7 @@ namespace Engine {
 		while (m_Running)
 		{
 			CREATE_PROFILE_SCOPEI("Frame");
+			FrameMark;
 
 			m_LayerStack.UpdateLayerChanges();
 
@@ -151,9 +152,6 @@ namespace Engine {
 					layer->OnRender();
 				END_PROFILEI(timer);
 			}
-
-			if (m_InEditer)
-				m_ImGuiLayer->Build();
 
 			// end Rendering
 			Renderer::EndFrame();

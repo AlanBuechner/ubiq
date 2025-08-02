@@ -11,6 +11,8 @@
 #include "Engine/Core/Threading/JobSystem.h"
 #include "CPUCommandList.h"
 
+struct ImDrawDataSnapshot;
+
 namespace Engine
 {
 	class Camera;
@@ -23,6 +25,7 @@ namespace Engine
 
 	class CommandList;
 	class CommandQueue;
+
 }
 
 namespace Engine
@@ -42,11 +45,11 @@ namespace Engine
 			~FrameContext();
 
 			Utils::Vector<CPUCommandAllocator*> m_Commands;
-			Ref<CommandList> m_IMGUICommandList;
+			ImDrawDataSnapshot* m_ImGuiSnapshot = nullptr;
 			Utils::Vector<Ref<CommandList>> m_CommandLists;
-			ResourceDeletionPool* m_DeletionPool;
-			UploadPool* m_UploadPool;
-			bool hasBeenDeleted = false;
+			ResourceDeletionPool* m_DeletionPool = nullptr;
+			UploadPool* m_UploadPool = nullptr;
+			Ref<RenderTarget2D> m_BackBuffer = nullptr;
 		};
 
 	public:
@@ -88,6 +91,7 @@ namespace Engine
 	private:
 		static void RenderThread(void* frameContext);
 		static void GPUThread(void* frameContext);
+		static void CleanupThread(void* frameContext);
 
 	private:
 		static Ref<GraphicsContext> s_Context;
@@ -102,6 +106,7 @@ namespace Engine
 		static std::atomic<FrameContext*> s_FrameContext;
 		static NamedJobThread* s_RenderThread;
 		static NamedJobThread* s_GPUThread;
+		static NamedJobThread* s_CleanupThread;
 
 		static Ref<Texture2D> s_WhiteTexture;
 		static Ref<Texture2D> s_BlackTexture;

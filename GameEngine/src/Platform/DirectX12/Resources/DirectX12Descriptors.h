@@ -34,6 +34,7 @@ namespace Engine
 
 		DirectX12DescriptorHandle Allocate();
 		void Free(DirectX12DescriptorHandle& handle);
+		void Free(D3D12_CPU_DESCRIPTOR_HANDLE handle); // only used by imgui
 		void Clear();
 
 		D3D12_DESCRIPTOR_HEAP_TYPE GetType() const { return m_Type; }

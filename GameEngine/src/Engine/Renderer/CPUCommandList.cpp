@@ -79,6 +79,9 @@ namespace Engine
 			delete m_CommandAllocator; // delete old allocator if it was not used
 		m_CommandAllocator = new CPUCommandAllocator(m_Name);
 		m_CommandAllocator->SubmitCommand(new CPUResourceTransitionCommand()); // create transition command for resource state management
+
+		m_BoundShader = nullptr;
+		m_RenderTarget = nullptr;
 	}
 
 	void CPUCommandList::StopRecording()
@@ -323,6 +326,9 @@ namespace Engine
 	void CPUCommandList::SetShader(Ref<GraphicsShaderPass> shader)
 	{
 		ASSERT_ALLOCATOR;
+		if (shader == m_BoundShader)
+			return;
+
 		CPUSetGraphicsShaderCommand* cmd = new CPUSetGraphicsShaderCommand();
 		cmd->shaderPass = shader;
 		cmd->format = m_RenderTarget->GetFormats();

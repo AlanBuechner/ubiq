@@ -45,7 +45,7 @@ def GetProject():
 	proj.sources = sources
 	proj.resources = []
 	proj.headers = headers
-	proj.includes = []
+	proj.includes = [projDir]
 	proj.sysIncludes = sysIncludes
 	proj.defines = defines
 	proj.links = []

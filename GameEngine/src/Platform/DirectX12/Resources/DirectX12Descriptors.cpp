@@ -60,9 +60,9 @@ namespace Engine
 		DirectX12DescriptorHandle handle;
 		handle.m_Container = this;
 		handle.m_Index = slot;
-		handle.cpu.ptr = m_CPUHandle.ptr + offset;
+		handle.cpu.ptr = GetCPUHeapStart().ptr + offset;
 		if (m_IsShaderVisable)
-			handle.gpu.ptr = m_GPUHandle.ptr + offset;
+			handle.gpu.ptr = GetGPUHeapStart().ptr + offset;
 
 		// remove the slot from the list of free slots
 		m_FreeSlots.Pop();
@@ -78,6 +78,15 @@ namespace Engine
 
 		m_FreeSlots.Push(handle.m_Index); // add the slot to the list of free slots
 		handle = {}; // invalidate the handle
+	}
+
+	void DirectX12DescriptorHeap::Free(D3D12_CPU_DESCRIPTOR_HANDLE handle)
+	{
+		// find index
+		uint32 offset = handle.ptr - GetCPUHeapStart().ptr;
+		uint32 index = offset / m_DescriporSize;
+
+		m_FreeSlots.Push(index); // add the slot to the list of free slots
 	}
 
 	void DirectX12DescriptorHeap::Clear()

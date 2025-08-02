@@ -134,7 +134,7 @@ namespace Engine
 
 		// set up swap chain
 		m_SwapChain = SwapChain::Create(*this);
-		m_SwapChain->Init(2);
+		m_SwapChain->Init(3);
 		m_SwapChain->SetVSync(m_Data.VSync);
 	}
 

@@ -17,7 +17,6 @@
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
 #include <algorithm>
-#include <imgui_internal.h>
 
 #if defined(PLATFORM_WINDOWS)
 #include "Platform/Windows/Win.h"
@@ -29,9 +28,6 @@
 #include "Platform/DirectX12/DirectX12CommandList.h"
 #include "Platform/DirectX12/DX.h"
 #endif // PLATFORM_WINDOWS
-
-
-#include <ImGuizmo.h>
 
 namespace Engine
 {
@@ -84,12 +80,28 @@ namespace Engine
 		// init dx12
 		wrl::ComPtr<ID3D12DescriptorHeap> heap = DirectX12ResourceManager::s_SRVHeap->GetHeap();
 		Ref<DirectX12SwapChain> swapChain = std::dynamic_pointer_cast<DirectX12SwapChain>(Application::Get().GetWindow().GetSwapChain());
-		CORE_ASSERT(ImGui_ImplDX12_Init(context->GetDevice().Get(), 
-			swapChain->GetBufferCount(), DXGI_FORMAT_R8G8B8A8_UNORM,
-			heap.Get(),
-			heap->GetCPUDescriptorHandleForHeapStart(),
-			heap->GetGPUDescriptorHandleForHeapStart()),
-			"Faild to initalize imgui");
+
+		ImGui_ImplDX12_InitInfo init_info = {};
+		init_info.Device = context->GetDevice().Get();
+		init_info.CommandQueue = Renderer::GetMainCommandQueue<DirectX12CommandQueue>()->GetCommandQueue();
+		init_info.NumFramesInFlight = swapChain->GetBufferCount();
+		init_info.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+		init_info.DSVFormat = DXGI_FORMAT_UNKNOWN;
+		// Allocating SRV descriptors (for textures) is up to the application, so we provide callbacks.
+		// (current version of the backend will only allocate one descriptor, future versions will need to allocate more)
+		init_info.SrvDescriptorHeap = heap.Get();
+		init_info.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo*, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
+			DirectX12DescriptorHandle handle = DirectX12ResourceManager::s_SRVHeap->Allocate();
+			out_cpu_handle->ptr = handle.cpu.ptr;
+			out_gpu_handle->ptr = handle.gpu.ptr;
+			return;
+		};
+		init_info.SrvDescriptorFreeFn = [](ImGui_ImplDX12_InitInfo*, D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle) { 
+			DirectX12ResourceManager::s_SRVHeap->Free(cpu_handle);
+		};
+
+		CORE_ASSERT(ImGui_ImplDX12_Init(&init_info),
+			"Faild to initalize imgui", "");
 #endif
 
 	}
@@ -126,7 +138,6 @@ namespace Engine
 		ImGui_ImplWin32_NewFrame();
 #endif
 		ImGui::NewFrame();
-		ImGuizmo::BeginFrame();
 
 	}
 
@@ -138,36 +149,41 @@ namespace Engine
 
 		// Rendering
 		ImGui::Render();
+
+		Renderer::GetFrameContext()->m_ImGuiSnapshot->SnapUsingSwap(ImGui::GetDrawData(), ImGui::GetTime());
+
+#ifdef PLATFORM_WINDOWS
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			//ImGui::RenderPlatformWindowsDefault(nullptr, (void*)commandList->GetCommandList());
+		}
+#endif // PLATFORM_WINDOWS
 	}
 
-	void ImGuiLayer::Build()
+	void ImGuiLayer::Build(ImDrawData& drawData, Ref<CommandList> cmdList, Ref<RenderTarget2D> backBuffer)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		ImGuiIO& io = ImGui::GetIO();
 
 #ifdef PLATFORM_WINDOWS
-		Ref<DirectX12SwapChain> swapChain = std::dynamic_pointer_cast<DirectX12SwapChain>(Application::Get().GetWindow().GetSwapChain());
-		Ref<DirectX12CommandList> commandList = std::dynamic_pointer_cast<DirectX12CommandList>(CommandList::Create(CommandListType::Graphics));
-		Ref<RenderTarget2D> rt = swapChain->GetCurrentRenderTarget();
+		Ref<DirectX12CommandList> commandList = std::dynamic_pointer_cast<DirectX12CommandList>(cmdList);
 
 		commandList->StartRecording();
 		{
 			CREATE_PROFILE_SCOPEI("Recored commands");
 			GPUTimer::BeginEvent(commandList, "ImGui");
-			commandList->Transition({ { rt->GetResource(), ResourceState::RenderTarget, ResourceState::Common } }); // common -> render target
-			commandList->SetRenderTarget(rt);
-			commandList->ClearRenderTarget(rt, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
-			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList->GetCommandList());
-			commandList->Transition({ { rt->GetResource(), ResourceState::Common, ResourceState::RenderTarget } }); // render target -> common
+			commandList->Transition({ { backBuffer->GetResource(), ResourceState::RenderTarget, ResourceState::Common } }); // common -> render target
+			commandList->SetRenderTarget(backBuffer);
+			commandList->ClearRenderTarget(backBuffer, (Math::Vector4&)ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+			ImGui_ImplDX12_RenderDrawData(&drawData, commandList->GetCommandList());
+			commandList->Transition({ { backBuffer->GetResource(), ResourceState::Common, ResourceState::RenderTarget } }); // render target -> common
 			GPUTimer::EndEvent(commandList);
 		}
 		commandList->Close();
 
-		Renderer::GetFrameContext()->m_IMGUICommandList = commandList;
-
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
-			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault(nullptr, (void*)commandList->GetCommandList());
 		}
 #endif // PLATFORM_WINDOWS

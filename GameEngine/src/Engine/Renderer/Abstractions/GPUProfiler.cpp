@@ -39,17 +39,17 @@ namespace Engine
 
 	void GPUTimer::BeginEvent(Ref<CPUCommandList> commandList, const char* eventName)
 	{
-		// TODO
+		commandList->BeginEvent(eventName);
 	}
 
 	void GPUTimer::BeginEvent(Ref<CPUCommandList> commandList, const std::string& eventName)
 	{
-		// TODO
+		commandList->BeginEvent(eventName);
 	}
 
 	void GPUTimer::EndEvent(Ref<CPUCommandList> commandList)
 	{
-		// TODO
+		commandList->EndEvent();
 	}
 
 

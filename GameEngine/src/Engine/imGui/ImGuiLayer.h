@@ -8,6 +8,12 @@
 
 namespace Engine
 {
+	class CommandList;
+	class RenderTarget2D;
+}
+
+namespace Engine
+{
 	class Window;
 	class  ImGuiLayer : public Layer
 	{
@@ -23,7 +29,7 @@ namespace Engine
 
 		void Begin();
 		void End();
-		void Build();
+		static void Build(ImDrawData& drawData, Ref<CommandList> cmdList, Ref<RenderTarget2D> backBuffer);
 
 		void SetBlockEvents(bool block) { m_BlockEvents = block; }
 

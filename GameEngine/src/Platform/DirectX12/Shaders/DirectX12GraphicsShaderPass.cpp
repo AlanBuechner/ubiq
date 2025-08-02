@@ -248,7 +248,7 @@ namespace Engine
 		{
 			desc.DepthStencilState.DepthEnable = TRUE;
 			desc.DSVFormat = GetDXGITextureFormat(formats.Back());
-			desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+			desc.DepthStencilState.DepthWriteMask = m_PassConfig.depthWrite ? D3D12_DEPTH_WRITE_MASK_ALL : D3D12_DEPTH_WRITE_MASK_ZERO;
 
 			switch (m_PassConfig.depthTest)
 			{

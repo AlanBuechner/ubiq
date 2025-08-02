@@ -192,6 +192,7 @@ namespace Engine
 		BlendMode blendMode = BlendMode::Blend;
 		CullMode cullMode = CullMode::Back;
 		DepthTest depthTest = DepthTest::LessOrEqual;
+		bool depthWrite = true;
 		bool enableConservativeRasterization = false;
 	};
 
@@ -277,6 +278,8 @@ namespace Engine
 		static BlendMode ParseBlendMode(const ObjectDescription& var);
 		static CullMode ParseCullMode(const ObjectDescription& var);
 		static DepthTest ParseDepthTest(const ObjectDescription& var);
-		static bool ParseConservativeRasterization(const ObjectDescription& var);
+		static bool ParseBool(const ObjectDescription& var);
+		static bool ParseDepthWrite(const ObjectDescription& var) { return ParseBool(var); }
+		static bool ParseConservativeRasterization(const ObjectDescription& var) { return ParseBool(var); }
 	};
 }

@@ -7,10 +7,13 @@
 #include "Abstractions/Resources/ResourceManager.h"
 #include "Engine/Core/MeshBuilder.h"
 #include "Abstractions/GPUProfiler.h"
+#include "Abstractions/Resources/SwapChain.h"
 
 #include "EngineResource.h"
 
 #include "Engine/Core/Application.h"
+
+#include "Engine/ImGui/ImGui.h"
 
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
 Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
@@ -30,6 +33,7 @@ Engine::Ref<Engine::Material> Engine::Renderer::s_DefultMaterial;
 std::atomic<Engine::Renderer::FrameContext*> Engine::Renderer::s_FrameContext = nullptr;
 Engine::NamedJobThread* Engine::Renderer::s_RenderThread;
 Engine::NamedJobThread* Engine::Renderer::s_GPUThread;
+Engine::NamedJobThread* Engine::Renderer::s_CleanupThread;
 
 namespace Engine
 {
@@ -39,21 +43,35 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		m_DeletionPool = new ResourceDeletionPool();
 		m_UploadPool = new UploadPool();
+		m_ImGuiSnapshot = new ImDrawDataSnapshot();
 	}
 
 	Renderer::FrameContext::~FrameContext()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		hasBeenDeleted = true;
+		// delete pools
 		delete m_DeletionPool;
 		delete m_UploadPool;
 
+		// delete imgui snapshot
+		delete m_ImGuiSnapshot;
+
+		// null out ptr's
 		m_DeletionPool = nullptr;
 		m_UploadPool = nullptr;
+		m_ImGuiSnapshot = nullptr;
 
+		// delete command allocators
 		for (uint32 i = 0; i < m_Commands.Count(); i++)
 			delete m_Commands[i];
 
+		// free command lists
+		for (uint32 i = 0; i < m_CommandLists.Count(); i++)
+		{
+			Ref<CommandList> commandList = m_CommandLists[i];
+			CommandList::Free(commandList);
+			m_CommandLists[i] = nullptr;
+		}
 	}
 
 	void Renderer::Init()
@@ -83,6 +101,7 @@ namespace Engine
 
 		s_RenderThread = JobSystem::AddNamedJob("Render Thread", &Renderer::RenderThread);
 		s_GPUThread = JobSystem::AddNamedJob("GPU Thread", &Renderer::GPUThread);
+		s_CleanupThread = JobSystem::AddNamedJob("Cleanup Thread", &Renderer::CleanupThread);
 
 		uint32 textureData;
 
@@ -157,6 +176,7 @@ namespace Engine
 		s_MainCommandList->StopRecording();
 		SubmitCommandList(s_MainCommandList);
 		FrameContext* context = s_FrameContext.exchange(new FrameContext());
+		context->m_BackBuffer = Application::Get().GetWindow().GetSwapChain()->GetCurrentRenderTarget();;
 		s_RenderThread->Invoke(context);
 	}
 
@@ -164,6 +184,7 @@ namespace Engine
 	{
 		s_RenderThread->Wait();
 		s_GPUThread->Wait();
+		s_CleanupThread->Wait();
 	}
 
 	void Renderer::Build(Ref<CPUCommandList> commandList)
@@ -204,8 +225,13 @@ namespace Engine
 			}
 		}
 
-		if (frameContext->m_IMGUICommandList)
-			frameContext->m_CommandLists.Push(frameContext->m_IMGUICommandList);
+		// check if we are using imgui
+		if(Application::InEditer())
+		{
+			Ref<CommandList> commandList = CommandList::Create(CommandListType::Graphics);
+			ImGuiLayer::Build(frameContext->m_ImGuiSnapshot->DrawData, commandList, frameContext->m_BackBuffer);
+			frameContext->m_CommandLists.Push(commandList);
+		}
 
 		s_GPUThread->Invoke(frameContext);
 	}
@@ -225,17 +251,18 @@ namespace Engine
 		s_MainCommandQueue->Await();
 		GPUProfiler::EndFrame();
 
-		// free command lists
-		for (uint32 i = 0; i < commandLists.Count(); i++)
-		{
-			Ref<CommandList> commandList = commandLists[i];
-			CommandList::Free(commandList);
-			commandLists[i] = nullptr;
-		}
-		frameContext->m_IMGUICommandList = nullptr;
-
 		// swap buffers
 		WindowManager::UpdateWindows();
+
+		s_CleanupThread->Invoke(data);
+	}
+
+	void Renderer::CleanupThread(void* data)
+	{
+		CREATE_PROFILE_SCOPEI("Cleanup Frame");
+		FrameContext* frameContext = (FrameContext*)data;
+
+		
 
 		// prepare for next frame
 		delete frameContext;

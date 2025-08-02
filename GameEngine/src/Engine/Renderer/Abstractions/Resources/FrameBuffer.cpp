@@ -27,6 +27,7 @@ namespace Engine
 
 	bool FrameBuffer::HasDepthAttachment() const
 	{
+		if (m_Attachments.Empty()) return false;
 		return IsTextureFormatDepthStencil(m_Attachments.Back()->GetResource()->GetFormat());
 	}
 

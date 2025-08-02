@@ -382,6 +382,7 @@ namespace Engine
 						else if (param == "blendMode")		rpass.blendMode = ParseBlendMode(val);
 						else if (param == "cullMode")		rpass.cullMode = ParseCullMode(val);
 						else if (param == "depthTest")		rpass.depthTest = ParseDepthTest(val);
+						else if (param == "depthWrite")		rpass.depthWrite = ParseDepthWrite(val);
 						else if (param == "topology")		rpass.topology = ParseTopology(val);
 						else if (param == "conservativeRasterization")	rpass.enableConservativeRasterization = ParseConservativeRasterization(val);
 					}
@@ -561,7 +562,7 @@ namespace Engine
 		return DepthTest::None;
 	}
 
-	bool ShaderCompiler::ParseConservativeRasterization(const ObjectDescription& var)
+	bool ShaderCompiler::ParseBool(const ObjectDescription& var)
 	{
 		CORE_ASSERT(var.GetType() == ObjectDescription::Type::String, "Description is not of type string");
 

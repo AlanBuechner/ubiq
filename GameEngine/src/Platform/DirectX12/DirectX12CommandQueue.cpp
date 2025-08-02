@@ -47,7 +47,7 @@ namespace Engine
 	void DirectX12CommandQueue::Execute()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		
+
 		Utils::Vector<ID3D12CommandList*> DXCommandLists;
 
 		DXCommandLists.Reserve(m_Commands.Count());

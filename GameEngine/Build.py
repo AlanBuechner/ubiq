@@ -15,7 +15,6 @@ pchSource = f"{location}/src/pch.cpp"
 sources = [
 	f"src/**.cpp",
 	f"{includeDirs['stb_image']}/**.cpp",
-	f"{includeDirs['ImGuizmo']}/ImGuizmo.cpp"
 ]
 
 resources = [
@@ -25,7 +24,6 @@ resources = [
 headers = [
 	f"src/**.h",
 	f"{includeDirs['stb_image']}/**.h",
-	f"{includeDirs['ImGuizmo']}/ImGuizmo.h",
 ]
 
 includes = [
