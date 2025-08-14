@@ -73,6 +73,8 @@ namespace Engine
 		ID3D12CommandAllocator* m_CommandAllocator;
 		ID3D12GraphicsCommandList10* m_CommandList;
 
+		Utils::Vector<std::string> m_EventStack;
+
 		friend class DirectX12CommandQueue;
 	};
 }

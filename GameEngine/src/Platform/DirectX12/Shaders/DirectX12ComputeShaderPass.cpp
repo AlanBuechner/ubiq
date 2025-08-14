@@ -27,7 +27,10 @@ namespace Engine
 			ShaderBlobs cs = DirectX12ShaderCompiler::Get().Compile(csc, m_Src->file, ShaderType::Compute);
 			CORE_ASSERT(cs.object, "Failed to compile compute shader");
 			m_Blobs.cs = cs.object;
-			DirectX12ShaderCompiler::Get().GetShaderParameters(cs, csi, m_ReflectionData, ShaderType::Compute);
+			wrl::ComPtr<ID3D12ShaderReflection> reflection = DirectX12ShaderCompiler::Get().GetShaderReflection(cs);
+			CORE_ASSERT(reflection != nullptr, "Failed to get reflection data on shader {0}: {1}", m_Src->file, m_PassName);
+			DirectX12ShaderCompiler::Get().GetShaderParameters(reflection, csi, m_ReflectionData, ShaderType::Compute);
+			DirectX12ShaderCompiler::Get().GetComputeGroupSize(reflection, m_ThreadGroupSize);
 		}
 
 		if (m_Blobs)

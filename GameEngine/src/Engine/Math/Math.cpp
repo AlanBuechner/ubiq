@@ -121,6 +121,11 @@ namespace Math
 		return glm::clamp(x, min, max);
 	}
 
+	uint32 Clamp(uint32 x, uint32 min, uint32 max)
+	{
+		return glm::clamp(x, min, max);
+	}
+
 	float Min(float x, float y)
 	{
 		return glm::min(x, y);

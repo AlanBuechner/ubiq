@@ -47,6 +47,8 @@ namespace Math
 	float Max(float x, float y);
 	float Mod(float x, float y);
 
+	uint32 Clamp(uint32 x, uint32 min, uint32 max);
+
 	float Lerp(float a, float b, float t);
 
 	// Random

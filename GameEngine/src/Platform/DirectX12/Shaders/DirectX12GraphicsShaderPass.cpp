@@ -66,8 +66,10 @@ namespace Engine
 				ShaderBlobs vs = DirectX12ShaderCompiler::Get().Compile(vsc, m_Src->file, ShaderType::Vertex);
 				CORE_ASSERT(vs.object, "Failed to compile vertex shader");
 				m_Blobs.vs = vs.object;
-				DirectX12ShaderCompiler::Get().GetShaderParameters(vs, vsi, m_ReflectionData, ShaderType::Vertex);
-				DirectX12ShaderCompiler::Get().GetInputLayout(vs, m_InputElements);
+				wrl::ComPtr<ID3D12ShaderReflection> reflection = DirectX12ShaderCompiler::Get().GetShaderReflection(vs);
+				DirectX12ShaderCompiler::Get().GetShaderParameters(reflection, vsi, m_ReflectionData, ShaderType::Vertex);
+				CORE_ASSERT(reflection != nullptr, "Failed to get reflection data on shader {0}: {1}", m_Src->file, m_PassName);
+				DirectX12ShaderCompiler::Get().GetInputLayout(reflection, m_InputElements);
 			}
 		}
 
@@ -80,7 +82,9 @@ namespace Engine
 				ShaderBlobs ps = DirectX12ShaderCompiler::Get().Compile(psc, m_Src->file, ShaderType::Pixel);
 				CORE_ASSERT(ps.object, "Failed to compile pixel shader");
 				m_Blobs.ps = ps.object;
-				DirectX12ShaderCompiler::Get().GetShaderParameters(ps, psi, m_ReflectionData, ShaderType::Pixel);
+				wrl::ComPtr<ID3D12ShaderReflection> reflection = DirectX12ShaderCompiler::Get().GetShaderReflection(ps);
+				CORE_ASSERT(reflection != nullptr, "Failed to get reflection data on shader {0}: {1}", m_Src->file, m_PassName);
+				DirectX12ShaderCompiler::Get().GetShaderParameters(reflection, psi, m_ReflectionData, ShaderType::Pixel);
 			}
 		}
 
@@ -95,7 +99,9 @@ namespace Engine
 				ShaderBlobs gs = DirectX12ShaderCompiler::Get().Compile(gsc, m_Src->file, ShaderType::Geometry);
 				CORE_ASSERT(gs.object, "Failed to compile geometry shader");
 				m_Blobs.gs = gs.object;
-				DirectX12ShaderCompiler::Get().GetShaderParameters(gs, gsi, m_ReflectionData, ShaderType::Geometry);
+				wrl::ComPtr<ID3D12ShaderReflection> reflection = DirectX12ShaderCompiler::Get().GetShaderReflection(gs);
+				CORE_ASSERT(reflection != nullptr, "Failed to get reflection data on shader {0}: {1}", m_Src->file, m_PassName);
+				DirectX12ShaderCompiler::Get().GetShaderParameters(reflection, gsi, m_ReflectionData, ShaderType::Geometry);
 			}
 		}
 
@@ -114,8 +120,6 @@ namespace Engine
 	{
 		CREATE_PROFILE_SCOPEI("Create Graphics PSO");
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-
-		ID3D12PipelineState* state;
 
 		CORE_ASSERT(m_Sig, "Root Signature is null for some reason");
 
@@ -244,7 +248,7 @@ namespace Engine
 			}
 		}
 
-		if (formats.Back() != TextureFormat::None)
+		if (IsTextureFormatDepthStencil(formats.Back()))
 		{
 			desc.DepthStencilState.DepthEnable = TRUE;
 			desc.DSVFormat = GetDXGITextureFormat(formats.Back());
@@ -267,13 +271,21 @@ namespace Engine
 			desc.DepthStencilState.FrontFace = defaultStencilOp;
 			desc.DepthStencilState.BackFace = defaultStencilOp;
 		}
+		else
+		{
+			desc.DepthStencilState.DepthEnable = FALSE;
+			desc.DepthStencilState.StencilEnable = FALSE;
+			desc.DSVFormat = DXGI_FORMAT_UNKNOWN;
+		}
 
 		desc.SampleMask = UINT_MAX;
 		desc.SampleDesc.Count = 1;
 
-		context->GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&state));
+		ID3D12PipelineState* pipline = nullptr;
+		CORE_ASSERT_HRESULT(context->GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipline)),
+			"Failed To Create Pipline");
 
-		return state;
+		return pipline;
 	}
 
 }

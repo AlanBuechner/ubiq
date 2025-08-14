@@ -95,6 +95,8 @@ namespace Engine
 		CPUBeginEventStaticCommand* cmd = new CPUBeginEventStaticCommand();
 		cmd->eventName = eventName;
 		m_CommandAllocator->SubmitCommand(cmd);
+
+		m_EventStack.Push(eventName);
 	}
 
 	void CPUCommandList::BeginEvent(const std::string& eventName)
@@ -103,6 +105,8 @@ namespace Engine
 		CPUBeginEventDynamicCommand* cmd = new CPUBeginEventDynamicCommand();
 		cmd->eventName = eventName;
 		m_CommandAllocator->SubmitCommand(cmd);
+
+		m_EventStack.Push(eventName);
 	}
 
 	void CPUCommandList::EndEvent()
@@ -110,6 +114,7 @@ namespace Engine
 		ASSERT_ALLOCATOR;
 		CPUEndEventCommand* cmd = new CPUEndEventCommand();
 		m_CommandAllocator->SubmitCommand(cmd);
+		m_EventStack.Pop();
 	}
 
 	void CPUCommandList::Present(Ref<FrameBuffer> fb)
@@ -474,7 +479,7 @@ namespace Engine
 		m_CommandAllocator->SubmitCommand(cmd);
 	}
 
-	void CPUCommandList::Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGroupsZ)
+	void CPUCommandList::DispatchGroups(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGroupsZ)
 	{
 		ASSERT_ALLOCATOR;
 		CPUDispatchCommand* cmd = new CPUDispatchCommand();
@@ -482,6 +487,16 @@ namespace Engine
 		cmd->threadGroupsY = threadGroupsY;
 		cmd->threadGroupsZ = threadGroupsZ;
 		m_CommandAllocator->SubmitCommand(cmd);
+	}
+
+	void CPUCommandList::DispatchThreads(uint32 threadsX, uint32 threadsY, uint32 threadsZ)
+	{
+		Math::UVector3 groupSize = std::dynamic_pointer_cast<ComputeShaderPass>(m_BoundShader)->GetThreadGroupSize();
+
+		uint32 groupsX = Math::Ceil((float)threadsX / (float)groupSize.x);
+		uint32 groupsY = Math::Ceil((float)threadsY / (float)groupSize.y);
+		uint32 groupsZ = Math::Ceil((float)threadsZ / (float)groupSize.z);
+		DispatchGroups(groupsX, groupsY, groupsZ);
 	}
 
 	void CPUCommandList::DispatchGraph(void* data, uint32 stride, uint32 count)

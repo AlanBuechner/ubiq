@@ -3,6 +3,7 @@
 #include "CPUCommands.h"
 #include "Abstractions/Resources/Texture.h"
 #include "Abstractions/Resources/FrameBuffer.h"
+#include "Shaders/ShaderPass.h"
 
 namespace Engine
 {
@@ -49,6 +50,8 @@ namespace Engine
 		~CPUCommandList();
 
 		void SetName(const std::string& name) { m_Name = name; }
+		const std::string& GetName() { return m_Name; }
+		const Ref<ShaderPass> GetBoundShader() { return m_BoundShader; }
 
 		CPUCommandAllocator* TakeAllocator();
 
@@ -103,6 +106,8 @@ namespace Engine
 		void SetRootConstant(uint32 index, uint32 data);
 		template<typename T>
 		void SetRootConstant(uint32 index, T data) { SetRootConstant(index, *(uint32*)&data); }
+		template<bool>
+		void SetRootConstant(uint32 index, bool data) { uint32 d = data; SetRootConstant(index, d); }
 		void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer);
 		void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer);
 		void SetRWStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer);
@@ -110,9 +115,19 @@ namespace Engine
 		void SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav);
 		void SetRWTexture(uint32 index, Ref<RWTexture2D> texture, uint32 mip = 0);
 
+		template<typename T>
+		void SetRootConstant(const std::string& name, T data) { SetRootConstant(m_BoundShader->GetUniformLocation(name), data); }
+		void SetConstantBuffer(const std::string& name, Ref<ConstantBuffer> data) { SetConstantBuffer(m_BoundShader->GetUniformLocation(name), data); }
+		void SetStructuredBuffer(const std::string& name, Ref<StructuredBuffer> data) { SetStructuredBuffer(m_BoundShader->GetUniformLocation(name), data); }
+		void SetRWStructuredBuffer(const std::string& name, Ref<RWStructuredBuffer> data) { SetRWStructuredBuffer(m_BoundShader->GetUniformLocation(name), data); }
+		void SetTexture(const std::string& name, Ref<Texture2D> data) { SetTexture(m_BoundShader->GetUniformLocation(name), data); }
+		void SetRWTexture(const std::string& name, Texture2DUAVDescriptorHandle* uav) { SetRWTexture(m_BoundShader->GetUniformLocation(name), uav); }
+		void SetRWTexture(const std::string& name, Ref<RWTexture2D> texture, uint32 mip = 0) { SetRWTexture(m_BoundShader->GetUniformLocation(name), texture, mip); }
+
 		// do work
 		void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, uint32 numInstances = UINT32_MAX);
-		void Dispatch(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGroupsZ);
+		void DispatchGroups(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGroupsZ);
+		void DispatchThreads(uint32 threadsX, uint32 threadsY, uint32 threadsZ);
 		void DispatchGraph(void* data, uint32 stride, uint32 count);
 		void DispatchGraph(uint32 numRecords = 1) { DispatchGraph(nullptr, 0, numRecords); }
 		template<typename T>
@@ -131,5 +146,7 @@ namespace Engine
 		Ref<FrameBuffer> m_RenderTarget = nullptr;
 		Ref<ShaderPass> m_BoundShader = nullptr;
 		std::string m_Name = "";
+
+		Utils::Vector<std::string> m_EventStack;
 	};
 }

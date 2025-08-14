@@ -23,9 +23,12 @@ namespace Engine
 		static DirectX12ShaderCompiler& Get();
 
 		ShaderBlobs Compile(const std::string& code, const fs::path& file, ShaderType type);
-		void GetShaderParameters(const ShaderBlobs& blobs, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type);
-		void GetLibraryParameters(const ShaderBlobs& blobs, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type);
-		void GetInputLayout(const ShaderBlobs& blobs, Utils::Vector<ShaderInputElement>& inputElements);
+		wrl::ComPtr<ID3D12ShaderReflection> GetShaderReflection(const ShaderBlobs& blobs);
+		wrl::ComPtr<ID3D12LibraryReflection> GetLibraryReflection(const ShaderBlobs& blobs);
+		void GetComputeGroupSize(wrl::ComPtr<ID3D12ShaderReflection> reflection, Math::UVector3& groupSize);
+		void GetShaderParameters(wrl::ComPtr<ID3D12ShaderReflection> reflection, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type);
+		void GetLibraryParameters(wrl::ComPtr<ID3D12LibraryReflection> reflection, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type);
+		void GetInputLayout(wrl::ComPtr<ID3D12ShaderReflection> reflection, Utils::Vector<ShaderInputElement>& inputElements);
 
 		ID3D12RootSignature* GenRootSignature(Utils::Vector<ShaderParameter>& params);
 

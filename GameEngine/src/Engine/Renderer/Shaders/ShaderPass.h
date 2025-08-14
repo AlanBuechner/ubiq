@@ -18,6 +18,7 @@ namespace Engine
 		inline Utils::Vector<ShaderParameter> GetReflectionData() { return m_ReflectionData; };
 		uint32 GetUniformLocation(const std::string& name);
 		bool IsComputeShader() { return m_ComputeShader; }
+		const std::string& GetName() { return m_PassName; }
 
 	protected:
 		std::unordered_map<std::string, uint32> m_UniformLocations;

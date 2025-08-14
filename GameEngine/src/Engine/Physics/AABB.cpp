@@ -72,7 +72,7 @@ namespace Engine
 		Math::Vector3 min = { FLT_MAX, FLT_MAX, FLT_MAX };
 		Math::Vector3 max = { FLT_MIN, FLT_MIN, FLT_MIN };
 
-		for (AABB aabb : aabbs)
+		for (AABB& aabb : aabbs)
 		{
 			if (aabb.m_Min.x < min.x) min.x = aabb.m_Min.x;
 			if (aabb.m_Min.y < min.y) min.y = aabb.m_Min.y;

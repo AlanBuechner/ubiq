@@ -197,21 +197,51 @@ namespace Engine
 		return blobs;
 	}
 
-	void DirectX12ShaderCompiler::GetShaderParameters(const ShaderBlobs& blobs, const SectionInfo& section, Utils::Vector<Engine::ShaderParameter>& params, ShaderType type)
+	wrl::ComPtr<ID3D12ShaderReflection> DirectX12ShaderCompiler::GetShaderReflection(const ShaderBlobs& blobs)
 	{
-		CREATE_PROFILE_SCOPEI("Get Shader Parameters");
 		if (!blobs.reflection)
-			return;
+			return nullptr;
 
 		DxcBuffer reflectionData;
 		reflectionData.Encoding = DXC_CP_ACP;
 		reflectionData.Ptr = blobs.reflection->GetBufferPointer();
 		reflectionData.Size = blobs.reflection->GetBufferSize();
 
-		D3D12_SHADER_DESC reflectionDesc;
-		ID3D12ShaderReflection* reflection;
+		wrl::ComPtr<ID3D12ShaderReflection> reflection;
 		CORE_ASSERT_HRESULT(m_Utils->CreateReflection(&reflectionData, IID_PPV_ARGS(&reflection)), "Failed to create reflection data");
 
+		return reflection;
+	}
+
+	wrl::ComPtr<ID3D12LibraryReflection> DirectX12ShaderCompiler::GetLibraryReflection(const ShaderBlobs& blobs)
+	{
+		if (!blobs.reflection)
+			return nullptr;
+
+		DxcBuffer reflectionData;
+		reflectionData.Encoding = DXC_CP_ACP;
+		reflectionData.Ptr = blobs.reflection->GetBufferPointer();
+		reflectionData.Size = blobs.reflection->GetBufferSize();
+
+		ID3D12LibraryReflection* reflection;
+		CORE_ASSERT_HRESULT(m_Utils->CreateReflection(&reflectionData, IID_PPV_ARGS(&reflection)), "Failed to create reflection data");
+
+		return reflection;
+	}
+
+	void DirectX12ShaderCompiler::GetComputeGroupSize(wrl::ComPtr<ID3D12ShaderReflection> reflection, Math::UVector3& groupSize)
+	{
+		reflection->GetThreadGroupSize(&groupSize.x, &groupSize.y, &groupSize.z);
+		groupSize.x = Math::Max(groupSize.x, 1);
+		groupSize.y = Math::Max(groupSize.y, 1);
+		groupSize.z = Math::Max(groupSize.z, 1);
+	}
+
+	void DirectX12ShaderCompiler::GetShaderParameters(wrl::ComPtr<ID3D12ShaderReflection> reflection, const SectionInfo& section, Utils::Vector<Engine::ShaderParameter>& params, ShaderType type)
+	{
+		CREATE_PROFILE_SCOPEI("Get Shader Parameters");
+		
+		D3D12_SHADER_DESC reflectionDesc;
 		reflection->GetDesc(&reflectionDesc);
 
 		// bound resources
@@ -224,20 +254,11 @@ namespace Engine
 		}
 	}
 
-	void DirectX12ShaderCompiler::GetLibraryParameters(const ShaderBlobs& blobs, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
+	void DirectX12ShaderCompiler::GetLibraryParameters(wrl::ComPtr<ID3D12LibraryReflection> reflection, const SectionInfo& section, Utils::Vector<ShaderParameter>& params, ShaderType type)
 	{
 		CREATE_PROFILE_SCOPEI("Get Library Parameters");
-		if (!blobs.reflection)
-			return;
-
-		DxcBuffer reflectionData;
-		reflectionData.Encoding = DXC_CP_ACP;
-		reflectionData.Ptr = blobs.reflection->GetBufferPointer();
-		reflectionData.Size = blobs.reflection->GetBufferSize();
-
+		
 		D3D12_LIBRARY_DESC reflectionDesc;
-		ID3D12LibraryReflection* reflection;
-		CORE_ASSERT_HRESULT(m_Utils->CreateReflection(&reflectionData, IID_PPV_ARGS(&reflection)), "Failed to create reflection data");
 		reflection->GetDesc(&reflectionDesc);
 
 		for (uint32 funcIndex = 0; funcIndex < reflectionDesc.FunctionCount; funcIndex++)
@@ -257,19 +278,9 @@ namespace Engine
 		}
 	}
 
-	void DirectX12ShaderCompiler::GetInputLayout(const ShaderBlobs& blobs, Utils::Vector<ShaderInputElement>& inputElements)
+	void DirectX12ShaderCompiler::GetInputLayout(wrl::ComPtr<ID3D12ShaderReflection> reflection, Utils::Vector<ShaderInputElement>& inputElements)
 	{
 		CREATE_PROFILE_SCOPEI("Get Input Layout");
-		if (!blobs.reflection)
-			return;
-
-		DxcBuffer reflectionData;
-		reflectionData.Encoding = DXC_CP_ACP;
-		reflectionData.Ptr = blobs.reflection->GetBufferPointer();
-		reflectionData.Size = blobs.reflection->GetBufferSize();
-
-		wrl::ComPtr<ID3D12ShaderReflection> reflection;
-		CORE_ASSERT_HRESULT(m_Utils->CreateReflection(&reflectionData, IID_PPV_ARGS(&reflection)), "Failed to create reflection data");
 
 		D3D12_SHADER_DESC reflectionDesc;
 		reflection->GetDesc(&reflectionDesc);

@@ -153,11 +153,13 @@ namespace Engine
 	void DirectX12CommandList::BeginEvent(const char* eventName)
 	{
 		GPUTimer::BeginEvent(this, eventName);
+		m_EventStack.Push(eventName);
 	}
 
 	void DirectX12CommandList::EndEvent()
 	{
 		GPUTimer::EndEvent(this);
+		m_EventStack.Pop();
 	}
 
 	// transitions
@@ -314,10 +316,11 @@ namespace Engine
 		}
 	}
 
-	void DirectX12CommandList::SetShader(const CPUSetGraphicsShaderCommand& cmd)
+	void DISABLE_OPS DirectX12CommandList::SetShader(const CPUSetGraphicsShaderCommand& cmd)
 	{
 		Ref<DirectX12GraphicsShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12GraphicsShaderPass>(cmd.shaderPass);
-		m_CommandList->SetPipelineState(dxShader->GetPipelineState(cmd.format));
+		ID3D12PipelineState* pipline = dxShader->GetPipelineState(cmd.format);
+		m_CommandList->SetPipelineState(pipline);
 
 		D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 		switch (dxShader->GetTopologyType())

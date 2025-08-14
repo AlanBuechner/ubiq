@@ -23,7 +23,7 @@ namespace Engine
 	void DirectX12Context::Init()
 	{
 #if defined(DEBUG)
-		//DirectX12Debug::GetInstance()->Enable();
+		DirectX12Debug::GetInstance()->Enable();
 #endif
 
 		CORE_ASSERT_HRESULT(CreateDXGIFactory1(IID_PPV_ARGS(&m_Factory)), "Failed to create DXGIFactory");
@@ -44,7 +44,7 @@ namespace Engine
 		//m_Format = SelectFormat();
 
 #if defined(DEBUG)
-		//DirectX12Debug::GetInstance()->InitInfoQueue(m_Device);
+		DirectX12Debug::GetInstance()->InitInfoQueue(m_Device);
 		//DirectX12Debug::GetInstance()->ReportLiveObjects();
 #endif
 

@@ -28,7 +28,9 @@ namespace Engine
 			ShaderBlobs wg = DirectX12ShaderCompiler::Get().Compile(wgc, m_Src->file, ShaderType::WorkGraph);
 			if (!wg.object) return;
 			m_Blobs.wg = wg.object;
-			DirectX12ShaderCompiler::Get().GetLibraryParameters(wg, wgi, m_ReflectionData, ShaderType::WorkGraph);
+			wrl::ComPtr<ID3D12LibraryReflection> reflection = DirectX12ShaderCompiler::Get().GetLibraryReflection(wg);
+			CORE_ASSERT(reflection != nullptr, "Failed to get reflection data on shader {0}: {1}", m_Src->file, m_PassName);
+			DirectX12ShaderCompiler::Get().GetLibraryParameters(reflection, wgi, m_ReflectionData, ShaderType::WorkGraph);
 		}
 
 		if (m_Blobs)
