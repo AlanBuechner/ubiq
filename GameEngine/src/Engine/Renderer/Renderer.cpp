@@ -203,7 +203,7 @@ namespace Engine
 		frameContext->m_Commands.Insert(0u, s_UploadCommandList->TakeAllocator()); // add upload command list
 
 		{ // create commands for resource state tracking
-			CREATE_PROFILE_SCOPEI("Prepare Command Lists");
+			CREATE_PROFILE_SCOPEI("Recource State Tracking");
 			CPUCommandAllocator::ResourceStateMap stateMap;
 			for (CPUCommandAllocator* commands : frameContext->m_Commands)
 			{
@@ -262,9 +262,7 @@ namespace Engine
 		CREATE_PROFILE_SCOPEI("Cleanup Frame");
 		FrameContext* frameContext = (FrameContext*)data;
 
-		
-
-		// prepare for next frame
+		// delete old frame context
 		delete frameContext;
 	}
 

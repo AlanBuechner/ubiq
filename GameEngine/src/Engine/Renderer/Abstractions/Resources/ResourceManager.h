@@ -35,6 +35,8 @@ namespace Engine
 		UploadBufferResource* GetResource() { return m_UploadBuffer; }
 		void Clear();
 
+		uint32 GetSize() { return m_Size; }
+
 	private:
 		UploadBufferResource* m_UploadBuffer;
 		uint32 m_Size = 0;
@@ -116,5 +118,12 @@ namespace Engine
 
 		void ScheduleResourceDeletion(GPUResource* resource) { GetDeletionPool()->m_Resources.Push(resource); }
 		void ScheduleHandleDeletion(Descriptor* descriptor) { GetDeletionPool()->m_Descriptors.Push(descriptor); }
+
+		static UploadPage* GetUploadPage(uint32 size);
+		static void FreeUploadPage(UploadPage* page);
+
+	private:
+		static uint32 s_CachedUploadPageSize;
+		static Utils::Vector<UploadPage*> s_CachedUploadPages;
 	};
 }

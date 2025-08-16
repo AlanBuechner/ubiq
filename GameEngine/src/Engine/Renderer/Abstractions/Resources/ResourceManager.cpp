@@ -9,6 +9,9 @@
 #include "Platform/DirectX12/Resources/DirectX12ResourceManager.h"
 #endif
 
+uint32 Engine::ResourceManager::s_CachedUploadPageSize = MEM_MiB(5);
+Utils::Vector<Engine::UploadPage*> Engine::ResourceManager::s_CachedUploadPages;
+
 namespace Engine
 {
 
@@ -82,7 +85,7 @@ namespace Engine
 	UploadPool::~UploadPool()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		delete m_UploadPage;
+		ResourceManager::FreeUploadPage(m_UploadPage);
 	}
 
 	void UploadPool::SubmitBuffer(GPUResource* dest, uint32 destOffset, void* data, uint32 size, ResourceState state)
@@ -195,7 +198,7 @@ namespace Engine
 
 		// create new upload buffer
 		if(uploadBufferSize != 0)
-			m_UploadPage = new UploadPage(uploadBufferSize);
+			m_UploadPage = ResourceManager::GetUploadPage(uploadBufferSize);
 
 		// data
 		Utils::Vector<ResourceStateObject> startb;
@@ -405,4 +408,36 @@ namespace Engine
 	{
 		return Renderer::GetFrameContext()->m_UploadPool;
 	}
+
+	UploadPage* ResourceManager::GetUploadPage(uint32 size)
+	{
+		// if size is larger than cash size create new page
+		if (size > s_CachedUploadPageSize)
+		{
+			CORE_WARN("Createing upload page larger than cashed page size. Try increasing cashed page size");
+			return new UploadPage(size);
+		}
+
+		// find page page with current cash size delete others (needed if cash size is updated mid game)
+		while (!s_CachedUploadPages.Empty())
+		{
+			UploadPage* page = s_CachedUploadPages.Pop();
+			if (page->GetSize() != s_CachedUploadPageSize)
+				delete page;
+			else
+				return page;
+		}
+
+		// if no pages create new one
+		return new UploadPage(s_CachedUploadPageSize);
+	}
+
+	void ResourceManager::FreeUploadPage(UploadPage* page)
+	{
+		if (page == nullptr)
+			return;
+
+		s_CachedUploadPages.Push(page);
+	}
+
 }
