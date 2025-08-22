@@ -32,7 +32,6 @@
 #include "Engine/Renderer/Abstractions/Resources/Buffer.h"
 #include "Engine/Renderer/Abstractions/Resources/ConstantBuffer.h"
 #include "Engine/Renderer/Abstractions/Resources/StructuredBuffer.h"
-#include "Engine/Renderer/Abstractions/Resources/InstanceBuffer.h"
 #include "Engine/Renderer/Abstractions/Resources/Texture.h"
 #include "Engine/Renderer/Abstractions/Resources/SubTexture.h"
 #include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"

@@ -124,6 +124,11 @@ namespace Engine
 	}
 
 
+	void DirectX12Texture2DResource::AllocateTransient(class TransientResourceHeap* heap, uint32 offset)
+	{
+		// TODO
+	}
+
 	DirectX12Texture2DSRVDescriptorHandle::DirectX12Texture2DSRVDescriptorHandle()
 	{
 		m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();

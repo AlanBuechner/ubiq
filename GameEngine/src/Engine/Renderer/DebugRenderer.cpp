@@ -4,8 +4,6 @@
 #include "Abstractions/Resources/Buffer.h"
 #include "Shaders/Shader.h"
 #include "Abstractions/CommandList.h"
-#include "Abstractions/Resources/InstanceBuffer.h"
-#include "Abstractions/CommandList.h"
 #include "Camera.h"
 #include "Mesh.h"
 

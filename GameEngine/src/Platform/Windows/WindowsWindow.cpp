@@ -138,17 +138,13 @@ namespace Engine
 		m_SwapChain->SetVSync(m_Data.VSync);
 	}
 
-	void WindowsWindow::HandleEvents()
+	void Window::HandleEvents()
 	{
-		while (!m_RequestClose) 
+		MSG msg;
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
-			WaitMessage();
-			MSG msg;
-			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
 

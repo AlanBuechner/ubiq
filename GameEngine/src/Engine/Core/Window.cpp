@@ -16,16 +16,7 @@ namespace Engine
 		window = CreateRef<WindowsWindow>();
 #endif
 
-		Flag createFlag;
-		std::thread windowThread([&]() {
-			window->Setup(props);
-			createFlag.Signal();
-			window->HandleEvents(); // start event loop
-		});
-
-		createFlag.Wait(true); // wait for window to finish being created
-		windowThread.detach(); // allow thread to continue in the background
-
+		window->Setup(props);
 		WindowManager::AddWindow(window);
 		return window;
 	}

@@ -17,8 +17,6 @@ namespace Engine
 
 		virtual void Close() override { m_RequestClose = true; }
 
-		virtual void HandleEvents() override;
-
 		virtual void OnUpdate() override; // updates the window
 
 		inline virtual unsigned int GetWidth() const override { return m_Data.Width; } // get the width of the window

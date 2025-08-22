@@ -43,6 +43,7 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		m_DeletionPool = new ResourceDeletionPool();
 		m_UploadPool = new UploadPool();
+		m_TransientPool = new TransientPool();
 		m_ImGuiSnapshot = new ImDrawDataSnapshot();
 	}
 
@@ -52,6 +53,7 @@ namespace Engine
 		// delete pools
 		delete m_DeletionPool;
 		delete m_UploadPool;
+		delete m_TransientPool;
 
 		// delete imgui snapshot
 		delete m_ImGuiSnapshot;
@@ -201,6 +203,13 @@ namespace Engine
 		// copy commands
 		frameContext->m_UploadPool->RecoredUploadCommands(s_UploadCommandList);
 		frameContext->m_Commands.Insert(0u, s_UploadCommandList->TakeAllocator()); // add upload command list
+
+		{
+			CREATE_PROFILE_SCOPEI("Transient Resources");
+			for (CPUCommandAllocator* commands : frameContext->m_Commands)
+				frameContext->m_TransientPool->ProcessCommandList(commands);
+			frameContext->m_TransientPool->CreateResources();
+		}
 
 		{ // create commands for resource state tracking
 			CREATE_PROFILE_SCOPEI("Recource State Tracking");

@@ -7,7 +7,6 @@
 #include "Abstractions/Resources/FrameBuffer.h"
 #include "Abstractions/Resources/ConstantBuffer.h"
 #include "Abstractions/Resources/StructuredBuffer.h"
-#include "Abstractions/Resources/InstanceBuffer.h"
 #include "Mesh.h"
 
 namespace Engine
@@ -449,7 +448,7 @@ namespace Engine
 		SetRWTexture(index, texture->GetUAVDescriptor(mip));
 	}
 
-	void CPUCommandList::DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer, uint32 numInstances)
+	void CPUCommandList::DrawMesh(Ref<Mesh> mesh, Ref<VertexBuffer> instanceBuffer, uint32 numInstances)
 	{
 		ASSERT_ALLOCATOR;
 

@@ -9,11 +9,19 @@
 #include "Platform/DirectX12/Resources/DirectX12ResourceManager.h"
 #endif
 
+std::mutex Engine::ResourceManager::s_UploadPageCashMutex;
 uint32 Engine::ResourceManager::s_CachedUploadPageSize = MEM_MiB(5);
-Utils::Vector<Engine::UploadPage*> Engine::ResourceManager::s_CachedUploadPages;
+std::queue<Engine::UploadPage*> Engine::ResourceManager::s_CachedUploadPages;
+
+
+std::mutex Engine::ResourceManager::s_TransientResourceHeapCashMutex;
+uint32 Engine::ResourceManager::s_TransientResourceHeapSize = MEM_MiB(5);
+Utils::Vector<Engine::TransientResourceHeap*> Engine::ResourceManager::s_CachedTransientResourceHeaps;
 
 namespace Engine
 {
+
+	/* ------------------------- Resource Upload ------------------------- */
 
 	// upload page
 	UploadPage::UploadPage(uint32 size) :
@@ -139,7 +147,6 @@ namespace Engine
 			return;
 		}
 
-		std::lock_guard g(m_UploadMutex);
 		UploadBufferData uploadData;
 		uploadData.size = size;
 		uploadData.destOffset = 0;
@@ -148,6 +155,7 @@ namespace Engine
 		uploadData.uploadResource = src;
 		uploadData.state = state;
 
+		std::lock_guard g(m_UploadMutex);
 		m_BufferUploadQueue.Push(uploadData);
 	}
 
@@ -161,7 +169,6 @@ namespace Engine
 			return;
 		}
 
-		std::lock_guard g(m_UploadMutex);
 		UploadTextureData uploadData;
 		uploadData.destResource = dest;
 		uploadData.uploadResource = src;
@@ -171,6 +178,7 @@ namespace Engine
 		uploadData.state = state;
 		uploadData.format = format;
 
+		std::lock_guard g(m_UploadMutex);
 		m_TextureUploadQueue.push(uploadData);
 	}
 
@@ -393,6 +401,109 @@ namespace Engine
 		GPUTimer::EndEvent(commandlist);
 	}
 
+	/* ------------------------- Transient Resources ------------------------- */
+
+
+	TransientResourceHeap* TransientResourceHeap::Create(uint32 size)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::DirectX12:
+			return new DirectX12TransientResourceHeap(size);
+		default:
+			break;
+		}
+
+		return nullptr;
+	}
+
+	TransientPool::~TransientPool()
+	{
+		ResourceManager::FreeTransientResourceHeap(m_Heap);
+	}
+
+	void TransientPool::ProcessCommandList(CPUCommandAllocator* commandList)
+	{
+		const Utils::Vector<CPUCommand*>& commands = commandList->GetCommands();
+		for (uint32 i = 0; i < commands.Count(); i++)
+		{
+			if (false) // check if allocate transient command
+				StartMapping(nullptr);
+			if (false)
+				EndMapping(nullptr);
+		}
+	}
+
+	void TransientPool::CreateResources()
+	{
+		// Allocate memory
+		if (m_NededSize != 0)
+			m_Heap = ResourceManager::GetTransientResourceHeap(m_NededSize);
+
+		// create resources
+		for (auto& mapping : m_AddressMappings)
+			mapping.first->AllocateTransient(m_Heap, mapping.second);
+
+		// create descriptors
+	}
+
+	
+
+	void TransientPool::StartMapping(GPUResource* res)
+	{
+		// check if there are any chunks
+		if (m_UsedChunks.Empty())
+		{
+			AddAllocation(res, 0);
+			return;
+		}
+
+		if (m_UsedChunks.Count() > 2)
+		{
+			for (uint32 i = 0; i < m_UsedChunks.Count() - 1; i++)
+			{
+				const Chunk& chunk = m_UsedChunks[i];
+				const Chunk& nextChunk = m_UsedChunks[i + 1];
+				uint32 freeStart = chunk.start + chunk.size;
+				uint32 freeSize = nextChunk.start - freeStart;
+
+				if (freeSize > res->GetUnderlyingResourceSize())
+				{
+					AddAllocation(res, freeStart);
+					return;
+				}
+			}
+		}
+
+		// create new allocation at end
+		AddAllocation(res, m_UsedChunks.Back().start + m_UsedChunks.Back().size);
+		return;
+	}
+
+	void TransientPool::EndMapping(GPUResource* res)
+	{
+		uint32 startAddress = m_AddressMappings[res];
+		uint32 chunkIndex = m_UsedChunks.FindIf([startAddress](const Chunk& chunk) { return chunk.start == startAddress; });
+		
+		m_UsedChunks.Remove(chunkIndex);
+	}
+
+	void TransientPool::AddAllocation(GPUResource* res, uint32 start)
+	{
+		Chunk newChunk;
+		newChunk.start = start;
+		newChunk.size = res->GetUnderlyingResourceSize();
+		m_UsedChunks.Push(newChunk);
+		m_AddressMappings[res] = newChunk.start;
+
+		uint32 allocationEnd = start + res->GetUnderlyingResourceSize();
+
+		if (allocationEnd > m_NededSize)
+			m_NededSize = allocationEnd;
+	}
+
+	/* ------------------------- Resource Manager ------------------------- */
+
 	ResourceManager::ResourceManager()
 	{}
 
@@ -411,21 +522,26 @@ namespace Engine
 
 	UploadPage* ResourceManager::GetUploadPage(uint32 size)
 	{
+		return new UploadPage(size); // TODO fix needing this
+
 		// if size is larger than cash size create new page
 		if (size > s_CachedUploadPageSize)
 		{
-			CORE_WARN("Createing upload page larger than cashed page size. Try increasing cashed page size");
+			CORE_WARN("Createing upload page larger than cached page size. Try increasing cached page size");
 			return new UploadPage(size);
 		}
 
-		// find page page with current cash size delete others (needed if cash size is updated mid game)
-		while (!s_CachedUploadPages.Empty())
-		{
-			UploadPage* page = s_CachedUploadPages.Pop();
-			if (page->GetSize() != s_CachedUploadPageSize)
-				delete page;
-			else
-				return page;
+		{ // find page page with current cash size delete others (needed if cash size is updated mid game)
+			std::lock_guard g(s_UploadPageCashMutex);
+			while (!s_CachedUploadPages.empty())
+			{
+				UploadPage* page = s_CachedUploadPages.front();
+				s_CachedUploadPages.pop();
+				if (page->GetSize() != s_CachedUploadPageSize)
+					delete page;
+				else
+					return page;
+			}
 		}
 
 		// if no pages create new one
@@ -434,10 +550,55 @@ namespace Engine
 
 	void ResourceManager::FreeUploadPage(UploadPage* page)
 	{
+		delete page;
+		return;
+
 		if (page == nullptr)
 			return;
 
-		s_CachedUploadPages.Push(page);
+		std::lock_guard g(s_UploadPageCashMutex);
+		s_CachedUploadPages.push(page);
 	}
+
+	TransientResourceHeap* ResourceManager::GetTransientResourceHeap(uint32 size)
+	{
+		return TransientResourceHeap::Create(size); // TODO fix needing this
+
+		// if size is larger than cash size create new page
+		if (size > s_TransientResourceHeapSize)
+		{
+			CORE_WARN("Createing transient page larger than cached page size. Try increasing transient page size");
+			return TransientResourceHeap::Create(size);
+		}
+
+		{ // find page page with current cash size delete others (needed if cash size is updated mid game)
+			std::lock_guard g(s_TransientResourceHeapCashMutex);
+			while (!s_CachedTransientResourceHeaps.Empty())
+			{
+				TransientResourceHeap* page = s_CachedTransientResourceHeaps.Pop();
+				if (page->GetSize() != s_TransientResourceHeapSize)
+					delete page;
+				else
+					return page;
+			}
+		}
+
+		// if no pages create new one
+		return TransientResourceHeap::Create(s_TransientResourceHeapSize);
+	}
+
+	void ResourceManager::FreeTransientResourceHeap(TransientResourceHeap* page)
+	{
+		delete page;
+		return;
+
+		if (page == nullptr)
+			return;
+
+		std::lock_guard g(s_TransientResourceHeapCashMutex);
+		s_CachedTransientResourceHeaps.Push(page);
+	}
+
+	
 
 }

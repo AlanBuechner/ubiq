@@ -79,6 +79,8 @@ namespace Engine
 
 		virtual void Resize(uint32 count);
 		void SetData(const void* data, uint32 count = 1, uint32 start = 0) { m_Resource->SetData(data, count, start); }
+		template<typename T>
+		void SetData(Utils::Vector<T> data) { SetData(data.Data(), data.Count()); }
 
 		static Ref<StructuredBuffer> Create(uint32 count, uint32 stride);
 

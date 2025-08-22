@@ -118,7 +118,7 @@ namespace Engine {
 
 			Time::UpdateDeltaTime();
 
-			//Window::HandleEvents();
+			Window::HandleEvents();
 			Input::UpdateKeyState(); // update the key stats
 			SendInputBuffer(); // sent the input buffer through the layer stack
 			Cursor::Update();

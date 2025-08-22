@@ -125,7 +125,7 @@ namespace Engine
 		void SetRWTexture(const std::string& name, Ref<RWTexture2D> texture, uint32 mip = 0) { SetRWTexture(m_BoundShader->GetUniformLocation(name), texture, mip); }
 
 		// do work
-		void DrawMesh(Ref<Mesh> mesh, Ref<InstanceBuffer> instanceBuffer = nullptr, uint32 numInstances = UINT32_MAX);
+		void DrawMesh(Ref<Mesh> mesh, Ref<VertexBuffer> instanceBuffer = nullptr, uint32 numInstances = UINT32_MAX);
 		void DispatchGroups(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGroupsZ);
 		void DispatchThreads(uint32 threadsX, uint32 threadsY, uint32 threadsZ);
 		void DispatchGraph(void* data, uint32 stride, uint32 count);

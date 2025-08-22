@@ -73,6 +73,11 @@ namespace Engine
 		}
 	}
 
+	void DirectX12StructuredBufferResource::AllocateTransient(class TransientResourceHeap* heap, uint32 offset)
+	{
+		// TODO
+	}
+
 	DirectX12StructuredBufferSRVDescriptorHandle::DirectX12StructuredBufferSRVDescriptorHandle()
 	{
 		m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();

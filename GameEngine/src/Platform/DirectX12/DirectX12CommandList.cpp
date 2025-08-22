@@ -11,7 +11,6 @@
 #include "Resources/DirectX12ConstantBuffer.h"
 #include "Resources/DirectX12StructuredBuffer.h"
 #include "Resources/DirectX12Texture.h"
-#include "Resources/DirectX12InstanceBuffer.h"
 #include "Resources/DirectX12ResourceManager.h"
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
@@ -430,7 +429,7 @@ namespace Engine
 
 		if (cmd.instanceBufferView)
 		{
-			DirectX12InstanceBufferView* instanceBufferView = (DirectX12InstanceBufferView*)cmd.instanceBufferView;
+			DirectX12VertexBufferView* instanceBufferView = (DirectX12VertexBufferView*)cmd.instanceBufferView;
 
 			D3D12_VERTEX_BUFFER_VIEW views[] = { vertexBufferView->GetView(), instanceBufferView->GetView() };
 			m_CommandList->IASetVertexBuffers(0, 2, views);

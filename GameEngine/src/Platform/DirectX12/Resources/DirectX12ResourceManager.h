@@ -15,6 +15,19 @@ namespace Engine
 namespace Engine
 {
 
+	class DirectX12TransientResourceHeap : public TransientResourceHeap
+	{
+	public:
+		DirectX12TransientResourceHeap(uint32 size);
+		virtual ~DirectX12TransientResourceHeap();
+
+		ID3D12Heap* GetHeap();
+
+	private:
+		ID3D12Heap* m_Heap;
+	};
+
+
 	class DirectX12ResourceManager : public ResourceManager
 	{
 

@@ -20,6 +20,8 @@ namespace Engine
 		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
 		virtual uint32 GetGPUState(ResourceState state) override;
 
+		virtual void AllocateTransient(class TransientResourceHeap* heap, uint32 offset) override;
+
 	private:
 		ID3D12Resource* m_Buffer;
 	};
@@ -44,6 +46,8 @@ namespace Engine
 	protected:
 		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
 		virtual uint32 GetGPUState(ResourceState state) override;
+
+		virtual void AllocateTransient(class TransientResourceHeap* heap, uint32 offset) override;
 
 	private:
 		ID3D12Resource* m_Buffer;

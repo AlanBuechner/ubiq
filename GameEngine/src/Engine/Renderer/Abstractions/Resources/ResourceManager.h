@@ -99,6 +99,46 @@ namespace Engine
 		std::mutex m_UploadMutex;
 	};
 
+	class TransientResourceHeap
+	{
+	public:
+		virtual ~TransientResourceHeap() {}
+
+		uint32 GetSize() { return m_Size; }
+
+		static TransientResourceHeap* Create(uint32 size);
+
+	protected:
+		uint32 m_Size = 0;
+	};
+
+	class TransientPool
+	{
+	public:
+
+		~TransientPool();
+
+		void ProcessCommandList(CPUCommandAllocator* commandList);
+		void CreateResources();
+
+	private:
+		void StartMapping(GPUResource* res);
+		void EndMapping(GPUResource* res);
+
+		void AddAllocation(GPUResource* res, uint32 start);
+	private:
+		struct Chunk
+		{
+			uint32 start;
+			uint32 size;
+		};
+		std::unordered_map<GPUResource*, uint64> m_AddressMappings;
+		Utils::Vector<Chunk> m_UsedChunks;
+		uint32 m_NededSize = 0;
+		TransientResourceHeap* m_Heap;
+	};
+
+
 	class ResourceManager
 	{
 	public:
@@ -122,8 +162,17 @@ namespace Engine
 		static UploadPage* GetUploadPage(uint32 size);
 		static void FreeUploadPage(UploadPage* page);
 
+		static TransientResourceHeap* GetTransientResourceHeap(uint32 size);
+		static void FreeTransientResourceHeap(TransientResourceHeap* page);
+
 	private:
+
+		static std::mutex s_UploadPageCashMutex;
 		static uint32 s_CachedUploadPageSize;
-		static Utils::Vector<UploadPage*> s_CachedUploadPages;
+		static std::queue<UploadPage*> s_CachedUploadPages;
+
+		static std::mutex s_TransientResourceHeapCashMutex;
+		static uint32 s_TransientResourceHeapSize;
+		static Utils::Vector<TransientResourceHeap*> s_CachedTransientResourceHeaps;
 	};
 }

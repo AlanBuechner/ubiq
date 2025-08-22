@@ -5,7 +5,6 @@
 #include "Engine/Core/Application.h"
 
 #include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"
-#include "Engine/Renderer/Abstractions/Resources/InstanceBuffer.h"
 #include "Engine/Renderer/Abstractions/Resources/ConstantBuffer.h"
 #include "Engine/Renderer/Abstractions/Resources/Texture.h"
 #include "Engine/Renderer/CPUCommandList.h"

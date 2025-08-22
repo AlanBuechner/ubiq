@@ -64,6 +64,11 @@ namespace Engine
 		}
 	}
 
+	void DirectX12ConstantBufferResource::AllocateTransient(class TransientResourceHeap* heap, uint32 offset)
+	{
+		CORE_ASSERT(false, "Cant make transient constant buffer", "");
+	}
+
 	DirectX12ConstantBufferCBVDescriptorHandle::DirectX12ConstantBufferCBVDescriptorHandle()
 	{
 		m_CBVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();

@@ -38,7 +38,7 @@ namespace Engine
 		static void Init();
 		static void Shutdown();
 
-		virtual void HandleEvents() = 0;
+		static void HandleEvents();
 
 		virtual void OnUpdate() = 0; // updates the window
 

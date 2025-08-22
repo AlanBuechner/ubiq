@@ -13,6 +13,30 @@ Engine::Ref<Engine::DirectX12DescriptorHeap> Engine::DirectX12ResourceManager::s
 
 namespace Engine
 {
+
+	DirectX12TransientResourceHeap::DirectX12TransientResourceHeap(uint32 size)
+	{
+		m_Size = size;
+
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+
+		CD3DX12_HEAP_DESC heapDesc(m_Size, D3D12_HEAP_TYPE_DEFAULT, 0, D3D12_HEAP_FLAG_NONE);
+		HRESULT hr = context->GetDevice()->CreateHeap(&heapDesc, IID_PPV_ARGS(&m_Heap));
+
+		CORE_ASSERT_HRESULT(hr, "Failed to create transient heap");
+	}
+
+	DirectX12TransientResourceHeap::~DirectX12TransientResourceHeap()
+	{
+		m_Heap->Release();
+		m_Heap = nullptr;
+	}
+
+
+
+
+
+
 	// resource manager
 	DirectX12ResourceManager::DirectX12ResourceManager() :
 		ResourceManager()

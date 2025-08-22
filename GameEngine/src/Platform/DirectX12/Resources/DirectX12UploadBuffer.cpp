@@ -65,6 +65,11 @@ namespace Engine
 		}
 	}
 
+	void DirectX12UploadBufferResource::AllocateTransient(class TransientResourceHeap* heap, uint32 offset)
+	{
+		CORE_ASSERT(false, "Cant make transient constant buffer", "");
+	}
+
 
 
 
@@ -143,6 +148,11 @@ namespace Engine
 		default:
 			return D3D12_RESOURCE_STATE_COMMON;
 		}
+	}
+
+	void DirectX12UploadTextureResource::AllocateTransient(class TransientResourceHeap* heap, uint32 offset)
+	{
+		CORE_ASSERT(false, "Cant make transient constant buffer", "");
 	}
 
 }

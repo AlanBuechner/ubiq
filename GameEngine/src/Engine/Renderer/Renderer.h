@@ -22,6 +22,7 @@ namespace Engine
 
 	class ResourceDeletionPool;
 	class UploadPool;
+	class TransientPool;
 
 	class CommandList;
 	class CommandQueue;
@@ -49,6 +50,7 @@ namespace Engine
 			Utils::Vector<Ref<CommandList>> m_CommandLists;
 			ResourceDeletionPool* m_DeletionPool = nullptr;
 			UploadPool* m_UploadPool = nullptr;
+			TransientPool* m_TransientPool = nullptr;
 			Ref<RenderTarget2D> m_BackBuffer = nullptr;
 		};
 

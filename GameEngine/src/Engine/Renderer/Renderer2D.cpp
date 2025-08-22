@@ -3,7 +3,6 @@
 
 #include "Engine/Core/Core.h"
 #include "Renderer.h"
-#include "Abstractions/Resources/InstanceBuffer.h"
 #include "Shaders/Shader.h"
 #include "Camera.h"
 #include "Engine/Core/Scene/Entity.h"
@@ -38,7 +37,8 @@ namespace Engine
 	struct Renderer2DData
 	{
 		static const uint32 MaxQuades = 100;
-		Ref<InstanceBuffer> QuadInstanceBuffer;
+		Ref<VertexBuffer> QuadInstanceBuffer;
+		Utils::Vector<QuadInstance> QuadInstances;
 
 		Ref<Mesh> QuadMesh;
 		Ref<Shader> SpriteShader;
@@ -49,7 +49,7 @@ namespace Engine
 
 		void AddInstance(const QuadInstance& instance)
 		{
-			QuadInstanceBuffer->PushBack(&instance);
+			QuadInstances.Push(instance);
 		}
 	};
 
@@ -77,7 +77,7 @@ namespace Engine
 		s_Data.SpriteShader = Application::Get().GetAssetManager().GetEmbededAsset<Shader>(TEXTURESHADER);
 
 		// create instance data
-		s_Data.QuadInstanceBuffer = InstanceBuffer::Create(sizeof(QuadInstance), s_Data.MaxQuades);
+		s_Data.QuadInstanceBuffer = VertexBuffer::Create(sizeof(QuadInstance), s_Data.MaxQuades);
 
 		s_Data.Camera = ConstantBuffer::Create(sizeof(Math::Mat4));
 	}
@@ -99,18 +99,21 @@ namespace Engine
 
 	void Renderer2D::EndScene()
 	{
-		s_Data.QuadInstanceBuffer->Apply();
+		uint32 quadCount = s_Data.QuadInstances.Count();
+		if (quadCount > s_Data.QuadInstanceBuffer->GetCount())
+			s_Data.QuadInstanceBuffer->Resize(quadCount);
+		s_Data.QuadInstanceBuffer->SetData(s_Data.QuadInstances);
 	}
 
 	void Renderer2D::Build(Ref<CPUCommandList> commandList)
 	{
-		if (!s_Data.QuadInstanceBuffer->Empty())
+		if (!s_Data.QuadInstances.Empty())
 		{
 			commandList->SetShader(s_Data.SpriteShader->GetGraphicsPass("main"));
 			commandList->SetConstantBuffer(0, s_Data.Camera);
-			commandList->DrawMesh(s_Data.QuadMesh, s_Data.QuadInstanceBuffer, s_Data.QuadInstanceBuffer->GetCount());
+			commandList->DrawMesh(s_Data.QuadMesh, s_Data.QuadInstanceBuffer, s_Data.QuadInstances.Count());
 		}
-		s_Data.QuadInstanceBuffer->Clear();
+		s_Data.QuadInstances.Clear();
 	}
 
 	void Renderer2D::ResetStats()

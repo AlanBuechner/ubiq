@@ -16,7 +16,7 @@ namespace Engine
 	class RWStructuredBuffer;
 	class Texture2D;
 	class RWTexture2D;
-	class InstanceBuffer;
+	class VertexBuffer;
 	class FrameBuffer;
 	class RenderTarget2D;
 	class UploadTextureResource;
@@ -25,7 +25,6 @@ namespace Engine
 	class StructuredBufferSRVDescriptorHandle;
 	class VertexBufferView;
 	class IndexBufferView;
-	class InstanceBufferView;
 	class Texture2DRTVDSVDescriptorHandle;
 	class StructuredBufferUAVDescriptorHandle;
 	class Texture2DSRVDescriptorHandle;
@@ -154,7 +153,7 @@ namespace Engine
 	CREATE_COMMAND(DrawMeshCommand)
 		VertexBufferView* vertexBufferView;
 		IndexBufferView* indexBufferView;
-		InstanceBufferView* instanceBufferView;
+		VertexBufferView* instanceBufferView;
 		uint32 numIndices;
 		uint32 numInstances;
 	};
