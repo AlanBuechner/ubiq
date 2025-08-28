@@ -231,7 +231,7 @@ namespace Engine
 		}\
 		static bool Decode(CAT(Math::Vector, num)& out, const ObjectDescription& in){\
 			if (!in.IsArray()) return false;\
-			for (uint8 i = 0; i < Math::Min(num, in.GetAsObjectArray().Count()); i++)\
+			for (uint8 i = 0; i < Math::Min(num##u, in.GetAsObjectArray().Count()); i++)\
 				out[i] = in[i].Get<float>();\
 			return true;\
 		}\

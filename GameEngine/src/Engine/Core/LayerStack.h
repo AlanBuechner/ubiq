@@ -36,7 +36,6 @@ namespace Engine {
 		Utils::Vector<Layer*> m_LayersToAdd;
 		Utils::Vector<Layer*> m_OverlaysToAdd;
 		Utils::Vector<Layer*> m_LayersToRemove;
-		bool m_Invalidate = false;
 		unsigned int m_LayerInsertIndex = 0;
 	};
 

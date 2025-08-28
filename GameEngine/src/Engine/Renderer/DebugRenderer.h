@@ -53,7 +53,7 @@ namespace Engine
 		static void DrawFrustom(const Math::Mat4& vp, Math::Vector4 color, bool depthTest = true);
 
 	private:
-		static void DrawMesh(const DebugMesh& mesh, const Math::Mat4& transform, class Pass& pass);
+		static void DrawMesh(const DebugMesh& mesh, const Math::Mat4& transform, struct Pass& pass);
 
 	};
 }

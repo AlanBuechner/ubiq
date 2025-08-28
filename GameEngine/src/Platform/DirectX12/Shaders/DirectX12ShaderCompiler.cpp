@@ -232,9 +232,9 @@ namespace Engine
 	void DirectX12ShaderCompiler::GetComputeGroupSize(wrl::ComPtr<ID3D12ShaderReflection> reflection, Math::UVector3& groupSize)
 	{
 		reflection->GetThreadGroupSize(&groupSize.x, &groupSize.y, &groupSize.z);
-		groupSize.x = Math::Max(groupSize.x, 1);
-		groupSize.y = Math::Max(groupSize.y, 1);
-		groupSize.z = Math::Max(groupSize.z, 1);
+		groupSize.x = Math::Max(groupSize.x, 1u);
+		groupSize.y = Math::Max(groupSize.y, 1u);
+		groupSize.z = Math::Max(groupSize.z, 1u);
 	}
 
 	void DirectX12ShaderCompiler::GetShaderParameters(wrl::ComPtr<ID3D12ShaderReflection> reflection, const SectionInfo& section, Utils::Vector<Engine::ShaderParameter>& params, ShaderType type)

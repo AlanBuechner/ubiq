@@ -12,44 +12,51 @@ namespace Math
 	constexpr float PI = 3.14592654f;
 
 	// trig
-	float Sin(float x);
-	float Cos(float x);
-	float Tan(float x);
-	float Cot(float x);
-	float Sec(float x);
-	float Csc(float x);
+	template <typename T> T Sin(T x) { return glm::sin(x); }
+	template <typename T> T Cos(T x) { return glm::cos(x); }
+	template <typename T> T Tan(T x) { return glm::tan(x); }
+	template <typename T> T Cot(T x) { return 1.0f / Tan(x); }
+	template <typename T> T Sec(T x) { return 1.0f / Cos(x); }
+	template <typename T> T Csc(T x) { return 1.0f / Sin(x); }
 
-	float Asin(float x);
-	float Acos(float x);
-	float Atan(float x);
+	template <typename T> T Asin(T x) { return glm::asin(x); }
+	template <typename T> T Acos(T x) { return glm::acos(x); }
+	template <typename T> T Atan(T x) { return glm::atan(x); }
+	template <typename T> T Acot(T x) { return 1.0f / Atan(x); }
+	template <typename T> T Asec(T x) { return 1.0f / Acos(x); }
+	template <typename T> T Acsc(T x) { return 1.0f / Asin(x); }
 
-	float Atan2(float y, float x);
+	template <typename T> T Atan2(T y, T x) { return glm::atan(x, y); }
 
-	float Sinh(float x);
-	float Cosh(float x);
-	float Tanh(float x);
+	template <typename T> T Sinh(T x) { return glm::sinh(x); }
+	template <typename T> T Cosh(T x) { return glm::cosh(x); }
+	template <typename T> T Tanh(T x) { return glm::tanh(x); }
 
-	float Degrees(float x);
-	float Radians(float x);
+
+	template <typename T> T Degrees(T x) { return glm::degrees((float)x); }
+	template <typename T> T Radians(T x) { return glm::radians((float)x); }
+	//template <> double Degrees(double x) { return glm::degrees(x); }
+	//template <> double Radians(double x) { return glm::radians(x); }
 
 	// float functions
-	float Sqrt(float x);
-	float Pow(float x, float y);
-	float Exp(float x);
+	template <typename T> T Sqrt(T x) { return glm::sqrt(x); }
+	template <typename T> T InvSqrt(T x) { return glm::inversesqrt(x); }
+	template <typename T> T Pow(T x, T y) { return glm::pow(x, y); }
+	template <typename T> T Exp(T x) { return glm::exp(x); }
 
-	float Log(float x);
+	template <typename T> T Log(T x) { return glm::log(x); }
 
-	float Floor(float x);
-	float Ceil(float x);
-	float Abs(float x);
-	float Clamp(float x, float min, float max);
-	float Min(float x, float y);
-	float Max(float x, float y);
-	float Mod(float x, float y);
+	template <typename T> T Floor(T x) { return glm::floor(x); }
+	template <typename T> T Ceil(T x) { return glm::ceil(x); }
 
-	uint32 Clamp(uint32 x, uint32 min, uint32 max);
+	template <typename T> T Abs(T x) { return glm::abs(x); }
+	template <typename T> T Clamp(T x, T min, T max) { return glm::clamp(x, min, max); }
+	template <typename T> T Min(T x, T y) { return glm::min(x, y); }
+	template <typename T> T Max(T x, T y) { return glm::max(x, y); }
+	template <typename T> T Mod(T x, T y) { return glm::mod(x, y); }
 
-	float Lerp(float a, float b, float t);
+	template <typename T> T Lerp(T a, T b, T t) { return glm::lerp(a, b, t); }
+	template <typename T> T Slerp(T a, T b, T t) { return glm::slerp(a, b, t); }
 
 	// Random
 	float Perlin(float p);
