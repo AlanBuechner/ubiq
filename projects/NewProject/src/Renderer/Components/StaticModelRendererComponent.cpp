@@ -111,58 +111,63 @@ namespace Game
 
 
 #pragma region Serialization
-#include "Engine/Core/Scene/SceneSerializer.h"
-namespace Game
+#include "Engine/Core/ObjectDescription/ObjectDescription.h"
+
+
+namespace Engine
 {
-	class StaticModelRendererSerializer : public Engine::ComponentSerializer
+	template<>
+	struct Convert<Game::StaticModelRendererComponent>
 	{
-		virtual void Serialize(Engine::Entity entity, YAML::Emitter& out) override
+		CONVERTER_BASE(Game::StaticModelRendererComponent);
+
+		static ObjectDescription Encode(const Game::StaticModelRendererComponent& val)
 		{
-			auto& meshRenderer = *entity.GetComponent<Game::StaticModelRendererComponent>();
-			if (meshRenderer.GetModel())
-				out << YAML::Key << "Model" << YAML::Value << meshRenderer.GetModel()->GetAssetID();
+			ObjectDescription desc(ObjectDescription::Type::Object);
 
-			if (!meshRenderer.GetMeshes().empty())
+			if (val.GetModel())
+				desc["Model"] = ObjectDescription::CreateFrom<uint64>(val.GetModel()->GetAssetID());
+
+			if (!val.GetMeshes().empty())
 			{
-				out << YAML::Key << "Materials";
-				out << YAML::BeginMap;
+				ObjectDescription materials(ObjectDescription::Type::Object);
 
-				for (auto& entry : meshRenderer.GetMeshes())
+				for (auto& entry : val.GetMeshes())
 				{
 					uint64 matID = 0;
 					if (entry.m_Material)
 						matID = (uint64)entry.m_Material->GetAssetID();
 
-					out << YAML::Key << entry.m_Name << YAML::Value << matID;
+					materials[entry.m_Name] = ObjectDescription::CreateFrom(matID);
 				}
 
-				out << YAML::EndMap;
+				desc["Materials"] = materials;
 			}
+
+			return desc;
 		}
 
-		virtual void Deserialize(Engine::Entity entity, YAML::Node data) override
+		static bool Decode(Game::StaticModelRendererComponent& comp, const ObjectDescription& data)
 		{
-			auto& mrc = *entity.GetComponent<Game::StaticModelRendererComponent>();
-			if (data["Model"])
-				mrc.SetModel(Engine::Application::Get().GetAssetManager().GetAsset<Model>(data["Model"].as<uint64>()));
+			if (data.HasEntery("Model"))
+				comp.SetModel(Engine::Application::Get().GetAssetManager().GetAsset<Game::Model>(data["Model"].Get<uint64>()));
 
-			if (data["Materials"])
+			if (data.HasEntery("Materials"))
 			{
-				YAML::Node materials = data["Materials"];
-
-				for (auto& entry : mrc.GetMeshes())
+				auto& materials = data["Materials"];
+				for (auto& entry : comp.GetMeshes())
 				{
-					Engine::UUID matID = 0;
-					if (materials[entry.m_Name])
-						matID = materials[entry.m_Name].as<uint64>();
+					uint64 matID = 0;
+					if (materials.HasEntery(entry.m_Name))
+						matID = materials[entry.m_Name].Get<uint64>();
+
 					entry.m_Material = Engine::Application::Get().GetAssetManager().GetAsset<Engine::Material>(matID);
 				}
 			}
-			mrc.Invalidate();
+			return true;
 		}
 	};
-	ADD_COMPONENT_SERIALIZER(Game::StaticModelRendererComponent, StaticModelRendererSerializer);
-
+	ADD_OBJECT_CONVERTER(Game::StaticModelRendererComponent);
 
 }
 #pragma endregion

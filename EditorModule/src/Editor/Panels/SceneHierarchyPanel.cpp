@@ -13,7 +13,6 @@
 #include <filesystem>
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
-#include <ImGuizmo/ImGuizmo.h>
 
 namespace Editor
 {
@@ -86,13 +85,13 @@ namespace Editor
 				break;
 			case Engine::KeyCode::G:
 			case Engine::KeyCode::T:
-				m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				//m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
 				break;
 			case Engine::KeyCode::S:
-				m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				//m_GizmoType = ImGuizmo::OPERATION::SCALE;
 				break;
 			case Engine::KeyCode::R:
-				m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+				//m_GizmoType = ImGuizmo::OPERATION::ROTATE;
 				break;
 			default:
 				break;
@@ -123,7 +122,7 @@ namespace Editor
 			m_Selected = Engine::Entity::null;
 
 		// right click on blank space
-		if (ImGui::BeginPopupContextWindow(0, ImGuiMouseButton_Right, false))
+		if (ImGui::BeginPopupContextWindow(0, ImGuiMouseButton_Right))
 		{
 			DrawCreateNewEntity();
 			ImGui::EndPopup();
@@ -183,39 +182,39 @@ namespace Editor
 		{
 			// TODO : Fix for child entity's
 			// Gizmo's
-			if (m_GizmoType != -1)
-			{
-				// get editor camera transform
-				Engine::Ref<Editor::EditorCamera> editorCamera = EditorLayer::Get()->GetEditorCamera();
-				const Math::Mat4& cameraProjection = editorCamera->GetProjectionMatrix();
-				const Math::Mat4& cameraView = editorCamera->GetViewMatrix();
-
-				// get position rotation and scale from global transform
-				auto& tc = selected.GetTransform(); // get the transform component
-				Math::Mat4 transform = tc.GetGlobalTransform(); // get the transform matrix
-				Math::Vector3 OldPosition, OldRotation, OldScale;
-				Math::DecomposeTransform(transform, OldPosition, OldRotation, OldScale);
-
-				ImGuizmo::SetOrthographic(false);
-				ImGuizmo::SetDrawlist();
-
-				float windowWidth = (float)ImGui::GetWindowWidth();
-				float windowHeight = (float)ImGui::GetWindowHeight();
-				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-
-				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-					(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
-
-				if (ImGuizmo::IsUsing())
-				{
-					Math::Vector3 position, rotation, scale;
-					Math::DecomposeTransform(transform, position, rotation, scale);
-
-					tc.Translate(position - OldPosition);
-					tc.Rotate(rotation - OldRotation);
-					tc.Scale(scale - OldScale);
-				}
-			}
+			//if (m_GizmoType != -1)
+			//{
+			//	// get editor camera transform
+			//	Engine::Ref<Editor::EditorCamera> editorCamera = EditorLayer::Get()->GetEditorCamera();
+			//	const Math::Mat4& cameraProjection = editorCamera->GetProjectionMatrix();
+			//	const Math::Mat4& cameraView = editorCamera->GetViewMatrix();
+			//
+			//	// get position rotation and scale from global transform
+			//	auto& tc = selected.GetTransform(); // get the transform component
+			//	Math::Mat4 transform = tc.GetGlobalTransform(); // get the transform matrix
+			//	Math::Vector3 OldPosition, OldRotation, OldScale;
+			//	Math::DecomposeTransform(transform, OldPosition, OldRotation, OldScale);
+			//
+			//	ImGuizmo::SetOrthographic(false);
+			//	ImGuizmo::SetDrawlist();
+			//
+			//	float windowWidth = (float)ImGui::GetWindowWidth();
+			//	float windowHeight = (float)ImGui::GetWindowHeight();
+			//	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+			//
+			//	ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+			//		(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
+			//
+			//	if (ImGuizmo::IsUsing())
+			//	{
+			//		Math::Vector3 position, rotation, scale;
+			//		Math::DecomposeTransform(transform, position, rotation, scale);
+			//
+			//		tc.Translate(position - OldPosition);
+			//		tc.Rotate(rotation - OldRotation);
+			//		tc.Scale(scale - OldScale);
+			//	}
+			//}
 		}
 	}
 
@@ -313,7 +312,7 @@ namespace Editor
 				ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth,
 				componentClass.GetName().c_str()
 			);
-			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+			float lineHeight = ImGui::CalcTextSize("+").y;
 			ImVec2 buttonSize = { lineHeight, lineHeight };
 			ImGui::PopStyleVar();
 

@@ -450,6 +450,7 @@ class ProjectEnviernment:
 		# link
 		ext = [".exe", ".lib"][self.buildType.value]
 		needsBuild = resourceBuildStatus != -1 or sourceBuildStatus != -1 or reflectionBuildStatus != -1
+		print(self.GetOutput())
 		linkStatus = LinkObjects(idir, self.dependancys, self.links, self.projectDirectory, self.GetOutput(), self.buildType, needsBuild)
 		if(linkStatus > 0):
 			return 1

@@ -51,8 +51,9 @@ namespace Game
 		IS_PLAYING{
 			m_Scene->AddUpdateEvent<Engine::SceneSystemUpdateEvent<InputSystem>>("HandleEvents");
 		}
-		m_Scene->AddUpdateEvent<Engine::ComponentUpdateEvent<Engine::TransformComponent>>("UpdateHierarchyGlobalTransform");
+		m_Scene->AddUpdateEvent<Engine::ComponentUpdateEvent<Engine::TransformComponent>>("UpdateTransformEvent");
 		m_Scene->AddUpdateEvent<Engine::SceneUpdateEvent>("OnPreRender");
+		m_Scene->AddUpdateEvent<Engine::ComponentUpdateEvent<Engine::TransformComponent>>("ClearDirtyFlag");
 	}
 
 }

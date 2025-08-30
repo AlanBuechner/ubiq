@@ -36,9 +36,10 @@ namespace Game
 		virtual void OnTransformChange(const Math::Mat4& transform) override;
 
 		void SetModel(Engine::Ref<Model> model);
-		Engine::Ref<Model> GetModel() { return m_Model; }
+		Engine::Ref<Model> GetModel() const { return m_Model; }
 
 		std::vector<MeshEntry>& GetMeshes() { return m_CollapsedModelTree; }
+		const std::vector<MeshEntry>& GetMeshes() const { return m_CollapsedModelTree; }
 
 		void Invalidate();
 

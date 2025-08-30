@@ -13,7 +13,6 @@
 #include "Editor/Panels/GridGizmosPanel.h"
 
 #include <imgui/imgui.h>
-#include <ImGuizmo/ImGuizmo.h>
 #include <memory>
 
 LINK_REFLECTION_DATA(EditorModule)
@@ -82,7 +81,7 @@ namespace Editor
 			m_EditorCamera->OnUpdate();
 
 			// check if the screen was clicked
-			if (Engine::Input::GetMouseButtonPressed(Engine::MouseCode::LEFT_MOUSE) && !Engine::Input::GetKeyDown(Engine::KeyCode::ALT) && !ImGuizmo::IsOver())
+			if (Engine::Input::GetMouseButtonPressed(Engine::MouseCode::LEFT_MOUSE) && !Engine::Input::GetKeyDown(Engine::KeyCode::ALT))
 			{
 				Math::Vector2 pos;
 				if (GetMousePositionInViewport(pos))
@@ -104,12 +103,12 @@ namespace Editor
 	void EditorLayer::OnRender()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		Engine::InstrumentationTimer timer = CREATE_PROFILEI();
-		timer.Start("Recored Commands");
+		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
+		START_PROFILEI(timer, "Recored Commands");
 
 		m_Game->OnRender();
 
-		Engine::Ref<Engine::CommandList> commandList = Engine::Renderer::GetMainCommandList();
+		Engine::Ref<Engine::CPUCommandList> commandList = Engine::Renderer::GetMainCommandList();
 
 		Engine::Ref<Engine::FrameBuffer> framBuffer = m_Game->GetScene()->GetSceneRenderer()->GetRenderTarget();
 		Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
@@ -117,6 +116,7 @@ namespace Editor
 		Engine::Renderer::Build(commandList);
 		commandList->Present(framBuffer); // present the render target
 		Engine::GPUTimer::EndEvent(commandList);
+
 
 		timer.End();
 	}

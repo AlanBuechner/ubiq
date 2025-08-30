@@ -209,6 +209,7 @@ def RunProject(projName):
 	proj = GetProject(projName)
 	projdata = GetProject(projName)["module"].GetProject()
 	output = projdata.GetOutput()
+	print("running : " + output)
 	cwd = Config.project
 	os.startfile(output, cwd = cwd)
 

@@ -177,7 +177,8 @@ namespace Engine
 			tc.SetRotation(data["Rotation"].Get<Math::Vector3>());
 			tc.SetScale(data["Scale"].Get<Math::Vector3>());
 
-			tc.SetParent(data["Parent"].Get<uint64>());
+			if(data.HasEntery("Parent"))
+				tc.SetParent(data["Parent"].Get<uint64>());
 
 			return true;
 		}
