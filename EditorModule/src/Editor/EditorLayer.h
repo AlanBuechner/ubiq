@@ -5,7 +5,7 @@
 
 #include "Editor/Panels/EditorPanel.h"
 
-#include "Engine/Renderer/EditorCamera.h"
+#include "Editor/EditorCamera.h"
 #include "Engine/Renderer/SceneRenderer.h"
 
 #include "ProjectManager/Project.h"
@@ -35,7 +35,7 @@ namespace Editor
 		void DefaultScene();
 		void LoadScene(const fs::path& file);
 
-		Engine::Ref<Engine::EditorCamera> GetEditorCamera() { return m_EditorCamera; }
+		Engine::Ref<Editor::EditorCamera> GetEditorCamera() { return m_EditorCamera; }
 
 		template<class T>
 		Engine::Ref<T> GetPanel();
@@ -59,7 +59,7 @@ namespace Editor
 
 	private:
 		// editor
-		Engine::Ref<Engine::EditorCamera> m_EditorCamera;
+		Engine::Ref<Editor::EditorCamera> m_EditorCamera;
 		fs::path m_LoadedScene;
 		bool m_Playing = false;
 		Utils::Vector<Engine::Ref<EditorPanel>> m_Panels;

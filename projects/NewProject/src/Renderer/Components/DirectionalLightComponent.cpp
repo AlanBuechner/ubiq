@@ -20,13 +20,25 @@ namespace Game
 		}
 
 		CREATE_PROFILE_SCOPEI("Update Directional Light Component")
-		if (Owner.GetScene()->DidCameraChange())
+		// get new cameras
+		Utils::Vector<Engine::Ref<Engine::Camera>> newCameras = Owner.GetScene()->GetSceneRenderer()->GetCameras();
+		Utils::Vector<Engine::Ref<Engine::Camera>> oldCameras = GetDirectinalLight()->GetCameras();
+
+		// remove old cameras
+		for (Engine::Ref<Engine::Camera> camera : oldCameras)
 		{
-			// remove all cameras from directional light
-			GetDirectinalLight()->ClearCameras();
-			// re add cameras to directional light
-			GetDirectinalLight()->AddCamera(Owner.GetScene()->GetSceneRenderer()->GetMainCamera());
+			if (!newCameras.Contains(camera))
+				GetDirectinalLight()->RemoveCamera(camera);
 		}
+
+		// add new cameras
+		for (Engine::Ref<Engine::Camera> camera : newCameras)
+		{
+			if (!oldCameras.Contains(camera))
+				GetDirectinalLight()->AddCamera(camera);
+		}
+
+		// update shadow maps
 		UpdateShadowMaps();
 	}
 
@@ -128,31 +140,39 @@ namespace Game
 #pragma endregion
 
 #pragma region Serialization
-#include "Engine/Core/Scene/SceneSerializer.h"
-namespace Game
+
+
+#include "Engine/Core/ObjectDescription/ObjectDescription.h"
+
+namespace Engine
 {
-	class DirectionalLightSerializer : public Engine::ComponentSerializer
+	template<>
+	struct Convert<Game::DirectionalLightComponent>
 	{
-		virtual void Serialize(Engine::Entity entity, YAML::Emitter& out) override
+		CONVERTER_BASE(Game::DirectionalLightComponent);
+		static ObjectDescription Encode(const Game::DirectionalLightComponent& val)
 		{
-			auto& dirLightComponent = *entity.GetComponent<DirectionalLightComponent>();
-			out << YAML::Key << "Direction" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetDirection();
-			out << YAML::Key << "Temperature" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetCCT();
-			out << YAML::Key << "Color" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetTint();
-			out << YAML::Key << "Intensity" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetIntensity();
-			out << YAML::Key << "Size" << YAML::Value << dirLightComponent.GetDirectinalLight()->GetSize();
+			ObjectDescription desc(ObjectDescription::Type::Object);
+			desc["Direction"] = ObjectDescription::CreateFrom(val.GetDirectinalLight()->GetDirection());
+			desc["Temperature"] = ObjectDescription::CreateFrom(val.GetDirectinalLight()->GetCCT());
+			desc["Color"] = ObjectDescription::CreateFrom(val.GetDirectinalLight()->GetTint());
+			desc["Intensity"] = ObjectDescription::CreateFrom(val.GetDirectinalLight()->GetIntensity());
+			desc["Size"] = ObjectDescription::CreateFrom(val.GetDirectinalLight()->GetSize());
+
+			return desc;
 		}
 
-		virtual void Deserialize(Engine::Entity entity, YAML::Node data) override
+		static bool Decode(Game::DirectionalLightComponent& dlc, const ObjectDescription& data)
 		{
-			auto& dlc = *entity.GetComponent<DirectionalLightComponent>();
-			dlc.SetDirection(data["Direction"].as<Math::Vector3>());
-			dlc.SetIntensity(data["Intensity"].as<float>());
-			dlc.SetTemperature(data["Temperature"].as<float>());
-			dlc.SetTint(data["Color"].as<Math::Vector3>());
-			dlc.SetSize(data["Size"].as<float>());
+			dlc.SetDirection(data["Direction"].Get<Math::Vector3>());
+			dlc.SetIntensity(data["Intensity"].Get<float>());
+			dlc.SetTemperature(data["Temperature"].Get<float>());
+			dlc.SetTint(data["Color"].Get<Math::Vector3>());
+			dlc.SetSize(data["Size"].Get<float>());
+
+			return true;
 		}
 	};
-	ADD_COMPONENT_SERIALIZER(DirectionalLightComponent, DirectionalLightSerializer);
+	ADD_OBJECT_CONVERTER(Game::DirectionalLightComponent);
 }
 #pragma endregion

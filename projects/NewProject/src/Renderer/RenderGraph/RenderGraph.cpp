@@ -4,10 +4,9 @@
 #include "Engine/Core/Application.h"
 
 #include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"
-#include "Engine/Renderer/Abstractions/Resources/InstanceBuffer.h"
 #include "Engine/Renderer/Abstractions/Resources/ConstantBuffer.h"
 #include "Engine/Renderer/Abstractions/Resources/Texture.h"
-#include "Engine/Renderer/Abstractions/CommandList.h"
+#include "Engine/Renderer/CPUCommandList.h"
 #include "Engine/Renderer/Abstractions/CommandQueue.h"
 #include "Engine/Renderer/Shaders/Shader.h"
 #include "Engine/Renderer/Renderer.h"
@@ -34,7 +33,7 @@ namespace Game
 	{
 		Engine::Window& window = Engine::Application::Get().GetWindow();
 
-		Engine::Ref<Engine::CommandList> commandList = Engine::CommandList::Create(Engine::CommandList::Direct);;
+		Engine::Ref<Engine::CPUCommandList> commandList = Engine::CPUCommandList::Create(Engine::CommandListType::Graphics);
 		m_CommandLists.Push(commandList);
 
 		float clearval = pow(0.2f, 2.2);

@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Core/Core.h"
+#include "Engine/Events/Event.h"
 #include "Engine/Core/Scene/Scene.h"
 
 #include <Reflection.h>

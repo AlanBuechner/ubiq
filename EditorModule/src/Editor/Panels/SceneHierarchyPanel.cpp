@@ -28,7 +28,7 @@ namespace Editor
 		pos.y = 1 - pos.y;
 
 		Engine::GameBase* game = Engine::GameBase::Get();
-		Engine::Ref<Engine::EditorCamera> editorCamera = Editor::EditorLayer::Get()->GetEditorCamera();
+		Engine::Ref<Editor::EditorCamera> editorCamera = Editor::EditorLayer::Get()->GetEditorCamera();
 
 		// calculate ray
 		Engine::Ray ray;
@@ -186,7 +186,7 @@ namespace Editor
 			if (m_GizmoType != -1)
 			{
 				// get editor camera transform
-				Engine::Ref<Engine::EditorCamera> editorCamera = EditorLayer::Get()->GetEditorCamera();
+				Engine::Ref<Editor::EditorCamera> editorCamera = EditorLayer::Get()->GetEditorCamera();
 				const Math::Mat4& cameraProjection = editorCamera->GetProjectionMatrix();
 				const Math::Mat4& cameraView = editorCamera->GetViewMatrix();
 

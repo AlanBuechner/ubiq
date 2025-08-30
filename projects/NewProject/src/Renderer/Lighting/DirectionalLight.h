@@ -76,7 +76,8 @@ namespace Game
 		Engine::Ref<Engine::ConstantBuffer> GetBuffer() { return m_Buffer; }
 
 		void AddCamera(Engine::Ref<Engine::Camera> camera);
-
+		Utils::Vector<Engine::Ref<Engine::Camera>> GetCameras();
+		void RemoveCamera(Engine::Ref<Engine::Camera> camera);
 		void ClearCameras();
 		void UpdateShadowMaps();
 

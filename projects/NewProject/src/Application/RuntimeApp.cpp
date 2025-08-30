@@ -2,7 +2,7 @@
 #include <Engine.h>
 #include <Engine/Core/EntryPoint.h>
 #include "RuntimeLayer.h"
-#include <Engine/Util/PlatformUtils.h>
+#include <Engine/PlatformUtils/PlatformUtils.h>
 #include <Engine/Core/GameBase.h>
 
 extern Engine::Layer* GetEditorLayer();
@@ -17,7 +17,7 @@ namespace Game
 			Application("USG Editor")
 		{
 			auto timer = CREATE_PROFILEI();
-			timer.Start("Create Layer");
+			START_PROFILEI(timer, "Create Layer");
 
 			Engine::Layer* editorLayer = GetEditorLayer();
 			m_InEditer = editorLayer != nullptr;
@@ -27,7 +27,7 @@ namespace Game
 				PushLayer(new RuntimeLayer()); // set the runtime layer
 			GenLayerStack();
 
-			timer.End();
+			END_PROFILEI(timer);
 		}
 
 		~Runtime()

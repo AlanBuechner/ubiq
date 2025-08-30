@@ -36,27 +36,31 @@ namespace Game
 #pragma endregion
 
 #pragma region Serialization
-#include "Engine/Core/Scene/SceneSerializer.h"
+#include "Engine/Core/ObjectDescription/ObjectDescription.h"
 
-namespace Game
+namespace Engine
 {
-	class SkyboxSerializer : public Engine::ComponentSerializer
+	template<>
+	struct Convert<Game::SkyboxComponent>
 	{
-		virtual void Serialize(Engine::Entity entity, YAML::Emitter& out) override
+		CONVERTER_BASE(Game::SkyboxComponent);
+		static ObjectDescription Encode(const Game::SkyboxComponent& val)
 		{
-			auto& skyboxComponent = *entity.GetComponent<SkyboxComponent>();
-			if (skyboxComponent.GetSkyboxTexture())
-				out << YAML::Key << "Texture" << YAML::Value << skyboxComponent.GetSkyboxTexture()->GetAssetID();
+			ObjectDescription desc(ObjectDescription::Type::Object);
+			if (val.GetSkyboxTexture())
+				desc["Texture"] = ObjectDescription::CreateFrom((uint64)val.GetSkyboxTexture()->GetAssetID());
+
+			return desc;
 		}
 
-		virtual void Deserialize(Engine::Entity entity, YAML::Node data) override
+		static bool Decode(Game::SkyboxComponent& sbc, const ObjectDescription& data)
 		{
-			auto& sbc = *entity.GetComponent<SkyboxComponent>();
-			if (data["Texture"])
-				sbc.SetSkyboxTexture(Engine::Application::Get().GetAssetManager().GetAsset<Engine::Texture2D>(data["Texture"].as<uint64>()));
+			if (data.HasEntery("Texture"))
+				sbc.SetSkyboxTexture(Engine::Application::Get().GetAssetManager().GetAsset<Engine::Texture2D>(data["Texture"].Get<uint64>()));
+
+			return true;
 		}
 	};
-	ADD_COMPONENT_SERIALIZER(SkyboxComponent, SkyboxSerializer);
-
+	ADD_OBJECT_CONVERTER(Game::SkyboxComponent);
 }
 #pragma endregion

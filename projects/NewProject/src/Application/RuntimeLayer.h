@@ -2,7 +2,6 @@
 #include <Engine.h>
 #include <Engine/Math/Math.h>
 
-#include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/SceneRenderer.h"
 
 #include "ProjectManager/Project.h"

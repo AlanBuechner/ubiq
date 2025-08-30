@@ -12,7 +12,7 @@ namespace Game
 		m_ToneMappingShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(TONEMAPPING);
 	}
 
-	void ToneMapping::RecordCommands(Engine::Ref<Engine::CommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
+	void ToneMapping::RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
 	{
 		Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("HillACES");
 		//Engine::Ref<Engine::ShaderPass> pass = m_ToneMappingShader->GetPass("NarkowiczACES");
@@ -28,7 +28,7 @@ namespace Game
 		commandList->SetShader(pass);
 		commandList->SetRootConstant(pass->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
 		commandList->SetRWTexture(pass->GetUniformLocation("DstTexture"), renderTarget->GetRWTexture2D(), 0);
-		commandList->Dispatch(std::max(renderTarget->GetWidth() / 8, 1u) + 1, std::max(renderTarget->GetHeight() / 8, 1u) + 1, 1);
+		commandList->DispatchThreads(renderTarget->GetWidth(), renderTarget->GetHeight(), 1);
 
 		Engine::GPUTimer::EndEvent(commandList);
 	}

@@ -43,7 +43,6 @@ namespace Game
 		void SetSkyBox(Engine::Ref<Engine::Texture2D> texture);
 
 		virtual void Build() override;
-		virtual void Render(Engine::Ref<Engine::CommandQueue> queue) override;
 
 		static Engine::Ref<SceneRenderer> Create();
 

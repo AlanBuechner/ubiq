@@ -1,6 +1,11 @@
 #pragma once
 #include "Engine/Renderer/RenderGraph.h"
 
+namespace Engine
+{
+	class VertexBuffer;
+}
+
 namespace Game
 {
 	class DirectionalLight;
@@ -12,7 +17,7 @@ namespace Game
 	{
 		Engine::Ref<Engine::Shader> m_Shader;
 		Engine::Ref<Engine::Mesh> m_Mesh;
-		Engine::Ref<Engine::InstanceBuffer> m_InstanceBuffer;
+		Engine::Ref<Engine::VertexBuffer> m_InstanceBuffer;
 	};
 
 	struct SceneData

@@ -14,7 +14,7 @@ namespace Game
 		else
 		{
 			color.r = temp - 60;
-			color.r = 329.698727446 * Math::Pow(color.r, -0.1332047592);
+			color.r = 329.698727446 * Math::Pow<float>(color.r, -0.1332047592);
 			if (color.r < 0) color.r = 0;
 			if (color.r > 255) color.r = 255;
 		}
@@ -28,7 +28,7 @@ namespace Game
 		else
 		{
 			color.g = temp - 60;
-			color.g = 288.1221695283 * Math::Pow(color.g, -0.0755148492);
+			color.g = 288.1221695283 * Math::Pow<float>(color.g, -0.0755148492);
 		}
 		if (color.g < 0) color.g = 0;
 		if (color.g > 255) color.g = 255;

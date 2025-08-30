@@ -14,7 +14,7 @@ namespace Game
 		RenderGraphNode(graph)
 	{}
 
-	void DISABLE_OPS GBufferPassNode::BuildImpl()
+	void GBufferPassNode::BuildImpl()
 	{
 		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 

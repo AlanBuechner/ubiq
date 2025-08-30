@@ -26,12 +26,12 @@ namespace Game
 	void RuntimeLayer::OnRender()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		Engine::InstrumentationTimer timer = CREATE_PROFILEI();
-		timer.Start("Recored Commands");
+		Profiler::InstrumentationTimer timer = CREATE_PROFILEI();
+		START_PROFILEI(timer, "Recored Commands");
 
 		m_Game->OnRender();
 
-		Engine::Ref<Engine::CommandList> commandList = Engine::Renderer::GetMainCommandList();
+		Engine::Ref<Engine::CPUCommandList> commandList = Engine::Renderer::GetMainCommandList();
 
 		Engine::Ref<Engine::FrameBuffer> framBuffer = m_Game->GetScene()->GetSceneRenderer()->GetRenderTarget();
 		Engine::GPUTimer::BeginEvent(commandList, "gizmo's");
@@ -48,7 +48,7 @@ namespace Game
 		commandList->Present();
 		Engine::GPUTimer::EndEvent(commandList);
 
-		timer.End();
+		END_PROFILEI(timer);
 	}
 
 	void RuntimeLayer::OnImGuiRender()

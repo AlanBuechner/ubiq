@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Renderer/RenderGraph/RenderGraph.h"
-#include <vector>
+#include "Utils/Vector.h"
 #include <list>
 
 namespace Engine
@@ -10,7 +10,7 @@ namespace Engine
 	class CommandQueue;
 	class Mesh;
 	class Material;
-	class InstanceBuffer;
+	class VertexBuffer;
 	class Camera;
 	class EditorCamera;
 	class ConstantBuffer;
@@ -24,11 +24,17 @@ namespace Game
 {
 	struct RenderObject;
 
+	struct InstanceData
+	{
+		Math::Mat4 m_Transform;
+		uint32 m_MaterialIndex;
+	};
+
 	// control block
 	struct ObjectControlBlock
 	{
 		RenderObject& m_Object;
-		uint32 m_InstanceLocation;
+		uint32 m_DataIndex;
 
 		void UpdateTransform(const Math::Mat4& transform);
 		void DestroySelf();
@@ -39,7 +45,8 @@ namespace Game
 	struct RenderObject
 	{
 		RenderObject();
-		Engine::Ref<Engine::InstanceBuffer> m_Instances;
+		Engine::Ref<Engine::VertexBuffer> m_Instances;
+		Utils::Vector<InstanceData> m_InstanceData;
 		Engine::Ref<Engine::Mesh> m_Mesh;
 
 		std::list<ObjectControlBlock> m_ControlBlocks;
@@ -47,12 +54,8 @@ namespace Game
 		ObjectControlBlockRef AddInstance(const Math::Mat4& transform, Engine::Ref<Engine::Material> mat);
 		void RemoveInstance(ObjectControlBlockRef controlBlock);
 
-	};
+		void UpdateInstanceBuffer();
 
-	struct InstanceData
-	{
-		Math::Mat4 m_Transform;
-		uint32 m_MaterialIndex;
 	};
 
 	class ShaderDrawSection

@@ -2,21 +2,20 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/Material.h"
-#include "Engine/Renderer/Abstractions/Resources/InstanceBuffer.h"
 #include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Abstractions/Resources/ConstantBuffer.h"
 #include "Engine/Renderer/Abstractions/CommandList.h"
 #include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"
 #include "Engine/Renderer/RenderGraph.h"
 #include "Renderer/Lighting/DirectionalLight.h"
+#include "Engine/Renderer/Abstractions/Resources/Buffer.h"
 
 namespace Game
 {
 	// ObjectControlBlock
 	void ObjectControlBlock::UpdateTransform(const Math::Mat4& transform)
 	{
-		InstanceData& data = m_Object.m_Instances->Get<InstanceData>(m_InstanceLocation);
+		InstanceData& data = m_Object.m_InstanceData[m_DataIndex];
 		data.m_Transform = transform;
 	}
 
@@ -27,14 +26,15 @@ namespace Game
 
 	RenderObject::RenderObject()
 	{
-		m_Instances = Engine::InstanceBuffer::Create(10, sizeof(InstanceData)); // default to capacity of 10
+		m_InstanceData.Reserve(10); // default to capacity of 10
+		m_Instances = Engine::VertexBuffer::Create(10, sizeof(InstanceData));
 	}
 
 	// RenderObject
 	ObjectControlBlockRef RenderObject::AddInstance(const Math::Mat4& transform, Engine::Ref<Engine::Material> mat)
 	{
 		InstanceData data{ transform, mat->GetBuffer()->GetCBVDescriptor()->GetIndex() };
-		m_Instances->PushBack(&data); // create new instance
+		m_InstanceData.Push(data); // create new instance
 		m_ControlBlocks.push_front(ObjectControlBlock{ *this, (uint32)m_Instances->GetCount() - 1 }); // create new control block
 		return &m_ControlBlocks.front(); // return control block
 	}
@@ -44,26 +44,38 @@ namespace Game
 		if (controlBlock == nullptr)
 			return;
 
+		// remove data
+		m_InstanceData.SwapAndPop(controlBlock->m_DataIndex);
+
+		// swap data indexes for control blocks
+
 		// find control block for last instance
-		uint32 swapIndex = (uint32)m_Instances->GetCount() - 1; // last index in the instance buffer
+		uint32 lastIndex = (uint32)m_Instances->GetCount() - 1; // last index in the instance buffer
+
+		// get lats control block
+		ObjectControlBlock* lastBlock = nullptr;
 		for (auto& block : m_ControlBlocks)
 		{
-			if (block.m_InstanceLocation == swapIndex)
+			if (block.m_DataIndex == lastIndex)
 			{
-				// swap the buffer data
-				m_Instances->Get<InstanceData>(controlBlock->m_InstanceLocation) = m_Instances->Get<InstanceData>(block.m_InstanceLocation);
-				m_Instances->PopBack(); // remove the last buffer
-
-				block.m_InstanceLocation = controlBlock->m_InstanceLocation; // swap the instance locations on the control blocks
-
-				// remove the deleted control block
-				m_ControlBlocks.remove_if([controlBlock](ObjectControlBlock& block) {return &block == controlBlock; });
-
-				return;
+				lastBlock = &block;
+				break;
 			}
 		}
+		CORE_ASSERT(lastBlock != nullptr, "some fucky shit happened", "");
 
-		CORE_ASSERT(false, "some fucky shit happened");
+		lastBlock->m_DataIndex = controlBlock->m_DataIndex; // swap the instance locations on the control blocks
+
+		// remove the deleted control block
+		m_ControlBlocks.remove_if([controlBlock](ObjectControlBlock& block) {return &block == controlBlock; });
+	}
+
+	void RenderObject::UpdateInstanceBuffer()
+	{
+		if (m_Instances->GetCount() < m_InstanceData.Capacity())
+			m_Instances->Resize(m_InstanceData.Capacity());
+
+		m_Instances->SetData(m_InstanceData);
 	}
 
 	// ShaderDrawSection
@@ -115,10 +127,7 @@ namespace Game
 		for (auto& shaderDawSection : m_ShaderDrawSection)
 		{
 			for (auto& renderObject : shaderDawSection)
-			{
-				//if (!renderObject.m_Instances->Empty())
-				renderObject.m_Instances->Apply();
-			}
+				renderObject.UpdateInstanceBuffer();
 		}
 	}
 
@@ -130,7 +139,7 @@ namespace Game
 			outDrawCommands.reserve(shaderDawSection.m_Objects.size());
 			for (auto& renderObject : shaderDawSection)
 			{
-				if (!renderObject.m_Instances->Empty())
+				if (!renderObject.m_InstanceData.Empty())
 				{
 					DrawCommand cmd;
 					cmd.m_Mesh = renderObject.m_Mesh;

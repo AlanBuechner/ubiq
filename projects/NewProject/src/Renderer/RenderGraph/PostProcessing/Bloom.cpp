@@ -18,7 +18,7 @@ namespace Game
 #endif
 	}
 
-	void Bloom::RecordCommands(Engine::Ref<Engine::CommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
+	void Bloom::RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
 	{
 		Engine::GPUTimer::BeginEvent(commandList, "Bloom");
 		Engine::Ref<Engine::GraphicsShaderPass> downSample = m_BloomShader->GetGraphicsPass("downSample");
@@ -187,7 +187,7 @@ namespace Game
 			m_GaussianSumTextures.resize(m_NumberDownSamples);
 			for (uint32 i = 0; i < m_NumberDownSamples; i++)
 			{
-				uint32 fac = Math::Pow(2, i + 1);
+				uint32 fac = Math::Pow<float>(2, i + 1);
 				uint32 w = width / fac;
 				uint32 h = height / fac;
 

@@ -5,6 +5,7 @@
 #include "Renderer/SceneRenderer/SceneRenderer.h"
 #include "SceneScripts/DefaultSceneScript.h"
 #include "TestModule/src/TestModule.h"
+#include "Editor/EditorCamera.h"
 
 
 LINK_REFLECTION_DATA(NewProject)
@@ -16,12 +17,12 @@ namespace Game
 	public:
 		Game()
 		{
-			m_DefaultCamera = Engine::CreateRef<Engine::EditorCamera>();
+			m_DefaultCamera = Engine::CreateRef<Editor::EditorCamera>();
 			m_DefaultCamera->SetOrientation({ Math::Radians(180 - 25), Math::Radians(25) });
 			TestModule::TestModule();
 		}
 
-		virtual void OnEvent(Engine::Event* e)
+		virtual void OnEvent(Engine::Event* e) override
 		{
 			m_Scene->GetSceneScript()->OnEvent(e);
 		}
@@ -37,7 +38,9 @@ namespace Game
 				m_DefaultCamera->OnUpdate();
 
 			if(camera)
-				GetScene()->OnUpdate(camera);
+				GetScene()->OnUpdate();
+
+			m_Scene->GetSceneRenderer()->SetMainCamera(camera);
 		}
 
 		Engine::Ref<Engine::Camera> GetSceneCamera()
@@ -51,14 +54,13 @@ namespace Game
 		virtual void OnRender() override
 		{
 			CREATE_PROFILE_FUNCTIONI();
-			Engine::Ref<Engine::CommandList> commandList = Engine::Renderer::GetMainCommandList();
+			Engine::Ref<Engine::CPUCommandList> commandList = Engine::Renderer::GetMainCommandList();
 			Engine::Ref<Engine::FrameBuffer> framBuffer = m_Scene->GetSceneRenderer()->GetRenderTarget();
 			m_Scene->GetSceneRenderer()->Build();
-			m_Scene->GetSceneRenderer()->Render(Engine::Renderer::GetMainCommandQueue());
 		}
 
 	private:
-		Engine::Ref<Engine::EditorCamera> m_DefaultCamera;
+		Engine::Ref<Editor::EditorCamera> m_DefaultCamera;
 
 	};
 }

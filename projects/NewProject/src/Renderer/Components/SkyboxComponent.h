@@ -12,7 +12,7 @@ namespace Game
 		virtual void OnComponentAdded() override;
 		virtual void OnComponentRemoved() override;
 
-		Engine::Ref<Engine::Texture2D> GetSkyboxTexture() { return m_SkyboxTexture; }
+		Engine::Ref<Engine::Texture2D> GetSkyboxTexture() const { return m_SkyboxTexture; }
 		FUNCTION()
 		void SetSkyboxTexture(Engine::Ref<Engine::Texture2D> texture);
 

@@ -78,7 +78,7 @@ namespace Editor
 		{
 			if (ImGui::IsItemActive())
 				m_DivideLoc += ImGui::GetIO().MouseDelta.x;
-			m_DivideLoc = Math::Clamp(m_DivideLoc, 10, ImGui::GetWindowWidth() - 200);
+			m_DivideLoc = Math::Clamp<float>(m_DivideLoc, 10, ImGui::GetWindowWidth() - 200);
 			if (ImGui::IsItemHovered())
 				ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
 		}
@@ -125,7 +125,7 @@ namespace Editor
 		if (m_CurrentDirectory != s_AssetsDirectory)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-			ImGui::ImageButton((ImTextureID)EditorAssets::s_BackIcon->GetSRVDescriptor()->GetGPUHandlePointer(), imageSize);
+			ImGui::ImageButton("##ContentBrowserBackButton", (ImTextureID)EditorAssets::s_BackIcon->GetSRVDescriptor()->GetGPUHandlePointer(), imageSize);
 			ImGui::PopStyleColor();
 			FileDropTarget(m_CurrentDirectory.parent_path());
 			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
@@ -147,7 +147,7 @@ namespace Editor
 			ImGui::PushID(itemID);
 			Engine::Ref<Engine::Texture2D> icon = GetFileIcon(p);
 			if (icon)
-				ImGui::ImageButton((ImTextureID)icon->GetSRVDescriptor()->GetGPUHandlePointer(), imageSize);
+				ImGui::ImageButton("##ContentBrowserFileIcon", (ImTextureID)icon->GetSRVDescriptor()->GetGPUHandlePointer(), imageSize);
 			ImGui::PopStyleColor();
 
 			if (path == m_SelectedAsset)
@@ -209,7 +209,7 @@ namespace Editor
 
 		ImGui::Columns(1);
 
-		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		if (ImGui::BeginPopupContextWindow(0, 1))
 		{
 			if (ImGui::BeginMenu("Add"))
 			{

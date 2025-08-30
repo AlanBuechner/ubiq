@@ -25,7 +25,7 @@ namespace Game
 		void SetTemperature(float temp);
 		void SetIntensity(float intensity);
 		void SetSize(float size);
-		Engine::Ref<DirectionalLight> GetDirectinalLight() { return m_Light; }
+		Engine::Ref<DirectionalLight> GetDirectinalLight() const { return m_Light; }
 
 		void UpdateShadowMaps();
 

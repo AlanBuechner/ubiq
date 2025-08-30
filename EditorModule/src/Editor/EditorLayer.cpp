@@ -4,8 +4,8 @@
 #include "Engine/Core/Scene/SceneSerializer.h"
 #include "Engine/Math/Math.h"
 #include "Engine/Core/Cursor.h"
-#include "Engine/Util/Performance.h"
-#include "Engine/Util/PlatformUtils.h"
+#include "Utils/Performance.h"
+#include "Engine/PlatformUtils/PlatformUtils.h"
 #include "Engine/Core/Scene/SceneScriptBase.h"
 
 #include "Panels/SceneHierarchyPanel.h"
@@ -53,7 +53,7 @@ namespace Editor
 		m_Game = CreateGame();
 		DefaultScene();
 
-		m_EditorCamera = Engine::CreateRef<Engine::EditorCamera>();
+		m_EditorCamera = Engine::CreateRef<Editor::EditorCamera>();
 		m_EditorCamera->SetOrientation({ Math::Radians(360-25), Math::Radians(25) });
 	}
 

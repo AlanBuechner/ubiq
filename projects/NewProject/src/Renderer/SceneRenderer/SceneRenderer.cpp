@@ -4,9 +4,7 @@
 
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/Material.h"
-#include "Engine/Renderer/Abstractions/Resources/InstanceBuffer.h"
 #include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Abstractions/Resources/ConstantBuffer.h"
 #include "Engine/Renderer/Abstractions/CommandList.h"
 #include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"
@@ -57,11 +55,7 @@ namespace Game
 		m_MainPassObject.BuildDrawCommands(data.m_DrawCommands);
 
 		m_RenderGraph->Build();
-	}
-
-	void SceneRenderer::Render(Engine::Ref<Engine::CommandQueue> queue)
-	{
-		m_RenderGraph->Submit(queue);
+		m_RenderGraph->Submit();
 	}
 
 	Engine::Ref<SceneRenderer> SceneRenderer::Create()

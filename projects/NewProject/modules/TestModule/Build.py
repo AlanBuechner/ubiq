@@ -31,6 +31,7 @@ includes = [
 	f"{includeDirs['stb_image']}",
 	f"{includeDirs['Reflection']}",
 	f"{includeDirs['Utilities']}",
+	f"{includeDirs['tracy']}",
 	f"{location}/GameEngine/src",
 	f"{location}/GameEngine/embeded",
 ]

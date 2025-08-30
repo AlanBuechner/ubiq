@@ -39,6 +39,7 @@ includes = [
 	f"{includeDirs['ProjectManager']}",
 	f"{includeDirs['Reflection']}",
 	f"{includeDirs['Utilities']}",
+	f"{includeDirs['tracy']}",
 	f"{location}/GameEngine/src",
 	f"{location}/GameEngine/embeded",
 	f"{projDir}/modules",

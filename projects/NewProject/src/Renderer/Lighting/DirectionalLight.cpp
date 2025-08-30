@@ -190,6 +190,19 @@ namespace Game
 		m_ShadowMaps[camera] = CascadedShadowMaps(camera); // add new shadow map
 	}
 
+	Utils::Vector<Engine::Ref<Engine::Camera>> DirectionalLight::GetCameras()
+	{
+		Utils::Vector<Engine::Ref<Engine::Camera>> cameras;
+		for (auto& shadowMap : m_ShadowMaps)
+			cameras.Push(shadowMap.first);
+		return cameras;
+	}
+
+	void DirectionalLight::RemoveCamera(Engine::Ref<Engine::Camera> camera)
+	{
+		m_ShadowMaps.erase(camera);
+	}
+
 	void DirectionalLight::ClearCameras()
 	{
 		m_ShadowMaps.clear();
