@@ -1,5 +1,6 @@
 # main build file
 
+
 import sys
 import os
 import shutil
@@ -8,6 +9,7 @@ import argparse
 import time
 import importlib.util
 import subprocess
+from contextlib import chdir
 
 # set our working directory to the projects root directory
 rootDir = os.path.dirname(os.path.dirname(inspect.getfile(lambda: None)))
@@ -209,9 +211,11 @@ def RunProject(projName):
 	proj = GetProject(projName)
 	projdata = GetProject(projName)["module"].GetProject()
 	output = projdata.GetOutput()
-	print("running : " + output)
 	cwd = Config.project
-	os.startfile(output, cwd = cwd)
+	with chdir(cwd):
+		#os.startfile(output)
+		#os.execv(output, [output])
+		subprocess.run([output], cwd=cwd, text=True)
 
 if(shouldRun):
 	RunProject(Config.project.split("/")[-1])

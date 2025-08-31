@@ -31,6 +31,10 @@ Run `Setup.bat` to download all dependances.
 
 Goto `projects/NewProject` and run `GenerateProjects.bat` to generate visual studio project files.
 
+<ins>**3. Debuging:**</ins>
+
+If you want the visual studio debuger to work you will need to install the [Microsoft Child Process Debugging Power Tool 2022](https://marketplace.visualstudio.com/items?itemName=vsdbgplat.MicrosoftChildProcessDebuggingPowerTool2022)
+
 ## Aditional Notes
 
 When you go to build the game do not press `Ctl+B` the custom build script will automaticly handle building all the dependances so this will just cause each project to be built multiple times. Insted right click on the project and click build.

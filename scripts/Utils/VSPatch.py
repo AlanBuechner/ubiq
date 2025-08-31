@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import os
+import Config
 
 def PatchVSXProj(script):
 	proj = script["module"].GetProject()
@@ -60,22 +61,25 @@ def GenVSXprojUser(script):
 		f.write(f"""<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommand>$(ProjectDir)\\bin\\$(Configuration)-windows-x86_64\\{projName}\\{projName}.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>{Config.location}/vendor/python/python.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>{Config.location}/scripts/Build.py -r -c $(Configuration) -a x86_64 -p {proj.projectDirectory}</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
-    <LocalDebuggerCommand>$(ProjectDir)\\bin\\$(Configuration)-windows-x86_64\\{projName}\\{projName}.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>{Config.location}/vendor/python/python.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>{Config.location}/scripts/Build.py -r -c $(Configuration) -a x86_64 -p {proj.projectDirectory}</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommand>$(ProjectDir)\\bin\\$(Configuration)-windows-x86_64\\{projName}\\{projName}.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>{Config.location}/vendor/python/python.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>{Config.location}/scripts/Build.py -r -c $(Configuration) -a x86_64 -p {proj.projectDirectory}</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
 </Project>
-		""")
+""")
 
 #		f.write(f"""<?xml version="1.0" encoding="utf-8"?>
 #<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">

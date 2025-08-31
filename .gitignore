@@ -3,7 +3,7 @@
 bin/
 bin-int/
 GameEngine/generated
-USG-Editor/generated
+EditorModule/generated
 projects/NewProject/generated
 temp/
 __pycache__
