@@ -19,12 +19,12 @@
 #include "MainPassNode.h"
 #include "SkyboxNode.h"
 #include "ShadowPassNode.h"
-#include "PostProcessNode.h"
+#include "PostProcessingModule/PostProcessNode.h"
 
-// post process
-#include "PostProcessing/Bloom.h"
-#include "PostProcessing/DepthOfField.h"
-#include "PostProcessing/ToneMapping.h"
+// post process effects
+#include "PostProcessingModule/Effects/Bloom.h"
+#include "PostProcessingModule/Effects/DepthOfField.h"
+#include "PostProcessingModule/Effects/ToneMapping.h"
 
 namespace Game
 {

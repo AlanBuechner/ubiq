@@ -12,7 +12,8 @@
 #include "Panels/ContentBrowserPanel.h"
 #include "Editor/Panels/GridGizmosPanel.h"
 
-#include <imgui/imgui.h>
+#include "Engine/imGui/ImGuiLayer.h"
+#include "Engine/ImGui/ImGui.h"
 #include <memory>
 
 LINK_REFLECTION_DATA(EditorModule)

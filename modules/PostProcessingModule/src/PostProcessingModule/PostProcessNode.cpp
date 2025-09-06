@@ -3,7 +3,6 @@
 #include "Engine/Core/MeshBuilder.h"
 #include "EngineResource.h"
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
-#include "RenderGraph.h"
 
 namespace Game
 {
@@ -46,7 +45,7 @@ namespace Game
 	void PostProcessNode::InitPostProcessStack()
 	{
 		for (Engine::Ref<PostProcess> pp : m_PostProcessStack)
-			pp->Init(m_Input, m_Graph.As<RenderGraph>().GetScene());
+			pp->Init(m_Input);
 	}
 
 	void PostProcessNode::OnViewportResize(uint32 width, uint32 height)

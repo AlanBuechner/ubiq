@@ -5,6 +5,11 @@
 #include "Engine/Core/Application.h"
 #include "Engine/Math/Math.h"
 
+#include "Engine/Events/Event.h"
+#include "Engine/Events/MouseEvent.h"
+#include "Engine/Events/KeyEvent.h"
+#include "Engine/Events/ApplicationEvent.h"
+
 #include <map>
 
 namespace Engine

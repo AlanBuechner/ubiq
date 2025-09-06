@@ -9,11 +9,9 @@
 namespace Game
 {
 
-	void DepthOfField::Init(const PostProcessInput& input, SceneData& scene)
+	void DepthOfField::Init(const PostProcessInput& input)
 	{
 		m_DepthOfFieldShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(DEPTHOFFIELD);
-
-		m_Scene = &scene;
 
 		uint32 width = 100;
 		uint32 height = 100;
@@ -48,7 +46,7 @@ namespace Game
 		commandList->SetRootConstant(coc->GetUniformLocation("RC_DepthLoc"), input.m_TextureHandles.at("Depth Buffer")->GetSRVDescriptor()->GetIndex());
 		commandList->SetRootConstant(coc->GetUniformLocation("RC_Radius"), m_ConfusionRadius);
 		commandList->SetRootConstant(coc->GetUniformLocation("RC_FocalPlane"), m_FocalPlane);
-		commandList->SetConstantBuffer(coc->GetUniformLocation("camera"), m_Scene->m_MainCamera->GetCameraBuffer());
+		//commandList->SetConstantBuffer(coc->GetUniformLocation("camera"), m_Scene->m_MainCamera->GetCameraBuffer());
 		commandList->DrawMesh(screenMesh);
 
 		Engine::GPUTimer::EndEvent(commandList); // end calc coc

@@ -6,8 +6,6 @@
 #include "Window.h"
 #include "LayerStack.h"
 
-#include "Engine/imGui/ImGuiLayer.h"
-
 #include "ProjectManager/Project.h"
 
 namespace Engine

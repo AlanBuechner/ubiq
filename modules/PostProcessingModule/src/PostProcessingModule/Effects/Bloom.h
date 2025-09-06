@@ -11,7 +11,7 @@ namespace Game
 	class Bloom : public PostProcess
 	{
 	public:
-		virtual void Init(const PostProcessInput& input, SceneData& scene) override;
+		virtual void Init(const PostProcessInput& input) override;
 		virtual void RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh) override;
 
 		virtual void OnViewportResize(uint32 width, uint32 height) override;

@@ -7,7 +7,7 @@
 namespace Game
 {
 
-	void ToneMapping::Init(const PostProcessInput& input, SceneData& scene)
+	void ToneMapping::Init(const PostProcessInput& input)
 	{
 		m_ToneMappingShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(TONEMAPPING);
 	}

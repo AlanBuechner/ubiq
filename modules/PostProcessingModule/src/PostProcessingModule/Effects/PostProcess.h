@@ -4,7 +4,6 @@
 #include "Engine/Renderer/Abstractions/CommandList.h"
 #include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"
 #include "Engine/Renderer/RenderGraph.h"
-#include "Renderer/RenderGraph/RenderGraph.h"
 
 #include <unordered_map>
 #include <string.h>
@@ -20,12 +19,9 @@ namespace Game
 	class PostProcess
 	{
 	public:
-		virtual void Init(const PostProcessInput& input, SceneData& scene) = 0;
+		virtual void Init(const PostProcessInput& input) = 0;
 		virtual void RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh) = 0;
 
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
-
-	protected:
-		SceneData* m_Scene;
 	};
 }

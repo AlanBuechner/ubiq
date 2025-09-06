@@ -6,11 +6,8 @@
 
 namespace Game
 {
-	void Bloom::Init(const PostProcessInput& input, SceneData& scene)
+	void Bloom::Init(const PostProcessInput& input)
 	{
-		m_Scene = &scene;
-
-
 #ifdef USE_BLOOM_COMPUTE
 		m_BloomShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(BLOOMCOMPUTE);
 #else

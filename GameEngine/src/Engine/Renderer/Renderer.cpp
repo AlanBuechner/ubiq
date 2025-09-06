@@ -13,6 +13,7 @@
 
 #include "Engine/Core/Application.h"
 
+#include "Engine/imGui/ImGuiLayer.h"
 #include "Engine/ImGui/ImGui.h"
 
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;

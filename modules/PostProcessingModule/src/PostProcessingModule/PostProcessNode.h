@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Renderer/RenderGraphNode.h"
-#include "PostProcessing/PostProcess.h"
+#include "Effects/PostProcess.h"
 
 namespace Game
 {

@@ -1,4 +1,4 @@
-# test project build script
+# test module build script
 
 import scripts.BuildUtils as BuildUtils
 from scripts.Utils.Utils import *
@@ -8,8 +8,6 @@ import time
 import inspect
 projDir = os.path.dirname(inspect.getfile(lambda: None)).replace("\\", "/")
 projName = os.path.basename(projDir)
-
-inEditor = True
 
 sources = [
 	f"src/**.cpp",
@@ -27,24 +25,14 @@ includes = [
 	projDir,
 	f"src",
 	f"{includeDirs['vendor']}",
-	f"{includeDirs['ImGui']}",
 	f"{includeDirs['glm']}",
 	f"{includeDirs['stb_image']}",
-	f"{includeDirs['yaml']}",
-	f"{includeDirs['ImGuizmo']}",
-	f"{includeDirs['Assimp']}",
-	f"{includeDirs['json']}",
-	f"{includeDirs['dxc']}",
-	f"{includeDirs['pix']}",
-	f"{includeDirs['ProjectManager']}",
 	f"{includeDirs['Reflection']}",
+	f"{includeDirs['ProjectManager']}",
 	f"{includeDirs['Utilities']}",
 	f"{includeDirs['tracy']}",
 	f"{location}/GameEngine/src",
 	f"{location}/GameEngine/embeded",
-	f"{projDir}/modules",
-	f"{location}/modules",
-	f"{location}/modules/PostProcessingModule/src",
 ]
 
 sysIncludes = []
@@ -57,33 +45,9 @@ defines = [
 	"_CRT_SECURE_NO_WARNINGS",
 ]
 
-vsDefines = [
-	"EDITOR"
-]
+dependancys = []
 
-dependancys = [
-	"TestModule",
-	"PostProcessingModule",
-	"GameEngine",
-]
-
-links = [
-	"kernel32.lib",
-	"user32.lib",
-	"comdlg32.lib",
-	"shell32.lib",
-]
-
-modules = [
-	"modules/TestModule",
-	f"{location}/modules/EditorModule",
-	f"{location}/modules/PostProcessingModule",
-]
-
-if(inEditor):
-	defines.append("EDITOR")
-	includes.append(f"{location}/modules/EditorModule/src")
-	dependancys.append("EditorModule")
+links = []
 
 def GetProject():
 	proj = BuildUtils.ProjectEnviernment()
@@ -96,18 +60,13 @@ def GetProject():
 	proj.includes = includes
 	proj.sysIncludes = sysIncludes
 	proj.defines = defines
-	proj.vsDefines = vsDefines
 	proj.links = links
 	proj.dependancys = dependancys
-	proj.buildType = BuildUtils.BuildType.EXECUTABLE
-	buildLoc = "/Runtime"
-	if(inEditor):
-		buildLoc = "/Editor"
-	proj.intDir = GetIntDir(projName, projDir) + buildLoc
-	proj.binDir = GetBinDir(projName, projDir) + buildLoc
+	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
+	proj.intDir = GetIntDir(projName, Config.project)
+	proj.binDir = GetBinDir(projName, Config.project) 
 	proj.genReflection = True
 	return proj
 
 
-def GetModules():
-	return modules
+
