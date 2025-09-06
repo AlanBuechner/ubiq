@@ -4,7 +4,7 @@ topology = triangle;
 passes = { 
 	main = {
 		VS = vertex;
-		PS = pixel; 
+		PS = pixel;
 	};
 };
 
@@ -72,17 +72,14 @@ struct Camera
 	float3 rotation;
 };
 
-cbuffer RC_MainCameraIndex
-{
-	uint mainCameraIndex;
-};
+RootConstant<uint> u_MainCameraIndex;
 
-ConstantBuffer<Camera> cameras[];
+ConstantBuffer<Camera> u_Cameras[];
 
 VS_Output main(VS_Input input)
 {
 	VS_Output output;
-	Camera camera = cameras[mainCameraIndex];
+	Camera camera = u_Cameras[u_MainCameraIndex];
 	output.position = input.position;
 	output.worldPosition = normalize(mul(inverse(camera.ViewPorjection), input.position).xyz);
 	return output;
@@ -90,10 +87,10 @@ VS_Output main(VS_Input input)
 
 #section pixel
 
-Texture2D<float4> texture;
-sampler s;
+Texture2D<float4> u_Texture;
+StaticSampler s_TextureSampler = StaticSampler(repeat, repeat, anisotropic, anisotropic);
 
-static const float PI = 3.14159265f;
+#include "Game/Include/common.hlsli"
 
 [earlydepthstencil]
 PS_Output main(PS_Input input)
@@ -103,9 +100,9 @@ PS_Output main(PS_Input input)
 	float3 wp = input.worldPosition;
 
 	float lon = -atan2(wp.z, wp.x);
-	float lat = atan(wp.y/length(wp.xz));
-	float2 uv = float2((lon+PI)/(2*PI), 1-(lat+(PI/2))/PI);
+	float lat = atan(wp.y / length(wp.xz));
+	float2 uv = float2((lon + PI) / (2 * PI), 1 - (lat + (PI / 2)) / PI);
 
-	output.color = texture.SampleLevel(s, uv, 0);// *0 + float4(uv, 0, 1);
+	output.color = u_Texture.SampleLevel(s_TextureSampler, uv, 0); // *0 + float4(uv, 0, 1);
 	return output;
 }

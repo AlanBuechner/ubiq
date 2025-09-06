@@ -53,7 +53,7 @@ VS_Output main(VS_Input input)
 {
 	VS_Output output;
 	output.position = input.position;
-	output.uv = float2(input.position.x+1, 1-input.position.y)/2;
+	output.uv = float2(input.position.x + 1, 1 - input.position.y) / 2;
 	return output;
 }
 
@@ -68,14 +68,10 @@ VS_Output main(VS_Input input)
 
 #section downSample
 
+RootConstant<float> u_Threshold;
 
-cbuffer RC_Threshold
-{
-	float threshold;
-};
-
-Texture2D<float4> src;
-StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
+Texture2D<float4> u_Src;
+StaticSampler s_TextureSampler = StaticSampler(clamp, clamp, linear, linear);
 
 float4 average(float4 a, float4 b, float4 c, float4 d)
 {
@@ -92,7 +88,7 @@ PS_Output main(PS_Input input)
 	PS_Output output;
 
 	uint2 srcTexelSize;
-	src.GetDimensions(srcTexelSize.x, srcTexelSize.y);
+	u_Src.GetDimensions(srcTexelSize.x, srcTexelSize.y);
 	float2 srcPixelUVSize = 1.0 / srcTexelSize;
 
 
@@ -108,19 +104,19 @@ PS_Output main(PS_Input input)
 	*/
 	float4 samples[13] =
 	{
-		src.Sample(textureSampler, input.uv + (float2(-2, 2) * srcPixelUVSize)), // 0
-		src.Sample(textureSampler, input.uv + (float2( 0, 2) * srcPixelUVSize)), // 1
-		src.Sample(textureSampler, input.uv + (float2( 2, 2) * srcPixelUVSize)), // 2
-		src.Sample(textureSampler, input.uv + (float2(-2, 0) * srcPixelUVSize)), // 3
-		src.Sample(textureSampler, input.uv + (float2( 0, 0) * srcPixelUVSize)), // 4
-		src.Sample(textureSampler, input.uv + (float2( 2, 0) * srcPixelUVSize)), // 5
-		src.Sample(textureSampler, input.uv + (float2(-2,-2) * srcPixelUVSize)), // 6
-		src.Sample(textureSampler, input.uv + (float2( 0,-2) * srcPixelUVSize)), // 7
-		src.Sample(textureSampler, input.uv + (float2( 2,-2) * srcPixelUVSize)), // 8
-		src.Sample(textureSampler, input.uv + (float2(-1, 1) * srcPixelUVSize)), // 9
-		src.Sample(textureSampler, input.uv + (float2( 1, 1) * srcPixelUVSize)), // 10
-		src.Sample(textureSampler, input.uv + (float2(-1,-1) * srcPixelUVSize)), // 11
-		src.Sample(textureSampler, input.uv + (float2( 1,-1) * srcPixelUVSize)), // 12
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(-2, 2) * srcPixelUVSize)), // 0
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(0, 2) * srcPixelUVSize)), // 1
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(2, 2) * srcPixelUVSize)), // 2
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(-2, 0) * srcPixelUVSize)), // 3
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(0, 0) * srcPixelUVSize)), // 4
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(2, 0) * srcPixelUVSize)), // 5
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(-2, -2) * srcPixelUVSize)), // 6
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(0, -2) * srcPixelUVSize)), // 7
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(2, -2) * srcPixelUVSize)), // 8
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(-1, 1) * srcPixelUVSize)), // 9
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(1, 1) * srcPixelUVSize)), // 10
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(-1, -1) * srcPixelUVSize)), // 11
+		u_Src.Sample(s_TextureSampler, input.uv + (float2(1, -1) * srcPixelUVSize)), // 12
 	};
 
 	float4 color = average(samples[9], samples[10], samples[11], samples[12]) * 0.5;
@@ -129,14 +125,14 @@ PS_Output main(PS_Input input)
 	color += average(samples[3], samples[4], samples[6], samples[7]) * 0.125;
 	color += average(samples[4], samples[5], samples[7], samples[8]) * 0.125;
 
-	//color = src.Sample(textureSampler, input.uv);
-	if (threshold != 0.0)
+	//color = src.Sample(s_TextureSampler, input.uv);
+	if (u_Threshold != 0.0)
 	{
 		const float k = 0.2;
 		float br = max3(color.r, color.g, color.b);
-		float rq = clamp(br - (threshold - k), 0.0, k*2);
-		rq = (0.25/k) * rq * rq;
-		color *= max(rq, br - threshold) / max(br, 0.000000001);
+		float rq = clamp(br - (u_Threshold - k), 0.0, k * 2);
+		rq = (0.25 / k) * rq * rq;
+		color *= max(rq, br - u_Threshold) / max(br, 0.000000001);
 	}
 
 
@@ -157,14 +153,14 @@ PS_Output main(PS_Input input)
 #section upSample
 
 
-Texture2D<float4> src;
-StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
+Texture2D<float4> u_Src;
+StaticSampler s_TextureSampler = StaticSampler(clamp, clamp, linear, linear);
 
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
 
-	float4 srcColor = src.Sample(textureSampler, input.uv);
+	float4 srcColor = u_Src.Sample(s_TextureSampler, input.uv);
 
 	output.color = srcColor;
 	output.color.a = 1;
@@ -186,16 +182,16 @@ PS_Output main(PS_Input input)
 #section composite
 
 
-Texture2D<float4> src;
-Texture2D<float4> bloomTex;
-StaticSampler textureSampler = StaticSampler(clamp, clamp, linear, linear);
+Texture2D<float4> u_Src;
+Texture2D<float4> u_BloomTex;
+StaticSampler s_TextureSampler = StaticSampler(clamp, clamp, linear, linear);
 
 PS_Output main(PS_Input input)
 {
 	PS_Output output;
 
-	float4 srcColor = src.Sample(textureSampler, input.uv);
-	float4 bloom = bloomTex.Sample(textureSampler, input.uv);
+	float4 srcColor = u_Src.Sample(s_TextureSampler, input.uv);
+	float4 bloom = u_BloomTex.Sample(s_TextureSampler, input.uv);
 
 	output.color = srcColor + bloom;
 	output.color.a = 1;

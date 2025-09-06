@@ -35,7 +35,7 @@ namespace Game
 	{
 		InstanceData data{ transform, mat->GetBuffer()->GetCBVDescriptor()->GetIndex() };
 		m_InstanceData.Push(data); // create new instance
-		m_ControlBlocks.push_front(ObjectControlBlock{ *this, (uint32)m_Instances->GetCount() - 1 }); // create new control block
+		m_ControlBlocks.push_front(ObjectControlBlock{ *this, (uint32)m_InstanceData.Count() - 1 }); // create new control block
 		return &m_ControlBlocks.front(); // return control block
 	}
 

@@ -106,7 +106,7 @@ namespace Engine
 		void SetRootConstant(uint32 index, uint32 data);
 		template<typename T>
 		void SetRootConstant(uint32 index, T data) { SetRootConstant(index, *(uint32*)&data); }
-		template<bool>
+		template<>
 		void SetRootConstant(uint32 index, bool data) { uint32 d = data; SetRootConstant(index, d); }
 		void SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer);
 		void SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer);

@@ -149,7 +149,8 @@ namespace Engine
 #ifdef DEBUG
 		args.Push(DXC_ARG_SKIP_OPTIMIZATIONS);
 #else
-		args.Push(DXC_ARG_OPTIMIZATION_LEVEL3);
+		args.Push(DXC_ARG_SKIP_OPTIMIZATIONS);
+		//args.Push(DXC_ARG_OPTIMIZATION_LEVEL3);
 #endif // DEBUG
 		args.Push(DXC_ARG_DEBUG);
 		args.Push(L"-Qembed_debug"); // embed debug information

@@ -18,7 +18,7 @@ namespace Game
 		Game()
 		{
 			m_DefaultCamera = Engine::CreateRef<Editor::EditorCamera>();
-			m_DefaultCamera->SetOrientation({ Math::Radians(180 - 25), Math::Radians(25) });
+			m_DefaultCamera->SetOrientation({ Math::Radians<float>(180 - 25), Math::Radians<float>(25) });
 			TestModule::TestModule();
 		}
 
@@ -37,8 +37,12 @@ namespace Game
 			if (camera == m_DefaultCamera)
 				m_DefaultCamera->OnUpdate();
 
+			if (!m_Scene->GetSceneRenderer()->GetCameras().Contains(camera))
+				m_Scene->GetSceneRenderer()->AddCamera(camera);
+
 			if(camera)
 				GetScene()->OnUpdate();
+
 
 			m_Scene->GetSceneRenderer()->SetMainCamera(camera);
 		}

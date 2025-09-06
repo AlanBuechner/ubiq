@@ -14,20 +14,22 @@ namespace Game
 
 	void ToneMapping::RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
 	{
+		CREATE_PROFILE_FUNCTIONI();
+		//Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("None");
 		Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("HillACES");
-		//Engine::Ref<Engine::ShaderPass> pass = m_ToneMappingShader->GetPass("NarkowiczACES");
-		//Engine::Ref<Engine::ShaderPass> pass = m_ToneMappingShader->GetPass("Uncharted");
+		//Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("NarkowiczACES");
+		//Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("Uncharted");
 
 		commandList->ValidateStates({
 			{ renderTarget->GetResource(), Engine::ResourceState::RenderTarget },
 			{ src->GetResource(), Engine::ResourceState::ShaderResource },
-		});
+			});
 
 		Engine::GPUTimer::BeginEvent(commandList, "ToneMapping");
 
 		commandList->SetShader(pass);
-		commandList->SetRootConstant(pass->GetUniformLocation("RC_SrcLoc"), src->GetSRVDescriptor()->GetIndex());
-		commandList->SetRWTexture(pass->GetUniformLocation("DstTexture"), renderTarget->GetRWTexture2D(), 0);
+		commandList->SetRootConstant("u_SrcLoc", src->GetSRVDescriptor()->GetIndex());
+		commandList->SetRWTexture("u_DstTexture", renderTarget->GetRWTexture2D(), 0);
 		commandList->DispatchThreads(renderTarget->GetWidth(), renderTarget->GetHeight(), 1);
 
 		Engine::GPUTimer::EndEvent(commandList);

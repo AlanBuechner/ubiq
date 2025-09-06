@@ -53,7 +53,7 @@ namespace Editor
 		DefaultScene();
 
 		m_EditorCamera = Engine::CreateRef<Editor::EditorCamera>();
-		m_EditorCamera->SetOrientation({ Math::Radians(360-25), Math::Radians(25) });
+		m_EditorCamera->SetOrientation({ Math::Radians<float>(360-25), Math::Radians<float>(25) });
 	}
 
 	void EditorLayer::OnDetach()

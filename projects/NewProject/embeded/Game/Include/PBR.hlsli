@@ -1,4 +1,7 @@
-static const float PI = 3.14159265f;
+#ifndef PBR_HLSLI
+#define PBR_HLSLI
+
+#include "Common.hlsli"
 
 // fresnel shlick function
 float3 F_Schlick(float3 f0, float HdotV)
@@ -68,3 +71,5 @@ float3 PBR(float3 color, float3 lightDirection, float3 lightColor, float intensi
 
 	return BRDF * lightColor * intensity * NdotL;
 }
+
+#endif

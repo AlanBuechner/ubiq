@@ -1,3 +1,9 @@
+#ifndef SHADOWS_HLSLI
+#define SHADOWS_HLSLI
+
+#include "Common.hlsli"
+#include "Hash.hlsli"
+
 #define DEPTH_BIAS (0.00001)
 
 
@@ -22,7 +28,7 @@ float HardShadow(Texture2D shadowMap, sampler s, float4 coords, float depthBias 
 
 
 // ---------------------- Moment Shadows ---------------------- //
-float4 compressMoments(float4 moments)
+float4 CompressMoments(float4 moments)
 {
 	float4x4 mat = {
 		1.5,			0,		-2,				 0,
@@ -34,7 +40,7 @@ float4 compressMoments(float4 moments)
 	return  mul(mat, moments) + float4(0.5, 0, 0.5, 0);
 }
 
-float4 decompressMoments(float4 moments)
+float4 DecompressMoments(float4 moments)
 {
 	float4x4 mat = {
 		-1/3,	 0,		1.73205080757,	0,
@@ -46,46 +52,53 @@ float4 decompressMoments(float4 moments)
 	return  mul(mat, moments - float4(0.5, 0, 0.5, 0));
 }
 
-float4 biasMoments(float4 moments, float a)
+float4 BiasMoments(float4 moments, float a)
 {
 	return (1.0-a) * moments + a * float4(0, 0.63, 0, 0.63);
 }
 
 
-float MomentShadow(Texture2D shadowMap, sampler s, float4 coords, float depth, float depthBias = DEPTH_BIAS)
+float MomentShadow(Texture2D shadowMap, sampler s, float4 coords, float depthBias = DEPTH_BIAS)
 {
+	float depth = (coords.z * 2) - 1; // remap to [-1,1]
 	float4 moments = shadowMap.Sample(s, coords.xy);
-	moments = decompressMoments(moments);
-	moments = biasMoments(moments, 6 * pow(10, -5));
-
-	float L32D22=mad(-moments[0],moments[1],moments[2]);
-	float D22=mad(-moments[0],moments[0], moments[1]);
-	float SquaredDepthVariance=mad(-moments[1],moments[1], moments[3]);
-	float D33D22=dot(float2(SquaredDepthVariance,-L32D22), float2(D22, L32D22));
-	float InvD22=1.0f/D22;
-	float L32=L32D22*InvD22;
+	//moments = DecompressMoments(moments);
+	moments = BiasMoments(moments, 6 * pow(10, -5));
+	float4 b = moments;
 	
 	float3 z;
-	z[0]=depth;
-	float3 c=float3(1.0f,z[0],z[0]*z[0]);
-	c[1]-=moments.x;
-	c[2]-=moments.y+L32*c[1];
-	c[1]*=InvD22;
-	c[2]*=D22/D33D22;
-	c[1]-=L32*c[2];
-	c[0]-=dot(c.yz,moments.xy);
-	float InvC2=1.0f/c[2];
-	float p=c[1]*InvC2;
-	float q=c[0]*InvC2;
-	float r=sqrt((p*p*0.25f)-q);
-	z[1]=-p*0.5f-r;
-	z[2]=-p*0.5f+r;
-	float4 Switch=
-	(z[2]<z[0])?float4(z[1],z[0],1.0f,1.0f):(
-	(z[1]<z[0])?float4(z[0],z[1],0.0f,1.0f):float4(0.0f,0.0f,0.0f,0.0f));
-	float Quotient=(Switch[0]*z[2]-moments[0]*(Switch[0]+z[2])+moments[1])/((z[2]-Switch[1])*(z[0]-z[1]));
-	return saturate(Switch[2]+Switch[3]*Quotient);
+	z[0] = depth - depthBias;
 
+	float L21D11 = mad(-b[0], b[1], b[2]);
+	float D11 = mad(-b[0], b[0], b[1]);
+	float SquaredDepthVariance = mad(-b[1], b[1], b[3]);
+	float D22D11 = dot(float2(SquaredDepthVariance, -L21D11), float2(D11, L21D11));
+	float InvD11 = 1.0f / D11;
+	float L21 = L21D11 * InvD11;
+	float D22 = D22D11 * InvD11;
+	float InvD22 = 1.0f / D22;
+
+	float3 c = float3(1.0f, z[0], z[0] * z[0]);
+	c[1] -= b.x;
+	c[2] -= b.y + L21 * c[1];
+	c[1] *= InvD11;
+	c[2] *= InvD22;
+	c[1] -= L21 * c[2];
+	c[0] -= dot(c.yz, b.xy);
+	float InvC2 = 1.0f / c[2];
+	float p = c[1] * InvC2;
+	float q = c[0] * InvC2;
+	float D = (p * p * 0.25f) - q;
+	float r = sqrt(D);
+	z[1] = -p * 0.5f - r;
+	z[2] = -p * 0.5f + r;
+	float4 Switch =
+		(z[2] < z[0]) ? float4(z[1], z[0], 1.0f, 1.0f) : (
+		(z[1] < z[0]) ? float4(z[0], z[1], 0.0f, 1.0f) :
+		float4(0.0f, 0.0f, 0.0f, 0.0f));
+	float Quotient = (Switch[0] * z[2] - b[0] * (Switch[0] + z[2]) + b[1]) / ((z[2] - Switch[1]) * (z[0] - z[1]));
+	float shadowIntensity = Switch[2] + Switch[3] * Quotient;
+	return saturate(shadowIntensity);
 }
 
 
@@ -101,7 +114,7 @@ float MomentShadow(Texture2D shadowMap, sampler s, float4 coords, float depth, f
 #define BLOCKER_SEARCH_NUM_SAMPLES 32
 #define PCF_NUM_SAMPLES 32
 
-static float2 poissonDisk[PCF_NUM_SAMPLES] = {
+static float2 s_PoissonDisk[PCF_NUM_SAMPLES] = {
 	float2(0.000000, 0.000000),
 	float2(-0.132461, -0.121293),
 	float2(0.022314, 0.253018),
@@ -136,7 +149,7 @@ static float2 poissonDisk[PCF_NUM_SAMPLES] = {
 	float2(0.546395, 0.837528),
 };
 
-static float2 ditherOffsets[DITHER_OFFSETS] = {
+static float2 s_DitherOffsets[DITHER_OFFSETS] = {
 	float2(0.680375, -0.211234),
 	float2(0.566198, 0.596880),
 	float2(0.823295, -0.604897),
@@ -185,7 +198,7 @@ void FindBlocker(Texture2D shadowMap, sampler s, out float avgBlockerDepth, out 
 
 	for (int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; ++i)
 	{
-		float2 offset = poissonDisk[i] * searchSize;
+		float2 offset = s_PoissonDisk[i] * searchSize;
 		float shadowMapDepth = shadowMap.SampleLevel(s, uv + offset, 0).r + depthBias;
 		if (shadowMapDepth < zReceiver) {
 			blockerSum += shadowMapDepth;
@@ -200,21 +213,12 @@ float PCF_Filter(Texture2D shadowMap, sampler s, float2 uv, float zReceiver, flo
 	float sum = 0.0f;
 	for (int i = 0; i < PCF_NUM_SAMPLES; ++i)
 	{
-		float2 ditherOffset = ditherOffsets[(ditherIndex + i) % DITHER_OFFSETS] * (3.141592654 / PCF_NUM_SAMPLES); // add dithering
-		//float2 ditherOffset = ditherOffsets[(ditherIndex + i) % DITHER_OFFSETS]; // add dithering
-		float2 offset = (poissonDisk[i] + ditherOffset) * filterRadiusUV;
+		float2 ditherOffset = s_DitherOffsets[(ditherIndex + i) % DITHER_OFFSETS] * (3.141592654 / PCF_NUM_SAMPLES); // add dithering
+		float2 offset = (s_PoissonDisk[i] + ditherOffset) * filterRadiusUV;
 		float depthSample = shadowMap.Sample(s, uv + offset).r + depthBias;
 		sum += (depthSample < zReceiver ? 0 : 1);
 	}
 	return sum / PCF_NUM_SAMPLES;
-}
-
-float hash1(uint n)
-{
-	// integer hash copied from Hugo Elias
-	n = (n << 13U) ^ n;
-	n = n * (n * n * 15731U + 789221U) + 1376312589U;
-	return float(n & uint(0x7fffffffU)) / float(0x7fffffff);
 }
 
 float PCSSDirectional(Texture2D shadowMap, sampler s, float4 coords, float4x4 ortho, float lightSize, float3 pixelLocation, float depthBias = DEPTH_BIAS)
@@ -239,6 +243,8 @@ float PCSSDirectional(Texture2D shadowMap, sampler s, float4 coords, float4x4 or
 	float2 filterRadiusUV = penumbraRatio * uvSearch;
 
 	// STEP 3: filtering
-	int ditherIndex = hash1(pixelLocation.x * 1750.8743 + pixelLocation.y* 9753.2198 + pixelLocation.z* 4930.9434) * DITHER_OFFSETS;
+	int ditherIndex = Hash1(pixelLocation.x * 1750.8743 + pixelLocation.y * 9753.2198 + pixelLocation.z * 4930.9434) * DITHER_OFFSETS;
 	return PCF_Filter(shadowMap, s, uv, zReceiver, filterRadiusUV, ditherIndex, depthBias);
 }
+
+#endif

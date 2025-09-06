@@ -51,10 +51,9 @@ namespace Game
 
 		if (scene.m_Skybox)
 		{
-			Engine::Ref<Engine::GraphicsShaderPass> pass = m_SkyboxShader->GetGraphicsPass("main");
-			m_CommandList->SetShader(pass);
-			m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), scene.m_MainCamera->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
-			m_CommandList->SetTexture(pass->GetUniformLocation("texture"), scene.m_Skybox);
+			m_CommandList->SetShader(m_SkyboxShader->GetGraphicsPass("main"));
+			m_CommandList->SetRootConstant("u_MainCameraIndex", scene.m_MainCamera->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
+			m_CommandList->SetTexture("u_Texture", scene.m_Skybox);
 			m_CommandList->DrawMesh(m_SkyboxMesh);
 		}
 

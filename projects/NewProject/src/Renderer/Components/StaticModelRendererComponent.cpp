@@ -164,6 +164,8 @@ namespace Engine
 					entry.m_Material = Engine::Application::Get().GetAssetManager().GetAsset<Engine::Material>(matID);
 				}
 			}
+			comp.Invalidate();
+
 			return true;
 		}
 	};

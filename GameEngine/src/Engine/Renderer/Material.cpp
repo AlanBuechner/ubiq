@@ -64,7 +64,7 @@ namespace Engine
 		m_Buffer->SetData(m_Data->GetData());
 	}
 
-	Ref<Material> Material::Create(const fs::path& path)
+	Ref<Material> DISABLE_OPS Material::Create(const fs::path& path)
 	{
 		Ref<Material> mat = CreateRef<Material>();
 
@@ -114,9 +114,15 @@ namespace Engine
 				if (desc.HasEntery(p.name))
 				{
 					auto& fp = desc[p.name];
-					if (p.type == MaterialParameterType::TextureID && fp.IsInt())
-						mat->SetTexture(p.name, assetManager.GetAsset<Texture2D>(fp.Get<uint64>()));
-					else if (p.type == MaterialParameterType::Float && fp.IsFloat())
+					if (p.type == MaterialParameterType::TextureID)
+					{
+						if (fp.IsInt())
+							mat->SetTexture(p.name, assetManager.GetAsset<Texture2D>(fp.Get<uint64>()));
+						else if(fp.IsString())
+							mat->SetTexture(p.name, assetManager.GetAsset<Texture2D>(fp.Get<std::string>()));
+
+					}
+					else if (p.type == MaterialParameterType::Float && fp.IsNumber())
 						*(float*)location = fp.Get<float>();
 					else if (p.type == MaterialParameterType::Float4 && fp.IsArray())
 					{
