@@ -45,6 +45,7 @@ includes = [
 	f"{projDir}/modules",
 	f"{location}/modules",
 	f"{location}/modules/PostProcessingModule/src",
+	f"{location}/modules/RenderingUtilsModule/src",
 ]
 
 sysIncludes = []
@@ -64,6 +65,7 @@ vsDefines = [
 dependancys = [
 	"TestModule",
 	"PostProcessingModule",
+	"RenderingUtilsModule",
 	"GameEngine",
 ]
 
@@ -78,6 +80,7 @@ modules = [
 	"modules/TestModule",
 	f"{location}/modules/EditorModule",
 	f"{location}/modules/PostProcessingModule",
+	f"{location}/modules/RenderingUtilsModule",
 ]
 
 if(inEditor):

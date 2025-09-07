@@ -43,7 +43,7 @@ namespace Engine
 	void DirectX12StructuredBufferResource::SetData(const void* data, uint32 count, uint32 start)
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		context->GetDX12ResourceManager()->UploadBufferRegion(this, m_Stride * start, data, m_Stride * count, m_DefultState);
+		context->GetDX12ResourceManager()->UploadBufferRegion(this, start * m_Stride, data, count * m_Stride, m_DefultState);
 	}
 
 	uint32 DirectX12StructuredBufferResource::GetGPUState(ResourceState state)

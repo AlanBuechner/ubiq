@@ -90,7 +90,7 @@ VS_Output main(VS_Input input)
 Texture2D<float4> u_Texture;
 StaticSampler s_TextureSampler = StaticSampler(repeat, repeat, anisotropic, anisotropic);
 
-#include "Game/Include/common.hlsli"
+#include "RenderingUtilsModule/Shaders/Include/Common.hlsli"
 
 [earlydepthstencil]
 PS_Output main(PS_Input input)

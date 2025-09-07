@@ -2,6 +2,10 @@
 #define PBR_HLSLI
 
 #include "Common.hlsli"
+#include "LightingCommon.hlsli"
+
+
+
 
 // fresnel shlick function
 float3 F_Schlick(float3 f0, float HdotV)
@@ -38,7 +42,7 @@ float G_Smith(float a, float NdotV, float NdotL)
 }
 
 
-float3 PBR(float3 color, float3 lightDirection, float3 lightColor, float intensity, float3 viewDirection, float3 normal, float roughness, float metallic)
+float3 PBR(float3 color, DirectionalLight light, float3 viewDirection, float3 normal, float roughness, float metallic)
 {
 	float reflectance = 0.04;
 	//float3 f0 = 0.16 * reflectance * reflectance * (1.0 - metallic) + color * metallic;
@@ -49,7 +53,7 @@ float3 PBR(float3 color, float3 lightDirection, float3 lightColor, float intensi
 	//float3 f0 = pow((ior - 1) / (ior + 1), 2);
 
 	// lighting
-	float3 dir = normalize(-lightDirection);
+	float3 dir = normalize(-light.direction);
 
 	float3 H = normalize(viewDirection + dir); // half way vector
 
@@ -69,7 +73,7 @@ float3 PBR(float3 color, float3 lightDirection, float3 lightColor, float intensi
 	float3 lambert = (kd * color / PI);
 	float3 BRDF = lambert + (ctn / ctd);
 
-	return BRDF * lightColor * intensity * NdotL;
+	return BRDF * light.color * light.intensity * NdotL;
 }
 
 #endif

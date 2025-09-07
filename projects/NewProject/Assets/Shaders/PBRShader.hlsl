@@ -74,39 +74,11 @@ struct PS_Input : VS_Output
 {
 };
 
-typedef VS_Output Depth_PS_Input;
-
-
-// common structures
-
-struct DirectionalLight
+struct Depth_PS_Input : VS_Output
 {
-	float3 direction;
-	float3 color;
-	float intensity;
-	float size;
 };
 
-struct DirectionalLightCascade
-{
-	uint camera;
-	uint texture;
-	uint tWidth;
-	uint tHeight;
-	float minDist;
-	float maxDist;
-};
-
-struct Camera
-{
-	float4x4 View;
-	float4x4 Porjection;
-	float4x4 InvProjection;
-	float4x4 ViewPorjection;
-
-	float3 Position;
-	float3 Rotation;
-};
+#include "Engine/Shaders/Include/Camera.hlsli"
 
 
 
@@ -122,7 +94,6 @@ struct Camera
 #section vertex
 
 
-// RC_ defines the cbuffer as a root constant
 RootConstant<uint> u_MainCameraIndex;
 
 // Material struct is generated automaticly by the data defined in the config section
@@ -163,6 +134,13 @@ VS_Output main(VS_Input input)
 
 #section pixel
 
+
+#include "RenderingUtilsModule/Shaders/Include/Common.hlsli"
+#include "RenderingUtilsModule/Shaders/Include/PBR.hlsli"
+#include "RenderingUtilsModule/Shaders/Include/Shadows.hlsli"
+#include "RenderingUtilsModule/Shaders/Include/Material.hlsli"
+
+
 struct PS_Output
 {
 	float4 color : SV_TARGET0;
@@ -180,11 +158,32 @@ StructuredBuffer<DirectionalLightCascade> u_Cascades : register(t0, space0);
 Texture2D<float4> u_Textures[] : register(t1, space0);
 StaticSampler s_TextureSampler = StaticSampler(repeat, repeat, anisotropic, anisotropic);
 
-StaticSampler s_ShadowSampler = StaticSampler(clamp, clamp, point, point);
 
-#include "Game/Include/Common.hlsli"
-#include "Game/Include/PBR.hlsli"
-#include "Game/Include/Shadows.hlsli"
+
+float SampleCSM(float4 worldPosition, float3 normal, float depth)
+{
+	if (!u_UseDirLight)
+		return 0.0;
+	
+	uint ci = GetCSMIndex(depth, u_Cascades);
+
+	if (ci == UINT_MAX)
+		return 0.0;
+
+	DirectionalLightCascade c = u_Cascades[ci];
+	Camera shadowCamera = u_Cameras[c.camera];
+	Texture2D shadowMap = u_Textures[NonUniformResourceIndex(c.texture)];
+	float bias = CalcCSMBias(ci, normal, u_DirLight.direction);
+			
+	return SampleCSMCascade(c, shadowMap, shadowCamera, u_DirLight, worldPosition, bias);
+		
+	//shadowAmount = MomentShadow(shadowMap, pos, input.position.z, bias);
+	//shadowAmount = PCSSDirectional(shadowMap, pos, shadowCamera.InvProjection, u_DirLight.size, (float3) input.worldPosition, bias);
+	//shadowAmount = HardShadow(shadowMap, pos);
+}
+
+
+
 
 [earlydepthstencil]
 PS_Output main(PS_Input input)
@@ -197,69 +196,22 @@ PS_Output main(PS_Input input)
 	float2 uv = input.uv;
 	
 	float4 diffuse = u_Textures[mat.diffuse].Sample(s_TextureSampler, uv);
-	float3 normal = normalize(normalize(u_Textures[mat.normal].Sample(s_TextureSampler, uv).rgb) * 2 - 1);
+	float3 normal = SampleNormalMap(u_Textures[mat.normal], uv);
+	normal = FixNormal(normal, input.normal, input.tangent, input.bitangent);
 	float roughness = u_Textures[mat.roughness].Sample(s_TextureSampler, uv).r;
 	float metallic = u_Textures[mat.metal].Sample(s_TextureSampler, uv).b;
 	float ao = u_Textures[mat.ao].Sample(s_TextureSampler, uv).r;
-
-	bool3 nan = isnan(input.tangent);
-	float tSqrLength = (input.tangent.x * input.tangent.x) + (input.tangent.y * input.tangent.y) + (input.tangent.z * input.tangent.z);
-	if (nan.x || nan.y || nan.z || tSqrLength < 0.1)
-	{
-		normal = input.normal;
-	}
-	else
-	{
-		float3x3 TBN = transpose(float3x3(normalize(input.tangent), normalize(input.bitangent), normalize(input.normal)));
-		normal = normalize(mul(TBN, normal));
-	}
+	
 	
 	
 	float3 lo = float3(0, 0, 0);
 
 	// directinal light
-	if (u_UseDirLight)
-	{
-		uint numCascades;
-		uint stride;
-		u_Cascades.GetDimensions(numCascades, stride);
-		
-		uint ci = numCascades;
-		for (uint i = 0; i < numCascades; i++)
-		{
-			DirectionalLightCascade c = u_Cascades[i];
-			float d = input.depth;
-			float min = c.minDist;
-			float max = c.maxDist;
-			if (d > min && d <= max)
-			{
-				ci = i;
-				break;
-			}
-		}
-
-		float shadowAmount = 1;
-		if (ci < numCascades)
-		{
-			DirectionalLightCascade c = u_Cascades[ci];
-			Camera shadowCamera = u_Cameras[c.camera];
-		
-			float4 pos = mul(shadowCamera.ViewPorjection, input.worldPosition);
-			pos.y = -pos.y; // flip v
-			pos = pos / pos.w;
-			pos.xy = pos.xy * 0.5 + 0.5; // map from -1:1 -> 0:1
-		
-			float bias = DEPTH_BIAS + (0.0002 * ci) * dot(input.normal, -u_DirLight.direction);
-			Texture2D shadowMap = u_Textures[NonUniformResourceIndex(c.texture)];
-			//shadowAmount = MomentShadow(u_Textures[c.texture], s_ShadowSampler, pos, input.position.z, bias);
-			shadowAmount = PCSSDirectional(shadowMap, s_ShadowSampler, pos, shadowCamera.InvProjection, u_DirLight.size, (float3) input.worldPosition, bias);
-			//shadowAmount = HardShadow(u_Textures[c.texture], s_ShadowSampler, pos);
-		}
 	
+	{
+		float shadowAmount = SampleCSM(input.worldPosition, input.normal, input.depth);
 		if (shadowAmount != 0)
-		{
-			lo += PBR(diffuse.rgb, u_DirLight.direction, u_DirLight.color, u_DirLight.intensity, viewDirection, normal, roughness, metallic) * shadowAmount;
-		}
+			lo += PBR(diffuse.rgb, u_DirLight, viewDirection, normal, roughness, metallic) * shadowAmount;
 	}
 
 	float3 ambiant = float3(0.5, 0.5, 0.5) * diffuse.rgb;
@@ -294,13 +246,14 @@ void main(Depth_PS_Input input)
 
 #section directionalShadowMap
 
+#include "RenderingUtilsModule/Shaders/Include/Shadows.hlsli"
+
+
 struct PS_Output
 {
 	float4 color : SV_TARGET0;
 	float depth : SV_DEPTH;
 };
-
-#include "Game/Include/Shadows.hlsli"
 
 [earlydepthstencil]
 PS_Output main(Depth_PS_Input input)

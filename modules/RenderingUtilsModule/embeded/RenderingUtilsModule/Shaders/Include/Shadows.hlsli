@@ -3,20 +3,23 @@
 
 #include "Common.hlsli"
 #include "Hash.hlsli"
+#include "LightingCommon.hlsli"
+#include "Engine/Shaders/Include/Camera.hlsli"
 
 #define DEPTH_BIAS (0.00001)
 
 
 
+StaticSampler s_ShadowSampler = StaticSampler(clamp, clamp, point, point);
 
 
 
 
 
 // ---------------------- Hard Shadows ---------------------- //
-float HardShadow(Texture2D shadowMap, sampler s, float4 coords, float depthBias = DEPTH_BIAS)
+float HardShadow(Texture2D shadowMap, float4 coords, float depthBias = DEPTH_BIAS)
 {
-	float depthSample = shadowMap.Sample(s, coords.xy).r + depthBias;
+	float depthSample = shadowMap.Sample(s_ShadowSampler, coords.xy).r + depthBias;
 	return (depthSample < coords.z ? 0 : 1);
 }
 
@@ -58,10 +61,10 @@ float4 BiasMoments(float4 moments, float a)
 }
 
 
-float MomentShadow(Texture2D shadowMap, sampler s, float4 coords, float depthBias = DEPTH_BIAS)
+float MomentShadow(Texture2D shadowMap, float4 coords, float depthBias = DEPTH_BIAS)
 {
 	float depth = (coords.z * 2) - 1; // remap to [-1,1]
-	float4 moments = shadowMap.Sample(s, coords.xy);
+	float4 moments = shadowMap.Sample(s_ShadowSampler, coords.xy);
 	//moments = DecompressMoments(moments);
 	moments = BiasMoments(moments, 6 * pow(10, -5));
 	float4 b = moments;
@@ -190,7 +193,7 @@ float PenumbraSize(float zReceiver, float zBlocker) //Parallel plane estimation
 	return (zReceiver - zBlocker) / zBlocker;
 }
 
-void FindBlocker(Texture2D shadowMap, sampler s, out float avgBlockerDepth, out float numBlockers, float2 uv, float zReceiver, float2 searchSize, float depthBias = DEPTH_BIAS)
+void FindBlocker(Texture2D shadowMap, out float avgBlockerDepth, out float numBlockers, float2 uv, float zReceiver, float2 searchSize, float depthBias = DEPTH_BIAS)
 {
 	//This uses similar triangles to compute what
 	float blockerSum = 0;
@@ -199,7 +202,7 @@ void FindBlocker(Texture2D shadowMap, sampler s, out float avgBlockerDepth, out 
 	for (int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; ++i)
 	{
 		float2 offset = s_PoissonDisk[i] * searchSize;
-		float shadowMapDepth = shadowMap.SampleLevel(s, uv + offset, 0).r + depthBias;
+		float shadowMapDepth = shadowMap.SampleLevel(s_ShadowSampler, uv + offset, 0).r + depthBias;
 		if (shadowMapDepth < zReceiver) {
 			blockerSum += shadowMapDepth;
 			numBlockers++;
@@ -208,20 +211,20 @@ void FindBlocker(Texture2D shadowMap, sampler s, out float avgBlockerDepth, out 
 	avgBlockerDepth = blockerSum / numBlockers;
 }
 
-float PCF_Filter(Texture2D shadowMap, sampler s, float2 uv, float zReceiver, float2 filterRadiusUV, int ditherIndex, float depthBias = DEPTH_BIAS)
+float PCF_Filter(Texture2D shadowMap, float2 uv, float zReceiver, float2 filterRadiusUV, int ditherIndex, float depthBias = DEPTH_BIAS)
 {
 	float sum = 0.0f;
 	for (int i = 0; i < PCF_NUM_SAMPLES; ++i)
 	{
 		float2 ditherOffset = s_DitherOffsets[(ditherIndex + i) % DITHER_OFFSETS] * (3.141592654 / PCF_NUM_SAMPLES); // add dithering
 		float2 offset = (s_PoissonDisk[i] + ditherOffset) * filterRadiusUV;
-		float depthSample = shadowMap.Sample(s, uv + offset).r + depthBias;
+		float depthSample = shadowMap.Sample(s_ShadowSampler, uv + offset).r + depthBias;
 		sum += (depthSample < zReceiver ? 0 : 1);
 	}
 	return sum / PCF_NUM_SAMPLES;
 }
 
-float PCSSDirectional(Texture2D shadowMap, sampler s, float4 coords, float4x4 ortho, float lightSize, float3 pixelLocation, float depthBias = DEPTH_BIAS)
+float PCSSDirectional(Texture2D shadowMap, float4 coords, float4x4 ortho, float lightSize, float3 pixelLocation, float depthBias = DEPTH_BIAS)
 {
 	float4 p = mul(ortho, float4(1, 1, 1, 1));
 	float2 orthoSize = (p.xy / p.w) * 2;
@@ -233,7 +236,7 @@ float PCSSDirectional(Texture2D shadowMap, sampler s, float4 coords, float4x4 or
 	// STEP 1: blocker search
 	float avgBlockerDepth = 0;
 	float numBlockers = 0;
-	FindBlocker(shadowMap, s, avgBlockerDepth, numBlockers, uv, zReceiver, uvSearch, depthBias); // we are scaling down the search area as a TEMP fix for the grainy shaodws
+	FindBlocker(shadowMap, avgBlockerDepth, numBlockers, uv, zReceiver, uvSearch, depthBias); // we are scaling down the search area as a TEMP fix for the grainy shaodws
 	if (numBlockers < 1)
 		//There are no occluders so early out (this saves filtering)
 		return 1.0f;
@@ -244,7 +247,49 @@ float PCSSDirectional(Texture2D shadowMap, sampler s, float4 coords, float4x4 or
 
 	// STEP 3: filtering
 	int ditherIndex = Hash1(pixelLocation.x * 1750.8743 + pixelLocation.y * 9753.2198 + pixelLocation.z * 4930.9434) * DITHER_OFFSETS;
-	return PCF_Filter(shadowMap, s, uv, zReceiver, filterRadiusUV, ditherIndex, depthBias);
+	return PCF_Filter(shadowMap, uv, zReceiver, filterRadiusUV, ditherIndex, depthBias);
 }
+
+
+
+uint GetCSMIndex(float depth, StructuredBuffer<DirectionalLightCascade> cascades)
+{
+	uint numCascades;
+	uint stride;
+	cascades.GetDimensions(numCascades, stride);
+	for (uint i = 0; i < numCascades; i++)
+	{
+		DirectionalLightCascade c = cascades[i];
+		float d = depth;
+		float min = c.minDist;
+		float max = c.maxDist;
+		if (d > min && d <= max)
+			return i;
+	}
+	
+	return UINT_MAX;
+}
+
+
+float CalcCSMBias(uint ci, float3 normal, float3 lightDir)
+{
+	return DEPTH_BIAS + (0.0002 * ci) * dot(normal, -lightDir);
+}
+
+float4 CalcCSMSamplePoint(float4x4 viewProjection, float4 worldPosition)
+{
+	float4 pos = mul(viewProjection, worldPosition);
+	pos.y = -pos.y; // flip v
+	pos = pos / pos.w;
+	pos.xy = pos.xy * 0.5 + 0.5; // map from -1:1 -> 0:1
+	return pos;
+}
+
+float SampleCSMCascade(DirectionalLightCascade cascade, Texture2D shadowMap, Camera camera, DirectionalLight light, float4 worldPosition, float bias)
+{
+	float4 pos = CalcCSMSamplePoint(camera.ViewPorjection, worldPosition);
+	return PCSSDirectional(shadowMap, pos, camera.InvProjection, light.size, (float3) worldPosition, bias);
+}
+
 
 #endif

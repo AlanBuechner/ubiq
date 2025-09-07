@@ -65,7 +65,7 @@ def DXC_ResolveURL(url):
 DownloadZip("DXC", "vendor/dxc", "https://api.github.com/repos/microsoft/DirectXShaderCompiler/releases/latest", None, DXC_ResolveURL)
 
 # install pix
-DownloadZip("PIX", "vendor/pix", "https://www.nuget.org/api/v2/package/WinPixEventRuntime/1.0.220810001")
+DownloadZip("PIX", "vendor/pix", "https://www.nuget.org/api/v2/package/WinPixEventRuntime/")
 
 # install Agility
 DownloadZip("Agility", "vendor/Agility", "https://www.nuget.org/api/v2/package/Microsoft.Direct3D.D3D12/1.614.0")

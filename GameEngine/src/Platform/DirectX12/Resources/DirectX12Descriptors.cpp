@@ -37,7 +37,7 @@ namespace Engine
 		if(isShaderVisable)
 			m_GPUHandle = m_Heap->GetGPUDescriptorHandleForHeapStart();
 
-		for (uint32 i = 0; i < size; i++) m_FreeSlots.Push(i);
+		for (uint32 i = size; i != 0; i--) m_FreeSlots.Push(i);
 
 	}
 

@@ -103,7 +103,7 @@ namespace Game
 		postPass->SetInput(input);
 		//postPass->AddPostProcess(CreateRef<DepthOfField>());
 		postPass->AddPostProcess(Engine::CreateRef<Bloom>());
-		postPass->AddPostProcess(Engine::CreateRef<ToneMapping>());
+		postPass->AddPostProcess(Engine::CreateRef<ToneMapping>("HillACES"));
 		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachment(0));
 		postPass->InitPostProcessStack();
 		postPass->AddDependincy(t2);

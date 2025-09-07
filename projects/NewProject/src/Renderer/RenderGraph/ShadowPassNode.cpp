@@ -73,7 +73,7 @@ namespace Game
 						if (pass)
 						{
 							m_CommandList->SetShader(pass);
-							m_CommandList->SetRootConstant(pass->GetUniformLocation("RC_MainCameraIndex"), camera->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
+							m_CommandList->SetRootConstant("u_MainCameraIndex", camera->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
 							m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
 						}
 					}

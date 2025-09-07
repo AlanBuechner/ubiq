@@ -315,7 +315,7 @@ namespace Engine
 		}
 	}
 
-	void DISABLE_OPS DirectX12CommandList::SetShader(const CPUSetGraphicsShaderCommand& cmd)
+	void DirectX12CommandList::SetShader(const CPUSetGraphicsShaderCommand& cmd)
 	{
 		Ref<DirectX12GraphicsShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12GraphicsShaderPass>(cmd.shaderPass);
 		ID3D12PipelineState* pipline = dxShader->GetPipelineState(cmd.format);

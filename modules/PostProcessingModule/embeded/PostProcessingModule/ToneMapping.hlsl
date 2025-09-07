@@ -3,8 +3,7 @@ topology = triangle;
 
 passes = {
 	None = {
-		CS =
-None;
+		CS = None;
 	};
 	HillACES = {
 		CS = HillACES;

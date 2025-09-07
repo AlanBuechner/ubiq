@@ -14,7 +14,7 @@ namespace Game
 		RenderGraphNode(graph), m_PassName(passName)
 	{}
 
-	void DISABLE_OPS ShaderPassNode::BuildImpl()
+	void ShaderPassNode::BuildImpl()
 	{
 		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 

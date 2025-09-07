@@ -16,9 +16,10 @@ namespace Game
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		//Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("None");
-		Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("HillACES");
+		//Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("HillACES");
 		//Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("NarkowiczACES");
 		//Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("Uncharted");
+		Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass(m_ToneMapper);
 
 		commandList->ValidateStates({
 			{ renderTarget->GetResource(), Engine::ResourceState::RenderTarget },

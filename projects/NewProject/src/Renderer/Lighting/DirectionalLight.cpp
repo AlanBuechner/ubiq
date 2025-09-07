@@ -41,7 +41,7 @@ namespace Game
 			size *= 2;
 		}
 
-		m_CameraIndeces = Engine::StructuredBuffer::Create(sizeof(CascadeData), s_NumShadowMaps);
+		m_CameraIndeces = Engine::StructuredBuffer::Create(s_NumShadowMaps, sizeof(CascadeData));
 		m_CameraIndeces->SetData(cascadeData.data(), s_NumShadowMaps);
 	}
 
