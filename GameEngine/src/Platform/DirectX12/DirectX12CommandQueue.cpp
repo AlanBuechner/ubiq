@@ -4,6 +4,7 @@
 #include "DirectX12CommandList.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Renderer/Renderer.h"
+#include "tracy/TracyD3D12.hpp"
 
 namespace Engine
 {
@@ -36,12 +37,15 @@ namespace Engine
 			"Faild to Create Fence");
 
 		m_EventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS); // create event for command queue completion
+
+		m_TracyCtx = TracyD3D12Context(context->GetDevice().Get(), m_CommandQueue);
 	}
 
 	DirectX12CommandQueue::~DirectX12CommandQueue()
 	{
 		m_CommandQueue->Release();
 		m_Fence->Release();
+		TracyD3D12Destroy(m_TracyCtx);
 	}
 
 	void DirectX12CommandQueue::Execute()
@@ -76,6 +80,8 @@ namespace Engine
 		WaitForSingleObject(m_EventHandle, INFINITE); // wait for event to be triggered
 		m_SignalCount = 0;
 		m_Fence->Signal(0);
+
+		TracyD3D12NewFrame(m_TracyCtx);
 	}
 
 }

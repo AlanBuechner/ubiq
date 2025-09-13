@@ -52,6 +52,7 @@ namespace Engine
 
 	void DirectX12CommandList::Init()
 	{
+
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		const uint32 numAllocators = 2;
 		D3D12_COMMAND_LIST_TYPE type = GetD3D12CommandListType(m_CommandListType);
@@ -74,6 +75,12 @@ namespace Engine
 
 		ID3D12DescriptorHeap* heaps[]{ DirectX12ResourceManager::s_SRVHeap->GetHeap().Get(), DirectX12ResourceManager::s_SamplerHeap->GetHeap().Get() };
 		m_CommandList->SetDescriptorHeaps(2, heaps);
+
+		// start tracy trace
+#define BEGIN_GPU_TRACE(name) CREATE_SOURCE_LOC(name); BeginGPUEvent(&SOURCE_LOC_NAME);
+		BEGIN_GPU_TRACE("CommandList");
+#undef BEGIN_GPU_TRACE
+		
 	}
 
 	void DirectX12CommandList::RecoredCommands(CPUCommandAllocator* commandAllocator)
@@ -85,9 +92,11 @@ namespace Engine
 			switch (cmd->GetCommandID())
 			{
 #define CALL_COMMAND(obj, func) case obj::GetStaticCommandID(): func(*(obj*)cmd); break
-			case CPUEndEventCommand::GetStaticCommandID(): EndEvent(); break;
 			case CPUBeginEventStaticCommand::GetStaticCommandID(): BeginEvent(((CPUBeginEventStaticCommand*)cmd)->eventName); break;
 			case CPUBeginEventDynamicCommand::GetStaticCommandID(): BeginEvent(((CPUBeginEventDynamicCommand*)cmd)->eventName.c_str()); break;
+			case CPUEndEventCommand::GetStaticCommandID(): EndEvent(); break;
+			case CPUBeginGPUEventCommand::GetStaticCommandID(): BeginGPUEvent(((CPUBeginGPUEventCommand*)cmd)->data); break;
+			case CPUEndGPUEventCommand::GetStaticCommandID(): EndGPUEvent(); break;
 				CALL_COMMAND(CPUResourceTransitionCommand, Transition);
 				CALL_COMMAND(CPUAwaitUAVCommand, AwaitUAVs);
 				CALL_COMMAND(CPUCopyBufferCommand, CopyBuffer);
@@ -118,6 +127,10 @@ namespace Engine
 	void DirectX12CommandList::Close()
 	{
 		CREATE_PROFILE_FUNCTIONI();
+
+		// end tracy trace
+		EndGPUEvent();
+
 		m_CommandList->Close();
 	}
 
@@ -159,6 +172,19 @@ namespace Engine
 	{
 		GPUTimer::EndEvent(this);
 		m_EventStack.Pop();
+	}
+
+	void DirectX12CommandList::BeginGPUEvent(const tracy::SourceLocationData* data)
+	{
+		TracyD3D12Ctx ctx = Renderer::GetMainCommandQueue<DirectX12CommandQueue>()->GetTracyCtx();
+		tracy::D3D12ZoneScope* zone = new tracy::D3D12ZoneScope( ctx, m_CommandList, data, true );
+		m_TracyEventStack.Push(zone);
+	}
+
+	void DirectX12CommandList::EndGPUEvent()
+	{
+		tracy::D3D12ZoneScope* zone = m_TracyEventStack.Pop();
+		delete zone;
 	}
 
 	// transitions
@@ -318,7 +344,7 @@ namespace Engine
 	void DirectX12CommandList::SetShader(const CPUSetGraphicsShaderCommand& cmd)
 	{
 		Ref<DirectX12GraphicsShaderPass> dxShader = std::dynamic_pointer_cast<DirectX12GraphicsShaderPass>(cmd.shaderPass);
-		ID3D12PipelineState* pipline = dxShader->GetPipelineState(cmd.format);
+		ID3D12PipelineState* pipline = dxShader->GetPipelineState(cmd.fbDesc);
 		m_CommandList->SetPipelineState(pipline);
 
 		D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;

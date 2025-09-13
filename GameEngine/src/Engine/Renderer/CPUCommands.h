@@ -1,7 +1,13 @@
 #pragma once
 #include "Abstractions/Resources/ResourceState.h"
 #include "Abstractions/Resources/TextureFormat.h"
+#include "Abstractions/Resources/FrameBuffer.h"
 #include "Utils/Hash.h"
+
+namespace tracy
+{
+	struct SourceLocationData;
+}
 
 namespace Engine
 {
@@ -63,6 +69,13 @@ namespace Engine
 	CREATE_COMMAND(EndEventCommand)
 	};
 
+	CREATE_COMMAND(BeginGPUEventCommand)
+		const tracy::SourceLocationData* data;
+	};
+
+	CREATE_COMMAND(EndGPUEventCommand)
+	};
+
 	CREATE_COMMAND(ResourceTransitionCommand)
 		Utils::Vector<ResourceTransitionObject> resourceStateTransitons;
 	};
@@ -103,7 +116,7 @@ namespace Engine
 
 	CREATE_COMMAND(SetGraphicsShaderCommand)
 		Ref<GraphicsShaderPass> shaderPass;
-		Utils::Vector<TextureFormat> format;
+		FrameBufferDescription fbDesc;
 	};
 
 	CREATE_COMMAND(SetComputeShaderCommand)

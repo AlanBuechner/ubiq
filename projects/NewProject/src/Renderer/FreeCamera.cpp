@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "EditorCamera.h"
+#include "FreeCamera.h"
 
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Core/Input/KeyCodes.h"
@@ -12,23 +12,23 @@
 
 #include "Engine/Core/Cursor.h"
 
-namespace Editor
+namespace Game
 {
 
-	EditorCamera::EditorCamera() :
-		EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f)
+	FreeCamera::FreeCamera() :
+		FreeCamera(45.0f, 1.778f, 0.1f, 10000.0f)
 	{
 		OnUpdate();
 	}
 
-	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip):
+	FreeCamera::FreeCamera(float fov, float aspectRatio, float nearClip, float farClip):
 		m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), 
 		Engine::Camera(Math::Perspective(Math::Radians(fov), aspectRatio, nearClip, farClip))
 	{
 		OnUpdate();
 	}
 
-	void EditorCamera::UpdateProjection()
+	void FreeCamera::UpdateProjection()
 	{
 		m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
 		m_CameraData.ProjectionMatrix = Math::Perspective(Math::Radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
@@ -36,7 +36,7 @@ namespace Editor
 		m_CameraData.VPMatrix = m_CameraData.ProjectionMatrix * m_CameraData.ViewMatrix;
 	}
 
-	void EditorCamera::UpdateView()
+	void FreeCamera::UpdateView()
 	{
 		m_Position = CalculatePosition();
 		m_CameraData.Position = m_Position;
@@ -47,7 +47,7 @@ namespace Editor
 		m_CameraData.VPMatrix = m_CameraData.ProjectionMatrix * m_CameraData.ViewMatrix;
 	}
 
-	std::pair<float, float> EditorCamera::PanSpeed() const
+	std::pair<float, float> FreeCamera::PanSpeed() const
 	{
 		float x = std::min(m_ViewportWidth / 1000.0f, 2.4f); // max = 2.4f
 		float xFactor = (0.0366f * (x * x) - 0.1778f * x + 0.3021f) * 30;
@@ -58,37 +58,37 @@ namespace Editor
 		return { xFactor * m_Distance, yFactor * m_Distance };
 	}
 
-	float EditorCamera::RotationSpeed() const
+	float FreeCamera::RotationSpeed() const
 	{
 		return 0.3f * 30;
 	}
 
-	float EditorCamera::ZoomSpeed() const
+	float FreeCamera::ZoomSpeed() const
 	{
 		return 30;
 	}
 
-	void EditorCamera::CalcDist()
+	void FreeCamera::CalcDist()
 	{
 		m_Distance = Math::Pow(1.1f, m_Zoom);
 	}
 
-	void EditorCamera::OnUpdate()
+	void FreeCamera::OnUpdate()
 	{
 		CalcDist();
 		UpdateView();
 		UpdateCameraBuffer();
 	}
 
-	void EditorCamera::OnEvent(Engine::Event* e)
+	void FreeCamera::OnEvent(Engine::Event* e)
 	{
 		Engine::EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<Engine::MouseScrolledEvent>(BIND_EVENT_FN(&EditorCamera::OnMouseScroll));
-		dispatcher.Dispatch<Engine::MouseMovedEvent>(BIND_EVENT_FN(&EditorCamera::OnMouseDelta));
-		dispatcher.Dispatch<Engine::KeyDownEvent>(BIND_EVENT_FN(&EditorCamera::OnKeyDown));
+		dispatcher.Dispatch<Engine::MouseScrolledEvent>(BIND_EVENT_FN(&FreeCamera::OnMouseScroll));
+		dispatcher.Dispatch<Engine::MouseMovedEvent>(BIND_EVENT_FN(&FreeCamera::OnMouseDelta));
+		dispatcher.Dispatch<Engine::KeyDownEvent>(BIND_EVENT_FN(&FreeCamera::OnKeyDown));
 	}
 
-	bool EditorCamera::OnMouseScroll(Engine::MouseScrolledEvent* e)
+	bool FreeCamera::OnMouseScroll(Engine::MouseScrolledEvent* e)
 	{
 		if (Input::GetMouseButtonDown(Engine::MouseCode::RIGHT_MOUSE))
 		{
@@ -103,7 +103,7 @@ namespace Editor
 		return true;
 	}
 
-	bool EditorCamera::OnMouseDelta(Engine::MouseMovedEvent* e)
+	bool FreeCamera::OnMouseDelta(Engine::MouseMovedEvent* e)
 	{
 		bool ctrl = Input::GetKeyDown(Engine::KeyCode::CONTROL);
 		bool alt = Input::GetKeyDown(Engine::KeyCode::ALT);
@@ -130,7 +130,7 @@ namespace Editor
 		return false;
 	}
 
-	bool EditorCamera::OnKeyDown(Engine::KeyDownEvent* e)
+	bool FreeCamera::OnKeyDown(Engine::KeyDownEvent* e)
 	{
 		bool alt = Input::GetKeyDown(Engine::KeyCode::ALT);
 		bool shift = Input::GetKeyDown(Engine::KeyCode::SHIFT);
@@ -158,21 +158,21 @@ namespace Editor
 		return true;
 	}
 
-	void EditorCamera::MousePan(const Math::Vector2& delta)
+	void FreeCamera::MousePan(const Math::Vector2& delta)
 	{
 		auto [xSpeed, ySpeed] = PanSpeed();
 		m_FocalPoint += -GetRightDirection() * delta.x * xSpeed * Time::GetDeltaTime();
 		m_FocalPoint += GetUpDirection() * delta.y * ySpeed * Time::GetDeltaTime();
 	}
 
-	void EditorCamera::MouseRotateAboutFocal(const Math::Vector2& delta)
+	void FreeCamera::MouseRotateAboutFocal(const Math::Vector2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
 		m_Yaw += yawSign * delta.x * RotationSpeed() * Time::GetDeltaTime();
 		m_Pitch += delta.y * RotationSpeed() * Time::GetDeltaTime();
 	}
 
-	void EditorCamera::MouseRotate(const Math::Vector2& delta)
+	void FreeCamera::MouseRotate(const Math::Vector2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
 		m_Yaw += yawSign * delta.x * RotationSpeed() * Time::GetDeltaTime();
@@ -180,53 +180,53 @@ namespace Editor
 		m_FocalPoint = CalculateFocal();
 	}
 
-	void EditorCamera::MouseZoom(float delta)
+	void FreeCamera::MouseZoom(float delta)
 	{
 		m_Zoom -= delta * ZoomSpeed() * Time::GetDeltaTime();
 		CalcDist();
 	}
 
-	void EditorCamera::MoveFB(float speed)
+	void FreeCamera::MoveFB(float speed)
 	{
 		m_FocalPoint += GetForwardDirection() * speed * Time::GetDeltaTime();
 	}
 
-	void EditorCamera::MoveRL(float speed)
+	void FreeCamera::MoveRL(float speed)
 	{
 		m_FocalPoint += GetRightDirection() * speed * Time::GetDeltaTime();
 	}
 
-	void EditorCamera::MoveUD(float speed)
+	void FreeCamera::MoveUD(float speed)
 	{
 		m_FocalPoint += GetUpDirection() * speed * Time::GetDeltaTime();
 	}
 
-	Math::Vector3 EditorCamera::GetUpDirection() const
+	Math::Vector3 FreeCamera::GetUpDirection() const
 	{
 		return GetOrientation() * Math::Vector3(0.0f, 1.0f, 0.0f);
 	}
 
-	Math::Vector3 EditorCamera::GetRightDirection() const
+	Math::Vector3 FreeCamera::GetRightDirection() const
 	{
 		return GetOrientation() * Math::Vector3(1.0f, 0.0f, 0.0f);
 	}
 
-	Math::Vector3 EditorCamera::GetForwardDirection() const
+	Math::Vector3 FreeCamera::GetForwardDirection() const
 	{
 		return GetOrientation() * Math::Vector3(0.0f, 0.0f, 1.0f);
 	}
 
-	Math::Vector3 EditorCamera::CalculatePosition() const
+	Math::Vector3 FreeCamera::CalculatePosition() const
 	{
 		return m_FocalPoint - GetForwardDirection() * m_Distance;
 	}
 
-	Math::Vector3 EditorCamera::CalculateFocal() const
+	Math::Vector3 FreeCamera::CalculateFocal() const
 	{
 		return m_Position + GetForwardDirection() * m_Distance;
 	}
 
-	Math::Quaternion EditorCamera::GetOrientation() const
+	Math::Quaternion FreeCamera::GetOrientation() const
 	{
 		return Math::Quaternion(Math::Vector3(m_Pitch, m_Yaw, 0.0f));
 	}

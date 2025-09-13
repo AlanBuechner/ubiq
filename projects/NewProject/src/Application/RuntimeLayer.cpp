@@ -43,7 +43,7 @@ namespace Game
 		Engine::Ref<Engine::RenderTarget2D> screen = Engine::Application::Get().GetWindow().GetSwapChain()->GetCurrentRenderTarget();
 		commandList->SetRenderTarget(screen);
 		commandList->SetShader(blitPass);
-		commandList->SetTexture(blitPass->GetUniformLocation("src"), framBuffer->GetAttachment(0));
+		commandList->SetTexture(blitPass->GetUniformLocation("u_Src"), framBuffer->GetAttachment(0));
 		commandList->DrawMesh(Engine::Renderer::GetScreenMesh());
 		commandList->Present();
 		Engine::GPUTimer::EndEvent(commandList);
@@ -56,9 +56,9 @@ namespace Game
 
 	}
 
-	void RuntimeLayer::OnEvent(Engine::Event* event)
+	void RuntimeLayer::OnEvent(Engine::Event* e)
 	{
-
+		m_Game->OnEvent(e);
 	}
 
 }

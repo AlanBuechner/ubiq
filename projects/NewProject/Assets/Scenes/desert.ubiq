@@ -15,25 +15,6 @@ Entities:
         Size: 0.5
       - Component: Game::SkyboxComponent
         Texture: 44308273739615182
-  - Entity: 11693751238415598823
-    Name: Camera
-    Components:
-      - Component: Engine::TransformComponent
-        Position: [3.19560456, 2.17798662, 5]
-        Rotation: [-0.242119506, 0.782615602, -1.8988132e-08]
-        Scale: [1, 1, 0.99999994]
-      - Component: Game::CameraComponent
-        Primary: true
-        FixedAspectRatio: false
-        Camera:
-          ProjectionType: 0
-          PerspectiveFOV: 0.785398185
-          PerspectiveNear: 0.00100000005
-          PerspectiveFar: 1000
-          OrthographicSize: 10
-          OrthographicNear: -1
-          OrthographicFar: 1
-      - Component: Game::CharacterController
   - Entity: 14785401870932044183
     Name: NanoSuit
     Components:

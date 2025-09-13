@@ -1,5 +1,7 @@
 #include "SkyboxComponent.h"
 #include "Renderer/SceneRenderer/SceneRenderer.h"
+#include "Engine/Renderer/Abstractions/Resources/Texture.h"
+#include "Engine/Core/Application.h"
 
 
 

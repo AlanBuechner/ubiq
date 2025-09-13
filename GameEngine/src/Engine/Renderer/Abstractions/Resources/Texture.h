@@ -17,6 +17,16 @@ namespace Engine
 		RenderTarget = BIT(1)
 	};
 
+	enum class MSAASampleCount
+	{
+		MSAA1 = 1,
+		MSAA2 = 2,
+		MSAA4 = 4,
+		MSAA8 = 8,
+		MSAA16 = 16,
+		None = MSAA1
+	};
+
 	class Texture2DResource : public GPUResource
 	{
 	public:
@@ -30,13 +40,15 @@ namespace Engine
 		TextureFormat GetFormat() { return m_Format; }
 		Math::Vector4 GetClearColor() { return m_ClearColor; }
 		TextureType GetTextureType() { return m_Type; }
+		MSAASampleCount GetMSAASampleCount() { return m_SampleCount; }
+		bool UsingMSAA() { return m_SampleCount != MSAASampleCount::MSAA1; }
 
 		bool IsDepthStencil() { return IsTextureFormatDepthStencil(m_Format); }
 		uint32 GetStride() { return GetTextureFormatStride(m_Format); }
 
 		virtual void SetData(void* data) = 0;
 
-		static Texture2DResource* Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type);
+		static Texture2DResource* Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount);
 
 	protected:
 		virtual bool SupportState(ResourceState state) override;
@@ -48,6 +60,7 @@ namespace Engine
 		TextureFormat m_Format = TextureFormat::RGBA8_UNORM;
 		Math::Vector4 m_ClearColor = { 0,0,0,0 };
 		TextureType m_Type;
+		MSAASampleCount m_SampleCount = MSAASampleCount::MSAA1;
 
 	};
 
@@ -98,7 +111,7 @@ namespace Engine
 	{
 	protected:
 		Texture2D(Texture2DResource* resource, Texture2DSRVDescriptorHandle* srv);
-		Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type);
+		Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount);
 	public:
 		Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format);
 		DISABLE_COPY(Texture2D);
@@ -163,11 +176,26 @@ namespace Engine
 	class RenderTarget2D : public Texture2D
 	{
 	public:
-		RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, bool RWCapable);
+		struct Description
+		{
+			Description(uint32 width, uint32 height, TextureFormat format) :
+				width(width), height(height), format(format)
+			{ }
+
+			uint32 width, height, mips = 1;
+			TextureFormat format;
+			Math::Vector4 clearColor = { 0,0,0,0 };
+			MSAASampleCount sampleCount = MSAASampleCount::MSAA1;
+			bool RWCapable = false;
+		};
+
+
+		RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampleCount, bool RWCapable);
 		DISABLE_COPY(RenderTarget2D);
 		virtual ~RenderTarget2D() override;
 
 		Math::Vector4 GetClearColor() { return m_Resource->GetClearColor(); }
+		MSAASampleCount GetSampleCount() { return m_Resource->GetMSAASampleCount(); }
 		Ref<RWTexture2D> GetRWTexture2D() { return m_RWTexture; }
 
 		Texture2DRTVDSVDescriptorHandle* GetRTVDSVDescriptor() { return m_RTVDSVDescriptor; }
@@ -176,12 +204,21 @@ namespace Engine
 
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, bool RWCapable);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, MSAASampleCount sampelCount);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, MSAASampleCount sampelCount, bool RWCapable);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor, bool RWCapable);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampelCount);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampelCount, bool RWCapable);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, bool RWCapable);
-		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, MSAASampleCount sampelCount);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, MSAASampleCount sampelCount, bool RWCapable);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor);
 		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, bool RWCapable);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampelCount);
+		static Ref<RenderTarget2D> Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampelCount, bool RWCapable);
+		static Ref<RenderTarget2D> Create(const Description& desc);
 
 	protected:
 		Texture2DRTVDSVDescriptorHandle* m_RTVDSVDescriptor;

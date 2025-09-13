@@ -2,6 +2,7 @@
 #include "StaticModelRendererComponent.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Core/Scene/TransformComponent.h"
+#include "Engine/Core/Application.h"
 
 
 namespace Game

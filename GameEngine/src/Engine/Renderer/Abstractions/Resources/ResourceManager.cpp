@@ -30,39 +30,52 @@ namespace Engine
 		CREATE_PROFILE_SCOPEI("Create Upload Buffer");
 		ANOTATE_PROFILEI("Size: " + std::to_string(size));
 		m_UploadBuffer = UploadBufferResource::Create(size);
-		m_BasePointer = m_UploadBuffer->Map();
-		m_MemWrightPointer = m_BasePointer;
 	}
 
 
 	UploadPage::~UploadPage()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		m_UploadBuffer->UnMap();
+		Close();
 		delete m_UploadBuffer;
 	}
 
-	void* UploadPage::Map(const void* data, uint32 size)
+	void UploadPage::Open()
+	{
+		m_UsedMemory = 0;
+
+		m_BasePointer = m_UploadBuffer->Map();
+		m_MemWrightPointer = m_BasePointer;
+	}
+
+	void UploadPage::Close()
+	{
+		if (m_MemWrightPointer == nullptr)
+			return;
+		m_UploadBuffer->UnMap();
+		m_BasePointer = nullptr;
+		m_MemWrightPointer = nullptr;
+	}
+
+	void* UploadPage::Map(const void* data, uint32 size, uint64& offset)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		// if the amount of memory requested to upload is greater than the amount of available space return nullptr 
-		if ((m_Size - m_UsedMemory) < size)
+		uint64 memRemaining = m_Size - m_UsedMemory;
+		if (memRemaining < size)
 		{
-			ANOTATE_PROFILEI("Page map failed");
+			CORE_ASSERT(false, "Failed To Allocate data in upload page", "");
 			return nullptr;
 		}
 
 		void* loc = m_MemWrightPointer;
 		memcpy(loc, data, size);
-		(uint64&)m_MemWrightPointer += size;
+		m_MemWrightPointer = (byte*)m_MemWrightPointer + size;
+
+		offset = m_UsedMemory;
 		m_UsedMemory += size;
 
 		return loc;
-	}
-
-	uint64 UploadPage::GetOffset(const void* data)
-	{
-		return (uint64)data - (uint64)m_BasePointer;
 	}
 
 	void UploadPage::Clear()
@@ -93,7 +106,9 @@ namespace Engine
 	UploadPool::~UploadPool()
 	{
 		CREATE_PROFILE_FUNCTIONI();
+		m_UploadPage->Close();
 		ResourceManager::FreeUploadPage(m_UploadPage);
+		m_UploadPage = nullptr;
 	}
 
 	void UploadPool::SubmitBuffer(GPUResource* dest, uint32 destOffset, void* data, uint32 size, ResourceState state)
@@ -194,6 +209,7 @@ namespace Engine
 	void UploadPool::RecordBufferCommands(Ref<CPUCommandList> commandlist)
 	{
 		CREATE_PROFILE_FUNCTIONI();
+		BEGIN_EVENT_TRACE_GPU(commandlist, "Upload Buffer");
 
 		// find needed buffer size
 		uint32 uploadBufferSize = 0;
@@ -207,6 +223,8 @@ namespace Engine
 		// create new upload buffer
 		if(uploadBufferSize != 0)
 			m_UploadPage = ResourceManager::GetUploadPage(uploadBufferSize);
+
+		m_UploadPage->Open();
 
 		// data
 		Utils::Vector<ResourceStateObject> startb;
@@ -228,9 +246,8 @@ namespace Engine
 			// copy data to upload resource if needed
 			if (m_UploadPage != nullptr)
 			{
-				void* dataLoc = m_UploadPage->Map(data.data, data.size); // copy data into resource
+				void* dataLoc = m_UploadPage->Map(data.data, data.size, data.srcOffset); // copy data into resource
 				data.uploadResource = m_UploadPage->GetResource();
-				data.srcOffset = m_UploadPage->GetOffset(dataLoc);
 			}
 			// always delete old data
 			if (data.data != nullptr)
@@ -251,24 +268,27 @@ namespace Engine
 		}
 
 		// record commands
-
-		GPUTimer::BeginEvent(commandlist, "Buffer Upload");
-		commandlist->ValidateStates(startb); // transition resources to copy dest
-
-		for (uint32 i = 0; i < numBufferCopys; i++)
 		{
-			commandlist->CopyBuffer(
-				bufferCopys[i].destResource,
-				bufferCopys[i].destOffset,
-				bufferCopys[i].uploadResource,
-				bufferCopys[i].srcOffset,
-				bufferCopys[i].size
-			);
+			CREATE_PROFILE_SCOPEI("Recored Commands");
+			GPUTimer::BeginEvent(commandlist, "Buffer Upload");
+			commandlist->ValidateStates(startb); // transition resources to copy dest
+
+			for (uint32 i = 0; i < numBufferCopys; i++)
+			{
+				commandlist->CopyBuffer(
+					bufferCopys[i].destResource,
+					bufferCopys[i].destOffset,
+					bufferCopys[i].uploadResource,
+					bufferCopys[i].srcOffset,
+					bufferCopys[i].size
+				);
+			}
+
+			commandlist->ValidateStates(endb); // transition resources back to original state
+			GPUTimer::EndEvent(commandlist);
 		}
 
-		commandlist->ValidateStates(endb); // transition resources back to original state
-		GPUTimer::EndEvent(commandlist);
-
+		END_EVENT_TRACE_GPU(commandlist);
 	}
 
 	void UploadPool::RecordTextureCommands(Ref<CPUCommandList> commandlist)
@@ -522,7 +542,8 @@ namespace Engine
 
 	UploadPage* ResourceManager::GetUploadPage(uint32 size)
 	{
-		return new UploadPage(size); // TODO fix needing this
+		std::lock_guard g(s_UploadPageCashMutex);
+		//return new UploadPage(size); // TODO fix needing this
 
 		// if size is larger than cash size create new page
 		if (size > s_CachedUploadPageSize)
@@ -532,7 +553,7 @@ namespace Engine
 		}
 
 		{ // find page page with current cash size delete others (needed if cash size is updated mid game)
-			std::lock_guard g(s_UploadPageCashMutex);
+			
 			while (!s_CachedUploadPages.empty())
 			{
 				UploadPage* page = s_CachedUploadPages.front();
@@ -550,13 +571,14 @@ namespace Engine
 
 	void ResourceManager::FreeUploadPage(UploadPage* page)
 	{
-		delete page;
-		return;
+		std::lock_guard g(s_UploadPageCashMutex);
+		//delete page;
+		//return;
 
 		if (page == nullptr)
 			return;
 
-		std::lock_guard g(s_UploadPageCashMutex);
+		
 		s_CachedUploadPages.push(page);
 	}
 

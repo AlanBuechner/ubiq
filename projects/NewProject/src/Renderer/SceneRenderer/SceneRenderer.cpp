@@ -9,7 +9,7 @@
 #include "Engine/Renderer/Abstractions/CommandList.h"
 #include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"
 #include "Engine/Renderer/RenderGraph.h"
-#include "Renderer/Lighting/DirectionalLight.h"
+#include "RenderingUtils/Lighting/DirectionalLight.h"
 #include "Renderer/RenderGraph/RenderGraph.h"
 
 namespace Game
@@ -52,7 +52,7 @@ namespace Game
 		data.m_MainCamera = m_MainCamera;
 
 		// compile commands
-		m_MainPassObject.BuildDrawCommands(data.m_DrawCommands);
+		m_MainPassObject.BuildDrawCommands(data.m_MainPassDrawCommands);
 
 		m_RenderGraph->Build();
 		m_RenderGraph->Submit();

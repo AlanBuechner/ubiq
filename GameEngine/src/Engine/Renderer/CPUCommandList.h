@@ -5,6 +5,11 @@
 #include "Abstractions/Resources/FrameBuffer.h"
 #include "Shaders/ShaderPass.h"
 
+namespace tracy
+{
+	struct SourceLocationData;
+}
+
 namespace Engine
 {
 
@@ -27,6 +32,7 @@ namespace Engine
 
 		void PrependResourceStateCommands(const ResourceStateMap& resourceStates);
 		void MergeResourceStatesInto(ResourceStateMap& resourceStates);
+		void SetEndOfFrameStates();
 		
 		void SubmitCommand(CPUCommand* command) { m_Commands.Push(command); }
 		CPUCommand* PeekCommand() { return m_Commands.Back(); }
@@ -61,6 +67,9 @@ namespace Engine
 		void BeginEvent(const char* eventName);
 		void BeginEvent(const std::string& eventName);
 		void EndEvent();
+
+		void BeginGPUEvent(const tracy::SourceLocationData* data);
+		void EndGPUEvent();
 
 		// resource transitions
 		void Present() { Present(m_RenderTarget); }

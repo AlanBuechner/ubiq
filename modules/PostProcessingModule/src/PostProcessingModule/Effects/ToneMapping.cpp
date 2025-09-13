@@ -27,12 +27,14 @@ namespace Game
 			});
 
 		Engine::GPUTimer::BeginEvent(commandList, "ToneMapping");
+		BEGIN_EVENT_TRACE_GPU(commandList, "ToneMapping");
 
 		commandList->SetShader(pass);
 		commandList->SetRootConstant("u_SrcLoc", src->GetSRVDescriptor()->GetIndex());
 		commandList->SetRWTexture("u_DstTexture", renderTarget->GetRWTexture2D(), 0);
 		commandList->DispatchThreads(renderTarget->GetWidth(), renderTarget->GetHeight(), 1);
 
+		END_EVENT_TRACE_GPU(commandList);
 		Engine::GPUTimer::EndEvent(commandList);
 	}
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Core.h"
 #include "Engine/Renderer/SceneRenderer.h"
-#include "RenderPassObject.h"
+#include "RenderingUtils/RenderPassObject.h"
 #include <vector>
 #include <list>
 

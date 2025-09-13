@@ -2,6 +2,8 @@
 #include "Engine/Renderer/Abstractions/CommandList.h"
 #include "DX.h"
 
+#include "tracy/TracyD3D12.hpp"
+
 namespace Engine
 {
 	class DirectX12CommandList : public CommandList
@@ -27,6 +29,9 @@ namespace Engine
 
 		void BeginEvent(const char* eventName);
 		void EndEvent();
+
+		void BeginGPUEvent(const tracy::SourceLocationData* data);
+		void EndGPUEvent();
 
 		// transitions
 		void Transition(const CPUResourceTransitionCommand& cmd);
@@ -74,6 +79,7 @@ namespace Engine
 		ID3D12GraphicsCommandList10* m_CommandList;
 
 		Utils::Vector<std::string> m_EventStack;
+		Utils::Vector<tracy::D3D12ZoneScope*> m_TracyEventStack;
 
 		friend class DirectX12CommandQueue;
 	};

@@ -16,16 +16,18 @@ namespace Game
 
 	void GBufferPassNode::BuildImpl()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 
 		// depth pre pass
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Depth pre pass");
+		BEGIN_EVENT_TRACE_GPU(m_CommandList, "Depth pre pass");
 		// set up render target
 		m_CommandList->SetRenderTarget(m_RenderTarget);
 		m_CommandList->ClearRenderTarget(m_RenderTarget);
 
 		// render all objects
-		for (auto& cmd : scene.m_DrawCommands)
+		for (auto& cmd : scene.m_MainPassDrawCommands)
 		{
 			Engine::Ref<Engine::GraphicsShaderPass> pass = cmd.m_Shader->GetGraphicsPass("depth");
 			if (pass)
@@ -35,11 +37,8 @@ namespace Game
 				m_CommandList->DrawMesh(cmd.m_Mesh, cmd.m_InstanceBuffer);
 			}
 		}
+		END_EVENT_TRACE_GPU(m_CommandList);
 		Engine::GPUTimer::EndEvent(m_CommandList); // end depth pre pass
-
-		// begin gbuffer pass
-		Engine::GPUTimer::BeginEvent(m_CommandList, "GBuffer pass");
-		Engine::GPUTimer::EndEvent(m_CommandList); // end gbuffer pass
 	}
 }
 

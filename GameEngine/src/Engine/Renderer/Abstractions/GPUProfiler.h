@@ -1,5 +1,11 @@
 #pragma once
 #include "Engine/Core/Core.h"
+#include "Utils/Performance.h"
+
+namespace tracy
+{
+	struct SourceLocationData;
+}
 
 namespace Engine
 {
@@ -34,3 +40,7 @@ namespace Engine
 		static void EndFrame();
 	};
 }
+
+
+#define BEGIN_EVENT_TRACE_GPU(cmdList, name) CREATE_SOURCE_LOC(name); cmdList->BeginGPUEvent(&SOURCE_LOC_NAME);
+#define END_EVENT_TRACE_GPU(cmdList) cmdList->EndGPUEvent();

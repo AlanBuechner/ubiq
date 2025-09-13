@@ -19,6 +19,7 @@ namespace Game
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		Engine::GPUTimer::BeginEvent(commandList, "Bloom");
+		BEGIN_EVENT_TRACE_GPU(commandList, "BLoom");
 		Engine::Ref<Engine::GraphicsShaderPass> downSample = m_BloomShader->GetGraphicsPass("downSample");
 		Engine::Ref<Engine::GraphicsShaderPass> upSample = m_BloomShader->GetGraphicsPass("upSample");
 		Engine::Ref<Engine::GraphicsShaderPass> composite = m_BloomShader->GetGraphicsPass("composite");
@@ -177,6 +178,7 @@ namespace Game
 		Engine::GPUTimer::EndEvent(commandList);
 #endif
 
+		END_EVENT_TRACE_GPU(commandList);
 		Engine::GPUTimer::EndEvent(commandList);
 
 	}

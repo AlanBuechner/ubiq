@@ -2,7 +2,7 @@
 #include "ShadowPassNode.h"
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/Shaders/Shader.h"
-#include "Renderer/Lighting/DirectionalLight.h"
+#include "RenderingUtils/Lighting/DirectionalLight.h"
 #include "Engine/Renderer/Renderer.h"
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
@@ -18,9 +18,11 @@ namespace Game
 
 	void ShadowPassNode::BuildImpl()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Shadow Pass");
+		BEGIN_EVENT_TRACE_GPU(m_CommandList, "Shadow pass");
 
 		// convert all frame buffers to render targets
 		Utils::Vector<Engine::ResourceStateObject> transitions;
@@ -67,7 +69,7 @@ namespace Game
 					m_CommandList->ClearRenderTarget(fb);
 
 					// for each object in the scene
-					for (auto& cmd : scene.m_DrawCommands)
+					for (auto& cmd : scene.m_MainPassDrawCommands)
 					{
 						Engine::Ref<Engine::GraphicsShaderPass> pass = cmd.m_Shader->GetGraphicsPass("directionalShadowMap");
 						if (pass)
@@ -94,6 +96,7 @@ namespace Game
 		if(!transitions.Empty())
 			m_CommandList->ValidateStates(transitions);
 
+		END_EVENT_TRACE_GPU(m_CommandList);
 		Engine::GPUTimer::EndEvent(m_CommandList);
 	}
 

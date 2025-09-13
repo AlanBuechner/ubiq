@@ -30,8 +30,10 @@ namespace Engine
 		UploadPage(uint32 size);
 		~UploadPage();
 
-		void* Map(const void* data, uint32 size);
-		uint64 GetOffset(const void* data);
+		void Open();
+		void Close();
+
+		void* Map(const void* data, uint32 size, uint64& offset);
 		UploadBufferResource* GetResource() { return m_UploadBuffer; }
 		void Clear();
 
@@ -39,8 +41,8 @@ namespace Engine
 
 	private:
 		UploadBufferResource* m_UploadBuffer;
-		uint32 m_Size = 0;
-		uint32 m_UsedMemory = 0;
+		uint64 m_Size = 0;
+		uint64 m_UsedMemory = 0;
 		void* m_MemWrightPointer = nullptr;
 		void* m_BasePointer = nullptr;
 	};

@@ -5,7 +5,7 @@
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
-#include "Renderer/Lighting/DirectionalLight.h"
+#include "RenderingUtils/Lighting/DirectionalLight.h"
 #include "RenderGraph.h"
 
 namespace Game
@@ -16,12 +16,14 @@ namespace Game
 
 	void ShaderPassNode::BuildImpl()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Shader Pass");
+		BEGIN_EVENT_TRACE_GPU(m_CommandList, "Shader pass");
 		m_CommandList->SetRenderTarget(m_RenderTarget);
 
-		for (auto& cmd : scene.m_DrawCommands)
+		for (auto& cmd : scene.m_MainPassDrawCommands)
 		{
 			Engine::Ref<Engine::GraphicsShaderPass> pass = cmd.m_Shader->GetGraphicsPass(m_PassName);
 			if (pass)
@@ -42,6 +44,7 @@ namespace Game
 			}
 		}
 
+		END_EVENT_TRACE_GPU(m_CommandList);
 		Engine::GPUTimer::EndEvent(m_CommandList);
 	}
 }

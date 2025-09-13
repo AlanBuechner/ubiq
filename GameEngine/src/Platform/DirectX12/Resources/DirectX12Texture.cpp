@@ -16,10 +16,11 @@ namespace Engine
 		m_Height = height;
 		m_Mips = 1;
 		m_Format = format;
+		m_SampleCount = MSAASampleCount::MSAA1;
 	}
 
 
-	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type)
+	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount)
 	{
 		m_DefultState = ResourceState::ShaderResource;
 		m_Width = width;
@@ -28,6 +29,7 @@ namespace Engine
 		m_Format = format;
 		m_ClearColor = clearColor;
 		m_Type = type;
+		m_SampleCount = sampleCount;
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -48,7 +50,7 @@ namespace Engine
 			rDesc.Height = height;
 			rDesc.Alignment = 0;
 			rDesc.DepthOrArraySize = 1;
-			rDesc.SampleDesc = { 1, 0 };
+			rDesc.SampleDesc = { (uint32)sampleCount, 0 };
 
 			D3D12_CLEAR_VALUE clearValue = {};
 			for(uint32 i = 0; i < 4; i++)
@@ -141,7 +143,7 @@ namespace Engine
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Format = dxResource->GetDXGISRVFormat();
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.ViewDimension = resource->UsingMSAA() ? D3D12_SRV_DIMENSION_TEXTURE2DMS : D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = dxResource->GetMips();
 		srvDesc.Texture2D.MostDetailedMip = 0;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -169,7 +171,7 @@ namespace Engine
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = dxResource->GetDXGISRVFormat();
-		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+		uavDesc.ViewDimension = resource->UsingMSAA() ? D3D12_UAV_DIMENSION_TEXTURE2DMS : D3D12_UAV_DIMENSION_TEXTURE2D;
 		uavDesc.Texture2D.MipSlice = mipSlice;
 		context->GetDevice()->CreateUnorderedAccessView(dxResource->GetBuffer(), nullptr, &uavDesc, m_UAVHandle.cpu);
 

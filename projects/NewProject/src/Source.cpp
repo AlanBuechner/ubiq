@@ -5,10 +5,19 @@
 #include "Renderer/SceneRenderer/SceneRenderer.h"
 #include "SceneScripts/DefaultSceneScript.h"
 #include "TestModule/src/TestModule.h"
-#include "Editor/EditorCamera.h"
+#include "Renderer/FreeCamera.h"
 
 
 LINK_REFLECTION_DATA(NewProject)
+
+#ifndef EDITOR
+
+Engine::Layer* GetEditorLayer()
+{
+	return nullptr;
+}
+
+#endif
 
 namespace Game
 {
@@ -17,7 +26,7 @@ namespace Game
 	public:
 		Game()
 		{
-			m_DefaultCamera = Engine::CreateRef<Editor::EditorCamera>();
+			m_DefaultCamera = Engine::CreateRef<FreeCamera>();
 			m_DefaultCamera->SetOrientation({ Math::Radians<float>(180 - 25), Math::Radians<float>(25) });
 			TestModule::TestModule();
 		}
@@ -25,6 +34,9 @@ namespace Game
 		virtual void OnEvent(Engine::Event* e) override
 		{
 			m_Scene->GetSceneScript()->OnEvent(e);
+
+			if(!e->Handled)
+				m_DefaultCamera->OnEvent(e);
 		}
 
 		virtual void OnUpdate(Engine::Ref<Engine::Camera> overideCamera) override
@@ -64,7 +76,7 @@ namespace Game
 		}
 
 	private:
-		Engine::Ref<Editor::EditorCamera> m_DefaultCamera;
+		Engine::Ref<FreeCamera> m_DefaultCamera;
 
 	};
 }

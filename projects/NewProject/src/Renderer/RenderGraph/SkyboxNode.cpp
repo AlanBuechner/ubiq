@@ -44,9 +44,11 @@ namespace Game
 
 	void SkyboxNode::BuildImpl()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Skybox Pass");
+		BEGIN_EVENT_TRACE_GPU(m_CommandList, "Skybox pass");
 		m_CommandList->SetRenderTarget(m_RenderTarget);
 
 		if (scene.m_Skybox)
@@ -57,6 +59,7 @@ namespace Game
 			m_CommandList->DrawMesh(m_SkyboxMesh);
 		}
 
+		END_EVENT_TRACE_GPU(m_CommandList);
 		Engine::GPUTimer::EndEvent(m_CommandList);
 	}
 

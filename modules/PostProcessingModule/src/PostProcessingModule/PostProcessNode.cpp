@@ -61,9 +61,11 @@ namespace Game
 
 	void PostProcessNode::BuildImpl()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		Engine::Ref<Engine::RenderTarget2D> curr = m_PostProcessStack.size() % 2 == 0 ? m_BackBuffer : m_RenderTarget;
 
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Post Processing");
+		BEGIN_EVENT_TRACE_GPU(m_CommandList, "Post Processing");
 
 		for (uint32 i = 0; i < m_PostProcessStack.size(); i++)
 		{
@@ -86,6 +88,7 @@ namespace Game
 			{ m_RenderTarget->GetResource(), Engine::ResourceState::RenderTarget },
 		});
 
+		END_EVENT_TRACE_GPU(m_CommandList);
 		Engine::GPUTimer::EndEvent(m_CommandList);
 	}
 

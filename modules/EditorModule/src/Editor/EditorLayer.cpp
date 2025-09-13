@@ -221,16 +221,17 @@ namespace Editor
 		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 		// set cursor visibility
-		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-		{
-			Engine::Cursor::Visibility(false);
-			Engine::Cursor::Lock(true);
-		}
-		else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
-		{
-			Engine::Cursor::Visibility(true);
-			Engine::Cursor::Lock(false);
-		}
+		//if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		//{
+		//	Engine::Cursor::Visibility(false);
+		//	Engine::Cursor::SetLockPos(Engine::Input::GetMousePosition().x, Engine::Input::GetMousePosition().y);
+		//	Engine::Cursor::Lock(true);
+		//}
+		//else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+		//{
+		//	Engine::Cursor::Visibility(true);
+		//	Engine::Cursor::Lock(false);
+		//}
 
 
 		// draw overlay

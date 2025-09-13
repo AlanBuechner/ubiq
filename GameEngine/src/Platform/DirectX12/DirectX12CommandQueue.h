@@ -4,6 +4,8 @@
 #include "DX.h"
 #include <thread>
 
+#include "tracy/TracyD3D12.hpp"
+
 namespace Engine
 {
 	class DirectX12CommandQueue : public CommandQueue
@@ -18,6 +20,8 @@ namespace Engine
 
 		inline ID3D12CommandQueue* GetCommandQueue() { return m_CommandQueue; }
 
+		TracyD3D12Ctx GetTracyCtx() { return m_TracyCtx; }
+
 	private:
 		ID3D12CommandQueue* m_CommandQueue;
 		ID3D12Fence1* m_Fence;
@@ -25,6 +29,6 @@ namespace Engine
 		uint32 m_SignalCount = 0;
 		D3D12_COMMAND_LIST_TYPE m_Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-		Profiler::InstrumentationTimer m_Timer = CREATE_PROFILEI();
+		TracyD3D12Ctx m_TracyCtx = nullptr;
 	};
 }

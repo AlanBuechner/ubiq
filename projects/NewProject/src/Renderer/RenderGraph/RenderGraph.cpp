@@ -37,9 +37,10 @@ namespace Game
 		m_CommandLists.Push(commandList);
 
 		float clearval = pow(0.2f, 2.2);
+		Engine::MSAASampleCount sampleCount = Engine::MSAASampleCount::MSAA1;
 		Engine::Ref<Engine::FrameBufferNode> renderTargetNode = Engine::CreateRef<Engine::FrameBufferNode>(*this, Utils::Vector<Engine::Ref<Engine::RenderTarget2D>>{
-			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, { clearval, clearval, clearval, 1 }),
-				Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::Depth, { 1,0,0,0 }),
+			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, { clearval, clearval, clearval, 1 }, sampleCount),
+			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::Depth, { 1,0,0,0 }, sampleCount),
 		});
 		m_Nodes.Push(renderTargetNode);
 
@@ -79,7 +80,7 @@ namespace Game
 
 		// create post processing render target
 		Engine::Ref<Engine::FrameBufferNode> postRenderTargetNode = Engine::CreateRef<Engine::FrameBufferNode>(*this, Utils::Vector<Engine::Ref<Engine::RenderTarget2D>>{
-			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, true),
+			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, sampleCount, true),
 		});
 		m_Nodes.Push(postRenderTargetNode);
 

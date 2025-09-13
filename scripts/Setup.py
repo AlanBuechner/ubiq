@@ -68,7 +68,7 @@ DownloadZip("DXC", "vendor/dxc", "https://api.github.com/repos/microsoft/DirectX
 DownloadZip("PIX", "vendor/pix", "https://www.nuget.org/api/v2/package/WinPixEventRuntime/")
 
 # install Agility
-DownloadZip("Agility", "vendor/Agility", "https://www.nuget.org/api/v2/package/Microsoft.Direct3D.D3D12/1.614.0")
+DownloadZip("Agility", "vendor/Agility", "https://www.nuget.org/api/v2/package/Microsoft.Direct3D.D3D12/1.616.0")
 
 # install compiler
 DownloadZip("Compiler", "vendor/Compiler", "https://github.com/AlanBuechner/Socrates/releases/download/v0.0.1-alpha/Socrates.zip")

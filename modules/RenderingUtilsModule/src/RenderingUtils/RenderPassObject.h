@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine/Core/Core.h"
-#include "Renderer/RenderGraph/RenderGraph.h"
 #include "Utils/Vector.h"
 #include <list>
 
@@ -22,6 +21,16 @@ namespace Engine
 
 namespace Game
 {
+
+	struct RenderPassDrawCommand
+	{
+		Engine::Ref<Engine::Shader> m_Shader;
+		Engine::Ref<Engine::Mesh> m_Mesh;
+		Engine::Ref<Engine::VertexBuffer> m_InstanceBuffer;
+	};
+
+
+
 	struct RenderObject;
 
 	struct InstanceData
@@ -81,7 +90,7 @@ namespace Game
 		void RemoveObject(ObjectControlBlockRef controlBlock);
 
 		void UpdateBuffers();
-		void BuildDrawCommands(std::vector<DrawCommand>& outDrawCommands);
+		void BuildDrawCommands(std::vector<RenderPassDrawCommand>& outDrawCommands);
 
 	private:
 		std::vector<ShaderDrawSection> m_ShaderDrawSection;

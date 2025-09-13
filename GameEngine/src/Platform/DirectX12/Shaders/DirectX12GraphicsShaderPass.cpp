@@ -40,13 +40,13 @@ namespace Engine
 		m_Sig->Release();
 	}
 
-	ID3D12PipelineState* DirectX12GraphicsShaderPass::GetPipelineState(const Utils::Vector<TextureFormat>& format)
+	ID3D12PipelineState* DirectX12GraphicsShaderPass::GetPipelineState(const FrameBufferDescription& fbDesc)
 	{
-		auto state = m_PiplineStates.find(format);
+		auto state = m_PiplineStates.find(fbDesc);
 		if (state == m_PiplineStates.end())
 		{
-			ID3D12PipelineState* pipline = CreatePiplineState(format);
-			m_PiplineStates[format] = pipline;
+			ID3D12PipelineState* pipline = CreatePiplineState(fbDesc);
+			m_PiplineStates[fbDesc] = pipline;
 			return pipline;
 		}
 
@@ -116,7 +116,7 @@ namespace Engine
 		}
 	}
 
-	ID3D12PipelineState* DirectX12GraphicsShaderPass::CreatePiplineState(const Utils::Vector<TextureFormat>& formats)
+	ID3D12PipelineState* DirectX12GraphicsShaderPass::CreatePiplineState(const FrameBufferDescription& fbDesc)
 	{
 		CREATE_PROFILE_SCOPEI("Create Graphics PSO");
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
@@ -182,12 +182,12 @@ namespace Engine
 		desc.BlendState.AlphaToCoverageEnable = FALSE;
 		desc.BlendState.IndependentBlendEnable = FALSE;
 
-		desc.NumRenderTargets = (uint32)formats.Count();
-		for (uint32 i = 0; i < formats.Count(); i++)
+		desc.NumRenderTargets = (uint32)fbDesc.formats.Count();
+		for (uint32 i = 0; i < fbDesc.formats.Count(); i++)
 		{
-			desc.RTVFormats[i] = GetDXGITextureFormat(formats[i]);
+			desc.RTVFormats[i] = GetDXGITextureFormat(fbDesc.formats[i]);
 
-			switch (formats[i])
+			switch (fbDesc.formats[i])
 			{
 			case TextureFormat::R8_UINT:
 			case TextureFormat::RG8_UINT:
@@ -248,10 +248,10 @@ namespace Engine
 			}
 		}
 
-		if (IsTextureFormatDepthStencil(formats.Back()))
+		if (IsTextureFormatDepthStencil(fbDesc.formats.Back()))
 		{
 			desc.DepthStencilState.DepthEnable = TRUE;
-			desc.DSVFormat = GetDXGITextureFormat(formats.Back());
+			desc.DSVFormat = GetDXGITextureFormat(fbDesc.formats.Back());
 			desc.DepthStencilState.DepthWriteMask = m_PassConfig.depthWrite ? D3D12_DEPTH_WRITE_MASK_ALL : D3D12_DEPTH_WRITE_MASK_ZERO;
 
 			switch (m_PassConfig.depthTest)
@@ -279,7 +279,8 @@ namespace Engine
 		}
 
 		desc.SampleMask = UINT_MAX;
-		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Count = (uint32)fbDesc.sampleCount;
+		desc.SampleDesc.Quality = 0;
 
 		ID3D12PipelineState* pipline = nullptr;
 		CORE_ASSERT_HRESULT(context->GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipline)),

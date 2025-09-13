@@ -7,7 +7,6 @@
 #include "Engine/Renderer/Abstractions/CommandList.h"
 #include "Engine/Renderer/Abstractions/Resources/FrameBuffer.h"
 #include "Engine/Renderer/RenderGraph.h"
-#include "Renderer/Lighting/DirectionalLight.h"
 #include "Engine/Renderer/Abstractions/Resources/Buffer.h"
 
 namespace Game
@@ -26,8 +25,8 @@ namespace Game
 
 	RenderObject::RenderObject()
 	{
-		m_InstanceData.Reserve(10); // default to capacity of 10
-		m_Instances = Engine::VertexBuffer::Create(10, sizeof(InstanceData));
+		m_InstanceData.Reserve(1);
+		m_Instances = Engine::VertexBuffer::Create(1, sizeof(InstanceData));
 	}
 
 	// RenderObject
@@ -131,7 +130,7 @@ namespace Game
 		}
 	}
 
-	void RenderPassObject::BuildDrawCommands(std::vector<DrawCommand>& outDrawCommands)
+	void RenderPassObject::BuildDrawCommands(std::vector<RenderPassDrawCommand>& outDrawCommands)
 	{
 		outDrawCommands.clear();
 		for (auto& shaderDawSection : m_ShaderDrawSection)
@@ -141,7 +140,7 @@ namespace Game
 			{
 				if (!renderObject.m_InstanceData.Empty())
 				{
-					DrawCommand cmd;
+					RenderPassDrawCommand cmd;
 					cmd.m_Mesh = renderObject.m_Mesh;
 					cmd.m_Shader = shaderDawSection.m_Shader;
 					cmd.m_InstanceBuffer = renderObject.m_Instances;

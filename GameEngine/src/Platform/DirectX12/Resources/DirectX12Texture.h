@@ -12,7 +12,7 @@ namespace Engine
 	{
 	public:
 		DirectX12Texture2DResource(uint32 width, uint32 height, TextureFormat format, ID3D12Resource* resource);
-		DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type);
+		DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount);
 		DISABLE_COPY(DirectX12Texture2DResource);
 		virtual ~DirectX12Texture2DResource() override;
 

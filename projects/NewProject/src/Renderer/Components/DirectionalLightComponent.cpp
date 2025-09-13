@@ -1,5 +1,5 @@
 #include "DirectionalLightComponent.h"
-#include "Renderer/Lighting/DirectionalLight.h"
+#include "RenderingUtils/Lighting/DirectionalLight.h"
 #include "Renderer/SceneRenderer/SceneRenderer.h"
 
 namespace Game

@@ -45,9 +45,6 @@ namespace Engine
 			// submit transition
 			if (transition.to != transition.from)
 				cmd->resourceStateTransitons.Push(transition);
-
-			// set end of frame state
-			state.resource->m_EOFState = state.state;
 		}
 	}
 
@@ -56,6 +53,13 @@ namespace Engine
 		CREATE_PROFILE_FUNCTIONI();
 		for (auto state : m_ResourceStates)
 			resourceStates[state.first] = state.second;
+	}
+
+	void CPUCommandAllocator::SetEndOfFrameStates()
+	{
+		CREATE_PROFILE_FUNCTIONI();
+		for (auto state : m_ResourceStates)
+			state.first->m_EOFState = state.second;
 	}
 
 #define ASSERT_ALLOCATOR CORE_ASSERT(m_CommandAllocator != nullptr, "Can not record commands without command allocator", "")
@@ -114,6 +118,21 @@ namespace Engine
 		CPUEndEventCommand* cmd = new CPUEndEventCommand();
 		m_CommandAllocator->SubmitCommand(cmd);
 		m_EventStack.Pop();
+	}
+
+	void CPUCommandList::BeginGPUEvent(const tracy::SourceLocationData* data)
+	{
+		ASSERT_ALLOCATOR;
+		CPUBeginGPUEventCommand* cmd = new CPUBeginGPUEventCommand();
+		cmd->data = data;
+		m_CommandAllocator->SubmitCommand(cmd);
+	}
+
+	void CPUCommandList::EndGPUEvent()
+	{
+		ASSERT_ALLOCATOR;
+		CPUEndGPUEventCommand* cmd = new CPUEndGPUEventCommand();
+		m_CommandAllocator->SubmitCommand(cmd);
 	}
 
 	void CPUCommandList::Present(Ref<FrameBuffer> fb)
@@ -255,7 +274,6 @@ namespace Engine
 		cmd->depthStencil = nullptr; // always default to nullptr
 		cmd->renderTargetHandles.Clear();
 
-		uint32 numRenderTargets = buffer->GetAttachments().Count() - (size_t)m_RenderTarget->HasDepthAttachment();
 		Utils::Vector<ResourceStateObject> resourceStateValidation;
 
 		// collect resource states and build command
@@ -335,7 +353,7 @@ namespace Engine
 
 		CPUSetGraphicsShaderCommand* cmd = new CPUSetGraphicsShaderCommand();
 		cmd->shaderPass = shader;
-		cmd->format = m_RenderTarget->GetFormats();
+		cmd->fbDesc = m_RenderTarget->GetDescription();
 		m_CommandAllocator->SubmitCommand(cmd);
 
 		m_BoundShader = shader;

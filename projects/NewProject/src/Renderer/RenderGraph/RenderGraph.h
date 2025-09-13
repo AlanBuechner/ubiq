@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Renderer/RenderGraph.h"
+#include "RenderingUtils/RenderPassObject.h"
 
 namespace Engine
 {
@@ -13,16 +14,10 @@ namespace Game
 
 namespace Game
 {
-	struct DrawCommand
-	{
-		Engine::Ref<Engine::Shader> m_Shader;
-		Engine::Ref<Engine::Mesh> m_Mesh;
-		Engine::Ref<Engine::VertexBuffer> m_InstanceBuffer;
-	};
 
 	struct SceneData
 	{
-		std::vector<DrawCommand> m_DrawCommands;
+		std::vector<RenderPassDrawCommand> m_MainPassDrawCommands;
 		Engine::Ref<Engine::Camera> m_MainCamera;
 		Engine::Ref<DirectionalLight> m_DirectinalLight;
 		Engine::Ref<Engine::Texture2D> m_Skybox;

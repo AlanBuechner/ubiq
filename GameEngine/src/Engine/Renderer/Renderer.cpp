@@ -179,7 +179,7 @@ namespace Engine
 		s_MainCommandList->StopRecording();
 		SubmitCommandList(s_MainCommandList);
 		FrameContext* context = s_FrameContext.exchange(new FrameContext());
-		context->m_BackBuffer = Application::Get().GetWindow().GetSwapChain()->GetCurrentRenderTarget();;
+		context->m_BackBuffer = Application::Get().GetWindow().GetSwapChain()->GetCurrentRenderTarget();
 		s_RenderThread->Invoke(context);
 	}
 
@@ -220,6 +220,9 @@ namespace Engine
 				commands->PrependResourceStateCommands(stateMap);
 				commands->MergeResourceStatesInto(stateMap);
 			}
+
+			for (CPUCommandAllocator* commands : frameContext->m_Commands)
+				commands->SetEndOfFrameStates();
 		}
 
 		{ // record commands

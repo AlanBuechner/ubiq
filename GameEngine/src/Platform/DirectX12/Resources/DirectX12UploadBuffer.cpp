@@ -16,14 +16,17 @@ namespace Engine
 		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
 
-		context->GetDevice()->CreateCommittedResource(
-			&props, // this heap will be used to upload the constant buffer data
-			D3D12_HEAP_FLAG_NONE, // no flags
-			&resDesc, // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
-			D3D12_RESOURCE_STATE_GENERIC_READ, // will be data that is read from so we keep it in the generic read state
-			nullptr, // we do not have use an optimized clear value for constant buffers
-			IID_PPV_ARGS(&m_Buffer)
-		);
+		{
+			CREATE_PROFILE_SCOPEI("Create Committed");
+			context->GetDevice()->CreateCommittedResource(
+				&props, // this heap will be used to upload the constant buffer data
+				D3D12_HEAP_FLAG_NONE, // no flags
+				&resDesc, // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
+				D3D12_RESOURCE_STATE_GENERIC_READ, // will be data that is read from so we keep it in the generic read state
+				nullptr, // we do not have use an optimized clear value for constant buffers
+				IID_PPV_ARGS(&m_Buffer)
+			);
+		}
 
 	}
 
@@ -39,6 +42,7 @@ namespace Engine
 
 	void* DirectX12UploadBufferResource::Map()
 	{
+		CREATE_PROFILE_FUNCTIONI();
 		CD3DX12_RANGE readRange(0, 0);
 		m_Buffer->Map(0, &readRange, &m_MapedBasePointer);
 		return m_MapedBasePointer;

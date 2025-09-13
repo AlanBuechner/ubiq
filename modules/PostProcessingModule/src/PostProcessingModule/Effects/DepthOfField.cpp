@@ -29,6 +29,7 @@ namespace Game
 	void DepthOfField::RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
 	{
 		Engine::GPUTimer::BeginEvent(commandList, "Depth Of Field");
+		BEGIN_EVENT_TRACE_GPU(commandList, "Depth Of Field");
 
 		Engine::Ref<Engine::GraphicsShaderPass> coc = m_DepthOfFieldShader->GetGraphicsPass("CoC");
 		Engine::Ref<Engine::GraphicsShaderPass> expandcoc = m_DepthOfFieldShader->GetGraphicsPass("expandCoC");
@@ -147,7 +148,7 @@ namespace Game
 			{m_FarBlur->GetResource(), Engine::ResourceState::RenderTarget},
 		});
 
-
+		END_EVENT_TRACE_GPU(commandList);
 		Engine::GPUTimer::EndEvent(commandList);
 	}
 

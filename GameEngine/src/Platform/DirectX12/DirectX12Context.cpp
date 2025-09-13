@@ -4,7 +4,7 @@
 #include "DX.h"
 
 
-extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 614; }
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 616; }
 extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
 
 namespace Engine
@@ -22,8 +22,8 @@ namespace Engine
 
 	void DirectX12Context::Init()
 	{
-#if defined(DEBUG)
 		DirectX12Debug::GetInstance()->Enable();
+#if defined(DEBUG)
 #endif
 
 		CORE_ASSERT_HRESULT(CreateDXGIFactory1(IID_PPV_ARGS(&m_Factory)), "Failed to create DXGIFactory");
@@ -43,8 +43,8 @@ namespace Engine
 
 		//m_Format = SelectFormat();
 
-#if defined(DEBUG)
 		DirectX12Debug::GetInstance()->InitInfoQueue(m_Device);
+#if defined(DEBUG)
 		//DirectX12Debug::GetInstance()->ReportLiveObjects();
 #endif
 
