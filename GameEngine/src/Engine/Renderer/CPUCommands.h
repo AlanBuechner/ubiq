@@ -39,6 +39,26 @@ namespace Engine
 
 namespace Engine
 {
+
+	struct GPUDataBinding
+	{
+		enum class Type
+		{
+			RootConstant,
+			ConstantBuffer,
+			StructuredBuffer,
+			RWStructuredBuffer,
+			Texture2D,
+			RWTexture2D,
+		};
+
+		uint32 index;
+		Type type;
+		bool isCompute;
+		uint64 data; // could be a pointer to a resource or handle
+	};
+
+
 	struct CPUCommand
 	{
 		virtual ~CPUCommand();
@@ -127,41 +147,45 @@ namespace Engine
 		Ref<WorkGraphShaderPass> shaderPass;
 	};
 
-	CREATE_COMMAND(SetRootConstantCommand)
-		uint32 index;
-		uint32 data;
-		bool isCompute;
+	CREATE_COMMAND(BindDataCommand)
+		Utils::Vector<GPUDataBinding> bindings;
 	};
 
-	CREATE_COMMAND(SetConstantBufferCommand)
-		uint32 index;
-		ConstantBufferResource* res;
-		bool isCompute;
-	};
-
-	CREATE_COMMAND(SetStructuredBufferCommand)
-		uint32 index;
-		StructuredBufferSRVDescriptorHandle* handle;
-		bool isCompute;
-	}; 
-	
-	CREATE_COMMAND(SetRWStructuredBufferCommand)
-		uint32 index;
-		StructuredBufferUAVDescriptorHandle* handle;
-		bool isCompute;
-	}; 
-	
-	CREATE_COMMAND(SetTextureCommand)
-		uint32 index;
-		Texture2DSRVDescriptorHandle* handle;
-		bool isCompute;
-	};
-
-	CREATE_COMMAND(SetRWTextureCommand)
-		uint32 index;
-		Texture2DUAVDescriptorHandle* handle;
-		bool isCompute;
-	};
+	//CREATE_COMMAND(SetRootConstantCommand)
+	//	uint32 index;
+	//	uint32 data;
+	//	bool isCompute;
+	//};
+	//
+	//CREATE_COMMAND(SetConstantBufferCommand)
+	//	uint32 index;
+	//	ConstantBufferResource* res;
+	//	bool isCompute;
+	//};
+	//
+	//CREATE_COMMAND(SetStructuredBufferCommand)
+	//	uint32 index;
+	//	StructuredBufferSRVDescriptorHandle* handle;
+	//	bool isCompute;
+	//}; 
+	//
+	//CREATE_COMMAND(SetRWStructuredBufferCommand)
+	//	uint32 index;
+	//	StructuredBufferUAVDescriptorHandle* handle;
+	//	bool isCompute;
+	//}; 
+	//
+	//CREATE_COMMAND(SetTextureCommand)
+	//	uint32 index;
+	//	Texture2DSRVDescriptorHandle* handle;
+	//	bool isCompute;
+	//};
+	//
+	//CREATE_COMMAND(SetRWTextureCommand)
+	//	uint32 index;
+	//	Texture2DUAVDescriptorHandle* handle;
+	//	bool isCompute;
+	//};
 
 	CREATE_COMMAND(DrawMeshCommand)
 		VertexBufferView* vertexBufferView;

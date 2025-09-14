@@ -233,10 +233,8 @@ namespace Engine
 	{
 		ASSERT_ALLOCATOR;
 		CPUUploadTextureCommand* cmd = new CPUUploadTextureCommand();
-
 		cmd->dest = dest;
 		cmd->src = src;
-
 		m_CommandAllocator->SubmitCommand(cmd);
 	}
 
@@ -348,6 +346,7 @@ namespace Engine
 	void CPUCommandList::SetShader(Ref<GraphicsShaderPass> shader)
 	{
 		ASSERT_ALLOCATOR;
+
 		if (shader == m_BoundShader)
 			return;
 
@@ -384,11 +383,11 @@ namespace Engine
 		if (index == UINT32_MAX) return;
 		ASSERT_ALLOCATOR;
 
-		CPUSetRootConstantCommand* cmd = new CPUSetRootConstantCommand();
-		cmd->index = index;
-		cmd->data = data;
-		cmd->isCompute = m_BoundShader->IsComputeShader();
-		m_CommandAllocator->SubmitCommand(cmd);
+		GPUDataBinding& binding = m_Bindings.Push({});
+		binding.index = index;
+		binding.isCompute = m_BoundShader->IsComputeShader();
+		binding.type = GPUDataBinding::Type::RootConstant;
+		binding.data = data;
 	}
 
 	void CPUCommandList::SetConstantBuffer(uint32 index, Ref<ConstantBuffer> buffer)
@@ -398,11 +397,11 @@ namespace Engine
 
 		ValidateState(buffer->GetResource(), ResourceState::ShaderResource);
 
-		CPUSetConstantBufferCommand* cmd = new CPUSetConstantBufferCommand();
-		cmd->index = index;
-		cmd->res = buffer->GetResource();
-		cmd->isCompute = m_BoundShader->IsComputeShader();
-		m_CommandAllocator->SubmitCommand(cmd);
+		GPUDataBinding& binding = m_Bindings.Push({});
+		binding.index = index;
+		binding.isCompute = m_BoundShader->IsComputeShader();
+		binding.type = GPUDataBinding::Type::ConstantBuffer;
+		binding.data = (uint64)buffer->GetResource();
 	}
 
 	void CPUCommandList::SetStructuredBuffer(uint32 index, Ref<StructuredBuffer> buffer)
@@ -412,11 +411,11 @@ namespace Engine
 
 		ValidateState(buffer->GetResource(), ResourceState::ShaderResource);
 
-		CPUSetStructuredBufferCommand* cmd = new CPUSetStructuredBufferCommand();
-		cmd->index = index;
-		cmd->handle = buffer->GetSRVDescriptor();
-		cmd->isCompute = m_BoundShader->IsComputeShader();
-		m_CommandAllocator->SubmitCommand(cmd);
+		GPUDataBinding& binding = m_Bindings.Push({});
+		binding.index = index;
+		binding.isCompute = m_BoundShader->IsComputeShader();
+		binding.type = GPUDataBinding::Type::StructuredBuffer;
+		binding.data = (uint64)buffer->GetSRVDescriptor();
 	}
 
 	void CPUCommandList::SetRWStructuredBuffer(uint32 index, Ref<RWStructuredBuffer> buffer)
@@ -426,11 +425,11 @@ namespace Engine
 
 		ValidateState(buffer->GetResource(), ResourceState::UnorderedResource);
 
-		CPUSetRWStructuredBufferCommand* cmd = new CPUSetRWStructuredBufferCommand();
-		cmd->index = index;
-		cmd->handle = buffer->GetUAVDescriptor();
-		cmd->isCompute = m_BoundShader->IsComputeShader();
-		m_CommandAllocator->SubmitCommand(cmd);
+		GPUDataBinding& binding = m_Bindings.Push({});
+		binding.index = index;
+		binding.isCompute = m_BoundShader->IsComputeShader();
+		binding.type = GPUDataBinding::Type::RWStructuredBuffer;
+		binding.data = (uint64)buffer->GetUAVDescriptor();
 	}
 
 	void CPUCommandList::SetTexture(uint32 index, Ref<Texture2D> texture)
@@ -440,11 +439,11 @@ namespace Engine
 
 		ValidateState(texture->GetResource(), ResourceState::ShaderResource);
 
-		CPUSetTextureCommand* cmd = new CPUSetTextureCommand();
-		cmd->index = index;
-		cmd->handle = texture->GetSRVDescriptor();
-		cmd->isCompute = m_BoundShader->IsComputeShader();
-		m_CommandAllocator->SubmitCommand(cmd);
+		GPUDataBinding& binding = m_Bindings.Push({});
+		binding.index = index;
+		binding.isCompute = m_BoundShader->IsComputeShader();
+		binding.type = GPUDataBinding::Type::Texture2D;
+		binding.data = (uint64)texture->GetSRVDescriptor();
 	}
 
 	void CPUCommandList::SetRWTexture(uint32 index, Texture2DUAVDescriptorHandle* uav)
@@ -454,11 +453,11 @@ namespace Engine
 
 		ValidateState(uav->m_Resource, ResourceState::UnorderedResource);
 
-		CPUSetRWTextureCommand* cmd = new CPUSetRWTextureCommand();
-		cmd->index = index;
-		cmd->handle = uav;
-		cmd->isCompute = m_BoundShader->IsComputeShader();
-		m_CommandAllocator->SubmitCommand(cmd);
+		GPUDataBinding& binding = m_Bindings.Push({});
+		binding.index = index;
+		binding.isCompute = m_BoundShader->IsComputeShader();
+		binding.type = GPUDataBinding::Type::RWTexture2D;
+		binding.data = (uint64)uav;
 	}
 
 	void CPUCommandList::SetRWTexture(uint32 index, Ref<RWTexture2D> texture, uint32 mip)
@@ -469,6 +468,7 @@ namespace Engine
 	void CPUCommandList::DrawMesh(Ref<Mesh> mesh, Ref<VertexBuffer> instanceBuffer, uint32 numInstances)
 	{
 		ASSERT_ALLOCATOR;
+		FlushBindings();
 
 		ValidateState(mesh->GetVertexBuffer()->GetResource(), ResourceState::PiplineInput);
 		ValidateState(mesh->GetIndexBuffer()->GetResource(), ResourceState::PiplineInput);
@@ -499,6 +499,8 @@ namespace Engine
 	void CPUCommandList::DispatchGroups(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGroupsZ)
 	{
 		ASSERT_ALLOCATOR;
+		FlushBindings();
+
 		CPUDispatchCommand* cmd = new CPUDispatchCommand();
 		cmd->threadGroupsX = threadGroupsX;
 		cmd->threadGroupsY = threadGroupsY;
@@ -519,6 +521,8 @@ namespace Engine
 	void CPUCommandList::DispatchGraph(void* data, uint32 stride, uint32 count)
 	{
 		ASSERT_ALLOCATOR;
+		FlushBindings();
+
 		CPUDispatchGraphCPUDataCommand* cmd = new CPUDispatchGraphCPUDataCommand();
 		cmd->stride = stride;
 		cmd->count = count;
@@ -533,9 +537,21 @@ namespace Engine
 	void CPUCommandList::DispatchGraph(Ref<StructuredBuffer> buffer)
 	{
 		ASSERT_ALLOCATOR;
+		FlushBindings();
+
 		CPUDispatchGraphGPUDataCommand* cmd = new CPUDispatchGraphGPUDataCommand();
 		cmd->res = buffer->GetResource();
 		m_CommandAllocator->SubmitCommand(cmd);
+	}
+
+	void CPUCommandList::FlushBindings()
+	{
+		ASSERT_ALLOCATOR;
+		CPUBindDataCommand* cmd = new CPUBindDataCommand();
+		cmd->bindings = m_Bindings;
+		m_CommandAllocator->SubmitCommand(cmd);
+
+		m_Bindings.Clear();
 	}
 
 	void CPUCommandList::Transition(const Utils::Vector<ResourceTransitionObject>& transitions)

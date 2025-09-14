@@ -57,12 +57,13 @@ namespace Engine
 		void SetShader(const CPUSetWorkGraphShaderCommand& cmd);
 
 		// set data
-		void SetRootConstant(const CPUSetRootConstantCommand& cmd);
-		void SetConstantBuffer(const CPUSetConstantBufferCommand& cmd);
-		void SetStructuredBuffer(const CPUSetStructuredBufferCommand& cmd);
-		void SetRWStructuredBuffer(const CPUSetRWStructuredBufferCommand& cmd);
-		void SetTexture(const CPUSetTextureCommand& cmd);
-		void SetRWTexture(const CPUSetRWTextureCommand& cmd);
+		void BindData(const CPUBindDataCommand& cmd);
+		void SetRootConstant(const GPUDataBinding& binding);
+		void SetConstantBuffer(const GPUDataBinding& binding);
+		void SetStructuredBuffer(const GPUDataBinding& binding);
+		void SetRWStructuredBuffer(const GPUDataBinding& binding);
+		void SetTexture(const GPUDataBinding& binding);
+		void SetRWTexture(const GPUDataBinding& binding);
 
 		// do work
 		void DrawMesh(const CPUDrawMeshCommand& cmd);

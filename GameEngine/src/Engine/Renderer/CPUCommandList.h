@@ -147,14 +147,17 @@ namespace Engine
 
 	private:
 
+		void FlushBindings();
+
 		void Transition(const Utils::Vector<ResourceTransitionObject>& transitions);
 
 	private:
+		std::string m_Name = "";
 		CPUCommandAllocator* m_CommandAllocator = nullptr;
 
 		Ref<FrameBuffer> m_RenderTarget = nullptr;
 		Ref<ShaderPass> m_BoundShader = nullptr;
-		std::string m_Name = "";
+		Utils::Vector<GPUDataBinding> m_Bindings;
 
 		Utils::Vector<std::string> m_EventStack;
 	};

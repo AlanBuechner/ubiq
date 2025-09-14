@@ -88,6 +88,7 @@ namespace Engine
 
 		void RecoredUploadCommands(Ref<CPUCommandList> commandList);
 
+		void GetUploadPage();
 		void RecordBufferCommands(Ref<CPUCommandList> commandList);
 		void RecordTextureCommands(Ref<CPUCommandList> commandList);
 
@@ -117,7 +118,6 @@ namespace Engine
 	class TransientPool
 	{
 	public:
-
 		~TransientPool();
 
 		void ProcessCommandList(CPUCommandAllocator* commandList);
@@ -127,7 +127,7 @@ namespace Engine
 		void StartMapping(GPUResource* res);
 		void EndMapping(GPUResource* res);
 
-		void AddAllocation(GPUResource* res, uint32 start);
+		void AddAllocation(GPUResource* res, uint32 start, uint32 index = UINT32_MAX);
 	private:
 		struct Chunk
 		{

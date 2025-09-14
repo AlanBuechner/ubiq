@@ -107,12 +107,13 @@ namespace Engine
 				CALL_COMMAND(CPUSetGraphicsShaderCommand, SetShader);
 				CALL_COMMAND(CPUSetComputeShaderCommand, SetShader);
 				CALL_COMMAND(CPUSetWorkGraphShaderCommand, SetShader);
-				CALL_COMMAND(CPUSetRootConstantCommand, SetRootConstant);
-				CALL_COMMAND(CPUSetConstantBufferCommand, SetConstantBuffer);
-				CALL_COMMAND(CPUSetStructuredBufferCommand, SetStructuredBuffer);
-				CALL_COMMAND(CPUSetRWStructuredBufferCommand, SetRWStructuredBuffer);
-				CALL_COMMAND(CPUSetTextureCommand, SetTexture);
-				CALL_COMMAND(CPUSetRWTextureCommand, SetRWTexture);
+				CALL_COMMAND(CPUBindDataCommand, BindData);
+				//CALL_COMMAND(CPUSetRootConstantCommand, SetRootConstant);
+				//CALL_COMMAND(CPUSetConstantBufferCommand, SetConstantBuffer);
+				//CALL_COMMAND(CPUSetStructuredBufferCommand, SetStructuredBuffer);
+				//CALL_COMMAND(CPUSetRWStructuredBufferCommand, SetRWStructuredBuffer);
+				//CALL_COMMAND(CPUSetTextureCommand, SetTexture);
+				//CALL_COMMAND(CPUSetRWTextureCommand, SetRWTexture);
 				CALL_COMMAND(CPUDrawMeshCommand, DrawMesh);
 				CALL_COMMAND(CPUDispatchCommand, Dispatch);
 				CALL_COMMAND(CPUDispatchGraphCPUDataCommand, DispatchGraph);
@@ -387,65 +388,87 @@ namespace Engine
 
 
 	// set data
-	void DirectX12CommandList::SetRootConstant(const CPUSetRootConstantCommand& cmd)
+	void DirectX12CommandList::BindData(const CPUBindDataCommand& cmd)
 	{
-		if (cmd.isCompute)
-			m_CommandList->SetComputeRoot32BitConstant(cmd.index, cmd.data, 0);
-		else
-			m_CommandList->SetGraphicsRoot32BitConstant(cmd.index, cmd.data, 0);
+		for (uint32 i = 0; i < cmd.bindings.Count(); i++)
+		{
+			const GPUDataBinding& binding = cmd.bindings[i];
+			switch (binding.type)
+			{
+#define CALL_BINDING(type, func) case GPUDataBinding::Type::type: func(binding); break
+				CALL_BINDING(RootConstant, SetRootConstant);
+				CALL_BINDING(ConstantBuffer, SetConstantBuffer);
+				CALL_BINDING(StructuredBuffer, SetStructuredBuffer);
+				CALL_BINDING(RWStructuredBuffer, SetRWStructuredBuffer);
+				CALL_BINDING(Texture2D, SetTexture);
+				CALL_BINDING(RWTexture2D, SetRWTexture);
+			default:
+				CORE_WARN("Unrecognized binding type");
+				break;
+#undef CALL_BINDING
+			}
+		}
 	}
 
-	void DirectX12CommandList::SetConstantBuffer(const CPUSetConstantBufferCommand& cmd)
+	void DirectX12CommandList::SetRootConstant(const GPUDataBinding& binding)
 	{
-		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)cmd.res;
+		if (binding.isCompute)
+			m_CommandList->SetComputeRoot32BitConstant(binding.index, binding.data, 0);
+		else
+			m_CommandList->SetGraphicsRoot32BitConstant(binding.index, binding.data, 0);
+	}
+
+	void DirectX12CommandList::SetConstantBuffer(const GPUDataBinding& binding)
+	{
+		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)binding.data;
 		D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = dxResource->GetBuffer()->GetGPUVirtualAddress();
-		if (cmd.isCompute)
-			m_CommandList->SetComputeRootConstantBufferView(cmd.index, gpuAddress);
+		if (binding.isCompute)
+			m_CommandList->SetComputeRootConstantBufferView(binding.index, gpuAddress);
 		else
-			m_CommandList->SetGraphicsRootConstantBufferView(cmd.index, gpuAddress);
+			m_CommandList->SetGraphicsRootConstantBufferView(binding.index, gpuAddress);
 	}
 
-	void DirectX12CommandList::SetStructuredBuffer(const CPUSetStructuredBufferCommand& cmd)
+	void DirectX12CommandList::SetStructuredBuffer(const GPUDataBinding& binding)
 	{
-		DirectX12StructuredBufferSRVDescriptorHandle* srv = (DirectX12StructuredBufferSRVDescriptorHandle*)cmd.handle;
+		DirectX12StructuredBufferSRVDescriptorHandle* srv = (DirectX12StructuredBufferSRVDescriptorHandle*)binding.data;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srv->GetHandle().gpu;
-		if (cmd.isCompute)
-			m_CommandList->SetComputeRootDescriptorTable(cmd.index, gpuHandle);
+		if (binding.isCompute)
+			m_CommandList->SetComputeRootDescriptorTable(binding.index, gpuHandle);
 		else
-			m_CommandList->SetGraphicsRootDescriptorTable(cmd.index, gpuHandle);
+			m_CommandList->SetGraphicsRootDescriptorTable(binding.index, gpuHandle);
 	}
 
-	void DirectX12CommandList::SetRWStructuredBuffer(const CPUSetRWStructuredBufferCommand& cmd)
+	void DirectX12CommandList::SetRWStructuredBuffer(const GPUDataBinding& binding)
 	{
-		DirectX12StructuredBufferUAVDescriptorHandle* uav = (DirectX12StructuredBufferUAVDescriptorHandle*)cmd.handle;
+		DirectX12StructuredBufferUAVDescriptorHandle* uav = (DirectX12StructuredBufferUAVDescriptorHandle*)binding.data;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = uav->GetHandle().gpu;
 
-		if (cmd.isCompute)
-			m_CommandList->SetComputeRootDescriptorTable(cmd.index, gpuHandle);
+		if (binding.isCompute)
+			m_CommandList->SetComputeRootDescriptorTable(binding.index, gpuHandle);
 		else
-			m_CommandList->SetGraphicsRootDescriptorTable(cmd.index, gpuHandle);
+			m_CommandList->SetGraphicsRootDescriptorTable(binding.index, gpuHandle);
 	}
 
-	void DirectX12CommandList::SetTexture(const CPUSetTextureCommand& cmd)
+	void DirectX12CommandList::SetTexture(const GPUDataBinding& binding)
 	{
 
-		DirectX12Texture2DSRVDescriptorHandle* srv = (DirectX12Texture2DSRVDescriptorHandle*)cmd.handle;
+		DirectX12Texture2DSRVDescriptorHandle* srv = (DirectX12Texture2DSRVDescriptorHandle*)binding.data;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srv->GetHandle().gpu;
 
-		if (cmd.isCompute)
-			m_CommandList->SetComputeRootDescriptorTable(cmd.index, gpuHandle);
+		if (binding.isCompute)
+			m_CommandList->SetComputeRootDescriptorTable(binding.index, gpuHandle);
 		else
-			m_CommandList->SetGraphicsRootDescriptorTable(cmd.index, gpuHandle);
+			m_CommandList->SetGraphicsRootDescriptorTable(binding.index, gpuHandle);
 	}
 
-	void DirectX12CommandList::SetRWTexture(const CPUSetRWTextureCommand& cmd)
+	void DirectX12CommandList::SetRWTexture(const GPUDataBinding& binding)
 	{
-		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = ((DirectX12Texture2DUAVDescriptorHandle*)cmd.handle)->GetHandle().gpu;
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = ((DirectX12Texture2DUAVDescriptorHandle*)binding.data)->GetHandle().gpu;
 
-		if (cmd.isCompute)
-			m_CommandList->SetComputeRootDescriptorTable(cmd.index, gpuHandle);
+		if (binding.isCompute)
+			m_CommandList->SetComputeRootDescriptorTable(binding.index, gpuHandle);
 		else
-			m_CommandList->SetGraphicsRootDescriptorTable(cmd.index, gpuHandle);
+			m_CommandList->SetGraphicsRootDescriptorTable(binding.index, gpuHandle);
 	}
 
 	void DirectX12CommandList::DrawMesh(const CPUDrawMeshCommand& cmd)

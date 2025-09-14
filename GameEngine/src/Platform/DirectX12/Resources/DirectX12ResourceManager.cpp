@@ -16,6 +16,8 @@ namespace Engine
 
 	DirectX12TransientResourceHeap::DirectX12TransientResourceHeap(uint32 size)
 	{
+		CREATE_PROFILE_FUNCTIONI();
+
 		m_Size = size;
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();

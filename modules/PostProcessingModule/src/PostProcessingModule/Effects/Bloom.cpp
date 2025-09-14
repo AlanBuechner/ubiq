@@ -111,7 +111,7 @@ namespace Game
 			commandList->ValidateStates({
 				{ m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
 				{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource },
-				});
+			});
 
 			commandList->SetRenderTarget(m_GaussianSumTextures[i]);
 			commandList->ClearRenderTarget(m_GaussianSumTextures[i]);
@@ -143,7 +143,7 @@ namespace Game
 			commandList->ValidateStates({
 				{ m_GaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
 				{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource },
-				});
+			});
 
 			commandList->SetRenderTarget(m_GaussianSumTextures[i]);
 			commandList->SetShader(upSample);
@@ -160,7 +160,7 @@ namespace Game
 		commandList->ValidateStates({
 			{ src->GetResource(), Engine::ResourceState::ShaderResource },
 			{ m_GaussianSumTextures[0]->GetResource(), Engine::ResourceState::ShaderResource },
-			});
+		});
 
 		commandList->SetRenderTarget(renderTarget);
 		commandList->ClearRenderTarget(renderTarget);

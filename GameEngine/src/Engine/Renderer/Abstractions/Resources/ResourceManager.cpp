@@ -200,16 +200,17 @@ namespace Engine
 	void UploadPool::RecoredUploadCommands(Ref<CPUCommandList> commandList)
 	{
 		CREATE_PROFILE_SCOPEI("Record Upload Commands");
+		GetUploadPage();
+
 		commandList->StartRecording();
 		RecordBufferCommands(commandList);
 		RecordTextureCommands(commandList);
 		commandList->StopRecording();
 	}
 
-	void UploadPool::RecordBufferCommands(Ref<CPUCommandList> commandlist)
+	void UploadPool::GetUploadPage()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		BEGIN_EVENT_TRACE_GPU(commandlist, "Upload Buffer");
 
 		// find needed buffer size
 		uint32 uploadBufferSize = 0;
@@ -221,10 +222,18 @@ namespace Engine
 		}
 
 		// create new upload buffer
-		if(uploadBufferSize != 0)
+		if (uploadBufferSize != 0)
 			m_UploadPage = ResourceManager::GetUploadPage(uploadBufferSize);
 
+		CORE_ASSERT(m_UploadPage != nullptr, "Failed to get upload page", "");
+
 		m_UploadPage->Open();
+	}
+
+	void UploadPool::RecordBufferCommands(Ref<CPUCommandList> commandlist)
+	{
+		CREATE_PROFILE_FUNCTIONI();
+		BEGIN_EVENT_TRACE_GPU(commandlist, "Upload Buffer");
 
 		// data
 		Utils::Vector<ResourceStateObject> startb;
@@ -244,18 +253,12 @@ namespace Engine
 			UploadBufferData& data = m_BufferUploadQueue[i];
 
 			// copy data to upload resource if needed
-			if (m_UploadPage != nullptr)
-			{
-				void* dataLoc = m_UploadPage->Map(data.data, data.size, data.srcOffset); // copy data into resource
-				data.uploadResource = m_UploadPage->GetResource();
-			}
-			// always delete old data
-			if (data.data != nullptr)
-			{
-				// delete old data
-				delete data.data;
-				data.data = nullptr;
-			}
+			void* dataLoc = m_UploadPage->Map(data.data, data.size, data.srcOffset); // copy data into resource
+			data.uploadResource = m_UploadPage->GetResource();
+
+			// delete old data
+			delete data.data;
+			data.data = nullptr;
 
 			// collect resource states
 			if (m_SeenUploads.find(data.destResource) == m_SeenUploads.end())
@@ -489,7 +492,7 @@ namespace Engine
 
 				if (freeSize > res->GetUnderlyingResourceSize())
 				{
-					AddAllocation(res, freeStart);
+					AddAllocation(res, freeStart, i + 1);
 					return;
 				}
 			}
@@ -508,12 +511,15 @@ namespace Engine
 		m_UsedChunks.Remove(chunkIndex);
 	}
 
-	void TransientPool::AddAllocation(GPUResource* res, uint32 start)
+	void TransientPool::AddAllocation(GPUResource* res, uint32 start, uint32 index)
 	{
 		Chunk newChunk;
 		newChunk.start = start;
 		newChunk.size = res->GetUnderlyingResourceSize();
-		m_UsedChunks.Push(newChunk);
+		if (index == UINT32_MAX)
+			m_UsedChunks.Push(newChunk);
+		else
+			m_UsedChunks.Insert(index, newChunk);
 		m_AddressMappings[res] = newChunk.start;
 
 		uint32 allocationEnd = start + res->GetUnderlyingResourceSize();
@@ -542,9 +548,6 @@ namespace Engine
 
 	UploadPage* ResourceManager::GetUploadPage(uint32 size)
 	{
-		std::lock_guard g(s_UploadPageCashMutex);
-		//return new UploadPage(size); // TODO fix needing this
-
 		// if size is larger than cash size create new page
 		if (size > s_CachedUploadPageSize)
 		{
@@ -553,7 +556,7 @@ namespace Engine
 		}
 
 		{ // find page page with current cash size delete others (needed if cash size is updated mid game)
-			
+			std::lock_guard g(s_UploadPageCashMutex);
 			while (!s_CachedUploadPages.empty())
 			{
 				UploadPage* page = s_CachedUploadPages.front();
@@ -571,21 +574,16 @@ namespace Engine
 
 	void ResourceManager::FreeUploadPage(UploadPage* page)
 	{
-		std::lock_guard g(s_UploadPageCashMutex);
-		//delete page;
-		//return;
 
 		if (page == nullptr)
 			return;
 
-		
+		std::lock_guard g(s_UploadPageCashMutex);
 		s_CachedUploadPages.push(page);
 	}
 
 	TransientResourceHeap* ResourceManager::GetTransientResourceHeap(uint32 size)
 	{
-		return TransientResourceHeap::Create(size); // TODO fix needing this
-
 		// if size is larger than cash size create new page
 		if (size > s_TransientResourceHeapSize)
 		{
@@ -611,9 +609,6 @@ namespace Engine
 
 	void ResourceManager::FreeTransientResourceHeap(TransientResourceHeap* page)
 	{
-		delete page;
-		return;
-
 		if (page == nullptr)
 			return;
 
