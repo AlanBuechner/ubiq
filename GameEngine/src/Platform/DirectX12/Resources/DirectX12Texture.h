@@ -31,7 +31,6 @@ namespace Engine
 
 	private:
 		ID3D12Resource* m_Buffer;
-		UploadTextureResource* m_UploadBuffer;
 
 		friend class DirectX12SwapChain;
 	};

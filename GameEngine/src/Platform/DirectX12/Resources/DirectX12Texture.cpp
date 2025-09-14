@@ -11,7 +11,6 @@ namespace Engine
 	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, TextureFormat format, ID3D12Resource* resource)
 	{
 		m_Buffer = resource;
-		m_UploadBuffer = nullptr;
 		m_Width = width;
 		m_Height = height;
 		m_Mips = 1;
@@ -66,25 +65,19 @@ namespace Engine
 			);
 		}
 
-		// create upload buffer
-		m_UploadBuffer = UploadTextureResource::Create(width, height, numMips, format);
+		
 	}
 
 	DirectX12Texture2DResource::~DirectX12Texture2DResource()
 	{
 		m_Buffer->Release();
 		m_Buffer = nullptr;
-		delete m_UploadBuffer;
-		m_UploadBuffer = nullptr;
 	}
 
 	void DirectX12Texture2DResource::SetData(void* data)
 	{
-		if (!m_UploadBuffer)
-		{
-			CORE_WARN("missing upload resource");
-			return;
-		}
+		// create upload buffer
+		UploadTextureResource* uploadBuffer = UploadTextureResource::Create(m_Width, m_Height, m_Mips, m_Format);
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -93,15 +86,19 @@ namespace Engine
 		UINT uploadSize = m_Height * uploadPitch;
 
 		// map the date to the upload buffer
-		void* mapped = m_UploadBuffer->Map();
+		void* mapped = uploadBuffer->Map();
 		for (uint32 y = 0; y < m_Height; y++)
 		{
 			byte* pScan = (byte*)mapped + y * uploadPitch;
 			memcpy(pScan, (byte*)data + y * m_Width * 4, m_Width * 4);
 		}
-		m_UploadBuffer->UnMap();
+		uploadBuffer->UnMap();
 
-		context->GetDX12ResourceManager()->UploadTexture(this, m_UploadBuffer, m_Width, m_Height, m_Mips, m_DefultState, m_Format);
+		// submit upload
+		context->GetDX12ResourceManager()->UploadTexture(this, uploadBuffer, m_Width, m_Height, m_Mips, m_DefultState, m_Format);
+
+		// schedule the upload buffer to be deleted
+		context->GetResourceManager()->ScheduleResourceDeletion(uploadBuffer);
 	}
 
 	uint32 DirectX12Texture2DResource::GetGPUState(ResourceState state)

@@ -92,11 +92,11 @@ namespace Engine
 
 		D3D12_RESOURCE_DESC rDesc;
 		UINT stride = GetStride();
-		UINT uploadSize = GetUploadSize();
+		UINT size = GetUploadSize();
 
 		rDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 		rDesc.Alignment = 0;
-		rDesc.Width = uploadSize;
+		rDesc.Width = size;
 		rDesc.Height = 1;
 		rDesc.DepthOrArraySize = 1;
 		rDesc.MipLevels = 1;
@@ -107,12 +107,13 @@ namespace Engine
 		rDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 		CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		CD3DX12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
 
 		CORE_ASSERT_HRESULT(
 			context->GetDevice()->CreateCommittedResource(
 				&props,
 				D3D12_HEAP_FLAG_NONE,
-				&rDesc,
+				&resDesc,
 				D3D12_RESOURCE_STATE_GENERIC_READ, 0, IID_PPV_ARGS(&m_Buffer)
 			), "Failed To Create Upload Buffer"
 		);
