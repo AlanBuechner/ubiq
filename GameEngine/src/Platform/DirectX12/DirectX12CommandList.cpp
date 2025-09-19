@@ -473,25 +473,19 @@ namespace Engine
 
 	void DirectX12CommandList::DrawMesh(const CPUDrawMeshCommand& cmd)
 	{
-		DirectX12VertexBufferView* vertexBufferView = (DirectX12VertexBufferView*)cmd.vertexBufferView;
 		DirectX12IndexBufferView* indexBufferView = (DirectX12IndexBufferView*)cmd.indexBufferView;
 
-		if (cmd.instanceBufferView)
+		Utils::Vector<D3D12_VERTEX_BUFFER_VIEW> vertexBufferViews;
+		vertexBufferViews.Resize(cmd.vertexBufferViews.Count());
+		for (uint32 i =0; i < cmd.vertexBufferViews.Count(); i++)
 		{
-			DirectX12VertexBufferView* instanceBufferView = (DirectX12VertexBufferView*)cmd.instanceBufferView;
+			DirectX12VertexBufferView* vb = (DirectX12VertexBufferView*)cmd.vertexBufferViews[i];
+			vertexBufferViews[i] = vb->GetView();
+		}
 
-			D3D12_VERTEX_BUFFER_VIEW views[] = { vertexBufferView->GetView(), instanceBufferView->GetView() };
-			m_CommandList->IASetVertexBuffers(0, 2, views);
-			m_CommandList->IASetIndexBuffer(&indexBufferView->GetView());
-			m_CommandList->DrawIndexedInstanced(cmd.numIndices, cmd.numInstances, 0, 0, 0);
-		}
-		else
-		{
-			D3D12_VERTEX_BUFFER_VIEW views[] = { vertexBufferView->GetView() };
-			m_CommandList->IASetVertexBuffers(0, 1, views);
-			m_CommandList->IASetIndexBuffer(&indexBufferView->GetView());
-			m_CommandList->DrawIndexedInstanced(cmd.numIndices, 1, 0, 0, 0);
-		}
+		m_CommandList->IASetVertexBuffers(0, vertexBufferViews.Count(), vertexBufferViews.Data());
+		m_CommandList->IASetIndexBuffer(&indexBufferView->GetView());
+		m_CommandList->DrawIndexedInstanced(cmd.numIndices, cmd.numInstances, 0, 0, 0);
 	}
 
 	void DirectX12CommandList::Dispatch(const CPUDispatchCommand& cmd)

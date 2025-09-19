@@ -83,7 +83,6 @@ namespace Engine
 	{
 		m_Resource = StructuredBufferResource::Create(count, stride, parantType);
 		m_SRVDescriptor = StructuredBufferSRVDescriptorHandle::Create(m_Resource);
-
 	}
 
 	StructuredBuffer::StructuredBuffer(uint32 count, uint32 stride) :

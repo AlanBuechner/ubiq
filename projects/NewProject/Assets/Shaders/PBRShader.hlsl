@@ -3,18 +3,20 @@ topology = triangle;
 
 passes = { 
 	lit = {
-		VS =
-vertex;
+		VS = vertex;
 		PS = pixel;
+		instanceStream = 1;
 	};
 	depth = {
 		VS = vertex;
 		PS = depth;
+		instanceStream = 1;
 	};
 	directionalShadowMap = {
 		VS = vertex;
 		PS = directionalShadowMap;
 		blendMode = none;
+		instanceStream = 1;
 		//depthTest = Greater;
 		//cullMode = back;
 	};
@@ -52,9 +54,8 @@ struct VS_Input
 	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
 	
-	// semantics starting with "I_" are per instance data
-	float4x4 transform : I_TRANSFORM;
-	uint materialID : I_MATID;
+	float4x4 transform : TRANSFORM_1_;
+	uint materialID : MATID_1_;
 };
 
 struct VS_Output

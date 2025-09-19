@@ -130,9 +130,23 @@ namespace Engine
 			uint32 slot = 0;
 			uint32 stepRate = 0;
 			D3D12_INPUT_CLASSIFICATION classification = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-			if (ie.semanticName.rfind("I_", 0) == 0)
+
+			for (uint32 i = ie.semanticName.size()-2; i < ie.semanticName.size(); i--)
 			{
-				slot = 1;
+				if (ie.semanticName[i] == '_')
+				{
+					if(i == ie.semanticName.size()-2) break;
+					uint32 start = i + 1;
+					uint32 end = ie.semanticName.size() - 1;
+					slot = std::stoi(ie.semanticName.substr(start, end - start));
+					break;
+				}
+
+				if(!std::isdigit(ie.semanticName[i])) break;
+			}
+
+			if (m_PassConfig.instanceStreams.Contains(slot))
+			{
 				stepRate = 1;
 				classification = D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA;
 			}

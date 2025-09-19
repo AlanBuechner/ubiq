@@ -38,7 +38,6 @@ namespace Engine
 			m_GPUHandle = m_Heap->GetGPUDescriptorHandleForHeapStart();
 
 		for (uint32 i = size; i != 0; i--) m_FreeSlots.Push(i);
-
 	}
 
 	DirectX12DescriptorHeap::~DirectX12DescriptorHeap()

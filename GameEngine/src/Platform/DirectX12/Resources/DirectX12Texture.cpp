@@ -64,8 +64,6 @@ namespace Engine
 				IID_PPV_ARGS(&m_Buffer)
 			);
 		}
-
-		
 	}
 
 	DirectX12Texture2DResource::~DirectX12Texture2DResource()

@@ -25,6 +25,7 @@ namespace Engine
 		~VertexBuffer();
 
 		VertexBufferView* GetView() { return m_View; }
+		bool IsRWCapable() { return m_RWStructuredBuffer != nullptr; }
 		Ref<RWStructuredBuffer> GetRWStructuredBuffer() { return m_RWStructuredBuffer; }
 
 		void Resize(uint32 count);

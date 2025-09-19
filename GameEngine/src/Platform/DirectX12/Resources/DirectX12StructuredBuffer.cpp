@@ -42,6 +42,9 @@ namespace Engine
 
 	void DirectX12StructuredBufferResource::SetData(const void* data, uint32 count, uint32 start)
 	{
+		if (count == 0)
+			return;
+
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 		context->GetDX12ResourceManager()->UploadBufferRegion(this, start * m_Stride, data, count * m_Stride, m_DefultState);
 	}

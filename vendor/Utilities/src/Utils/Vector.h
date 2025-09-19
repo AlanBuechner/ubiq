@@ -38,6 +38,8 @@ namespace Utils
 		Type& Insert(Iterator pos, const Type& value);
 		Type& Insert(ConstIterator pos, const Type& value);
 
+		void Append(const Vector<Type>& vector);
+
 		void Remove(uint32 index);
 		void Remove(Type* pos);
 		void Remove(Iterator pos);
@@ -175,6 +177,16 @@ namespace Utils
 	{
 		return *Base::insert(pos, value);
 	}
+
+
+	template<class Type>
+	void Utils::Vector<Type>::Append(const Vector<Type>& vector)
+	{
+		ReserveMore(vector.Count());
+		for (uint32 i = 0; i < vector.Count(); i++)
+			Push(vector[i]);
+	}
+
 
 	template<class Type> inline void Vector<Type>::Remove(uint32 index) { Base::erase(Base::begin() + index); }
 	template<class Type> inline void Vector<Type>::Remove(Type* pos) { Base::erase(std::remove(Base::begin(), Base::end(), pos), Base::end()); }

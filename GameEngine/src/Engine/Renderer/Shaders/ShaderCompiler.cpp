@@ -11,7 +11,7 @@ namespace Engine
 	Utils::Vector<std::string> Tokenize(const std::string& line)
 	{
 		const char delimiters[] = { ' ', '	', '\r', '\n' };
-		const char reservedTokens[] = { "={};\"(),<>" };
+		const char reservedTokens[] = { "{}[]<>()\"=;," };
 
 		Utils::Vector<std::string> tokens;
 
@@ -379,11 +379,13 @@ namespace Engine
 						if (param == "VS")					rpass.vs = val.GetAsString();
 						else if (param == "PS")				rpass.ps = val.GetAsString();
 						else if (param == "GS")				rpass.gs = val.GetAsString();
+						else if (param == "topology")		rpass.topology = ParseTopology(val);
 						else if (param == "blendMode")		rpass.blendMode = ParseBlendMode(val);
 						else if (param == "cullMode")		rpass.cullMode = ParseCullMode(val);
 						else if (param == "depthTest")		rpass.depthTest = ParseDepthTest(val);
+						else if (param == "instanceStreams" ||
+								 param == "instanceStream")	rpass.instanceStreams = ParseInstanceStreams(val);
 						else if (param == "depthWrite")		rpass.depthWrite = ParseDepthWrite(val);
-						else if (param == "topology")		rpass.topology = ParseTopology(val);
 						else if (param == "conservativeRasterization")	rpass.enableConservativeRasterization = ParseConservativeRasterization(val);
 					}
 					config.graphicsPasses.Push(rpass);
@@ -483,6 +485,23 @@ namespace Engine
 
 			return description;
 		}
+		else if (tokenQueue.front() == "[")
+		{
+			tokenQueue.pop(); // remove '['
+
+			Utils::Vector<std::string> params;
+			while (tokenQueue.front() != ")")
+			{
+				params.Push(tokenQueue.front());
+				tokenQueue.pop(); // remove the parameter
+				if (tokenQueue.front() == ",")
+					tokenQueue.pop(); // remove the ","
+			}
+			tokenQueue.pop(); // remove ']'
+
+			ObjectDescription description = ObjectDescription::CreateFrom(params);
+			return description;
+		}
 		else // value
 		{
 			// get value
@@ -562,9 +581,27 @@ namespace Engine
 		return DepthTest::None;
 	}
 
+	Utils::Vector<uint32> ShaderCompiler::ParseInstanceStreams(const ObjectDescription& var)
+	{
+		Utils::Vector<uint32> instanceStreams;
+
+		if (var.IsString())
+			instanceStreams.Push(std::stoi(var.GetAsString()));
+		else if (var.IsArray())
+		{
+			Utils::Vector<std::string> strs = var.Get<Utils::Vector<std::string>>();
+			for(uint32 i = 0; i < strs.Count(); i++)
+				instanceStreams.Push(std::stoi(strs[i]));
+		}
+		else
+			CORE_ASSERT(false, "Description is not of type string or array", "");
+
+		return instanceStreams;
+	}
+
 	bool ShaderCompiler::ParseBool(const ObjectDescription& var)
 	{
-		CORE_ASSERT(var.GetType() == ObjectDescription::Type::String, "Description is not of type string");
+		CORE_ASSERT(var.GetType() == ObjectDescription::Type::String, "Description is not of type string", "");
 
 		const std::string& str = var.GetAsString();
 		if		(str == "true")		return true;

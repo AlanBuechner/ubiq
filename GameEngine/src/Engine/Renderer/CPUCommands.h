@@ -23,6 +23,7 @@ namespace Engine
 	class Texture2D;
 	class RWTexture2D;
 	class VertexBuffer;
+	class IndexBuffer;
 	class FrameBuffer;
 	class RenderTarget2D;
 	class UploadTextureResource;
@@ -151,46 +152,9 @@ namespace Engine
 		Utils::Vector<GPUDataBinding> bindings;
 	};
 
-	//CREATE_COMMAND(SetRootConstantCommand)
-	//	uint32 index;
-	//	uint32 data;
-	//	bool isCompute;
-	//};
-	//
-	//CREATE_COMMAND(SetConstantBufferCommand)
-	//	uint32 index;
-	//	ConstantBufferResource* res;
-	//	bool isCompute;
-	//};
-	//
-	//CREATE_COMMAND(SetStructuredBufferCommand)
-	//	uint32 index;
-	//	StructuredBufferSRVDescriptorHandle* handle;
-	//	bool isCompute;
-	//}; 
-	//
-	//CREATE_COMMAND(SetRWStructuredBufferCommand)
-	//	uint32 index;
-	//	StructuredBufferUAVDescriptorHandle* handle;
-	//	bool isCompute;
-	//}; 
-	//
-	//CREATE_COMMAND(SetTextureCommand)
-	//	uint32 index;
-	//	Texture2DSRVDescriptorHandle* handle;
-	//	bool isCompute;
-	//};
-	//
-	//CREATE_COMMAND(SetRWTextureCommand)
-	//	uint32 index;
-	//	Texture2DUAVDescriptorHandle* handle;
-	//	bool isCompute;
-	//};
-
 	CREATE_COMMAND(DrawMeshCommand)
-		VertexBufferView* vertexBufferView;
+		Utils::Vector<VertexBufferView*> vertexBufferViews;
 		IndexBufferView* indexBufferView;
-		VertexBufferView* instanceBufferView;
 		uint32 numIndices;
 		uint32 numInstances;
 	};

@@ -465,33 +465,50 @@ namespace Engine
 		SetRWTexture(index, texture->GetUAVDescriptor(mip));
 	}
 
+	void CPUCommandList::DrawMesh(Ref<Mesh> mesh)
+	{
+		DrawMesh(mesh->GetVertexBuffers(), mesh->GetIndexBuffer());
+	}
+
 	void CPUCommandList::DrawMesh(Ref<Mesh> mesh, Ref<VertexBuffer> instanceBuffer, uint32 numInstances)
+	{
+		DrawMesh(mesh, Utils::Vector{ instanceBuffer }, numInstances);
+	}
+
+	void CPUCommandList::DrawMesh(Ref<Mesh> mesh, Utils::Vector<Ref<VertexBuffer>> instanceBuffers, uint32 numInstances)
+	{
+		Utils::Vector<Ref<VertexBuffer>> vertexBuffers;
+		vertexBuffers = mesh->GetVertexBuffers();
+		vertexBuffers.Append(instanceBuffers);
+
+		if (numInstances == UINT32_MAX && !instanceBuffers.Empty())
+			numInstances = instanceBuffers[0]->GetCount();
+
+		DrawMesh(vertexBuffers, mesh->GetIndexBuffer(), numInstances);
+	}
+
+	void CPUCommandList::DrawMesh(Utils::Vector<Ref<VertexBuffer>> vertexBuffers, Ref<IndexBuffer> indexBuffer, uint32 numInstances)
 	{
 		ASSERT_ALLOCATOR;
 		FlushBindings();
 
-		ValidateState(mesh->GetVertexBuffer()->GetResource(), ResourceState::PiplineInput);
-		ValidateState(mesh->GetIndexBuffer()->GetResource(), ResourceState::PiplineInput);
-		if(instanceBuffer)
-			ValidateState(instanceBuffer->GetResource(), ResourceState::PiplineInput);
+		for (Ref<VertexBuffer> vb : vertexBuffers)
+		{
+			CORE_ASSERT(vb != nullptr, "Missing Vertex Stream", "");
+			ValidateState(vb->GetResource(), ResourceState::PiplineInput);
+		}
+		ValidateState(indexBuffer->GetResource(), ResourceState::PiplineInput);
 
 		CPUDrawMeshCommand* cmd = new CPUDrawMeshCommand();
-		cmd->vertexBufferView = mesh->GetVertexBuffer()->GetView();
-		cmd->indexBufferView = mesh->GetIndexBuffer()->GetView();
-		cmd->numIndices = mesh->GetIndexBuffer()->GetCount();
-
-		if (instanceBuffer)
+		cmd->vertexBufferViews.Reserve(vertexBuffers.Count());
+		for (Ref<VertexBuffer> vb : vertexBuffers)
 		{
-			cmd->instanceBufferView = instanceBuffer->GetView();
-			cmd->numInstances = numInstances;
-			if (numInstances == UINT32_MAX)
-				cmd->numInstances = instanceBuffer->GetCount();
+			CORE_ASSERT(vb != nullptr, "Missing Vertex Stream", "");
+			cmd->vertexBufferViews.Push(vb->GetView());
 		}
-		else
-		{
-			cmd->instanceBufferView = nullptr;
-			cmd->numInstances = 0;
-		}
+		cmd->indexBufferView = indexBuffer->GetView();
+		cmd->numIndices = indexBuffer->GetCount();
+		cmd->numInstances = numInstances;
 
 		m_CommandAllocator->SubmitCommand(cmd);
 	}
