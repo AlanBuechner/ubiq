@@ -465,6 +465,50 @@ namespace Engine
 		SetRWTexture(index, texture->GetUAVDescriptor(mip));
 	}
 
+	void CPUCommandList::SetVertexBuffer(uint32 stream, Ref<VertexBuffer> vb)
+	{
+		if (stream >= m_BoundVertexBuffers.Count())
+			m_BoundVertexBuffers.Resize(stream + 1);
+
+		m_BoundVertexBuffers[stream] = vb;
+	}
+
+	void CPUCommandList::SetIndexBuffer(Ref<IndexBuffer> ib)
+	{
+		m_BoundIndexBuffer = ib;
+	}
+
+
+
+	void CPUCommandList::DrawInstanced(uint32 numInstances)
+	{
+		ASSERT_ALLOCATOR;
+		FlushBindings();
+
+		for (Ref<VertexBuffer> vb : m_BoundVertexBuffers)
+		{
+			CORE_ASSERT(vb != nullptr, "Missing Vertex Stream", "");
+			ValidateState(vb->GetResource(), ResourceState::PiplineInput);
+		}
+		ValidateState(m_BoundIndexBuffer->GetResource(), ResourceState::PiplineInput);
+
+		CPUDrawMeshCommand* cmd = new CPUDrawMeshCommand();
+		cmd->vertexBufferViews.Reserve(m_BoundVertexBuffers.Count());
+		for (Ref<VertexBuffer> vb : m_BoundVertexBuffers)
+		{
+			CORE_ASSERT(vb != nullptr, "Missing Vertex Stream", "");
+			cmd->vertexBufferViews.Push(vb->GetView());
+		}
+		cmd->indexBufferView = m_BoundIndexBuffer->GetView();
+		cmd->numIndices = m_BoundIndexBuffer->GetCount();
+		cmd->numInstances = numInstances;
+
+		m_CommandAllocator->SubmitCommand(cmd);
+
+		m_BoundVertexBuffers.Clear();
+		m_BoundIndexBuffer = nullptr;
+	}
+
 	void CPUCommandList::DrawMesh(Ref<Mesh> mesh)
 	{
 		DrawMesh(mesh->GetVertexBuffers(), mesh->GetIndexBuffer());
@@ -489,28 +533,10 @@ namespace Engine
 
 	void CPUCommandList::DrawMesh(Utils::Vector<Ref<VertexBuffer>> vertexBuffers, Ref<IndexBuffer> indexBuffer, uint32 numInstances)
 	{
-		ASSERT_ALLOCATOR;
-		FlushBindings();
+		m_BoundVertexBuffers = vertexBuffers;
+		m_BoundIndexBuffer = indexBuffer;
 
-		for (Ref<VertexBuffer> vb : vertexBuffers)
-		{
-			CORE_ASSERT(vb != nullptr, "Missing Vertex Stream", "");
-			ValidateState(vb->GetResource(), ResourceState::PiplineInput);
-		}
-		ValidateState(indexBuffer->GetResource(), ResourceState::PiplineInput);
-
-		CPUDrawMeshCommand* cmd = new CPUDrawMeshCommand();
-		cmd->vertexBufferViews.Reserve(vertexBuffers.Count());
-		for (Ref<VertexBuffer> vb : vertexBuffers)
-		{
-			CORE_ASSERT(vb != nullptr, "Missing Vertex Stream", "");
-			cmd->vertexBufferViews.Push(vb->GetView());
-		}
-		cmd->indexBufferView = indexBuffer->GetView();
-		cmd->numIndices = indexBuffer->GetCount();
-		cmd->numInstances = numInstances;
-
-		m_CommandAllocator->SubmitCommand(cmd);
+		DrawInstanced(numInstances);
 	}
 
 	void CPUCommandList::DispatchGroups(uint32 threadGroupsX, uint32 threadGroupsY, uint32 threadGroupsZ)

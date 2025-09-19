@@ -133,7 +133,11 @@ namespace Engine
 		void SetRWTexture(const std::string& name, Texture2DUAVDescriptorHandle* uav) { SetRWTexture(m_BoundShader->GetUniformLocation(name), uav); }
 		void SetRWTexture(const std::string& name, Ref<RWTexture2D> texture, uint32 mip = 0) { SetRWTexture(m_BoundShader->GetUniformLocation(name), texture, mip); }
 
+		void SetVertexBuffer(uint32 stream, Ref<VertexBuffer> vb);
+		void SetIndexBuffer(Ref<IndexBuffer> ib);
+
 		// do work
+		void DrawInstanced(uint32 numInstances = 1);
 		void DrawMesh(Ref<Mesh> mesh);
 		void DrawMesh(Ref<Mesh> mesh, Ref<VertexBuffer> instanceBuffer, uint32 numInstances = UINT32_MAX);
 		void DrawMesh(Ref<Mesh> mesh, Utils::Vector<Ref<VertexBuffer>> instanceBuffers, uint32 numInstances = UINT32_MAX);
@@ -161,6 +165,9 @@ namespace Engine
 		Ref<FrameBuffer> m_RenderTarget = nullptr;
 		Ref<ShaderPass> m_BoundShader = nullptr;
 		Utils::Vector<GPUDataBinding> m_Bindings;
+
+		Utils::Vector<Ref<VertexBuffer>> m_BoundVertexBuffers;
+		Ref<IndexBuffer> m_BoundIndexBuffer;
 
 		Utils::Vector<std::string> m_EventStack;
 	};
