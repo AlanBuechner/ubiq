@@ -16,8 +16,8 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 		{
-			VertexBufferView* handle = new DirectX12VertexBufferView();
-			handle->Bind(resource);
+			VertexBufferView* handle = new DirectX12VertexBufferView(resource);
+			handle->Bind();
 			return handle;
 		}
 		default: return nullptr;
@@ -81,8 +81,8 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 		{
-			IndexBufferView* handle = new DirectX12IndexBufferView();
-			handle->Bind(resource);
+			IndexBufferView* handle = new DirectX12IndexBufferView(resource);
+			handle->Bind();
 			return handle;
 		}
 		default: return nullptr;

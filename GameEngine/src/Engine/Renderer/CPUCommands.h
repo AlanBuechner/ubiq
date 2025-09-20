@@ -104,6 +104,15 @@ namespace Engine
 	CREATE_COMMAND(AwaitUAVCommand)
 		Utils::Vector<GPUResource*> UAVs;
 	};
+
+	CREATE_COMMAND(OpenTransientCommand)
+		GPUResource* res;
+		Utils::Vector<Descriptor*> descriptors;
+	};
+
+	CREATE_COMMAND(CloseTransientCommand)
+		GPUResource* res;
+	};
 	
 	CREATE_COMMAND(CopyBufferCommand)
 		GPUResource* dest;

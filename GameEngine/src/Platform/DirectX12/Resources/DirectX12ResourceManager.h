@@ -21,7 +21,7 @@ namespace Engine
 		DirectX12TransientResourceHeap(uint32 size);
 		virtual ~DirectX12TransientResourceHeap();
 
-		ID3D12Heap* GetHeap();
+		ID3D12Heap* GetHeap() { return m_Heap; }
 
 	private:
 		ID3D12Heap* m_Heap;

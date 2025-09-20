@@ -15,7 +15,7 @@ std::queue<Engine::UploadPage*> Engine::ResourceManager::s_CachedUploadPages;
 
 
 std::mutex Engine::ResourceManager::s_TransientResourceHeapCashMutex;
-uint32 Engine::ResourceManager::s_TransientResourceHeapSize = MEM_MiB(5);
+uint32 Engine::ResourceManager::s_TransientResourceHeapSize = MEM_GiB(1);
 Utils::Vector<Engine::TransientResourceHeap*> Engine::ResourceManager::s_CachedTransientResourceHeaps;
 
 namespace Engine
@@ -398,7 +398,7 @@ namespace Engine
 				commandlist->SetShader(blitPass);
 				commandlist->SetRWTexture("u_SrcTexture", lastMip);
 				commandlist->SetRWTexture("u_DstTexture", nextMip);
-				commandlist->DispatchThreads(nextMip->m_Width, nextMip->m_Height + 1, 1);
+				commandlist->DispatchThreads(nextMip->GetWidth(), nextMip->GetHeight() + 1, 1);
 
 				commandlist->AwaitUAV(mipTexture.mipTexture->GetResource());
 			}
@@ -450,10 +450,21 @@ namespace Engine
 		const Utils::Vector<CPUCommand*>& commands = commandList->GetCommands();
 		for (uint32 i = 0; i < commands.Count(); i++)
 		{
-			if (false) // check if allocate transient command
-				StartMapping(nullptr);
-			if (false)
-				EndMapping(nullptr);
+			CPUCommand& cmd = *commands[i];
+			if (cmd.GetCommandID() == CPUOpenTransientCommand::GetStaticCommandID())
+			{
+				CPUOpenTransientCommand& openCmd = (CPUOpenTransientCommand&)cmd;
+				StartMapping(openCmd.res);
+				
+				for (Descriptor* desc : openCmd.descriptors)
+					m_Descriptors.Push(desc);
+			}
+
+			if (cmd.GetCommandID() == CPUCloseTransientCommand::GetStaticCommandID())
+			{
+				CPUCloseTransientCommand& closeCmd = (CPUCloseTransientCommand&)cmd;
+				EndMapping(closeCmd.res);
+			}
 		}
 	}
 
@@ -468,6 +479,8 @@ namespace Engine
 			mapping.first->AllocateTransient(m_Heap, mapping.second);
 
 		// create descriptors
+		for (Descriptor* desc : m_Descriptors)
+			desc->Bind();
 	}
 
 	
@@ -487,12 +500,21 @@ namespace Engine
 			{
 				const Chunk& chunk = m_UsedChunks[i];
 				const Chunk& nextChunk = m_UsedChunks[i + 1];
-				uint32 freeStart = chunk.start + chunk.size;
-				uint32 freeSize = nextChunk.start - freeStart;
 
-				if (freeSize > res->GetUnderlyingResourceSize())
+				GPUResource::AllocationInfo allocInfo = res->GetAllocationInfo();
+
+				uint32 start = chunk.start + chunk.size;
+				uint32 offset = allocInfo.allignment - (start % allocInfo.allignment);
+				start = start + (offset % allocInfo.allignment);
+
+				if(start >= nextChunk.start)
+					continue;
+
+				uint32 freeSize = nextChunk.start - start;
+
+				if (freeSize > allocInfo.size)
 				{
-					AddAllocation(res, freeStart, i + 1);
+					AddAllocation(res, start, i + 1);
 					return;
 				}
 			}
@@ -513,16 +535,18 @@ namespace Engine
 
 	void TransientPool::AddAllocation(GPUResource* res, uint32 start, uint32 index)
 	{
+		GPUResource::AllocationInfo allocInfo = res->GetAllocationInfo();
+
 		Chunk newChunk;
 		newChunk.start = start;
-		newChunk.size = res->GetUnderlyingResourceSize();
+		newChunk.size = allocInfo.size;
 		if (index == UINT32_MAX)
 			m_UsedChunks.Push(newChunk);
 		else
 			m_UsedChunks.Insert(index, newChunk);
 		m_AddressMappings[res] = newChunk.start;
 
-		uint32 allocationEnd = start + res->GetUnderlyingResourceSize();
+		uint32 allocationEnd = start + allocInfo.size;
 
 		if (allocationEnd > m_NededSize)
 			m_NededSize = allocationEnd;

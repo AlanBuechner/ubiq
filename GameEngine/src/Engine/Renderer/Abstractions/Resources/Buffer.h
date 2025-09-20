@@ -12,10 +12,17 @@ namespace Engine
 	// vertex buffers don't use descriptors they use views but architecturally they are similar
 	class VertexBufferView : public Descriptor
 	{
+	protected:
+		VertexBufferView(StructuredBufferResource* resource) :
+			m_Resource(resource)
+		{ }
+
 	public:
-		virtual void Bind(StructuredBufferResource* resource) = 0;
 
 		static VertexBufferView* Create(StructuredBufferResource* resource);
+
+	protected:
+		StructuredBufferResource* m_Resource;
 	};
 
 	class VertexBuffer : public StructuredBuffer
@@ -47,10 +54,17 @@ namespace Engine
 	// index buffers don't use descriptors they use views but architecturally they are similar
 	class IndexBufferView : public Descriptor
 	{
+	protected:
+		IndexBufferView(StructuredBufferResource* resource) :
+			m_Resource(resource)
+		{ }
+
 	public:
-		virtual void Bind(StructuredBufferResource* resource) = 0;
 
 		static IndexBufferView* Create(StructuredBufferResource* resource);
+
+	protected:
+		StructuredBufferResource* m_Resource;
 	};
 
 	class IndexBuffer : public StructuredBuffer

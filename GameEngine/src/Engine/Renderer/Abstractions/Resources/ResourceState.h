@@ -19,20 +19,27 @@ namespace Engine
 	class GPUResource
 	{
 	public:
+		struct AllocationInfo
+		{
+			uint32 size = 0;
+			uint32 allignment = 0;
+		};
+
+	public:
 		virtual ~GPUResource() = default;
 
 	public:
-		ResourceState GetDefultState() { return m_DefultState; }
+		ResourceState GetDefultState() const { return m_DefultState; }
 
-		virtual void* GetGPUResourcePointer() = 0;
-		virtual bool SupportState(ResourceState state) = 0;
-		virtual uint32 GetGPUState(ResourceState state) = 0;
-		uint32 GetUnderlyingResourceSize() { return m_UnderlyingResourceSize; }
-		bool IsTransient() { return m_Transient; }
+		virtual void* GetGPUResourcePointer() const = 0;
+		virtual bool SupportState(ResourceState state) const  = 0;
+		virtual uint32 GetGPUState(ResourceState state) const = 0;
+		AllocationInfo GetAllocationInfo() const { return m_AllocationInfo; }
+		bool IsTransient() const { return m_Transient; }
 		virtual void AllocateTransient(class TransientResourceHeap* heap, uint32 offset) = 0;
 
 	protected:
-		uint32 m_UnderlyingResourceSize = 0;
+		AllocationInfo m_AllocationInfo;
 		bool m_Transient = false;
 		ResourceState m_DefultState = ResourceState::Common;
 		ResourceState m_EOFState = ResourceState::Unknown; // end of frame state

@@ -29,7 +29,7 @@ namespace Engine
 		
 	}
 
-	bool Texture2DResource::SupportState(ResourceState state)
+	bool Texture2DResource::SupportState(ResourceState state) const
 	{
 		switch (state)
 		{
@@ -53,8 +53,8 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 		{
-			Texture2DSRVDescriptorHandle* handle = new DirectX12Texture2DSRVDescriptorHandle();
-			handle->Bind(resource);
+			Texture2DSRVDescriptorHandle* handle = new DirectX12Texture2DSRVDescriptorHandle(resource);
+			handle->Bind();
 			return handle;
 		}
 		default: return nullptr;
@@ -68,8 +68,8 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 		{
-			Texture2DUAVDescriptorHandle* handle = new DirectX12Texture2DUAVDescriptorHandle();
-			handle->Bind(resource, mipSlice, width, height);
+			Texture2DUAVDescriptorHandle* handle = new DirectX12Texture2DUAVDescriptorHandle(resource, mipSlice, width, height);
+			handle->Bind();
 			return handle;
 		}
 		default: return nullptr;
@@ -85,7 +85,7 @@ namespace Engine
 		case RendererAPI::DirectX12:
 		{
 			Texture2DRTVDSVDescriptorHandle* handle = new DirectX12Texture2DRTVDSVDescriptorHandle(resource);
-			handle->Bind(resource);
+			handle->Bind();
 			return handle;
 		}
 		default: return nullptr;

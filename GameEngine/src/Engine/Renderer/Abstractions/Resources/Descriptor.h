@@ -6,5 +6,7 @@ namespace Engine
 	{
 	public:
 		virtual ~Descriptor() = 0;
+
+		virtual void Bind() = 0;
 	};
 }

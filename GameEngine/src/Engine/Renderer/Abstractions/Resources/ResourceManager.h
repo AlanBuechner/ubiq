@@ -13,6 +13,11 @@
 
 namespace Engine
 {
+	class Descriptor;
+}
+
+namespace Engine
+{
 
 	class ResourceDeletionPool
 	{
@@ -134,7 +139,9 @@ namespace Engine
 			uint32 start;
 			uint32 size;
 		};
+
 		std::unordered_map<GPUResource*, uint64> m_AddressMappings;
+		Utils::Vector<Descriptor*> m_Descriptors;
 		Utils::Vector<Chunk> m_UsedChunks;
 		uint32 m_NededSize = 0;
 		TransientResourceHeap* m_Heap;

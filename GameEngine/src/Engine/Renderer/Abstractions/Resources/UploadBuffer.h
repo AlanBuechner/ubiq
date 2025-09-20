@@ -20,7 +20,7 @@ namespace Engine
 		static UploadBufferResource* Create(uint32 size);
 
 	protected:
-		bool SupportState(ResourceState state) override;
+		virtual bool SupportState(ResourceState state) const override;
 
 	protected:
 		void* m_MapedBasePointer = nullptr;
@@ -52,7 +52,7 @@ namespace Engine
 		static UploadTextureResource* Create(uint32 width, uint32 height, uint32 mips, TextureFormat format);
 
 	protected:
-		bool SupportState(ResourceState state) override;
+		virtual bool SupportState(ResourceState state) const override;
 
 	protected:
 		void* m_MapedBasePointer = nullptr;

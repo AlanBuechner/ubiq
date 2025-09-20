@@ -451,7 +451,7 @@ namespace Engine
 		if (index == UINT32_MAX) return;
 		ASSERT_ALLOCATOR;
 
-		ValidateState(uav->m_Resource, ResourceState::UnorderedResource);
+		ValidateState(uav->GetResource(), ResourceState::UnorderedResource);
 
 		GPUDataBinding& binding = m_Bindings.Push({});
 		binding.index = index;

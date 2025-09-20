@@ -16,7 +16,7 @@ namespace Engine
 		uint32 GetSize() { return m_Size; }
 		uint32 GetRealSize() { return m_RealSize; }
 
-		virtual bool SupportState(ResourceState state) override;
+		virtual bool SupportState(ResourceState state)  const override;
 
 		virtual void SetData(const void* data) = 0;
 
@@ -31,12 +31,19 @@ namespace Engine
 
 	class ConstantBufferCBVDescriptorHandle : public Descriptor
 	{
+	protected:
+		ConstantBufferCBVDescriptorHandle(ConstantBufferResource* resource) :
+			m_Resource(resource)
+		{ }
+
 	public:
 		virtual uint64 GetGPUHandlePointer() const = 0;
 		virtual uint32 GetIndex() const = 0;
-		virtual void Bind(ConstantBufferResource* resource) = 0;
 
 		static ConstantBufferCBVDescriptorHandle* Create(ConstantBufferResource* resource);
+
+	protected:
+		ConstantBufferResource* m_Resource;
 	};
 
 	// Constant Buffer Objects ---------------------------------------------------------- //

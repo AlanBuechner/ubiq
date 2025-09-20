@@ -9,9 +9,10 @@ namespace Engine
 	class DirectX12VertexBufferView : public VertexBufferView
 	{
 	public:
+		DirectX12VertexBufferView(StructuredBufferResource* resource);
 		virtual ~DirectX12VertexBufferView() override = default;
 
-		virtual void Bind(StructuredBufferResource* resource) override;
+		virtual void Bind() override;
 
 		D3D12_VERTEX_BUFFER_VIEW& GetView() { return m_View; }
 
@@ -24,9 +25,10 @@ namespace Engine
 	class DirectX12IndexBufferView : public IndexBufferView
 	{
 	public:
+		DirectX12IndexBufferView(StructuredBufferResource* resource);
 		virtual ~DirectX12IndexBufferView() override = default;
 
-		virtual void Bind(StructuredBufferResource* resource) override;
+		virtual void Bind() override;
 
 		D3D12_INDEX_BUFFER_VIEW& GetView() { return m_View; }
 

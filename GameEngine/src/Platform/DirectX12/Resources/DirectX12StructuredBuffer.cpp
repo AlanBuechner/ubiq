@@ -49,7 +49,7 @@ namespace Engine
 		context->GetDX12ResourceManager()->UploadBufferRegion(this, start * m_Stride, data, count * m_Stride, m_DefultState);
 	}
 
-	uint32 DirectX12StructuredBufferResource::GetGPUState(ResourceState state)
+	uint32 DirectX12StructuredBufferResource::GetGPUState(ResourceState state) const
 	{
 		switch (state)
 		{
@@ -81,37 +81,47 @@ namespace Engine
 		// TODO
 	}
 
-	DirectX12StructuredBufferSRVDescriptorHandle::DirectX12StructuredBufferSRVDescriptorHandle()
+	DirectX12StructuredBufferSRVDescriptorHandle::DirectX12StructuredBufferSRVDescriptorHandle(StructuredBufferResource* resource) :
+		StructuredBufferSRVDescriptorHandle(resource)
 	{
 		m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
-	void DirectX12StructuredBufferSRVDescriptorHandle::Bind(StructuredBufferResource* resource)
+	void DirectX12StructuredBufferSRVDescriptorHandle::Bind()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		DirectX12StructuredBufferResource* dxResource = (DirectX12StructuredBufferResource*)resource;
+		DirectX12StructuredBufferResource* dxResource = (DirectX12StructuredBufferResource*)m_Resource;
+
+		// check if resource has been allocated
+		if (dxResource->GetBuffer() == nullptr)
+			return;
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 		srvDesc.Buffer.FirstElement = 0;
-		srvDesc.Buffer.NumElements = resource->GetCount();
-		srvDesc.Buffer.StructureByteStride = resource->GetStride();
+		srvDesc.Buffer.NumElements = m_Resource->GetCount();
+		srvDesc.Buffer.StructureByteStride = m_Resource->GetStride();
 		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
 		context->GetDevice()->CreateShaderResourceView(dxResource->GetBuffer(), &srvDesc, m_SRVHandle.cpu);
 	}
 
-	DirectX12StructuredBufferUAVDescriptorHandle::DirectX12StructuredBufferUAVDescriptorHandle()
+	DirectX12StructuredBufferUAVDescriptorHandle::DirectX12StructuredBufferUAVDescriptorHandle(StructuredBufferResource* resource) :
+		StructuredBufferUAVDescriptorHandle(resource)
 	{
 		m_UAVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
-	void DirectX12StructuredBufferUAVDescriptorHandle::Bind(StructuredBufferResource* resource)
+	void DirectX12StructuredBufferUAVDescriptorHandle::Bind()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		DirectX12StructuredBufferResource* dxResource = (DirectX12StructuredBufferResource*)resource;
+		DirectX12StructuredBufferResource* dxResource = (DirectX12StructuredBufferResource*)m_Resource;
+
+		// check if resource has been allocated
+		if (dxResource->GetBuffer() == nullptr)
+			return;
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;

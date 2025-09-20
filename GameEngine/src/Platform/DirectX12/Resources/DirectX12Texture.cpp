@@ -32,24 +32,43 @@ namespace Engine
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
-		{ // create texture buffer
-			CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
-			D3D12_RESOURCE_DESC rDesc;
-			rDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-			rDesc.Format = GetDXGIFormat();
-			rDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-			rDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-			if((uint32)m_Type & (uint32)TextureType::RenderTarget)
-				rDesc.Flags |= (IsTextureFormatDepthStencil(GetFormat()) ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			if ((uint32)m_Type & (uint32)TextureType::RWTexture)
-				rDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-			rDesc.MipLevels = m_Mips;
-			rDesc.Width = width;
-			rDesc.Height = height;
-			rDesc.Alignment = 0;
-			rDesc.DepthOrArraySize = 1;
-			rDesc.SampleDesc = { (uint32)sampleCount, 0 };
+		m_TextureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		m_TextureDesc.Format = GetDXGIFormat();
+		m_TextureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		m_TextureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+		if ((uint32)m_Type & (uint32)TextureType::RenderTarget)
+			m_TextureDesc.Flags |= (IsTextureFormatDepthStencil(GetFormat()) ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+		if ((uint32)m_Type & (uint32)TextureType::RWTexture)
+			m_TextureDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		m_TextureDesc.MipLevels = m_Mips;
+		m_TextureDesc.Width = width;
+		m_TextureDesc.Height = height;
+		m_TextureDesc.Alignment = 0;
+		m_TextureDesc.DepthOrArraySize = 1;
+		m_TextureDesc.SampleDesc = { (uint32)sampleCount, 0 };
+
+		if (m_Transient)
+		{
+			// attempt small resource placement first
+			m_TextureDesc.Alignment = D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT;
+			D3D12_RESOURCE_ALLOCATION_INFO info = context->GetDevice()->GetResourceAllocationInfo(0, 1, &m_TextureDesc);
+
+			if (info.Alignment != D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT)
+			{
+				// If the alignment requested is not granted, then let D3D tell us
+				// the alignment that needs to be used for these resources.
+				m_TextureDesc.Alignment = 0;
+				info = context->GetDevice()->GetResourceAllocationInfo(0, 1, &m_TextureDesc);
+			}
+
+			m_AllocationInfo.size = info.SizeInBytes;
+			m_AllocationInfo.allignment = info.Alignment;
+		}
+		else
+		{
+			// create texture buffer
+			CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
 			D3D12_CLEAR_VALUE clearValue = {};
 			for(uint32 i = 0; i < 4; i++)
@@ -58,7 +77,7 @@ namespace Engine
 			context->GetDevice()->CreateCommittedResource(
 				&props,
 				D3D12_HEAP_FLAG_NONE,
-				&rDesc,
+				&m_TextureDesc,
 				(D3D12_RESOURCE_STATES)GetGPUState(m_DefultState),
 				nullptr,
 				IID_PPV_ARGS(&m_Buffer)
@@ -99,7 +118,7 @@ namespace Engine
 		context->GetResourceManager()->ScheduleResourceDeletion(uploadBuffer);
 	}
 
-	uint32 DirectX12Texture2DResource::GetGPUState(ResourceState state)
+	uint32 DirectX12Texture2DResource::GetGPUState(ResourceState state) const
 	{
 		switch (state)
 		{
@@ -121,62 +140,77 @@ namespace Engine
 	}
 
 
-	void DirectX12Texture2DResource::AllocateTransient(class TransientResourceHeap* heap, uint32 offset)
+	void DirectX12Texture2DResource::AllocateTransient(TransientResourceHeap* heap, uint32 offset)
 	{
-		// TODO
+		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
+
+		DirectX12TransientResourceHeap* dxHeap = (DirectX12TransientResourceHeap*)heap;
+
+		context->GetDevice()->CreatePlacedResource(
+			dxHeap->GetHeap(),
+			m_AllocationInfo.size,
+			&m_TextureDesc,
+			(D3D12_RESOURCE_STATES)GetGPUState(m_DefultState),
+			nullptr,
+			IID_PPV_ARGS(&m_Buffer)
+		);
 	}
 
-	DirectX12Texture2DSRVDescriptorHandle::DirectX12Texture2DSRVDescriptorHandle()
+	DirectX12Texture2DSRVDescriptorHandle::DirectX12Texture2DSRVDescriptorHandle(Texture2DResource* resource) :
+		Texture2DSRVDescriptorHandle(resource)
 	{
 		m_SRVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
-	void DirectX12Texture2DSRVDescriptorHandle::Bind(Texture2DResource* resource)
+	void DirectX12Texture2DSRVDescriptorHandle::Bind()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)resource;
+		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)m_Resource;
+
+		// check if resource has been allocated
+		if (dxResource->GetBuffer() == nullptr)
+			return;
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Format = dxResource->GetDXGISRVFormat();
-		srvDesc.ViewDimension = resource->UsingMSAA() ? D3D12_SRV_DIMENSION_TEXTURE2DMS : D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.ViewDimension = m_Resource->UsingMSAA() ? D3D12_SRV_DIMENSION_TEXTURE2DMS : D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = dxResource->GetMips();
 		srvDesc.Texture2D.MostDetailedMip = 0;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 		context->GetDevice()->CreateShaderResourceView(dxResource->GetBuffer(), &srvDesc, m_SRVHandle.cpu);
 
-		m_Resource = resource;
 	}
 
 
 
-	DirectX12Texture2DUAVDescriptorHandle::DirectX12Texture2DUAVDescriptorHandle()
+	DirectX12Texture2DUAVDescriptorHandle::DirectX12Texture2DUAVDescriptorHandle(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height) :
+		Texture2DUAVDescriptorHandle(resource, mipSlice, width, height)
 	{
 		m_UAVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
-	void DirectX12Texture2DUAVDescriptorHandle::Bind(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height)
+	void DirectX12Texture2DUAVDescriptorHandle::Bind()
 	{
-		m_MipSlice = mipSlice;
-		m_Width = width;
-		m_Height = height;
-
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)resource;
+		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)m_Resource;
+
+		// check if resource has been allocated
+		if (dxResource->GetBuffer() == nullptr)
+			return;
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = dxResource->GetDXGISRVFormat();
-		uavDesc.ViewDimension = resource->UsingMSAA() ? D3D12_UAV_DIMENSION_TEXTURE2DMS : D3D12_UAV_DIMENSION_TEXTURE2D;
-		uavDesc.Texture2D.MipSlice = mipSlice;
+		uavDesc.ViewDimension = m_Resource->UsingMSAA() ? D3D12_UAV_DIMENSION_TEXTURE2DMS : D3D12_UAV_DIMENSION_TEXTURE2D;
+		uavDesc.Texture2D.MipSlice = m_MipSlice;
 		context->GetDevice()->CreateUnorderedAccessView(dxResource->GetBuffer(), nullptr, &uavDesc, m_UAVHandle.cpu);
-
-		m_Resource = resource;
 	}
 
 
 
 
-	DirectX12Texture2DRTVDSVDescriptorHandle::DirectX12Texture2DRTVDSVDescriptorHandle(Texture2DResource* resource)
+	DirectX12Texture2DRTVDSVDescriptorHandle::DirectX12Texture2DRTVDSVDescriptorHandle(Texture2DResource* resource) :
+		Texture2DRTVDSVDescriptorHandle(resource)
 	{
 		m_DSV = IsTextureFormatDepthStencil(resource->GetFormat());
 		if (m_DSV)
@@ -185,11 +219,16 @@ namespace Engine
 			m_RTVDSVHandle = DirectX12ResourceManager::s_RTVHeap->Allocate();
 	}
 
-	void DirectX12Texture2DRTVDSVDescriptorHandle::Bind(Texture2DResource* resource)
+	void DirectX12Texture2DRTVDSVDescriptorHandle::Bind()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)resource;
-		bool DSV = IsTextureFormatDepthStencil(resource->GetFormat());
+		DirectX12Texture2DResource* dxResource = (DirectX12Texture2DResource*)m_Resource;
+
+		// check if resource has been allocated
+		if (dxResource->GetBuffer() == nullptr)
+			return;
+
+		bool DSV = IsTextureFormatDepthStencil(m_Resource->GetFormat());
 
 		// no api to change the format so this should never trigger but i want it here just in case
 		CORE_ASSERT(DSV == m_DSV, m_DSV ? "cannot rebind depth stencel as render target" : "cannot rebind render target as depth stencil");
@@ -198,8 +237,6 @@ namespace Engine
 			context->GetDevice()->CreateDepthStencilView(dxResource->GetBuffer(), nullptr, m_RTVDSVHandle.cpu);
 		else
 			context->GetDevice()->CreateRenderTargetView(dxResource->GetBuffer(), nullptr, m_RTVDSVHandle.cpu);
-
-		m_Resource = resource;
 	}
 
 }

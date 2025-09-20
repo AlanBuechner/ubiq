@@ -39,6 +39,10 @@ namespace Engine
 		// UAVs
 		void AwaitUAVs(const CPUAwaitUAVCommand& cmd);
 
+		// transient allocation
+		void OpenTransient(const CPUOpenTransientCommand& cmd);
+		void CloseTransient(const CPUCloseTransientCommand& cmd);
+
 		// copying
 		void CopyBuffer(const CPUCopyBufferCommand& cmd);
 		void UploadTexture(const CPUUploadTextureCommand& Command);

@@ -13,7 +13,7 @@ namespace Engine
 
 	ConstantBufferResource::~ConstantBufferResource() {}
 
-	bool ConstantBufferResource::SupportState(ResourceState state)
+	bool ConstantBufferResource::SupportState(ResourceState state) const
 	{
 		switch (state)
 		{
@@ -47,8 +47,8 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 		{
-			ConstantBufferCBVDescriptorHandle* handle = new DirectX12ConstantBufferCBVDescriptorHandle();
-			handle->Bind(resource);
+			ConstantBufferCBVDescriptorHandle* handle = new DirectX12ConstantBufferCBVDescriptorHandle(resource);
+			handle->Bind();
 			return handle;
 		}
 		default: return nullptr;

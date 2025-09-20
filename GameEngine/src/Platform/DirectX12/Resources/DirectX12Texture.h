@@ -24,12 +24,14 @@ namespace Engine
 		virtual void SetData(void* data) override;
 
 	protected:
-		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
-		virtual uint32 GetGPUState(ResourceState state) override;
+		virtual void* GetGPUResourcePointer() const override { return m_Buffer; }
+		virtual uint32 GetGPUState(ResourceState state) const override;
 
 		virtual void AllocateTransient(class TransientResourceHeap* heap, uint32 offset) override;
 
 	private:
+		D3D12_RESOURCE_DESC m_TextureDesc;
+
 		ID3D12Resource* m_Buffer;
 
 		friend class DirectX12SwapChain;
@@ -40,12 +42,12 @@ namespace Engine
 	class DirectX12Texture2DSRVDescriptorHandle : public Texture2DSRVDescriptorHandle
 	{
 	public:
-		DirectX12Texture2DSRVDescriptorHandle();
+		DirectX12Texture2DSRVDescriptorHandle(Texture2DResource* resource);
 		virtual ~DirectX12Texture2DSRVDescriptorHandle() override { m_SRVHandle.Free(); }
 
 		virtual uint64 GetGPUHandlePointer() const override { return m_SRVHandle.gpu.ptr; }
 		virtual uint32 GetIndex() const override { return m_SRVHandle.GetIndex(); }
-		virtual void Bind(Texture2DResource* resource) override;
+		virtual void Bind() override;
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_SRVHandle; }
 
@@ -57,12 +59,12 @@ namespace Engine
 	class DirectX12Texture2DUAVDescriptorHandle : public Texture2DUAVDescriptorHandle
 	{
 	public:
-		DirectX12Texture2DUAVDescriptorHandle();
+		DirectX12Texture2DUAVDescriptorHandle(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height);
 		virtual ~DirectX12Texture2DUAVDescriptorHandle() { m_UAVHandle.Free(); }
 
 		virtual uint64 GetGPUHandlePointer() const override { return m_UAVHandle.gpu.ptr; }
 		virtual uint32 GetIndex() const override { return m_UAVHandle.GetIndex(); }
-		virtual void Bind(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height) override;
+		virtual void Bind() override;
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_UAVHandle; }
 
@@ -79,7 +81,7 @@ namespace Engine
 
 		virtual uint64 GetGPUHandlePointer() const override { return m_RTVDSVHandle.gpu.ptr; }
 		virtual uint32 GetIndex() const override { return m_RTVDSVHandle.GetIndex(); }
-		virtual void Bind(Texture2DResource* resource) override;
+		virtual void Bind() override;
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_RTVDSVHandle; }
 

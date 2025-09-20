@@ -19,8 +19,8 @@ namespace Engine
 
 	private:
 
-		virtual void* GetGPUResourcePointer() override { return m_Buffer; }
-		virtual uint32 GetGPUState(ResourceState state) override;
+		virtual void* GetGPUResourcePointer() const override { return m_Buffer; }
+		virtual uint32 GetGPUState(ResourceState state) const override;
 
 		virtual void AllocateTransient(class TransientResourceHeap* heap, uint32 offset) override;
 
@@ -32,12 +32,12 @@ namespace Engine
 	class DirectX12ConstantBufferCBVDescriptorHandle : public ConstantBufferCBVDescriptorHandle
 	{
 	public:
-		DirectX12ConstantBufferCBVDescriptorHandle();
+		DirectX12ConstantBufferCBVDescriptorHandle(ConstantBufferResource* resource);
 		virtual ~DirectX12ConstantBufferCBVDescriptorHandle() override { m_CBVHandle.Free(); }
 
 		virtual uint64 GetGPUHandlePointer() const override { return m_CBVHandle.gpu.ptr; }
 		virtual uint32 GetIndex() const override { return m_CBVHandle.GetIndex(); }
-		virtual void Bind(ConstantBufferResource* resource) override;
+		virtual void Bind() override;
 
 		const DirectX12DescriptorHandle& GetHandle() { return m_CBVHandle; }
 

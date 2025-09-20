@@ -24,7 +24,7 @@ namespace Engine
 		uint32 GetStride() { return m_Stride; }
 		ParentType GetParentType() { return m_ParentType; }
 
-		virtual bool SupportState(ResourceState state) override;
+		virtual bool SupportState(ResourceState state) const override;
 
 		virtual void SetData(const void* data, uint32 count = 1, uint32 start = 0) = 0;
 
@@ -41,22 +41,36 @@ namespace Engine
 
 	class StructuredBufferSRVDescriptorHandle : public Descriptor
 	{
+	protected:
+		StructuredBufferSRVDescriptorHandle(StructuredBufferResource* resource) :
+			m_Resource(resource)
+		{ }
+
 	public:
 		virtual uint64 GetGPUHandlePointer() const = 0;
 		virtual uint32 GetIndex() const = 0;
-		virtual void Bind(StructuredBufferResource* resource) = 0;
 
 		static StructuredBufferSRVDescriptorHandle* Create(StructuredBufferResource* resource);
+
+	protected:
+		StructuredBufferResource* m_Resource;
 	};
 
 	class StructuredBufferUAVDescriptorHandle : public Descriptor
 	{
+	protected:
+		StructuredBufferUAVDescriptorHandle(StructuredBufferResource* resource) :
+			m_Resource(resource)
+		{ }
+
 	public:
 		virtual uint64 GetGPUHandlePointer() const = 0;
 		virtual uint32 GetIndex() const = 0;
-		virtual void Bind(StructuredBufferResource* resource) = 0;
 
 		static StructuredBufferUAVDescriptorHandle* Create(StructuredBufferResource* resource);
+
+	protected:
+		StructuredBufferResource* m_Resource;
 	};
 
 

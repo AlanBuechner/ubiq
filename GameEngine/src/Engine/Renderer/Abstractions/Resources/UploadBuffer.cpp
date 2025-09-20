@@ -17,7 +17,7 @@ namespace Engine
 		}
 	}
 
-	bool UploadBufferResource::SupportState(ResourceState state)
+	bool UploadBufferResource::SupportState(ResourceState state) const
 	{
 		switch (state)
 		{
@@ -42,7 +42,7 @@ namespace Engine
 		}
 	}
 
-	bool UploadTextureResource::SupportState(ResourceState state)
+	bool UploadTextureResource::SupportState(ResourceState state) const
 	{
 		switch (state)
 		{

@@ -22,7 +22,7 @@ namespace Engine
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
-		CD3DX12_HEAP_DESC heapDesc(m_Size, D3D12_HEAP_TYPE_DEFAULT, 0, D3D12_HEAP_FLAG_NONE);
+		CD3DX12_HEAP_DESC heapDesc(m_Size, D3D12_HEAP_TYPE_DEFAULT, D3D12_DEFAULT_MSAA_RESOURCE_PLACEMENT_ALIGNMENT, D3D12_HEAP_FLAG_NONE);
 		HRESULT hr = context->GetDevice()->CreateHeap(&heapDesc, IID_PPV_ARGS(&m_Heap));
 
 		CORE_ASSERT_HRESULT(hr, "Failed to create transient heap");

@@ -99,6 +99,8 @@ namespace Engine
 			case CPUEndGPUEventCommand::GetStaticCommandID(): EndGPUEvent(); break;
 				CALL_COMMAND(CPUResourceTransitionCommand, Transition);
 				CALL_COMMAND(CPUAwaitUAVCommand, AwaitUAVs);
+				CALL_COMMAND(CPUOpenTransientCommand, OpenTransient);
+				CALL_COMMAND(CPUCloseTransientCommand, CloseTransient);
 				CALL_COMMAND(CPUCopyBufferCommand, CopyBuffer);
 				CALL_COMMAND(CPUUploadTextureCommand , UploadTexture);
 				CALL_COMMAND(CPUSetViewportCommand, SetViewport);
@@ -108,12 +110,6 @@ namespace Engine
 				CALL_COMMAND(CPUSetComputeShaderCommand, SetShader);
 				CALL_COMMAND(CPUSetWorkGraphShaderCommand, SetShader);
 				CALL_COMMAND(CPUBindDataCommand, BindData);
-				//CALL_COMMAND(CPUSetRootConstantCommand, SetRootConstant);
-				//CALL_COMMAND(CPUSetConstantBufferCommand, SetConstantBuffer);
-				//CALL_COMMAND(CPUSetStructuredBufferCommand, SetStructuredBuffer);
-				//CALL_COMMAND(CPUSetRWStructuredBufferCommand, SetRWStructuredBuffer);
-				//CALL_COMMAND(CPUSetTextureCommand, SetTexture);
-				//CALL_COMMAND(CPUSetRWTextureCommand, SetRWTexture);
 				CALL_COMMAND(CPUDrawMeshCommand, DrawMesh);
 				CALL_COMMAND(CPUDispatchCommand, Dispatch);
 				CALL_COMMAND(CPUDispatchGraphCPUDataCommand, DispatchGraph);
@@ -221,6 +217,18 @@ namespace Engine
 		for (uint32 i = 0; i < cmd.UAVs.Count(); i++)
 			barriers[i] = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)cmd.UAVs[i]->GetGPUResourcePointer());
 		m_CommandList->ResourceBarrier(barriers.Count(), barriers.Data());
+	}
+
+	// transient allocation
+	void DirectX12CommandList::OpenTransient(const CPUOpenTransientCommand& cmd)
+	{
+		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Aliasing(nullptr, (ID3D12Resource*)cmd.res->GetGPUResourcePointer());
+		m_CommandList->ResourceBarrier(1, &barrier);
+	}
+
+	void DirectX12CommandList::CloseTransient(const CPUCloseTransientCommand& cmd)
+	{
+		// nothing to do
 	}
 
 	// copying

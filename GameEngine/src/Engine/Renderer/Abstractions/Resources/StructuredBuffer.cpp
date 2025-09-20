@@ -13,7 +13,7 @@ namespace Engine
 
 	StructuredBufferResource::~StructuredBufferResource() {}
 
-	bool StructuredBufferResource::SupportState(ResourceState state)
+	bool StructuredBufferResource::SupportState(ResourceState state) const
 	{
 		switch (state)
 		{
@@ -51,8 +51,8 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 		{
-			StructuredBufferSRVDescriptorHandle* handle = new DirectX12StructuredBufferSRVDescriptorHandle();
-			handle->Bind(resource);
+			StructuredBufferSRVDescriptorHandle* handle = new DirectX12StructuredBufferSRVDescriptorHandle(resource);
+			handle->Bind();
 			return handle;
 		}
 		default: return nullptr;
@@ -66,8 +66,8 @@ namespace Engine
 		{
 		case RendererAPI::DirectX12:
 		{
-			StructuredBufferUAVDescriptorHandle* handle = new DirectX12StructuredBufferUAVDescriptorHandle();
-			handle->Bind(resource);
+			StructuredBufferUAVDescriptorHandle* handle = new DirectX12StructuredBufferUAVDescriptorHandle(resource);
+			handle->Bind();
 			return handle;
 		}
 		default: return nullptr;

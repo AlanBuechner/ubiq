@@ -48,7 +48,7 @@ namespace Engine
 		context->GetDX12ResourceManager()->UploadBuffer(this, data, m_Size, m_DefultState);
 	}
 
-	uint32 DirectX12ConstantBufferResource::GetGPUState(ResourceState state)
+	uint32 DirectX12ConstantBufferResource::GetGPUState(ResourceState state) const
 	{
 		switch (state)
 		{
@@ -69,15 +69,16 @@ namespace Engine
 		CORE_ASSERT(false, "Cant make transient constant buffer", "");
 	}
 
-	DirectX12ConstantBufferCBVDescriptorHandle::DirectX12ConstantBufferCBVDescriptorHandle()
+	DirectX12ConstantBufferCBVDescriptorHandle::DirectX12ConstantBufferCBVDescriptorHandle(ConstantBufferResource* resource) :
+		ConstantBufferCBVDescriptorHandle(resource)
 	{
 		m_CBVHandle = DirectX12ResourceManager::s_SRVHeap->Allocate();
 	}
 
-	void DirectX12ConstantBufferCBVDescriptorHandle::Bind(ConstantBufferResource* resource)
+	void DirectX12ConstantBufferCBVDescriptorHandle::Bind()
 	{
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
-		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)resource;
+		DirectX12ConstantBufferResource* dxResource = (DirectX12ConstantBufferResource*)m_Resource;
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
 		desc.BufferLocation = dxResource->GetBuffer()->GetGPUVirtualAddress();

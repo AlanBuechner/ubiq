@@ -51,7 +51,7 @@ namespace Engine
 		static Texture2DResource* Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount);
 
 	protected:
-		virtual bool SupportState(ResourceState state) override;
+		virtual bool SupportState(ResourceState state) const override;
 
 	protected:
 		uint32 m_Width = 1;
@@ -68,10 +68,14 @@ namespace Engine
 
 	class Texture2DSRVDescriptorHandle : public Descriptor
 	{
+	protected:
+		Texture2DSRVDescriptorHandle(Texture2DResource* resource) :
+			m_Resource(resource)
+		{ }
+
 	public:
 		virtual uint64 GetGPUHandlePointer() const = 0;
 		virtual uint32 GetIndex() const = 0;
-		virtual void Bind(Texture2DResource* resource) = 0;
 
 		static Texture2DSRVDescriptorHandle* Create(Texture2DResource* resource);
 
@@ -80,13 +84,22 @@ namespace Engine
 
 	class Texture2DUAVDescriptorHandle : public Descriptor
 	{
+	protected:
+		Texture2DUAVDescriptorHandle(Texture2DResource* res, uint32 mipSlice, uint32 width, uint32 height) :
+			m_Resource(res), m_MipSlice(mipSlice), m_Width(width), m_Height(height)
+		{ }
+
 	public:
+		uint32 GetWidth() { return m_Width; }
+		uint32 GetHeight() { return m_Height; }
+		Texture2DResource* GetResource() { return m_Resource; }
+
 		virtual uint64 GetGPUHandlePointer() const = 0;
 		virtual uint32 GetIndex() const = 0;
-		virtual void Bind(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height) = 0;
 
 		static Texture2DUAVDescriptorHandle* Create(Texture2DResource* resource, uint32 mipSlice, uint32 width, uint32 height);
 
+	protected:
 		Texture2DResource* m_Resource;
 		uint32 m_MipSlice;
 		uint32 m_Width, m_Height;
@@ -94,10 +107,14 @@ namespace Engine
 
 	class Texture2DRTVDSVDescriptorHandle : public Descriptor
 	{
+	protected:
+		Texture2DRTVDSVDescriptorHandle(Texture2DResource* resource) :
+			m_Resource(resource)
+		{ }
+
 	public:
 		virtual uint64 GetGPUHandlePointer() const = 0;
 		virtual uint32 GetIndex() const = 0;
-		virtual void Bind(Texture2DResource* resource) = 0;
 
 		static Texture2DRTVDSVDescriptorHandle* Create(Texture2DResource* resource);
 
