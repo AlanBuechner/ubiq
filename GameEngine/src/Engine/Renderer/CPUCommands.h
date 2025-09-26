@@ -36,6 +36,7 @@ namespace Engine
 	class StructuredBufferUAVDescriptorHandle;
 	class Texture2DSRVDescriptorHandle;
 	class StructuredBufferResource;
+	class Texture2DResource;
 }
 
 namespace Engine
@@ -112,6 +113,16 @@ namespace Engine
 
 	CREATE_COMMAND(CloseTransientCommand)
 		GPUResource* res;
+	};
+
+	CREATE_COMMAND(ResolveMSAACommand)
+		struct Resolve
+		{
+			Texture2DResource* dest;
+			Texture2DResource* src;
+		};
+
+		Utils::Vector<Resolve> resolves;
 	};
 	
 	CREATE_COMMAND(CopyBufferCommand)

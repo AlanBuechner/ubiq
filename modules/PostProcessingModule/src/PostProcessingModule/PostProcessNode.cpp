@@ -39,7 +39,7 @@ namespace Game
 		uint32 width = fb->GetResource()->GetWidth();
 		uint32 height = fb->GetResource()->GetHeight();
 		Engine::TextureFormat format = fb->GetResource()->GetFormat();
-		m_BackBuffer = Engine::RenderTarget2D::Create(width, height, format, true);
+		m_BackBuffer = Engine::RenderTarget2D::Create(width, height, format, Engine::ResourceCapabilities::ReadWrite | Engine::ResourceCapabilities::Transient);
 	}
 
 	void PostProcessNode::InitPostProcessStack()
@@ -62,10 +62,13 @@ namespace Game
 	void PostProcessNode::BuildImpl()
 	{
 		CREATE_PROFILE_FUNCTIONI();
+		// make sure m_RenderTarget is always the last to be rendered to
 		Engine::Ref<Engine::RenderTarget2D> curr = m_PostProcessStack.size() % 2 == 0 ? m_BackBuffer : m_RenderTarget;
 
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Post Processing");
 		BEGIN_EVENT_TRACE_GPU(m_CommandList, "Post Processing");
+
+		m_CommandList->AllocateTransient(m_BackBuffer);
 
 		for (uint32 i = 0; i < m_PostProcessStack.size(); i++)
 		{
@@ -83,6 +86,8 @@ namespace Game
 
 			curr = (curr == m_BackBuffer) ? m_RenderTarget : m_BackBuffer; // swap buffers
 		}
+
+		m_CommandList->CloseTransient(m_BackBuffer);
 
 		m_CommandList->ValidateStates({
 			{ m_RenderTarget->GetResource(), Engine::ResourceState::RenderTarget },

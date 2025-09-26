@@ -43,6 +43,9 @@ namespace Engine
 		void OpenTransient(const CPUOpenTransientCommand& cmd);
 		void CloseTransient(const CPUCloseTransientCommand& cmd);
 
+		// msaa
+		void ResolveMSAA(const CPUResolveMSAACommand& cmd);
+
 		// copying
 		void CopyBuffer(const CPUCopyBufferCommand& cmd);
 		void UploadTexture(const CPUUploadTextureCommand& Command);

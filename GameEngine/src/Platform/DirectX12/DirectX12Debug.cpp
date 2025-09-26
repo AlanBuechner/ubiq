@@ -40,6 +40,7 @@ namespace Engine
 			D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE,                         // This warning occurs when using capture frame while graphics debugging.
 			D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE,                       // This warning occurs when using capture frame while graphics debugging.
 			D3D12_MESSAGE_ID_CREATERESOURCE_STATE_IGNORED,
+			D3D12_MESSAGE_ID_CREATERESOURCE_INVALIDALIGNMENT,
 		};
 
 		D3D12_INFO_QUEUE_FILTER NewFilter = {};

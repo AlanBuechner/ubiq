@@ -76,5 +76,16 @@ namespace Engine
 		m_CommandList->ValidateStates(transitions);
 	}
 
+
+
+	ResolveMSAANode::ResolveMSAANode(RenderGraph& graph) :
+		RenderGraphNode(graph)
+	{}
+
+	void ResolveMSAANode::BuildImpl()
+	{
+		m_CommandList->ResolveMSAA(m_Dest, m_Src);
+	}
+
 }
 

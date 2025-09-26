@@ -12,7 +12,31 @@ namespace Engine
 		UnorderedResource,
 		RenderTarget,
 		CopySource,
-		CopyDestination
+		CopyDestination,
+		ResolveSource,
+		ResolveDestination,
+	};
+
+
+	struct ResourceCapabilities
+	{
+		bool shaderReadable;
+		bool shaderWritable;
+		bool transient;
+
+		ResourceCapabilities operator | (const ResourceCapabilities& other) const
+		{
+			ResourceCapabilities out;
+			out.shaderReadable = shaderReadable || other.shaderReadable;
+			out.shaderWritable = shaderWritable || other.shaderWritable;
+			out.transient = transient || other.transient;
+			return out;
+		}
+
+		static const ResourceCapabilities PiplineInput;
+		static const ResourceCapabilities Read;
+		static const ResourceCapabilities ReadWrite;
+		static const ResourceCapabilities Transient;
 	};
 
 
@@ -35,12 +59,15 @@ namespace Engine
 		virtual bool SupportState(ResourceState state) const  = 0;
 		virtual uint32 GetGPUState(ResourceState state) const = 0;
 		AllocationInfo GetAllocationInfo() const { return m_AllocationInfo; }
-		bool IsTransient() const { return m_Transient; }
+		ResourceCapabilities GetCapabilities() { return m_Capabilities; }
+		bool IsShaderReadable() const { return m_Capabilities.shaderReadable; }
+		bool IsReadWrite() const { return m_Capabilities.shaderWritable; }
+		bool IsTransient() const { return m_Capabilities.transient; }
 		virtual void AllocateTransient(class TransientResourceHeap* heap, uint32 offset) = 0;
 
 	protected:
 		AllocationInfo m_AllocationInfo;
-		bool m_Transient = false;
+		ResourceCapabilities m_Capabilities = ResourceCapabilities::Read;
 		ResourceState m_DefultState = ResourceState::Common;
 		ResourceState m_EOFState = ResourceState::Unknown; // end of frame state
 

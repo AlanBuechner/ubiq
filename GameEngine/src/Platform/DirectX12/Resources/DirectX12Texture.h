@@ -11,8 +11,8 @@ namespace Engine
 	class DirectX12Texture2DResource : public Texture2DResource
 	{
 	public:
-		DirectX12Texture2DResource(uint32 width, uint32 height, TextureFormat format, ID3D12Resource* resource);
-		DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount);
+		DirectX12Texture2DResource(uint32 width, uint32 height, TextureFormat format, ID3D12Resource* resource); // this is for the swap chain
+		DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount, ResourceCapabilities cap);
 		DISABLE_COPY(DirectX12Texture2DResource);
 		virtual ~DirectX12Texture2DResource() override;
 
@@ -32,7 +32,7 @@ namespace Engine
 	private:
 		D3D12_RESOURCE_DESC m_TextureDesc;
 
-		ID3D12Resource* m_Buffer;
+		ID3D12Resource* m_Buffer = nullptr;
 
 		friend class DirectX12SwapChain;
 	};

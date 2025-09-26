@@ -77,11 +77,21 @@ namespace Engine
 		void ValidateStates(const Utils::Vector<ResourceStateObject>& resources);
 		void ValidateState(ResourceStateObject resource) { ValidateStates({ resource }); }
 		void ValidateState(GPUResource* resource, ResourceState state) { ValidateStates({ { resource, state } }); }
-		void ValidateState(Ref<FrameBuffer> frameBuffer);
+		void ValidateState(Ref<FrameBuffer> frameBuffer, ResourceState state = ResourceState::RenderTarget);
 
 		// UAV
 		void AwaitUAVs(Utils::Vector<GPUResource*> uavs);
 		void AwaitUAV(GPUResource* uav) { AwaitUAVs({ uav }); }
+
+		// transient
+		void AllocateTransient(Ref<RenderTarget2D> renderTarget);
+		void AllocateTransient(Ref<FrameBuffer> buffer);
+
+		void CloseTransient(Ref<RenderTarget2D> renderTarget);
+		void CloseTransient(Ref<FrameBuffer> buffer);
+
+		// MSAA
+		void ResolveMSAA(Ref<FrameBuffer> texture, Ref<FrameBuffer> msaaTexture);
 
 		// copying
 		void CopyBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size);

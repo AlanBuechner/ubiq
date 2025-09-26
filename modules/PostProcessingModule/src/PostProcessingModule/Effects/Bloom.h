@@ -14,15 +14,7 @@ namespace Game
 		virtual void Init(const PostProcessInput& input) override;
 		virtual void RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh) override;
 
-		virtual void OnViewportResize(uint32 width, uint32 height) override;
-
 	private:
 		Engine::Ref<Engine::Shader> m_BloomShader;
-		uint32 m_NumberDownSamples = 1;
-#ifdef USE_BLOOM_COMPUTE
-		Utils::Vector<Engine::Ref<Engine::RWTexture2D>> m_GaussianSumTextures;
-#else
-		Utils::Vector<Engine::Ref<Engine::RenderTarget2D>> m_GaussianSumTextures;
-#endif
 	};
 }

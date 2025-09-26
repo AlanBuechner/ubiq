@@ -494,18 +494,19 @@ namespace Engine
 			return;
 		}
 
-		if (m_UsedChunks.Count() > 2)
+#define ALLIGN(val, allignment) val + ((allignment - (val % allignment)) % allignment)
+
+		GPUResource::AllocationInfo allocInfo = res->GetAllocationInfo();
+
+		if (m_UsedChunks.Count() >= 2)
 		{
 			for (uint32 i = 0; i < m_UsedChunks.Count() - 1; i++)
 			{
 				const Chunk& chunk = m_UsedChunks[i];
 				const Chunk& nextChunk = m_UsedChunks[i + 1];
 
-				GPUResource::AllocationInfo allocInfo = res->GetAllocationInfo();
-
 				uint32 start = chunk.start + chunk.size;
-				uint32 offset = allocInfo.allignment - (start % allocInfo.allignment);
-				start = start + (offset % allocInfo.allignment);
+				start = ALLIGN(start, allocInfo.allignment);
 
 				if(start >= nextChunk.start)
 					continue;
@@ -521,8 +522,12 @@ namespace Engine
 		}
 
 		// create new allocation at end
-		AddAllocation(res, m_UsedChunks.Back().start + m_UsedChunks.Back().size);
+		uint32 start = m_UsedChunks.Back().start + m_UsedChunks.Back().size;
+		start = ALLIGN(start, allocInfo.allignment);
+		AddAllocation(res, start);
 		return;
+
+#undef ALLIGN
 	}
 
 	void TransientPool::EndMapping(GPUResource* res)

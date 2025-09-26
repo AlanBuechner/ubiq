@@ -16,10 +16,11 @@ namespace Engine
 		m_Mips = 1;
 		m_Format = format;
 		m_SampleCount = MSAASampleCount::MSAA1;
+		m_Capabilities = ResourceCapabilities::PiplineInput;
 	}
 
 
-	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount)
+	DirectX12Texture2DResource::DirectX12Texture2DResource(uint32 width, uint32 height, uint32 numMips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount, ResourceCapabilities cap)
 	{
 		m_DefultState = ResourceState::ShaderResource;
 		m_Width = width;
@@ -29,6 +30,7 @@ namespace Engine
 		m_ClearColor = clearColor;
 		m_Type = type;
 		m_SampleCount = sampleCount;
+		m_Capabilities = cap;
 
 		Ref<DirectX12Context> context = Renderer::GetContext<DirectX12Context>();
 
@@ -48,7 +50,7 @@ namespace Engine
 		m_TextureDesc.DepthOrArraySize = 1;
 		m_TextureDesc.SampleDesc = { (uint32)sampleCount, 0 };
 
-		if (m_Transient)
+		if (IsTransient())
 		{
 			// attempt small resource placement first
 			m_TextureDesc.Alignment = D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT;
@@ -87,8 +89,11 @@ namespace Engine
 
 	DirectX12Texture2DResource::~DirectX12Texture2DResource()
 	{
-		m_Buffer->Release();
-		m_Buffer = nullptr;
+		if(m_Buffer)
+		{
+			m_Buffer->Release();
+			m_Buffer = nullptr;
+		}
 	}
 
 	void DirectX12Texture2DResource::SetData(void* data)
@@ -134,6 +139,10 @@ namespace Engine
 			return D3D12_RESOURCE_STATE_COPY_SOURCE;
 		case ResourceState::CopyDestination:
 			return D3D12_RESOURCE_STATE_COPY_DEST;
+		case ResourceState::ResolveSource:
+			return D3D12_RESOURCE_STATE_RESOLVE_SOURCE;
+		case ResourceState::ResolveDestination:
+			return D3D12_RESOURCE_STATE_RESOLVE_DEST;
 		default: 
 			return D3D12_RESOURCE_STATE_COMMON;
 		}

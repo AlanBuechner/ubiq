@@ -23,7 +23,7 @@ namespace Game
 			//uint32 width = 1024;
 			//uint32 height = 1024;
 			m_ShadowMaps[i] = Engine::FrameBuffer::Create({
-				Engine::RenderTarget2D::Create(width, height, 1, Engine::TextureFormat::R32_FLOAT, { 1, 1, 1, 1 }, true),
+				Engine::RenderTarget2D::Create(width, height, 1, Engine::TextureFormat::R32_FLOAT, { 1, 1, 1, 1 }, Engine::ResourceCapabilities::ReadWrite),
 				Engine::RenderTarget2D::Create(width, height, 1, Engine::TextureFormat::Depth, {1,0,0,0}),
 				});
 

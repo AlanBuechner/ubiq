@@ -186,12 +186,12 @@ namespace Engine
 			Transition(transitions);
 	}
 
-	void CPUCommandList::ValidateState(Ref<FrameBuffer> frameBuffer)
+	void CPUCommandList::ValidateState(Ref<FrameBuffer> frameBuffer, ResourceState state)
 	{
 		Utils::Vector<ResourceStateObject> transitions;
 		transitions.Reserve(frameBuffer->GetAttachments().Count());
 		for (uint32 i = 0; i < frameBuffer->GetAttachments().Count(); i++)
-			transitions.Push({ frameBuffer->GetAttachment(i)->GetResource(), ResourceState::RenderTarget });
+			transitions.Push({ frameBuffer->GetAttachment(i)->GetResource(), state });
 		ValidateStates(transitions);
 	}
 
@@ -213,6 +213,65 @@ namespace Engine
 		// submit command
 		if (cmd != lastCMD)
 			m_CommandAllocator->SubmitCommand(cmd);
+	}
+
+	void CPUCommandList::AllocateTransient(Ref<RenderTarget2D> renderTarget)
+	{
+		ASSERT_ALLOCATOR;
+
+		CPUOpenTransientCommand* cmd = new CPUOpenTransientCommand();
+		cmd->res = renderTarget->GetResource();
+
+		cmd->descriptors.Push(renderTarget->GetRTVDSVDescriptor());
+		cmd->descriptors.Push(renderTarget->GetSRVDescriptor());
+
+		Ref<RWTexture2D> rwTexture = renderTarget->GetRWTexture2D();
+		if (rwTexture)
+		{
+			for (uint32 i = 0; i < rwTexture->GetMips(); i++)
+				cmd->descriptors.Push(rwTexture->GetUAVDescriptor(i));
+		}
+
+		m_CommandAllocator->SubmitCommand(cmd);
+	}
+
+	void CPUCommandList::AllocateTransient(Ref<FrameBuffer> buffer)
+	{
+		for (Ref<RenderTarget2D> rt : buffer->GetAttachments())
+			AllocateTransient(rt);
+	}
+
+	void CPUCommandList::CloseTransient(Ref<RenderTarget2D> renderTarget)
+	{
+		ASSERT_ALLOCATOR;
+		CPUCloseTransientCommand* cmd = new CPUCloseTransientCommand();
+		cmd->res = renderTarget->GetResource();
+		m_CommandAllocator->SubmitCommand(cmd);
+	}
+
+	void CPUCommandList::CloseTransient(Ref<FrameBuffer> buffer)
+	{
+		for (Ref<RenderTarget2D> rt : buffer->GetAttachments())
+			CloseTransient(rt);
+	}
+
+	void CPUCommandList::ResolveMSAA(Ref<FrameBuffer> texture, Ref<FrameBuffer> msaaTexture)
+	{
+		ASSERT_ALLOCATOR;
+		CORE_ASSERT(texture->GetFormats() == msaaTexture->GetFormats(), "resolveing msaa frame buffer requires both buffers to have the same formats", "");
+
+		ValidateState(texture, ResourceState::ResolveDestination);
+		ValidateState(msaaTexture, ResourceState::ResolveSource);
+
+		CPUResolveMSAACommand* cmd = new CPUResolveMSAACommand();
+		for (uint32 i = 0; i < texture->GetAttachments().Count(); i++)
+		{
+			cmd->resolves.Push({
+				texture->GetAttachment(i)->GetResource(),
+				msaaTexture->GetAttachment(i)->GetResource()
+			});
+		}
+		m_CommandAllocator->SubmitCommand(cmd);
 	}
 
 	void CPUCommandList::CopyBuffer(GPUResource* dest, uint64 destOffset, GPUResource* src, uint64 srcOffset, uint64 size)

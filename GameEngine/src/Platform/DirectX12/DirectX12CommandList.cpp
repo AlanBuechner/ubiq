@@ -89,18 +89,33 @@ namespace Engine
 		for (uint32 i = 0; i < commandAllocator->GetCommands().Count(); i++)
 		{
 			CPUCommand* cmd = commandAllocator->GetCommands()[i];
+#define CALL_COMMAND(obj, func) case obj::GetStaticCommandID(): func(*(obj*)cmd); continue
+
+			// event tracking
 			switch (cmd->GetCommandID())
 			{
-#define CALL_COMMAND(obj, func) case obj::GetStaticCommandID(): func(*(obj*)cmd); break
-			case CPUBeginEventStaticCommand::GetStaticCommandID(): BeginEvent(((CPUBeginEventStaticCommand*)cmd)->eventName); break;
-			case CPUBeginEventDynamicCommand::GetStaticCommandID(): BeginEvent(((CPUBeginEventDynamicCommand*)cmd)->eventName.c_str()); break;
-			case CPUEndEventCommand::GetStaticCommandID(): EndEvent(); break;
-			case CPUBeginGPUEventCommand::GetStaticCommandID(): BeginGPUEvent(((CPUBeginGPUEventCommand*)cmd)->data); break;
-			case CPUEndGPUEventCommand::GetStaticCommandID(): EndGPUEvent(); break;
+			case CPUBeginEventStaticCommand::GetStaticCommandID(): BeginEvent(((CPUBeginEventStaticCommand*)cmd)->eventName); continue;
+			case CPUBeginEventDynamicCommand::GetStaticCommandID(): BeginEvent(((CPUBeginEventDynamicCommand*)cmd)->eventName.c_str()); continue;
+			case CPUEndEventCommand::GetStaticCommandID(): EndEvent(); continue;
+			case CPUBeginGPUEventCommand::GetStaticCommandID(): BeginGPUEvent(((CPUBeginGPUEventCommand*)cmd)->data); continue;
+			case CPUEndGPUEventCommand::GetStaticCommandID(): EndGPUEvent(); continue;
+			default: break;
+			}
+
+			// state management
+			switch (cmd->GetCommandID())
+			{
 				CALL_COMMAND(CPUResourceTransitionCommand, Transition);
 				CALL_COMMAND(CPUAwaitUAVCommand, AwaitUAVs);
 				CALL_COMMAND(CPUOpenTransientCommand, OpenTransient);
 				CALL_COMMAND(CPUCloseTransientCommand, CloseTransient);
+			default: break;
+			}
+
+			// commands
+			switch (cmd->GetCommandID())
+			{
+				CALL_COMMAND(CPUResolveMSAACommand, ResolveMSAA);
 				CALL_COMMAND(CPUCopyBufferCommand, CopyBuffer);
 				CALL_COMMAND(CPUUploadTextureCommand , UploadTexture);
 				CALL_COMMAND(CPUSetViewportCommand, SetViewport);
@@ -114,10 +129,9 @@ namespace Engine
 				CALL_COMMAND(CPUDispatchCommand, Dispatch);
 				CALL_COMMAND(CPUDispatchGraphCPUDataCommand, DispatchGraph);
 				CALL_COMMAND(CPUDispatchGraphGPUDataCommand, DispatchGraph);
-#undef CALL_COMMAND
-			default:
-				break;
+			default: break;
 			}
+#undef CALL_COMMAND
 		}
 	}
 
@@ -229,6 +243,17 @@ namespace Engine
 	void DirectX12CommandList::CloseTransient(const CPUCloseTransientCommand& cmd)
 	{
 		// nothing to do
+	}
+
+	void DirectX12CommandList::ResolveMSAA(const CPUResolveMSAACommand& cmd)
+	{
+		for (uint32 i = 0; i < cmd.resolves.Count(); i++)
+		{
+			DirectX12Texture2DResource* dest = (DirectX12Texture2DResource*)cmd.resolves[i].dest;
+			DirectX12Texture2DResource* src = (DirectX12Texture2DResource*)cmd.resolves[i].src;
+
+			m_CommandList->ResolveSubresource(dest->GetBuffer(), 0, src->GetBuffer(), 0, dest->GetDXGISRVFormat());
+		}
 	}
 
 	// copying

@@ -37,18 +37,18 @@ namespace Game
 		m_CommandLists.Push(commandList);
 
 		float clearval = pow(0.2f, 2.2);
-		Engine::MSAASampleCount sampleCount = Engine::MSAASampleCount::MSAA1;
-		Engine::Ref<Engine::FrameBufferNode> renderTargetNode = Engine::CreateRef<Engine::FrameBufferNode>(*this, Utils::Vector<Engine::Ref<Engine::RenderTarget2D>>{
+		Engine::MSAASampleCount sampleCount = Engine::MSAASampleCount::MSAA4;
+		Engine::Ref<Engine::FrameBufferNode> msaaRenderTargetNode = Engine::CreateRef<Engine::FrameBufferNode>(*this, Utils::Vector<Engine::Ref<Engine::RenderTarget2D>>{
 			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, { clearval, clearval, clearval, 1 }, sampleCount),
 			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::Depth, { 1,0,0,0 }, sampleCount),
 		});
-		m_Nodes.Push(renderTargetNode);
+		m_Nodes.Push(msaaRenderTargetNode);
 
 		// set frame buffer to render target
 		Engine::Ref<Engine::TransitionNode> t1 = Engine::CreateRef<Engine::TransitionNode>(*this);
 		t1->SetCommandList(commandList);
-		t1->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), Engine::ResourceState::RenderTarget });
-		t1->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), Engine::ResourceState::RenderTarget });
+		t1->AddBuffer({ msaaRenderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), Engine::ResourceState::RenderTarget });
+		t1->AddBuffer({ msaaRenderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), Engine::ResourceState::RenderTarget });
 		m_Nodes.Push(t1);
 
 		// shadow pass
@@ -59,28 +59,43 @@ namespace Game
 		// gbuffer pass
 		Engine::Ref<GBufferPassNode> gBufferPass = Engine::CreateRef<GBufferPassNode>(*this);
 		gBufferPass->SetCommandList(commandList);
-		gBufferPass->SetRenderTarget(renderTargetNode->m_Buffer);
+		gBufferPass->SetRenderTarget(msaaRenderTargetNode->m_Buffer);
 		gBufferPass->AddDependincy(t1);
 		m_Nodes.Push(gBufferPass);
 
 		// skybox pass
 		Engine::Ref<SkyboxNode> skyboxPass = Engine::CreateRef<SkyboxNode>(*this);
 		skyboxPass->SetCommandList(commandList);
-		skyboxPass->SetRenderTarget(renderTargetNode->m_Buffer);
+		skyboxPass->SetRenderTarget(msaaRenderTargetNode->m_Buffer);
 		skyboxPass->AddDependincy(gBufferPass);
 		m_Nodes.Push(skyboxPass);
 
 		// main lit pass
 		Engine::Ref<ShaderPassNode> mainPass = Engine::CreateRef<ShaderPassNode>(*this, "lit");
 		mainPass->SetCommandList(commandList);
-		mainPass->SetRenderTarget(renderTargetNode->m_Buffer);
+		mainPass->SetRenderTarget(msaaRenderTargetNode->m_Buffer);
 		mainPass->AddDependincy(shadowPass);
 		mainPass->AddDependincy(skyboxPass);
 		m_Nodes.Push(mainPass);
 
+		// resolve msaa
+		Engine::Ref<Engine::FrameBufferNode> renderTargetNode = Engine::CreateRef<Engine::FrameBufferNode>(*this, Utils::Vector<Engine::Ref<Engine::RenderTarget2D>>{
+			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, { clearval, clearval, clearval, 1 }),
+			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::Depth, { 1,0,0,0 }),
+		});
+		m_Nodes.Push(renderTargetNode);
+
+		Engine::Ref<Engine::ResolveMSAANode> resolveNode = Engine::CreateRef<Engine::ResolveMSAANode>(*this);
+		resolveNode->SetCommandList(commandList);
+		resolveNode->SetDestination(renderTargetNode->m_Buffer);
+		resolveNode->SetSource(msaaRenderTargetNode->m_Buffer);
+		resolveNode->AddDependincy(mainPass);
+		m_Nodes.Push(resolveNode);
+
+
 		// create post processing render target
 		Engine::Ref<Engine::FrameBufferNode> postRenderTargetNode = Engine::CreateRef<Engine::FrameBufferNode>(*this, Utils::Vector<Engine::Ref<Engine::RenderTarget2D>>{
-			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, sampleCount, true),
+			Engine::RenderTarget2D::Create(window.GetWidth(), window.GetHeight(), Engine::TextureFormat::RGBA16_FLOAT, Engine::ResourceCapabilities::ReadWrite),
 		});
 		m_Nodes.Push(postRenderTargetNode);
 
@@ -90,7 +105,7 @@ namespace Game
 		t2->AddBuffer({ postRenderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), Engine::ResourceState::UnorderedResource });
 		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(0)->GetResourceHandle(), Engine::ResourceState::ShaderResource });
 		t2->AddBuffer({ renderTargetNode->m_Buffer->GetAttachment(1)->GetResourceHandle(), Engine::ResourceState::ShaderResource });
-		t2->AddDependincy(mainPass);
+		t2->AddDependincy(resolveNode);
 		m_Nodes.Push(t2);
 
 		// post processing

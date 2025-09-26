@@ -63,7 +63,7 @@ namespace Engine
 		Ref<FrameBuffer> m_Buffer;
 	};
 
-	// transition Node
+	// transition node
 	class TransitionNode : public RenderGraphNode
 	{
 	public:
@@ -84,4 +84,23 @@ namespace Engine
 	private:
 		Utils::Vector<TransitionObject> m_Transitions;
 	};
+
+	// resolve msaa node
+	class ResolveMSAANode : public RenderGraphNode
+	{
+	public:
+		ResolveMSAANode(RenderGraph& graph);
+
+		void SetDestination(Ref<FrameBuffer> buffer) { m_Dest = buffer; }
+		void SetSource(Ref<FrameBuffer> buffer) { m_Src = buffer; }
+
+		virtual void BuildImpl() override;
+
+	private:
+		Ref<FrameBuffer> m_Dest;
+		Ref<FrameBuffer> m_Src;
+	};
+
+
+
 }

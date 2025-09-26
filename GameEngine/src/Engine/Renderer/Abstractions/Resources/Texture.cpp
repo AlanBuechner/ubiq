@@ -18,12 +18,12 @@ namespace Engine
 	Texture2DResource::~Texture2DResource() {}
 
 
-	Texture2DResource* Texture2DResource::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount)
+	Texture2DResource* Texture2DResource::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount, ResourceCapabilities cap)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::DirectX12:
-			return new DirectX12Texture2DResource(width, height, mips, format, clearColor, type, sampleCount);
+			return new DirectX12Texture2DResource(width, height, mips, format, clearColor, type, sampleCount, cap);
 		default: return nullptr;
 		}
 		
@@ -38,6 +38,8 @@ namespace Engine
 		case ResourceState::RenderTarget:
 		case ResourceState::CopySource:
 		case ResourceState::CopyDestination:
+		case ResourceState::ResolveSource:
+		case ResourceState::ResolveDestination:
 			return true;
 		case ResourceState::UnorderedResource:
 			return (uint32)m_Type & (uint32)TextureType::RWTexture;
@@ -103,14 +105,17 @@ namespace Engine
 		m_SRVDescriptor = srv;
 	}
 
-	Texture2D::Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount)
+	Texture2D::Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, TextureType type, MSAASampleCount sampleCount, ResourceCapabilities cap)
 	{
-		m_Resource = Texture2DResource::Create(width, height, mips, format, clearColor, type, sampleCount);
-		m_SRVDescriptor = Texture2DSRVDescriptorHandle::Create(m_Resource);
+		cap = cap | ResourceCapabilities::Read;
+
+		m_Resource = Texture2DResource::Create(width, height, mips, format, clearColor, type, sampleCount, cap);
+		if(m_Resource->IsShaderReadable())
+			m_SRVDescriptor = Texture2DSRVDescriptorHandle::Create(m_Resource);
 	}
 
 	Texture2D::Texture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format) :
-		Texture2D(width, height, mips, format, {0,0,0,0}, TextureType::Texture, MSAASampleCount::MSAA1)
+		Texture2D(width, height, mips, format, {0,0,0,0}, TextureType::Texture, MSAASampleCount::MSAA1, ResourceCapabilities::Read)
 	{}
 
 	Texture2D::~Texture2D()
@@ -142,7 +147,8 @@ namespace Engine
 			m_Resource->GetFormat(), 
 			m_Resource->GetClearColor(), 
 			m_Resource->GetTextureType(), 
-			m_Resource->GetMSAASampleCount()
+			m_Resource->GetMSAASampleCount(),
+			m_Resource->GetCapabilities()
 		);
 
 		// rebind srv handles
@@ -197,9 +203,10 @@ namespace Engine
 		GenerateUAVDescriptors();
 	}
 
-	RWTexture2D::RWTexture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor) :
-		Texture2D(width, height, mips, format, clearColor, TextureType::RWTexture, MSAASampleCount::MSAA1), m_Owner(nullptr)
+	RWTexture2D::RWTexture2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, ResourceCapabilities cap) :
+		Texture2D(width, height, mips, format, clearColor, TextureType::RWTexture, MSAASampleCount::MSAA1, cap), m_Owner(nullptr)
 	{
+		CORE_ASSERT(cap.shaderWritable, "RWTexture needs resource capabilities of ReadWrite");
 		GenerateUAVDescriptors();
 	}
 
@@ -229,14 +236,14 @@ namespace Engine
 
 	}
 
-	Ref<RWTexture2D> RWTexture2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format)
+	Ref<RWTexture2D> RWTexture2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, ResourceCapabilities cap)
 	{
-		return Create(width, height, mips, format, { 0,0,0,0 });
+		return Create(width, height, mips, format, { 0,0,0,0 }, cap | ResourceCapabilities::ReadWrite);
 	}
 
-	Ref<RWTexture2D> RWTexture2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor)
+	Ref<RWTexture2D> RWTexture2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearClolor, ResourceCapabilities cap)
 	{
-		return CreateRef<RWTexture2D>(width, height, mips, format, clearClolor);
+		return CreateRef<RWTexture2D>(width, height, mips, format, clearClolor, cap | ResourceCapabilities::ReadWrite);
 	}
 
 	void RWTexture2D::GenerateUAVDescriptors()
@@ -258,12 +265,17 @@ namespace Engine
 
 
 
-	RenderTarget2D::RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampleCount, bool RWCapable) :
-		Texture2D(width, height, mips, format, clearColor, (TextureType)((uint32)TextureType::RenderTarget | (uint32)(RWCapable ? TextureType::RWTexture : TextureType::Texture)), sampleCount)
+	RenderTarget2D::RenderTarget2D(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampleCount, ResourceCapabilities cap) :
+		Texture2D(
+			width, height, mips,
+			format, clearColor,
+			(TextureType)((uint32)TextureType::RenderTarget | (uint32)(cap.shaderWritable ? TextureType::RWTexture : TextureType::Texture)), 
+			sampleCount, cap
+		)
 	{
 		m_RTVDSVDescriptor = Texture2DRTVDSVDescriptorHandle::Create(m_Resource);
 
-		if (RWCapable)
+		if (cap.shaderWritable)
 			m_RWTexture = CreateRef<RWTexture2D>(m_Resource, m_SRVDescriptor, this);
 	}
 
@@ -297,139 +309,82 @@ namespace Engine
 		}
 	}
 
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format)
+
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, ResourceCapabilities cap)
 	{
 		Description desc(width, height, format);
+		desc.capabilities = cap;
 		return Create(desc);
 	}
 
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, bool RWCapable)
-	{
-		Description desc(width, height, format);
-		desc.RWCapable = RWCapable;
-		return Create(desc);
-	}
 
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, MSAASampleCount sampelCount)
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, MSAASampleCount sampelCount, ResourceCapabilities cap)
 	{
 		Description desc(width, height, format);
 		desc.sampleCount = sampelCount;
+		desc.capabilities = cap;
 		return Create(desc);
 	}
 
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, MSAASampleCount sampelCount, bool RWCapable)
-	{
-		Description desc(width, height, format);
-		desc.sampleCount = sampelCount;
-		desc.RWCapable = RWCapable;
-		return Create(desc);
-	}
-
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor)
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor, ResourceCapabilities cap)
 	{
 		Description desc(width, height, format);
 		desc.clearColor = clearColor;
-		return Create(desc);
-	}
-
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor, bool RWCapable)
-	{
-		Description desc(width, height, format);
-		desc.clearColor = clearColor;
-		desc.RWCapable = RWCapable;
-		return Create(desc);
-	}
-
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampleCount)
-	{
-		Description desc(width, height, format);
-		desc.clearColor = clearColor;
-		desc.sampleCount = sampleCount;
+		desc.capabilities = cap;
 		return Create(desc);
 	}
 	
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampleCount, bool RWCapable)
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampleCount, ResourceCapabilities cap)
 	{
 		Description desc(width, height, format);
 		desc.clearColor = clearColor;
 		desc.sampleCount = sampleCount;
-		desc.RWCapable = RWCapable;
+		desc.capabilities = cap;
 		return Create(desc);
 	}
 
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format)
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, ResourceCapabilities cap)
 	{
 		Description desc(width, height, format);
 		desc.mips = mips;
+		desc.capabilities = cap;
 		return Create(desc);
 	}
 
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, bool RWCapable)
-	{
-		Description desc(width, height, format);
-		desc.mips = mips;
-		desc.RWCapable = RWCapable;
-		return Create(desc);
-	}
-
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, MSAASampleCount sampelCount)
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, MSAASampleCount sampelCount, ResourceCapabilities cap)
 	{
 		Description desc(width, height, format);
 		desc.mips = mips;
 		desc.sampleCount = sampelCount;
+		desc.capabilities = cap;
 		return Create(desc);
 	}
 
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, MSAASampleCount sampelCount, bool RWCapable)
-	{
-		Description desc(width, height, format);
-		desc.mips = mips;
-		desc.sampleCount = sampelCount;
-		desc.RWCapable = RWCapable;
-		return Create(desc);
-	}
-
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor)
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, ResourceCapabilities cap)
 	{
 		Description desc(width, height, format);
 		desc.mips = mips;
 		desc.clearColor = clearColor;
-		return Create(desc);
-	}
-
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, bool RWCapable)
-	{
-		Description desc(width, height, format);
-		desc.mips = mips;
-		desc.clearColor = clearColor;
-		desc.RWCapable = RWCapable;
-		return Create(desc);
-	}
-
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampleCount)
-	{
-		Description desc(width, height, format);
-		desc.mips = mips;
-		desc.clearColor = clearColor;
-		desc.sampleCount = sampleCount;
+		desc.capabilities = cap;
 		return Create(desc);
 	}
 	
-	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampleCount, bool RWCapable)
+	Ref<RenderTarget2D> RenderTarget2D::Create(uint32 width, uint32 height, uint32 mips, TextureFormat format, Math::Vector4 clearColor, MSAASampleCount sampleCount, ResourceCapabilities cap)
 	{
 		Description desc(width, height, format);
 		desc.mips = mips;
 		desc.clearColor = clearColor;
 		desc.sampleCount = sampleCount;
-		desc.RWCapable = RWCapable;
+		desc.capabilities = cap;
 		return Create(desc);
 	}
 
 	Ref<RenderTarget2D> RenderTarget2D::Create(const Description& desc)
 	{
 		CORE_ASSERT(desc.width != 0 && desc.height != 0, "width and height cant be 0");
-		CORE_ASSERT(!(IsTextureFormatDepthStencil(desc.format) && desc.RWCapable), "Depth Stencil formats can not be Read/Write capable");
-		return CreateRef<RenderTarget2D>(desc.width, desc.height, desc.mips, desc.format, desc.clearColor, desc.sampleCount, desc.RWCapable);
+		CORE_ASSERT(!(IsTextureFormatDepthStencil(desc.format) && (desc.capabilities.shaderWritable)), "Depth Stencil formats can not be shader writable");
+		CORE_ASSERT(!((desc.sampleCount != MSAASampleCount::MSAA1) && (desc.capabilities.shaderWritable)), "MSAA textures can not be shader writable");
+		return CreateRef<RenderTarget2D>(desc.width, desc.height, desc.mips, desc.format, desc.clearColor, desc.sampleCount, desc.capabilities);
 	}
 
 	// Utils ---------------------------------------------------------- //
