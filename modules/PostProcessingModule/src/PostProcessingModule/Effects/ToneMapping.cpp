@@ -7,12 +7,12 @@
 namespace Game
 {
 
-	void ToneMapping::Init(const PostProcessInput& input)
+	void ToneMapping::Init()
 	{
 		m_ToneMappingShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(TONEMAPPING);
 	}
 
-	void ToneMapping::RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
+	void ToneMapping::RecordCommands(Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src)
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		//Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("None");
@@ -21,21 +21,21 @@ namespace Game
 		//Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass("Uncharted");
 		Engine::Ref<Engine::ComputeShaderPass> pass = m_ToneMappingShader->GetComputePass(m_ToneMapper);
 
-		commandList->ValidateStates({
+		m_CommandList->ValidateStates({
 			{ renderTarget->GetResource(), Engine::ResourceState::RenderTarget },
 			{ src->GetResource(), Engine::ResourceState::ShaderResource },
 			});
 
-		Engine::GPUTimer::BeginEvent(commandList, "ToneMapping");
-		BEGIN_EVENT_TRACE_GPU(commandList, "ToneMapping");
+		Engine::GPUTimer::BeginEvent(m_CommandList, "ToneMapping");
+		BEGIN_EVENT_TRACE_GPU(m_CommandList, "ToneMapping");
 
-		commandList->SetShader(pass);
-		commandList->SetRootConstant("u_SrcLoc", src->GetSRVDescriptor()->GetIndex());
-		commandList->SetRWTexture("u_DstTexture", renderTarget->GetRWTexture2D(), 0);
-		commandList->DispatchThreads(renderTarget->GetWidth(), renderTarget->GetHeight(), 1);
+		m_CommandList->SetShader(pass);
+		m_CommandList->SetRootConstant("u_SrcLoc", src->GetSRVDescriptor()->GetIndex());
+		m_CommandList->SetRWTexture("u_DstTexture", renderTarget->GetRWTexture2D(), 0);
+		m_CommandList->DispatchThreads(renderTarget->GetWidth(), renderTarget->GetHeight(), 1);
 
-		END_EVENT_TRACE_GPU(commandList);
-		Engine::GPUTimer::EndEvent(commandList);
+		END_EVENT_TRACE_GPU(m_CommandList);
+		Engine::GPUTimer::EndEvent(m_CommandList);
 	}
 
 }

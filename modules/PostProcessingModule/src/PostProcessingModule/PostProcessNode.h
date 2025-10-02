@@ -12,9 +12,14 @@ namespace Game
 		void SetRenderTarget(Engine::Ref<Engine::RenderTarget2D> fb);
 		void SetInput(const PostProcessInput& input) { m_Input = input; }
 		void SetSrc(Engine::Ref<Engine::Texture2D> src) { m_Src = src; }
-		void AddPostProcess(Engine::Ref<PostProcess> post) { m_PostProcessStack.push_back(post); }
 
-		void InitPostProcessStack();
+		template<class T, typename ... Args>
+		void AddPostProcess(Args&& ... args)
+		{
+			Engine::Ref<T> post = Engine::CreateRef<T>(std::forward<Args>(args)...);
+			m_PostProcessStack.push_back(post);
+			post->Initialize(m_CommandList, &m_Input, m_ScreenMesh);
+		}
 
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 

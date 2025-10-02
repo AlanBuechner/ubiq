@@ -6,7 +6,7 @@
 
 namespace Game
 {
-	void Bloom::Init(const PostProcessInput& input)
+	void Bloom::Init()
 	{
 #ifdef USE_BLOOM_COMPUTE
 		m_BloomShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(BLOOMCOMPUTE);
@@ -15,11 +15,11 @@ namespace Game
 #endif
 	}
 
-	void Bloom::RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh)
+	void Bloom::RecordCommands(Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src)
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		Engine::GPUTimer::BeginEvent(commandList, "Bloom");
-		BEGIN_EVENT_TRACE_GPU(commandList, "BLoom");
+		Engine::GPUTimer::BeginEvent(m_CommandList, "Bloom");
+		BEGIN_EVENT_TRACE_GPU(m_CommandList, "BLoom");
 		Engine::Ref<Engine::GraphicsShaderPass> downSample = m_BloomShader->GetGraphicsPass("downSample");
 		Engine::Ref<Engine::GraphicsShaderPass> upSample = m_BloomShader->GetGraphicsPass("upSample");
 		Engine::Ref<Engine::GraphicsShaderPass> composite = m_BloomShader->GetGraphicsPass("composite");
@@ -43,86 +43,86 @@ namespace Game
 				h = (h == 0) ? 1 : h;
 
 				gaussianSumTextures[i] = Engine::RenderTarget2D::Create(w, h, Engine::TextureFormat::RGBA16_FLOAT, Engine::ResourceCapabilities::Transient);
-				commandList->AllocateTransient(gaussianSumTextures[i]);
+				m_CommandList->AllocateTransient(gaussianSumTextures[i]);
 			}
 		}
 
-		Engine::GPUTimer::BeginEvent(commandList, "Down Sample");
+		Engine::GPUTimer::BeginEvent(m_CommandList, "Down Sample");
 		for (uint32 i = 0; i < numberDownSamples; i++)
 		{
 			CREATE_PROFILE_SCOPEI("Down Sample");
 			ANOTATE_PROFILEI(std::to_string(i));
-			Engine::GPUTimer::BeginEvent(commandList, std::to_string(i));
+			Engine::GPUTimer::BeginEvent(m_CommandList, std::to_string(i));
 			Engine::Ref<Engine::Texture2D> srcTexture = (i == 0) ? src : gaussianSumTextures[i - 1];
 
-			commandList->ValidateStates({
+			m_CommandList->ValidateStates({
 				{ gaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
 				{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource },
 			});
 
-			commandList->SetRenderTarget(gaussianSumTextures[i]);
-			commandList->ClearRenderTarget(gaussianSumTextures[i]);
-			commandList->SetShader(downSample);
-			commandList->SetTexture("u_Src", srcTexture);
+			m_CommandList->SetRenderTarget(gaussianSumTextures[i]);
+			m_CommandList->ClearRenderTarget(gaussianSumTextures[i]);
+			m_CommandList->SetShader(downSample);
+			m_CommandList->SetTexture("u_Src", srcTexture);
 			float threshold = i == 0 ? 1 : 0;
-			commandList->SetRootConstant("u_Threshold", threshold);
-			commandList->DrawMesh(screenMesh);
+			m_CommandList->SetRootConstant("u_Threshold", threshold);
+			m_CommandList->DrawMesh(m_ScreenMesh);
 
-			Engine::GPUTimer::EndEvent(commandList);
+			Engine::GPUTimer::EndEvent(m_CommandList);
 		}
 
 		{ // validate that all sum textures are render targets
 			Utils::Vector<Engine::ResourceStateObject> transitions(gaussianSumTextures.Count());
 			for (uint32 i = 0; i < gaussianSumTextures.Count(); i++)
 				transitions[i] = { gaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget };
-			commandList->ValidateStates(transitions);
+			m_CommandList->ValidateStates(transitions);
 		}
-		Engine::GPUTimer::EndEvent(commandList);
+		Engine::GPUTimer::EndEvent(m_CommandList);
 
-		Engine::GPUTimer::BeginEvent(commandList, "Up Sample");
+		Engine::GPUTimer::BeginEvent(m_CommandList, "Up Sample");
 		for (int i = numberDownSamples - 2; i >= 0; i--)
 		{
 			CREATE_PROFILE_SCOPEI("Up Sample");
 			ANOTATE_PROFILEI(std::to_string(i));
-			Engine::GPUTimer::BeginEvent(commandList, std::to_string(i));
+			Engine::GPUTimer::BeginEvent(m_CommandList, std::to_string(i));
 			Engine::Ref<Engine::Texture2D> srcTexture = gaussianSumTextures[i + 1];
 
-			commandList->ValidateStates({
+			m_CommandList->ValidateStates({
 				{ gaussianSumTextures[i]->GetResource(), Engine::ResourceState::RenderTarget },
 				{ srcTexture->GetResource(), Engine::ResourceState::ShaderResource },
 			});
 
-			commandList->SetRenderTarget(gaussianSumTextures[i]);
-			commandList->SetShader(upSample);
-			commandList->SetTexture("u_Src", srcTexture);
-			commandList->DrawMesh(screenMesh);
+			m_CommandList->SetRenderTarget(gaussianSumTextures[i]);
+			m_CommandList->SetShader(upSample);
+			m_CommandList->SetTexture("u_Src", srcTexture);
+			m_CommandList->DrawMesh(m_ScreenMesh);
 
-			Engine::GPUTimer::EndEvent(commandList);
+			Engine::GPUTimer::EndEvent(m_CommandList);
 		}
 
-		Engine::GPUTimer::EndEvent(commandList);
+		Engine::GPUTimer::EndEvent(m_CommandList);
 
-		Engine::GPUTimer::BeginEvent(commandList, "Composite");
+		Engine::GPUTimer::BeginEvent(m_CommandList, "Composite");
 
-		commandList->ValidateStates({
+		m_CommandList->ValidateStates({
 			{ src->GetResource(), Engine::ResourceState::ShaderResource },
 			{ gaussianSumTextures[0]->GetResource(), Engine::ResourceState::ShaderResource },
 		});
 
-		commandList->SetRenderTarget(renderTarget);
-		commandList->ClearRenderTarget(renderTarget);
-		commandList->SetShader(composite);
-		commandList->SetTexture("u_Src", src);
-		commandList->SetTexture("u_BloomTex", gaussianSumTextures[0]);
-		commandList->DrawMesh(screenMesh);
+		m_CommandList->SetRenderTarget(renderTarget);
+		m_CommandList->ClearRenderTarget(renderTarget);
+		m_CommandList->SetShader(composite);
+		m_CommandList->SetTexture("u_Src", src);
+		m_CommandList->SetTexture("u_BloomTex", gaussianSumTextures[0]);
+		m_CommandList->DrawMesh(m_ScreenMesh);
 
 		// close transient resources
 		for (uint32 i = 0; i < gaussianSumTextures.Count(); i++)
-			commandList->CloseTransient(gaussianSumTextures[i]);
-		Engine::GPUTimer::EndEvent(commandList);
+			m_CommandList->CloseTransient(gaussianSumTextures[i]);
+		Engine::GPUTimer::EndEvent(m_CommandList);
 
-		END_EVENT_TRACE_GPU(commandList);
-		Engine::GPUTimer::EndEvent(commandList);
+		END_EVENT_TRACE_GPU(m_CommandList);
+		Engine::GPUTimer::EndEvent(m_CommandList);
 
 	}
 }

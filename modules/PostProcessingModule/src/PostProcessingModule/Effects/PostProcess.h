@@ -17,10 +17,21 @@ namespace Game
 
 	class PostProcess
 	{
+	protected:
+		PostProcess() = default;
+
 	public:
-		virtual void Init(const PostProcessInput& input) = 0;
-		virtual void RecordCommands(Engine::Ref<Engine::CPUCommandList> commandList, Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src, const PostProcessInput& input, Engine::Ref<Engine::Mesh> screenMesh) = 0;
+
+		void Initialize(Engine::Ref<Engine::CPUCommandList> commandList, PostProcessInput* input, Engine::Ref<Engine::Mesh> screenMesh);
+		virtual void Init() = 0;
+		virtual void RecordCommands(Engine::Ref<Engine::RenderTarget2D> renderTarget, Engine::Ref<Engine::Texture2D> src) = 0;
 
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
+
+	protected:
+		PostProcessInput* m_Input;
+		Engine::Ref<Engine::Mesh> m_ScreenMesh;
+		Engine::Ref<Engine::CPUCommandList> m_CommandList;
 	};
+
 }

@@ -100,11 +100,10 @@ namespace Game
 		Engine::Ref<PostProcessNode> postPass = AddNode<PostProcessNode>();
 		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer->GetAttachment(0));
 		postPass->SetInput(input);
-		//postPass->AddPostProcess(CreateRef<DepthOfField>());
-		postPass->AddPostProcess(Engine::CreateRef<Bloom>());
-		postPass->AddPostProcess(Engine::CreateRef<ToneMapping>("HillACES"));
+		//postPass->AddPostProcess<DepthOfField>();
+		postPass->AddPostProcess<Bloom>();
+		postPass->AddPostProcess<ToneMapping>("HillACES");
 		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachment(0));
-		postPass->InitPostProcessStack();
 
 		// create outputNode
 		m_OutputNode = AddNode<Engine::OutputNode>();

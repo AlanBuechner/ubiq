@@ -41,12 +41,6 @@ namespace Game
 		m_BackBuffer = Engine::RenderTarget2D::Create(width, height, format, Engine::ResourceCapabilities::ReadWrite | Engine::ResourceCapabilities::Transient);
 	}
 
-	void PostProcessNode::InitPostProcessStack()
-	{
-		for (Engine::Ref<PostProcess> pp : m_PostProcessStack)
-			pp->Init(m_Input);
-	}
-
 	void PostProcessNode::OnViewportResize(uint32 width, uint32 height)
 	{
 		m_BackBuffer->Resize(width, height);
@@ -81,7 +75,7 @@ namespace Game
 				{ src->GetResource(), Engine::ResourceState::ShaderResource },
 			});
 
-			post->RecordCommands(m_CommandList, curr, src, m_Input, m_ScreenMesh);
+			post->RecordCommands(curr, src);
 
 			curr = (curr == m_BackBuffer) ? m_RenderTarget : m_BackBuffer; // swap buffers
 		}
