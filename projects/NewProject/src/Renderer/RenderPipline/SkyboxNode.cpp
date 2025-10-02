@@ -7,13 +7,10 @@
 
 #include "Engine/Core/MeshBuilder.h"
 
-#include "RenderGraph.h"
-
 namespace Game
 {
 	
-	SkyboxNode::SkyboxNode(Engine::RenderGraph& graph) :
-		RenderGraphNode(graph)
+	SkyboxNode::SkyboxNode()
 	{
 		m_SkyboxShader = Engine::Application::Get().GetAssetManager().GetAsset<Engine::Shader>("Assets/Shaders/SkyboxShader.hlsl");
 
@@ -42,20 +39,19 @@ namespace Game
 
 	}
 
-	void SkyboxNode::BuildImpl()
+	void SkyboxNode::Build()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Skybox Pass");
 		BEGIN_EVENT_TRACE_GPU(m_CommandList, "Skybox pass");
 		m_CommandList->SetRenderTarget(m_RenderTarget);
 
-		if (scene.m_Skybox)
+		if (m_SkyboxTextureBind)
 		{
 			m_CommandList->SetShader(m_SkyboxShader->GetGraphicsPass("main"));
-			m_CommandList->SetRootConstant("u_MainCameraIndex", scene.m_MainCamera->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
-			m_CommandList->SetTexture("u_Texture", scene.m_Skybox);
+			m_CommandList->SetRootConstant("u_MainCameraIndex", (*m_CameraBind)->GetCameraBuffer()->GetCBVDescriptor()->GetIndex());
+			m_CommandList->SetTexture("u_Texture", *m_SkyboxTextureBind);
 			m_CommandList->DrawMesh(m_SkyboxMesh);
 		}
 

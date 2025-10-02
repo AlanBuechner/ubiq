@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "RenderGraphNode.h"
+#include "RenderPiplineNode.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Core/Window.h"
 
@@ -9,28 +9,9 @@
 
 namespace Engine
 {
-	RenderGraphNode::RenderGraphNode(RenderGraph& graph) :
-		m_Graph(graph)
-	{}
-
-	void RenderGraphNode::Build()
-	{
-		if (!m_Built)
-		{
-			for (auto de : m_Dependincys)
-				de->Build();
-			BuildImpl();
-		}
-		m_Built = true;
-	}
-
 
 	// output node
-	OutputNode::OutputNode(RenderGraph& graph) :
-		RenderGraphNode(graph)
-	{}
-
-	void OutputNode::BuildImpl()
+	void OutputNode::Build()
 	{
 		GPUTimer::BeginEvent(m_CommandList, "Output Node");
 
@@ -42,9 +23,10 @@ namespace Engine
 		GPUTimer::EndEvent(m_CommandList);
 	}
 
+
+
 	// frame buffer node
-	FrameBufferNode::FrameBufferNode(RenderGraph& graph, const Utils::Vector<Ref<RenderTarget2D>>& attachments) :
-		RenderGraphNode(graph)
+	FrameBufferNode::FrameBufferNode(const Utils::Vector<Ref<RenderTarget2D>>& attachments)
 	{
 		m_Buffer = FrameBuffer::Create(attachments);
 	}
@@ -55,16 +37,16 @@ namespace Engine
 		m_Buffer->Resize(width, height);
 	}
 
-	TransitionNode::TransitionNode(RenderGraph& graph) :
-		RenderGraphNode(graph)
-	{}
 
+
+
+	// transition node
 	void TransitionNode::AddBuffer(const TransitionObject& transition)
 	{
 		m_Transitions.Push(transition);
 	}
 
-	void TransitionNode::BuildImpl()
+	void TransitionNode::Build()
 	{
 		Utils::Vector<ResourceStateObject> transitions(m_Transitions.Count());
 		for (uint32 i = 0; i < transitions.Count(); i++)
@@ -77,12 +59,8 @@ namespace Engine
 	}
 
 
-
-	ResolveMSAANode::ResolveMSAANode(RenderGraph& graph) :
-		RenderGraphNode(graph)
-	{}
-
-	void ResolveMSAANode::BuildImpl()
+	// msaa node
+	void ResolveMSAANode::Build()
 	{
 		m_CommandList->ResolveMSAA(m_Dest, m_Src);
 	}

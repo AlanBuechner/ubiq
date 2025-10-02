@@ -35,12 +35,11 @@ namespace Game
 		SceneRenderer();
 
 		RenderPassObject& GetMainPass() { return m_MainPassObject; }
-		
-		virtual void OnViewportResize(uint32 width, uint32 height) override;
+
 		virtual void UpdateBuffers() override;
 
-		void SetDirectionalLight(Engine::Ref<DirectionalLight> light);
-		void SetSkyBox(Engine::Ref<Engine::Texture2D> texture);
+		void SetDirectionalLight(Engine::Ref<DirectionalLight> light) { m_DirectinalLight = light; }
+		void SetSkyBox(Engine::Ref<Engine::Texture2D> texture) { m_Skybox = texture; }
 
 		virtual void Build() override;
 
@@ -48,6 +47,9 @@ namespace Game
 
 	private:
 		RenderPassObject m_MainPassObject;
-		
+
+		std::vector<RenderPassDrawCommand> m_MainPassDrawCommands;
+		Engine::Ref<DirectionalLight> m_DirectinalLight;
+		Engine::Ref<Engine::Texture2D> m_Skybox;
 	};
 }

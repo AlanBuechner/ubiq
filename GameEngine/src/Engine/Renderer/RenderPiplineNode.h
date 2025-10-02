@@ -1,6 +1,5 @@
 #pragma once
 
-#include "RenderGraph.h"
 #include "Engine/Renderer/Abstractions/CommandList.h"
 
 namespace Engine
@@ -15,48 +14,37 @@ namespace Engine
 	class RenderGraph;
 
 	// base node
-	class RenderGraphNode
+	class RenderPiplineNode
 	{
 	public:
-		RenderGraphNode(RenderGraph& graph);
 
-		void Build();
+		virtual void Build() {};
 		virtual void OnViewportResize(uint32 width, uint32 height) {}
-		virtual void Invalidate() { m_Built = false; }
 
 		void SetCommandList(Ref<CPUCommandList> commandList) { m_CommandList = commandList; }
 		Ref<CPUCommandList> GetCommandList() { return m_CommandList; }
 
-		void AddDependincy(Ref<RenderGraphNode> dependency) { m_Dependincys.Push(dependency); }
+	protected:
 
 	protected:
-		virtual void BuildImpl() {};
-
-	protected:
-		bool m_Built = false;
-		RenderGraph& m_Graph;
-
-		Utils::Vector<Ref<RenderGraphNode>> m_Dependincys;
 		Ref<CPUCommandList> m_CommandList;
 	};
 
-	// nodes
 	// output node
-	class OutputNode : public RenderGraphNode
+	class OutputNode : public RenderPiplineNode
 	{
 	public:
-		OutputNode(RenderGraph& graph);
 
-		virtual void BuildImpl() override;
+		virtual void Build() override;
 
 		Ref<FrameBuffer> m_Buffer;
 	};
 
 	// frame buffer node
-	class FrameBufferNode : public RenderGraphNode
+	class FrameBufferNode : public RenderPiplineNode
 	{
 	public:
-		FrameBufferNode(RenderGraph& graph, const Utils::Vector<Ref<RenderTarget2D>>& fbSpec);
+		FrameBufferNode(const Utils::Vector<Ref<RenderTarget2D>>& fbSpec);
 		
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 
@@ -64,7 +52,7 @@ namespace Engine
 	};
 
 	// transition node
-	class TransitionNode : public RenderGraphNode
+	class TransitionNode : public RenderPiplineNode
 	{
 	public:
 		struct TransitionObject
@@ -74,11 +62,10 @@ namespace Engine
 		};
 
 	public:
-		TransitionNode(RenderGraph& graph);
 
 		void AddBuffer(const TransitionObject& transition);
 
-		virtual void BuildImpl() override;
+		virtual void Build() override;
 
 
 	private:
@@ -86,15 +73,14 @@ namespace Engine
 	};
 
 	// resolve msaa node
-	class ResolveMSAANode : public RenderGraphNode
+	class ResolveMSAANode : public RenderPiplineNode
 	{
 	public:
-		ResolveMSAANode(RenderGraph& graph);
 
 		void SetDestination(Ref<FrameBuffer> buffer) { m_Dest = buffer; }
 		void SetSource(Ref<FrameBuffer> buffer) { m_Src = buffer; }
 
-		virtual void BuildImpl() override;
+		virtual void Build() override;
 
 	private:
 		Ref<FrameBuffer> m_Dest;

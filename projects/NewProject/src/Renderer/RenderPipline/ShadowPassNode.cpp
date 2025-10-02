@@ -2,24 +2,15 @@
 #include "ShadowPassNode.h"
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/Shaders/Shader.h"
-#include "RenderingUtils/Lighting/DirectionalLight.h"
 #include "Engine/Renderer/Renderer.h"
 
 #include "Engine/Renderer/Abstractions/GPUProfiler.h"
 
-#include "RenderGraph.h"
-
 namespace Game
 {
-
-	ShadowPassNode::ShadowPassNode(Engine::RenderGraph& graph) :
-		RenderGraphNode(graph)
-	{}
-
-	void ShadowPassNode::BuildImpl()
+	void ShadowPassNode::Build()
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		const SceneData& scene = m_Graph.As<RenderGraph>().GetScene();
 
 		Engine::GPUTimer::BeginEvent(m_CommandList, "Shadow Pass");
 		BEGIN_EVENT_TRACE_GPU(m_CommandList, "Shadow pass");
@@ -28,10 +19,10 @@ namespace Game
 		Utils::Vector<Engine::ResourceStateObject> transitions;
 
 		// directional light
-		if (scene.m_DirectinalLight)
+		if (*m_DirLightBind)
 		{
 			// for each camera on the directional light
-			for (auto& cm : scene.m_DirectinalLight->GetShadowMaps())
+			for (auto& cm : (*m_DirLightBind)->GetShadowMaps())
 			{
 				const DirectionalLight::CascadedShadowMaps& maps = cm.second;
 				for (Engine::Ref<Engine::FrameBuffer> fb : maps.m_ShadowMaps)
@@ -47,12 +38,12 @@ namespace Game
 
 
 		// directional light
-		if(scene.m_DirectinalLight) 
+		if(*m_DirLightBind)
 		{
 			Engine::GPUTimer::BeginEvent(m_CommandList, "Directional Light");
 
 			// for each camera using the directional lights shadow maps
-			for (auto& cm : scene.m_DirectinalLight->GetShadowMaps())
+			for (auto& cm : (*m_DirLightBind)->GetShadowMaps())
 			{
 				Engine::Ref<Engine::Camera> camera = cm.first;
 				const DirectionalLight::CascadedShadowMaps& maps = cm.second;
@@ -69,7 +60,7 @@ namespace Game
 					m_CommandList->ClearRenderTarget(fb);
 
 					// for each object in the scene
-					for (auto& cmd : scene.m_MainPassDrawCommands)
+					for (auto& cmd : *m_DrawCommandsBind)
 					{
 						Engine::Ref<Engine::GraphicsShaderPass> pass = cmd.m_Shader->GetGraphicsPass("directionalShadowMap");
 						if (pass)

@@ -7,8 +7,7 @@
 namespace Game
 {
 
-	PostProcessNode::PostProcessNode(Engine::RenderGraph& graph) :
-		RenderGraphNode(graph)
+	PostProcessNode::PostProcessNode()
 	{
 		struct Vertex
 		{
@@ -59,7 +58,7 @@ namespace Game
 		}
 	}
 
-	void PostProcessNode::BuildImpl()
+	void PostProcessNode::Build()
 	{
 		CREATE_PROFILE_FUNCTIONI();
 		// make sure m_RenderTarget is always the last to be rendered to

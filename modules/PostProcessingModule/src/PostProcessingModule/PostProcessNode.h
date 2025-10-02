@@ -1,13 +1,13 @@
 #pragma once
-#include "Engine/Renderer/RenderGraphNode.h"
+#include "Engine/Renderer/RenderPiplineNode.h"
 #include "Effects/PostProcess.h"
 
 namespace Game
 {
-	class PostProcessNode : public Engine::RenderGraphNode
+	class PostProcessNode : public Engine::RenderPiplineNode
 	{
 	public:
-		PostProcessNode(Engine::RenderGraph& graph);
+		PostProcessNode();
 
 		void SetRenderTarget(Engine::Ref<Engine::RenderTarget2D> fb);
 		void SetInput(const PostProcessInput& input) { m_Input = input; }
@@ -19,7 +19,7 @@ namespace Game
 		virtual void OnViewportResize(uint32 width, uint32 height) override;
 
 	protected:
-		virtual void BuildImpl() override;
+		virtual void Build() override;
 
 	private:
 		Engine::Ref<Engine::RenderTarget2D> m_RenderTarget;
