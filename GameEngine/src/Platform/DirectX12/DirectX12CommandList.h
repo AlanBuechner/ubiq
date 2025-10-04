@@ -27,6 +27,8 @@ namespace Engine
 		void SetRenderTarget(Ref<RenderTarget2D> renderTarget);
 		void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, Math::Vector4 color);
 
+		void FlushResourceBarriers();
+
 		void BeginEvent(const char* eventName);
 		void EndEvent();
 
@@ -85,6 +87,8 @@ namespace Engine
 
 		ID3D12CommandAllocator* m_CommandAllocator;
 		ID3D12GraphicsCommandList10* m_CommandList;
+
+		Utils::Vector<D3D12_RESOURCE_BARRIER> m_ResourceBarriers;
 
 		Utils::Vector<std::string> m_EventStack;
 		Utils::Vector<tracy::D3D12ZoneScope*> m_TracyEventStack;

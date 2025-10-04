@@ -7,12 +7,14 @@
 
 #include "Engine/Core/MeshBuilder.h"
 
+#include "Resource.h"
+
 namespace Game
 {
 	
 	SkyboxNode::SkyboxNode()
 	{
-		m_SkyboxShader = Engine::Application::Get().GetAssetManager().GetAsset<Engine::Shader>("Assets/Shaders/SkyboxShader.hlsl");
+		m_SkyboxShader = Engine::Application::Get().GetAssetManager().GetEmbededAsset<Engine::Shader>(SKYBOX);
 
 		struct Vertex
 		{

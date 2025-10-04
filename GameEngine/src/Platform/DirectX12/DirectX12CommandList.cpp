@@ -112,6 +112,8 @@ namespace Engine
 			default: break;
 			}
 
+			FlushResourceBarriers();
+
 			// commands
 			switch (cmd->GetCommandID())
 			{
@@ -138,6 +140,8 @@ namespace Engine
 	void DirectX12CommandList::Close()
 	{
 		CREATE_PROFILE_FUNCTIONI();
+
+		FlushResourceBarriers();
 
 		// end tracy trace
 		EndGPUEvent();
@@ -173,6 +177,16 @@ namespace Engine
 
 
 
+	void DirectX12CommandList::FlushResourceBarriers()
+	{
+		if (m_ResourceBarriers.Empty())
+			return;
+
+		m_CommandList->ResourceBarrier((uint32)m_ResourceBarriers.Count(), m_ResourceBarriers.Data());
+
+		m_ResourceBarriers.Clear();
+	}
+
 	void DirectX12CommandList::BeginEvent(const char* eventName)
 	{
 		GPUTimer::BeginEvent(this, eventName);
@@ -206,18 +220,20 @@ namespace Engine
 		if (transitions.Count() == 0)
 			return;
 
-		Utils::Vector<D3D12_RESOURCE_BARRIER> barriers;
-		barriers.Resize(transitions.Count());
+
 		for (uint32 i = 0; i < transitions.Count(); i++)
 		{
 			ResourceState to = transitions[i].to;
 			ResourceState from = transitions[i].from;
 			GPUResource* resource = transitions[i].resource;
-			barriers[i] = TransitionResource((ID3D12Resource*)resource->GetGPUResourcePointer(), 
-				(D3D12_RESOURCE_STATES)resource->GetGPUState(from), (D3D12_RESOURCE_STATES)resource->GetGPUState(to));
-		}
+			D3D12_RESOURCE_BARRIER b = TransitionResource(
+				(ID3D12Resource*)resource->GetGPUResourcePointer(),
+				(D3D12_RESOURCE_STATES)resource->GetGPUState(from), 
+				(D3D12_RESOURCE_STATES)resource->GetGPUState(to)
+			);
 
-		m_CommandList->ResourceBarrier((uint32)barriers.Count(), barriers.Data());
+			m_ResourceBarriers.Push(b);
+		}
 	}
 
 	// UAVs
@@ -226,18 +242,18 @@ namespace Engine
 		if (cmd.UAVs.Count() == 0)
 			return;
 
-		Utils::Vector<CD3DX12_RESOURCE_BARRIER> barriers;
-		barriers.Resize(cmd.UAVs.Count());
 		for (uint32 i = 0; i < cmd.UAVs.Count(); i++)
-			barriers[i] = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)cmd.UAVs[i]->GetGPUResourcePointer());
-		m_CommandList->ResourceBarrier(barriers.Count(), barriers.Data());
+		{
+			CD3DX12_RESOURCE_BARRIER b = CD3DX12_RESOURCE_BARRIER::UAV((ID3D12Resource*)cmd.UAVs[i]->GetGPUResourcePointer());
+			m_ResourceBarriers.Push(b);
+		}
 	}
 
 	// transient allocation
 	void DirectX12CommandList::OpenTransient(const CPUOpenTransientCommand& cmd)
 	{
-		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Aliasing(nullptr, (ID3D12Resource*)cmd.res->GetGPUResourcePointer());
-		m_CommandList->ResourceBarrier(1, &barrier);
+		CD3DX12_RESOURCE_BARRIER b = CD3DX12_RESOURCE_BARRIER::Aliasing(nullptr, (ID3D12Resource*)cmd.res->GetGPUResourcePointer());
+		m_ResourceBarriers.Push(b);
 	}
 
 	void DirectX12CommandList::CloseTransient(const CPUCloseTransientCommand& cmd)

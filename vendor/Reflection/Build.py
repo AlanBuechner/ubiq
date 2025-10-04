@@ -49,6 +49,6 @@ def GetProject():
 	proj.links = []
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
-	proj.intDir = GetIntDir(projName)
-	proj.binDir = GetBinDir(projName)
+	proj.intDir = GetIntDir(projName, Config.project)
+	proj.binDir = GetBinDir(projName, Config.project)
 	return proj

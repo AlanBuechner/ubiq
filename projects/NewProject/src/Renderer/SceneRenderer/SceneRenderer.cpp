@@ -13,10 +13,10 @@
 #include "Engine/Core/Application.h"
 
 // nodes
-#include "Renderer/RenderPipline/GBufferPassNode.h"
-#include "Renderer/RenderPipline/MainPassNode.h"
-#include "Renderer/RenderPipline/SkyboxNode.h"
-#include "Renderer/RenderPipline/ShadowPassNode.h"
+#include "RenderingUtils/Nodes/GBufferPassNode.h"
+#include "RenderingUtils/Nodes/MainPassNode.h"
+#include "RenderingUtils/Nodes/SkyboxNode.h"
+#include "RenderingUtils/Nodes/ShadowPassNode.h"
 #include "PostProcessingModule/PostProcessNode.h"
 
 // post process effects
@@ -99,11 +99,11 @@ namespace Game
 
 		Engine::Ref<PostProcessNode> postPass = AddNode<PostProcessNode>();
 		postPass->SetRenderTarget(postRenderTargetNode->m_Buffer->GetAttachment(0));
+		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachment(0));
 		postPass->SetInput(input);
 		//postPass->AddPostProcess<DepthOfField>();
 		postPass->AddPostProcess<Bloom>();
 		postPass->AddPostProcess<ToneMapping>("HillACES");
-		postPass->SetSrc(renderTargetNode->m_Buffer->GetAttachment(0));
 
 		// create outputNode
 		m_OutputNode = AddNode<Engine::OutputNode>();
