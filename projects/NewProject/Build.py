@@ -9,14 +9,10 @@ import inspect
 projDir = os.path.dirname(inspect.getfile(lambda: None)).replace("\\", "/")
 projName = os.path.basename(projDir)
 
-inEditor = False
+inEditor = True
 
 sources = [
 	f"src/**.cpp",
-]
-
-resources = [
-	f"embeded/**.rc",
 ]
 
 headers = [
@@ -27,11 +23,9 @@ includes = [
 	projDir,
 	f"src",
 	f"{includeDirs['vendor']}",
-	f"{includeDirs['ImGui']}",
 	f"{includeDirs['glm']}",
 	f"{includeDirs['stb_image']}",
 	f"{includeDirs['yaml']}",
-	f"{includeDirs['ImGuizmo']}",
 	f"{includeDirs['Assimp']}",
 	f"{includeDirs['json']}",
 	f"{includeDirs['dxc']}",
@@ -46,6 +40,7 @@ includes = [
 	f"{location}/modules",
 	f"{location}/modules/PostProcessingModule/src",
 	f"{location}/modules/RenderingUtilsModule/src",
+	f"{location}/modules/GUIModule/src",
 ]
 
 sysIncludes = []
@@ -94,7 +89,6 @@ def GetProject():
 	proj.pchSource = ""
 	proj.pchHeader = ""
 	proj.sources = sources
-	proj.resources = resources
 	proj.headers = headers
 	proj.includes = includes
 	proj.sysIncludes = sysIncludes

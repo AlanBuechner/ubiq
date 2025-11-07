@@ -5,7 +5,6 @@ projects = [] # will be populated later
 buildScripts = {} # will be populated later
 p = {
 	"Dependancies" : {
-		"imgui" : "vendor/imgui",
 		"yaml-cpp" : "vendor/yaml-cpp",
 		"ProjectManager" : "vendor/ProjectManager",
 		"Reflection" : "vendor/Reflection",
@@ -51,9 +50,7 @@ vendorDirs = {
 	# third party
 	"yaml"				: f"{location}/vendor/yaml-cpp",
 	"glm"				: f"{location}/vendor/glm",
-	"ImGui"				: f"{location}/vendor/imgui",
 	"stb_image"			: f"{location}/vendor/stb_image",
-	"ImGuizmo"			: f"{location}/vendor/ImGuizmo",
 	"Assimp"			: f"{location}/vendor/Assimp",
 	"json"				: f"{location}/vendor/json",
 	"dxc"				: f"{location}/vendor/dxc",
@@ -72,9 +69,7 @@ includeDirs = {
 	"vendor"			: f"{location}/vendor",
 	"yaml"				: f"{vendorDirs['yaml']}/include",
 	"glm"				: f"{vendorDirs['glm']}",
-	"ImGui"				: f"{vendorDirs['ImGui']}",
 	"stb_image"			: f"{vendorDirs['stb_image']}",
-	"ImGuizmo"			: f"{vendorDirs['ImGuizmo']}",
 	"Assimp"			: f"{vendorDirs['Assimp']}/include",
 	"json"				: f"{vendorDirs['json']}/single_include",
 	"dxc"				: f"{vendorDirs['dxc']}/inc",

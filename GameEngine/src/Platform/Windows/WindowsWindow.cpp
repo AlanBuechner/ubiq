@@ -18,9 +18,6 @@
 #include <vssym32.h>
 #pragma comment(lib, "uxtheme.lib")
 
-#include <imgui.h>
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 namespace Engine
 {
 	void Window::Init()
@@ -245,9 +242,6 @@ namespace Engine
 	LRESULT WINAPI WindowsWindow::HandleEventSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		CREATE_PROFILE_FUNCTIONI();
-		// send events to imgui
-		if (Application::InEditer())
-			ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
 		if (msg == WM_NCCREATE)
 		{
@@ -266,10 +260,6 @@ namespace Engine
 
 	LRESULT WINAPI WindowsWindow::HandleEventThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		// send events to imgui
-		if (Application::InEditer())
-			ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-
 		// get a pointer to the window
 		WindowsWindow* const pWnd = reinterpret_cast<WindowsWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 		return pWnd->HandleEvent(hWnd, msg, wParam, lParam); // call handle event for that window

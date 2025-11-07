@@ -111,8 +111,6 @@ project "{projName}"
 		code += f"\t\t\"{x}\",\n"
 	for x in proj.headers:
 		code += f"\t\t\"{x}\",\n"
-	for x in proj.resources:
-		code += f"\t\t\"{x}\",\n"
 
 	code += "\t}\n\n"
 	code += "\tincludedirs = \n\t{\n"

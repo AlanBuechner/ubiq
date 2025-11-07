@@ -7,6 +7,22 @@ namespace Engine
 	class Cursor
 	{
 	public:
+
+		enum Icon {
+			Arrow,
+			IBeam,
+			Wait,
+			Cross,
+			SizeNWSE,
+			SizeNESW,
+			SizeWE,
+			SizeNS,
+			SizeAll,
+			No,
+			Hand,
+			UnInitialized,
+		};
+
 		static void ConstrainToWindow(Ref<Window> window);
 		static void Visibility(bool v);
 

@@ -28,8 +28,6 @@ namespace Game
 #pragma region Editor
 #if defined(EDITOR)
 
-#include "Editor/Panels/PropertiesPanel.h"
-
 namespace Game
 {
 }

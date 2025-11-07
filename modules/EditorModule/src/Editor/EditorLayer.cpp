@@ -8,12 +8,6 @@
 #include "Engine/PlatformUtils/PlatformUtils.h"
 #include "Engine/Core/Scene/SceneScriptBase.h"
 
-#include "Panels/SceneHierarchyPanel.h"
-#include "Panels/ContentBrowserPanel.h"
-#include "Editor/Panels/GridGizmosPanel.h"
-
-#include "Engine/imGui/ImGuiLayer.h"
-#include "Engine/ImGui/ImGui.h"
 #include <memory>
 
 LINK_REFLECTION_DATA(EditorModule)
@@ -29,6 +23,31 @@ Editor::EditorLayer* Editor::EditorLayer::s_Instance = nullptr;
 namespace Editor
 {
 
+	class TextPanel : public GUI::PanelBase
+	{
+	public:
+
+		virtual void Init() override
+		{
+			m_DrawData.color = { 0.2, 0.2, 0.2, 1 };
+			m_DrawData.borderColor = { 0.3, 0.3, 0.3, 1 };
+			m_DrawData.borderWidth = 0.002f;
+			m_DrawData.borderHardness = 0.8f;
+
+			m_Transform.position = { 0.25, 0.25 };
+			m_Transform.size = { 0.5, 0.5 };
+		}
+		
+
+		virtual void OnGUIRender() override
+		{
+			GUI::PanelBase::OnGUIRender();
+		}
+	};
+
+
+
+
 	EditorLayer::EditorLayer()
 		: Super("EditorLayer")
 	{
@@ -38,14 +57,19 @@ namespace Editor
 		EditorAssets::Init();
 		m_ViewPortSize = { Engine::Application::Get().GetWindow().GetWidth(), Engine::Application::Get().GetWindow().GetHeight() };
 
-		m_Panels.Push(Engine::CreateRef<SceneHierarchyPanel>());
-		m_Panels.Push(Engine::CreateRef<ContentBrowserPanel>());
-		m_Panels.Push(Engine::CreateRef<GridGizmosPanel>());
+		GUI::Initalize();
+		GUI::PanelRef panel1 = m_Context.CreatePanel<TextPanel>();
+		GUI::PanelRef panel2 = m_Context.CreatePanel<TextPanel>();
+		GUI::PanelRef panel3 = m_Context.CreatePanel<TextPanel>();
+
+		panel1->Split(panel2, GUI::SplitAxis::X);
+		panel2->Split(panel3, GUI::SplitAxis::Y);
 	}
 
 	EditorLayer::~EditorLayer()
 	{
 		EditorAssets::Destroy();
+		GUI::Destroy();
 	}
 
 	void EditorLayer::OnAttach()
@@ -65,6 +89,10 @@ namespace Editor
 	void EditorLayer::OnUpdate()
 	{
 		CREATE_PROFILE_FUNCTIONI();
+
+		m_Context.SetWindowSize(Engine::Application::Get().GetWindow().GetWidth(), Engine::Application::Get().GetWindow().GetHeight());
+		m_Context.OnGUIRender();
+
 
 		// resize
 		Engine::Ref<Engine::Texture2D> res = m_Game->GetScene()->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0);
@@ -87,15 +115,11 @@ namespace Editor
 				Math::Vector2 pos;
 				if (GetMousePositionInViewport(pos))
 				{
-					for (uint32 i = 0; i < m_Panels.Count(); i++)
-						m_Panels[i]->OnScreenClick(pos);
+					
 				}
 			}
 		}
 
-		// update editor panels
-		for (uint32 i = 0; i < m_Panels.Count(); i++)
-			m_Panels[i]->OnUpdate();
 
 		// update game
 		m_Game->OnUpdate(m_Playing ? nullptr : m_EditorCamera);
@@ -119,69 +143,38 @@ namespace Editor
 		Engine::GPUTimer::EndEvent(commandList);
 
 
+		Engine::GPUTimer::BeginEvent(commandList, "GUI");
+
+		Engine::Ref<Engine::RenderTarget2D> rt = Engine::Application::Get().GetWindow().GetSwapChain()->GetCurrentRenderTarget();
+
+		Engine::Ref<Engine::RenderTarget2D> depthBuffer = Engine::RenderTarget2D::Create(rt->GetWidth(), rt->GetHeight(),
+			Engine::TextureFormat::Depth, { 1,0,0,0 }, Engine::ResourceCapabilities::Transient);
+
+		commandList->AllocateTransient(depthBuffer);
+		commandList->ClearRenderTarget(depthBuffer);
+
+		m_Context.SetRenderTarget(rt);
+		m_Context.SetDepthBuffer(depthBuffer);
+
+		m_Context.Draw(commandList);
+		m_Context.EndFrame();
+
+		commandList->CloseTransient(depthBuffer);
+		Engine::GPUTimer::EndEvent(commandList);
+
 		timer.End();
-	}
-
-	void EditorLayer::OnImGuiRender()
-	{
-		// draw menu
-		if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("New", "Ctrl+N"))
-					NewScene();
-				ImGui::Separator();
-
-				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
-					SaveSceneDialog();
-
-				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
-					SaveSceneAsDialog();
-
-				if (ImGui::MenuItem("Exit"))
-					Engine::Application::Get().Close();
-
-				ImGui::EndMenu();
-			}
-
-			fs::path tempScenePath = fs::current_path() / "temp/tempScene.ubiq";
-			if (ImGui::MenuItem(m_Playing ? "Stop" : "Play"))
-			{
-				// save scene to temp file
-				if (m_Playing == false)
-				{
-					Engine::SceneSerializer serializer(m_Game->GetScene());
-					serializer.Serialize(tempScenePath);
-				}
-				m_Playing = !m_Playing;
-				LoadScene(tempScenePath);
-			}
-
-			ImGui::EndMenuBar();
-		}
-
-		for (uint32 i = 0; i < m_Panels.Count(); i++)
-			m_Panels[i]->OnImGuiRender();
-
-		DrawViewport();
-		m_Game->DrawGizmos();
 	}
 
 	void EditorLayer::NewScene()
 	{
 		m_Game->SwitchScene(Engine::Scene::Create());
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
-		for (uint32 i = 0; i < m_Panels.Count(); i++)
-			m_Panels[i]->OnSceneChange(m_Game->GetScene());
 	}
 
 	void EditorLayer::DefaultScene()
 	{
 		m_Game->SwitchScene(Engine::Scene::CreateDefault());
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
-		for (uint32 i = 0; i < m_Panels.Count(); i++)
-			m_Panels[i]->OnSceneChange(m_Game->GetScene());
 	}
 
 	void EditorLayer::LoadScene(const fs::path& file)
@@ -191,74 +184,13 @@ namespace Editor
 		Engine::Ref<Engine::Scene> scene = Engine::Scene::Create(file);
 		m_Game->GetScene()->OnViewportResize((uint32)m_ViewPortSize.x, (uint32)m_ViewPortSize.y);
 		m_Game->SwitchScene(scene);
-		for (uint32 i = 0; i < m_Panels.Count(); i++)
-			m_Panels[i]->OnSceneChange(m_Game->GetScene());
 	}
 
-	void EditorLayer::DrawViewport()
-	{
-		// Game window
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("Viewport##Viewport", nullptr, ImGuiWindowFlags_NoTitleBar);
-
-		auto viewportOffset = ImGui::GetCursorPos();
-
-		Engine::Application::Get().GetImGuiLayer()->SetBlockEvents(!ImGui::IsWindowFocused());
-
-		// draw viewport
-		ImVec2 viewPortPanalSize = ImGui::GetContentRegionAvail();
-		if (m_ViewPortSize != *(Math::Vector2*)&viewPortPanalSize)
-			m_ViewPortSize = { viewPortPanalSize.x, viewPortPanalSize.y };
-		ImGui::Image((ImTextureID)m_Game->GetScene()->GetSceneRenderer()->GetRenderTarget()->GetAttachment(0)->GetSRVDescriptor()->GetGPUHandlePointer(), viewPortPanalSize);
-
-		// update bounds
-		ImVec2 minBound = ImGui::GetWindowPos();
-		minBound.x += viewportOffset.x;
-		minBound.y += viewportOffset.y;
-
-		ImVec2 maxBound = { minBound.x + viewPortPanalSize.x, minBound.y + viewPortPanalSize.y };
-		m_ViewportBounds[0] = { minBound.x, minBound.y };
-		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
-
-		// set cursor visibility
-		//if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-		//{
-		//	Engine::Cursor::Visibility(false);
-		//	Engine::Cursor::SetLockPos(Engine::Input::GetMousePosition().x, Engine::Input::GetMousePosition().y);
-		//	Engine::Cursor::Lock(true);
-		//}
-		//else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
-		//{
-		//	Engine::Cursor::Visibility(true);
-		//	Engine::Cursor::Lock(false);
-		//}
-
-
-		// draw overlay
-		float fps = Time::GetFPS();
-		ImGui::SetCursorPos(ImVec2(10, viewportOffset.y + 10));
-		ImGui::PushStyleColor(ImGuiCol_Text, fps > 60.0f ? IM_COL32(0, 255, 0, 255) : IM_COL32(255, 0, 0, 255));
-		ImGui::Text("  FPS : %.2f", fps);
-		ImGui::PopStyleColor();
-
-		float frameTime = Time::GetDeltaMilliseconds();
-		ImGui::SetCursorPosX(10);
-		ImGui::PushStyleColor(ImGuiCol_Text, frameTime < 16.666f ? IM_COL32(0, 255, 0, 255) : IM_COL32(255, 0, 0, 255));
-		ImGui::Text("Frame : %.2f m/s", Time::GetDeltaMilliseconds());
-		ImGui::PopStyleColor();
-
-
-		// gizmos
-		for (uint32 i = 0; i < m_Panels.Count(); i++)
-			m_Panels[i]->OnDrawGizmos();
-
-		ImGui::End();
-		ImGui::PopStyleVar();
-	}
+	
 
 	bool EditorLayer::GetMousePositionInViewport(Math::Vector2& pos)
 	{
-		auto [mx, my] = ImGui::GetMousePos();
+		auto [mx, my] = std::pair(0,0); // TODO get mouse position
 		mx -= m_ViewportBounds[0].x;
 		my -= m_ViewportBounds[0].y;
 
@@ -300,11 +232,11 @@ namespace Editor
 	{
 		Super::OnEvent(e);
 
+		if (m_Context.OnEvent(e))
+			return;
+
 		m_EditorCamera->OnEvent(e);
 		m_Game->OnEvent(e);
-
-		for (uint32 i = 0; i < m_Panels.Count(); i++)
-			m_Panels[i]->OnEvent(e);
 	}
 
 	bool EditorLayer::OnKeyPressed(Engine::KeyPressedEvent* e)

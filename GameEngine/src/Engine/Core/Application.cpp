@@ -3,11 +3,10 @@
 #include "Time.h"
 #include "Input/Input.h"
 #include "Cursor.h"
+#include "Layer.h"
 
 #include "Engine/Events/Event.h"
 #include "Engine/Events/ApplicationEvent.h"
-
-#include "Engine/imGui/ImGuiLayer.h"
 
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Abstractions/Resources/SwapChain.h"
@@ -123,18 +122,6 @@ namespace Engine {
 			SendInputBuffer(); // sent the input buffer through the layer stack
 			Cursor::Update();
 
-			// update gui
-			if (m_InEditer)
-			{
-				// render imgui layer
-				START_PROFILEI(timer, "ImGui Render");
-				m_ImGuiLayer->Begin();
-				for (Layer* layer : m_LayerStack)
-					layer->OnImGuiRender();
-				m_ImGuiLayer->End();
-				END_PROFILEI(timer);
-			}
-
 			// update the layer stack
 			START_PROFILEI(timer, "Update Layers");
 			for (Layer* layer : m_LayerStack)
@@ -166,16 +153,6 @@ namespace Engine {
 	void Application::Close()
 	{
 		m_Running = false;
-	}
-
-	void Application::GenLayerStack()
-	{
-		if (m_InEditer)
-		{
-			// create imgui layer
-			m_ImGuiLayer = new ImGuiLayer();
-			PushOverlay(m_ImGuiLayer);
-		}
 	}
 
 	void Application::SendInputBuffer()

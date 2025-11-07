@@ -12,7 +12,7 @@ namespace Engine
 {
 
 	static POINT s_CursorLockPoint;
-	static bool s_IsLocked;
+	static bool s_IsLocked = false;
 
 	struct WrapBox
 	{
@@ -20,7 +20,10 @@ namespace Engine
 		POINT max;
 	};
 	static WrapBox s_WrapBox;
-	static bool s_IsWrap;
+	static bool s_IsWrap = false;
+
+	static Cursor::Icon s_Icon = Cursor::UnInitialized;
+	static Cursor::Icon s_RequestedIcon = Cursor::Arrow;
 
 	void Cursor::ConstrainToWindow(Ref<Window> window)
 	{
@@ -112,6 +115,27 @@ namespace Engine
 			POINT point = s_CursorLockPoint;
 			ClientToScreen(window, &point);
 			SetCursorPos(point.x, point.y);
+		}
+
+		if (s_RequestedIcon != s_Icon && s_RequestedIcon != Cursor::UnInitialized)
+		{
+			static const LPCTSTR lookup[] = {
+				IDC_ARROW,
+				IDC_IBEAM,
+				IDC_WAIT,
+				IDC_CROSS,
+				IDC_SIZENWSE,
+				IDC_SIZENESW,
+				IDC_SIZEWE,
+				IDC_SIZENS,
+				IDC_SIZEALL,
+				IDC_NO,
+				IDC_HAND,
+			};
+
+			HCURSOR hCursor = LoadCursor(NULL, lookup[(uint32)s_RequestedIcon]);
+			SetCursor(hCursor);
+
 		}
 	}
 

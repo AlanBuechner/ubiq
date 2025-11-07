@@ -136,6 +136,7 @@ namespace Engine
 
 		uint32 GetWidth() const { return m_Resource->GetWidth(); }
 		uint32 GetHeight() const { return m_Resource->GetHeight(); }
+		float GetAspect() const { return (float)GetWidth() / (float)GetHeight(); }
 		uint32 GetMips() const { return m_Resource->GetMips(); }
 		Texture2DResource* GetResource() const { return m_Resource; }
 		GPUResourceHandle GetResourceHandle()const { return (GPUResource**) & m_Resource; }

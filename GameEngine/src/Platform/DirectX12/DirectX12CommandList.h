@@ -21,14 +21,9 @@ namespace Engine
 		virtual void RecoredCommands(CPUCommandAllocator* commandAllocator) override;
 		void Close() override;
 
-		// non command object abstractions
-		// NOTE : i am only adding abstractions for imgui
-		void Transition(const Utils::Vector<ResourceTransitionObject>& transitions);
-		void SetRenderTarget(Ref<RenderTarget2D> renderTarget);
-		void ClearRenderTarget(Ref<RenderTarget2D> renderTarget, Math::Vector4 color);
-
 		void FlushResourceBarriers();
 
+		// events
 		void BeginEvent(const char* eventName);
 		void EndEvent();
 

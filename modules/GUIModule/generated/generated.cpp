@@ -3,4 +3,4 @@
 #include <stdarg.h>
 #include "Reflection.h"
 #define private public
-void DeadLinkEditorModule() {}
+void DeadLinkGUIModule() {}

@@ -9,9 +9,6 @@
 
 #include "Engine/Core/Threading/Flag.h"
 #include "Engine/Core/Threading/JobSystem.h"
-#include "CPUCommandList.h"
-
-struct ImDrawDataSnapshot;
 
 namespace Engine
 {
@@ -46,7 +43,6 @@ namespace Engine
 			~FrameContext();
 
 			Utils::Vector<CPUCommandAllocator*> m_Commands;
-			ImDrawDataSnapshot* m_ImGuiSnapshot = nullptr;
 			Utils::Vector<Ref<CommandList>> m_CommandLists;
 			ResourceDeletionPool* m_DeletionPool = nullptr;
 			UploadPool* m_UploadPool = nullptr;

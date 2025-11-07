@@ -13,10 +13,6 @@ sources = [
 	f"src/**.cpp",
 ]
 
-resources = [
-	f"embeded/**.rc",
-]
-
 headers = [
 	f"src/**.h",
 ]
@@ -25,11 +21,9 @@ includes = [
 	projDir,
 	f"src",
 	f"{includeDirs['vendor']}",
-	f"{includeDirs['ImGui']}",
 	f"{includeDirs['glm']}",
 	f"{includeDirs['stb_image']}",
 	f"{includeDirs['yaml']}",
-	f"{includeDirs['ImGuizmo']}",
 	f"{includeDirs['Assimp']}",
 	f"{includeDirs['json']}",
 	f"{includeDirs['dxc']}",
@@ -40,6 +34,7 @@ includes = [
 	f"{includeDirs['tracy']}",
 	f"{location}/GameEngine/src",
 	f"{location}/GameEngine/embeded",
+	f"{location}/modules/GUIModule/src",
 ]
 
 sysIncludes = []
@@ -53,9 +48,15 @@ defines = [
 	"EDITOR",
 ]
 
-dependancys = []
+dependancys = [
+	"GUIModule",
+]
 
 links = []
+
+modules = [
+	f"{location}/modules/GUIModule",
+]
 
 def GetProject():
 	proj = BuildUtils.ProjectEnviernment()
@@ -63,7 +64,6 @@ def GetProject():
 	proj.pchSource = ""
 	proj.pchHeader = ""
 	proj.sources = sources
-	proj.resources = resources
 	proj.headers = headers
 	proj.includes = includes
 	proj.sysIncludes = sysIncludes
@@ -71,10 +71,11 @@ def GetProject():
 	proj.links = links
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
-	proj.intDir = GetIntDir(projName)
-	proj.binDir = GetBinDir(projName)
+	proj.intDir = GetIntDir(projName, Config.project)
+	proj.binDir = GetBinDir(projName, Config.project)
 	proj.genReflection = True
 	return proj
 
 
-
+def GetModules():
+	return modules

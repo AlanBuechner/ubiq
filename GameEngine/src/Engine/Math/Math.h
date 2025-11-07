@@ -5,6 +5,7 @@
 #include "Matrix.h"
 #include "Quaternion.h"
 #include <math.h>
+#include <glm/glm.hpp>
 
 namespace Math
 {
@@ -57,6 +58,8 @@ namespace Math
 
 	template <typename T> T Lerp(T a, T b, T t) { return glm::lerp(a, b, t); }
 	template <typename T> T Slerp(T a, T b, T t) { return glm::slerp(a, b, t); }
+
+	inline float InError(float val, float target, float error) { return (val >= target - error) && (val <= target + error); }
 
 	// Random
 	float Perlin(float p);

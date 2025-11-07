@@ -92,49 +92,7 @@ namespace Game
 #pragma region Editor
 #if defined(EDITOR)
 
-#include "Editor/Panels/PropertiesPanel.h"
 
-namespace Game
-{
-	ADD_EXPOSE_PROP_FUNC(DirectionalLightComponent) {
-		bool changed = false;
-		DirectionalLightComponent& component = *(DirectionalLightComponent*)voidData;
-		Math::Vector3 direction = component.GetDirectinalLight()->GetDirection();
-		Math::Vector2 rot = component.GetDirectinalLight()->GetAngles();
-
-		if (Editor::PropertysPanel::DrawVec2Control("Direction", rot))
-			component.SetAngles(rot); changed = true;
-
-		float temp = component.GetDirectinalLight()->GetCCT();
-		if (Editor::PropertysPanel::DrawFloatSlider("Temperature", temp, 1700, 20000, 6600))
-		{
-			component.SetTemperature(temp);
-			changed = true;
-		}
-
-		Math::Vector3 color = component.GetDirectinalLight()->GetTint();
-		if (Editor::PropertysPanel::DrawColorControl("Color", color))
-		{
-			component.SetTint(color);
-			changed = true;
-		}
-
-		float intensity = component.GetDirectinalLight()->GetIntensity();
-		if (Editor::PropertysPanel::DrawFloatControl("Intensity", intensity))
-		{
-			component.SetIntensity(intensity);
-			changed = true;
-		}
-
-		float size = component.GetDirectinalLight()->GetSize();
-		if (Editor::PropertysPanel::DrawFloatControl("Size", size))
-		{
-			component.SetSize(size);
-			changed = true;
-		}
-		return changed;
-	});
-}
 
 #endif
 #pragma endregion

@@ -490,7 +490,7 @@ namespace Engine
 			tokenQueue.pop(); // remove '['
 
 			Utils::Vector<std::string> params;
-			while (tokenQueue.front() != ")")
+			while (tokenQueue.front() != "]")
 			{
 				params.Push(tokenQueue.front());
 				tokenQueue.pop(); // remove the parameter

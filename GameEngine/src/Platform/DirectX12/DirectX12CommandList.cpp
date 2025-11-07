@@ -150,31 +150,6 @@ namespace Engine
 	}
 
 
-	void DirectX12CommandList::Transition(const Utils::Vector<ResourceTransitionObject>& transitions)
-	{
-		CPUResourceTransitionCommand cmd;
-		cmd.resourceStateTransitons = transitions;
-		Transition(cmd);
-	}
-
-	void DirectX12CommandList::SetRenderTarget(Ref<RenderTarget2D> renderTarget)
-	{
-		CPUSetRenderTargetCommand cmd;
-		cmd.renderTargetHandles.Push(renderTarget->GetRTVDSVDescriptor());
-		cmd.depthStencil = nullptr;
-		SetRenderTarget(cmd);
-	}
-
-	void DirectX12CommandList::ClearRenderTarget(Ref<RenderTarget2D> renderTarget, Math::Vector4 color)
-	{
-		CPUClearRenderTargetCommand cmd;
-		cmd.handle = renderTarget->GetRTVDSVDescriptor();
-		cmd.color = color;
-		cmd.isDepthStencil = false;
-		ClearRenderTarget(cmd);
-	}
-
-
 
 
 	void DirectX12CommandList::FlushResourceBarriers()

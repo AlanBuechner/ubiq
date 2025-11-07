@@ -1,4 +1,4 @@
-# engine build script
+# GUI module build script
 
 import scripts.BuildUtils as BuildUtils
 from scripts.Utils.Utils import *
@@ -9,17 +9,12 @@ import inspect
 projDir = os.path.dirname(inspect.getfile(lambda: None)).replace("\\", "/")
 projName = os.path.basename(projDir)
 
-pchHeader = f"{location}/src/pch.h"
-pchSource = f"{location}/src/pch.cpp"
-
 sources = [
 	f"src/**.cpp",
-	f"{includeDirs['stb_image']}/**.cpp",
 ]
 
 headers = [
 	f"src/**.h",
-	f"{includeDirs['stb_image']}/**.h",
 ]
 
 includes = [
@@ -28,16 +23,12 @@ includes = [
 	f"{includeDirs['vendor']}",
 	f"{includeDirs['glm']}",
 	f"{includeDirs['stb_image']}",
-	f"{includeDirs['yaml']}",
-	f"{includeDirs['Assimp']}",
-	f"{includeDirs['json']}",
-	f"{includeDirs['dxc']}",
-	f"{includeDirs['pix']}",
-	f"{includeDirs['Reflection']}",
 	f"{includeDirs['ProjectManager']}",
+	f"{includeDirs['Reflection']}",
 	f"{includeDirs['Utilities']}",
-	f"{includeDirs['Agility']}",
 	f"{includeDirs['tracy']}",
+	f"{location}/GameEngine/src",
+	f"{location}/GameEngine/embeded",
 ]
 
 sysIncludes = []
@@ -50,48 +41,25 @@ defines = [
 	"_CRT_SECURE_NO_WARNINGS",
 ]
 
-dependancys = [
-	f"yaml-cpp",
-	f"Reflection",
-	f"Utilities",
-	f"ProjectManager",
-]
+dependancys = []
 
-links = [
-	f"{libs['Assimp']}",
-	f"{libs['pix']}",
-]
-
-dlls = [
-	{
-		"folder" : "D3D12",
-		"files" : [
-			f"{vendorDirs['Agility']}/build/native/bin/x64/D3D12Core.dll",
-			f"{vendorDirs['Agility']}/build/native/bin/x64/d3d12SDKLayers.dll",
-		]
-	},
-	f"{vendorDirs['dxc']}/bin/x64/dxil.dll",
-	f"{vendorDirs['dxc']}/bin/x64/dxcompiler.dll",
-	f"{vendorDirs['Assimp']}/assimp-vc140-mt.dll",
-	f"{vendorDirs['pix']}/bin/x64/WinPixEventRuntime.dll",
-	f"{projDir}/zlibd.dll",
-]
+links = []
 
 def GetProject():
 	proj = BuildUtils.ProjectEnviernment()
 	proj.projectDirectory = projDir
-	proj.pchSource = pchSource
-	proj.pchHeader = pchHeader
+	proj.pchSource = ""
+	proj.pchHeader = ""
 	proj.sources = sources
 	proj.headers = headers
 	proj.includes = includes
 	proj.sysIncludes = sysIncludes
 	proj.defines = defines
 	proj.links = links
-	proj.dlls = dlls
 	proj.dependancys = dependancys
 	proj.buildType = BuildUtils.BuildType.STATICLIBRARY
 	proj.intDir = GetIntDir(projName, Config.project)
 	proj.binDir = GetBinDir(projName, Config.project)
 	proj.genReflection = True
 	return proj
+

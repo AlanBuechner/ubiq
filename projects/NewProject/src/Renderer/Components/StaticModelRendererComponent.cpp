@@ -83,30 +83,14 @@ namespace Game
 #pragma region Editor
 #if defined(EDITOR)
 
-#include "Editor/Panels/PropertiesPanel.h"
+
 #include "Editor/Properties.h"
 
 namespace Game
 {
-	ADD_EXPOSE_PROP_FUNC(StaticModelRendererComponent) {
-		bool changed = false;
-		StaticModelRendererComponent& component = *(StaticModelRendererComponent*)voidData;
-		Engine::Ref<Model> model = component.GetModel();
-		if (DrawModelControl("Model", model))
-		{
-			component.SetModel(model);
-			component.Invalidate();
-		}
 
-		for (uint32_t i = 0; i < component.GetMeshes().size(); i++)
-		{
-			auto& entry = component.GetMeshes()[i];
-			if (Editor::PropertysPanel::DrawMaterialControl(entry.m_Name, entry.m_Material))
-				component.Invalidate();
-		}
-		return changed;
-	});
 }
+
 #endif
 #pragma endregion
 

@@ -25,7 +25,6 @@ namespace Game
 				PushLayer(editorLayer); // set the editor layer
 			else
 				PushLayer(new RuntimeLayer()); // set the runtime layer
-			GenLayerStack();
 
 			END_PROFILEI(timer);
 		}

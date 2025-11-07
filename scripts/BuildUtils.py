@@ -223,83 +223,6 @@ def BuildSources(sources, projDir, intDir, includes, sysIncluds, defines):
 
 
 
-# ------------------------------------------- Resources ------------------------------------------- #
-class ResourceEnviernment:
-	def __init__(self):
-		self.resource = ""
-		self.outFile = ""
-		self.workingDir = ""
-		self.includes = []
-
-	def Build(self):
-		name = os.path.basename(self.resource)
-		args = [f"{GetWindowsKitBin()}/x64/rc.exe", "/R", "/FO", self.outFile]
-		for include in self.includes:
-			args.extend(["/I", include])
-		args.append(self.resource)
-		my_env = os.environ.copy()
-		my_env["PATH"] = f"{GetWindowsKitBin()}/x64:{my_env['PATH']}"
-		result = subprocess.run(args, cwd=self.workingDir, shell=True, env=my_env, capture_output=True, text=True)
-		log = f"|------------- Building file : {name} -------------|\n"
-		log += str(result.stderr)
-		log += str(result.stdout)
-		log += f"building {name} completed with error code {result.returncode}\n"
-		print(log)
-		return result.returncode
-
-
-def BuildResourceEnviernments(objects, jobs = 0):
-	if(jobs == 0):
-		jobs = multiprocessing.cpu_count()
-	pool = concurrent.futures.ThreadPoolExecutor(max_workers=jobs)
-	futures = []
-	for o in objects:
-		futures.append(pool.submit(ResourceEnviernment.Build, o))
-	
-	pool.shutdown(wait=True)
-
-	numSuccess = 0
-	numFailed = 0;
-	total = len(objects)
-	for f in futures:
-		if(f.result()==0):
-			numSuccess+=1
-		elif(f.result()>0):
-			numFailed+=1
-
-	print(f"finished building resources : {numSuccess} succeeded : {numFailed} failed : {total - (numSuccess+numFailed)} up-to-date")
-	if(numSuccess == 0 and numFailed == 0):
-		return -1 # no work done
-	return numFailed
-
-def BuildResources(resources, dependancys, projDir, intDir):
-	projName = os.path.basename(projDir)
-	files = ResolveFiles(resources, projDir)
-	if(len(files) == 0):
-		return -1
-	includes = []
-	for d in dependancys:
-		includes.append(os.path.join(FindProjectPath(d), "/embeded"))
-	buildActions = []
-
-	for file in files:
-		name = os.path.splitext(os.path.basename(file))[0]
-		outFile = os.path.join(intDir, name) + ".res"
-
-		env = ResourceEnviernment()
-		env.resource = file
-		env.outFile = outFile
-		env.workingDir = projDir
-		env.includes = includes
-
-		buildActions.append(env)
-
-	return BuildResourceEnviernments(buildActions)
-
-
-
-
-
 
 # ------------------------------------------- Linker ------------------------------------------- #
 class BuildType(Enum):
@@ -382,7 +305,6 @@ class ProjectEnviernment:
 		self.pchSource = ""
 		self.pchHeader = ""
 		self.sources = []
-		self.resources = []
 		self.headers = []
 		self.includes = []
 		self.sysIncludes = []
@@ -417,12 +339,6 @@ class ProjectEnviernment:
 		if(not os.path.exists(bdir)):
 			os.makedirs(bdir)
 
-		# build resource files
-		resourceBuildStatus = True
-		#resourceBuildStatus = BuildResources(self.resources, self.dependancys, self.projectDirectory, idir)
-		#if(resourceBuildStatus > 0): # faild to build resources
-		#	return 1
-
 		# build pch
 		# TODO
 
@@ -449,7 +365,7 @@ class ProjectEnviernment:
 
 		# link
 		ext = [".exe", ".lib"][self.buildType.value]
-		needsBuild = resourceBuildStatus != -1 or sourceBuildStatus != -1 or reflectionBuildStatus != -1
+		needsBuild = sourceBuildStatus != -1 or reflectionBuildStatus != -1
 		print(self.GetOutput())
 		linkStatus = LinkObjects(idir, self.dependancys, self.links, self.projectDirectory, self.GetOutput(), self.buildType, needsBuild)
 		if(linkStatus > 0):

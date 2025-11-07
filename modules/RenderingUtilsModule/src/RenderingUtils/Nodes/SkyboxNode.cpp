@@ -38,7 +38,6 @@ namespace Game
 		meshBuilder.Apply();
 
 		m_SkyboxMesh = meshBuilder.mesh;
-
 	}
 
 	void SkyboxNode::Build()

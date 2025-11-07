@@ -19,7 +19,6 @@ namespace Game
 
 		virtual void OnUpdate() override;
 		virtual void OnRender() override;
-		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Engine::Event* event) override;
 
 	private:

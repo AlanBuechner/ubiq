@@ -51,11 +51,6 @@ namespace Game
 		END_PROFILEI(timer);
 	}
 
-	void RuntimeLayer::OnImGuiRender()
-	{
-
-	}
-
 	void RuntimeLayer::OnEvent(Engine::Event* e)
 	{
 		m_Game->OnEvent(e);

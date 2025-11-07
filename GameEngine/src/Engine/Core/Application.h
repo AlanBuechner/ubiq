@@ -11,7 +11,6 @@
 namespace Engine
 {
 	class Layer;
-	class ImGuiLayer;
 	class WindowCloseEvent;
 	class WindowResizeEvent;
 	class Application;
@@ -42,7 +41,6 @@ namespace Engine
 		inline static bool InEditer() { return s_Instance->m_InEditer; }
 
 		inline Window& GetWindow() { return *m_Window;  }
-		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 		inline LayerStack& GetLayerStack() { return m_LayerStack; }
 		inline AssetManager& GetAssetManager() { return m_AssetManager; }
 
@@ -52,7 +50,6 @@ namespace Engine
 
 	protected:
 		bool m_InEditer = false;
-		void GenLayerStack();
 		virtual void OnExit() {}; // let the application delete layers after they are removed from the layer stack
 
 	private:
@@ -67,7 +64,6 @@ namespace Engine
 		bool m_Running = true;
 		bool m_Minimized = false;
 
-		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
 		Utils::Vector<Layer*> m_NewLayers;
 

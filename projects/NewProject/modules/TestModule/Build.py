@@ -15,10 +15,6 @@ sources = [
 	f"src/**.cpp",
 ]
 
-resources = [
-	f"embeded/**.rc",
-]
-
 headers = [
 	f"src/**.h",
 ]
@@ -60,7 +56,6 @@ def GetProject():
 	proj.pchSource = ""
 	proj.pchHeader = ""
 	proj.sources = sources
-	proj.resources = resources
 	proj.headers = headers
 	proj.includes = includes
 	proj.sysIncludes = sysIncludes

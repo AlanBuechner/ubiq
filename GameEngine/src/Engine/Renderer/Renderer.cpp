@@ -13,9 +13,6 @@
 
 #include "Engine/Core/Application.h"
 
-#include "Engine/imGui/ImGuiLayer.h"
-#include "Engine/ImGui/ImGui.h"
-
 Engine::Ref<Engine::GraphicsContext> Engine::Renderer::s_Context;
 Engine::Ref<Engine::CommandQueue> Engine::Renderer::s_MainCommandQueue;
 Engine::Ref<Engine::CPUCommandList> Engine::Renderer::s_MainCommandList;
@@ -45,7 +42,6 @@ namespace Engine
 		m_DeletionPool = new ResourceDeletionPool();
 		m_UploadPool = new UploadPool();
 		m_TransientPool = new TransientPool();
-		m_ImGuiSnapshot = new ImDrawDataSnapshot();
 	}
 
 	Renderer::FrameContext::~FrameContext()
@@ -56,13 +52,9 @@ namespace Engine
 		delete m_UploadPool;
 		delete m_TransientPool;
 
-		// delete imgui snapshot
-		delete m_ImGuiSnapshot;
-
 		// null out ptr's
 		m_DeletionPool = nullptr;
 		m_UploadPool = nullptr;
-		m_ImGuiSnapshot = nullptr;
 
 		// delete command allocators
 		for (uint32 i = 0; i < m_Commands.Count(); i++)
@@ -236,14 +228,6 @@ namespace Engine
 				commandList->RecoredCommands(commands);
 				commandList->Close();
 			}
-		}
-
-		// check if we are using imgui
-		if(Application::InEditer())
-		{
-			Ref<CommandList> commandList = CommandList::Create(CommandListType::Graphics);
-			ImGuiLayer::Build(frameContext->m_ImGuiSnapshot->DrawData, commandList, frameContext->m_BackBuffer);
-			frameContext->m_CommandLists.Push(commandList);
 		}
 
 		s_GPUThread->Invoke(frameContext);
