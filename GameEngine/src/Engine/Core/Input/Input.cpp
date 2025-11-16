@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Events/MouseEvent.h"
+#include "Engine/Core/Cursor.h"
 
 Engine::Input* Engine::Input::s_Instance = new Input;
 
@@ -53,6 +54,7 @@ namespace Engine
 
 	bool Input::OnMouseMoved(MouseMovedEvent* e)
 	{
+		Cursor::SetIcon(Cursor::Arrow); // reset cursor
 		m_MousePosition = { e->GetX(), e->GetY() };
 		return false;
 	}

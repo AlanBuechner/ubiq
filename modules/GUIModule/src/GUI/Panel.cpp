@@ -3,6 +3,7 @@
 #include "Engine/Events/MouseEvent.h"
 #include "Engine/Core/Input/KeyCodes.h"
 #include "Engine/Core/Input/Input.h"
+#include "Engine/Core/Cursor.h"
 #include <cmath>
 #include <math.h>
 
@@ -185,6 +186,14 @@ namespace GUI
 		bool hoveringSplit = false;
 		if (m_Axis == SplitAxis::X) hoveringSplit = Math::InError(mousePos.x, splitPoint.x, 0.004f);
 		if (m_Axis == SplitAxis::Y) hoveringSplit = Math::InError(mousePos.y, splitPoint.y, 0.004f);
+
+		if (hoveringSplit && e->GetEventType() == Engine::EventType::MouseMoved) \
+		{
+			Engine::Cursor::Icon icon;
+			if (m_Axis == SplitAxis::X) icon = Engine::Cursor::SizeWE;
+			if (m_Axis == SplitAxis::Y) icon = Engine::Cursor::SizeNS;
+			Engine::Cursor::SetIcon(icon);
+		}
 
 		if (hoveringSplit && e->GetEventType() == Engine::EventType::MouseButtonPressed) // check for start dragging
 		{

@@ -106,6 +106,14 @@ namespace Engine
 		}
 	}
 
+
+	void Cursor::SetIcon(Icon icon)
+	{
+		s_RequestedIcon = icon;
+	}
+
+
+
 	void Cursor::Update()
 	{
 		CREATE_PROFILE_FUNCTIONI();

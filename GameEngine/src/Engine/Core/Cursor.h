@@ -33,6 +33,8 @@ namespace Engine
 		static void SetLockPos(int x, int y);
 		static void Lock(bool lock);
 
+		static void SetIcon(Icon icon);
+
 		static void Update();
 	};
 }
